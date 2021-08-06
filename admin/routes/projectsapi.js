@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const { Projects } = require('../models')
 const { getProject, updateProjectStatus, updateWithApprovedTasks } = require('../projects')
-const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../projects/xtrfApi")
 const { emitter } = require('../events')
 const { getProjectManageToken } = require("../middleware")
 const { notifyManagerProjectStarts } = require('../utils')
@@ -181,16 +180,6 @@ router.get('/step-decision', getProjectManageToken, async (req, res) => {
 	}
 })
 
-router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
-	const { projectId } = req.params;
-	res.send(await createXtrfProjectWithFinance(projectId))
-})
-
-router.get('/updateXtrfProject/:projectId', async (req, res) => {
-	const { projectId } = req.params;
-	await updateFianceXTRF(projectId)
-	res.send('Done!')
-})
 
 
 

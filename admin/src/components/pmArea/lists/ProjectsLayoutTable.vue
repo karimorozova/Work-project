@@ -1,7 +1,7 @@
 <template lang="pug">
   .table
 
-    .table__filters
+    .table__filters(ref="filter")
       ProjectsLayoutFilter
 
     .table__result
@@ -136,7 +136,7 @@
 						label: "Project Id",
 						headerKey: "headerID",
 						key: "projectId",
-						style: { "width": "135px" }
+						style: { "width": "140px" }
 					},
 					{
 						label: "Project Name",
@@ -292,10 +292,9 @@
 				return discounts.reduce((acc, curr) => {
 					acc = acc + `${ curr.value }, `
 					return acc
-				}, '') + `<span style="margin-left: 4px; color: #919191;">%</span>`
+				}, '') + `<span style="margin-left: 4px; color: #9c9c9c;">%</span>`
 			},
 			progress(project) {
-				console.log(project.projectId)
 				let progresses = []
 				const isObject = (key) => typeof key === "object"
 				const calculatePercentage = (step) => (+step.progress.wordsDone / +step.progress.totalWordCount) * 100
@@ -339,16 +338,30 @@
 				return Math.ceil(progress) > 100 ? 100 : Math.ceil(progress)
 			},
 			inXtrf(project) {
-				const { tasks, isSendToXtrf, xtrfLink } = project
+				const { tasks, isSendToXtrf, xtrfLink, xtrfLinks } = project
 				if (!tasks.length) return '-'
 
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Compliance')) {
-					if (isSendToXtrf) return `<a style="color: #919191;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
-					else return 'Not transferred yet'
+					// if (isSendToXtrf && xtrfLinks && xtrfLinks.length ) return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
+					// else return 'Not transferred yet'
+
+          if(isSendToXtrf && xtrfLink) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+          else if (isSendToXtrf && xtrfLinks && xtrfLinks.length)  return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
+          else return 'Not transferred yet'
 				}
 
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Translation')) {
-					if (isSendToXtrf) return `<a style="color: #919191;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					else return 'Not transferred yet'
+				}
+
+				if (tasks.length && tasks.every(({ service }) => service.title === 'Copywriting')) {
+					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					else return 'Not transferred yet'
+				}
+
+				if (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2) {
+					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
 					else return 'Not transferred yet'
 				}
 
@@ -372,7 +385,7 @@
 					return { sourceLanguage: item[0], targetLanguages: [ ...new Set(item[1].map(({ targetLanguage }) => targetLanguage)) ].join(';&ensp;') }
 				})
 				groupedLanguages = groupedLanguages.reduce((acc, curr) => {
-					acc = acc + `${ curr.sourceLanguage } <span style="font-size: 12px;color: #919191;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ${ curr.targetLanguages } <br>`
+					acc = acc + `${ curr.sourceLanguage } <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ${ curr.targetLanguages } <br>`
 					return acc
 				}, '')
 				return groupedLanguages

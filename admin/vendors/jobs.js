@@ -82,11 +82,12 @@ async function updateStepProp({ jobId, prop, value }) {
 				item[prop] = value
 				
 				if(prop === "status" || value === "Accepted" || value === "Rejected" ) {
-				item.vendorsClickedOffer = [item.vendor]
+					item.vendorsClickedOffer = [item.vendor]
 				}
 			}
 			return item
 		})
+
 		if (prop === "status") {
 			return await manageStatuses({ project, steps, jobId, status: value })
 		}
@@ -128,13 +129,15 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 	const step = steps.find(item => item.id === jobId)
 	try {
 		await stepCompletedNotifyPM(project, step)
-		if (isAllStepsCompleted({ jobId, steps })) {
+
+		console.log(isAllStepsCompleted({ steps, task }))
+
+		if (isAllStepsCompleted({ steps, task })) {
 			await setTaskStatusAndSave({ project, jobId, steps, status: "Pending Approval [DR1]" })
-      //DELETE
-			// await addToDelivery(project, { ...task, status: "Pending Approval [DR1]" })
       await pushTasksToDR1(project, task, step)
 			return await taskCompleteNotifyPM(project, task)
 		}
+
 		const stage1step = task.service.steps.find(item => item.stage === 'stage1')
 		if (step.serviceStep.step.toString() === stage1step.step._id.toString()) {
 			const updatedSteps = getWithReadyToStartSteps({ task, steps })
@@ -256,7 +259,9 @@ function setRejectedStatus({ steps, jobId }) {
 async function setTaskStatusAndSave({ project, jobId, steps, status }) {
 	const { tasks } = project
 	const { taskId } = steps.find(item => item._id.toString() === jobId)
-	const currSteps = steps.filter(item => item.taskId === taskId)
+	const currSteps = steps
+				.filter(item => item.taskId === taskId)
+				.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
 	const updatedTasks = tasks.map(item => {
 		if (item.taskId === taskId) {
@@ -289,17 +294,12 @@ function getProjectStatus({ project, status, updatedTasks }) {
 	return incompletedTasks ? projectStatus : "Ready for Delivery"
 }
 
-function isAllStepsCompleted({ jobId, steps }) {
-	const currentStep = steps.find(item => item.id === jobId)
-	const taskSteps = steps.filter(item => item.taskId === currentStep.taskId)
-	const validStatuses = ["Completed", "Cancelled", "Cancelled Halfway"]
-	const nonCompleted = taskSteps.reduce((init, cur) => {
-		if (cur.taskId === currentStep.taskId && validStatuses.indexOf(cur.status) !== -1) {
-			return init
-		}
-		return ++init
-	}, 0)
-	return nonCompleted === 0
+function isAllStepsCompleted({ steps, task }) {
+	const taskSteps = steps
+			.filter(item => item.taskId === task.taskId)
+			.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+
+	return !taskSteps.length ? false : taskSteps.every(item => item.status === 'Completed')
 }
 
 module.exports = { getJobs, updateStepProp }

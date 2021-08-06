@@ -1,12 +1,21 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color="#47A6A6" :outline="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
-      span(v-else) {{ project.projectId}} : &nbsp;
-        a( target="_blank" :href="project.xtrfLink")
+      Button.margin-bottom(v-if="isShowingSendButton" value="Send tasks to XTRF" color="#47A6A6" :outline="true"  @clicked="sendTo" :isDisabled="isDisable")
+      .xtrf-tasks(v-for="xtrfTask of project.xtrfLinks")
+        span {{ xtrfTask.taskId}} : &nbsp;
+        a( target="_blank" :href="xtrfTask.link")
           i(class="fas fa-link")
-        | &nbsp;&nbsp;
-        i(class="fas fa-sync-alt cursor-pointer" @click="updateFinance")
+        | &nbsp;|&nbsp;
+        span(class="cursor-pointer" @click="updateFinance(xtrfTask.xtrfId, xtrfTask.taskId)")
+          i(class="fas fa-sync-alt") &nbsp;
+          | Update & Close
+
+
+      //a( target="_blank" :href="project.xtrfLink || ''")
+        //Button(value="Go to XTRF Project")
+      //br
+      //Button(v-if="project.xtrfLink" value="Update Fiance / Close Jobs & Project" @clicked="updateFinance")
 
 
 
@@ -35,9 +44,9 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
-			async updateFinance() {
+			async updateFinance(xtrfId, taskId) {
 				try {
-					await this.$http.get('/pm-manage/updateXtrfProject/' + this.$route.params.id)
+					await this.$http.post('/pm-manage/updateXtrfTasks/' + this.$route.params.id, {xtrfId, taskId})
 					this.alertToggle({
 						message: "Updated",
 						isShow: true,
@@ -54,33 +63,51 @@
 			sendTo() {
 				this.isDisable = true
 				axios
-						.get('/pm-manage/createXtrfProjectWithFinance/' + this.$route.params.id)
+						.post('/pm-manage/createXtrfTasksWithFinance/' + this.$route.params.id)
 						.then((res) => res.data)
 						.then((data) => {
-							if (data.isSuccess) {
-								const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
+							if (!!data) {
+							// 	const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
 								this.alertToggle({
-									message: "Send success" + notFoundVendorsMessage,
+									// message: "Send success" + notFoundVendorsMessage,
+									message: "Send success",
 									isShow: true,
 									type: "success"
 								})
 								this.$emit('refreshProject')
 							} else {
-								this.alertToggle({
-									message: data.message,
-									isShow: true,
-									type: "error"
-								})
+								// this.alertToggle({
+								// 	message: data.message,
+								// 	isShow: true,
+								// 	type: "error"
+								// })
 							}
 						})
 						.finally(() => this.isDisable = false)
 			}
 		},
+    computed: {
+      isShowingSendButton() {
+        console.log(this.project.xtrfLinks.length !== this.project.tasks.length  )
+        return this.project.xtrfLinks.length !== this.project.tasks.length
+      }
+    },
 		components: { Button }
 	}
 </script>
 
 <style scoped lang="scss">
+  .xtrf-tasks {
+    margin: 10px 0;
+
+    &__group {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
   .projectToXtrf {
     box-sizing: border-box;
     padding: 20px;
@@ -107,6 +134,7 @@
       text-decoration: none;
       color: inherit;
     }
+
     .margin-bottom {
       margin-bottom: 10px;
     }

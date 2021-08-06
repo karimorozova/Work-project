@@ -11,7 +11,8 @@ const {
 	createArchiveForDeliverableItem,
 	manageDeliveryFile,
 	getPdf,
-	generateAndSaveCertificate
+	generateAndSaveCertificate,
+	copyProjectFiles
 } = require('./files')
 
 const {
@@ -39,9 +40,9 @@ const {
 	taskCompleteNotifyPM,
 	notifyManagerStepStarted,
 	notifyStepDecisionMade,
-	notifyDeliverablesDownloaded,
+	// notifyDeliverablesDownloaded,
 	stepCompletedNotifyPM,
-	notifyReadyForDr2,
+	// notifyReadyForDr2,
 	notifyStepReopened,
 	notifyVendorStepStart,
 	sendQuoteMessage,
@@ -96,6 +97,7 @@ const {
 	approveFilesDR2,
 	changeManagersDR1,
 	saveCertificateTODR1Files,
+	changeNameLang,
 } = require('./delivery')
 
 const {
@@ -103,6 +105,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	copyProjectFiles,
 	setStepDeadlineProjectAndMemoq,
 	saveCertificateTODR1Files,
 	autoCreatingTaskInProject,
@@ -140,7 +143,7 @@ module.exports = {
 	createTasks,
 	getMessage,
 	taskCompleteNotifyPM,
-	notifyDeliverablesDownloaded,
+	// notifyDeliverablesDownloaded,
 	getProjectWithUpdatedFinance,
 	updateProjectProgress,
 	updateWithApprovedTasks,
@@ -154,7 +157,7 @@ module.exports = {
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,
-	notifyReadyForDr2,
+	// notifyReadyForDr2,
 	notifyStepReopened,
 	getPdf,
 	notifyVendorStepStart,
@@ -171,6 +174,7 @@ module.exports = {
 	addDR2,
 	addMultiLangDR2,
 	removeMultiDR2,
+	changeNameLang,
 	// getClientsRequests,
 	// getClientRequestById,
 }

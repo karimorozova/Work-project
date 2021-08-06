@@ -81,7 +81,7 @@ const createArchiveForDeliverableItem = async ({type, projectId, entityId, user,
 
     if (type === 'multi') {
         const { file } = tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ entityId }`);
-        await archiveMultipleFiles({ outputPath: `./dist${outputPath}`, files: getParsedFiles([file]) });
+        await archiveMultipleFiles({ outputPath: `./dist${outputPath}`, files: getParsedFiles(file) });
         await setDeliveredStatus('multiLang')
 
     }
@@ -124,9 +124,12 @@ async function manageDeliveryFile({fileData, file}) {
         const newPath = `/projectFiles/${projectId}/${additionFileInfo}-${file.filename.replace(/['"]/g, '_').replace(/\s+/, '_')}`;
         await moveFile(file, `./dist${newPath}`);
         if(!!path && path !== newPath) {
-            fs.unlink(`./dist${path}`, (err) => {
-                if(err) throw(err);
-            });
+            if(await fs.existsSync(`./dist${path}`)) {
+                fs.unlink(`./dist${path}`, (err) => {
+                    if(err) throw(err);
+                });
+            }
+
             return newPath;
         } else {
             return newPath;
@@ -156,9 +159,9 @@ async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     }
 }
 
-const generateAndSaveCertificate = async ({ project, task, deliveryTask }) => {
+const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
     const allLanguages = await Languages.find()
-    const template = getCertificateTemplate({ project, task, deliveryTask, allLanguages })
+    const template = getCertificateTemplate({ project, allLanguages, tasks, deliveryData })
     const pdf = new Promise((resolve, reject) => {
         htmlToPdf.create(
             template,
@@ -186,10 +189,23 @@ const generateAndSaveCertificate = async ({ project, task, deliveryTask }) => {
     // })
 }
 
+const copyProjectFiles = (project, originalFile) => {
+    const copiedName = originalFile.path.split("/").pop()
+    const additional = `${ Math.floor(Math.random() * 1000000) }-${ copiedName }`
+    const newPath = `./dist/projectFiles/${ project._id }/${ additional }`
+
+    fs.copyFile(`./dist/${ originalFile.path }`, newPath, (err) => {
+        if (err) throw err
+    })
+
+    return newPath
+}
+
 module.exports = {
     storeFiles,
     createArchiveForDeliverableItem,
     // getDeliverablesLink,
+    copyProjectFiles,
     manageDeliveryFile,
     getProjectDeliverables,
     getPdf,

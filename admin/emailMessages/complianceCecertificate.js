@@ -8,13 +8,16 @@ const logo = apiUrl + '/static/certificate-images/logo.png'
 const background = apiUrl + '/static/certificate-images/watermark.png'
 const stamp = apiUrl + '/static/certificate-images/stamp.png'
 
-module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLanguages }) => {
+module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()
-	const { targetLanguage, sourceLanguage } = task
-	function getLang(arg){
-		const { lang } = allLanguages.find(({symbol}) => symbol === arg )
+	const projectTasks = project.tasks.filter(item => tasks.includes(item.taskId))
+	const languages = [ ...new Set(projectTasks.map(item => `${ getLang(item.sourceLanguage) } >> ${ getLang(item.targetLanguage) }`)) ]
+
+	function getLang(arg) {
+		const { lang } = allLanguages.find(({ symbol }) => symbol === arg)
 		return lang
 	}
+
 	return `<style>* { margin: 0; padding: 0; }</style>
 	<div class="layout" style="background-image: url(${ background });color: #333;height: 1054px;width: 814px;background-size: 65%;background-repeat: no-repeat;background-position: center;font-family: Arial, sans-serif;">
     <div class="header2" style="padding-top: 50px; position: relative;">
@@ -28,8 +31,8 @@ module.exports.getCertificateTemplate = ({ project, task, deliveryTask, allLangu
 	         Certification of Translation
 	      </div>
 	      <div class="description" style="padding: 10px;border: 1px solid #333;font-size: 16px;text-align: center;margin: 20px 40px 60px 40px;line-height: 26px;">
-	               Translation of ${ project.projectId } - ${ project.projectName } <br> 
-	               from  ${getLang(sourceLanguage)} to ${getLang(targetLanguage)}
+	               Translation of ${ project.projectId } - ${ deliveryData.deliveryName || project.projectName}  <br> 
+	               from ${languages.join(', ')}
 	      </div>
 	      <div class="text" style="padding: 0 40px 40px;line-height: 22px;">
 	         We, Pangea Localization Services, a professional translation company, hereby

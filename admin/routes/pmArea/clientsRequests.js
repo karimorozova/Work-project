@@ -9,7 +9,8 @@ const {
 	checkRequestedFiles,
 	manageClientContacts,
 	removeContactClientRequest,
-	sendMailToClient
+	sendMailToClient,
+	removeClientRequestById,
 } = require("../../clientRequests")
 
 const { pmAssignInRequest } = require('../../emailMessages/internalCommunication')
@@ -110,7 +111,7 @@ router.post('/:id/update-prop', async (req, res) => {
 		const requests = await updateClientRequestProps({ id, value })
 		if (value.status !== undefined) {
 			const message = pmAssignInRequest(requests)
-			await managerNotifyMail({ email: requests.projectManager.email }, message, `Client Request - ${ requests.requestForm.service.title }, has been assign to you (ID I0011.1)`)
+			await managerNotifyMail({ email: requests.projectManager.email }, message, `Client Request - ${ requests.requestForm.service.title }, has been assign to you (I0011.1)`)
 		}
 		res.send(requests)
 	} catch (err) {
@@ -145,9 +146,9 @@ router.post('/:id/update-client-contact', async (req, res) => {
 
 
 router.post('/:id/delete', async (req, res) => {
-	const filters = { ...req.body }
+	const { id } = req.params
 	try {
-		const requests = await getClientRequestById(filters)
+		const requests = await removeClientRequestById(id)
 		res.send(requests)
 	} catch (err) {
 		console.log(err)

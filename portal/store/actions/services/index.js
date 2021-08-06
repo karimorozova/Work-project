@@ -30,15 +30,16 @@ export const getProjectsAndRequests = async function({ commit, dispatch, state})
   try {
     const result = await this.$axios.get(`/portal/projects?token=${state.token}`);
     let { client, user, projects, memoqProjects, requests, languages } = result.data;
+
+    projects = JSON.parse(window.atob(projects)).sort((a, b) => b.startDate - a.startDate);
     projects.push(...memoqProjects);
-    projects = projects.sort((a, b) => b.startDate - a.startDate);
     commit('SET_PROJECTS', projects);
     // commit('SET_REQUESTS', requests);
-    dispatch('setClientRequests', requests);
-    commit('SET_USER', user);
-    commit('SET_CLIENT', client);
+    dispatch('setClientRequests', JSON.parse(window.atob(requests)) );
+    commit('SET_USER', JSON.parse(window.atob(user)) );
+    commit('SET_CLIENT', JSON.parse(window.atob(client)));
     commit('SET_LANGUAGES', languages);
-    dispatch('setLangCombinations', client);
+    dispatch('setLangCombinations', JSON.parse(window.atob(client)));
   } catch(err) {
       console.log(err);
       dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});

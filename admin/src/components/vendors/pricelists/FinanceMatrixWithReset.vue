@@ -1,52 +1,50 @@
 <template lang="pug">
   .finance-matrix
-    .finance-matrix__table
-      DataTable(
+
+    .table
+      GeneralTable(
         :fields="fields"
         :tableData="tableData"
-        bodyRowClass="rates-matrix-row"
-        :bodyClass="['rates-matrix-body', 'tbody_visible-overflow']"
-        tableheadRowClass="tbody_visible-overflow"
-        bodyCellClass="matrix-table"
       )
         template(slot="headerText" slot-scope="{ field }")
-          span.finance-matrix__text {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerRate" slot-scope="{ field }")
-          span.finance-matrix__text {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="text" slot-scope="{ row }")
-          span.finance-matrix__text {{ row.text }}
+          .table__header {{ row.text }}
 
         template(slot="rate" slot-scope="{ row }")
           .table__data(v-if="!isEdit")
             span {{ row.rate }}
             span.finance-matrix__percent %
-          div(v-else)
-            input.finance-matrix__rate(
+          .table__data(v-else)
+            input(
               type="number" min="0" max ="100"
               :value="row.rate | maxRateCount"
               @change="(e) => setMatrixData(e, row.key)"
             )
 
         template(slot="icons" slot-scope="{ row }")
-          .finance-matrix__icons
+          .table__icons
             .altered(v-if="row.altered")
               .tooltip
                 span#myTooltip.tooltiptext {{ row.notification }}
-                .finance-matrix__icons-info
+                .table__icons-info
                   i.fas.fa-info-circle
 
             .link(v-if="isEdit")
               span(v-if="row.altered")
-                .icons-link(@click="getDefaultValues(row.key)")
+                .table__icons-link(@click="getDefaultValues(row.key)")
                   i.fa.fa-link(aria-hidden='true')
               span(v-else)
-                .icons-link-opacity
+                .table__icons-link-opacity
                   i.fa.fa-link(aria-hidden='true')
 
 </template>
 
 <script>
-	import DataTable from "./DataTable"
+	import DataTable from "../../DataTable"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -61,9 +59,9 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Translation match", headerKey: "headerText", key: "text", width: "78%" },
-					{ label: "Value %", headerKey: "headerRate", key: "rate", width: "11%" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "11%" }
+					{ label: "Translation match", headerKey: "headerText", key: "text", style: { width: "76%" } },
+					{ label: "Value", headerKey: "headerRate", key: "rate", style: { width: "12%" } },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "12%" } }
 				]
 			}
 		},
@@ -76,6 +74,7 @@
 			}
 		},
 		components: {
+			GeneralTable,
 			DataTable
 		},
 		computed: {
@@ -89,58 +88,42 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../assets/scss/colors.scss";
+  @import "../../../assets/scss/colors";
 
   .table {
-    &__dataEdit {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-  }
-
-  .icons {
-    &-link {
-      cursor: pointer;
-      font-size: 16px;
+    &__header,
+    &__data {
+      padding: 0 6px;
     }
 
-    &-link-opacity {
-      cursor: default;
-      font-size: 16px;
-      opacity: 0.5;
+    &__data {
+      width: 100%;
     }
-  }
 
-  .finance-matrix {
     &__icons {
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 7px;
-      height: 30px;
+      width: 100%;
+      height: 40px;
 
       &-info {
         cursor: help;
         color: $red;
         font-size: 16px;
       }
-    }
 
-    &__rate {
-      color: #66563d;
-      border: none;
-      width: 94%;
-      background: inherit;
-      outline: none;
-
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+      &-link {
+        cursor: pointer;
+        font-size: 16px;
       }
-    }
 
-    &__percent {
-      margin-left: 3px;
+      &-link-opacity {
+        cursor: default;
+        font-size: 16px;
+        opacity: 0.5;
+      }
     }
   }
 
@@ -152,27 +135,28 @@
       visibility: hidden;
       font-size: 14px;
       width: max-content;
-      background-color: $red;
-      color: #fff;
+      background-color: white;
+      color: $text;
       text-align: center;
       border-radius: 4px;
-      right: 30px;
-      bottom: -3px;
-      padding: 6px;
+      right: 28px;
+      bottom: -7px;
+      padding: 7px 12px;
       position: absolute;
       z-index: 1;
       opacity: 0;
       transition: opacity .3s;
+      border: 1px solid $border;
 
       &::after {
         content: "";
         position: absolute;
-        top: 38%;
-        right: -10px;
+        top: 30%;
+        right: -12px;
         transform: rotate(270deg);
-        border-width: 5px;
+        border-width: 6px;
         border-style: solid;
-        border-color: $red transparent transparent;
+        border-color: $border transparent transparent;
       }
     }
 

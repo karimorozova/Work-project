@@ -1,81 +1,70 @@
 <template lang="pug">
   .competencies
-    .competencies__table
-      SettingsTable(
-        :fields="fields",
-        :tableData="competenciesData",
-        :errors="errors",
-        :areErrors="areErrors",
-        :isApproveModal="isDeleting",
-        :tbodyStyle="{'max-height': '256px'}",
-        :rowCount="9",
-        @closeErrors="closeErrors",
-        @approve="deleteCompetencies",
-        @notApprove="setDefaults",
-        @closeModal="setDefaults"
+    .competencies__modal-wrapper
+      ApproveModal(
+        v-if="isDeleting"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="deleteCompetencies"
+        @close="closeModal"
+        @notApprove="closeModal"
       )
-        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-          .competencies__head-title {{ field.label }}
-
-        template(slot="source", slot-scope="{ row, index }")
-          .competencies__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
-          .competencies__drop-menu(v-else)
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentSource.lang",
-              :options="sourceData | firstEnglishLanguage",
-              @chooseOption="setSource"
-            )
-
-        template(slot="targets", slot-scope="{ row, index }")
-          .competencies__data(v-if="currentActive !== index") {{ row.targetLanguage.lang }}
-          .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentTargets.lang",
-              :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
-              @chooseOption="setTarget"
-            )
-          .competencies__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentTargets.map((i) => i.lang)",
-              :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
-              @chooseOptions="setTargets"
-              :allOptionsButtons="true"
-            )
-
-        template(slot="industry", slot-scope="{ row, index }")
-          .competencies__data(v-if="currentActive !== index") {{ row.industry.name }}
-          .competencies__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentIndustries.name",
-              :options="vendorIndustries",
-              @chooseOption="setIndustry"
-            )
-          .competencies__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentIndustries.map((i) => i.name)",
-              :options="vendorIndustries",
-              @chooseOptions="setIndustries"
-              :allOptionsButtons="true"
-            )
-
-        template(slot="step", slot-scope="{ row, index }")
-          .competencies__data(v-if="currentActive !== index") {{ row.step.title }}
-          .competencies__drop-menu(v-if="currentActive == index && !newRow")
+      ValidationErrors(
+        v-if="areErrors"
+        :errors="errors"
+        @closeErrors="closeErrors"
+      )
+    .competencies__table
+      .competencies__editing(v-if="currentActive >= 0" :class="{'move-bottom': toggleFilter}" :style='`width: ${widthWithoutScroll}` ')
+        .competencies__editing-item(style="width: 21%; background: white;")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentSource.lang",
+            :options="sourceData | firstEnglishLanguage",
+            @chooseOption="setSource"
+          )
+        .competencies__editing-item(v-if="!newRow" style="width: 21%; background: white;")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentTargets.lang",
+            :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
+            @chooseOption="setTarget"
+          )
+        .competencies__editing-item(v-if="newRow" style="width: 21%; background: white;")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentTargets.map((i) => i.lang)",
+            :options="languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))",
+            @chooseOptions="setTargets"
+            :allOptionsButtons="true"
+          )
+        .competencies__editing-item(v-if="!newRow" style="width: 21%; background: white;")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentIndustries.name",
+            :options="vendorIndustries",
+            @chooseOption="setIndustry"
+          )
+        .competencies__editing-item(v-if="newRow" style="width: 21%; background: white;")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentIndustries.map((i) => i.name)",
+            :options="vendorIndustries",
+            @chooseOptions="setIndustries"
+            :allOptionsButtons="true"
+          )
+        .competencies__editing-item(v-if="!newRow" style="width: 21%; background: white;")
             SelectSingle(
               :isTableDropMenu="isTableDropMenu",
               placeholder="Select",
@@ -84,21 +73,64 @@
               :options="filteredSteps",
               @chooseOption="setStep"
             )
-          .competencies__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentSteps.map((i) => i.title)",
-              :options="filteredSteps",
-              @chooseOptions="setSteps"
-              :allOptionsButtons="true"
+        .competencies__editing-item(v-if=" newRow" style="width: 21%; background: white;")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentSteps.map((i) => i.title)",
+            :options="filteredSteps",
+            @chooseOptions="setSteps"
+            :allOptionsButtons="true"
+          )
+        .competencies__editing-item(style="width: 16%")
+          .competencies__icons
+            img.competencies__icon(
+              v-for="(icon, key) in saveCancelIcon",
+              :src="icon.icon",
+              @click.stop="makeAction(currentActive, key)",
+              class="competencies_opacity"
             )
+
+      GeneralTable(
+        :fields="fields"
+        :tableData="finalData"
+        :isFilterShow="true"
+        :activeField="currentActive"
+        :isCoverBody="currentActive >= 0 || isDeleting || areErrors"
+
+        @addSortKey="addSortKeyIfCan"
+        @changeSortKey="changeSortKeyIfCan"
+        @removeSortKey="removeSortKeyIfCan"
+        @setFilter="setFilterIfCan"
+        @removeFilter="removeFilterIfCan"
+        @clearAllFilters="clearAllFiltersIfCan"
+        @toggleFilter="(e) => (toggleFilter = e)"
+      )
+
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .competencies__head-title {{ field.label }}
+
+        template(slot="sourceLanguage", slot-scope="{ row, index }")
+          .competencies__data {{ row.sourceLanguage.lang }}
+
+
+        template(slot="targetLanguage", slot-scope="{ row, index }")
+          .competencies__data  {{ row.targetLanguage.lang }}
+
+
+        template(slot="industry", slot-scope="{ row, index }")
+          .competencies__data  {{ row.industry.name }}
+
+
+        template(slot="step", slot-scope="{ row, index }")
+          .competencies__data  {{ row.step.title }}
+
 
         template(slot="icons", slot-scope="{ row, index }")
           .competencies__icons
             img.competencies__icon(
-              v-for="(icon, key) in icons",
+              v-for="(icon, key) in editDeleteIcon",
               :src="icon.icon",
               @click="makeAction(index, key)",
               :class="{ competencies_opacity: isActive(key, index) }"
@@ -112,13 +144,16 @@
 	import Add from "../Add"
 	import SelectSingle from "../SelectSingle"
 	import SelectMulti from "../SelectMulti"
-	import SettingsTable from "../Table/SettingsTable"
+	import GeneralTable from "../GeneralTable"
+	import ValidationErrors from "../ValidationErrors"
+	import ApproveModal from "../ApproveModal"
 	import crudIcons from "@/mixins/crudIcons"
 	import scrollEnd from "../../mixins/scrollEnd"
 	import checkCombinations from "../../mixins/combinationsChecker"
+  import tableSortAndFilter from "../../mixins/tableSortAndFilter"
 
 	export default {
-		mixins: [ crudIcons, scrollEnd, checkCombinations ],
+		mixins: [ crudIcons, scrollEnd, checkCombinations,tableSortAndFilter ],
 		props: {
 			vendorIndustries: {
 				type: Array
@@ -142,41 +177,52 @@
 					{
 						label: "Source Language",
 						headerKey: "headerSource",
-						key: "source",
-						width: "21%",
+						key: "sourceLanguage",
+            dataKey: "lang",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+						style: {width: "21%"},
 						padding: "0"
 					},
 					{
 						label: "Target Language",
 						headerKey: "headerTarget",
-						key: "targets",
-						width: "21%",
+						key: "targetLanguage",
+            dataKey: "lang",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+						style: {width: "21%"},
 						padding: "0"
 					},
 					{
 						label: "Industry",
 						headerKey: "headerIndustry",
 						key: "industry",
-						width: "21%",
+            dataKey: "name",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+            style: {width: "21%"},
 						padding: "0"
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "21%",
+            dataKey: "title",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+            style: {width: "21%"},
 						padding: "0"
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "16%",
+            style: {width: "16%"},
 						padding: "0"
 					}
 				],
 
-				// competenciesData: [],
 				currentSource: "",
 				currentTargets: [],
 				currentIndustries: [],
@@ -189,7 +235,8 @@
 				isDeleting: false,
 				deleteIndex: -1,
 				isTableDropMenu: true,
-				newRow: false
+				newRow: false,
+        toggleFilter: false
 			}
 		},
 		methods: {
@@ -198,7 +245,48 @@
 				storeCurrentVendor: "storeCurrentVendor",
 				updateVendorProp: "updateVendorProp"
 			}),
-
+      addSortKeyIfCan(e) {
+			  if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+			    this.addSortKey(e)
+        }
+      },
+      changeSortKeyIfCan(e) {
+			  if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+			    this.changeSortKey(e)
+        }
+      },
+      removeSortKeyIfCan(e) {
+			  if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+			    this.removeSortKey(e)
+        }
+      },
+      setFilterIfCan(e) {
+			  if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+			    this.setFilter(e)
+        }
+      },
+      removeFilterIfCan(e) {
+			  if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+			    this.removeFilter(e)
+        }
+      },
+      clearAllFiltersIfCan(e) {
+			  if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+			    this.clearAllFilters(e)
+        }
+      },
 			presentArrays(Arr, key) {
 				if (!Arr.length) return ""
 				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "")
@@ -263,16 +351,18 @@
 			},
 
 			setEditingData(index) {
+			  const allCompetencies = this.finalData[index] ? this.finalData[index] : this.competenciesData[index]
 				this.currentActive = index
-				this.currentId = this.competenciesData[index]._id
-				this.currentSource = this.competenciesData[index].sourceLanguage
-				this.currentTargets = this.competenciesData[index].targetLanguage
-				this.currentIndustries = this.competenciesData[index].industry
-				this.currentSteps = this.competenciesData[index].step
+				this.currentId = allCompetencies._id
+				this.currentSource = allCompetencies.sourceLanguage
+				this.currentTargets = allCompetencies.targetLanguage
+				this.currentIndustries = allCompetencies.industry
+				this.currentSteps = allCompetencies.step
 			},
 
 			manageCancelEdition(index) {
-				!this.competenciesData[index]._id && this.competenciesData.splice(index, 1)
+        const allCompetencies = this.finalData[index] ? this.finalData : this.competenciesData
+				!allCompetencies[index]._id && allCompetencies.splice(index, 1)
 				this.setDefaults()
 				this.isDeleting = false
 				this.newRow = false
@@ -324,7 +414,9 @@
 			},
 			async manageSaveClick(index) {
 				try {
-					const id = this.competenciesData[index]._id
+
+          const allCompetencies = this.finalData[index] ? this.finalData[index] : this.competenciesData[index]
+					const id = allCompetencies._id
 					const currentData = {
 						_id: id,
 						sourceLanguage: this.currentSource,
@@ -337,21 +429,7 @@
 						currentData
 					})
 					await this.storeCurrentVendor(result.data)
-					// await this.updateVendorProp({ id: this.$route.params.id , key: 'competencies', value: result.data.competencies })
-
-					this.competenciesData.length && this.$emit("updateRates", true)
-
-					// this.updateVendorProp({ prop: "competencies", value: result.data.competencies })
-
-					// this.competenciesData = result.data.competencies;
-					// this.competenciesData.length && this.$emit("updateQualifications");
-					//
-
-					// if (result.data.pendingCompetencies.length) {
-					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
-					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data })
-					// }
-
+					this.finalData.length && this.$emit("updateRates", true)
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: null,
 						langPairs: this.getArrayLanguagesCombinations(this.currentSource, this.currentTargets)
@@ -382,9 +460,13 @@
 				}
 			},
 			async manageDeleteClick(index) {
-				if (!this.competenciesData[index]._id) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+          return
+        }
+				if (!this.finalData[index]._id) {
 					this.newRow = false
-					this.competenciesData.splice(index, 1)
+					this.finalData.splice(index, 1)
 					this.setDefaults()
 					return
 				}
@@ -398,14 +480,9 @@
 
 			async deleteCompetencies() {
 				try {
-					let currentData = this.competenciesData[this.deleteIndex]
+					let currentData = this.finalData[this.deleteIndex]
 					const result = await this.$http.delete(`/vendorsapi/competencies/${ this.$route.params.id }/${ currentData._id }`)
 					await this.storeCurrentVendor(result.data)
-					// if (result.data.pendingCompetencies.length) {
-					// 	const updatedPendingCompetencies = await this.$http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: result.data.pendingCompetencies })
-					// 	this.updateVendorProp({ prop: "pendingCompetencies", value: updatedPendingCompetencies.data.pendingCompetencies })
-					// }
-					// this.competenciesData.splice(this.deleteIndex, 1);
 					this.$emit("updateRates", true)
 					this.closeModal()
 					this.alertToggle({
@@ -434,9 +511,6 @@
 					industry: []
 				})
 				this.setEditingData(this.competenciesData.length - 1)
-				this.$nextTick(() => {
-					this.scrollToEnd()
-				})
 			},
 
 			closeErrors() {
@@ -446,35 +520,39 @@
 			setSource({ option }) {
 				this.currentSource = this.languages.find((item) => item.lang === option)
 			}
-			// async getVendorInfo() {
-			// 	console.log('1')
-			// 	const vendor = await this.$http.get(`/vendorsapi/vendor?id=${ this.$route.params.id }`);
-			// 	this.competenciesData = vendor.data.competencies;
-			// },
-			// getVendorInfoByState(){
-			// 	this.competenciesData = this.currentVendor.competencies
-			// }
 		},
 		computed: {
-			// ...mapGetters({
-			// 	currentVendor: "getCurrentVendor",
-			// }),
+      widthWithoutScroll(){
+        return document.querySelector('.data') ? document.querySelector('.data').clientWidth+1 +'px' : '100%'
+      },
+		  saveCancelIcon() {
+        const {cancel, save} = this.icons
+        return { save,cancel  }
+      },
+      editDeleteIcon() {
+        const { cancel, save, ...result } = this.icons
+        return result
+      },
 			sourceData() {
 				return this.languages.map((i) => i.lang).sort((a, b) => a.localeCompare(b))
 			},
 			filteredSteps() {
 				return this.steps.filter(step => step.calculationUnit.length).map(step => step.title)
-			}
+			},
+      rawData() {
+        return this.competenciesData.filter(data => {
+          return data.sourceLanguage.hasOwnProperty('lang') && data.targetLanguage.hasOwnProperty('lang') && data.step.hasOwnProperty('title') && data.industry.hasOwnProperty('name')
+        })
+      },
+
 		},
 		created() {
-			// if(this.currentVendor._id){
-			// 	this.competenciesData = this.currentVendor.competencies
-			// }
-			// ?  : this.getVendorInfo();
 		},
 		components: {
 			SelectSingle,
-			SettingsTable,
+      ApproveModal,
+      GeneralTable,
+      ValidationErrors,
 			SelectMulti,
 			Add
 		}
@@ -483,8 +561,37 @@
 
 <style lang="scss" scoped>
   @import "../../assets/styles/settingsTable.scss";
+  @import "../../assets/scss/colors";
+
 
   .competencies {
+
+    &__table {
+      position: relative;
+    }
+
+    &__editing {
+      position: absolute;
+      height: 40px;
+      background-color: $light-green;
+      z-index: 3;
+      top: 80px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      margin-left: 1px;
+
+      &.move-bottom{
+        top:120px;
+      }
+
+      &-item {
+        position: relative;
+        height: 32px;
+        margin: 0 2px;
+      }
+    }
 
     &__data {
       @extend %table-data;
@@ -503,7 +610,7 @@
     &__icons {
       @extend %table-icons;
       height: 30px;
-      justify-content: center;
+      width: 100%;
     }
 
     &__icon {
@@ -521,6 +628,25 @@
 
     &__input {
       @extend %table-text-input;
+    }
+    &__head-title {
+      padding: 0 6px;
+    }
+    &__modal-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+    }
+    &__content-close {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      background-color: rgba(61,61,61,.3);
+      z-index: 5;
     }
   }
 </style>

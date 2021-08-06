@@ -1,8 +1,11 @@
 <template lang="pug">
   .sidebarMenu
     .sidebarMenu__mainIcon(@click="toggleMenu")
-      img(src="../../../assets/images/left-menu-close.png" v-if="!isShowMenu")
-      img(src="../../../assets/images/left-menu-open.png" v-else)
+      span(v-if="!isShowMenu")
+        i.fas.fa-bars
+      span(v-if="isShowMenu")
+        i.fas.fa-times
+
     transition(name='slide')
       .sidebarMenu__body(v-if="isShowMenu")
         .sidebarMenu__content
@@ -14,9 +17,7 @@
               i.fas.fa-clipboard
 
           .sidebarMenu__allActivities
-            .allActivities(@click="openAllActivities")
-              i.fas.fa-chart-line
-              span.allActivities__title View All Activities
+            Button(@clicked="openAllActivities" value="View All Activities" :isFullWidth="true" :outline="true" color="#47a6a6" )
 
           .sidebarMenu__generalInfo
             SideGeneral(:isSaveClicked="isSaveClicked")
@@ -25,6 +26,7 @@
             OpenActivities(
               @openActivityDetails="openActivityDetails"
             )
+
         transition(name='slide-bottom')
           .sidebarMenu__activityDetails(v-if="isShowDetailsTask && !!taskData")
             ActivityDetailTask(
@@ -39,6 +41,7 @@
 	import OpenActivities from "./OpenActivities"
 	import ActivityDetailTask from './ActivityDetailTask'
 	import SideGeneral from "../clientInfo/SideGeneral"
+	import Button from "../../Button"
 
 	export default {
 		props: {
@@ -46,7 +49,7 @@
 		},
 		data() {
 			return {
-				isShowMenu: false,
+				isShowMenu: true,
 				isShowDetailsTask: false,
 				taskData: null
 
@@ -74,19 +77,20 @@
 			createTask() {
 				this.$emit('createTask')
 			},
-      createNote() {
+			createNote() {
 				this.$emit('createNote')
 			},
-      openAllActivities() {
-			  this.$emit('openAllActivities')
-        this.closeActivityDetailsTask()
-        this.isShowMenu = false
-      },
+			openAllActivities() {
+				this.$emit('openAllActivities')
+				this.closeActivityDetailsTask()
+				this.isShowMenu = false
+			},
 			toggleMenu() {
 				this.isShowMenu = !this.isShowMenu
 			}
 		},
 		components: {
+			Button,
 			SideGeneral,
 			OpenActivities,
 			ActivityDetailTask
@@ -95,6 +99,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../assets/scss/colors";
+
   .sidebarMenu {
     &__generalInfo {
       padding: 0 20px 20px 20px;
@@ -110,7 +116,7 @@
       .allActivities {
         padding: 10px;
         display: flex;
-        border: 1px solid #e8e8e8;
+        border: 1px solid $border;
         font-size: 18px;
         justify-content: center;
         font-family: 'Myriad600';
@@ -131,39 +137,55 @@
       display: flex;
       padding: 0 20px 20px 20px;
       align-items: center;
+      gap: 12px;
     }
 
     &__activityDetails {
       position: absolute;
       bottom: 0;
-      padding-bottom: 35px;
+      padding-bottom: 50px;
       width: 100%;
       z-index: 10;
       background: white;
     }
 
     &__content {
-      margin-top: 6vh;
-      height: 88vh;
       position: relative;
+      margin-top: 80px;
     }
 
     &__mainIcon {
       position: fixed;
+      height: 40px;
+      min-width: 40px;
+      width: 40px;
+      background: $light-green;
+      font-size: 18px;
+      border-radius: 40px;
+      color: $green;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: .2s ease;
       right: 20px;
       z-index: 99999;
       cursor: pointer;
-      top: 7vh;
+      top: 80px;
+
+      &:hover {
+        cursor: pointer;
+        background: #c8e4e4;
+      }
     }
 
     &__body {
       background: #fff;
       position: fixed;
-      width: 400px;
+      width: 430px;
       right: 0;
       top: 0;
       height: 100vh;
-      z-index: 9;
+      z-index: 30;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
   }
@@ -195,22 +217,21 @@
   }
 
   i {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .icon {
     height: 40px;
     min-width: 40px;
     width: 40px;
-    background: #daeded;
-    font-size: 20px;
+    background: $light-green;
+    font-size: 18px;
     border-radius: 40px;
-    color: #4ba5a5;
+    color: $green;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: ease 0.2s;
-    margin-right: 5px;
 
     &:hover {
       cursor: pointer;

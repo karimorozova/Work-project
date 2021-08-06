@@ -24,7 +24,8 @@ const {
 	targetFileDR1,
 	approveInstructionDR2,
 	approveFilesDR2,
-	changeManagersDR1
+	changeManagersDR1,
+	changeNameLang,
 } = require("../../projects")
 
 const {
@@ -70,7 +71,7 @@ router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req
 })
 
 router.post('/remove-dr2-file', async (req, res) => {
-	const { type, taskId, projectId, path, entityId } = req.body
+	const {  type, taskId, projectId, path, entityId } = req.body
 	try {
 		if (type === 'single') {
 			if (taskId !== 'Loaded in DR2') {
@@ -85,6 +86,17 @@ router.post('/remove-dr2-file', async (req, res) => {
 					{ $pull: { "tasksDR2.singleLang.$[i].files": { path } } },
 					{ arrayFilters: [ { 'i._id': entityId } ] }
 			)
+
+		}else{
+			await Projects.updateOne(
+					{ "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.file.path": path },
+					{ $pull: { "tasksDR2.multiLang.$[i].file": { path } } },
+					{ arrayFilters: [ { 'i._id': entityId } ] }
+			)
+
+		}
+
+		if(await fs.existsSync(`./dist${path}`)) {
 			fs.unlink(`./dist${ path }`, (err) => {
 				if (err) throw(err)
 			})
@@ -184,9 +196,11 @@ router.post('/remove-dr-file', async (req, res) => {
 	const { taskId, path, projectId } = req.body
 	try {
 		await Projects.updateOne({ "_id": projectId, 'tasksDR1.files.path': path }, { $pull: { 'tasksDR1.$[i].files': { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
-		fs.unlink(`./dist${ path }`, (err) => {
-			if (err) throw(err)
-		})
+		if(await fs.existsSync(`./dist${path}`)) {
+			fs.unlink(`./dist${ path }`, (err) => {
+				if (err) throw(err)
+			})
+		}
 		const updatedProject = await getProject({ "_id": projectId })
 		res.send(updatedProject)
 	} catch (err) {
@@ -261,11 +275,22 @@ router.post('/file-dr2-pull', async (req, res) => {
 	}
 })
 
+router.post('/dr2-name-change', async (req, res) => {
+	const { projectId, deliveryId, deliveryName, type } = req.body
+	try {
+		const project = await changeNameLang({ projectId, deliveryId, deliveryName, type })
+		res.send(project)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on multi-name-dr2-change')
+	}
+
+})
 router.post('/multi-file-dr2-push', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
-	const { projectId, taskIds, dr1Manager, dr2Manager } = req.body
+	const { projectId, taskIds, filesFromVault } = req.body
 	const { refFiles } = req.files
 	try {
-		const DR2 = await addMultiLangDR2({ projectId, taskIds: JSON.parse(taskIds), dr1Manager, dr2Manager, refFiles })
+		const DR2 = await addMultiLangDR2({ projectId, taskIds: JSON.parse(taskIds), refFiles, filesFromVault: JSON.parse(filesFromVault) })
 		res.send(DR2)
 	} catch (err) {
 		console.log(err)

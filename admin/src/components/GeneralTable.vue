@@ -1,28 +1,11 @@
 <template lang="pug">
   .generalTable
 
-    .th__modals
-      ValidationErrors(
-        v-if="areErrors"
-        :errors="errors"
-        :isAbsolute="isAbsolute"
-        @closeErrors="closeErrors"
-      )
-      ApproveModal(
-        v-if="isApproveModal"
-        text="Are you sure?"
-        approveValue="Yes"
-        notApproveValue="Cancel"
-        @approve="approve"
-        @notApprove="notApprove"
-        @close="closeModal"
-      )
-
-    .filter(v-if="isFilterShow" @click="showFilter")
+    .filter(v-if="isFilterShow" @click="showFilter" :class="{'absoluteFilter': isFilterAbsolute}")
       span(v-if="!showFilters")
         i.fas.fa-filter
       span(v-if="showFilters")
-        i.fas.fa-times-circle
+        i.fas.fa-times-circle#filterClose
 
     table
 
@@ -48,10 +31,28 @@
               input(:ref='key' @keyup="(e) => setFilter({filterInfo, value: e.target.value, key: dataKey, filterField: key})")
               i.fas.fa-backspace.th__filter-close(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
 
-      tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" @scroll="handleBodyScroll")
-        tr.data(v-for="(row, index) of tableData")
+      tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" ref="tableBody" @scroll="handleBodyScroll")
+        tr.data(v-for="(row, index) of tableData" :class="{'active': activeField === index}")
           td(v-for="field of fields" :style="field.style")
             slot(:name="field.key" :row="row" :index="index" )
+
+
+    ValidationErrors(
+      v-if="areErrors"
+      :errors="errors"
+      :isAbsolute="true"
+      @closeErrors="closeErrors"
+    )
+    .approve(v-if="isApproveModal")
+      ApproveModal(
+        v-if="isApproveModal"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approve"
+        @notApprove="notApprove"
+        @close="closeModal"
+      )
 
 </template>
 
@@ -85,15 +86,23 @@
 				type: Boolean,
 				default: false
 			},
-      isBodyShort: {
-			  type: Boolean,
-        default: false
+			isFilterAbsolute: {
+				type: Boolean,
+				default: false
+			},
+			isBodyShort: {
+				type: Boolean,
+				default: false
+			},
+      activeField: {
+			  type: Number,
+        default: -1
       }
 		},
 		data() {
 			return {
 				showFilters: false,
-				elementToScroll: this.isBodyShort ? 7 : 15
+				elementToScroll: this.isBodyShort ? 7 : 13
 			}
 		},
 		methods: {
@@ -120,12 +129,13 @@
 				this.$emit('removeSortKey', field)
 			},
 
-      showFilter() {
-        this.showFilters = !this.showFilters
-        if (!this.showFilters) {
-          this.$emit('clearAllFilters')
-        }
-      },
+			showFilter() {
+				this.showFilters = !this.showFilters
+        this.$emit('toggleFilter', this.showFilters)
+				if (!this.showFilters) {
+					this.$emit('clearAllFilters')
+				}
+			},
 			setFilter(field) {
 				this.$emit('setFilter', field)
 			},
@@ -151,6 +161,29 @@
 <style lang="scss" scoped>
   @import "../assets/scss/colors";
 
+  .absoluteFilter {
+    position: absolute;
+    right: 0;
+    top: -37px;
+  }
+  .data {
+     &.active {
+       opacity: 0.5;
+    }
+  }
+
+  .generalTable {
+    position: relative
+  }
+
+  .approve {
+    position: absolute;
+    z-index: 50;
+    background-color: transparent;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 
   .filter {
     border: 1px solid $border;
@@ -169,6 +202,10 @@
       .fa-filter {
         color: $text !important;
       }
+
+      #filterClose {
+        color: $text !important;
+      }
     }
   }
 
@@ -183,7 +220,7 @@
   }
 
   .fa-filter {
-    font-size: 11px;
+    font-size: 12px;
     color: $dark-border;
   }
 
@@ -306,9 +343,9 @@
   }
 
   tbody {
-    max-height: 600px;
+    max-height: 480px;
     display: block;
-    color: $table;
+    color: $text;
   }
 
   tbody tr:nth-child(even) {
@@ -326,7 +363,7 @@
   }
 
   .hideScrollBlock {
-    height: 40px;
+    height: 100%;
     width: 20px;
     background: white;
     position: absolute;
@@ -337,6 +374,7 @@
   .scroll {
     overflow-y: scroll;
   }
+
   .shortBody {
     max-height: 240px;
   }

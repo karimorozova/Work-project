@@ -603,8 +603,11 @@
 						.filter(({ steps }) => steps.some(({ step: { calculationUnit } }) => calculationUnit.includes(catId)))
 						.map(({ title }) => title)
 
-				let taskSteps = this.currentProject.steps.filter(item => item.taskId === task.taskId)
+				let taskSteps = this.currentProject.steps
+            .filter(item => item.taskId === task.taskId)
+
 				taskSteps = taskSteps.filter(item => !item.stepId.includes('Cancelled'))
+
 				if (CATServices.includes(task.service.title)) {
 					const [ firstStep, secondStep ] = taskSteps
 					if (taskSteps.length === 2) {
@@ -761,17 +764,17 @@
 
   .table {
     &__data {
-      padding: 0 5px;
+      padding: 0 6px;
       word-break: break-word;
     }
 
     &__header {
-      padding: 0 5px;
+      padding: 0 6px;
       word-break: break-all;
     }
 
     &__finance {
-      padding: 0 3px 0 5px;
+      padding: 0 3px 0 6px;
     }
   }
 
@@ -781,7 +784,7 @@
     }
 
     &__name {
-      color: #68573e;
+      color: $text;
       margin-right: 10px;
     }
 

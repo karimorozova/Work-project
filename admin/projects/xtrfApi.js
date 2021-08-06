@@ -1,6 +1,6 @@
 const { Projects } = require('../models/')
 const axios = require("axios")
-const request = require('request')
+// const request = require('request')
 
 const { writeFileSync, readFileSync, createReadStream } = require('fs')
 const csv = require('csv-parser')
@@ -35,8 +35,28 @@ const errorMessages = {
 	cannotFindLanguage: "Sorry! We can not find language pair",
 	cannotSendProject: "Sorry! We can not send the project to XTRF"
 }
-const services = { Translation: 80, Compliance: 79, Copywriting: 81 }
-
+const STEP_IDS = {
+	Translation: {
+		services: 80,
+		calculationUnitId: 1,
+		jobTypeId: 4,
+	},
+	Compliance: {
+		services: 79,
+		calculationUnitId: 11,
+		jobTypeId: 67,
+	},
+	Copywriting: {
+		services: 81,
+		calculationUnitId: 6,
+		jobTypeId: 69,
+	},
+	NewsletterSMS: {
+		services: 81,
+		calculationUnitId: 6,
+		jobTypeId: 69,
+	}
+}
 const createXtrfProjectWithFinance = async (vendorId) => {
 	try {
 		// csvToJsonXtrf()
@@ -59,16 +79,14 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			customer,
 			steps,
 			tasks,
-			accountManager
+			accountManager,
+			isTest,
 		} = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
 
-		const { stepsInfo, stepsSource, stepsTarget, noFoundVendors } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors)
+		const currentServices = getServices(tasks)
 
-		const currentServices = Array.from(new Set(tasks.map(({ service }) => service.title).filter((servicesTitle) => Object.keys(services).includes(servicesTitle)))).pop()
-		const service = currentServices ? services[currentServices] : false
-		if (!services) {
-			return { isSuccess: false, message: errorMessages['cannotFindServices'] }
-		}
+		const { stepsInfo, stepsSource, stepsTarget, noFoundVendors } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, currentServices.name)
+
 
 		const allCustomer = await sendRequest('get', 'customers')
 		const customers = findInXtrf(allCustomer, "name", customer.name)
@@ -79,11 +97,11 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
 			name: `${ projectId }: ${ projectName }`,
 			clientId: customers.id,
-			serviceId: service
+			serviceId: currentServices.id
 		})
 
 		// IS test true
-		await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: true })
+		await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: isTest })
 
 		// Set AM
 		try {
@@ -102,7 +120,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			targetLanguageIds: stepsTarget
 		})
 
-		await setProjectFinance(xtrfProjectInfo.data.projectId, stepsInfo, currentServices)
+		await setProjectFinance(xtrfProjectInfo.data.projectId, stepsInfo, currentServices.name)
 
 		await Projects.updateOne(
 				{ _id: vendorId },
@@ -119,7 +137,22 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 
 }
 
-function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors) {
+function getServices(tasks) {
+	try {
+		const uniqueServices = Array.from(new Set(tasks.map(({ service }) => service.title)))
+
+		const currentServices = uniqueServices.sort((a, b) => a.localeCompare(b)).join('')
+		const service = currentServices ? STEP_IDS[currentServices].services : false
+		if (!service) {
+			return { isSuccess: false, message: errorMessages['cannotFindServices'] }
+		}
+		return { id: service, name: currentServices }
+	}catch (e) {
+		throw new Error( errorMessages['cannotFindServices'])
+	}
+}
+
+function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, currentServicesName) {
 	let stepsInfo = {}
 	let stepsSource = new Set()
 	let stepsTarget = new Set()
@@ -146,7 +179,12 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors) {
 			subInfo: [ subInfo ]
 		}
 		if (stepsInfo.hasOwnProperty(sourceLang + ">>" + targetLang)) {
-			stepsInfo[sourceLang + ">>" + targetLang].subInfo.push(subInfo)
+			if(currentServicesName === "NewsletterSMS") {
+				stepsInfo[sourceLang + ">>" + targetLang].subInfo[0].payables += nativeFinance.Price.payables
+			}else {
+				stepsInfo[sourceLang + ">>" + targetLang].subInfo.push(subInfo)
+			}
+
 			stepsInfo[sourceLang + ">>" + targetLang].receivables += finance.Price.receivables
 		} else {
 			stepsInfo[sourceLang + ">>" + targetLang] = stepInfo
@@ -186,13 +224,15 @@ async function setProjectFinance(xtrfProjectId, stepsInfo, currentServices) {
 				sourceLanguageId: sourceLanguageId,
 				targetLanguageId: targetLanguageId
 			},
-			"calculationUnitId": currentServices === "Translation" ? 1 : currentServices === "Copywriting" ? 6 : 11,
+			"calculationUnitId": STEP_IDS[currentServices].calculationUnitId,
+			// "calculationUnitId": currentServices === "Translation" ? 1 : currentServices === "Copywriting" ? 6 : 11,
 			"ignoreMinimumCharge": false,
 			"description": "payable"
 		}
 		const receivablesData = {
 			...baseData,
-			"jobTypeId": currentServices === "Translation" ? 4 : currentServices === "Copywriting" ? 69 : 67,
+			"jobTypeId":  STEP_IDS[currentServices].jobTypeId,
+			// "jobTypeId": currentServices === "Translation" ? 4 : currentServices === "Copywriting" ? 69 : 67,
 			"rate": receivables,
 			"quantity": 1
 		}
@@ -299,10 +339,10 @@ const updateFianceXTRF = async (id) => {
 	for await (let id of receivables) await sendRequest('delete', `v2/projects/${xtrfId}/finance/receivables/${id}`)
 
 	const { stepsInfo } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors)
-	const currentServices = Array.from(new Set(tasks.map(({ service }) => service.title).filter((servicesTitle) => Object.keys(services).includes(servicesTitle)))).pop()
-
-	await setProjectFinance(xtrfId, stepsInfo, currentServices)
+	// const currentServices = Array.from(new Set(tasks.map(({ service }) => service.title).filter((servicesTitle) => Object.keys(services).includes(servicesTitle)))).pop()
+	const currentServices = getServices(tasks)
+	await setProjectFinance(xtrfId, stepsInfo, currentServices.name)
 
 }
 
-module.exports = { createXtrfProjectWithFinance, updateFianceXTRF }
+	module.exports = { createXtrfProjectWithFinance, updateFianceXTRF, sendRequest }

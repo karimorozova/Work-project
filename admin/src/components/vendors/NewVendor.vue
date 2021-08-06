@@ -1,10 +1,6 @@
 <template lang="pug">
   .vendor-wrap
     .vendor-info
-      .buttons
-        input.button(type="button" value="Save" @click="checkForErrors")
-        input.button(type="button" value="Cancel" @click="cancel")
-      .title General Information
       .gen-info
         .gen-info__block
           .photo-wrap(v-if="!vendor.photo")
@@ -89,6 +85,11 @@
                 :options="getAllIndustries.map(i => i.name)"
                 @chooseOptions="setIndustries"
               )
+
+      .buttons
+        input.button(type="button" value="Save" @click="checkForErrors")
+        input.button(type="button" value="Cancel" @click="cancel")
+
       .delete-approve(v-if="approveShow")
         p Are you sure you want to delete?
         input.button.approve-block(type="button" value="Cancel" @click="cancelApprove")
@@ -368,7 +369,7 @@
   .vendor-subinfo {
     &__general {
       padding: 20px;
-      margin-top: 145px;
+      margin-top: 50px;
       width: 350px;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
@@ -452,7 +453,7 @@
       width: 35%;
 
       &:first-child {
-        width: 22%;
+        width: 20%;
         text-align: center;
       }
     }
@@ -598,9 +599,9 @@
   .buttons {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    margin-left: 10px;
+    justify-content: center;
     width: 1000px;
+    margin-top: 30px;
   }
 
   .button {

@@ -5,18 +5,20 @@
       .openActivities__list(v-for="item in listOfActivity")
         .openActivities__item(v-on:click="openActivityDetails(item)")
           .card
-            .card__check(
-              v-on:click.stop="completeActivity(item)"
-              :class="{notActive: item.assignedTo._id.toString() !== user._id.toString() && !isAdmin}"
-            )
-              i.far.fa-check-circle
+
+            .card__icon
+              span(v-html="renderIcon(item.entity)")
+
             .card__data
               .card__title {{ item.title }}
               .card__date
                 span.due Due:
                 span {{ item.dateTime | formatDate}}
-            .card__icon
-              span(v-html="renderIcon(item.entity)")
+
+            .card__check(v-on:click.stop="completeActivity(item)" :class="{notActive: item.assignedTo._id.toString() !== user._id.toString() && !isAdmin}")
+              i.far.fa-check-circle
+
+
     .openActivities__no-activity(v-else)
       span There are no activities now
 
@@ -63,24 +65,25 @@
 				currentClient: "getCurrentClient",
 				user: "getUser"
 			}),
-			isAdmin(){
+			isAdmin() {
 				return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
-      },
+			},
 			listOfActivity() {
-				let result = [
+				return [
 					...this.currentClient.tasks
-					    .filter(item => item.status !== 'Completed')
+							.filter(item => item.status !== 'Completed')
 							.map(item => {
 								return { ...item, entity: 'task' }
 							})
 				]
-				return result
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../assets/scss/colors";
+
   .notActive {
     cursor: default !important;
     color: rgba(0, 0, 0, .1) !important;
@@ -90,10 +93,16 @@
     &__content {
       max-height: 45vh;
       overflow-y: auto;
+      padding: 10px;
+      border-radius: 4px;
+      border: 2px solid $light-border;
+      box-sizing: border-box;
     }
 
     &__title {
-      font-size: 18px;
+      font-size: 16px;
+      margin-bottom: 5px;
+      letter-spacing: .2px;
     }
 
     &__item {
@@ -106,22 +115,25 @@
     display: flex;
     align-items: center;
     padding: 10px;
-    border: 1px solid #E8E8E8;
-    margin-top: 5px;
-    transition: ease 0.2s;
+    border: 1px solid $border;
+    border-radius: 4px;
+    margin-top: 0px;
+    transition: .1s ease;
+    margin-bottom: 10px;
 
     &:hover {
       cursor: pointer;
-      background: rgba(153, 153, 153, .1);
+      background: $list-hover;
     }
 
     &__title {
-      font-size: 16px;
-      margin-bottom: 2px;
+      font-size: 14px;
+      margin-bottom: 4px;
     }
 
     &__date {
-      color: rgba(0, 0, 0, .6);
+      font-family: 'Myriad300';
+      font-size: 13px;
     }
 
     &__data {
@@ -130,16 +142,15 @@
 
     &__check {
       height: 22px;
-      font-size: 21px;
+      font-size: 22px;
       width: 22px;
-      margin-right: 10px;
-      color: rgba(0, 0, 0, .6);
+      color: $dark-border;
       cursor: pointer;
       transition: ease 0.2s;
+      cursor: pointer;
 
       &:hover {
-        cursor: pointer;
-        color: #4ba5a5;
+        color: $text;
       }
     }
 
@@ -147,14 +158,16 @@
       height: 40px;
       min-width: 40px;
       width: 40px;
-      background: #daeded;
-      font-size: 20px;
+      font-size: 18px;
       border-radius: 40px;
-      color: #4ba5a5;
       display: flex;
       justify-content: center;
       align-items: center;
+      margin-right: 15px;
+      border: 1px solid $green;
+      color: $green;
     }
+
     &__no-activity {
       font-size: 14px;
       padding-top: 5px;

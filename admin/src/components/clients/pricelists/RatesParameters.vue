@@ -2,7 +2,6 @@
   .ratesParams
     .pricelist-infoBlock
       .rates
-
         .rates-item
           .rates-item__title Pricelist:
           .rates-item__input(v-if="currentClient.defaultPricelist") {{currentClient.defaultPricelist.name}}
@@ -18,8 +17,9 @@
           .rates-item__input
             .ratio__input
               input(v-if="isEdit" type="number" ref="minPrice" :value="currentClient.minPrice" @change="updateMinPrice")
-              span(v-else) {{ currentClient.minPrice }}
-              span.ratio__input-symbol(v-html="getSymbol(currentClient.currency)")
+              span(v-else)
+                span {{ currentClient.minPrice || "Not assigned" }}
+                span.ratio__input-symbol(v-if="!!currentClient.minPrice" v-html="getSymbol(currentClient.currency)")
 
         //.rates-item
           .rates-item__title Ignore Min Price:
@@ -27,11 +27,6 @@
             .checkbox
               input(type="checkbox" id="ignoreMinPrice" v-model="ignoreMinPrice" @change="setTest")
               label(for="ignoreMinPrice")
-    .discounts
-      Discounts(
-        :paramsIsEdit="isEdit",
-        :enum="'client'"
-      )
 
 </template>
 <script>
@@ -116,14 +111,22 @@
   @import '../../../assets/scss/colors';
 
   .link {
+    transition: .2s ease-out;
+    color: $dark-border;
     cursor: pointer;
+    font-size: 15px;
+    margin-left: 8px;
+
+    &:hover {
+      color: $text;
+    }
   }
 
   .ratesParams {
     display: flex;
-    justify-content: space-between;
     position: relative;
-    padding-bottom: 20px;
+    margin-bottom: 13px;
+    margin-top: -45px;
   }
 
   .discounts {
@@ -149,26 +152,36 @@
   }
 
   .rates {
+    height: 32px;
     display: flex;
-    padding: 10px;
-    background: $table-list;
-    border: 1px solid $border;
-    flex-direction: column;
-    border-radius: 4px;
+    align-items: center;
 
     .rates-item {
-      min-height: 32px;
       display: flex;
       align-items: center;
+      padding-left: 20px;
+      padding-right: 20px;
+      border-right: 1px solid $border;
+      height: 32px;
+
+
+      &:first-child {
+        padding-left: 0;
+      }
+
+      &:last-child {
+        border: none;
+      }
 
       &__title {
-        width: 100px;
+        margin-right: 12px;
+        font-family: 'Myriad600';
       }
 
       &__input {
-        width: 120px;
         display: flex;
-        justify-content: space-between;
+        max-width: 140px;
+        align-items: center;
       }
     }
   }
@@ -243,7 +256,7 @@
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
-    width: 80px;
+    width: 70px;
     height: 32px;
     transition: .1s ease-out;
 

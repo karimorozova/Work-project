@@ -1,23 +1,47 @@
 <template lang="pug">
   .overallView
-    .row(v-if="isPm || isAdmin")
-      .col
-        AcceptedRequest( :projects="acceptedRequest")
-      .col
-        Dr1( :projects="dr1")
-    .row(v-if="isAm || isAdmin")
-      .col
-        IncomingRequests( :projects="incomingRequests")
-      .col
-        Dr2( :projects ="dr2")
-    .row
-      .col
-        DueToday( :projects="dueToday")
-      .col
-        StartedToday( :projects="startedToday")
-    .row
-      .col
-        Quotes( :projects ="quotes")
+    div(v-if="isAdmin")
+      .row
+        .col
+          XtrfStatsToday( :xtrfStats="todayStats")
+      .row
+        .col
+          AcceptedRequest( :projects="acceptedRequest")
+        .col
+          IncomingRequests( :projects="incomingRequests")
+      .row
+        .col
+          Dr1( :projects="dr1")
+        .col
+          Dr2( :projects ="dr2")
+      .row
+        .col
+          DueToday( :projects="dueToday")
+        .col
+          StartedToday( :projects="startedToday")
+      .row
+        .col
+          Quotes( :projects ="quotes")
+
+    div(v-else)
+      .row(v-if="isPm")
+        .col
+          AcceptedRequest( :projects="acceptedRequest")
+        .col
+          Dr1( :projects="dr1")
+      .row(v-if="isAm")
+        .col
+          IncomingRequests( :projects="incomingRequests")
+        .col
+          Dr2( :projects ="dr2")
+      .row
+        .col
+          DueToday( :projects="dueToday")
+        .col
+          StartedToday( :projects="startedToday")
+      .row
+        .col
+          Quotes( :projects ="quotes")
 
 
     //.overallView__col
@@ -33,6 +57,7 @@
 <script>
 	import ProjectFinanceStats from "./OverallViewChildrens/ProjectFinanceStats"
 	import moment from "moment"
+	import XtrfStatsToday from "./Tables/XtrfStatsToday"
 	import DueToday from "./Tables/DueToday"
 	import StartedToday from "./Tables/StartedToday"
 	import Quotes from "./Tables/Quotes"
@@ -47,6 +72,7 @@
 			return {
 				projects: [],
 				clientRequest: [],
+				todayStats: {},
 				startDateMonth: moment({ hour: 0, minute: 0, second: 0 }).subtract(30, 'days').toDate()
 			}
 		},
@@ -93,7 +119,7 @@
 					return this.projects.filter(project => {
 						return project.hasOwnProperty('tasksDR2')
 								&& ((project.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.singleLang.filter(item => item.status !== 'Delivered').some(singleLang => singleLang.files.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
-										|| (project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').some(multiLang => multiLang.files.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
+										|| (project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').length ? project.tasksDR2.multiLang.filter(item => item.status !== 'Delivered').some(multiLang => multiLang.file.some(({ dr2Manager }) => dr2Manager === this.user._id)) : false)
 								)
 					})
 				}
@@ -122,6 +148,9 @@
 				return this.filteredForPmAmOrAdmin.length
 						? this.filteredForPmAmOrAdmin.filter((project) => {
 							return moment(0, "HH").isSame(project.startDate, 'days')
+									&& project.status !== 'Draft'
+									&& project.status !== 'Cost Quote'
+									&& project.status !== 'Quote sent'
 						})
 						: []
 			},
@@ -152,9 +181,11 @@
 		async created() {
 			this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
 			this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
+			this.todayStats = (await this.$http.get('/dashboard-api/finance')).data
 		},
 		components: {
 			DueToday,
+			XtrfStatsToday,
 			StartedToday,
 			Quotes,
 			IncomingRequests,
@@ -173,7 +204,7 @@
     .row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 50px;
+      margin-bottom: 35px;
     }
 
     .col {

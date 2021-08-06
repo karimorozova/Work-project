@@ -449,24 +449,24 @@
 				return this.$route.query.deadline || ''
 			},
 			selectedSourceLanguages() {
-				return this.$route.query.sourceLanguages
+				return this.$route.query.sourceLanguages && this.languages.length
 						? this.$route.query.sourceLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
 						: []
 			},
 			selectedTargetLanguages() {
-				return this.$route.query.targetLanguages
+				return this.$route.query.targetLanguages && this.languages.length
 						? this.$route.query.targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
 						: []
 			},
 			selectedIndustry() {
-				if (this.$route.query.industry) {
+				if (this.$route.query.industry && this.industries.length) {
 					const { name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.industry }`)
 					return name
 				}
 				return ''
 			},
 			selectedServices() {
-				return this.$route.query.services
+				return this.$route.query.services && this.services.length
 						? this.$route.query.services.split(',').map(_id => this.services.find(service => _id === service._id).title)
 						: []
 			},
@@ -476,7 +476,7 @@
 						: []
 			},
 			selectedVendors() {
-				return this.$route.query.vendors
+				return this.$route.query.vendors && this.vendors.length
 						? this.$route.query.vendors.split(',').map(_id => {
 							const vendor = this.vendors.find(vendor => _id === vendor._id)
 							return vendor ? `${ vendor.firstName } ${ vendor.surname }` : ''

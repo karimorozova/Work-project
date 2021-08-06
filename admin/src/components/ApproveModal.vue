@@ -73,19 +73,19 @@
     background-color: $white;
     max-width: 300px;
     font-size: 14px;
+    border-radius: 4px;
 
     &__text{
       text-align: center;
-      margin-top: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      font-family: 'Myriad600';
     }
 
     &__buttons {
       margin-top: 10px;
       display: flex;
-    }
-
-    &__button {
-      margin: 5px;
+      gap: 10px;
     }
 
     &__close {

@@ -32,10 +32,9 @@
       .review-table__data(slot="check" slot-scope="{ row, index }")
         CheckBox(:isChecked="row.isChecked" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
-      .review-table__data(slot="name" slot-scope="{ row }")
+      .review-table__data.review-table__scroled-data(slot="name" slot-scope="{ row }")
         span.review-table__file-name {{ row.fileName }}
 
-      .review-table__data(slot="pair" slot-scope="{ row }") {{ row.pair }}
       .review-table__data(slot="task" slot-scope="{ row }")
         span(v-if="type ==='multi'") {{ getTasksIds(row.taskId) }}
         span(v-if="type ==='single'") {{ row.taskId.substring(row.taskId.length - 3)  }}
@@ -66,9 +65,11 @@
           img.review-table__icon(:src="icons.download.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'download')")
           .review-table__upload( :class="{'review-table_opacity-04': row.isFileApproved}")
             input.review-table__file-input(type="file" :disabled="row.isFileApproved" @change="(e) => uploadFile(e, index)")
-          span(v-if="type === 'single'")
+          //span(v-if="type === 'single'")
+          span
             img.review-table__icon(:src="icons.delete.src" :class="{'review-table_opacity-04': row.isFileApproved}" @click="makeOneAction(index, 'delete')")
           i.review-table__check-icon.fa.fa-check-circle(:class="{'review-table_green': row.isFileApproved}" @click="approveFile(index)")
+          //span
           span(v-if="type === 'single'")
             i.review-table__rollback-icon.fas.fa-undo-alt(v-if="!row.isFileApproved && row.taskId !== 'Loaded in DR2'"  @click="rollback(row.taskId)")
 
@@ -76,8 +77,8 @@
           img.review-table__icon(:src="icons.lock.src" :class="{'review-table_opacity-04': row.isFileApproved}")
 
 
-    .review-table__upload.review-table_no-back(v-if="type === 'single' && canAddDR2Manager ")
-      input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing")
+    .review-table__upload.review-table_no-back(v-if=" canAddDR2Manager ")
+      input.review-table__file-inputButton(type="file" @change="uploadFile" :disabled="isReviewing" :multiple="type !== 'single'")
       Add
 
 </template>
@@ -107,11 +108,10 @@
 			return {
 				fields: [
 					{ label: "", headerKey: "headerCheck", key: "check", style: { width: "4%" } },
-					{ label: "File Name", headerKey: "headerName", key: "name", style: { width: "21%" } },
-					{ label: "Task ID", headerKey: "headerTask", key: "task", style: { width: "8%" } },
-					{ label: "Language pair", headerKey: "headerPair", key: "pair", style: { width: "14%" } },
-					{ label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", style: { width: "19%" } },
-					{ label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", style: { width: "19%" } },
+					{ label: "File Name", headerKey: "headerName", key: "name", style: { width: "23%" } },
+					{ label: "Task ID", headerKey: "headerTask", key: "task", style: { width: "14%" } },
+					{ label: "DR1 Manager", headerKey: "headerDR1", key: "dr1", style: { width: "22%" } },
+					{ label: "DR2 Manager", headerKey: "headerDR2", key: "dr2", style: { width: "22%" } },
 					{ label: "Action", headerKey: "headerAction", key: "action", style: { width: "15%" } }
 				],
 				icons: {
@@ -221,7 +221,7 @@
 				link.click()
 			},
 			uploadFile(e, index) {
-				const file = e.target.files[0]
+				const file = e.target.files
 				this.$emit('uploadFile', { file, index })
 				e.target.value = ""
 			},
@@ -325,6 +325,9 @@
       &-manager {
         display: flex;
       }
+    }
+    &__scroled-data {
+      overflow-y: hidden;
     }
 
     &__check-cell {

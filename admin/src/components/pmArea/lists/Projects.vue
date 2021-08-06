@@ -454,7 +454,7 @@
     transition: .2s ease-out;
 
     & i {
-      color: #919191;
+      color: #9c9c9c;
       height: 20px;
       width: 20px;
       display: -ms-flexbox;

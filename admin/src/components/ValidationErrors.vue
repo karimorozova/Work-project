@@ -43,7 +43,7 @@
     .validation {
       &__errors {
         position: fixed;
-        width: 300px;
+        width: 260px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -51,14 +51,12 @@
         box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
         background-color: white;
         border-radius: 4px;
-        border-top: 3px solid $red;
+        border-left: 4px solid $red;
       }
 
       &__errors-title {
-        font-size: 18px;
-        color: $orange;
+        font-size: 16px;
         font-family: Myriad600;
-        text-align: center;
         margin-bottom: 10px;
       }
 
@@ -96,14 +94,12 @@
 
   }
 
-
   .validationAbsolute {
 
     .validation {
-
       &__errors {
         position: absolute;
-        width: 300px;
+        width: 260px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -111,14 +107,12 @@
         box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
         background-color: white;
         border-radius: 4px;
-        border-top: 3px solid $red;
+        border-left: 4px solid $red;
       }
 
       &__errors-title {
-        font-size: 18px;
-        color: $orange;
+        font-size: 16px;
         font-family: Myriad600;
-        text-align: center;
         margin-bottom: 10px;
       }
 

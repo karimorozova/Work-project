@@ -24,6 +24,11 @@
         :project="currentProject"
         @refreshProject="refreshProject"
       )
+      ImportTasksToXtrf(
+        v-else-if="canSendTaskToXtrf"
+        :project="currentProject"
+        @refreshProject="refreshProject"
+      )
       ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
       .project-info__action
         ProjectAction(
@@ -51,6 +56,7 @@ const Preview = () => import("./Preview")
 import { mapGetters, mapActions } from 'vuex'
 import ProjectSubInformation from './ProjectSubInformation'
 import Deliverables from './Deliverables'
+import ImportTasksToXtrf from "./ImportTasksToXtrf"
 
 export default {
   data() {
@@ -246,9 +252,18 @@ export default {
       const {status, tasks} = this.currentProject
 
       const closedCheck = tasks.length && (
-      		tasks.every(({ service }) => service.title === 'Compliance') ||
-		      tasks.every(({ service }) => service.title === 'Translation')
-		      // tasks.every(({ service }) => service.title === 'Copywriting')
+		       tasks.every(({ service }) => service.title === 'Translation')
+		      || (tasks.every(({ service }) => service.title === 'Copywriting') && tasks.length === 1)
+		      || (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2)
+      )
+
+      return  closedCheck && ( status === 'Closed' || status === 'In progress' || status === 'Approved' )
+    },
+    canSendTaskToXtrf() {
+      const {status, tasks} = this.currentProject
+
+      const closedCheck = tasks.length && (
+          tasks.every(({ service }) => service.title === 'Compliance')
       )
 
       return  closedCheck && ( status === 'Closed' || status === 'In progress' || status === 'Approved' )
@@ -262,6 +277,7 @@ export default {
     }
   },
   components: {
+    ImportTasksToXtrf,
     ImportProjectToXtrf,
     ValidationErrors,
     Project,
@@ -276,6 +292,9 @@ export default {
     await this.getProject()
     await this.getVendorsForProject()
   },
+	beforeDestroy(){
+		this.setCurrentProject({})
+	},
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
       if (from.name === "client-info") {

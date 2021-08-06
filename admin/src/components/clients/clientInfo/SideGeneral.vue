@@ -20,7 +20,7 @@
       .block-item
         label.block-item__label Account Manager:
           span.require *
-        .block-item__dropindex-9(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
+        .block-item__drop.index-9(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.accountManager}")
           SelectSingle(
             :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
             placeholder="Select",
@@ -35,7 +35,7 @@
       .block-item
         label.block-item__label Project Manager:
           span.require *
-        .block-item__dropindex-8(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
+        .block-item__drop.index-8(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.projectManager}")
           SelectSingle(
             :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
             placeholder="Select",
@@ -104,13 +104,15 @@
   @import "../../../assets/scss/colors.scss";
 
   .block-items {
-    padding: 10px;
-    border: 1px solid #e8e8e8;
+    padding: 20px;
+    border: 2px solid $light-border;
+    border-radius: 4px;
   }
 
   .title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 5px;
+    letter-spacing: 0.2px;
   }
 
   .index-10 {
@@ -146,6 +148,7 @@
         position: relative;
         width: 220px;
         height: 32px;
+        background-color: white;
       }
     }
 
@@ -199,6 +202,7 @@
           border: 1px solid #c1bbb1;
           left: 0px;
           top: 3px;
+          background: white;
         }
 
         &::after {

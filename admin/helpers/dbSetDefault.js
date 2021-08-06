@@ -1,5 +1,5 @@
 const ObjectId = require('mongodb').ObjectID;
-const { Converter } = require('easy-currencies');
+// const { Converter } = require('easy-currencies');
 const {
   Languages,
   User,
@@ -446,14 +446,14 @@ async function fillUnitSteps() {
 
 async function fillCurrencyRatio() {
   try {
-    const converter = new Converter();
+    // const converter = new Converter();
     const currencyRatios = await CurrencyRatio.find();
     if (!currencyRatios.length) {
-      const usdRatio = await converter.convert(1, 'EUR', 'USD');
-      const gbpRatio = await converter.convert(1, 'EUR', 'GBP');
+      // const usdRatio = await converter.convert(1, 'EUR', 'USD');
+      // const gbpRatio = await converter.convert(1, 'EUR', 'GBP');
       await CurrencyRatio.create({
-        USD: usdRatio.toFixed(2),
-        GBP: gbpRatio.toFixed(2),
+        USD: 1.2,
+        GBP: 0.9,
       });
       console.log('Currency ratios are saved!');
     }

@@ -1,8 +1,6 @@
 <template lang="pug">
   .content
-    .clientCloseNotes(@click="toggleNotes")
-      img.clientCloseNotes__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'clientCloseNotes__reverse': isNotesShow}")
-    .clientsNotes(v-if="isNotesShow")
+    .clientsNotes
       .clientsNotes__modal(v-if="isAlert")
         ApproveModal(
           text="Delete message?"
@@ -42,10 +40,10 @@
 </template>
 
 <script>
-	import CKEditor from "ckeditor4-vue";
-	import { mapGetters, mapActions } from "vuex";
-	import moment from "moment";
-	import ApproveModal from "../ApproveModal";
+	import CKEditor from "ckeditor4-vue"
+	import { mapGetters, mapActions } from "vuex"
+	import moment from "moment"
+	import ApproveModal from "../ApproveModal"
 
 	export default {
 		data() {
@@ -62,25 +60,25 @@
 				deleteIndex: null,
 				editorData: "",
 				editorConfig: {
-					extraPlugins: ['colorbutton', 'smiley'],
+					extraPlugins: [ 'colorbutton', 'smiley' ],
 					toolbarGroups: [
-						{ name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-						{ name: 'document', groups: ['mode', 'document', 'doctools'] },
-						{ name: 'editing', groups: ['find', 'selection', 'spellchecker', 'editing'] },
-						{ name: 'forms', groups: ['forms'] },
-						{ name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi', 'paragraph'] },
-						{ name: 'clipboard', groups: ['clipboard', 'undo'] },
-						{ name: 'links', groups: ['links'] },
-						{ name: 'insert', groups: ['insert'] },
-						{ name: 'styles', groups: ['styles'] },
-						{ name: 'colors', groups: ['colors'] },
-						{ name: 'tools', groups: ['tools'] },
-						{ name: 'others', groups: ['others'] },
-						{ name: 'about', groups: ['about'] }
+						{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+						{ name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+						{ name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+						{ name: 'forms', groups: [ 'forms' ] },
+						{ name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+						{ name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+						{ name: 'links', groups: [ 'links' ] },
+						{ name: 'insert', groups: [ 'insert' ] },
+						{ name: 'styles', groups: [ 'styles' ] },
+						{ name: 'colors', groups: [ 'colors' ] },
+						{ name: 'tools', groups: [ 'tools' ] },
+						{ name: 'others', groups: [ 'others' ] },
+						{ name: 'about', groups: [ 'about' ] }
 					],
 					removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
-					uiColor: "#f7f7f7",
-					height: 70,
+					uiColor: "#ffffff",
+					height: 80
 				}
 			}
 		},
@@ -90,64 +88,61 @@
 				updateClientNotes: "updateClientNotes",
 				deleteClientNotes: "deleteClientNotes"
 			}),
-			toggleNotes() {
-				this.isNotesShow = !this.isNotesShow;
-			},
 			openAlert(index) {
-				this.deleteIndex = index;
-				this.isAlert = true;
+				this.deleteIndex = index
+				this.isAlert = true
 			},
 			setEditorData(index) {
-				this.editableNoteIndex = index;
-				this.currentEditableNote = this.currentClient.notes[index];
-				this.editorData = this.currentEditableNote.message;
+				this.editableNoteIndex = index
+				this.currentEditableNote = this.currentClient.notes[index]
+				this.editorData = this.currentEditableNote.message
 			},
 			formateDate(updatedAT) {
 				return moment(updatedAT).format("DD-MM-YYYY LT")
 			},
 			setDefault() {
-				this.editorData = "";
-				this.currentEditableNote = null;
-				this.editableNoteIndex = null;
-				this.deleteIndex = null;
-				this.isAlert = false;
+				this.editorData = ""
+				this.currentEditableNote = null
+				this.editableNoteIndex = null
+				this.deleteIndex = null
+				this.isAlert = false
 			},
 			async sendMessage() {
-				const notesId = this.currentEditableNote ? this.currentEditableNote._id : null;
-				const { _id, photo, firstName, lastName, position } = this.getUser;
+				const notesId = this.currentEditableNote ? this.currentEditableNote._id : null
+				const { _id, photo, firstName, lastName, position } = this.getUser
 				try {
 					await this.updateClientNotes({
 						user: { _id, photo, firstName, lastName, position },
 						notesId,
 						message: this.editorData,
-						clientId: this.currentClient._id,
-					});
+						clientId: this.currentClient._id
+					})
 				} catch (err) {
-					this.alertToggle({ message: "Error in send message", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error in send message", isShow: true, type: "error" })
 				} finally {
-					this.setDefault();
-					!notesId && this.$nextTick(() => this.scrollToEnd());
+					this.setDefault()
+					!notesId && this.$nextTick(() => this.scrollToEnd())
 				}
 			},
 			async deleteNote(index) {
 				try {
-					await this.deleteClientNotes({ index, clientId: this.currentClient._id });
+					await this.deleteClientNotes({ index, clientId: this.currentClient._id })
 				} catch (err) {
-					this.alertToggle({ message: "Error in delete message", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error in delete message", isShow: true, type: "error" })
 				} finally {
-					this.setDefault();
+					this.setDefault()
 				}
 			},
 			scrollToEnd() {
-				const element = this.$el.querySelector('.clientsNotes__commentsBody');
+				const element = this.$el.querySelector('.clientsNotes__commentsBody')
 				element.scrollTop = element.scrollHeight
-			},
+			}
 		},
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient",
 				getUser: "getUser"
-			}),
+			})
 		},
 		components: {
 			ApproveModal,
@@ -157,27 +152,10 @@
 </script>
 
 <style lang="scss" scoped>
-  .clientCloseNotes {
-    height: 60px;
-    cursor: pointer;
-    position: relative;
-
-    &__reverse {
-      transform: rotate(180deg);
-    }
-
-    &__icon {
-      position: absolute;
-      height: 14px;
-      right: 20px;
-      bottom: 20px;
-      transition: .1s ease;
-    }
-  }
+  @import "../../assets/scss/colors";
 
   .clientsNotes {
     position: relative;
-    padding: 0 20px 20px;
 
     &__modal {
       position: absolute;
@@ -190,10 +168,7 @@
     }
 
     &__commentsBody {
-      border-top: 1px solid #d1d1d1;
-      border-left: 1px solid #d1d1d1;
-      border-right: 1px solid #d1d1d1;
-      background: #F7F5F3;
+      background: $table-list-hover;
       padding: 20px 20px 0;
       max-height: 500px;
       overflow-y: auto;
@@ -205,21 +180,19 @@
 
     &__button {
       position: absolute;
-      left: 86%;
+      left: 82%;
       bottom: 45px;
-      width: 100px;
+      width: 140px;
       height: 30px;
       border-radius: 4px;
       font-size: 14px;
       background-color: #fff;
-      color: #938676;
       outline: none;
-      border: none;
-      transition: 0.2s ease-out;
+      transition: .2s ease-out;
       text-align: center;
       line-height: 30px;
-      letter-spacing: 0.2px;
-      border: 2px solid #938676;
+      letter-spacing: .2px;
+      border: 1px solid $border;
 
       &:active {
         transform: scale(.98);
@@ -227,7 +200,7 @@
 
       &:hover {
         cursor: pointer;
-        background: #f7f7f7;
+        border: 1px solid $border-focus;
       }
     }
 
@@ -244,6 +217,7 @@
 
     &__icons {
       display: flex;
+      gap: 7px;
     }
 
     &__titleRow {
@@ -293,14 +267,12 @@
   }
 
   .time {
-    color: #c2baaf;
     margin-right: 10px;
+    opacity: 0.5;
   }
 
   .icon {
-    margin-left: 5px;
     cursor: pointer;
-    opacity: .9;
 
     img {
       width: 100%;

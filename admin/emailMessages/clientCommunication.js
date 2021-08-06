@@ -48,7 +48,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 		const totalForSelected = obj.selectedTasks.reduce((acc, curr) => {
 			acc = curr.finance.Price.receivables
 			return acc
-		},0)
+		}, 0)
 		taskIdsString = taskIdsString.replace(/[' ']/g, '%')
 		acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Approved` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.projectId }, ${ totalForSelected.toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
 		declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-accept-decline-tasks-quote?projectId=${ obj.id }&tasksIds=${ taskIdsString }&t=${ token }&to=${ date }&prop=Rejected` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.projectId }, ${ totalForSelected.toFixed(2) } ${ returnIconCurrencyByStringCode(obj.projectCurrency) }</a>`
@@ -613,103 +613,6 @@ function emailMessageForContact(obj) {
         </div>`
 }
 
-// Return template for Task ready for Delivery
-function notifyLanguagePairIsReady(obj) {
-	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
-                </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
-                        This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
-                    <p style="font-weight: 400;">
-                    		The translation for ${ obj.languagePair } from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready.
-                    </p>
-                    <p style="font-weight: 400;">
-                        It will be delivered once all tasks have been completed.
-                    </p>
-                    <p style="font-weight: 400;">
-                        In case of any questions, please do not hesitate to contact us :-)
-                    </p>
-                </div>
-                <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
-                </footer>
-            </div>`
-}
-
-function notifyMultilingualIsReady(obj) {
-	const pairsContent = obj.languagesPairs.reduce((acc, curr) => {
-		acc = acc + `<li>${curr}</li>`
-		return acc
-	}, '')
-	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
-                </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
-                        This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
-                    <p style="font-weight: 400;">
-                    	The translation in project ${ obj.project.projectId } - ${ obj.project.projectName } in the following languages is ready in one multilingual file. 
-                    	<ul style="font-weight: 400;">
-                    		${pairsContent}
-											</ul>
-                    </p>
-                    <p style="font-weight: 400;">
-                        It will be delivered once all tasks have been completed.
-                    </p>
-                    <p style="font-weight: 400;">
-                        In case of any questions, please do not hesitate to contact us :-)
-                    </p>
-                </div>
-                <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
-                </footer>
-            </div>`
-}
-
-function notifyAssignmentIsReady(obj) {
-	let content;
-	if(!!obj.services){
-		const [service] = obj.services
-		const {languageForm} = obj.allServices.find(({title}) => title === service)
-		const language = languageForm === 'Duo' ? `${ obj.source } >> ${ obj.target }` : obj.target
-		content = `Service ${obj.services.join(' ')} for ${language} from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready. 
-		It will be delivered once all tasks have been completed.`
-	}else{
-		content = `Assignment from project ${ obj.project.projectId } - ${ obj.project.projectName } is ready. 
-		It will be delivered once all tasks have been completed.`
-	}
-
-	const am = `${ obj.project.accountManager.firstName } ${ obj.project.accountManager.lastName }`
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
-                </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
-                        This message is sent to you on behalf of ${ am }</p>
-                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName }</span></p>
-     	    					<p style="font-weight: 400;">
-                       ${ content }
-                    </p>
-                    <p style="font-weight: 400;">
-                        In case of any questions, please do not hesitate to contact us :-)
-                    </p>
-                </div>
-                <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
-                </footer>
-            </div>`
-}
 
 // Return template for Task for Delivery
 function getDeliveryMessage(obj) {
@@ -722,14 +625,52 @@ function getDeliveryMessage(obj) {
                             This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
                         <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
                         <p style="font-weight: 400;">
-                        	I'm pleased to inform you that the task(s) of ${obj.langPair} from project ${ obj.projectId } - ${ obj.projectName } has been completed and is ready for review.
+                        	I'm pleased to inform you that delivery: <strong> ${ obj.projectId } - ${ obj.deliveryName } </strong> is completed and is ready for review:
                         </p>
                         <div style="font-weight: 400;">
-                        	${obj.comment}
+                        	${ obj.comment }
 												</div>
+												<ul>
+													<li>
+														<span style="font-weight: 400;"> language pair:</span>
+														<strong>${ obj.languagesAndServices.languages.join(', ') }</strong>
+													</li>
+												</ul>
+			                    <p style="font-weight: 400;">
+			                        The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+		                    	</p>
                         <p style="font-weight: 400;">
-                            The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+                            In case of any questions, please do not hesitate to contact us :-)
                         </p>
+                    </div>
+                    <footer>
+                        <hr size="15" color="#66563E">
+                        <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                    </footer>
+                </div>`
+}
+
+function getNotifyDeliveryMessage(obj) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                    <header style="background-color:#66563E;text-align:center;" >
+                        <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                    </header>
+                    <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                        <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;" >***This is an automated message***<br>
+                            This message is sent to you on behalf of ${ obj.accManager.firstName } ${ obj.accManager.lastName }</p>
+                        <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.contact.firstName } ${ obj.contact.surname || "" }</span></p>
+                        <p style="font-weight: 400;">
+													I'm pleased to inform you that delivery: <strong> ${ obj.projectId } - ${ obj.deliveryName } </strong> is completed:
+                        </p>
+												<ul>
+													<li>
+														<span style="font-weight: 400;"> language pair:</span>
+														<strong>${ obj.languagesAndServices.languages.join(', ') }</strong>
+													</li>
+												</ul>
+		                    <p style="font-weight: 400;">
+		                        The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+	                      </p>
                         <p style="font-weight: 400;">
                             In case of any questions, please do not hesitate to contact us :-)
                         </p>
@@ -864,7 +805,7 @@ function tasksMiddleCancelledMessage(obj) {
 
 //When Project Ready to Delivery
 function projectDeliveryMessage(obj) {
-  //DELIVER PROJECT CHANGE TEMPLATE #MAX
+	//DELIVER PROJECT CHANGE TEMPLATE #MAX
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
@@ -878,11 +819,11 @@ function projectDeliveryMessage(obj) {
                     </p>
                     <p style="font-weight: 400;">
                         The files are available for you in our
-                        <a href="${ apiUrl }/dashboard/details/${ obj.id }">Portal</a>
+                        <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a>
                         and attached to this email in a zip format.
                     </p>
                      <div style="font-weight: 400;">
-                        	${obj.comment}
+                        	${ obj.comment }
 											</div>
                     <p style="font-weight: 400;">
                         In case of any questions, please do not hesitate to contact us :-)
@@ -909,7 +850,6 @@ function getTaskProgress(task, steps) {
 module.exports = {
 	messageForClientSendQuote,
 	emailMessageForContact,
-	notifyLanguagePairIsReady,
 	getDeliveryMessage,
 	projectCancelledMessage,
 	tasksMiddleCancelledMessage,
@@ -917,6 +857,5 @@ module.exports = {
 	projectMiddleCancelledMessage,
 	getPdfOfQuote,
 	messageForClientSendCostQuote,
-	notifyAssignmentIsReady,
-	notifyMultilingualIsReady
+	getNotifyDeliveryMessage,
 }

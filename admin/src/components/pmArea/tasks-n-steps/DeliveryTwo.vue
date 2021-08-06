@@ -5,7 +5,15 @@
     .review__modal(v-if="isModalRollback")
       RollbackModal(:manager="rollbackManager" @close="closeRollback" @setRollbackManager="setRollbackManager" @rollBack="rollBackApprove")
 
-    .review__title Delivery Review 2
+    .review__title
+      span Delivery Review 2:
+      .review__delivery-name
+        input.field__name(type="text" placeholder="Delivery Name" v-model="deliveryName" :disabled="isCertificateExist")
+        .review__action-icon(v-if="deliveryName !== deliveryData.deliveryName")
+          i(class="fas fa-save" @click="setDeliveryName")
+          i(class="fas fa-times-circle" @click="setDefaultDeliveryName")
+
+
     .review__check
       .review__headers
         .review__headers-item Check
@@ -39,6 +47,9 @@
           ckeditor(v-model="deliveryData.comment" :config="editorConfig")
           .notes__button(v-if="canAddDR2Manager" @click="sendComment") Save Comment &nbsp;
             i.fa.fa-paper-plane(aria-hidden='true')
+    .relative__wrapper(v-if="isServiceForCertificate")
+      .review__certificate
+        Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
 
     .review__table
       TableDR2(
@@ -68,18 +79,21 @@
           @toggleOption="toggleOption"
         )
 
+      .review__additionalOptions
+
         .review__email-comment(v-if="(isDeliver) && allChecked")
           .review__email-checkbox
             CheckBox(:isChecked="isComment" @check="toggleCommentEmail"  @uncheck="toggleCommentEmail")
-            span Do you want to external comment? &nbsp;&nbsp;
-          .review__notes(v-if="isComment")
-            ckeditor(v-model="comment" :config="editorConfig")
+            span Add external comment
 
         .review__contacts(v-if="(isDeliver || isNotify) && allChecked") Contacts:
           SelectMulti(
             :options="contactsNames"
             :selectedOptions="selectedContacts"
             @chooseOptions="setContacts")
+
+      .review__templateCommentRow(v-if="isComment")
+        ckeditor(v-model="comment" :config="editorConfig")
 
       .review__buttons
         .review__button(v-if="allChecked")
@@ -121,7 +135,8 @@
 				taskIdRollback: null,
 				selectedContacts: [],
 				comment: "",
-				isComment: false
+				isComment: false,
+        deliveryName: ''
 			}
 		},
 		beforeDestroy() {
@@ -138,6 +153,25 @@
 				"setCurrentProject",
 				"setShowTasksAndDeliverables"
 			]),
+			async generateCertificate() {
+				const tasks = this.type === 'single'
+						? this.deliveryData.files.map(item => item.taskId)
+						: this.deliveryData.tasks
+
+				try {
+					const updatedProject = await this.$http.post('/pm-manage/generate-certificate', {
+						project: this.project,
+						type: this.type,
+						tasks,
+						deliveryData: this.deliveryData
+					})
+					await this.setCurrentProject(updatedProject.data)
+					await this.updatedFiles(updatedProject)
+					this.alertToggle({ message: "Certificate generated!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Certificate not generated!", isShow: true, type: "error" })
+				}
+			},
 			toggleCommentEmail() {
 				this.isComment = !this.isComment
 			},
@@ -203,7 +237,7 @@
 					this.files = files.map(item => ({ ...item, isChecked: false }))
 				} else {
 					const { file, tasks } = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-					this.files = [ { ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false } ]
+					this.files = file.map(files => ({ ...files, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false }))
 				}
 			},
 			async removeFile(file) {
@@ -224,7 +258,9 @@
 			async uploadFile({ file, index }) {
 				const { path } = index !== undefined ? this.files[index] : { path: "" }
 				const fileData = new FormData()
-				fileData.append("targetFile", file)
+				for (let i = 0; i < file.length; i++) {
+					fileData.append("targetFile", file[i])
+				}
 				fileData.append("projectId", this.project._id)
 				fileData.append("path", path)
 				fileData.append("entityId", this.deliveryData._id)
@@ -360,12 +396,42 @@
 				this.selectedContacts = []
 				const { firstName, surname } = this.project.clientContacts[0]
 				this.selectedContacts.push(`${ firstName } ${ surname }`)
-			}
+			},
+			async setDeliveryName() {
+				const deliveryId = this.deliveryData._id
+				const projectId = this.project._id
+				const updatedProject = await this.$http.post('/delivery/dr2-name-change', { projectId, deliveryId, deliveryName: this.deliveryName, type: this.type })
+				await this.setCurrentProject(updatedProject.data)
+
+			},
+      setDefaultDeliveryName() {
+			  this.deliveryName = this.deliveryData.deliveryName
+      }
 		},
 		computed: {
 			...mapGetters({
 				requestCounter: 'getRequestCounter'
 			}),
+			isServiceForCertificate() {
+				if (Object.keys(this.deliveryData).length && this.type && this.project) {
+					let tasks = this.type === 'single'
+							? this.deliveryData.files.map(item => item.taskId)
+							: this.deliveryData.tasks
+					tasks = tasks.filter(item => item !== "Loaded in DR2")
+
+					const services = this.project.tasks.filter(item => tasks.includes(item.taskId)).map(item => item.service.title)
+					return services.length && services.every(item => item === 'Compliance' || item === 'Translation')
+				}
+			},
+			isCertificateExist() {
+				if (this.files.length) {
+					const filesNames = this.files.map(i => i.fileName)
+					for (let str of filesNames) {
+						if (str.indexOf('certificate') !== -1) return true
+					}
+					return false
+				}
+			},
 			contactsNames() {
 				return this.project.clientContacts.map(item => `${ item.firstName } ${ item.surname }`)
 			},
@@ -373,11 +439,11 @@
 				const { tasksDR2 } = this.project
 				if (this.type === 'single') {
 					const deliveryData = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
-					console.log('deliveryDataS', deliveryData)
+          this.deliveryName = deliveryData.deliveryName
 					return deliveryData
 				} else {
 					const deliveryData = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-					console.log('deliveryDataM', deliveryData)
+          this.deliveryName = deliveryData.deliveryName
 					return deliveryData
 				}
 			},
@@ -412,7 +478,7 @@
 				this.files = files.map(item => ({ ...item, isChecked: false }))
 			} else {
 				const { file, tasks } = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-				this.files = [ { ...file, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false } ]
+				this.files = file.map(files => ({ ...files, taskId: tasks.join(', '), pair: 'Multilingual', isChecked: false }))
 			}
 			this.setDefaultContact()
 		}
@@ -421,6 +487,19 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
+
+  .field__name {
+    font-size: 14px;
+    color: #3d3d3d;
+    border: 1px solid #bfbfbf;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+  }
 
   .dr1Comment {
     &__title {
@@ -462,6 +541,59 @@
     width: 1000px;
     border-radius: 4px;
 
+    &__delivery-name{
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    &__action-icon{
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 5px;
+      font-size: 18px;
+      i {
+        transition: .2s ease-out;
+        color: $dark-border;
+        cursor: pointer;
+
+
+        &:hover {
+          color: $text;
+        }
+      }
+    }
+
+    &__templateCommentRow {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    &__additionalOptions {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    &__certificate {
+      padding: 15px 0;
+
+      input {
+        margin-right: 15px;
+      }
+    }
+    .inputs{
+      &__group {
+        display: flex;
+        margin-bottom: 10px;
+      }
+    }
+
+    .relative__wrapper {
+      position: relative;
+    }
+
     &__checkSubTitle {
       border-bottom: 1px solid $border;
       font-family: Myriad600;
@@ -472,18 +604,20 @@
 
     &__email-comment {
       position: relative;
-      margin-top: 20px;
+      height: 50px;
+      align-items: center;
+      display: flex;
+      margin-top: 6px;
     }
 
     &__email-checkbox {
       display: flex;
       font-size: 14px;
       justify-content: center;
-      margin-bottom: 10px;
 
       & span {
-        padding-left: 5px;
-
+        padding-left: 8px;
+        margin-top: 2px;
       }
 
     }
@@ -492,6 +626,9 @@
       font-size: 21px;
       margin-bottom: 20px;
       font-family: 'Myriad600';
+      display: flex;
+      align-items: center;
+      gap: 10px
     }
 
     &__close {
@@ -519,7 +656,7 @@
     }
 
     &__table {
-      margin-top: 20px;
+      //margin-top: 20px;
     }
 
     &__check-item {
@@ -608,9 +745,8 @@
 
     &__contacts {
       position: relative;
-      width: 200px;
+      width: 220px;
       height: 50px;
-      margin-top: 20px;
     }
 
     &__group {
@@ -697,6 +833,6 @@
   }
 
   .max-with-400 {
-    max-width: 400px;
+    max-width: 440px;
   }
 </style>

@@ -154,6 +154,8 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '../../../assets/scss/colors';
+
   .notActive {
     cursor: default !important;
     color: rgba(0, 0, 0, .1) !important;
@@ -180,17 +182,18 @@
   }
 
   .associatedUser {
-    border: 1px solid #e8e8e8;
+    border: 1px solid $light-border;
     margin-bottom: 5px;
+    border-radius: 4px;
     display: flex;
 
     &__title {
-      padding: 5px;
+      padding: 7px;
     }
 
     &__block {
       width: 5px;
-      background: #e8e8e8;
+      background: $light-green;
     }
   }
 
@@ -199,7 +202,7 @@
 
     &__priorityBlockHigh {
       padding: 5px 12px;
-      background: #D15F45;
+      background: $red;
       color: white;
       width: fit-content;
       display: inline-block;
@@ -207,7 +210,7 @@
 
     &__priorityBlockRegular {
       padding: 5px 12px;
-      background: #48a6a6;
+      background: $green;
       color: white;
       width: fit-content;
       display: inline-block;
@@ -229,43 +232,43 @@
 
     &__check {
       height: 22px;
-      font-size: 21px;
+      font-size: 22px;
       width: 22px;
       margin-right: 10px;
-      color: rgba(0, 0, 0, .6);
+      color: $dark-border;
       cursor: pointer;
       transition: ease 0.2s;
 
       &:hover {
-        cursor: pointer;
-        color: #4ba5a5;
+        color: $text;
       }
     }
 
     &__checkDone {
       height: 22px;
-      font-size: 21px;
+      font-size: 22px;
       width: 22px;
-      margin-right: 10px;
-      color: #4ba5a5;
+      margin-right: 15px;
+      color: $green;
       cursor: default;
     }
 
     &__title {
-      font-size: 20px;
-      margin-bottom: 2px;
+      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     &__date {
-      color: rgba(0, 0, 0, .6);
+      font-family: Myriad300;
+      font-size: 13px;
     }
   }
 
   .activityDetail {
     &__header {
-      background: #48A6A6;
+      background: $green;
       color: white;
-      padding: 5px 20px;
+      padding: 7px 20px;
     }
   }
 
@@ -279,24 +282,23 @@
     }
 
     &__status {
-      border: 1px solid white;
-      padding: 5px;
-      margin-left: 40px;
+      border: 1px solid #fff;
+      padding: 4px 10px;
+      margin-left: 15px;
+      font-family: 'Myriad300';
+      font-size: 14px;
+      letter-spacing: 0.2px;
     }
 
     &__title {
-      font-size: 18px;
-      margin-left: 10px;
+      font-size: 20px;
+      margin-left: 15px;
+      font-family: 'Myriad300';
     }
 
     &__icon {
-      height: 40px;
-      min-width: 40px;
-      width: 40px;
-      background: white;
-      font-size: 20px;
-      border-radius: 40px;
-      color: #4ba5a5;
+      font-size: 18px;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;

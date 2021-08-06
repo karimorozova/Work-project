@@ -18,7 +18,7 @@ const {
 	getProject
 } = require("./getProjects")
 
-const { manageDeliveryFile } = require('./files')
+const { manageDeliveryFile, copyProjectFiles } = require('./files')
 
 const {
 	moveProjectFile
@@ -93,7 +93,8 @@ async function changeManagerDR2({ project, prevManager, manager, type, file, ent
 
 		if (type === 'multi') {
 			const idx = multiLang.findIndex(({ _id }) => `${ _id }` === `${ entityId }`)
-			multiLang[idx].file = { ...file, dr2Manager: manager, isFileApproved: false }
+			const fileIdx = multiLang[idx].file.findIndex(({ _id }) => `${ _id }` === `${ file._id }`)
+			multiLang[idx].file[fileIdx] = { ...file, dr2Manager: manager, isFileApproved: false }
 			return await getProjectAfterUpdate({ "_id": project._id }, { "tasksDR2.multiLang": multiLang })
 		} else {
 			const idx = singleLang.findIndex(({ _id }) => `${ _id }` === `${ entityId }`)
@@ -164,7 +165,7 @@ const taskApproveReady = async ({ projectId, type, entityId }) => {
 
 async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 	const allLang = await Languages.find({})
-	const { projectId: strId, tasks, tasksDR2: { singleLang, multiLang } } = await Projects.findOne({ _id: projectId })
+	const { projectId: strId, projectName, tasks, tasksDR2: { singleLang, multiLang } } = await Projects.findOne({ _id: projectId })
 
 	const { sourceLanguage, targetLanguage, service } = tasks.find(({ taskId: tId }) => tId === taskId)
 	const sourceLang = allLang.find(({ symbol }) => sourceLanguage === symbol)
@@ -202,6 +203,7 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 		const instructions = service.title === 'Compliance' ? drInstructionsCompliance : dr2Instructions
 		singleLang.push({
 			deliveryInternalId: returnNewDeliveryId(strId, singleLang, multiLang),
+			deliveryName: projectName,
 			status: 'Pending Approval [DR2]',
 			sourceLanguage: sourceLang._id,
 			targetLanguage: targetLang._id,
@@ -214,26 +216,38 @@ async function addDR2({ projectId, taskId, dr1Manager, dr2Manager, files }) {
 const sendNotificationToDR2 = async (projectId, taskIds, accountManager) => {
 	const project = await Projects.findOne({ _id: projectId })
 	const allUsers = await User.find().populate('group')
-	const messageToNew = managerDr1Assigned({ taskId: taskIds, project, manager: allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`), }, '2')
+	const messageToNew = managerDr1Assigned({ taskId: taskIds, project, manager: allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`) }, '2')
 	await managerNotifyMail(allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`), messageToNew, `The DR2 has been assigned to you: ${ project.projectId } (I009.1)`)
 }
 
+const changeNameLang = async ({projectId, deliveryId, deliveryName, type}) => {
+	const deliveryType = type === 'single' ? 'singleLang': 'multiLang'
+	await Projects.updateOne(
+			{ "_id": projectId, [`tasksDR2.${deliveryType}._id`]: deliveryId },
+			{ [`tasksDR2.${deliveryType}.$[i].deliveryName`]: deliveryName },
+			{ arrayFilters: [ { 'i._id': deliveryId } ] }
+	)
+	return await getProject({ _id: projectId })
+}
+
+
+
 function returnNewDeliveryId(projectId, singleLang, multiLang) {
-	if(!singleLang.length && !multiLang.length) return `${projectId} D01`
+	if (!singleLang.length && !multiLang.length) return `${ projectId } D01`
 
 	let arrayOfDeliveryIds = []
-	if(singleLang.length) for(let { deliveryInternalId } of singleLang) arrayOfDeliveryIds.push(deliveryInternalId)
-	if(multiLang.length) for(let { deliveryInternalId } of multiLang) arrayOfDeliveryIds.push(deliveryInternalId)
+	if (singleLang.length) for (let { deliveryInternalId } of singleLang) arrayOfDeliveryIds.push(deliveryInternalId)
+	if (multiLang.length) for (let { deliveryInternalId } of multiLang) arrayOfDeliveryIds.push(deliveryInternalId)
 
 	return findAndReturnBiggestId(arrayOfDeliveryIds)
 
-	function findAndReturnBiggestId(arr){
+	function findAndReturnBiggestId(arr) {
 		const formattedArr = arr.map(item => /\d*$/ig.exec(item)[0]).map(item => {
-			const [first, ...rest] = item;
+			const [ first, ...rest ] = item
 			return +rest[0]
 		})
-		const maxNumberInArray = Math.max.apply(null, formattedArr);
-		return `${projectId} D0${maxNumberInArray+1}`
+		const maxNumberInArray = Math.max.apply(null, formattedArr)
+		return `${ projectId } D0${ maxNumberInArray + 1 }`
 	}
 }
 
@@ -258,23 +272,43 @@ const removeDR2 = async ({ projectId, taskId, path, sourceLanguage: source, targ
 	}
 }
 
-async function addMultiLangDR2({ projectId, taskIds, refFiles }) {
-	const {projectId: strId, tasksDR2: { singleLang, multiLang: projectMultiLang }, projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
+async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault }) {
+	const { projectId: strId, projectName, tasksDR2: { singleLang, multiLang: projectMultiLang }, projectManager, accountManager, tasksDR2 } = await Projects.findOne({ _id: projectId })
 
-	const file = (await storeFile(refFiles[0], projectId))[0]
+	let files = []
+	if (refFiles) {
+		for await (let file of Array.from(refFiles)) {
+			const path = await storeFile(file, projectId)
+			files.push({
+				fileName: path.split('/').pop(),
+				path,
+				isFileApproved: false,
+				dr1Manager: projectManager,
+				dr2Manager: accountManager
+			})
+		}
+	}
+
+	if (filesFromVault.length) {
+		for (let file of filesFromVault) {
+			const path = copyProjectFiles({ _id: projectId }, file)
+			files.push({
+				fileName: path.split('/').pop(),
+				path,
+				isFileApproved: false,
+				dr1Manager: projectManager,
+				dr2Manager: accountManager
+			})
+		}
+	}
 
 	let multiLang = {
 		deliveryInternalId: returnNewDeliveryId(strId, singleLang, projectMultiLang),
+		deliveryName: projectName,
 		tasks: taskIds,
 		instructions: dr2Instructions,
 		status: 'Pending Approval [DR2]',
-		file: {
-			fileName: file.split('/').pop(),
-			path: file,
-			isFileApproved: false,
-			dr1Manager: projectManager,
-			dr2Manager: accountManager
-		}
+		file: files
 	}
 
 	await sendNotificationToDR2(projectId, taskIds, accountManager)
@@ -284,13 +318,11 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles }) {
 	async function storeFile(file, projectId) {
 		try {
 			const additionFileInfo = `${ Math.floor(Math.random() * 1000000) }`
-			let storedFiles = []
 			if (file) {
 				const newPath = `/projectFiles/${ projectId }/${ additionFileInfo }-${ file.filename.replace(/['"]/g, '_').replace(/\s+/, '_') }`
 				await moveProjectFile(file, `./dist${ newPath }`)
-				storedFiles.push(newPath)
+				return newPath
 			}
-			return storedFiles
 		} catch (err) {
 			console.log(err)
 			console.log("Error in storeFiles")
@@ -385,14 +417,46 @@ const targetFileDR2 = async (fileData, files) => {
 			)
 		}
 	} else {
-		const { file: { dr1Manager, dr2Manager } } = project.tasksDR2.multiLang.find(({ _id }) => _id.toString() === entityId)
-		const newPath = await manageDeliveryFile({ fileData, file: files[0] })
-		const fileName = newPath.split("/").pop()
-		await Projects.updateOne(
-				{ "_id": projectId, 'tasksDR2.multiLang._id': entityId },
-				{ "tasksDR2.multiLang.$[i].file": { isFileApproved: false, dr1Manager, dr2Manager, fileName: fileName, path: newPath } },
-				{ arrayFilters: [ { 'i._id': entityId } ] }
-		)
+		// const { file } = project.tasksDR2.multiLang.find(({ _id }) => _id.toString() === entityId)
+		let filesRedyToPush = []
+		if (!!path) {
+			const newPath = await manageDeliveryFile({ fileData, file: files[0] })
+			const fileName = newPath.split("/").pop()
+			await Projects.updateOne(
+					{ "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.file.path": path },
+					{
+						"tasksDR2.multiLang.$[i].file.$[j]": {
+							isFileApproved: false,
+							// pair: getLanguagesPairsSymbols(sourceLanguage, targetLanguage),
+							fileName: fileName,
+							path: newPath,
+							// taskId,
+							dr1Manager,
+							dr2Manager: user
+						}
+					},
+					{ arrayFilters: [ { 'i._id': entityId }, { 'j.path': path } ] }
+			)
+		} else {
+			for (let i = 0; i < files.length; i++) {
+				const newPath = await manageDeliveryFile({ fileData, file: files[i] })
+				const fileName = newPath.split("/").pop()
+				filesRedyToPush.push({
+					fileName: fileName,
+					path: newPath,
+					isFileApproved: false,
+					dr1Manager: project.projectManager._id,
+					dr2Manager: user
+				})
+			}
+			await Projects.updateOne(
+					{ "_id": projectId, 'tasksDR2.multiLang._id': entityId },
+					{ $push: { "tasksDR2.multiLang.$[i].file": filesRedyToPush } },
+					{ arrayFilters: [ { 'i._id': entityId } ] }
+			)
+
+		}
+
 	}
 
 	return await getProject({ "_id": projectId })
@@ -484,66 +548,103 @@ const approveFilesDR2 = async ({ type, entityId, projectId, isFileApproved, path
 		)
 	} else {
 		await Projects.updateOne(
-				{ "_id": projectId, 'tasksDR2.multiLang._id': entityId },
-				{ "tasksDR2.multiLang.$[i].file.isFileApproved": isFileApproved },
-				{ arrayFilters: [ { 'i._id': entityId } ] }
+				{ "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.file.path": { $in: paths } },
+				{ "tasksDR2.multiLang.$[i].file.$[j].isFileApproved": isFileApproved },
+				{ arrayFilters: [ { 'i._id': entityId }, { 'j.path': { $in: paths } } ] }
 		)
+		// await Projects.updateOne(
+		// 		{ "_id": projectId, 'tasksDR2.multiLang._id': entityId },
+		// 		{ "tasksDR2.multiLang.$[i].file.isFileApproved": isFileApproved },
+		// 		{ arrayFilters: [ { 'i._id': entityId } ] }
+		// )
 	}
 	return await getProject({ "_id": projectId })
 }
 
 const changeManagersDR1 = async ({ projectId, checkedTasksId, manager }) => {
-		const allUsers = await User.find().populate('group')
-		let project = await getProject({ '_id': projectId })
+	const allUsers = await User.find().populate('group')
+	let project = await getProject({ '_id': projectId })
 
-		const message = severalDr1Assign({ manager, project, checkedTasksId })
-		await managerNotifyMail(manager, message, `DR1 has been assigned to you ${ project.projectId } (I009.1)`)
+	const message = severalDr1Assign({ manager, project, checkedTasksId })
+	await managerNotifyMail(manager, message, `DR1 has been assigned to you ${ project.projectId } (I009.1)`)
 
-		let tasksAndManagersForReassign = []
-		let finalManagerTasks = []
+	let tasksAndManagersForReassign = []
+	let finalManagerTasks = []
 
-		for (let taskId of checkedTasksId) {
-			const { tasksDR1 } = project
-			const { dr1Manager } = tasksDR1.find(item => item.taskId === taskId)
-			tasksAndManagersForReassign.push({ taskId, manager: dr1Manager })
-		}
+	for (let taskId of checkedTasksId) {
+		const { tasksDR1 } = project
+		const { dr1Manager } = tasksDR1.find(item => item.taskId === taskId)
+		tasksAndManagersForReassign.push({ taskId, manager: dr1Manager })
+	}
 
-		const managersTasks = _.chain(tasksAndManagersForReassign).groupBy("manager").value()
-		for (let manager in managersTasks) {
-			finalManagerTasks.push({
-				manager: allUsers.find(({ _id }) => `${ _id }` === `${ manager }`),
-				checkedTasksId: managersTasks[manager].map(({ taskId }) => taskId)
-			})
-		}
+	const managersTasks = _.chain(tasksAndManagersForReassign).groupBy("manager").value()
+	for (let manager in managersTasks) {
+		finalManagerTasks.push({
+			manager: allUsers.find(({ _id }) => `${ _id }` === `${ manager }`),
+			checkedTasksId: managersTasks[manager].map(({ taskId }) => taskId)
+		})
+	}
 
-		for (let item of finalManagerTasks) {
-			const message = severalDr1reAssign({ prevManager: item.manager, manager, project, checkedTasksId: item.checkedTasksId })
-			await managerNotifyMail(item.manager, message, `DR1 has been assigned to you ${ project.projectId } (I009.1)`)
-		}
+	for (let item of finalManagerTasks) {
+		const message = severalDr1reAssign({ prevManager: item.manager, manager, project, checkedTasksId: item.checkedTasksId })
+		await managerNotifyMail(item.manager, message, `DR1 has been assigned to you ${ project.projectId } (I009.1)`)
+	}
 
-		await Projects.updateOne(
-				{ "_id": projectId, 'tasksDR1.taskId': { $in: checkedTasksId } },
-				{ "tasksDR1.$[i].dr1Manager": manager._id },
-				{ arrayFilters: [ { 'i.taskId': { $in: checkedTasksId } } ] }
-		)
+	await Projects.updateOne(
+			{ "_id": projectId, 'tasksDR1.taskId': { $in: checkedTasksId } },
+			{ "tasksDR1.$[i].dr1Manager": manager._id },
+			{ arrayFilters: [ { 'i.taskId': { $in: checkedTasksId } } ] }
+	)
 
-		return await getProject({ "_id": projectId })
+	return await getProject({ "_id": projectId })
 }
 
-const saveCertificateTODR1Files = async ({ _id }, { taskId }) => {
+const saveCertificateTODR1Files = async (project, type, deliveryData) => {
 	const additionFileInfo = `${ Math.floor(Math.random() * 1000000) }`
-	const newPath = `/projectFiles/${ _id }/${ additionFileInfo }-certificate.pdf`
+	const fileName = `${ additionFileInfo }-certificate.pdf`
+	const newPath = `/projectFiles/${ project._id }/${ fileName }`
 	try {
 		await moveFile({ path: './dist/uploads/certificatePdf.pdf' }, `./dist${ newPath }`)
-		await Projects.updateOne(
-				{ _id, 'tasksDR1.taskId': taskId },
-				{ $push: { 'tasksDR1.$.files': { isFileApproved: false, fileName: `${ additionFileInfo }-certificate.pdf`, path: newPath } } }
-		)
+
+		if (type === 'single') {
+			const allLanguages = await Languages.find()
+			const file = {
+				isFileApproved: false,
+				pair: `${ allLanguages.find(item => item._id.toString() === deliveryData.sourceLanguage).symbol } >> ${ allLanguages.find(item => item._id.toString() === deliveryData.targetLanguage).symbol }`,
+				fileName,
+				path: newPath,
+				taskId: 'Loaded in DR2',
+				dr1Manager: project.projectManager._id,
+				dr2Manager: project.accountManager._id
+			}
+
+			await Projects.updateOne(
+					{ "_id": project._id, 'tasksDR2.singleLang._id': deliveryData._id },
+					{ $push: { "tasksDR2.singleLang.$[i].files": file } },
+					{ arrayFilters: [ { 'i._id': deliveryData._id } ] }
+			)
+		}
+
+		if (type === 'multi') {
+			const file = {
+				fileName,
+				path: newPath,
+				isFileApproved: false,
+				dr1Manager: project.projectManager._id,
+				dr2Manager: project.accountManager._id
+			}
+
+			await Projects.updateOne(
+					{ "_id": project._id, 'tasksDR2.multiLang._id': deliveryData._id },
+					{ $push: { "tasksDR2.multiLang.$[i].file": file } },
+					{ arrayFilters: [ { 'i._id': deliveryData._id } ] }
+			)
+		}
 	} catch (err) {
 		console.log(err)
 		console.log("Error in saveCertificateTODR1Files")
 	}
-	return await getProject({ _id })
+	return await getProject({ _id: project._id })
 }
 
 module.exports = {
@@ -564,5 +665,6 @@ module.exports = {
 	changeManagerDR2,
 	changeManager,
 	rollbackReview,
-	targetFileDR2
+	targetFileDR2,
+	changeNameLang,
 }

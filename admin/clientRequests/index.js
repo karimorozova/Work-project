@@ -2,6 +2,7 @@ const  {
 	getClientRequestById,
   getClientRequestAfterUpdate,
 	getClientsRequests,
+	removeClientRequestById,
 } = require('./getClientsRequests')
 
 const {
@@ -41,24 +42,12 @@ module.exports = {
 	storeRequestFilesForTasksAndSteps,
 	getTaskCopiedFiles,
 	getTaskCopiedFilesFromRequestToProject,
-	// getClientRequest,
-	// getClientRequests,
-	// updateClientRequest,
-	// getFilteredClientRequests,
-	// createRequest,
-	// storeRequestFiles,
-	// addRequestFile,
-	// removeRequestFile,
-	// removeRequestFiles,
-	// clientRequestNotification,
-	// sendNotificationToManager,
-	// removeClientRequest,
-	// notifyRequestCancelled
 	getClientsRequests,
 	getClientRequestById,
 	updateClientRequestProps,
 	getClientRequestAfterUpdate,
   updateClientContacts,
+	removeClientRequestById,
   removeContactClientRequest,
   sendMailToClient,
 }

@@ -10,8 +10,8 @@ async function notifyManagerProjectRejected(project) {
 		const projectManager = await User.findOne({ "_id": project.projectManager._id });
 		const messagePM = managerProjectRejectedMessage({ ...project._doc, manager: projectManager.firstName });
 		const messageAM = managerProjectRejectedMessage({ ...project._doc, manager: accManager.firstName });
-		await managerNotifyMail(accManager, messageAM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (ID C003.0)`);
-		await managerNotifyMail(projectManager, messagePM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (ID C003.0)`);
+		await managerNotifyMail(accManager, messageAM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (C003.0)`);
+		await managerNotifyMail(projectManager, messagePM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (C003.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyManagerProjectRejected");
@@ -40,8 +40,8 @@ async function notifyMangerProjectAppoved({ project, projectManager, accountMana
 	try {
 		const messageAM = managerProjectAcceptedMessage({ ...project._doc, accManager: accountManager.firstName });
 		const messagePM = managerProjectAcceptedMessage({ ...project._doc, accManager: projectManager.firstName });
-		await managerNotifyMail(accountManager, messageAM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (ID C002.0)`);
-		await managerNotifyMail(projectManager, messagePM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (ID C002.0)`);
+		await managerNotifyMail(accountManager, messageAM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (C002.0)`);
+		await managerNotifyMail(projectManager, messagePM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (C002.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in notifyMangerProjectAppoved");
@@ -73,8 +73,8 @@ async function managerEmailsSend({ project, projectManager, accountManager }) {
 		const smMessageObj = { ...project._doc, user: { ...accountManager._doc, id: accountManager.id } };
 		const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
 		const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
-		await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (ID I001.0)`);
-		await managerNotifyMail(accountManager, smMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (ID I001.0)`);
+		await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (I001.0)`);
+		await managerNotifyMail(accountManager, smMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (I001.0)`);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in managerEmailsSend");

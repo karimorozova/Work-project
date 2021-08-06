@@ -142,7 +142,7 @@
             @check="(e) => setQuoteDecision('Start')"
           )
         .form__submit
-          Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm")
+          Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm || isRequestSend")
 
       div(v-if="!isSent")
         .content__order
@@ -203,11 +203,11 @@ import ClientTable from "../../../../components/ClientTable"
 import Button from "../../../../components/buttons/Button"
 import ClientRequestCompleted from "../../../../components/completedOrder/clientRequestCompleted"
 import ValidationErrors from "../../../../components/ValidationErrors"
-import error from "../../../../../vendor/layouts/error"
 
 export default {
   data() {
     return {
+      isRequestSend: false,
       currentDeadline: '',
       currentProjectName: '',
       currentSourceLang: {},
@@ -312,6 +312,7 @@ export default {
       }
     },
     async addService() {
+      this.isRequestSend = true
       let formData = new FormData()
       formData.append('deadline', this.currentDeadline)
       formData.append('projectName', this.currentProjectName)
@@ -329,8 +330,9 @@ export default {
       try {
         await this.$axios.post('/portal/compliance-service', formData)
         this.isSent = true
+        this.isRequestSend = false
       } catch (err) {
-
+        this.isRequestSend = false
       }
     },
     removeContact(index) {
@@ -388,11 +390,13 @@ export default {
       const filteredFiles = Array.from(files).filter(item => item.size < 50000000).filter(item => !this.sourceFiles.map(item => item.name).includes(item.name))
       this.sourceFiles.push(...filteredFiles )
       this.clearFileInput('sourceFiles')
+      this.closeFileModal()
     },
     setRefFiles({ files }) {
       const filteredFiles = Array.from(files).filter(item => item.size < 50000000).filter(item => !this.refFiles.map(item => item.name).includes(item.name))
 	    this.refFiles.push(...filteredFiles )
       this.clearFileInput('refFiles')
+	    this.closeFileModal()
     },
     clearFileInput(name) {
       const fileInput = document.querySelector(`input[name=${ name }]`)
@@ -411,8 +415,8 @@ export default {
     ...mapGetters({
       user: "getUserInfo",
       allLanguages: 'allLanguages',
-      clientSourceLanguages: "clientSourceLanguages",
-      clientTargetLanguages: "clientTargetLanguages",
+      // clientSourceLanguages: "clientSourceLanguages",
+      // clientTargetLanguages: "clientTargetLanguages",
       getClientIndustries: "getClientIndustries",
       clientInfo: "getClientInfo"
     }),

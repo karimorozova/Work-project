@@ -5,12 +5,7 @@
         .buttons__radio
           RadioButton.radio(name="Company" :selected="clientType" @toggleRadio="toggleRadio")
           RadioButton.radio(name="Individual" :selected="clientType" @toggleRadio="toggleRadio")
-        .button-group
-          .button
-            Button(value="Save" @clicked="checkForErrors")
-          .button
-            Button(value="Cancel" @clicked="cancel")
-      .title General Information
+
       .new-client-info__gen-info
         NewGeneral(
           :client="client"
@@ -19,50 +14,89 @@
           :languages="languages"
           :timezones="timezones"
         )
-      .title(v-if="!isIndividual") Contact Details
-      .new-client-info__contacts-info(v-if="!isIndividual" :class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
-        NewContactsInfo(
-          :client="client"
-          @contactDetails="contactDetails"
-          @setLeadContact="setLeadContact"
-          @saveContactUpdates="saveContactUpdates"
-          @newContact="addNewContact"
-          @approveDelete="approveContactDelete"
-        )
-      .title Rates Parameters
-      .new-client-info__rates
-        NewRates(
-          :client="client"
-          :isSaveClicked="isSaveClicked"
-        )
 
-      .title Documents
-      .new-client-info__documents
-        NewClientDocuments(
-          @uploadFiles="uploadFiles"
-        )
+      .new-client-info__block(v-if="!isIndividual" :class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
+        .block__header(@click="toggleBlock('isContactDetails')")
+          .title Contact Details
+          .icon(v-if="!isContactDetails")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isContactDetails")
+          NewContactsInfo(
+            :client="client"
+            @contactDetails="contactDetails"
+            @setLeadContact="setLeadContact"
+            @saveContactUpdates="saveContactUpdates"
+            @newContact="addNewContact"
+            @approveDelete="approveContactDelete"
+          )
 
-      .title Sales Information
-      .new-client-info__sales
-        NewClientSalesInfo(
-          :client="client"
-          @setLeadSource="setLeadSource"
-          :isEmpty="isLeadEmpty"
-        )
+      .new-client-info__block
+        .block__header(@click="toggleBlock('isRatesParameters')")
+          .title Rates Parameters
+          .icon(v-if="!isRatesParameters")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isRatesParameters")
+          NewRates(
+            :client="client"
+            :isSaveClicked="isSaveClicked"
+          )
 
-      .title(v-if="!isIndividual") Billing Information
-      .new-client-info__billing(v-if="!isIndividual")
-        NewClientBillInfo(
-          :client="client"
-          :errorFields="billErrors"
-          @changeProperty="setBillInfo"
-        )
+      .new-client-info__block
+        .block__header(@click="toggleBlock('isDocuments')")
+          .title Documents
+          .icon(v-if="!isDocuments")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isDocuments")
+          NewClientDocuments(
+            @uploadFiles="uploadFiles"
+          )
+
+      .new-client-info__block
+        .block__header(@click="toggleBlock('isSalesInformation')")
+          .title Sales Information
+          .icon(v-if="!isSalesInformation")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isSalesInformation")
+          NewClientSalesInfo(
+            :client="client"
+            @setLeadSource="setLeadSource"
+            :isEmpty="isLeadEmpty"
+          )
+
+      .new-client-info__block(v-if="!isIndividual")
+        .block__header(@click="toggleBlock('isBillingInformation')")
+          .title Billing Information
+          .icon(v-if="!isBillingInformation")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isBillingInformation")
+          NewClientBillInfo(
+            :client="client"
+            :errorFields="billErrors"
+            @changeProperty="setBillInfo"
+          )
 
       ValidationErrors(
         v-if="areErrorsExist"
         :errors="errors"
         @closeErrors="closeErrorsBlock"
       )
+
+      .button-group
+        .button
+          Button(value="Save" @clicked="checkForErrors")
+        .button
+          Button(value="Cancel" @clicked="cancel")
+
     .new-client-subinfo
       .new-client-subinfo__general
         NewSideGeneral(
@@ -84,7 +118,7 @@
 	import { mapGetters, mapActions } from "vuex"
 	import vatChecker from "../../../mixins/Client/vatChecker"
 	import NewContactsInfo from "./NewContactsInfo"
-  import RadioButton from "../../RadioButton";
+	import RadioButton from "../../RadioButton"
 
 	export default {
 		mixins: [ vatChecker ],
@@ -107,6 +141,12 @@
 		},
 		data() {
 			return {
+				isContactDetails: true,
+				isRatesParameters: true,
+				isDocuments: true,
+				isSalesInformation: true,
+				isBillingInformation: true,
+
 				timezones: [],
 				languages: [],
 				errors: [],
@@ -120,7 +160,7 @@
 				contractFile: [],
 				ndaFile: [],
 				documentsFiles: [],
-        clientType: 'Company',
+				clientType: 'Company',
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
 			}
 		},
@@ -129,16 +169,19 @@
 			this.getTimezones()
 		},
 		methods: {
-      toggleRadio({value}) {
-        this.clientType = value
-        if (value === "Individual") {
-          this.resetFieldsToIndividualType()
-        }
-      },
-      resetFieldsToIndividualType () {
-        this.client.industries = [this.industries.find(({name}) => name === "Other")]
-        this.client.leadSource = "Online Search"
-      },
+			toggleBlock(prop) {
+				this[prop] = !this[prop]
+			},
+			toggleRadio({ value }) {
+				this.clientType = value
+				if (value === "Individual") {
+					this.resetFieldsToIndividualType()
+				}
+			},
+			resetFieldsToIndividualType() {
+				this.client.industries = [ this.industries.find(({ name }) => name === "Other") ]
+				this.client.leadSource = "Online Search"
+			},
 			async getLangs() {
 				try {
 					const result = await this.$http.get("/api/languages")
@@ -217,10 +260,10 @@
 				if (!this.client.industries.length) this.errors.push('Please, choose at least one industry.')
 				if (!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.')
 				if (!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.')
-				if (this.clientType !=="Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
+				if (this.clientType !== "Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
 				if (!this.client.currency.length) this.errors.push('Please, add currency.')
 				if (this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.')
-				if (this.clientType !=="Individual" && !this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.')
+				if (this.clientType !== "Individual" && !this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.')
 				if (!this.client.status) this.errors.push('Please, choose status.')
 				if (!this.client.leadSource) {
 					this.errors.push('Please, choose lead source.')
@@ -232,7 +275,7 @@
 				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
 					this.errors.push('Please provide a valid email in General Information.')
 				}
-				if (this.clientType !=="Individual" && this.client.billingInfo.paymentType === '') {
+				if (this.clientType !== "Individual" && this.client.billingInfo.paymentType === '') {
 					this.errors.push('Please, add Payment type.')
 					this.billErrors.push('payment')
 				}
@@ -242,14 +285,14 @@
 				// }
 				if (
 						!this.client.accountManager ||
-            // !this.client.salesManager ||
-            !this.client.projectManager) this.errors.push('All managers should be assigned.')
+						// !this.client.salesManager ||
+						!this.client.projectManager) this.errors.push('All managers should be assigned.')
 
 				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)
 				if (isSameEmailsExists) {
 					this.errors.push("A client with such Email already exists, the client's Email should be unique!")
 				}
-				if (this.clientType !=="Individual" && this.client.website) {
+				if (this.clientType !== "Individual" && this.client.website) {
 					if (this.websiteRegEx.exec(this.client.website) === null) {
 						this.errors.push("The website field must contain a link")
 					}
@@ -268,7 +311,7 @@
 				}
 				this.clientType === "Company" ? await this.saveClient() : await this.saveClientIndividual()
 
-      },
+			},
 
 			async checkSameClientEmails(clientEmail) {
 				const clientMails = await this.$http.get('/clientsapi/all-clients-emails')
@@ -280,61 +323,61 @@
 			uploadFiles(data) {
 				this.documentsFiles = data
 			},
-      async saveClientIndividual () {
-        let sendData = new FormData()
+			async saveClientIndividual() {
+				let sendData = new FormData()
 
 
-        this.client.nativeLanguage = null
-        this.client.timeZone = null
-        this.client.website = ""
-        this.client.officialCompanyName = this.client.name
-        this.client.clientType = "Individual"
+				this.client.nativeLanguage = null
+				this.client.timeZone = null
+				this.client.website = ""
+				this.client.officialCompanyName = this.client.name
+				this.client.clientType = "Individual"
 
-        this.client.billingInfo= {
-              officialCompanyName: this.client.name,
-              vat: false,
-              vatId: '',
-              dueDate: '',
-              address: '',
-              invoiceSending: false,
-              paymentType: "PPP"
-        }
+				this.client.billingInfo = {
+					officialCompanyName: this.client.name,
+					vat: false,
+					vatId: '',
+					dueDate: '',
+					address: '',
+					invoiceSending: false,
+					paymentType: "PPP"
+				}
 
-        this.client.contacts = [{
-          leadContact: true,
-          firstName:  this.client.name,
-          surname: "",
-          password: "12345",
-          email: this.client.email,
-          gender: "",
-          position: "Manager",
-          phone: "",
-          photo: "",
-          whatsApp: "",
-          skype: "",
-          linkedIn: "",
-          country: "",
-          notes: "",
-        }]
+				this.client.contacts = [ {
+					leadContact: true,
+					firstName: this.client.name,
+					surname: "",
+					password: "12345",
+					email: this.client.email,
+					gender: "",
+					position: "Manager",
+					phone: "",
+					photo: "",
+					whatsApp: "",
+					skype: "",
+					linkedIn: "",
+					country: "",
+					notes: ""
+				} ]
 
-        sendData.append('client', JSON.stringify(this.client))
-        for (let i = 0; i < this.contactsPhotos.length; i++) {
-          sendData.append('photos', this.contactsPhotos[i])
-        }
-        for (const document of this.documentsFiles) {
-          sendData.append(document.category, document.file)
-        }
-        try {
-          // console.log(this.client)
-          const result = await this.$http.post('/clientsapi/update-client', sendData)
-          const newClient = { ...result.data.client }
-          await this.addNewClient(newClient)
-          this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
-          await this.$router.push(`/pangea-clients/all/details/${ newClient._id }`)
-        } catch (err) {
-          this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
-        }
-      },
+				sendData.append('client', JSON.stringify(this.client))
+				for (let i = 0; i < this.contactsPhotos.length; i++) {
+					sendData.append('photos', this.contactsPhotos[i])
+				}
+				for (const document of this.documentsFiles) {
+					sendData.append(document.category, document.file)
+				}
+				try {
+					// console.log(this.client)
+					const result = await this.$http.post('/clientsapi/update-client', sendData)
+					const newClient = { ...result.data.client }
+					await this.addNewClient(newClient)
+					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
+					await this.$router.push(`/pangea-clients/all/details/${ newClient._id }`)
+				} catch (err) {
+					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
+				}
+			},
 			async saveClient() {
 				let sendData = new FormData()
 
@@ -370,7 +413,7 @@
 		computed: {
 			...mapGetters({
 				allClients: "getClients",
-        industries: "getAllIndustries",
+				industries: "getAllIndustries"
 			}),
 			selectedIndNames() {
 				let result = []
@@ -381,12 +424,12 @@
 				}
 				return result
 			},
-      isIndividual() {
-			  return this.clientType === 'Individual'
-      }
+			isIndividual() {
+				return this.clientType === 'Individual'
+			}
 		},
 		components: {
-      RadioButton,
+			RadioButton,
 			NewContactsInfo,
 			NewGeneral,
 			Button,
@@ -411,7 +454,7 @@
 
   .new-client-subinfo {
     &__general {
-      margin-top: 97px;
+      margin-top: 40px;
       width: 390px;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       margin-left: 40px;
@@ -431,26 +474,60 @@
     }
   }
 
+  .block {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      cursor: pointer;
+      align-items: center;
+      transition: .2s ease;
+      align-items: center;
+      letter-spacing: 0.2px;
+
+      .title {
+        font-size: 15px;
+        font-family: Myriad600;
+      }
+
+      .icon {
+        font-size: 15px;
+        color: $text;
+      }
+    }
+
+    &__data {
+      padding: 20px 20px 20px;
+      border-top: 2px solid $light-border;
+    }
+  }
+
   .new-client-info {
     position: relative;
     width: 1000px;
 
-    &__gen-info, &__rates, &__documents, &__contacts-info, &__sales, &__billing {
+    &__gen-info {
       padding: 20px;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       box-sizing: border-box;
-      background: white;
+      margin-bottom: 25px;
+      position: relative;
       border-radius: 4px;
+      background-color: white;
+    }
+
+    &__block {
+      box-sizing: border-box;
+      margin-bottom: 25px;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      position: relative;
+      border-radius: 4px;
+      background-color: white;
     }
 
     &_error-shadow {
       box-shadow: 0 0 5px $red;
     }
-  }
-
-  .title {
-    font-size: 21px;
-    padding: 30px 0 10px;
   }
 
   .buttons {
@@ -459,8 +536,9 @@
     justify-content: space-between;
     align-items: center;
 
-    &__radio{
+    &__radio {
       display: flex;
+      margin-bottom: 20px;
 
       .radio {
         margin-right: 10px;
@@ -471,6 +549,9 @@
   .button-group {
     display: flex;
     align-items: center;
+    width: 1000px;
+    justify-content: center;
+    margin-top: 30px;
   }
 
   .button {

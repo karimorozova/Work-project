@@ -469,7 +469,6 @@
       margin-bottom: 20px;
 
       ::-webkit-input-placeholder {
-        color: #68573E;
         opacity: 0.4;
       }
     }
@@ -485,7 +484,6 @@
       height: 42px;
       width: 488px;
       border-radius: 4px;
-      color: #68573E;
       border: 1px solid $border;
       outline: none;
       color: $text;

@@ -601,6 +601,7 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	} else {
 		assignedSteps.push(neededStep);
 	}
+	assignedSteps = assignedSteps.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
 	let projectUsers = [];
 	const currentProjectUsers = await getProjectUsers(memoqProjectId);
@@ -691,17 +692,62 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 }
 
 const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
+	const users = await getMemoqUsers()
+	const allVendors = await Vendors.find()
 	let { steps } = await Projects.findOne({ '_id': projectId })
-	const { memoqProjectId, memoqDocIds, deadline, serviceStep: { memoqAssignmentRole }, vendor: vendorId } = steps.find(item => item.stepId === stepId)
-	const { email } = await Vendors.findOne({ "_id": vendorId })
 
-	const users = await getMemoqUsers();
-	const user = users.find(item => item.email === email)
+	const { taskId } = steps.find(item => item.stepId === stepId)
 
-	if(user.id){
-		for await (let documentGuid of memoqDocIds) {
-			await setMemoqDocsDeadline(memoqProjectId, documentGuid, deadline, memoqAssignmentRole, user.id)
-		}
+	const allTasksStep = steps
+			.filter(item => item.taskId === taskId)
+			.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+
+	const currentStepIndex = allTasksStep.findIndex(item => item.stepId === stepId)
+
+	if (currentStepIndex === 0) {
+		const documentAssigment = generateStructure([ stepId ], steps)
+		await setDeadlineByStepId(stepId, documentAssigment)
+	}
+
+	if (currentStepIndex === 1) {
+		const mappedSteps = allTasksStep.map(({ stepId }) => stepId)
+		const documentAssigment = generateStructure(mappedSteps, steps)
+		for await (let stepId of mappedSteps) await setDeadlineByStepId(stepId, documentAssigment)
+	}
+
+	async function setDeadlineByStepId(stepId, structure) {
+		const {
+			memoqProjectId,
+			memoqDocIds
+		} = steps.find(item => item.stepId === stepId)
+
+		for await (let documentGuid of memoqDocIds)
+			await setMemoqDocsDeadline(memoqProjectId, documentGuid, structure)
+	}
+
+	function generateStructure(arrIds, steps) {
+		return arrIds.reduce((acc, curr) => {
+			const {
+				deadline,
+				serviceStep: { memoqAssignmentRole },
+				vendor: vendorId
+			} = steps.find(item => item.stepId === curr)
+
+			const { email } = allVendors
+					.find(({ _id }) => _id.toString() === vendorId.toString())
+
+			const user = users
+					.find(item => item.email === email)
+
+			acc = acc + `
+					<ns:TranslationDocumentUserRoleAssignment>
+					<ns:DeadLine>${ deadline }</ns:DeadLine>
+					<ns:DocumentAssignmentRole>${ memoqAssignmentRole }</ns:DocumentAssignmentRole>
+					<ns:UserGuid>${ user.id }</ns:UserGuid>
+					</ns:TranslationDocumentUserRoleAssignment>
+				`
+			return acc
+		}, '')
 	}
 }
 

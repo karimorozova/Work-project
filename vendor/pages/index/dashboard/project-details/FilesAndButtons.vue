@@ -87,8 +87,9 @@
 
 						const noUserGuidInMemoq = !memoqUserGuids.includes(this.getVendor.guid)
 						const includesEmailInMemoq = memoqUserMails.includes(this.getVendor.email)
+
 						switch (true) {
-							case typeCAT && this.getVendor.guid === null && !includesEmailInMemoq:
+							case typeCAT && (this.getVendor.guid === null || this.getVendor.guid === '') && !includesEmailInMemoq:
 								await this.createMemoqTranslator()
 								break
 							case typeCAT && !!this.getVendor.guid && noUserGuidInMemoq && !includesEmailInMemoq:
@@ -102,7 +103,6 @@
 								break
 						}
           }
-
 				} catch (err) {
 					console.log(err)
 					this.alertToggle({ message: "Error in creating Vendor in MemoQ or guid recovering!", isShow: true, type: "error" })

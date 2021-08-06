@@ -8,66 +8,73 @@
         :length="length"
         :isPercent="true"
       )
-    .button(v-if="dataArray.some(it => !!it.isCheck)")
+    .button(v-if="finalData.some(it => !!it.isCheck)")
       Button(value="Update Selected" @clicked="openUpdateModal")
 
-    DataTable(
-      :fields="fields",
-      :tableData="tableData",
-      :bodyClass="['client-pricelist-table-body', { 'tbody_visible-overflow': dataArray.length < 6 }]",
-      :tableheadRowClass="['client-pricelist-table-head', { 'tbody_visible-overflow': dataArray.length < 6 }]",
-      bodyRowClass="client-pricelist-table-row",
-      bodyCellClass="client-pricelist-table-cell"
-    )
-      template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        .price-title(v-else) {{ field.label }}
+    .table
 
-      template(slot="check" slot-scope="{ row, index }")
-        .price__data(v-if="isEdit && row.isActive")
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
+      GeneralTable(
+        :fields="fields",
+        :tableData="finalData",
+        :isFilterShow="true"
+        :isFilterAbsolute="true"
 
-      template(slot="step", slot-scope="{ row, index }")
-        .price__data(:class="{'opacity-05': !row.isActive}") {{ row.step.title }}
+        @addSortKey="addSortKey"
+        @changeSortKey="changeSortKey"
+        @removeSortKey="removeSortKey"
+        @setFilter="setFilter"
+        @removeFilter="removeFilter"
+        @clearAllFilters="clearAllFilters"
+      )
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .table__header(v-if="field.headerKey === 'headerCheck' && isEdit")
+            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+          .table__header(v-else) {{ field.label }}
 
-      template(slot="unit", slot-scope="{ row, index }")
-        .price__data(:class="{'opacity-05': !row.isActive}") {{ row.unit.type }}
+        template(slot="check" slot-scope="{ row, index }")
+          .table__data(v-if="isEdit && row.isActive")
+            CheckBox(:isChecked="row.isCheck" @check="toggleCheck(row, true)" @uncheck="toggleCheck(row, false)")
 
-      template(slot="size", slot-scope="{ row, index }")
-        .price__data(:class="{'opacity-05': !row.isActive}") {{ row.size }}
+        template(slot="step", slot-scope="{ row, index }")
+          .table__data(:class="{'opacity-05': !row.isActive}") {{ row.step.title }}
 
-      template(slot="multiplier", slot-scope="{ row, index }")
-        .price__editing-data(v-if="isEdit && row.isActive")
-          input.price__data-input(type="number" @change="setRowValue(row)" v-model="dataArray[index].multiplier")
-        .price__data(v-if="isEdit && !row.isActive")
-          span(:class="{'opacity-05': !row.isActive}") {{ row.multiplier }}
-        .price__data(v-if="!isEdit")
-          span#multiplier {{ row.multiplier }}
-          label(for="multiplier") &#37;
+        template(slot="unit", slot-scope="{ row, index }")
+          .table__data(:class="{'opacity-05': !row.isActive}") {{ row.unit.type }}
 
-      template(slot="icons", slot-scope="{ row, index }")
-        .price__icons
-          .altered(v-if="row.altered && row.isActive")
-            .tooltip
-              span#myTooltip.tooltiptext {{ row.notification }}
-              .price__icons-info
-                i.fas.fa-info-circle
-          .link(v-if="isEdit && row.isActive")
-            span(v-if="row.altered && isEdit")
-              .price__icons-link(@click="getRowPrice(row)")
-                i.fa.fa-link(aria-hidden="true")
-            span(v-else)
-              .price__icons-link-opacity
-                i.fa.fa-link(aria-hidden="true")
-          .toggle(v-if="isEdit")
-            Toggler(
-              :isDisabled="false"
-              :isActive="row.isActive"
-              @toggle="toggleActive(row)"
-            )
+        template(slot="size", slot-scope="{ row, index }")
+          .table__data(:class="{'opacity-05': !row.isActive}") {{ row.size }}
 
-    .price__empty(v-if="!dataArray.length") Nothing found...
+        template(slot="multiplier", slot-scope="{ row, index }")
+          .table__data(v-if="isEdit && row.isActive")
+            input(type="number" @change="setRowValue(row)" v-model="finalData[index].multiplier")
+          .table__data(v-if="isEdit && !row.isActive")
+            span(:class="{'opacity-05': !row.isActive}") {{ row.multiplier }}
+          .table__data(v-if="!isEdit")
+            span#multiplier {{ row.multiplier }}
+            label(for="multiplier") &#37;
+
+        template(slot="icons", slot-scope="{ row, index }")
+          .table__icons
+            .altered(v-if="row.altered && row.isActive")
+              .tooltip
+                span#myTooltip.tooltiptext {{ row.notification }}
+                .table__icons-info
+                  i.fas.fa-info-circle
+            .link(v-if="isEdit && row.isActive")
+              span(v-if="row.altered && isEdit")
+                .table__icons-link(@click="getRowPrice(row)")
+                  i.fa.fa-link(aria-hidden="true")
+              span(v-else)
+                .table__icons-link-opacity
+                  i.fa.fa-link(aria-hidden="true")
+            .toggle(v-if="isEdit")
+              Toggler(
+                :isDisabled="false"
+                :isActive="row.isActive"
+                @toggle="toggleActive(row)"
+              )
+
+      .table__empty(v-if="!finalData.length") Nothing found...
 </template>
 <script>
 	import DataTable from "../../DataTable"
@@ -76,8 +83,11 @@
 	import SetPriceModal from "../../finance/pricelistSettings/SetPriceModal"
 	import Button from "../../Button"
 	import Toggler from "../../Toggler"
+	import GeneralTable from "../../GeneralTable"
+  import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 
 	export default {
+		mixins: [ tableSortAndFilter ],
 		props: {
 			dataArray: {
 				type: Array
@@ -97,43 +107,45 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-						width: "4%",
-						padding: 0
+						style: { width: "4%" }
 					},
 					{
 						label: "Step",
 						headerKey: "headerStep",
 						key: "step",
-						width: "31.5%",
-						padding: "0"
+						dataKey: "title",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "30%" }
 					},
 					{
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "31.5%",
-						padding: "0"
+						dataKey: "type",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "30%" }
 					},
 					{
 						label: "Size",
 						headerKey: "headerSize",
 						key: "size",
-						width: "11%",
-						padding: "0"
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "12%" }
 					},
 					{
 						label: "%",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						width: "11%",
-						padding: "0"
+						style: { width: "12%" }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "11%",
-						padding: "0"
+						style: { width: "12%" }
 					}
 				],
 				isDataRemain: true,
@@ -163,11 +175,11 @@
 				}
 			},
 			getIndex(id) {
-				return this.dataArray.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+				return this.finalData.findIndex(({ _id }) => `${ _id }` === `${ id }`)
 			},
 			async setPrice(price) {
-				this.length = this.dataArray.filter(i => !!i.isCheck).length
-				for await (let [ index, row ] of this.dataArray.filter(i => !!i.isCheck).entries()) {
+				this.length = this.finalData.filter(i => !!i.isCheck).length
+				for await (let [ index, row ] of this.finalData.filter(i => !!i.isCheck).entries()) {
 					this.i = index + 1
 					row.multiplier = price
 					await this.manageSavePrice(row)
@@ -192,7 +204,7 @@
 				try {
 					await this.$http.post("/clientsapi/rates/sync-cost/" + this.clientId, {
 						tableKey: "Step Multipliers Table",
-						row: this.dataArray[this.getIndex(row._id)]
+						row: this.finalData[this.getIndex(row._id)]
 					})
 					const result = await this.$http.post(`/clientsapi/client-rate-by-key`, { id: this.clientId, key: 'stepMultipliersTable' })
 					this.setUpClientRatesProp({ id: this.$route.params.id, key: 'stepMultipliersTable', value: result.data })
@@ -206,7 +218,7 @@
 			},
 			async checkErrors(row) {
 				if (!this.isEdit) return
-				if (this.dataArray[this.getIndex(row._id)].multiplier === "") this.dataArray[this.getIndex(row._id)].multiplier = 100
+				if (this.finalData[this.getIndex(row._id)].multiplier === "") this.finalData[this.getIndex(row._id)].multiplier = 100
 				await this.manageSaveClick(row)
 			},
 			refreshResultTable() {
@@ -233,7 +245,7 @@
 				}
 			},
 			async manageSaveClick(row) {
-				const { _id, step, unit, size, multiplier } = this.dataArray[this.getIndex(row._id)]
+				const { _id, step, unit, size, multiplier } = this.finalData[this.getIndex(row._id)]
 				try {
 					await this.$http.post("/clientsapi/rates/" + this.clientId, {
 						itemIdentifier: "Step Multipliers Table",
@@ -258,15 +270,16 @@
 			...mapGetters({
 				currentClient: "getCurrentClient"
 			}),
-			tableData() {
+			isAllSelected() {
+				return (this.finalData && this.finalData.length) && this.finalData.filter(i => !!i.isActive).every(i => i.isCheck)
+			},
+			rawData() {
 				if (this.isEdit) return this.dataArray
 				return this.dataArray.filter(i => !!i.isActive)
-			},
-			isAllSelected() {
-				return (this.dataArray && this.dataArray.length) && this.dataArray.filter(i => !!i.isActive).every(i => i.isCheck)
 			}
 		},
 		components: {
+			GeneralTable,
 			Toggler,
 			Button,
 			SetPriceModal,
@@ -278,53 +291,15 @@
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
 
-  .button {
-    position: absolute;
-    right: 20px;
-    margin-top: -40px;
-  }
-
-  .price {
-    background-color: #fff;
-    box-shadow: none;
-
-    input {
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-    }
-
-    label {
-      margin-left: 3px;
-    }
-
-    &__data,
-    &__editing-data {
-      height: 31px;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
+  .table {
+    &__header,
+    &__data {
+      padding: 0 6px;
     }
 
     &__empty {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    &__editing-data {
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
-    &__data-input {
-      width: 100%;
-      border: none;
-      outline: none;
-      color: $main-color;
-      padding: 0 2px;
-      background-color: transparent;
+      opacity: 0.5;
+      margin-top: 10px;
     }
 
     &__icons {
@@ -332,7 +307,8 @@
       justify-content: center;
       align-items: center;
       gap: 7px;
-      height: 30px;
+      width: 100%;
+      height: 40px;
 
       &-info {
         cursor: help;
@@ -353,6 +329,16 @@
     }
   }
 
+  label {
+    margin-left: 3px;
+  }
+
+  .button {
+    position: absolute;
+    left: 590px;
+    margin-top: -78px;
+  }
+
   .tooltip {
     position: relative;
     display: flex;
@@ -361,27 +347,28 @@
       visibility: hidden;
       font-size: 14px;
       width: max-content;
-      background-color: $red;
-      color: #fff;
+      background-color: white;
+      color: $text;
       text-align: center;
       border-radius: 4px;
-      right: 30px;
-      bottom: -3px;
-      padding: 6px;
+      right: 28px;
+      bottom: -7px;
+      padding: 7px 12px;
       position: absolute;
       z-index: 1;
       opacity: 0;
       transition: opacity .3s;
+      border: 1px solid $border;
 
       &::after {
         content: "";
         position: absolute;
-        top: 38%;
-        right: -10px;
+        top: 30%;
+        right: -12px;
         transform: rotate(270deg);
-        border-width: 5px;
+        border-width: 6px;
         border-style: solid;
-        border-color: $red transparent transparent;
+        border-color: $border transparent transparent;
       }
     }
 
@@ -391,9 +378,5 @@
         opacity: 1;
       }
     }
-  }
-
-  .opacity-05 {
-    opacity: 0.5;
   }
 </style>

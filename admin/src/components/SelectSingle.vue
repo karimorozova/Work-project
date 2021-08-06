@@ -208,12 +208,11 @@
         height: 32px;
         color: $text;
         border: 1px solid $border;
-        border-radius: 4px;
-        margin: 11px 3%;
+        margin: 9px 3%;
         transition: .1s ease-out;
 
         &:focus {
-          border: 1px solid $border-focus;
+          border: 1px solid $dark-border;
         }
       }
 
@@ -270,7 +269,7 @@
     justify-content: space-between;
 
     .selected {
-      width: 80%;
+      width: 100%;
       padding: 0 7px;
       font-size: 14px;
       display: flex;

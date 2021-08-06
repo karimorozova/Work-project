@@ -23,17 +23,22 @@
     border: 1px solid $border;
     border-radius: 4px;
     cursor: pointer;
-    /*transition: .1s cubic-bezier(.12,0,.39,0);*/
     margin-top: 10px;
+    transition: .2s ease-out;
     display: flex;
     justify-content: center;
     align-items: center;
-    /*    &:hover{
-          background: $table-list;
-        }*/
+
+    &:hover {
+      .add-button__icon {
+        color: $text;
+      }
+    }
+
     &__icon {
-      font-size: 16px;
-      color: $border;
+      font-size: 15px;
+      color: $dark-border;
+      margin-top: 1px;
     }
 
   }

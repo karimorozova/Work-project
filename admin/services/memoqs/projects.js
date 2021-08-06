@@ -279,7 +279,7 @@ async function setMemoqDocsAssignments(projectId, docsInfo) {
 	}
 }
 
-async function setMemoqDocsDeadline(memoqProjectId, documentGuid, deadline, memoqAssignmentRole, guid) {
+async function setMemoqDocsDeadline(memoqProjectId, documentGuid, structure) {
 	const xml = `${ xmlHeader }
 	            <soapenv:Body>
 	                <ns:SetProjectTranslationDocumentUserAssignments>
@@ -288,11 +288,7 @@ async function setMemoqDocsDeadline(memoqProjectId, documentGuid, deadline, memo
 													<ns:ServerProjectTranslationDocumentUserAssignments>
 										           <ns:DocumentGuid>${documentGuid}</ns:DocumentGuid>
 										           <ns:UserRoleAssignments>
-											           <ns:TranslationDocumentUserRoleAssignment>
-											               <ns:DeadLine>${deadline}</ns:DeadLine>
-											               <ns:DocumentAssignmentRole>${memoqAssignmentRole}</ns:DocumentAssignmentRole>
-											               <ns:UserGuid>${guid}</ns:UserGuid>
-											           </ns:TranslationDocumentUserRoleAssignment>
+																	${structure}
 										           </ns:UserRoleAssignments>
 										        </ns:ServerProjectTranslationDocumentUserAssignments>
 							         </ns:assignments>

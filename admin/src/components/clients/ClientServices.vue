@@ -1,106 +1,155 @@
 <template lang="pug">
   .clientService
+    .clientService__modal-wrapper
+      ApproveModal(
+        v-if="isDeleting"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="deleteService"
+        @close="closeModal"
+        @notApprove="closeModal"
+      )
+      ValidationErrors(
+        v-if="areErrors"
+        :errors="errors"
+        @closeErrors="closeErrors"
+      )
+
+
     .clientService__table
-      SettingsTable(
-        :fields="fields",
-        :tableData="clientServices",
-        :errors="errors",
-        :areErrors="areErrors",
-        :isApproveModal="isDeleting",
-        :tbodyStyle="{'max-height': '300px'}",
-        :rowCount="9",
-        @closeErrors="closeErrors",
-        @approve="deleteService",
-        @notApprove="setDefaults",
-        @closeModal="setDefaults"
+      .clientService__editing(v-if="currentActive >= 0" :class="{'move-bottom': toggleFilter}" :style='`width: ${widthWithoutScroll}` ')
+        .clientService__editing-item(style="width: 20%; background: white;")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentSource.lang",
+            :options="sourceLanguagesClient | firstEnglishLanguage",
+            @chooseOption="setSource",
+            @scrollDrop="scrollDrop"
+          )
+        .clientService__editing-item(v-if=" !newRow" style="width: 20%; background: white;" )
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentTargets[0].lang",
+            :options="targetLanguagesClient",
+            @chooseOption="setTarget"
+          )
+
+        .clientService__editing-item( v-if=" newRow" style="width: 20%; background: white;")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentTargets.map((i) => i.lang)",
+            :options="targetLanguagesClient",
+            @chooseOptions="setTargets"
+            :allOptionsButtons="true"
+          )
+        .clientService__editing-item(v-if=" !newRow" style="width: 20%; background: white;")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentServices[0].title",
+            :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
+            @chooseOption="setService"
+            :allOptionsButtons="true"
+          )
+        .clientService__editing-item(v-if=" newRow" style="width: 20%; background: white;")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentServices.map((i) => i.title)",
+            :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
+            @chooseOptions="setServices"
+            :allOptionsButtons="true"
+          )
+        .clientService__editing-item(v-if=" !newRow" style="width: 20%; background: white;")
+          SelectSingle(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOption="currentIndustries[0].name",
+            :options="clientIndustries",
+            @chooseOption="setIndustry"
+          )
+        .clientService__editing-item(v-if=" newRow" style="width: 20%; background: white;")
+          SelectMulti(
+            :isTableDropMenu="isTableDropMenu",
+            placeholder="Select",
+            :hasSearch="true",
+            :selectedOptions="currentIndustries.map((i) => i.name)",
+            :options="clientIndustries",
+            @chooseOptions="setIndustries"
+            :allOptionsButtons="true"
+          )
+        .clientService__editing-item(style="width: 20%;")
+          .clientService__icons
+            img.clientService__icon(
+              v-for="(icon, key) in saveCancelIcon",
+              :src="icon.icon",
+              @click="makeAction(currentActive, key)",
+              class="clientService_opacity"
+            )
+      //GeneralTable(
+      //
+      //  :fields="fields",
+      //  :tableData="clientServices",
+      //  :errors="errors",
+      //  :areErrors="areErrors",
+      //  :isApproveModal="isDeleting",
+      //  :tbodyStyle="{'max-height': '300px'}",
+      //  :rowCount="9",
+      //  @closeErrors="closeErrors",
+      //  @approve="deleteService",
+      //  @notApprove="setDefaults",
+      //  @closeModal="setDefaults"
+
+
+      //)
+      GeneralTable(
+        :fields="fields"
+        :tableData="finalData"
+        :isFilterShow="true"
+        :activeField="currentActive"
+        :isCoverBody="currentActive >= 0 || isDeleting || areErrors"
+
+        @addSortKey="addSortKeyIfCan"
+        @changeSortKey="changeSortKeyIfCan"
+        @removeSortKey="removeSortKeyIfCan"
+        @setFilter="setFilterIfCan"
+        @removeFilter="removeFilterIfCan"
+        @clearAllFilters="clearAllFiltersIfCan"
+        @toggleFilter="(e) => (toggleFilter = e)"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .clientService__head-title {{ field.label }}
 
-        template(slot="source", slot-scope="{ row, index }")
-          .clientService__data(v-if="currentActive !== index") {{ row.sourceLanguage.lang }}
-          .clientService__drop-menu(v-else)
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentSource.lang",
-              :options="sourceLanguagesClient | firstEnglishLanguage",
-              @chooseOption="setSource",
-              @scrollDrop="scrollDrop"
-            )
+        template(slot="sourceLanguage", slot-scope="{ row, index }")
+          .clientService__data {{ row.sourceLanguage.lang }}
 
-        template(slot="targets", slot-scope="{ row, index }")
-          .clientService__data(v-if="currentActive !== index") {{ row.targetLanguages[0].lang }}
-          .clientService__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentTargets[0].lang",
-              :options="targetLanguagesClient",
-              @chooseOption="setTarget"
-            )
-          .clientService__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentTargets.map((i) => i.lang)",
-              :options="targetLanguagesClient",
-              @chooseOptions="setTargets"
-              :allOptionsButtons="true"
-            )
 
-        template(slot="service", slot-scope="{ row, index }")
-          .clientService__data(v-if="currentActive !== index") {{ row.services[0].title }}
-          .clientService__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentServices[0].title",
-              :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
-              @chooseOption="setService"
-              :allOptionsButtons="true"
-            )
-          .clientService__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentServices.map((i) => i.title)",
-              :options="services.filter(item => item.steps.length && item.active).map((i) => i.title)",
-              @chooseOptions="setServices"
-              :allOptionsButtons="true"
-            )
+        template(slot="targetLanguages", slot-scope="{ row, index }")
+          .clientService__data {{ row.targetLanguages[0].lang }}
 
-        template(slot="industry", slot-scope="{ row, index }")
-          .clientService__data(v-if="currentActive !== index") {{ row.industries[0].name }}
-          .clientService__drop-menu(v-if="currentActive == index && !newRow")
-            SelectSingle(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOption="currentIndustries[0].name",
-              :options="clientIndustries",
-              @chooseOption="setIndustry"
-            )
-          .clientService__drop-menu(v-if="currentActive == index && newRow")
-            SelectMulti(
-              :isTableDropMenu="isTableDropMenu",
-              placeholder="Select",
-              :hasSearch="true",
-              :selectedOptions="currentIndustries.map((i) => i.name)",
-              :options="clientIndustries",
-              @chooseOptions="setIndustries"
-              :allOptionsButtons="true"
-            )
+
+        template(slot="services", slot-scope="{ row, index }")
+          .clientService__data {{ row.services[0].title }}
+
+
+        template(slot="industries", slot-scope="{ row, index }")
+          .clientService__data {{ row.industries[0].name }}
+
 
         template(slot="icons", slot-scope="{ row, index }")
           .clientService__icons
             img.clientService__icon(
-              v-for="(icon, key) in icons",
+              v-for="(icon, key) in editDeleteIcon",
               :src="icon.icon",
               @click="makeAction(index, key)",
               :class="{ clientService_opacity: isActive(key, index) }"
@@ -114,14 +163,17 @@
 	import Add from "../Add"
 	import SelectSingle from "../SelectSingle"
 	import SelectMulti from "../SelectMulti"
-	import SettingsTable from "../Table/SettingsTable"
+	import GeneralTable from "../GeneralTable"
 	import crudIcons from "@/mixins/crudIcons"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import scrollEnd from "../../mixins/scrollEnd"
 	import checkCombinations from "../../mixins/combinationsChecker"
+  import tableSortAndFilter from "../../mixins/tableSortAndFilter"
+  import ValidationErrors from "../ValidationErrors"
+  import ApproveModal from "../ApproveModal"
 
 	export default {
-		mixins: [ scrollDrop, crudIcons, scrollEnd, checkCombinations ],
+		mixins: [ scrollDrop, crudIcons, scrollEnd, checkCombinations,tableSortAndFilter ],
 		props: {
 			clientServices: {
 				type: Array
@@ -154,38 +206,45 @@
 					{
 						label: "Source Language",
 						headerKey: "headerSource",
-						key: "source",
-						width: "20%",
-						padding: "0"
+						key: "sourceLanguage",
+            dataKey: "lang",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+            style: {width: "20%"},
 					},
 					{
 						label: "Target Languages",
 						headerKey: "headerTarget",
-						key: "targets",
-						width: "20%",
-						padding: "0"
+						key: "targetLanguages",
+            dataKey: "lang",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+            style: {width: "20%"},
 					},
 					{
 						label: "Services",
 						headerKey: "headerService",
-						key: "service",
-						width: "20%",
-						padding: "0"
+						key: "services",
+            dataKey: "title",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+            style: {width: "20%"},
 					},
 					{
 						label: "Industries",
 						headerKey: "headerIndustry",
-						key: "industry",
-						width: "20%",
-						padding: "0"
+						key: "industries",
+            dataKey: "name",
+            sortInfo: { isSort: true, order: 'default' },
+            filterInfo: { isFilter: true },
+            style: {width: "20%"},
 					},
 
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "20%",
-						padding: "0"
+            style: {width: "20%"},
 					}
 				],
 
@@ -215,6 +274,49 @@
 				if (!Arr.length) return ""
 				return Arr.reduce((acc, cur) => acc + `${ cur[key] }; `, "")
 			},
+
+      addSortKeyIfCan(e) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+          this.addSortKey(e)
+        }
+      },
+      changeSortKeyIfCan(e) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+          this.changeSortKey(e)
+        }
+      },
+      removeSortKeyIfCan(e) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+          this.removeSortKey(e)
+        }
+      },
+      setFilterIfCan(e) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+          this.setFilter(e)
+        }
+      },
+      removeFilterIfCan(e) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+          this.removeFilter(e)
+        }
+      },
+      clearAllFiltersIfCan(e) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+          this.isEditing()
+        }else {
+          this.clearAllFilters(e)
+        }
+      },
 
 			setIndustries({ option }) {
 				const position = this.currentIndustries.map((item) => item.name).indexOf(option)
@@ -275,16 +377,19 @@
 			},
 
 			setEditingData(index) {
+
+        const allServices = this.finalData[index] ? this.finalData[index] : this.clientServices[index]
 				this.currentActive = index
-				this.currentId = this.clientServices[index]._id
-				this.currentSource = this.clientServices[index].sourceLanguage
-				this.currentTargets = this.clientServices[index].targetLanguages
-				this.currentIndustries = this.clientServices[index].industries
-				this.currentServices = this.clientServices[index].services
+				this.currentId = allServices._id
+				this.currentSource = allServices.sourceLanguage
+				this.currentTargets = allServices.targetLanguages
+				this.currentIndustries = allServices.industries
+				this.currentServices = allServices.services
 			},
 
 			manageCancelEdition(index) {
-				!this.clientServices[index]._id && this.clientServices.splice(index, 1)
+        const allServices = this.finalData[index] ? this.finalData : this.clientServices
+				!allServices[index]._id && allServices.splice(index, 1)
 				this.setDefaults()
 				this.isDeleting = false
 				this.newRow = false
@@ -306,7 +411,7 @@
 				this.errors = []
 
 				if (!this.newRow) {
-					const arraysOfTheSame = this.clientServices
+					const arraysOfTheSame = this.finalData
 							.filter((item, index) => index !== currentIndex)
 							.filter((item) =>
 									item.sourceLanguage.lang === this.currentSource.lang &&
@@ -331,10 +436,11 @@
 
 			async manageSaveClick(index) {
 
+        const allServices = this.finalData[index] ? this.finalData : this.clientServices
 				if (this.currentActive === -1) return
 				try {
-					const id = this.clientServices[index]._id
-					const oldData = this.clientServices[index]
+					const id = allServices[index]._id
+					const oldData = allServices[index]
 					const currentData = {
 						_id: id,
 						sourceLanguage: this.currentSource,
@@ -352,7 +458,7 @@
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'rates', value: result.data.rates })
 
 					// this.clientServices = result.data.services;
-					this.clientServices.length && this.$emit("updateRates", true)
+          allServices.length && this.$emit("updateRates", true)
 
 					await this.$http.post('/pm-manage/check-pricelist-langs', {
 						pricelistId: this.defaultPriceList,
@@ -373,9 +479,13 @@
 			},
 
 			async manageDeleteClick(index) {
-				if (!this.clientServices[index]._id) {
+        if(this.currentActive >= 0 || this.isDeleting) {
+         return this.isEditing()
+        }
+
+				if (!this.finalData[index]._id) {
 					this.newRow = false
-					this.clientServices.splice(index, 1)
+					this.finalData.splice(index, 1)
 					this.setDefaults()
 					return
 				}
@@ -389,13 +499,13 @@
 
 			async deleteService() {
 				try {
-					let currentData = this.clientServices[this.deleteIndex]
+					let currentData = this.finalData[this.deleteIndex]
 					const result = await this.$http.delete(`/clientsapi/services/${ this.$route.params.id }/${ currentData._id }`)
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'services', value: result.data.services })
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'rates', value: result.data.rates })
 
 					this.$emit("updateRates", true)
-					this.clientServices.splice(this.deleteIndex, 1)
+					this.finalData.splice(this.deleteIndex, 1)
 					this.closeModal()
 					this.alertToggle({ message: "Services are deleted", isShow: true, type: "success" })
 				} catch (err) {
@@ -443,16 +553,35 @@
 		computed: {
 			...mapGetters({
 				currentClient: "getCurrentClient"
-			})
+			}),
+
+      widthWithoutScroll(){
+        return document.querySelector('.data') ? document.querySelector('.data').clientWidth+1 +'px' : '100%'
+      },
+      saveCancelIcon() {
+        const {cancel, save} = this.icons
+        return { save,cancel  }
+      },
+      editDeleteIcon() {
+        const { cancel, save, ...result } = this.icons
+        return result
+      },
+      rawData() {
+        return this.clientServices.filter(data => {
+          return data.sourceLanguage.hasOwnProperty('lang')
+        })
+      },
 		},
 		created() {
 			// this.getClientInfo();
 		},
 		components: {
 			SelectSingle,
-			SettingsTable,
+      GeneralTable,
 			SelectMulti,
-			Add
+			Add,
+      ValidationErrors,
+      ApproveModal,
 		}
 	}
 </script>
@@ -464,6 +593,39 @@
     &__data {
       @extend %table-data;
       overflow-x: hidden;
+    }
+    &__table{
+      position: relative;
+    }
+    &__modal-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+    }
+
+    &__editing {
+      position: absolute;
+      height: 40px;
+      background-color: $light-green;
+      z-index: 3;
+      top: 80px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      margin-left: 1px;
+
+      &.move-bottom{
+        top:120px;
+      }
+
+      &-item {
+        position: relative;
+        height: 32px;
+        margin: 0 2px;
+      }
     }
 
     &__editing-data {
@@ -478,6 +640,7 @@
     &__icons {
       @extend %table-icons;
       height: 30px;
+      width: 100%;
       justify-content: center;
     }
 
@@ -496,6 +659,10 @@
 
     &__input {
       @extend %table-text-input;
+    }
+
+    &__head-title{
+      padding: 0 6px;
     }
   }
 </style>

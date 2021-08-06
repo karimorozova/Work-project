@@ -141,6 +141,11 @@ const ProjectsSchema = new mongoose.Schema({
 		    default: '',
 		    trim: true
 	    },
+	    deliveryName: {
+		    type: String,
+		    trim: true,
+		    default: ''
+	    },
       status: {
         type: String,
         default: '',
@@ -201,6 +206,11 @@ const ProjectsSchema = new mongoose.Schema({
 		    default: '',
 		    trim: true
 	    },
+	    deliveryName: {
+	    	type: String,
+		    trim: true,
+		    default: ''
+	    },
       status: {
         type: String,
         default: '',
@@ -218,7 +228,7 @@ const ProjectsSchema = new mongoose.Schema({
         type: Date,
         default: ""
       },
-      file: {
+      file: [{
         fileName: {
           type: String,
           default: "",
@@ -241,7 +251,7 @@ const ProjectsSchema = new mongoose.Schema({
           type: Schema.Types.ObjectId,
           ref: "User"
         },
-      }
+      }]
     }],
   },
   tasksDeliverables: [{
@@ -437,6 +447,10 @@ const ProjectsSchema = new mongoose.Schema({
 	xtrfLink: {
 		type: String,
 		default: ''
+	},
+	xtrfLinks: {
+		type: Array,
+		default: []
 	},
 	isTest: {
 		type: Boolean,
