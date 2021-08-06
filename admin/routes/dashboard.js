@@ -41,60 +41,62 @@ router.get("/all-client-requests", async (req, res) => {
 router.get("/finance", async (req, res) => {
 	try {
 		const currencyNormalize = {
-			'&euro;': 'EUR',
-			'$': 'USD'
+			'[&euro;]': 'EUR',
+			'[$]': 'USD'
 		}
 
 		let sumEuro = 0
 		let sumDolars = 0
 		let sumEuroMonth = 0
 		let sumDolarsMonth = 0
+		let sumEuroTotal = 0
+		let sumEuroMonthTotal = 0
 
 
-		const reportsLink = await sendRequest('get', 'reports/128/result/printerFriendly')
+		const reportsLink = await sendRequest('get', 'reports/132/result/printerFriendly')
 		const xtrfPayments = (await axios({
 			method: 'get',
 			url: reportsLink.data.url
 		}))
 
-		const reportsLinkMonth = await sendRequest('get', 'reports/129/result/printerFriendly')
+		const reportsLinkMonth = await sendRequest('get', 'reports/131/result/printerFriendly')
 		const xtrfPaymentsMonth = (await axios({
 			method: 'get',
 			url: reportsLinkMonth.data.url
 		}))
 
-		const matchStrings = xtrfPayments.data.match(/class='xtrf-financial-report-body'.+?>(.+?)<\/td.+?>(.+?)<\/td.+?>(?<Currency>.+?)<\/td.+?>(?<Value>.+?)<\/td.+?>/gm)
+		const matchStrings = xtrfPayments.data.match(/(('xtrf\-financial\-report\-body')|(xtrf\-financial\-report\-footer\-main"))><td.+?>(.+?)<\/td>.+?>(.+?)<\/td/gm) || []
 
 		for await (let matchString of matchStrings) {
 
-			const xtrfFinanceToday = /class='xtrf-financial-report-body'.+?>(.+?)<\/td.+?>(.+?)<\/td.+?>.+?\[(?<currency>.+?)\]<\/td.+?>(?<value>.+?)<\/td.+?>/gm.exec(matchString)
-			const { currency, value } = xtrfFinanceToday.groups
+			const xtrfFinanceToday = /<td.+?>(?<title>.+?)<\/td>.+?>(?<value>.+?)<\/td/gm.exec(matchString)
+			const { title, value } = xtrfFinanceToday.groups
 
-			if (currencyNormalize[currency] === 'EUR') {
-				sumEuro += +value
-			} else {
-				sumDolars += +value
+			if (currencyNormalize[title.split(' ').pop()] === 'EUR') {
+				sumEuro = +value
+			} else if (currencyNormalize[title.split(' ').pop()] === 'USD') {
+				sumDolars = +value
+			}else {
+				sumEuroTotal = +value
 			}
 
 		}
 
-		const sumEuroTotal = sumEuro + sumDolars / 1.2
+		const matchStringsMonth = xtrfPaymentsMonth.data.match(/(('xtrf\-financial\-report\-body')|(xtrf\-financial\-report\-footer\-main"))><td.+?>(.+?)<\/td>.+?>(.+?)<\/td/gm) || []
 
-		const matchStringsMonth = xtrfPaymentsMonth.data.match(/class='xtrf-financial-report-body'.+?>(.+?)<\/td.+?>(.+?)<\/td.+?>(?<Currency>.+?)<\/td.+?>(?<Value>.+?)<\/td.+?>/gm)
+		for await (let matchString of matchStringsMonth || []) {
+			const xtrfFinanceToday = /<td.+?>(?<title>.+?)<\/td>.+?>(?<value>.+?)<\/td/gm.exec(matchString)
+			const { title, value } = xtrfFinanceToday.groups
 
-		for await (let matchString of matchStringsMonth) {
-
-			const xtrfFinanceToday = /class='xtrf-financial-report-body'.+?>(.+?)<\/td.+?>(.+?)<\/td.+?>.+?\[(?<currency>.+?)\]<\/td.+?>(?<value>.+?)<\/td.+?>/gm.exec(matchString)
-			const { currency, value } = xtrfFinanceToday.groups
-
-			if (currencyNormalize[currency] === 'EUR') {
-				sumEuroMonth += +value
-			} else {
-				sumDolarsMonth += +value
+			if (currencyNormalize[(title.split(' ')).pop()] === 'EUR') {
+				sumEuroMonth = +value
+			} else if (currencyNormalize[title.split(' ').pop()] === 'USD') {
+				sumDolarsMonth = +value
+			}else {
+				sumEuroMonthTotal = +value
 			}
 		}
 
-		const sumEuroMonthTotal = sumEuroMonth + sumDolarsMonth / 1.2
 
 		const today = moment().format('YYYY-MM-DD')
 		const projectFinance = await Projects.find({
