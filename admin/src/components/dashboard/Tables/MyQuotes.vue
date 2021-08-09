@@ -1,6 +1,6 @@
 <template lang="pug">
   .component
-    .component__title All Quotes
+    .component__title My Quotes
     .component__content
       GeneralTable(
         :fields="fields"

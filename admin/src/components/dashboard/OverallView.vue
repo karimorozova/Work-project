@@ -22,6 +22,8 @@
       .row
         .col
           Quotes( :projects ="quotes")
+        .col
+          MyQuotes( :projects ="myQuotes")
 
     div(v-else)
       .row(v-if="isPm")
@@ -42,6 +44,8 @@
       .row
         .col
           Quotes( :projects ="quotes")
+        .col
+          MyQuotes( :projects ="myQuotes")
 
 
     //.overallView__col
@@ -61,6 +65,7 @@
 	import DueToday from "./Tables/DueToday"
 	import StartedToday from "./Tables/StartedToday"
 	import Quotes from "./Tables/Quotes"
+	import MyQuotes from "./Tables/MyQuotes"
 	import IncomingRequests from "./Tables/IncomingRequests"
 	import AcceptedRequest from "./Tables/AcceptedRequest"
 	import Dr1 from "./Tables/Dr1"
@@ -156,12 +161,23 @@
 			},
 			quotes() {
 				const STATUSES = [ 'Draft', 'Cost Quote', 'Quote sent' ]
-				return this.filteredForPmAmOrAdmin.length
-						? this.filteredForPmAmOrAdmin.filter((project) => {
+				return this.projects.length
+						? this.projects.filter((project) => {
 							return STATUSES.includes(project.status)
 						})
 						: []
 			},
+      myQuotes() {
+        const STATUSES = [ 'Draft', 'Cost Quote', 'Quote sent' ]
+        if (this.isAdmin)
+          return this.quotes.filter(({accountManager, projectManager})=> (accountManager._id === this.user._id || projectManager._id === this.user._id))
+
+        return this.filteredForPmAmOrAdmin.length
+            ? this.filteredForPmAmOrAdmin.filter((project) => {
+              return STATUSES.includes(project.status)
+            })
+            : []
+      },
 			isAdmin() {
 				if (!this.user.hasOwnProperty('group')) return false
 				const userGroup = this.user.group.name
@@ -188,6 +204,7 @@
 			XtrfStatsToday,
 			StartedToday,
 			Quotes,
+      MyQuotes,
 			IncomingRequests,
 			AcceptedRequest,
 			ProjectFinanceStats,
