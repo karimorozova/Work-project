@@ -204,7 +204,7 @@ router.post('/login-with-google',  async (req, res, next) => {
 
     if (!user) res.send({status: "error"})
 
-    const token = await jwt.sign({ user }, secretKey, { expiresIn: '2h' })
+    const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
 
     res.statusCode = 200
     const loggedUser = Object.keys(user).reduce((init, cur) => {
