@@ -33,6 +33,9 @@ const ClientRequestSchema = new mongoose.Schema({
 	billingDate: {
 		type: Date
 	},
+	createdBy: {
+		type: Object,
+	},
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
 	},
@@ -161,7 +164,7 @@ const ClientRequestSchema = new mongoose.Schema({
 		isCheckComplianceTemplate: {
 			type: Boolean,
 			default: false
-		}
+		},
 	}
 
 	//  type: {

@@ -13,6 +13,7 @@
             .data-table__header(slot="headerDeadline" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerTotalCost" slot-scope="{ field }") {{ field.label }}
+            .data-table__header(slot="headerCreatedBy" slot-scope="{ field }") {{ field.label }}
             .data-table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
 
             .data-table__data(slot="requestDate" slot-scope="{ row, index }") {{ getFormattedDate(row.startDate) }}
@@ -24,6 +25,7 @@
                 .data-table__payment(v-if="row.status !== 'Requested' && row.finance") {{ row.finance.Price.receivables }}
                     span.data-table__currency(v-if="row.finance.Price.receivables")
                     span(v-html="currencyIconDetected(row.projectCurrency)")
+            .data-table__data(slot="createdBy" slot-scope="{ row, index }") {{ getCreatedBy(row.createdBy) }}
             .data-table__data.data-table_centered(slot="icons" slot-scope="{ row, index }")
                 img.data-table__icon(v-if="row.status === 'Quote sent' && !row.hasOwnProperty('fromXTRF')" v-for="(icon, key) in icons" :src="icon.src" @click.stop="makeAction(index, key)")
             .data-table__data.data-table__progress(slot="progress" slot-scope="{ row, index }")
@@ -55,12 +57,13 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "18%", padding: "0"},
+                {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "15%", padding: "0"},
                 {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "18%", padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "18%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0"},
                 {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "11.5%", padding: "0"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "11.5%", padding: "0"},
                 {label: "Total Cost", headerKey: "headerTotalCost", key: "totalCost", width: "11.5%", padding: "0"},
+                {label: "Created By", headerKey: "headerCreatedBy", key: "createdBy", width: "9%", padding: "0"},
                 {label: "", headerKey: "headerIcons", key: "icons", width: "11.5%", padding: "0"}
             ],
             tableWidth: 1010,
@@ -104,13 +107,17 @@ export default {
             if(this.isOpenRequest) {
               this.fields = [
                 {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "20%", padding: "0"},
-                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "30%", padding: "0"},
+                {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0"},
                 {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0"},
                 {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0"},
                 {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0"},
+                {label: "Created By", headerKey: "headerCreatedBy", key: "createdBy", width: "10%", padding: "0"},
               ]
             }
-        }
+        },
+      getCreatedBy(createdBy) {
+          return createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+      }
     },
     created() {
         this.setFields()

@@ -323,6 +323,7 @@ export default {
       formData.append('startOption', this.startOption)
       formData.append('complianceTemplate', JSON.stringify(this.currentComplianceTemplate))
       formData.append('clientContacts', JSON.stringify(this.currentContacts))
+      formData.append('createdBy', JSON.stringify({_id: this.user._id, firstName: this.user.firstName, surname: this.user.surname, email: this.user.email}))
 
       if (this.refFiles.length) for (let file of this.refFiles) formData.append('refFiles', file)
       if (this.sourceFiles.length) for (let file of this.sourceFiles) formData.append('sourceFiles', file)
