@@ -329,6 +329,10 @@
 					{
 						title: '[10] Corporate: Financial statements',
 						description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
+					},
+					{
+						title: 'N/A - no template',
+						description: ''
 					}
 				],
 				// forbiddenExtensions: [
