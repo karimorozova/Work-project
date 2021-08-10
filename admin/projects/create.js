@@ -65,7 +65,7 @@ const createProjectFromRequest = async (requestId) => {
   todayEnd.setUTCHours(23, 59, 59, 0)
 
   const request = await getClientRequestById(requestId)
-  const { projectManager, accountManager, paymentProfile, clientContacts, projectName, isUrgent, brief, notes, startDate, deadline, billingDate, industry, customer } = request
+  const { projectManager, accountManager, paymentProfile, clientContacts, projectName, isUrgent, brief, notes, startDate, deadline, billingDate, industry, customer, createdBy } = request
   const { _id,  minPrice, currency } = customer
   const { discounts } = await Clients.findOne({ '_id': _id }).populate('discounts');
 
@@ -93,7 +93,8 @@ const createProjectFromRequest = async (requestId) => {
     discounts,
     minimumCharge: { value: minPrice, toIgnore: false },
     crossRate: calculateCrossRate(USD, GBP),
-    projectCurrency: currency
+    projectCurrency: currency,
+    createdBy,
   }
 
   const createdProject = await Projects.create({

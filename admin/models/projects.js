@@ -66,6 +66,10 @@ const ProjectsSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now
 	},
+	createdBy: {
+		type: Object,
+		default: {}
+	},
 	discounts: [ {
 		name: {
 			type: String,

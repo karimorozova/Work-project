@@ -1,17 +1,29 @@
 <template lang="pug">
   .dashboard
     .dashboard__item
-      .dashboard__title Open Quotes
+      .dashboard__title My Quotes
+      .dashboard__table
+        Table(:projects="myFilteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'myFilteredQuotes')")
+    .dashboard__item
+      .dashboard__title My Requests
+      .dashboard__table
+        Table(:projects="myFilteredRequest"  @getDetails="getMyRequestDetails" :isOpenRequest="true" )
+    .dashboard__item
+      .dashboard__title My Open Projects
+      .dashboard__table
+        Table(:projects="myFilteredProjects" @getDetails="(e) => getDetails(e, 'myFilteredProjects')" :isOpenProjects="true")
+    .dashboard__item
+      .dashboard__title All Quotes
       .dashboard__table
         Table(:projects="filteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'filteredQuotes')")
     .dashboard__item
-      .dashboard__title Open Projects
-      .dashboard__table
-        Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
-    .dashboard__item
-      .dashboard__title Open Requests
+      .dashboard__title All Requests
       .dashboard__table
         Table(:projects="filteredRequest"  @getDetails="getRequestDetails" :isOpenRequest="true" )
+    .dashboard__item
+      .dashboard__title All Open Projects
+      .dashboard__table
+        Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
 </template>
 
 <script>
@@ -45,6 +57,10 @@
 				const id = this[prop][index]._id
 				this.$router.push(`/dashboard/details/${ id }`)
 			},
+      getMyRequestDetails({ index }) {
+        const id = this.myFilteredRequest[index]._id
+        this.$router.push(`/client-request/details/${ id }`)
+      },
       getRequestDetails({index}) {
         const id = this.filteredRequest[index]._id
         this.$router.push(`/client-request/details/${ id }`)
@@ -60,6 +76,7 @@
 		},
 		computed: {
 		  ...mapGetters({
+        user: "getUserInfo",
         clientRequests: "getClientRequests",
       }),
 			filteredProjects() {
@@ -75,7 +92,16 @@
       filteredRequest() {
 				// let statuses = [ 'Quote sent', 'Requested' ]
 				return this.clientRequests
-			}
+			},
+      myFilteredQuotes() {
+		    return this.filteredQuotes.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
+      },
+      myFilteredProjects() {
+		    return this.filteredProjects.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
+      },
+      myFilteredRequest() {
+		    return this.filteredRequest.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
+      }
 		},
 		components: {
 			Table
