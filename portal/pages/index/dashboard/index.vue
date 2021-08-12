@@ -5,7 +5,7 @@
       .dashboard__table
         Table(:projects="myFilteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'myFilteredQuotes')")
     .dashboard__item
-      .dashboard__title My Requests
+      .dashboard__title My Open Requests
       .dashboard__table
         Table(:projects="myFilteredRequest"  @getDetails="getMyRequestDetails" :isOpenRequest="true" )
     .dashboard__item
@@ -17,7 +17,7 @@
       .dashboard__table
         Table(:projects="filteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'filteredQuotes')")
     .dashboard__item
-      .dashboard__title All Requests
+      .dashboard__title All Open Requests
       .dashboard__table
         Table(:projects="filteredRequest"  @getDetails="getRequestDetails" :isOpenRequest="true" )
     .dashboard__item
@@ -90,8 +90,7 @@
 				return projects
 			},
       filteredRequest() {
-				// let statuses = [ 'Quote sent', 'Requested' ]
-				return this.clientRequests
+				return this.clientRequests.filter(clientRequest => clientRequest.status !== 'Closed')
 			},
       myFilteredQuotes() {
 		    return this.filteredQuotes.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
