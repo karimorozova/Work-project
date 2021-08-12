@@ -33,7 +33,7 @@
 
       tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" ref="tableBody" @scroll="handleBodyScroll")
         tr.data(v-for="(row, index) of tableData" :class="{'active': activeField === index}")
-          td(v-for="field of fields" :style="field.style")
+          td(v-for="field of fields" :style="field.style" :class="row.class")
             slot(:name="field.key" :row="row" :index="index" )
 
 
@@ -373,6 +373,10 @@
 
   .scroll {
     overflow-y: scroll;
+  }
+
+  .red-row{
+    background-color: #F4CCCC;
   }
 
   .shortBody {

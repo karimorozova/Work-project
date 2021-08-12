@@ -275,6 +275,10 @@ export default {
         {
           title: '[10] Corporate: Financial statements',
           description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
+        },
+        {
+          title: 'N/A - no template',
+          description: ''
         }
       ]
     }
@@ -323,6 +327,7 @@ export default {
       formData.append('startOption', this.startOption)
       formData.append('complianceTemplate', JSON.stringify(this.currentComplianceTemplate))
       formData.append('clientContacts', JSON.stringify(this.currentContacts))
+      formData.append('createdBy', JSON.stringify({_id: this.user._id, firstName: this.user.firstName, surname: this.user.surname, email: this.user.email}))
 
       if (this.refFiles.length) for (let file of this.refFiles) formData.append('refFiles', file)
       if (this.sourceFiles.length) for (let file of this.sourceFiles) formData.append('sourceFiles', file)

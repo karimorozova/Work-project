@@ -14,6 +14,7 @@ const complianceService = async (formData, client) => {
 	const industry = JSON.parse(formData.industry)
 	const complianceTemplate = JSON.parse(formData.complianceTemplate)
 	const clientContacts = JSON.parse(formData.clientContacts)
+	const createdBy = JSON.parse(formData.createdBy)
 	return await ClientRequest.create({
 		projectId: "Req " + moment(new Date()).format("YYYY MM DD") + " " + await getNextNumberForProjectName(),
 		projectName,
@@ -28,6 +29,7 @@ const complianceService = async (formData, client) => {
 		accountManager: null,
 		status: "Client Request",
 		notes: brief,
+		createdBy,
 
 		requestForm: {
 			sourceLanguage,
