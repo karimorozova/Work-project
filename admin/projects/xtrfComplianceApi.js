@@ -185,6 +185,8 @@ function findInXtrf(response, field, value) {
 
 function findLanguageId(response, field, value) {
 	if (!value) return false
+	const langSymbolParts = value.split('-')
+	value = langSymbolParts[0] === 'spa' ? value.replace('spa','ES') : value
 	const found = response.data.filter((elem) => elem[field].toLowerCase().includes(value.toLowerCase()))
 	return Array.isArray(found) ? found[0] : found
 }
