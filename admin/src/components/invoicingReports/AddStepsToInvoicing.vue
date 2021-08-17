@@ -82,13 +82,13 @@ export default {
           label: "",
           headerKey: "headerCheck",
           key: "check",
-          style: { width: "3%" }
+          style: { width: "2%" }
         },
         {
           label: "Step Id",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "11%" }
+          style: { width: "12%" }
         },
         {
           label: "Vendor Name",

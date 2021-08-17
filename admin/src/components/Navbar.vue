@@ -302,7 +302,7 @@
                   {
                     type: 'link',
                     path: '/pangea-finance/invoicing-reports/create-reports',
-                    name: 'Create Reports'
+                    name: 'Add Reports'
                   },
                 ]
 

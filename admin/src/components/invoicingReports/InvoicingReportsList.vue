@@ -54,37 +54,37 @@ export default {
           label: "Report Id",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "270px" }
+          style: { width: "271px" }
         },
         {
           label: "Date Range",
           headerKey: "headerDateRange",
           key: "dateRange",
-          style: { width: "270px" }
+          style: { width: "300px" }
         },
         {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "270px" }
+          style: { width: "300px" }
         },
         {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { width: "111px" }
+          style: { width: "200px" }
         },
         {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "100px" }
+          style: { width: "200px" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { width: "120px" }
+          style: { width: "200px" }
         },
 
       ]

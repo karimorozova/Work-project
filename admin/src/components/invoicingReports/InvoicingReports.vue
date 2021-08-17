@@ -63,7 +63,7 @@ export default {
 @import "../../assets/scss/colors";
   .invoicing-reports {
     position: relative;
-    width: 1200px;
+    width: 1530px;
     margin: 50px;
     background: #fff;
     &__block {
