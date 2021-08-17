@@ -1,19 +1,21 @@
 <template lang="pug">
   .reports
     .reports__table
-      GeneralTable(
-        :fields="fields",
-        :tableData="reports",
-        :isFilterShow="false"
-        :isFilterAbsolute="false"
+      LayoutsTable(
+        :fields="fields"
+        :tableData="reports"
 
+        :customNumberOfFilterRows="1"
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
           .table__header {{ field.label }}
 
         template(slot="reportId" slot-scope="{ row, index }" )
-          .table__data(@click="openDetails(row._id)" class="clickable-element") {{ row.reportId }}
+          .table__data
+            router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/reports/${row._id}`}")
+              span {{ row.reportId }}
+
 
         template(slot="dateRange" slot-scope="{ row, index }")
           .table__data {{ formattedDate(row.firstPaymentDate) +' - '+ formattedDate(row.lastPaymentDate)|| '-' }}
@@ -35,6 +37,7 @@
 
 <script>
 import GeneralTable from '../GeneralTable'
+import LayoutsTable from '../LayoutsTable'
 import moment from "moment"
 export default {
   name: "InvoicingReportsList",
@@ -51,37 +54,37 @@ export default {
           label: "Report Id",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "15%" }
+          style: { width: "270px" }
         },
         {
           label: "Date Range",
           headerKey: "headerDateRange",
           key: "dateRange",
-          style: { width: "20%" }
+          style: { width: "270px" }
         },
         {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "20%" }
+          style: { width: "270px" }
         },
         {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { width: "15%" }
+          style: { width: "111px" }
         },
         {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "15%" }
+          style: { width: "100px" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { width: "15%" }
+          style: { width: "120px" }
         },
 
       ]
@@ -103,7 +106,8 @@ export default {
     },
   },
   components: {
-    GeneralTable
+    GeneralTable,
+    LayoutsTable,
   },
 }
 </script>
@@ -150,5 +154,15 @@ export default {
 
 .clickable-element{
   cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

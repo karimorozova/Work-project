@@ -66,6 +66,8 @@ import ContactDetailsInNewClient from "../components/clients/new-client/ContactD
 import ContactDetailsAddExistingClient from "../components/clients/ContactDetailsAddExistingClient"
 import ContactDetailsExistingClient from "../components/clients/ContactDetailsExistingClient"
 import InvoicingReports from "../components/invoicingReports/InvoicingReports"
+import InvoicingDetails from "../components/invoicingReports/InvoicingDetails"
+import AddInvoicing from "../components/invoicingReports/AddInvoicing"
 // =====================================================================================================
 
 
@@ -622,10 +624,21 @@ const router = new Router({
 							component: clearRouterView
 						},
 						{
-							path: 'invoicing-reports',
+							path: 'invoicing-reports/reports',
 							name: 'invoicing-reports',
 							component: InvoicingReports
-						}
+						},
+						{
+							path: 'invoicing-reports/reports/:id',
+							name: 'invoicing-reports',
+							component: InvoicingDetails
+						},
+						{
+							path: 'invoicing-reports/create-reports',
+							name: 'invoicing-reports',
+							component: AddInvoicing
+						},
+
 					]
 				},
 				{

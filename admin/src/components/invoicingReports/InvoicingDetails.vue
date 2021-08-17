@@ -1,6 +1,16 @@
 <template lang="pug">
   .invoicing-details
-    .invoicing-details__wrapper
+    .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
+      ApproveModal(
+          v-if="isDeletingStep"
+          class="absolute-middle"
+          text="Are you sure?"
+          approveValue="Yes"
+          notApproveValue="No"
+          @approve="deleteStep"
+          @close="closeModalStep"
+          @notApprove="closeModalStep"
+        )
       .invoicing-details__details
         .invoicing-details__title
           .title__block
@@ -8,8 +18,6 @@
             .add-button(@click="changeToggleAddSteps")
               i.fas.fa-times-circle(v-if="toggleAddSteps")
               i.fas.fa-plus-circle(v-else)
-          .icon-button(@click="closeModal")
-            i.fas.fa-times-circle
         .invoicing-details__body
           .invoicing-details__text
             .text__block
@@ -26,7 +34,7 @@
               .text__value {{ getStepsPayables(reportDetailsInfo.steps)| roundTwoDigit }}
             .text__block
               .text__title Address:
-              .text__value test address
+              .text__value ...soon
 
 
           .invoicing-details__table
@@ -61,12 +69,12 @@
 
               template(slot="icons", slot-scope="{ row, index }")
                 .table__icons
-                  i(class="fas fa-trash" @click="deleteStep(row._id)")
+                  i(class="fas fa-trash" @click="requestToDelete(row._id)")
       .invoicing-details__add-steps
         .add-steps__title
 
         .add-steps__body
-          AddStepsToInvoicing.add-steps__table(v-if="toggleAddSteps" :invoicingEditId="reportDetailsInfo._id" :invoicingVendorId="reportDetailsInfo.vendor._id" @refreshReports="refreshReports")
+          AddStepsToInvoicing.add-steps__table(v-if="toggleAddSteps" :steps="steps" :invoicingEditId="reportDetailsInfo._id" @refreshReports="refreshReports")
 
 
 </template>
@@ -74,19 +82,14 @@
 <script>
 import GeneralTable from '../GeneralTable'
 import moment from "moment"
-import crudIcons from "../../mixins/crudIcons"
 import AddStepsToInvoicing from "./AddStepsToInvoicing"
+import ApproveModal from '../ApproveModal'
+
 export default {
-  mixins: [ crudIcons ],
   name: "InvoicingDetails",
-  props: {
-    reportDetailsInfo: {
-      type: Object,
-      default: {}
-    }
-  },
   data() {
     return {
+      reportDetailsInfo: {},
       fields: [
         {
           label: "Step Id",
@@ -122,6 +125,9 @@ export default {
         }
       ],
       toggleAddSteps: false,
+      deleteInfo: {},
+      isDeletingStep: false,
+      steps: []
 
     }
   },
@@ -135,32 +141,45 @@ export default {
     formattedDate(date) {
       return moment(date).format("DD-MM-YYYY");
     },
-    closeModal() {
-      this.$emit('closeModal')
-    },
-    deleteStep(stepId) {
-      this.$emit('deleteStep', {reportId: this.reportDetailsInfo._id, stepId })
-    },
-    refreshReports() {
-      this.$emit('refreshDetailsOfReports', this.reportDetailsInfo._id)
-    },
-    addNewSteps() {
-      this.$emit('addSteps', {reportId: this.reportDetailsInfo._id})
+    async refreshReports() {
+      await this.openDetails(this.$route.params.id)
+      await this.getSteps()
     },
     changeToggleAddSteps() {
       this.toggleAddSteps = !this.toggleAddSteps
-    }
-  },
-  computed: {
-    editDeleteIcon() {
-      console.log(this.icons)
-      const { cancel, edit, save, ...result } = this.icons
-      return result
+      if (this.toggleAddSteps) {
+        this.getSteps()
+      }
     },
+    requestToDelete(stepId) {
+      this.deleteInfo = {reportId: this.reportDetailsInfo._id, stepId }
+      this.isDeletingStep = true
+    },
+    async deleteStep() {
+      const {reportId, stepId} = this.deleteInfo
+      this.closeModalStep()
+      await this.$http.post(`/invoicing-reports/report/${reportId}/delete/${stepId}`)
+      await this.refreshReports()
+
+    },
+    closeModalStep() {
+      this.deleteInfo = {}
+      this.isDeletingStep = false
+    },
+    async openDetails(id) {
+      this.reportDetailsInfo =  (await this.$http.post('/invoicing-reports/report/' + id)).data[0]
+    },
+    async getSteps() {
+      this.steps = (await this.$http.post('/invoicing-reports/steps/not-in-requests', { countToSkip: 0, countToGet: -1, vendorId: this.reportDetailsInfo.vendor._id})).data.map(i => ({ ...i, isCheck: false }))
+    },
+  },
+  created() {
+    this.openDetails(this.$route.params.id)
   },
   components: {
     GeneralTable,
-    AddStepsToInvoicing
+    AddStepsToInvoicing,
+    ApproveModal
   }
 }
 </script>
@@ -169,7 +188,9 @@ export default {
 @import "../../assets/scss/colors";
 
 .invoicing-details {
+  position: relative;
   width: 1200px;
+  margin: 50px;
   background: #fff;
   &__body {
     display: flex;
@@ -299,5 +320,12 @@ export default {
 
     }
   }
+}
+.absolute-middle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 5;
 }
 </style>

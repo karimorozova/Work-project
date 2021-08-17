@@ -16,9 +16,6 @@
         template(slot="check" slot-scope="{ row, index }")
           .table__data
             CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
-          //.table__data(v-if="isEdit")
-
-
 
         template(slot="stepId" slot-scope="{ row, index }")
           .table__data {{ row.steps.stepId }}
@@ -71,16 +68,15 @@ export default {
       type: String,
       default: '0'
     },
-    invoicingVendorId: {
-      type: String,
-      default: '0'
+    steps: {
+      type: Array,
+      default: []
     }
   },
   data() {
     return {
       isAllSelected: false,
       isDataRemain: true,
-      steps: [],
       fields: [
         {
           label: "",
@@ -149,16 +145,7 @@ export default {
     formattedDate(date) {
       return moment(date).format("DD-MM-YYYY");
     },
-    async bottomScrolled() {
-      if (this.isDataRemain) {
-        const result = await this.$http.post("/invoicing-reports/steps/not-in-requests", {
-          // ...this.allFilters,
-          countToSkip: this.steps.length
-        })
-        this.steps.push(...result.data.map(i => ({ ...i, isCheck: false })))
-        this.isDataRemain = result.data.length === 25
-      }
-    },
+
     toggleCheck(index, val) {
       this.steps[index].isCheck = val
     },
@@ -173,23 +160,11 @@ export default {
       const checkedProjects = this.steps.filter(step => step.isCheck)
       try {
         await this.$http.post(`/invoicing-reports/report/${this.invoicingEditId}/steps/add`, {checkedProjects: checkedProjects.map(({ steps })=> steps._id), createdBy: this.user._id})
-        await this.getSteps()
-        this.$emit('closeModal')
         this.$emit('refreshReports')
       }catch (e) {
         console.log(e)
       }
-
     },
-    closeModal() {
-      this.$emit('closeModal')
-    },
-    async getSteps() {
-      this.steps =  (await this.$http.post('/invoicing-reports/steps/not-in-requests', { countToSkip: 0, countToGet: -1, vendorId: this.invoicingVendorId})).data.map(i => ({ ...i, isCheck: false }))
-    },
-  },
-  async created() {
-    await this.getSteps()
   },
   computed: {
     ...mapGetters({
