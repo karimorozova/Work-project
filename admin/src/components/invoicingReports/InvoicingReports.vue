@@ -75,7 +75,7 @@ export default {
 
     &__title {
       display: flex;
-      justify-content: end;
+      justify-content: flex-end;
       margin-bottom: 10px;
     }
   }

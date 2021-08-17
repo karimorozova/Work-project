@@ -9,7 +9,13 @@
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-          .table__header {{ field.label }}
+          .table__header(v-if="field.headerKey === 'headerCheck'")
+            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+          .table__header(v-else) {{ field.label }}
+
+        template(slot="check" slot-scope="{ row, index }")
+          .table__data
+            CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
         template(slot="reportId" slot-scope="{ row, index }" )
           .table__data
@@ -39,6 +45,7 @@
 import GeneralTable from '../GeneralTable'
 import LayoutsTable from '../LayoutsTable'
 import moment from "moment"
+import CheckBox from "../CheckBox"
 export default {
   name: "InvoicingReportsList",
   props: {
@@ -51,10 +58,16 @@ export default {
     return {
       fields: [
         {
+          label: "",
+          headerKey: "headerCheck",
+          key: "check",
+          style: { width: "2%" }
+        },
+        {
           label: "Report Id",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "271px" }
+          style: { width: "236px" }
         },
         {
           label: "Date Range",
@@ -104,10 +117,21 @@ export default {
     formattedDate(date) {
       return moment(date).format("DD-MM-YYYY");
     },
+    toggleCheck(index, val) {
+      this.reports[index].isCheck = val
+    },
+    toggleAll(val) {
+      this.reports = this.reports.reduce((acc, cur) => {
+        acc.push({ ...cur, isCheck: val })
+        return acc
+      }, [])
+      this.isAllSelected = val
+    },
   },
   components: {
     GeneralTable,
     LayoutsTable,
+    CheckBox,
   },
 }
 </script>
@@ -116,9 +140,8 @@ export default {
 @import "../../assets/scss/colors";
 
 .table {
-  &__header,
-  &__data {
-    padding: 0 6px;
+  &__header {
+    padding: 0 7px;
   }
 
   &__data {
