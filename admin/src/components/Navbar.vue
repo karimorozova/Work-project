@@ -287,6 +287,11 @@
 								type: 'link',
 								name: 'Finance',
 								path: '/pangea-finance/finance'
+							},
+							{
+								type: 'link',
+								name: 'Payables',
+								path: '/pangea-finance/invoicing-reports'
 							}
 						]
 					},

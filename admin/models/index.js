@@ -40,6 +40,7 @@ const IndustryTierInfo = require('./industryTier');
 const ClientsTasks = require('./clientsTasks')
 const ClientsNotes = require('./clientsNotes')
 const ClientsApiSetting = require('./clientsApiSetting')
+const InvoicingReports = require('./invoicingReports')
 
 const Models = {
   Languages,
@@ -84,6 +85,7 @@ const Models = {
   ClientsTasks,
   ClientsNotes,
   ClientsApiSetting,
+  InvoicingReports
 };
 
 module.exports = Models;

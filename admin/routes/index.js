@@ -25,6 +25,7 @@ router.use("/delivery", requiresLogin, require("./pmArea/delivery"))
 router.use("/clients-requests", requiresLogin, require("./pmArea/clientsRequests"))
 router.use("/pm-manage", requiresLogin, require("./pmArea/pm-manage"))
 router.use("/reportsapi", requiresLogin, require("./reportsapi"))
+router.use("/invoicing-reports", requiresLogin, require("./invoicingRequests"))
 
 
 //Open API ==========================================================================

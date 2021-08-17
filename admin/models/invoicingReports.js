@@ -9,7 +9,7 @@ const InvoicingReportsSchema = new mongoose.Schema({
 	},
 	vendor: {
 		type: Schema.Types.ObjectId,
-		ref: 'vendor'
+		ref: 'Vendors'
 	},
 	status: {
 		type: String,
@@ -18,6 +18,7 @@ const InvoicingReportsSchema = new mongoose.Schema({
 	},
 	steps: [{
 		type: Schema.Types.ObjectId,
+		ref: 'Projects.steps'
 	}],
 	firstPaymentDate: {
 		type: Date,
@@ -28,8 +29,8 @@ const InvoicingReportsSchema = new mongoose.Schema({
 		default: new Date()
 	},
 	file: {
-		type: Date,
-		default: new Date()
+		type: Object,
+		default: () => ({})
 	},
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
@@ -38,10 +39,12 @@ const InvoicingReportsSchema = new mongoose.Schema({
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
 	createAt: {
-		type: Schema.Types.ObjectId, ref: 'user'
+		type: Date,
+		default: new Date()
 	},
 	updatedAt: {
-		type: Schema.Types.ObjectId, ref: 'user'
+		type: Date,
+		default: new Date()
 	}
 });
 
