@@ -1,15 +1,24 @@
 const router = require('express').Router();
-const { getAllReports, getReport, reportAddSteps, reportDeleteStep, getAllSteps, addStepsToRequest} = require('../invoicingReports')
+
+const { Languages } = require('../models')
+const {
+	getAllReports,
+	getReport,
+	reportAddSteps,
+	reportDeleteStep,
+	getAllSteps,
+	addStepsToRequest,
+	stepsFiltersQuery
+} = require('../invoicingReports')
+
 const ObjectId = require("mongodb").ObjectID
 
-router.post("/steps/not-in-requests", async (req, res) => {
-	const { countToSkip, countToGet, vendorId = '' } = req.body;
+router.post("/not-selected-steps-list", async (req, res) => {
+	const { countToSkip, countToGet, filters } = req.body;
+	const allLanguages = await Languages.find()
 	try {
-		let queryForStep = {}
-		if (vendorId) {
-			queryForStep = {"steps.vendor": ObjectId(vendorId)}
-		}
-		const steps = await getAllSteps(countToSkip, countToGet, queryForStep)
+		const query = stepsFiltersQuery(filters, allLanguages)
+		const steps = await getAllSteps(countToSkip, countToGet, query)
 		res.send(steps);
 	} catch(err) {
 		console.log(err);

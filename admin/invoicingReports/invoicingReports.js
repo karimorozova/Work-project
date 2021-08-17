@@ -3,6 +3,27 @@ const { INVOICING_STATUSES } = require("./enum")
 const moment = require("moment")
 const ObjectId = require('mongodb').ObjectID
 
+const stepsFiltersQuery = ({ vendors, sourceLanguages, targetLanguages, to, from, step }, allLanguages) => {
+	const q = {}
+	if (vendors) {
+		q["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	}
+	if (sourceLanguages) {
+		q["steps.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if (targetLanguages) {
+		q["steps.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if(step){
+		q["steps.serviceStep.title"] = step
+	}
+	if(!to) to = moment().add('days', 1).format('YYYY-MM-DD');
+	if(!from) from = '1970-01-01'
+
+	q["billingDate"] = { $gte: new Date(`${ from }T00:00:00.000Z`), $lt: new Date(`${ to }T24:00:00.000Z`) }
+
+	return q
+}
 
 const getAllReports = async () => {
 	const invoicingReprots = await InvoicingReports.aggregate([
@@ -55,7 +76,7 @@ const reportDeleteStep = async (reportId, stepId) => {
 	{ arrayFilters: [ { 'i._id': stepId } ] })
 
 	} catch (e) {
-		
+
 	}
 }
 
@@ -147,4 +168,4 @@ const addStepsToRequest = async (projects, createdBy) => {
 }
 
 
-module.exports = { getAllReports, getReport, reportAddSteps, reportDeleteStep, getAllSteps, addStepsToRequest }
+module.exports = { getAllReports, getReport, reportAddSteps, reportDeleteStep, getAllSteps, addStepsToRequest, stepsFiltersQuery }

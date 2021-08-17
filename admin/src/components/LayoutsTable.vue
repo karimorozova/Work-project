@@ -206,7 +206,7 @@
   }
 
   table td {
-
+    padding: 0;
     box-shadow: inset -1px 0 0 $light-border;
   }
 

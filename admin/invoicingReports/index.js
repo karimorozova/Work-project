@@ -1,3 +1,19 @@
-const { getAllReports, getReport, reportAddSteps, reportDeleteStep, getAllSteps, addStepsToRequest} = require('./invoicingReports')
+const {
+	getAllReports,
+	getReport,
+	reportAddSteps,
+	reportDeleteStep,
+	getAllSteps,
+	addStepsToRequest,
+	stepsFiltersQuery
+} = require('./invoicingReports')
 
-module.exports = { getAllReports, getReport, reportAddSteps, reportDeleteStep, getAllSteps, addStepsToRequest }
+module.exports = {
+	getAllReports,
+	getReport,
+	reportAddSteps,
+	reportDeleteStep,
+	getAllSteps,
+	addStepsToRequest,
+	stepsFiltersQuery,
+}
