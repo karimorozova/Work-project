@@ -283,11 +283,11 @@
 						isOpen: false,
 						parent: true,
 						children: [
-							{
-								type: 'link',
-								name: 'Finance',
-								path: '/pangea-finance/finance'
-							},
+							// {
+							// 	type: 'link',
+							// 	name: 'Finance',
+							// 	path: '/pangea-finance/finance'
+							// },
               {
                 type: 'group',
                 path: 'invoicing-reports',
