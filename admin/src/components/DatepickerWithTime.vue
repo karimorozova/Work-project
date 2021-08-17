@@ -88,7 +88,7 @@
             )
               i.fa.fa-chevron-down
 
-        Button.select-date(value="Set date" @clicked="selectDate()")
+        Button.select-date(value="Set date" @clicked="setDateAndTime()")
 
 
     <!-- Month View -->
@@ -169,7 +169,10 @@
 			disabled: Object,
 			highlighted: Object,
 			placeholder: String,
-			inline: Boolean,
+			inline: {
+				type: Boolean,
+        default: false,
+      },
 			isReadonly: {
 				type: Boolean,
 				default: true
@@ -204,27 +207,11 @@
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
 			return {
-				/*
-         * Vue cannot observe changes to a Date Object so date must be stored as a timestamp
-         * This represents the first day of the current viewing month
-         * {Number}
-         */
 				pageTimestamp: startDate.setDate(1),
-				/*
-         * Selected Date
-         * {Date}
-         */
 				selectedDate: null,
-				/*
-         * Flags to show calendar views
-         * {Boolean}
-         */
 				showDayView: false,
 				showMonthView: false,
 				showYearView: false,
-				/*
-         * Positioning
-         */
 				calendarHeight: 0,
 				day: '',
 				hours: moment().hour(),
@@ -263,7 +250,6 @@
 				if (!this.initialView) {
 					return this.minimumView
 				}
-
 				return this.initialView
 			},
 			pageDate() {
@@ -288,11 +274,6 @@
 			currYear() {
 				return this.pageDate.getFullYear()
 			},
-			/**
-			 * Returns the day number of the week less one for the first of the current month
-			 * Used to show amount of empty cells before the first in the day calendar layout
-			 * @return {Number}
-			 */
 			blankDays() {
 				const d = this.pageDate
 				let dObj = new Date(d.getFullYear(), d.getMonth(), 1, d.getHours(), d.getMinutes())
@@ -362,7 +343,6 @@
 			years() {
 				const d = this.pageDate
 				let years = []
-				// set up a new date object to the beginning of the current 'page'
 				let dObj = new Date(Math.floor(d.getFullYear() / 10) * 10, d.getMonth(), d.getDate(), d.getHours(), d.getMinutes())
 				for (let i = 0; i < 10; i++) {
 					years.push({
@@ -394,13 +374,10 @@
 			}
 		},
 		methods: {
-			/**
-			 * Close all calendar layers
-			 */
-			removeSelectedDate(){
+			removeSelectedDate() {
 				this.selectedDate = null
-        this.$emit('removeSelectedDate')
-      },
+				this.$emit('removeSelectedDate')
+			},
 			close(full) {
 				this.showDayView = this.showMonthView = this.showYearView = false
 				if (!this.isInline) {
@@ -415,10 +392,6 @@
 				}
 				this.setPageDate(this.selectedDate)
 			},
-			/**
-			 * Effectively a toggle to show/hide the calendar
-			 * @return {mixed} [description]
-			 */
 			showCalendar() {
 				if (!this.isOpen) {
 					this.$emit('isOpened')
@@ -430,6 +403,7 @@
 					return this.close(true)
 				}
 				this.setInitialView()
+
 				if (!this.isInline) {
 					this.$emit('opened')
 				}
@@ -465,7 +439,6 @@
 				}
 				this.$emit('scrollDrop', { drop: !this.isOpen, offsetTop: top, offsetHeight: height })
 			},
-			// Setting date manually by input
 			setDateManually(e) {
 				const value = e.target.value
 				const dateParts = value.split(", ")
@@ -477,7 +450,6 @@
 				this.$emit('selected', newDate)
 				this.$emit('input', newDate)
 			},
-			//
 			setInitialView() {
 				const initialView = this.computedInitialView
 
@@ -546,15 +518,20 @@
 				this.$emit('input', null)
 				this.$emit('cleared')
 			},
-			/**
-			 * @param {Object} day
-			 */
-			selectDate() {
+			setDateAndTime() {
 				if (this.day.isDisabled) {
 					this.$emit('selectedDisabled', this.day)
 					return false
 				}
-				this.setDate(moment(this.day.timestamp).set({ hour: this.hours, minute: this.minutes }).format())
+
+				if(!this.day){
+          const str = moment(this.value).format('YYYY-MM-DD');
+					const now = moment(str).unix();
+					this.setDate(moment(now*1000).set({ hour: this.hours, minute: this.minutes }).format())
+        }else{
+					this.setDate(moment(this.day.timestamp).set({ hour: this.hours, minute: this.minutes }).format())
+        }
+
 				if (!this.isInline) {
 					this.close(true)
 				}
@@ -565,9 +542,6 @@
 					this.day = day
 				}
 			},
-			/**
-			 * @param {Object} month
-			 */
 			selectMonth(month) {
 				if (month.isDisabled) {
 					return false
@@ -585,9 +559,6 @@
 					}
 				}
 			},
-			/**
-			 * @param {Object} year
-			 */
 			selectYear(year) {
 				if (year.isDisabled) {
 					return false
@@ -605,27 +576,15 @@
 					}
 				}
 			},
-			/**
-			 * @return {Number}
-			 */
 			getPageDate() {
 				return this.pageDate.getDate()
 			},
-			/**
-			 * @return {Number}
-			 */
 			getPageMonth() {
 				return this.pageDate.getMonth()
 			},
-			/**
-			 * @return {Number}
-			 */
 			getPageYear() {
 				return this.pageDate.getFullYear()
 			},
-			/**
-			 * @return {String}
-			 */
 			getPageDecade() {
 				const decadeStart = Math.floor(this.pageDate.getFullYear() / 10) * 10
 				const decadeEnd = decadeStart + 9
@@ -713,19 +672,9 @@
 				}
 				return Math.ceil(this.disabled.from.getFullYear() / 10) * 10 <= Math.ceil(this.pageDate.getFullYear() / 10) * 10
 			},
-			/**
-			 * Whether a day is selected
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isSelectedDate(dObj) {
 				return this.selectedDate && this.selectedDate.toDateString() === dObj.toDateString()
 			},
-			/**
-			 * Whether a day is disabled
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isDisabledDate(date) {
 				let disabled = false
 
@@ -768,11 +717,6 @@
 				}
 				return disabled
 			},
-			/**
-			 * Whether a day is highlighted (only if it is not disabled already except when highlighted.includeDisabled is true)
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isHighlightedDate(date) {
 				if (!(this.highlighted && this.highlighted.includeDisabled) && this.isDisabledDate(date)) {
 					return false
@@ -811,12 +755,6 @@
 
 				return highlighted
 			},
-			/**
-			 * Whether a day is highlighted and it is the first date
-			 * in the highlighted range of dates
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isHighlightStart(date) {
 				return this.isHighlightedDate(date) &&
 						(this.highlighted.from instanceof Date) &&
@@ -824,12 +762,6 @@
 						(this.highlighted.from.getMonth() === date.getMonth()) &&
 						(this.highlighted.from.getDate() === date.getDate())
 			},
-			/**
-			 * Whether a day is highlighted and it is the first date
-			 * in the highlighted range of dates
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isHighlightEnd(date) {
 				return this.isHighlightedDate(date) &&
 						(this.highlighted.to instanceof Date) &&
@@ -837,29 +769,15 @@
 						(this.highlighted.to.getMonth() === date.getMonth()) &&
 						(this.highlighted.to.getDate() === date.getDate())
 			},
-			/**
-			 * Helper
-			 * @param  {mixed}  prop
-			 * @return {Boolean}
-			 */
 			isDefined(prop) {
 				return typeof prop !== 'undefined' && prop
 			},
-			/**
-			 * Whether the selected date is in this month
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
+
 			isSelectedMonth(date) {
 				return (this.selectedDate &&
 						this.selectedDate.getFullYear() === date.getFullYear() &&
 						this.selectedDate.getMonth() === date.getMonth())
 			},
-			/**
-			 * Whether a month is disabled
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isDisabledMonth(date) {
 				let disabled = false
 
@@ -886,19 +804,9 @@
 				}
 				return disabled
 			},
-			/**
-			 * Whether the selected date is in this year
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isSelectedYear(date) {
 				return this.selectedDate && this.selectedDate.getFullYear() === date.getFullYear()
 			},
-			/**
-			 * Whether a year is disabled
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isDisabledYear(date) {
 				let disabled = false
 				if (typeof this.disabled === 'undefined' || !this.disabled) {
@@ -918,10 +826,6 @@
 
 				return disabled
 			},
-			/**
-			 * Set the datepicker value
-			 * @param {Date|String|Number|null} date
-			 */
 			setValue(date) {
 				if (typeof date === 'string' || typeof date === 'number') {
 					let parsed = new Date(date)
@@ -947,10 +851,6 @@
 				}
 				this.pageTimestamp = (new Date(date)).setDate(1)
 			},
-			/**
-			 * Close the calendar if clicked outside the datepicker
-			 * @param  {Event} event
-			 */
 			clickOutside(event) {
 				if (this.$el && !this.$el.contains(event.target)) {
 					if (this.isInline) {
