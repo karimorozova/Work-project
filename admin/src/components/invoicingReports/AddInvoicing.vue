@@ -148,10 +148,10 @@ export default {
         const result = await this.$http.post("/invoicing-reports/steps/not-in-requests", {
           // ...this.allFilters,
           countToSkip: this.steps.length,
-          countToGet: 25,
+          countToGet: 100,
         })
         this.steps.push(...result.data.map(i => ({ ...i, isCheck: false })))
-        this.isDataRemain = result.data.length === 25
+        this.isDataRemain = result.data.length === 100
       }
     },
     toggleCheck(index, val) {
@@ -180,7 +180,7 @@ export default {
       this.$emit('closeModal')
     },
     async getSteps() {
-      this.steps =  (await this.$http.post('/invoicing-reports/steps/not-in-requests', { countToSkip: 0, countToGet: 25})).data.map(i => ({ ...i, isCheck: false }))
+      this.steps =  (await this.$http.post('/invoicing-reports/steps/not-in-requests', { countToSkip: 0, countToGet: 100})).data.map(i => ({ ...i, isCheck: false }))
     },
   },
   async created() {

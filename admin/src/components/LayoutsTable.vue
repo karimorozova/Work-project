@@ -46,6 +46,10 @@
 				type: Array,
 				default: () => []
 			},
+			customNumberOfFilterRows: {
+				type: Number,
+				default: 0
+			},
 			isApproveModal: {
 				type: Boolean,
 				default: false
@@ -90,9 +94,13 @@
 				user: "getUser"
 			}),
 			getUserHeight() {
-				if (Object.keys(this.user).length) {
+			  if (this.customNumberOfFilterRows > 0) {
+          const height =  Math.floor(this.innerHeight - (66 * this.customNumberOfFilterRows) - 185)
+          return height > 1200 ? 1200 : height
+        }
+        if (Object.keys(this.user).length) {
 					const { layoutsSettings: { project: { filters } } } = this.user
-					const height = Math.floor(this.innerHeight - (66 * Math.ceil(filters.length / 6)) - 185)
+					const height =  Math.floor(this.innerHeight - (66 * Math.ceil(filters.length / 6)) - 185)
 					return height > 1200 ? 1200 : height
 				}
 			}

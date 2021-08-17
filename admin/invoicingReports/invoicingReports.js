@@ -17,7 +17,9 @@ const getAllReports = async () => {
 					],
 					as: "stepFinance"
 				}
-			}]
+			},
+			{ $sort : { reportId : -1 }}
+		]
 	)
 	return (await InvoicingReports.populate(invoicingReprots, ['vendor']))
 }
@@ -106,7 +108,7 @@ const addStepsToRequest = async (projects, createdBy) => {
 	let groupedProjectsByVendor = {}
 
 	const lastIndex = await InvoicingReports.findOne().sort({ 'reportId': -1 })
-	let lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 0
+	let lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 100
 	let allSteps = []
 	for (const project of projects) {
 		const projectVendorId = project.currentVendor._id
