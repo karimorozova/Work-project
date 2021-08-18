@@ -502,14 +502,11 @@
       height: 16px;
       font-size: 16px;
       width: 16px;
-      color: $dark-border;
+      color: $text;
       cursor: pointer;
       transition: ease 0.2s;
       cursor: pointer;
 
-      &:hover {
-        color: $text;
-      }
     }
   }
 
