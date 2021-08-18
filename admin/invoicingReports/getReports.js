@@ -1,6 +1,16 @@
 const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
 const { InvoicingReports, Projects } = require("../models")
+
+
+const getReportsDateRange = (steps) => {
+	return steps.reduce((acc, { billingDate }) => {
+		acc.firstPaymentDate = moment.min(moment(billingDate.toString()), moment(acc.firstPaymentDate)).toISOString()
+		acc.lastPaymentDate = moment.max(moment(billingDate.toString()), moment(acc.lastPaymentDate)).toISOString()
+		return acc
+	}, {firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20,'years')})
+}
+
 const stepsFiltersQuery = ({ vendors, sourceLanguages, targetLanguages, to, from, step }, allLanguages) => {
 	const q = {}
 	if (vendors) {
@@ -90,6 +100,24 @@ const getReport = async (id) => {
 	return (await InvoicingReports.populate(invoicingReprots, ['vendor']))
 }
 
+const getReportProjectsAndSteps = async (id) => {
+	const invoicingReprots = await InvoicingReports.aggregate([
+		{ $match: {"_id": ObjectId(id)}},
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'steps': '$steps' },
+				pipeline: [
+					{ "$unwind": "$steps" },
+					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+				],
+				as: "steps"
+			}
+		}]
+	)
+	return (await InvoicingReports.populate(invoicingReprots, ['vendor']))
+}
+
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	const queryPipeline =  [
 		{ $match: { status: "Closed" } },
@@ -125,4 +153,4 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	return (await Projects.aggregate(queryPipeline))
 }
 
-module.exports = {stepsFiltersQuery, getAllReports, getReport, getAllSteps,reportsFiltersQuery}
+module.exports = {stepsFiltersQuery, getAllReports, getReport, getAllSteps,reportsFiltersQuery, getReportsDateRange, getReportProjectsAndSteps}

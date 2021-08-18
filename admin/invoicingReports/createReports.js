@@ -1,10 +1,17 @@
 const { InvoicingReports, Projects } = require("../models")
 const moment = require("moment")
 const { INVOICING_STATUSES } = require("./enum")
+const { getReportProjectsAndSteps, getReportsDateRange } = require("./getReports")
 
 const reportAddSteps = async (reportId, stepsId) => {
+	await InvoicingReports.updateOne({_id: reportId }, {$push: {'steps': {$each: stepsId}} })
+
+	const currentReport = (await getReportProjectsAndSteps(reportId)).pop()
+
+	const { firstPaymentDate, lastPaymentDate } = getReportsDateRange(currentReport.steps)
+
 	await InvoicingReports.updateOne({_id: reportId },
-			{$push: {'steps': {$each: stepsId}} })
+			{$set: {firstPaymentDate, lastPaymentDate}})
 
 	await Projects.updateMany(
 			{ 'steps._id': { $in: stepsId } },
@@ -12,11 +19,12 @@ const reportAddSteps = async (reportId, stepsId) => {
 			{ arrayFilters: [ { 'i._id': { $in: stepsId } } ] })
 }
 
+
 const addStepsToRequest = async (projects, createdBy) => {
 	let groupedProjectsByVendor = {}
 
 	const stepsVendors = projects.map(({ currentVendor }) => currentVendor._id )
-	const existsVendors = (await InvoicingReports.find({vendor: {$in: stepsVendors}, status: 'Created'}, {vendor: 1, firstPaymentDate: 1, lastPaymentDate: 1}, {lean: 'toObject'}))
+	const existsVendors = (await InvoicingReports.find({vendor: {$in: stepsVendors}, $or: [{status: 'Created'}, {status: 'Sent'}]}, {vendor: 1, firstPaymentDate: 1, lastPaymentDate: 1}, {lean: 'toObject'}))
 
 
 
