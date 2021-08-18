@@ -389,7 +389,7 @@
 				return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
 			},
 			selectedVendors() {
-				return this.$route.query.vendors && this.vendors.length
+				return this.$route.query.vendors && this.vendorsList.length
 						? this.$route.query.vendors.split(',').map(_id => {
 							const vendor = this.vendorsList.find(vendor => _id === vendor._id)
 							return vendor ? `${ vendor.firstName } ${ vendor.surname }` : ''
