@@ -82,22 +82,24 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 }
 
 const getReport = async (id) => {
-	const invoicingReprots = await InvoicingReports.aggregate([
+	const invoicingReports = await InvoicingReports.aggregate([
 		{ $match: {"_id": ObjectId(id)}},
 		{
 			$lookup: {
 				from: "projects",
-				let: { 'steps': '$steps' },
+				let: { 'steps': '$steps', 'steps2': '$billingDate' },
 				pipeline: [
 					{ "$unwind": "$steps" },
 					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ '$replaceRoot': { newRoot: '$steps' } }
+					{ "$addFields": {"steps.billingDate": '$billingDate'}},
+					{ '$replaceRoot': { newRoot: '$steps' } },
 				],
 				as: "steps"
 			}
-		}]
+		}
+		]
 	)
-	return (await InvoicingReports.populate(invoicingReprots, ['vendor']))
+	return (await InvoicingReports.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
 }
 
 const getReportProjectsAndSteps = async (id) => {
