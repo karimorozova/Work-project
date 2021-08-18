@@ -134,7 +134,7 @@
             .table__data {{ getTime( row.updatedAt) }}
 
           template(slot="icon" slot-scope="{ row, index }")
-            .table__data
+            .table__icon
               i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
         .table__empty(v-if="!reports.length") Nothing found...
@@ -166,13 +166,13 @@
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
-						style: { width: "36px" }
+						style: { width: "35px" }
 					},
 					{
 						label: "Report Id",
 						headerKey: "headerReportId",
 						key: "reportId",
-						style: { width: "155px" }
+						style: { width: "150px" }
 					},
 					{
 						label: "Vendor Name",
@@ -190,19 +190,19 @@
 						label: "Status",
 						headerKey: "headerStatus",
 						key: "status",
-						style: { width: "150px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Jobs",
 						headerKey: "headerJobs",
 						key: "jobs",
-						style: { width: "150px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Amount",
 						headerKey: "headerAmount",
 						key: "amount",
-						style: { width: "150px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Created At",
@@ -220,7 +220,7 @@
 						label: "",
 						headerKey: "headerIcon",
 						key: "icon",
-						style: { width: "16px" }
+						style: { width: "57px" }
 					}
 				],
 				isDataRemain: true,
@@ -239,7 +239,7 @@
 					'status'
 				],
 
-        deleteRequestId: '',
+				deleteRequestId: ''
 			}
 		},
 		methods: {
@@ -323,17 +323,17 @@
 			defaultSetter() {
 				for (let variable of this.dataVariables) this[variable] = ''
 			},
-      requestToDeleteRequest(id) {
-			  this.deleteRequestId = id
-        console.log(id)
-      },
-      async deleteRequest() {
-			  await this.$http.get(`/invoicing-reports/reports/${this.deleteRequestId}/delete`)
-        this.closeDeleteRequestModal()
-      },
-      closeDeleteRequestModal() {
-        this.deleteRequestId = ''
-      },
+			requestToDeleteRequest(id) {
+				this.deleteRequestId = id
+				console.log(id)
+			},
+			async deleteRequest() {
+				await this.$http.get(`/invoicing-reports/reports/${ this.deleteRequestId }/delete`)
+				this.closeDeleteRequestModal()
+			},
+			closeDeleteRequestModal() {
+				this.deleteRequestId = ''
+			},
 			async getReports() {
 				this.reports = (await this.$http.post('/invoicing-reports/reports', {
 					countToSkip: 0,
@@ -388,9 +388,9 @@
 			reportIdValue() {
 				return this.$route.query.reportId || ''
 			},
-      isAllSelected() {
-        return (this.reports && this.reports.length) && this.reports.every(i => i.isCheck)
-      }
+			isAllSelected() {
+				return (this.reports && this.reports.length) && this.reports.every(i => i.isCheck)
+			}
 		},
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
@@ -415,13 +415,17 @@
 			GeneralTable,
 			LayoutsTable,
 			CheckBox,
-      ApproveModal
+			ApproveModal
 		}
 	}
 </script>
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
+
+  .fa-trash {
+    cursor: pointer;
+  }
 
   .reports {
     position: relative;
@@ -491,22 +495,20 @@
   }
 
   .table {
+    &__icon {
+      width: 100%;
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      font-size: 15px;
+    }
+
     &__header {
       padding: 0 7px;
     }
 
     &__empty {
       margin-top: 10px;
-    }
-    &__data i {
-      height: 16px;
-      font-size: 16px;
-      width: 16px;
-      color: $text;
-      cursor: pointer;
-      transition: ease 0.2s;
-      cursor: pointer;
-
     }
   }
 
@@ -566,8 +568,10 @@
     margin-right: 4px;
     color: $dark-border;
   }
+
   .modal {
     position: relative;
+
     &__block {
       position: absolute;
       top: 50%;
