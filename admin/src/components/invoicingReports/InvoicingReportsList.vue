@@ -77,15 +77,26 @@
             Button(value="Add Reports")
 
       .reports__container
+        .modal
+          .modal__block
+            ApproveModal(
+              v-if="deleteRequestId !== ''"
+              text="Are you sure?"
+              approveValue="Yes"
+              notApproveValue="No"
+              @approve="deleteRequest"
+              @close="closeDeleteRequestModal"
+              @notApprove="closeDeleteRequestModal"
+            )
         LayoutsTable(
           :fields="fields"
           :tableData="reports"
-          :customNumberOfFilterRows="1"
+          :customNumberOfFilterRows="2"
           @bottomScrolled="bottomScrolled"
         )
           template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .table__header(v-if="field.headerKey === 'headerCheck'")
-              CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+              CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
             .table__header(v-else) {{ field.label }}
 
           template(slot="check" slot-scope="{ row, index }")
@@ -122,6 +133,10 @@
           template(slot="updated" slot-scope="{ row, index }")
             .table__data {{ getTime( row.updatedAt) }}
 
+          template(slot="icon" slot-scope="{ row, index }")
+            .table__data
+              i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
+
         .table__empty(v-if="!reports.length") Nothing found...
 
 </template>
@@ -136,6 +151,7 @@
 	import DatepickerWithTime from "../DatepickerWithTime"
 	import SelectSingle from "../SelectSingle"
 	import Button from "../Button"
+	import ApproveModal from "../ApproveModal"
 
 	export default {
 		name: "InvoicingReportsList",
@@ -156,19 +172,19 @@
 						label: "Report Id",
 						headerKey: "headerReportId",
 						key: "reportId",
-						style: { width: "150px" }
+						style: { width: "155px" }
 					},
 					{
 						label: "Vendor Name",
 						headerKey: "headerVendorName",
 						key: "vendorName",
-						style: { width: "150px" }
+						style: { width: "210px" }
 					},
 					{
 						label: "Date Range",
 						headerKey: "headerDateRange",
 						key: "dateRange",
-						style: { width: "150px" }
+						style: { width: "210px" }
 					},
 					{
 						label: "Status",
@@ -192,13 +208,19 @@
 						label: "Created At",
 						headerKey: "headerCreated",
 						key: "created",
-						style: { width: "150px" }
+						style: { width: "190px" }
 					},
 					{
 						label: "Updated At",
 						headerKey: "headerUpdated",
 						key: "updated",
-						style: { width: "150px" }
+						style: { width: "190px" }
+					},
+					{
+						label: "",
+						headerKey: "headerIcon",
+						key: "icon",
+						style: { width: "16px" }
 					}
 				],
 				isDataRemain: true,
@@ -215,7 +237,9 @@
 					'to',
 					'from',
 					'status'
-				]
+				],
+
+        deleteRequestId: '',
 			}
 		},
 		methods: {
@@ -270,7 +294,6 @@
 					acc.push({ ...cur, isCheck: val })
 					return acc
 				}, [])
-				this.isAllSelected = val
 			},
 			getVendorsIdByFullName(option) {
 				const { _id } = this.vendorsList.find(({ firstName, surname }) => `${ firstName } ${ surname }` === option)
@@ -300,6 +323,17 @@
 			defaultSetter() {
 				for (let variable of this.dataVariables) this[variable] = ''
 			},
+      requestToDeleteRequest(id) {
+			  this.deleteRequestId = id
+        console.log(id)
+      },
+      async deleteRequest() {
+			  await this.$http.get(`/invoicing-reports/reports/${this.deleteRequestId}/delete`)
+        this.closeDeleteRequestModal()
+      },
+      closeDeleteRequestModal() {
+        this.deleteRequestId = ''
+      },
 			async getReports() {
 				this.reports = (await this.$http.post('/invoicing-reports/reports', {
 					countToSkip: 0,
@@ -353,7 +387,10 @@
 			},
 			reportIdValue() {
 				return this.$route.query.reportId || ''
-			}
+			},
+      isAllSelected() {
+        return (this.reports && this.reports.length) && this.reports.every(i => i.isCheck)
+      }
 		},
 		beforeRouteEnter(to, from, next) {
 			next((vm) => {
@@ -377,7 +414,8 @@
 			SelectMulti,
 			GeneralTable,
 			LayoutsTable,
-			CheckBox
+			CheckBox,
+      ApproveModal
 		}
 	}
 </script>
@@ -460,6 +498,19 @@
     &__empty {
       margin-top: 10px;
     }
+    &__data i {
+      height: 16px;
+      font-size: 16px;
+      width: 16px;
+      color: $dark-border;
+      cursor: pointer;
+      transition: ease 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        color: $text;
+      }
+    }
   }
 
   .fa-backspace {
@@ -517,5 +568,14 @@
   .currency {
     margin-right: 4px;
     color: $dark-border;
+  }
+  .modal {
+    position: relative;
+    &__block {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, 50%);
+    }
   }
 </style>

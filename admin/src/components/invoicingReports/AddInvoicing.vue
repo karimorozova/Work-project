@@ -134,7 +134,9 @@
               | {{ row.steps.targetLanguage }}
 
           template(slot="payables" slot-scope="{ row, index }")
-            .table__data {{ row.steps.nativeFinance.Price.payables | roundTwoDigit}}
+            .table__data
+              span.currency(v-html="'&euro;'")
+              span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit }}
 
         .table__empty(v-if="!steps.length") Nothing found...
 
@@ -158,7 +160,6 @@
 				highlighted: {
 					days: [ 6, 0 ]
 				},
-				isAllSelected: false,
 				isDataRemain: true,
 				steps: [],
 				fields: [
@@ -172,31 +173,31 @@
 						label: "Step Id",
 						headerKey: "headerStepId",
 						key: "stepId",
-						style: { width: "175px" }
+						style: { width: "205px" }
 					},
 					{
 						label: "Vendor Name",
 						headerKey: "headerVendorName",
 						key: "vendorName",
-						style: { width: "175px" }
+						style: { width: "220px" }
 					},
 					{
 						label: "Start Date",
 						headerKey: "headerStartDate",
 						key: "startDate",
-						style: { width: "120px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
-						style: { width: "120px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Billing Date",
 						headerKey: "headerBillingDate",
 						key: "billingDate",
-						style: { width: "120px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Step",
@@ -220,7 +221,7 @@
 						label: "Fee ",
 						headerKey: "headerPayables",
 						key: "payables",
-						style: { width: "100px" }
+						style: { width: "140px" }
 					}
 				],
 
@@ -276,7 +277,6 @@
 					acc.push({ ...cur, isCheck: val })
 					return acc
 				}, [])
-				this.isAllSelected = val
 			},
 			async sendTasks() {
 				const checkedProjects = this.steps.filter(step => step.isCheck)
@@ -417,7 +417,10 @@
 			},
 			toDateValue() {
 				return this.$route.query.to || ''
-			}
+			},
+      isAllSelected() {
+        return (this.steps && this.steps.length) && this.steps.every(i => i.isCheck)
+      }
 		},
 		components: {
 			DatepickerWithTime,
