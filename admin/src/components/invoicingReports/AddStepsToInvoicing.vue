@@ -6,6 +6,7 @@
         :tableData="steps",
         :isFilterShow="false"
         :isFilterAbsolute="false"
+        :isBodyShort="true"
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -43,155 +44,163 @@
 
         template(slot="langPair" slot-scope="{ row, index }")
           .table__data {{ row.steps.sourceLanguage}}
-            span(style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+            span(style="font-size: 12px;color: #999999;margin: 0 4px;")
               i(class="fas fa-angle-double-right")
             | {{ row.steps.targetLanguage }}
 
         template(slot="payables" slot-scope="{ row, index }")
-          .table__data {{ row.steps.nativeFinance.Price.payables | roundTwoDigit}}
+          .table__data
+            span.currency(v-html="'&euro;'")
+            span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit}}
 
       .table__empty(v-if="!steps.length") Nothing found...
 
-      Button(class="add-button" value="Add Steps" @clicked="sendTasks")
+      .table__buttons
+        Button(v-if="steps.length" class="add-button" value="Add Jobs" @clicked="sendTasks")
+        Button(class="add-button" value="Cancel" @clicked="closeTable")
+
 </template>
 
 <script>
-import GeneralTable from '../GeneralTable'
-import CheckBox from '../CheckBox'
-import Button from '../Button'
-import moment from "moment"
-import { mapGetters } from "vuex"
-import { getUser } from "../../vuex/general/getters"
-export default {
-  props: {
-    invoicingEditId: {
-      type: String,
-      default: '0'
-    },
-    steps: {
-      type: Array,
-      default: []
-    }
-  },
-  data() {
-    return {
-      isAllSelected: false,
-      isDataRemain: true,
-      fields: [
-        {
-          label: "",
-          headerKey: "headerCheck",
-          key: "check",
-          style: { width: "2%" }
-        },
-        {
-          label: "Step Id",
-          headerKey: "headerStepId",
-          key: "stepId",
-          style: { width: "12%" }
-        },
-        {
-          label: "Vendor Name",
-          headerKey: "headerVendorName",
-          key: "vendorName",
-          style: { width: "12%" }
-        },
-        {
-          label: "Project Start Date",
-          headerKey: "headerStartDate",
-          key: "startDate",
-          style: { width: "11%" }
-        },
-        {
-          label: "Project deadline",
-          headerKey: "headerDeadline",
-          key: "deadline",
-          style: { width: "11%" }
-        },
-        {
-          label: "Billing Date",
-          headerKey: "headerBillingDate",
-          key: "billingDate",
-          style: { width: "11%" }
-        },
-        {
-          label: "Step",
-          headerKey: "headerService",
-          key: "service",
-          style: { width: "11%" }
-        },
-        {
-          label: "Job Status",
-          headerKey: "headerJobStatus",
-          key: "jobStatus",
-          style: { width: "11%" }
-        },
-        {
-          label: "Language Pair",
-          headerKey: "headerLangPair",
-          key: "langPair",
-          style: { width: "11%" }
-        },
-        {
-          label: "Fee ",
-          headerKey: "headerPayables",
-          key: "payables",
-          style: { width: "11%" }
-        },
-      ]
-    }
-  },
-  methods: {
-    formattedDate(date) {
-      return moment(date).format("DD-MM-YYYY");
-    },
+	import GeneralTable from '../GeneralTable'
+	import CheckBox from '../CheckBox'
+	import Button from '../Button'
+	import moment from "moment"
+	import { mapGetters } from "vuex"
+	import { getUser } from "../../vuex/general/getters"
 
-    toggleCheck(index, val) {
-      this.steps[index].isCheck = val
-    },
-    toggleAll(val) {
-      this.steps = this.steps.reduce((acc, cur) => {
-        acc.push({ ...cur, isCheck: val })
-        return acc
-      }, [])
-      this.isAllSelected = val
-    },
-    async sendTasks() {
-      const checkedProjects = this.steps.filter(step => step.isCheck)
-      try {
-        await this.$http.post(`/invoicing-reports/report/${this.invoicingEditId}/steps/add`, {checkedProjects: checkedProjects.map(({ steps })=> steps._id), createdBy: this.user._id})
-        this.$emit('refreshReports')
-      }catch (e) {
-        console.log(e)
-      }
-    },
-  },
-  computed: {
-    ...mapGetters({
-      user: "getUser"
-    })
+	export default {
+		props: {
+			invoicingEditId: {
+				type: String,
+				default: '0'
+			},
+			steps: {
+				type: Array,
+				default: []
+			}
+		},
+		data() {
+			return {
+				isAllSelected: false,
+				isDataRemain: true,
+				fields: [
+					{
+						label: "",
+						headerKey: "headerCheck",
+						key: "check",
+						style: { width: "2.2%" }
+					},
+					{
+						label: "Step Id",
+						headerKey: "headerStepId",
+						key: "stepId",
+						style: { width: "14%" }
+					},
+					{
+						label: "Vendor Name",
+						headerKey: "headerVendorName",
+						key: "vendorName",
+						style: { width: "14%" }
+					},
+					{
+						label: "Project Start Date",
+						headerKey: "headerStartDate",
+						key: "startDate",
+						style: { width: "10%" }
+					},
+					{
+						label: "Project deadline",
+						headerKey: "headerDeadline",
+						key: "deadline",
+						style: { width: "10%" }
+					},
+					{
+						label: "Billing Date",
+						headerKey: "headerBillingDate",
+						key: "billingDate",
+						style: { width: "10%" }
+					},
+					{
+						label: "Step",
+						headerKey: "headerService",
+						key: "service",
+						style: { width: "10%" }
+					},
+					{
+						label: "Job Status",
+						headerKey: "headerJobStatus",
+						key: "jobStatus",
+						style: { width: "10%" }
+					},
+					{
+						label: "Language Pair",
+						headerKey: "headerLangPair",
+						key: "langPair",
+						style: { width: "10%" }
+					},
+					{
+						label: "Fee ",
+						headerKey: "headerPayables",
+						key: "payables",
+						style: { width: "9.8%" }
+					}
+				]
+			}
+		},
+		methods: {
+			closeTable(){
+				this.$emit('closeTable')
+      },
+			formattedDate(date) {
+				return moment(date).format("DD-MM-YYYY")
+			},
 
-  },
-  components: {
-    GeneralTable,
-    CheckBox,
-    Button,
-  }
-}
+			toggleCheck(index, val) {
+				this.steps[index].isCheck = val
+			},
+			toggleAll(val) {
+				this.steps = this.steps.reduce((acc, cur) => {
+					acc.push({ ...cur, isCheck: val })
+					return acc
+				}, [])
+				this.isAllSelected = val
+			},
+			async sendTasks() {
+				const checkedProjects = this.steps.filter(step => step.isCheck)
+				try {
+					await this.$http.post(`/invoicing-reports/report/${ this.invoicingEditId }/steps/add`, {
+						checkedProjects: checkedProjects.map(({ steps }) => steps._id),
+						createdBy: this.user._id
+					})
+					this.$emit('refreshReports')
+				} catch (e) {
+					console.log(e)
+				}
+			}
+		},
+		computed: {
+			...mapGetters({
+				user: "getUser"
+			})
+
+		},
+		components: {
+			GeneralTable,
+			CheckBox,
+			Button
+		}
+	}
 </script>
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
+
   .invoicing-reports-add {
-    //width: 1200px;
-    //background: #fff;
     &__table {
       margin-top: 40px;
-      //border-radius: 4px;
-      //padding: 20px;
-      //box-sizing: border-box;
-      //box-shadow: 0 1px 2px 0 rgba(99,99,99,.3),0 1px 3px 1px rgba(99,99,99,.15);
     }
+
     &__title {
       display: flex;
       justify-content: end;
@@ -200,10 +209,14 @@ export default {
   }
 
   .add-button {
-    margin-top: 10px;
+    margin-top: 20px;
   }
 
   .table {
+    &__buttons{
+      display: flex;
+      gap: 20px;
+    }
     &__header,
     &__data {
       padding: 0 6px;
@@ -212,45 +225,14 @@ export default {
     &__data {
       width: 100%;
     }
-
-    &__icons {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 7px;
-      width: 100%;
-      height: 40px;
-
-      &-info {
-        cursor: help;
-        color: $red;
-        font-size: 16px;
-      }
-
-      &-link {
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      &-link-opacity {
-        cursor: default;
-        font-size: 16px;
-        opacity: 0.5;
-      }
+    &__empty{
+      margin-top: 10px;
     }
+
   }
-  .icon-button {
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: .2s ease-out;
-    justify-content: center;
+
+  .currency {
+    margin-right: 4px;
     color: $dark-border;
-
-    &:hover {
-      color: $text;
-
-    }
   }
 </style>
