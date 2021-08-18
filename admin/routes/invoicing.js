@@ -26,6 +26,18 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	}
 });
 
+router.post("/not-selected-steps-list/:vendor", async (req, res) => {
+	const { vendor } = req.params;
+	try {
+		const query = {"steps.vendor": ObjectId(vendor)}
+		const steps = await getAllSteps(0, 0, query)
+		res.send(steps);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
 router.post("/reports", async (req, res) => {
 	try {
 		const reports = await getAllReports()

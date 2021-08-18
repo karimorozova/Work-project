@@ -170,7 +170,7 @@ export default {
       this.reportDetailsInfo =  (await this.$http.post('/invoicing-reports/report/' + id)).data[0]
     },
     async getSteps() {
-      this.steps = (await this.$http.post('/invoicing-reports/steps/not-in-requests', { countToSkip: 0, countToGet: -1, vendorId: this.reportDetailsInfo.vendor._id})).data.map(i => ({ ...i, isCheck: false }))
+      this.steps = (await this.$http.post('/invoicing-reports/not-selected-steps-list/'+ this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
     },
   },
   created() {
