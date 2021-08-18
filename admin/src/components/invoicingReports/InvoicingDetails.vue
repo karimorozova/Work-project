@@ -185,10 +185,10 @@
 			},
 			async openDetails(id) {
 				this.reportDetailsInfo = (await this.$http.post('/invoicing-reports/report/' + id)).data[0]
-				console.log(this.reportDetailsInfo)
 			},
 			async getSteps() {
 				this.steps = (await this.$http.post('/invoicing-reports/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
+				console.log('steps', this.steps)
 			}
 		},
 		created() {
@@ -211,16 +211,12 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    height: 32px;
 
     &__text {
       font-size: 21px;
       font-family: 'Myriad600';
     }
-
-    &__button {
-
-    }
-
   }
 
   .invoicing-details {
@@ -269,16 +265,17 @@
     }
 
     &__address {
-      font-size: 16px;
+      font-size: 15px;
       font-family: Myriad300;
       width: 300px;
       line-height: 1.2;
       padding-bottom: 10px;
-      letter-spacing: .3px;
+      letter-spacing: .2px;
     }
 
     &__title {
       width: 100px;
+      font-family: Myriad600;
     }
 
     &__value {

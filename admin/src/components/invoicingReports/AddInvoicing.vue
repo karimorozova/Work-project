@@ -101,8 +101,8 @@
             .table__data
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-
           template(slot="stepId" slot-scope="{ row, index }")
+          
             .table__data {{ row.steps.stepId }}
 
           template(slot="vendorName" slot-scope="{ row, index }")
@@ -118,14 +118,11 @@
           template(slot="billingDate" slot-scope="{ row, index }")
             .table__data {{ formattedDate(row.billingDate) }}
 
-
           template(slot="service" slot-scope="{ row, index }")
             .table__data {{ row.steps.service.title }}
 
-
           template(slot="jobStatus" slot-scope="{ row, index }")
             .table__data {{ row.steps.status }}
-
 
           template(slot="langPair" slot-scope="{ row, index }")
             .table__data {{ row.steps.sourceLanguage}}
@@ -140,7 +137,12 @@
 
         .table__empty(v-if="!steps.length") Nothing found...
 
-      Button(value="Create Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
+      .footer
+        .footer__button
+          Button(value="Create Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
+        .footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndVendors }}
+
+
 </template>
 
 <script>
@@ -176,7 +178,7 @@
 						style: { width: "205px" }
 					},
 					{
-						label: "Vendor Name",
+						label: "Vendor",
 						headerKey: "headerVendorName",
 						key: "vendorName",
 						style: { width: "220px" }
@@ -376,6 +378,13 @@
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
 				return filters
 			},
+			calculatingJobsAndVendors() {
+				if (this.isOptionToCreateReport) {
+					const vendors = [ ...new Set(this.steps.filter(item => item.isCheck).map(item => item.currentVendor._id.toString())) ].length
+					const steps = this.steps.filter(item => item.isCheck).length
+					return `Vendors Selected : ${ vendors }, Jobs Selected: ${ steps }`
+				}
+			},
 			isOptionToCreateReport() {
 				if (this.steps.length) {
 					return this.steps.some(item => item.isCheck)
@@ -418,9 +427,9 @@
 			toDateValue() {
 				return this.$route.query.to || ''
 			},
-      isAllSelected() {
-        return (this.steps && this.steps.length) && this.steps.every(i => i.isCheck)
-      }
+			isAllSelected() {
+				 if(this.steps && this.steps.length) return this.steps.every(i => i.isCheck)
+			}
 		},
 		components: {
 			DatepickerWithTime,
@@ -451,6 +460,16 @@
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &__description {
+      opacity: 0.5;
+    }
+  }
 
   .filter {
     display: flex;
@@ -496,7 +515,8 @@
   .table__header {
     padding: 0 0 0 7px;
   }
-  .table__empty{
+
+  .table__empty {
     margin-top: 10px;
   }
 

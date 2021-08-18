@@ -56,7 +56,7 @@
       .table__empty(v-if="!steps.length") Nothing found...
 
       .table__buttons
-        Button(v-if="steps.length" class="add-button" value="Add Jobs" @clicked="sendTasks")
+        Button(v-if="steps.length" class="add-button" value="Add Jobs" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
         Button(class="add-button" value="Cancel" @clicked="closeTable")
 
 </template>
@@ -98,19 +98,19 @@
 						style: { width: "14%" }
 					},
 					{
-						label: "Vendor Name",
+						label: "Vendor",
 						headerKey: "headerVendorName",
 						key: "vendorName",
 						style: { width: "14%" }
 					},
 					{
-						label: "Project Start Date",
+						label: "Start Date",
 						headerKey: "headerStartDate",
 						key: "startDate",
 						style: { width: "10%" }
 					},
 					{
-						label: "Project deadline",
+						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
 						style: { width: "10%" }
@@ -182,8 +182,13 @@
 		computed: {
 			...mapGetters({
 				user: "getUser"
-			})
-
+			}),
+			isOptionToCreateReport() {
+				if (this.steps.length) {
+					return this.steps.some(item => item.isCheck)
+				}
+				return false
+			},
 		},
 		components: {
 			GeneralTable,
