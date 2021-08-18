@@ -41,7 +41,6 @@ const addStepsToRequest = async (projects, createdBy) => {
 			currentProject.lastPaymentDate = moment.max(moment(currentProject.lastPaymentDate), moment(project.billingDate)).toISOString()
 		} else {
 			groupedProjectsByVendor[projectVendorId] = {
-				reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0"),
 				vendor: projectVendorId,
 				status: INVOICING_STATUSES.CREATED,
 				steps: [ project.steps._id ],
@@ -65,7 +64,7 @@ const addStepsToRequest = async (projects, createdBy) => {
 			const lastPaymentDate =  moment.max(moment(foundInDB.lastPaymentDate), moment(report.lastPaymentDate)).toISOString()
 			await  InvoicingReports.updateOne({_id: foundInDB._id}, {$set: {lastPaymentDate, firstPaymentDate}, $push: {steps: {$each: report.steps}}} )
 		} else {
-			await InvoicingReports.create(report)
+			await InvoicingReports.create({...report, reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0")})
 		}
 
 		await Projects.updateMany(
