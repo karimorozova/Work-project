@@ -8,7 +8,8 @@ const {
 	reportDeleteStep,
 	getAllSteps,
 	addStepsToRequest,
-	stepsFiltersQuery
+	stepsFiltersQuery,
+	reportsFiltersQuery
 } = require('../invoicingReports')
 
 const ObjectId = require("mongodb").ObjectID
@@ -40,7 +41,10 @@ router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 
 router.post("/reports", async (req, res) => {
 	try {
-		const reports = await getAllReports()
+		const {	countToSkip, countToGet, filters } = req.body
+		console.log(filters)
+		const query = reportsFiltersQuery(filters)
+		const reports = await getAllReports( countToSkip, countToGet, query )
 		res.send(reports);
 	} catch(err) {
 		console.log(err);

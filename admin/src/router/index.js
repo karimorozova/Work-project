@@ -65,7 +65,7 @@ import ContactDetailsAddInNewClient from "../components/clients/new-client/Conta
 import ContactDetailsInNewClient from "../components/clients/new-client/ContactDetailsInNewClient"
 import ContactDetailsAddExistingClient from "../components/clients/ContactDetailsAddExistingClient"
 import ContactDetailsExistingClient from "../components/clients/ContactDetailsExistingClient"
-import InvoicingReports from "../components/invoicingReports/InvoicingReports"
+import InvoicingReportsList from "../components/invoicingReports/InvoicingReportsList"
 import InvoicingDetails from "../components/invoicingReports/InvoicingDetails"
 import AddInvoicing from "../components/invoicingReports/AddInvoicing"
 // =====================================================================================================
@@ -626,7 +626,7 @@ const router = new Router({
 						{
 							path: 'invoicing-reports/reports',
 							name: 'invoicing-reports',
-							component: InvoicingReports
+							component: InvoicingReportsList
 						},
 						{
 							path: 'invoicing-reports/reports/:id',

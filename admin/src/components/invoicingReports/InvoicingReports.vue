@@ -58,17 +58,5 @@
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
 
-  .invoicing-reports {
-    position: relative;
-    width: 1530px;
-    margin: 50px;
-    background: #fff;
 
-    &__block {
-      border-radius: 4px;
-      padding: 20px;
-      box-sizing: border-box;
-      box-shadow: 0 1px 2px 0 rgba(99, 99, 99, .3), 0 1px 3px 1px rgba(99, 99, 99, .15);
-    }
-  }
 </style>

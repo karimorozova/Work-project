@@ -23,7 +23,32 @@ const stepsFiltersQuery = ({ vendors, sourceLanguages, targetLanguages, to, from
 	return q
 }
 
-const getAllReports = async () => {
+const reportsFiltersQuery = ({reportId,  vendors, to, from, status }) => {
+	const q = {}
+	const reg = /[.*+?^${}()|[\]\\]/g
+
+	if(reportId){
+		const f = reportId.replace(reg, '\\$&')
+		q['reportId'] = { "$regex": new RegExp(f, 'i') }
+	}
+	if (vendors) {
+		q["vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	}
+	if(status) {
+		q["status"] = status
+	}
+
+	if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
+	if(!from) from = '1970-01-01'
+
+	q['firstPaymentDate'] = {  $gte: new Date(`${ from }T00:00:00.000Z`) }
+	q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
+
+	return q
+}
+
+
+const getAllReports = async (countToSkip, countToGet, query) => {
 	const invoicingReprots = await InvoicingReports.aggregate([
 				{
 					$lookup: {
@@ -37,10 +62,13 @@ const getAllReports = async () => {
 						as: "stepFinance"
 					}
 				},
-				{ $sort : { reportId : -1 }}
+				{ $match: {...query} },
+				{ $sort : { reportId : -1 }},
+				{ $skip: countToSkip },
+				{ $limit: countToGet}
 			]
 	)
-	return (await InvoicingReports.populate(invoicingReprots, ['vendor']))
+	return (await InvoicingReports.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
 }
 
 const getReport = async (id) => {
@@ -97,4 +125,4 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	return (await Projects.aggregate(queryPipeline))
 }
 
-module.exports = {stepsFiltersQuery, getAllReports, getReport, getAllSteps}
+module.exports = {stepsFiltersQuery, getAllReports, getReport, getAllSteps,reportsFiltersQuery}

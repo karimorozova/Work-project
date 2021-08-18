@@ -1,106 +1,128 @@
 <template lang="pug">
   .reports
-    .filter
-      .filter__item
-        label Report Id:
-        .filter__input
-          input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
-          .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
-            i.fas.fa-backspace
-      .filter__item
-        label Vendors:
-        .filter__input
-          SelectMulti(
-            :selectedOptions="selectedVendors"
-            :options="allVendors"
-            :hasSearch="true"
-            placeholder="Options"
-            @chooseOptions="setVendors"
-            :isSelectedWithIcon="true"
-            :isRemoveOption="true"
-            @removeOption="removeVendors"
-          )
-      .filter__item
-        label Date From:
-        .filter__input
-          DatepickerWithTime(
-            :value="fromDateValue"
-            @selected="setFromDate"
-            placeholder="Date"
-            :isTime="false"
-            :highlighted="highlighted"
-            :monday-first="true"
-            inputClass="datepicker-custom-filter"
-            calendarClass="calendar-custom"
-            :format="customFormatter"
-            :isClearIcon="true"
-            @removeSelectedDate="removeFromDate"
-          )
-      .filter__item
-        label Date To:
-        .filter__input
-          DatepickerWithTime(
-            :value="toDateValue"
-            @selected="setToDate"
-            placeholder="Date"
-            :isTime="false"
-            :highlighted="highlighted"
-            :monday-first="true"
-            inputClass="datepicker-custom-filter"
-            calendarClass="calendar-custom"
-            :format="customFormatter"
-            :isClearIcon="true"
-            @removeSelectedDate="removeToDate"
-          )
-    .options
-      .options__item
-        label Reports Actions:
-        .options__input
-          SelectSingle
-      router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/create-reports`}")
-        Button(value="Add Reports")
+    .reports__wrapper
+      .filter
+        .filter__item
+          label Report Id:
+          .filter__input
+            input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
+            .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
+              i.fas.fa-backspace
+        .filter__item
+          label Status:
+          .filter__input
+            SelectSingle(
+              :selectedOption="selectedStatus"
+              :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Paid']"
+              placeholder="Option"
+              @chooseOption="setStatus"
+              :isRemoveOption="true"
+              @removeOption="removeStatus"
+            )
+        .filter__item
+          label Vendors:
+          .filter__input
+            SelectMulti(
+              :selectedOptions="selectedVendors"
+              :options="allVendors"
+              :hasSearch="true"
+              placeholder="Options"
+              @chooseOptions="setVendors"
+              :isSelectedWithIcon="true"
+              :isRemoveOption="true"
+              @removeOption="removeVendors"
+            )
+        .filter__item
+          label Date From:
+          .filter__input
+            DatepickerWithTime(
+              :value="fromDateValue"
+              @selected="setFromDate"
+              placeholder="Date"
+              :isTime="false"
+              :highlighted="highlighted"
+              :monday-first="true"
+              inputClass="datepicker-custom-filter"
+              calendarClass="calendar-custom"
+              :format="customFormatter"
+              :isClearIcon="true"
+              @removeSelectedDate="removeFromDate"
+            )
+        .filter__item
+          label Date To:
+          .filter__input
+            DatepickerWithTime(
+              :value="toDateValue"
+              @selected="setToDate"
+              placeholder="Date"
+              :isTime="false"
+              :highlighted="highlighted"
+              :monday-first="true"
+              inputClass="datepicker-custom-filter"
+              calendarClass="calendar-custom"
+              :format="customFormatter"
+              :isClearIcon="true"
+              @removeSelectedDate="removeToDate"
+            )
 
+      .options
+        .options__item(v-if="ifSomeCheck")
+          label Reports Actions:
+          .options__input
+            SelectSingle
+          .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
-    .reports__container
-      LayoutsTable(
-        :fields="fields"
-        :tableData="reports"
-        :customNumberOfFilterRows="1"
-      )
-        template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-          .table__header(v-if="field.headerKey === 'headerCheck'")
-            CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-          .table__header(v-else) {{ field.label }}
+        .options__button(v-else)
+          router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/create-reports`}")
+            Button(value="Add Reports")
 
-        template(slot="check" slot-scope="{ row, index }")
-          .table__data
-            CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+      .reports__container
+        LayoutsTable(
+          :fields="fields"
+          :tableData="reports"
+          :customNumberOfFilterRows="1"
+          @bottomScrolled="bottomScrolled"
+        )
+          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+            .table__header(v-if="field.headerKey === 'headerCheck'")
+              CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+            .table__header(v-else) {{ field.label }}
 
-        template(slot="reportId" slot-scope="{ row, index }" )
-          .table__data
-            router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/reports/${row._id}`}")
-              span {{ row.reportId }}
+          template(slot="check" slot-scope="{ row, index }")
+            .table__data
+              CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-        template(slot="dateRange" slot-scope="{ row, index }")
-          .table__data(v-html="dateRange(row)")
+          template(slot="reportId" slot-scope="{ row, index }" )
+            .table__data
+              router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/reports/${row._id}`}")
+                span {{ row.reportId }}
 
-        template(slot="vendorName" slot-scope="{ row, index }")
-          .table__data
-            router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
-              span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
+          template(slot="dateRange" slot-scope="{ row, index }")
+            .table__data(v-html="dateRange(row)")
 
-        template(slot="status" slot-scope="{ row, index }")
-          .table__data {{ row.status }}
+          template(slot="vendorName" slot-scope="{ row, index }")
+            .table__data
+              router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
+                span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
 
-        template(slot="jobs" slot-scope="{ row, index }")
-          .table__data {{ row.steps.length }}
+          template(slot="status" slot-scope="{ row, index }")
+            .table__data {{ row.status }}
 
-        template(slot="amount" slot-scope="{ row, index }")
-          .table__data
-            span.currency(v-html="'&euro;'")
-            span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
+          template(slot="jobs" slot-scope="{ row, index }")
+            .table__data {{ row.steps.length }}
 
-      .table__empty(v-if="!reports.length") Nothing found...
+          template(slot="amount" slot-scope="{ row, index }")
+            .table__data
+              span.currency(v-html="'&euro;'")
+              span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
+
+          template(slot="created" slot-scope="{ row, index }")
+            .table__data {{ getTime( row.createdAt) }}
+
+          template(slot="updated" slot-scope="{ row, index }")
+            .table__data {{ getTime( row.updatedAt) }}
+
+        .table__empty(v-if="!reports.length") Nothing found...
 
 </template>
 
@@ -117,14 +139,9 @@
 
 	export default {
 		name: "InvoicingReportsList",
-		props: {
-			reports: {
-				type: Array,
-				default: []
-			}
-		},
 		data() {
 			return {
+				reports: [],
 				highlighted: {
 					days: [ 6, 0 ]
 				},
@@ -139,46 +156,80 @@
 						label: "Report Id",
 						headerKey: "headerReportId",
 						key: "reportId",
-						style: { width: "236px" }
-					},
-					{
-						label: "Date Range",
-						headerKey: "headerDateRange",
-						key: "dateRange",
-						style: { width: "300px" }
+						style: { width: "150px" }
 					},
 					{
 						label: "Vendor Name",
 						headerKey: "headerVendorName",
 						key: "vendorName",
-						style: { width: "300px" }
+						style: { width: "150px" }
+					},
+					{
+						label: "Date Range",
+						headerKey: "headerDateRange",
+						key: "dateRange",
+						style: { width: "150px" }
 					},
 					{
 						label: "Status",
 						headerKey: "headerStatus",
 						key: "status",
-						style: { width: "200px" }
+						style: { width: "150px" }
 					},
 					{
 						label: "Jobs",
 						headerKey: "headerJobs",
 						key: "jobs",
-						style: { width: "200px" }
+						style: { width: "150px" }
 					},
 					{
 						label: "Amount",
 						headerKey: "headerAmount",
 						key: "amount",
-						style: { width: "200px" }
+						style: { width: "150px" }
+					},
+					{
+						label: "Created At",
+						headerKey: "headerCreated",
+						key: "created",
+						style: { width: "150px" }
+					},
+					{
+						label: "Updated At",
+						headerKey: "headerUpdated",
+						key: "updated",
+						style: { width: "150px" }
 					}
+				],
+				isDataRemain: true,
 
+				reportId: '',
+				vendors: '',
+				to: '',
+				from: '',
+				status: '',
+
+				dataVariables: [
+					'reportId',
+					'vendors',
+					'to',
+					'from',
+					'status'
 				]
-
 			}
 		},
 		methods: {
+			setStatus({ option }) {
+				this.replaceRoute('status', option)
+			},
+			removeStatus() {
+				this.replaceRoute('status', '')
+			},
+			getTime(time) {
+				return moment(time).format('DD-MM-YYYY, HH:mm')
+			},
 			dateRange(row) {
-				return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999;"> / </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
+				return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999;">  /  </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
 			},
 			removeSelectedInputs(prop) {
 				this.replaceRoute(prop, '')
@@ -242,12 +293,47 @@
 				if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
 				else _ids.push(this.getVendorsIdByFullName(option))
 				this.replaceRoute('vendors', _ids.join(','))
+			},
+			querySetter(vm, to) {
+				for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
+			},
+			defaultSetter() {
+				for (let variable of this.dataVariables) this[variable] = ''
+			},
+			async getReports() {
+				this.reports = (await this.$http.post('/invoicing-reports/reports', {
+					countToSkip: 0,
+					countToGet: 100,
+					filters: this.allFilters
+				})).data.map(i => ({ ...i, isCheck: false }))
+			},
+			async bottomScrolled() {
+				if (this.isDataRemain) {
+					const result = await this.$http.post("/invoicing-reports/reports", {
+						filters: this.allFilters,
+						countToSkip: this.reports.length,
+						countToGet: 100
+					})
+					this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
+					this.isDataRemain = result.data.length === 50
+				}
 			}
 		},
 		computed: {
 			...mapGetters({
 				vendorsList: "getAllVendorsForOptions"
 			}),
+			allFilters() {
+				const filters = {}
+				for (let variable of this.dataVariables) filters[variable] = this[variable]
+				return filters
+			},
+			ifSomeCheck() {
+				return this.reports.length && this.reports.some(item => item.isCheck)
+			},
+			selectedStatus() {
+				return this.$route.query.status || ''
+			},
 			selectedVendors() {
 				return this.$route.query.vendors && this.vendorsList.length
 						? this.$route.query.vendors.split(',').map(_id => {
@@ -269,6 +355,21 @@
 				return this.$route.query.reportId || ''
 			}
 		},
+		beforeRouteEnter(to, from, next) {
+			next((vm) => {
+				vm.defaultSetter()
+				vm.querySetter(vm, to)
+				vm.getReports()
+			})
+		},
+		watch: {
+			$route(to, from) {
+				if (to.path === from.path) {
+					this.querySetter(this, to)
+					this.getReports()
+				}
+			}
+		},
 		components: {
 			Button,
 			SelectSingle,
@@ -285,6 +386,18 @@
   @import "../../assets/scss/colors";
 
   .reports {
+    position: relative;
+    width: 1530px;
+    margin: 50px;
+    background: #fff;
+
+    &__wrapper {
+      border-radius: 4px;
+      padding: 20px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 2px 0 rgba(99, 99, 99, .3), 0 1px 3px 1px rgba(99, 99, 99, .15);
+    }
+
     &__container {
       margin-top: 15px;
     }
@@ -314,6 +427,17 @@
     top: 20px;
     right: 20px;
     align-items: center;
+
+    &__description {
+      opacity: .5;
+      margin-top: 5px;
+    }
+
+    &__button {
+      height: 66px;
+      display: flex;
+      align-items: center;
+    }
 
     &__item {
       position: relative;

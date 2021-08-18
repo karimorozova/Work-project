@@ -12,6 +12,7 @@ const {
 	getReport,
 	getAllSteps,
 	stepsFiltersQuery,
+	reportsFiltersQuery,
 } = require('./getReports')
 
 module.exports = {
@@ -22,4 +23,5 @@ module.exports = {
 	getAllSteps,
 	addStepsToRequest,
 	stepsFiltersQuery,
+	reportsFiltersQuery,
 }
