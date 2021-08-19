@@ -5,6 +5,7 @@ const {
 
 const {
 	reportDeleteStep,
+	reportDelete,
 } = require('./deleteReports')
 
 const {
@@ -27,6 +28,7 @@ module.exports = {
 	getReport,
 	reportAddSteps,
 	reportDeleteStep,
+	reportDelete,
 	getAllSteps,
 	addStepsToRequest,
 	stepsFiltersQuery,

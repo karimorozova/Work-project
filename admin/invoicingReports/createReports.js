@@ -2,6 +2,7 @@ const { InvoicingReports, Projects } = require("../models")
 const moment = require("moment")
 const { INVOICING_STATUSES } = require("./enum")
 const { getReportProjectsAndSteps, getReportsDateRange } = require("./getReports")
+const { createDir } = require("./reportsFilesAndDirecrory")
 
 const reportAddSteps = async (reportId, stepsId) => {
 	await InvoicingReports.updateOne({_id: reportId }, {$push: {'steps': {$each: stepsId}} })
@@ -64,7 +65,8 @@ const addStepsToRequest = async (projects, createdBy) => {
 			const lastPaymentDate =  moment.max(moment(foundInDB.lastPaymentDate), moment(report.lastPaymentDate)).toISOString()
 			await  InvoicingReports.updateOne({_id: foundInDB._id}, {$set: {lastPaymentDate, firstPaymentDate}, $push: {steps: {$each: report.steps}}} )
 		} else {
-			await InvoicingReports.create({...report, reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0")})
+			const { _id } = await InvoicingReports.create({...report, reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0")})
+			await createDir(_id.toString())
 		}
 
 		await Projects.updateMany(
@@ -72,7 +74,6 @@ const addStepsToRequest = async (projects, createdBy) => {
 				{ 'steps.$[i].isInReports': true },
 				{ arrayFilters: [ { 'i._id': { $in: allSteps } } ] })
 	}
-
 }
 
 module.exports = { reportAddSteps, addStepsToRequest}
