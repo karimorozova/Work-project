@@ -1,10 +1,12 @@
 <template lang="pug">
   .competencies
     .competencies__table
-      SettingsTable(
+      DataTable(
         :fields="fields"
         :tableData="competenciesData"
-        :tbodyStyle="{'max-height': '288px'}",
+        :rowClass="'cursor-default'"
+        :bodyClass="[competenciesData.length < 10 ? 'table_no-body-bottom-margin tbody_visible-overflow' : 'table_no-body-bottom-margin']"
+        :tableHeadRowClass="competenciesData.length < 10 ? 'tbody_visible-overflow' : ''"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           .competencies__head-title {{ field.label }}
@@ -27,6 +29,7 @@
 	import { mapActions } from "vuex"
 
 	import SettingsTable from "../SettingsTable"
+	import DataTable from "../DataTable"
 	export default {
 		props: {
 			competenciesData: {
@@ -339,6 +342,7 @@
 		// 	this.currentVendor._id ? this.getVendorInfoByState() : this.getVendorInfo()
 		// },
 		components: {
+			DataTable,
 			SettingsTable
 		}
 	}

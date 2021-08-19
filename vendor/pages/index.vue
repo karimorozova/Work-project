@@ -118,7 +118,8 @@
 			...mapActions([
 				"alertToggle",
 				"logout",
-				"setOriginallyUnits"
+				"setOriginallyUnits",
+				"setReports"
 			]),
 
 			mainPageRender() {
@@ -138,6 +139,16 @@
 					const data = JSON.parse(decode)
 					this.$store.commit("SET_VENDOR", data)
 					this.$store.commit("SET_ACCOUNT_INFO")
+				} catch (err) {
+				}
+			},
+			async getVendorReports() {
+				try {
+					// const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
+					// const decode = window.atob(result.data)
+					// const data = JSON.parse(decode)
+					// this.setReports(data)
+					this.setReports([2,3,3])
 				} catch (err) {
 				}
 			},
@@ -222,6 +233,7 @@
 		async created() {
 			await this.getOriginallyUnits()
 			await this.getVendorInfo()
+			await this.getVendorReports()
 			await this.getAllIndustries()
 			await this.getAllLanguages()
 			await this.getAllSteps()

@@ -41,3 +41,9 @@ export const SET_JOBS = (state, payload) => {
 export const SELECT_JOB = (state, payload) => {
     state.selectedJob = payload;
 }
+
+export const SET_REPORTS = (state, payload) => {
+    state.reports = payload;
+}
+
+

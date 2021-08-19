@@ -28,3 +28,11 @@ export const setOriginallyUnits = ({ state, dispatch }, payload) =>{
         dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
     }
 }
+
+export const setReports = ({ commit, dispatch }, payload) =>{
+    try {
+        commit("SET_REPORTS", payload);
+    }catch (err) {
+        dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+    }
+}
