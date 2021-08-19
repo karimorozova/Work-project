@@ -44,6 +44,7 @@
                   span {{ note.title }}
           .vendor-portal__balloons
       nuxt-child
+
 </template>
 
 <script>
@@ -101,6 +102,13 @@
 						active: false
 					},
 					{
+						title: "INVOICES",
+						path: "/invoices",
+						imgBrown: require("../assets/images/CATEGORIES/documents.png"),
+						imgWhite: require("../assets/images/CATEGORIES/documents(selected).png"),
+						active: false
+					},
+					{
 						title: "PROFILE",
 						path: "/account",
 						imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
@@ -147,6 +155,7 @@
 					const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
 					const decode = window.atob(result.data)
 					const data = JSON.parse(decode)
+					console.log('reppp', data)
 					this.setReports(data)
 				} catch (err) {
 				}

@@ -13,6 +13,10 @@ const {
 } = require('./updateReports')
 
 const {
+	clearReportsStepsPrivateKeys,
+} = require('./helpers')
+
+const {
 	getAllReports,
 	getReport,
 	getAllSteps,
@@ -22,6 +26,7 @@ const {
 } = require('./getReports')
 
 module.exports = {
+	clearReportsStepsPrivateKeys,
 	setReportsNextStatus,
 	getReportByVendorId,
 	getAllReports,

@@ -13,14 +13,39 @@ const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
-const { getReportByVendorId } = require('../../invoicingReports')
+const { getReportByVendorId, setReportsNextStatus, getReport, clearReportsStepsPrivateKeys } = require('../../invoicingReports')
 
 
 router.get("/reports", checkVendor, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getReportByVendorId(verificationResult.vendorId )
+		const reports = await getReportByVendorId(verificationResult.vendorId)
+		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor info. Try later.")
+	}
+})
+
+router.get("/get-report", checkVendor, async (req, res) => {
+	const { reportId } = req.query
+	try {
+		let reports = await getReport(reportId)
+		reports = await clearReportsStepsPrivateKeys(reports)
+		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor info. Try later.")
+	}
+})
+
+router.post("/approve-report", checkVendor, async (req, res) => {
+	try {
+		const { reportsIds, nextStatus } = req.body
+		await setReportsNextStatus(reportsIds, nextStatus)
+		let reports = await getReport(reportsIds[0])
+		reports = clearReportsStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -81,15 +106,15 @@ router.get("/info", checkVendor, async (req, res) => {
 })
 
 router.get("/has-competencies", checkVendor, async (req, res) => {
-  const { token } = req.query
-  try {
-    const verificationResult = jwt.verify(token, secretKey)
-    const vendor = await hasVendorCompetenciesAndPending(verificationResult.vendorId )
-    res.send({check: vendor})
-  } catch (err) {
-    console.log(err)
-    res.status(500).send("Error on getting Vendor info. Try later.")
-  }
+	const { token } = req.query
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		const vendor = await hasVendorCompetenciesAndPending(verificationResult.vendorId)
+		res.send({ check: vendor })
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor info. Try later.")
+	}
 })
 
 router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (req, res) => {
@@ -170,8 +195,8 @@ router.post("/assign-translator", checkVendor, async (req, res) => {
 
 		await assignMemoqTranslator(vendorId, stepId, projectId)
 
-		const {memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
-		for (let documentGuid of memoqDocIds){
+		const { memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
+		for (let documentGuid of memoqDocIds) {
 			await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
 		}
 		res.send('Assigned')
@@ -183,8 +208,8 @@ router.post("/assign-translator", checkVendor, async (req, res) => {
 
 router.post("/set-workFlowStatus", checkVendor, async (req, res) => {
 	const { stepId, stepAction } = req.body
-	const {memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
-	for (let documentGuid of memoqDocIds){
+	const { memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
+	for (let documentGuid of memoqDocIds) {
 		await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
 	}
 	try {

@@ -348,10 +348,10 @@
     }
   }
 
-  .fa-angle-double-right {
-    font-size: 14px;
-    margin: 0 5px;
-  }
+  /*.fa-angle-double-right {*/
+  /*  font-size: 14px;*/
+  /*  margin: 0 5px;*/
+  /*}*/
 
   .fa-download {
     font-size: 18px;
