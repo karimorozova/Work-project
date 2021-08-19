@@ -1,5 +1,6 @@
 const { InvoicingReports, Projects } = require("../models")
 const { getReportProjectsAndSteps, getReportsDateRange } = require("./getReports")
+const { removeDir } = require("./reportsFilesAndDirecrory")
 
 
 const reportDeleteStep = async (reportId, stepId) => {
@@ -20,8 +21,18 @@ const reportDeleteStep = async (reportId, stepId) => {
 	} catch (e) {
 		console.log(e)
 	}
+}
 
+const reportDelete = async (reportId) => {
+	const reporotInfo = await InvoicingReports.findOne({ _id: reportId })
+	const steps = reporotInfo ? reporotInfo.steps : []
+	await Projects.updateMany(
+			{ 'steps._id': {$in: steps}  },
+			{ 'steps.$[i].isInReports': false },
+			{ arrayFilters: [ { 'i._id': {$in: steps} } ] })
 
+	await InvoicingReports.deleteOne({_id: reportId})
+	await removeDir(reportId)
 
 }
-module.exports = {  reportDeleteStep }
+module.exports = {  reportDeleteStep, reportDelete }

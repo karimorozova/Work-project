@@ -328,7 +328,8 @@
 				console.log(id)
 			},
 			async deleteRequest() {
-				await this.$http.get(`/invoicing-reports/reports/${ this.deleteRequestId }/delete`)
+				await this.$http.get(`/invoicing-reports/report/${ this.deleteRequestId }/delete`)
+        await this.getReports()
 				this.closeDeleteRequestModal()
 			},
 			closeDeleteRequestModal() {

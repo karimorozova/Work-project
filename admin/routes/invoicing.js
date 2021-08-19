@@ -9,7 +9,8 @@ const {
 	getAllSteps,
 	addStepsToRequest,
 	stepsFiltersQuery,
-	reportsFiltersQuery
+	reportsFiltersQuery,
+	reportDelete,
 } = require('../invoicingReports')
 
 const ObjectId = require("mongodb").ObjectID
@@ -56,6 +57,17 @@ router.post("/report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
 		const report = await getReport(id)
+		res.send(report);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.get("/report/:id/delete", async (req, res) => {
+	const { id } = req.params
+	try {
+		const report = await reportDelete(id)
 		res.send(report);
 	} catch(err) {
 		console.log(err);
