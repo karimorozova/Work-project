@@ -402,7 +402,7 @@
 			}),
 			availableActionOptions() {
 				if (this.reports && this.reports.length) {
-					if (this.reports.every(i => i.status === 'Created')) {
+					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
 						return [ 'Send Report' ]
 					}
 				}
