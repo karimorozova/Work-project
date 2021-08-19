@@ -13,9 +13,11 @@ const {
 	getAllSteps,
 	stepsFiltersQuery,
 	reportsFiltersQuery,
+	getReportByVendorId,
 } = require('./getReports')
 
 module.exports = {
+	getReportByVendorId,
 	getAllReports,
 	getReport,
 	reportAddSteps,

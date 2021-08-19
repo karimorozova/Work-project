@@ -102,6 +102,39 @@ const getReport = async (id) => {
 	return (await InvoicingReports.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
 }
 
+const getReportByVendorId = async (id) => {
+	return await InvoicingReports.aggregate([
+				{ $match: {"vendor": ObjectId(id)}},
+				{
+					$lookup: {
+						from: "projects",
+						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						pipeline: [
+							{ "$unwind": "$steps" },
+							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$addFields": {"steps.billingDate": '$billingDate'}},
+							{ '$replaceRoot': { newRoot: '$steps' } },
+						],
+						as: "steps"
+					}
+				},
+				{
+					$unset: [
+							"steps.finance",
+							"steps.nativeFinance.Price.receivables",
+							"steps.refFiles",
+							"steps.defaultStepPrice",
+							"steps.clientRate",
+							"steps.targetFile",
+							"steps.vendor",
+							"steps.service",
+							"steps.memoqDocIds",
+					]
+				}
+			]
+	)
+}
+
 const getReportProjectsAndSteps = async (id) => {
 	const invoicingReprots = await InvoicingReports.aggregate([
 		{ $match: {"_id": ObjectId(id)}},
@@ -155,4 +188,13 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	return (await Projects.aggregate(queryPipeline))
 }
 
-module.exports = {stepsFiltersQuery, getAllReports, getReport, getAllSteps,reportsFiltersQuery, getReportsDateRange, getReportProjectsAndSteps}
+module.exports = {
+	getReportByVendorId,
+	stepsFiltersQuery,
+	getAllReports,
+	getReport,
+	getAllSteps,
+	reportsFiltersQuery,
+	getReportsDateRange,
+	getReportProjectsAndSteps
+}

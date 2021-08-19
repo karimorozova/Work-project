@@ -144,11 +144,10 @@
 			},
 			async getVendorReports() {
 				try {
-					// const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
-					// const decode = window.atob(result.data)
-					// const data = JSON.parse(decode)
-					// this.setReports(data)
-					this.setReports([2,3,3])
+					const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
+					const decode = window.atob(result.data)
+					const data = JSON.parse(decode)
+					this.setReports(data)
 				} catch (err) {
 				}
 			},

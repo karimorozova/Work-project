@@ -13,7 +13,20 @@ const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
+const { getReportByVendorId } = require('../../invoicingReports')
 
+
+router.get("/reports", checkVendor, async (req, res) => {
+	const { token } = req.query
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		const reports = await getReportByVendorId(verificationResult.vendorId )
+		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor info. Try later.")
+	}
+})
 
 router.post("/login", async (req, res, next) => {
 	if (req.body.logemail) {
