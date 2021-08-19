@@ -77,9 +77,8 @@
 
     &__text{
       text-align: center;
-      margin-top: 5px;
+      margin-top: 10px;
       font-size: 16px;
-      font-family: 'Myriad600';
     }
 
     &__buttons {

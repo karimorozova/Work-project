@@ -1,6 +1,17 @@
 <template lang="pug">
   .reports
     .reports__wrapper
+      .modal
+        .modal__block
+          ApproveModal(
+            v-if="isActionModal"
+            :text='`Confirm action: "${selectedReportAction}"`'
+            approveValue="Yes"
+            notApproveValue="No"
+            @approve="manageReportActions"
+            @close="closeApproveActionModal"
+            @notApprove="closeApproveActionModal"
+          )
       .filter
         .filter__item
           label Report Id:
@@ -69,7 +80,12 @@
         .options__item(v-if="ifSomeCheck")
           label Reports Actions:
           .options__input
-            SelectSingle
+            SelectSingle(
+              :options="availableActionOptions",
+              placeholder="Action",
+              :selectedOption="selectedReportAction",
+              @chooseOption="openApproveActionModal"
+            )
           .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
         .options__button(v-else)
@@ -147,7 +163,7 @@
 	import moment from "moment"
 	import CheckBox from "../CheckBox"
 	import SelectMulti from "../SelectMulti"
-	import { mapGetters } from "vuex"
+	import { mapActions, mapGetters } from "vuex"
 	import DatepickerWithTime from "../DatepickerWithTime"
 	import SelectSingle from "../SelectSingle"
 	import Button from "../Button"
@@ -157,6 +173,8 @@
 		name: "InvoicingReportsList",
 		data() {
 			return {
+				selectedReportAction: '',
+				isActionModal: false,
 				reports: [],
 				highlighted: {
 					days: [ 6, 0 ]
@@ -243,6 +261,28 @@
 			}
 		},
 		methods: {
+			...mapActions(['alertToggle']),
+			async manageReportActions() {
+				const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
+				try {
+					await this.$http.post('/invoicing-reports/manage-report-status', {
+						reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+            nextStatus
+          })
+          this.closeApproveActionModal()
+          this.getReports()
+				} catch (error) {
+					this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
+				}
+			},
+			openApproveActionModal({ option }) {
+				this.selectedReportAction = option
+				this.isActionModal = true
+			},
+			closeApproveActionModal() {
+				this.selectedReportAction = ''
+				this.isActionModal = false
+			},
 			setStatus({ option }) {
 				this.replaceRoute('status', option)
 			},
@@ -287,9 +327,11 @@
 				return moment(date).format("DD-MM-YYYY")
 			},
 			toggleCheck(index, val) {
+				if(this.isActionModal) return
 				this.reports[index].isCheck = val
 			},
 			toggleAll(val) {
+				if(this.isActionModal) return
 				this.reports = this.reports.reduce((acc, cur) => {
 					acc.push({ ...cur, isCheck: val })
 					return acc
@@ -357,6 +399,13 @@
 			...mapGetters({
 				vendorsList: "getAllVendorsForOptions"
 			}),
+			availableActionOptions() {
+				if (this.reports && this.reports.length) {
+					if (this.reports.every(i => i.status === 'Created')) {
+						return [ 'Send Report' ]
+					}
+				}
+			},
 			allFilters() {
 				const filters = {}
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
@@ -434,6 +483,7 @@
     background: #fff;
 
     &__wrapper {
+      position: relative;
       border-radius: 4px;
       padding: 20px;
       box-sizing: border-box;
@@ -577,6 +627,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, 50%);
+      z-index: 50;
     }
   }
 </style>

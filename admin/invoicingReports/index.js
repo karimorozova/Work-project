@@ -8,6 +8,10 @@ const {
 } = require('./deleteReports')
 
 const {
+	setReportsNextStatus,
+} = require('./updateReports')
+
+const {
 	getAllReports,
 	getReport,
 	getAllSteps,
@@ -17,6 +21,7 @@ const {
 } = require('./getReports')
 
 module.exports = {
+	setReportsNextStatus,
 	getReportByVendorId,
 	getAllReports,
 	getReport,

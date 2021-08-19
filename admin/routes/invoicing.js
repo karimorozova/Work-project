@@ -9,10 +9,29 @@ const {
 	getAllSteps,
 	addStepsToRequest,
 	stepsFiltersQuery,
-	reportsFiltersQuery
+	reportsFiltersQuery,
+	setReportsNextStatus
 } = require('../invoicingReports')
 
 const ObjectId = require("mongodb").ObjectID
+
+
+router.post("/manage-report-status", async (req, res) => {
+	const { nextStatus } = req.body
+	try {
+		switch (nextStatus) {
+			case "Sent":
+				const { reportsIds } = req.body
+				await setReportsNextStatus(reportsIds, nextStatus)
+				//TODO send nofitication
+				break;
+		}
+		res.send('foo');
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on manage-report-status');
+	}
+});
 
 router.post("/not-selected-steps-list", async (req, res) => {
 	const { countToSkip, countToGet, filters } = req.body;
@@ -42,7 +61,6 @@ router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 router.post("/reports", async (req, res) => {
 	try {
 		const {	countToSkip, countToGet, filters } = req.body
-		console.log(filters)
 		const query = reportsFiltersQuery(filters)
 		const reports = await getAllReports( countToSkip, countToGet, query )
 		res.send(reports);
