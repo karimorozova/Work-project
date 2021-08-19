@@ -104,7 +104,7 @@ const getReport = async (id) => {
 
 const getReportByVendorId = async (id) => {
 	return await InvoicingReports.aggregate([
-				{ $match: { "vendor ": ObjectId(id), "status": { $ne: 'Created' }},},
+				{ $match: { "vendor": ObjectId(id), "status": { $ne: 'Created' }},},
 				{
 					$lookup: {
 						from: "projects",
