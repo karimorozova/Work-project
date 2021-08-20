@@ -1,6 +1,7 @@
 const { InvoicingReports, InvoicingReportsArchive } = require("../models")
 const { moveProjectFile } = require('../utils/movingFile')
 const fs = require('fs')
+const ObjectId = require("mongodb").ObjectID
 
 const setReportsNextStatus = async (reportsIds, nextStatus) => {
 	await InvoicingReports.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus })
@@ -37,12 +38,23 @@ const paidOrAddPaymentInfo = async (reportId, data) => {
 	await InvoicingReports.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: data } })
 
 	if ("Paid" === status) {
-		const {_id, ...neededInvoicing} = await InvoicingReports.findOne({_id: reportId})
-		await InvoicingReportsArchive.create(neededInvoicing)
-		// await InvoicingReports.remove({_id: reportId})
+		await InvoicingReports.aggregate([
+			{	"$match": {"_id" : ObjectId(reportId) } },
+			{"$unset" : [	"_id"	]	},
+			{
+				"$merge" : {
+					"into" : {
+						"db" : "pangea",
+						"coll" : "invoicingreportsarchives"
+					}
+				}
+			}
+		])
+		await InvoicingReports.remove({_id: reportId})
+		return "Moved"
 	}
 
-	return 'success'
+	return 'Success'
 
 }
 module.exports = { setReportsNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile }
