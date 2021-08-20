@@ -31,7 +31,7 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
                 span(v-html="'&euro;'")
 
-            .payment-info
+            .payment-info(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
               .payment-info__block-title Payment information
               .payment-info__block
                 .payment-info__title
@@ -42,7 +42,7 @@
                 input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
               .payment-info__block-flex
                 .payment-info__title Unpaid Amount:
-                .payment-info__value {{ (getStepsPayables(reportDetailsInfo.steps) - this.getPaymentRemainder) | roundTwoDigit}} €
+                .payment-info__value {{ getUnpaidAmount}} €
               .payment-info__block
                 .payment-info__title Payment Method:
                 .payment-info__select
@@ -64,6 +64,7 @@
                   inputClass="datepicker-custom-filter"
                   calendarClass="calendar-custom"
                   :format="customFormatter"
+                  :disabled="disabled"
                 )
               .payment-info__block
                 .payment-info__title Notes:
@@ -191,8 +192,11 @@
         amount: 0,
         notes: '',
 
-        isFull: false
+        isFull: false,
 
+        disabled: {
+          to: moment().add(-1, 'day').endOf('day').toDate()
+        },
 			}
 		},
 		methods: {
@@ -214,7 +218,7 @@
       async reportToPayment() {
         const data = {
           paidAmount: this.amount,
-          unpaidAmount: this.getPaymentRemainder - this.amount,
+          unpaidAmount: this.getUnpaidAmount,
           paymentMethod: this.paymentMethod,
           paymentDate: this.paymentDate,
           notes: this.notes,
@@ -226,15 +230,15 @@
       updatePaidAmount(event) {
         const value = event.target.value
         console.log(value, this.amount)
-        if (value <= (this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder)) {
-          this.amount = value
+        if (value <= (this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder) && value >= 0) {
+          this.amount = (parseFloat(value)).toFixed(2)
         }
         this.$forceUpdate()
       },
       togglePaidFull(val) {
 			  this.isFull = val
         if (val) {
-          this.amount = this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder
+          this.amount = this.getUnpaidAmount
         }
       },
 			formattedDate(date) {
@@ -274,6 +278,7 @@
 			}
 		},
     computed: {
+      //Todo: show status "Invoice Received" and "Partially Paid"1
       getPaymentRemainder() {
         const {paymentInformation = []} = this.reportDetailsInfo
         return paymentInformation.reduce((sum, item) => {
@@ -281,6 +286,10 @@
           return sum
         } ,0)
       },
+      getUnpaidAmount() {
+        const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder + +this.amount)
+        return (parseFloat(rawUnpaidAmount)).toFixed(2)
+      }
     },
 		created() {
 			this.openDetails(this.$route.params.id)

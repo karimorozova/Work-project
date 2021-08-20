@@ -1,4 +1,4 @@
-const { InvoicingReports } = require("../models")
+const { InvoicingReports, InvoicingReportsArchive } = require("../models")
 const { moveProjectFile } = require('../utils/movingFile')
 const fs = require('fs')
 
@@ -32,8 +32,17 @@ const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate,
 }
 
 const paidOrAddPaymentInfo = async (reportId, data) => {
+	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 
-	await InvoicingReports.updateOne({ _id: reportId }, { $push: { paymentInformation: data } })
+	await InvoicingReports.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: data } })
+
+	if ("Paid" === status) {
+		const {_id, ...neededInvoicing} = await InvoicingReports.findOne({_id: reportId})
+		await InvoicingReportsArchive.create(neededInvoicing)
+		// await InvoicingReports.remove({_id: reportId})
+	}
+
+	return 'success'
 
 }
 module.exports = { setReportsNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile }

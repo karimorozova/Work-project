@@ -41,6 +41,7 @@ const ClientsTasks = require('./clientsTasks')
 const ClientsNotes = require('./clientsNotes')
 const ClientsApiSetting = require('./clientsApiSetting')
 const InvoicingReports = require('./invoicingReports')
+const InvoicingReportsArchive = require('./InvoicingReportsArchive')
 
 const Models = {
   Languages,
@@ -85,7 +86,8 @@ const Models = {
   ClientsTasks,
   ClientsNotes,
   ClientsApiSetting,
-  InvoicingReports
+  InvoicingReports,
+  InvoicingReportsArchive,
 };
 
 module.exports = Models;
