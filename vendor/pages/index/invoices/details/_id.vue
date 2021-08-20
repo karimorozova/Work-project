@@ -231,6 +231,8 @@
 
 				try {
 					await this.$axios.post(`/vendor/invoice-submission`, fileData)
+					this.clearInputFiles(".file-button")
+					this.invoiceFile = null
 					await this.getReport()
 				} catch (err) {
 					console.log(err)
