@@ -28,9 +28,18 @@ const InvoicingReportsSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	},
-	file: {
-		type: Object,
-		default: () => ({})
+	paymentDetails: {
+		paymentMethod: {
+			type: String,
+		},
+		file: {
+			type: Object,
+			default: () => ({})
+		},
+		expectedPaymentDate: {
+			type: Date,
+			default: new Date()
+		},
 	},
 	paymentInformation: [{
 		paidAmount: {
@@ -43,10 +52,6 @@ const InvoicingReportsSchema = new mongoose.Schema({
 			type: String,
 		},
 		paymentDate: {
-			type: Date,
-			default: new Date()
-		},
-		expectedPaymentDate: {
 			type: Date,
 			default: new Date()
 		},
