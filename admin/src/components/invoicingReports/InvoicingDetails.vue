@@ -31,6 +31,45 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
                 span(v-html="'&euro;'")
 
+            .payment-info
+              .payment-info__block-title Payment information
+              .payment-info__block
+                .payment-info__title
+                  span Paid Amount:
+                  .check-box
+                    CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
+                    span(class="check-box__text") paid full
+                input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
+              .payment-info__block-flex
+                .payment-info__title Unpaid Amount:
+                .payment-info__value {{(getStepsPayables(reportDetailsInfo.steps)) | roundTwoDigit}} €
+              .payment-info__block
+                .payment-info__title Payment Method:
+                .payment-info__select
+                  SelectSingle(
+                    :selectedOption="paymentMethod"
+                    :options="['1', '2', '3' ]"
+                    placeholder="Option"
+                    @chooseOption="setPaymentMethod"
+                  )
+              .payment-info__block
+                .payment-info__title Payment Date:
+                DatepickerWithTime(
+                  :value="paymentDate"
+                  @selected="setFromDate"
+                  placeholder="Date"
+                  :isTime="true"
+                  :highlighted="highlighted"
+                  :monday-first="true"
+                  inputClass="datepicker-custom-filter"
+                  calendarClass="calendar-custom"
+                  :format="customFormatter"
+                )
+              .payment-info__block
+                .payment-info__title Notes:
+                textarea
+              Button(value="Submit" @clicked="reportToPayment")
+
 
           .invoicing-details__table
             ApproveModal(
@@ -96,6 +135,9 @@
 	import AddStepsToInvoicing from "./AddStepsToInvoicing"
 	import ApproveModal from '../ApproveModal'
 	import Button from "../Button"
+	import SelectSingle from "../SelectSingle"
+	import DatepickerWithTime from "../DatepickerWithTime"
+	import CheckBox from "../CheckBox"
 
 	export default {
 		name: "InvoicingDetails",
@@ -143,7 +185,12 @@
 				toggleAddSteps: false,
 				deleteInfo: {},
 				isDeletingStep: false,
-				steps: []
+				steps: [],
+        paymentMethod: '',
+        paymentDate: new Date(),
+        amount: 0,
+
+        isFull: false
 
 			}
 		},
@@ -154,8 +201,41 @@
 					return sum
 				}, 0)
 			},
+      setPaymentMethod({option}) {
+        this.paymentMethod = option
+      },
+      setFromDate(e) {
+			  this.paymentDate = e
+      },
+      customFormatter(date) {
+        return moment(date).format('DD-MM-YYYY, HH:mm')
+      },
+      reportToPayment() {
+        const data = {
+          paidAmount: this.paidAmount,
+          paymentMethod: this.paymentMethod,
+          paymentDate: this.paymentDate,
+          notes: this.notes,
+        }
+        console.log(this.reportDetailsInfo._id)
+        this.$http.post(`/invoicing-reports/report-final-status/${this.reportDetailsInfo._id}` , {data})
+      },
+      updatePaidAmount(event) {
+        const value = event.target.value
+        console.log(value, this.amount)
+        if (value <= this.getStepsPayables(this.reportDetailsInfo.steps)) {
+          this.amount = value
+        }
+        this.$forceUpdate()
+      },
+      togglePaidFull(val) {
+			  this.isFull = val
+        if (val) {
+          this.amount = this.getStepsPayables(this.reportDetailsInfo.steps)
+        }
+      },
 			formattedDate(date) {
-				return moment(date).format("DD-MM-YYYY")
+				return moment(date).format("DD-MM-YYYY ")
 			},
 			async refreshReports() {
 				await this.openDetails(this.$route.params.id)
@@ -190,6 +270,9 @@
 				console.log('steps', this.steps)
 			}
 		},
+    computed: {
+
+    },
 		created() {
 			this.openDetails(this.$route.params.id)
 		},
@@ -197,14 +280,53 @@
 			Button,
 			GeneralTable,
 			AddStepsToInvoicing,
-			ApproveModal
+			ApproveModal,
+      SelectSingle,
+      DatepickerWithTime,
+      CheckBox,
 		}
 	}
 </script>
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
-
+  .payment-info {
+    &__block-title {
+      font-size: 18px;
+      font-family: Myriad600;
+    }
+    &__block {
+      margin: 10px 0;
+      width: 220px;
+    }
+    &__block-flex {
+      margin: 10px 0;
+      display: flex;
+      width: 220px;
+      justify-content: space-between;
+    }
+    &__select{
+      position: relative;
+      height: 31px;
+    }
+    &__title {
+      display: flex;
+      justify-content: space-between;
+      font-family: Myriad600;
+    }
+    &__input {
+      font-size: 14px;
+      color: #3d3d3d;
+      border: 1px solid #bfbfbf;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      width: 220px;
+      height: 32px;
+      transition: .1s ease-out;
+    }
+  }
   .title {
     display: flex;
     justify-content: space-between;
@@ -303,6 +425,12 @@
       align-items: center;
       display: flex;
       justify-content: center;
+    }
+  }
+  .check-box {
+    display: flex;
+    &__text {
+      font-family: Myriad400;
     }
   }
 

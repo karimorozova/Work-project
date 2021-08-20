@@ -71,6 +71,20 @@ router.post("/reports", async (req, res) => {
 	}
 });
 
+router.post("/report-final-status/:reportId", async (req, res) => {
+	const {reportId} = req.params
+	const {data} = req.body
+	console.log(data)
+	try {
+		// const query = paidOrAddPaymentInfo(filters)
+		// const reports = await getAllReports( countToSkip, countToGet, query )
+		res.send(reports);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
 router.post("/report/:id", async (req, res) => {
 	const { id } = req.params
 	try {

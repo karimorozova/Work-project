@@ -32,6 +32,29 @@ const InvoicingReportsSchema = new mongoose.Schema({
 		type: Object,
 		default: () => ({})
 	},
+	paymentInformation: [{
+		paidAmount: {
+			type: Number,
+		},
+		unpaidAmount: {
+			type: Number
+		},
+		paymentMethod: {
+			type: String,
+		},
+		paymentDate: {
+			type: Date,
+			default: new Date()
+		},
+		expectedPaymentDate: {
+			type: Date,
+			default: new Date()
+		},
+		notes: {
+			type: String,
+			default: ""
+		}
+	}],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
