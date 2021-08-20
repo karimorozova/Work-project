@@ -30,46 +30,59 @@
               .text__value
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
                 span(v-html="'&euro;'")
+            .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
+              .text__title Invoice:
+              .text__value
+                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                  i(class="fas fa-download")
+
 
             .payment-info(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
-              .payment-info__block-title Payment information
-              .payment-info__block
-                .payment-info__title
-                  span Paid Amount:
-                  .check-box
-                    CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
-                    span(class="check-box__text") paid full
-                input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
-              .payment-info__block-flex
-                .payment-info__title Unpaid Amount:
-                .payment-info__value {{ getUnpaidAmount}} €
-              .payment-info__block
-                .payment-info__title Payment Method:
-                .payment-info__select
-                  SelectSingle(
-                    :selectedOption="paymentMethod"
-                    :options="['1', '2', '3' ]"
-                    placeholder="Option"
-                    @chooseOption="setPaymentMethod"
+
+              .payment-info__doublePay
+                .payment-info__payBlock
+                  .amount__title Paid Amount:
+                  input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
+                .check-box
+                  CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
+                  span(class="check-box__text") Paid full
+
+              .payment-info__amountAndFile
+                .payment-info__amount
+                  .amount__title Unpaid Amount:
+                  .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
+
+              .payment-info__double
+                .payment-info__block
+                  .payment-info__title Payment Method:
+                  .payment-info__select
+                    SelectSingle(
+                      :selectedOption="paymentMethod"
+                      :options="['1', '2', '3' ]"
+                      placeholder="Option"
+                      @chooseOption="setPaymentMethod"
+                    )
+                .payment-info__block
+                  .payment-info__title Payment Date:
+                  DatepickerWithTime(
+                    :value="paymentDate"
+                    @selected="setFromDate"
+                    placeholder="Date"
+                    :isTime="true"
+                    :highlighted="highlighted"
+                    :monday-first="true"
+                    inputClass="datepicker-custom-filter-185"
+                    calendarClass="calendar-custom"
+                    :format="customFormatter"
+                    :disabled="disabled"
                   )
-              .payment-info__block
-                .payment-info__title Payment Date:
-                DatepickerWithTime(
-                  :value="paymentDate"
-                  @selected="setFromDate"
-                  placeholder="Date"
-                  :isTime="true"
-                  :highlighted="highlighted"
-                  :monday-first="true"
-                  inputClass="datepicker-custom-filter"
-                  calendarClass="calendar-custom"
-                  :format="customFormatter"
-                  :disabled="disabled"
-                )
-              .payment-info__block
+
+
+              .payment-info__notes
                 .payment-info__title Notes:
-                textarea(v-model="notes")
-              Button(value="Submit" @clicked="reportToPayment")
+                textarea(type="text" rows="3" v-model="notes")
+
+              Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
 
 
           .invoicing-details__table
@@ -127,6 +140,12 @@
             @closeTable="changeToggleAddSteps"
           )
 
+    .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
+      .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
+        PaymentInformationCard(
+          :cardInfo="cardInfo"
+          :paymentDetails="reportDetailsInfo.paymentDetails"
+        )
 
 </template>
 
@@ -139,6 +158,7 @@
 	import SelectSingle from "../SelectSingle"
 	import DatepickerWithTime from "../DatepickerWithTime"
 	import CheckBox from "../CheckBox"
+	import PaymentInformationCard from "./PaymentInformationCard"
 
 	export default {
 		name: "InvoicingDetails",
@@ -187,16 +207,16 @@
 				deleteInfo: {},
 				isDeletingStep: false,
 				steps: [],
-        paymentMethod: '',
-        paymentDate: new Date(),
-        amount: 0,
-        notes: '',
+				paymentMethod: '',
+				paymentDate: new Date(),
+				amount: 0,
+				notes: '',
 
-        isFull: false,
+				isFull: false,
 
-        disabled: {
-          to: moment().add(-1, 'day').endOf('day').toDate()
-        },
+				disabled: {
+					to: moment().add(-1, 'day').endOf('day').toDate()
+				}
 			}
 		},
 		methods: {
@@ -206,41 +226,41 @@
 					return sum
 				}, 0)
 			},
-      setPaymentMethod({option}) {
-        this.paymentMethod = option
-      },
-      setFromDate(e) {
-			  this.paymentDate = e
-      },
-      customFormatter(date) {
-        return moment(date).format('DD-MM-YYYY, HH:mm')
-      },
-      async reportToPayment() {
-        const data = {
-          paidAmount: this.amount,
-          unpaidAmount: this.getUnpaidAmount,
-          paymentMethod: this.paymentMethod,
-          paymentDate: this.paymentDate,
-          notes: this.notes,
-        }
-        await this.$http.post(`/invoicing-reports/report-final-status/${this.reportDetailsInfo._id}` , data)
-        this.amount = 0
-        await this.refreshReports()
-      },
-      updatePaidAmount(event) {
-        const value = event.target.value
-        console.log(value, this.amount)
-        if (value <= (this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder) && value >= 0) {
-          this.amount = (parseFloat(value)).toFixed(2)
-        }
-        this.$forceUpdate()
-      },
-      togglePaidFull(val) {
-			  this.isFull = val
-        if (val) {
-          this.amount = this.getUnpaidAmount
-        }
-      },
+			setPaymentMethod({ option }) {
+				this.paymentMethod = option
+			},
+			setFromDate(e) {
+				this.paymentDate = e
+			},
+			customFormatter(date) {
+				return moment(date).format('DD-MM-YYYY, HH:mm')
+			},
+			async reportToPayment() {
+				const data = {
+					paidAmount: this.amount,
+					unpaidAmount: this.getUnpaidAmount - +this.amount,
+					paymentMethod: this.paymentMethod,
+					paymentDate: this.paymentDate,
+					notes: this.notes
+				}
+				await this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data)
+				this.amount = 0
+				await this.refreshReports()
+			},
+			updatePaidAmount(event) {
+				const value = event.target.value
+				console.log(value, this.amount)
+				if (value <= (this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder) && value >= 0) {
+					this.amount = (parseFloat(value)).toFixed(2)
+				}
+				this.$forceUpdate()
+			},
+			togglePaidFull(val) {
+				this.isFull = val
+				if (val) {
+					this.amount = this.getUnpaidAmount
+				}
+			},
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY ")
 			},
@@ -277,20 +297,20 @@
 				console.log('steps', this.steps)
 			}
 		},
-    computed: {
-      //Todo: show status "Invoice Received" and "Partially Paid"1
-      getPaymentRemainder() {
-        const {paymentInformation = []} = this.reportDetailsInfo
-        return paymentInformation.reduce((sum, item) => {
-          sum += item.paidAmount
-          return sum
-        } ,0)
-      },
-      getUnpaidAmount() {
-        const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder + +this.amount)
-        return (parseFloat(rawUnpaidAmount)).toFixed(2)
-      }
-    },
+		computed: {
+			//Todo: show status "Invoice Received" and "Partially Paid"1
+			getPaymentRemainder() {
+				const { paymentInformation = [] } = this.reportDetailsInfo
+				return paymentInformation.reduce((sum, item) => {
+					sum += item.paidAmount
+					return sum
+				}, 0)
+			},
+			getUnpaidAmount() {
+				const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder)
+				return +(parseFloat(rawUnpaidAmount)).toFixed(2)
+			}
+		},
 		created() {
 			this.openDetails(this.$route.params.id)
 		},
@@ -299,52 +319,166 @@
 			GeneralTable,
 			AddStepsToInvoicing,
 			ApproveModal,
-      SelectSingle,
-      DatepickerWithTime,
-      CheckBox,
+			SelectSingle,
+			DatepickerWithTime,
+			CheckBox,
+			PaymentInformationCard
 		}
 	}
 </script>
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
-  .payment-info {
-    &__block-title {
-      font-size: 18px;
-      font-family: Myriad600;
+
+  textarea {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid $border;
+    padding: 5px;
+    color: $text;
+    outline: none;
+    box-sizing: border-box;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
     }
-    &__block {
-      margin: 10px 0;
-      width: 220px;
-    }
-    &__block-flex {
-      margin: 10px 0;
-      display: flex;
-      width: 220px;
-      justify-content: space-between;
-    }
-    &__select{
-      position: relative;
-      height: 31px;
-    }
+  }
+
+  .file-fake-button {
+    height: 30px;
+    width: 40px;
+    background-color: $red;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: white;
+
+  }
+
+  .green-value {
+    border: 1px solid $border !important;
+    color: $text !important;
+  }
+
+  .amount {
     &__title {
+      font-family: Myriad600;
+      width: 120px;
+      align-items: center;
+      display: flex;
+    }
+
+    &__value {
+      border-radius: 4px;
+      border: 1px solid #d15f4547;
+      padding: 0 7px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      width: 100px;
+      box-sizing: border-box;
+      color: $red;
+    }
+  }
+
+  .payment-info {
+    width: 427px;
+    padding: 20px;
+    box-sizing: border-box;
+    background: white;
+    border: 2px solid $border;
+    margin-top: 20px;
+    border-radius: 4px;
+
+
+    &__notes {
+      margin-top: 10px;
+    }
+
+    &__payBlock {
+      display: flex;
+    }
+
+    &__file {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    &__amountAndFile {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    &__amount {
+      display: flex;
+    }
+
+    &__double {
       display: flex;
       justify-content: space-between;
-      font-family: Myriad600;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #ededed;
     }
+
+    &__doublePay {
+      gap: 15px;
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    /*&__block-title {*/
+    /*  font-size: 18px;*/
+    /*  font-family: Myriad600;*/
+    /*}*/
+
+    &__block {
+      /*margin: 10px 0;*/
+      /*width: 220px;*/
+    }
+
+    &__block-flex {
+      /*margin: 10px 0;*/
+      /*display: flex;*/
+      /*width: 220px;*/
+      /*justify-content: space-between;*/
+    }
+
+    &__select {
+      position: relative;
+      height: 32px;
+      width: 185px;
+      background-color: white;
+      border-radius: 4px;
+    }
+
+    &__title {
+      font-family: Myriad600;
+      margin-bottom: 3px;
+    }
+
     &__input {
       font-size: 14px;
-      color: #3d3d3d;
-      border: 1px solid #bfbfbf;
+      border: 1px solid $border;
       border-radius: 4px;
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;
-      width: 220px;
+      width: 100px;
       height: 32px;
       transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
     }
   }
+
   .title {
     display: flex;
     justify-content: space-between;
@@ -362,7 +496,12 @@
     position: relative;
     width: 1530px;
     margin: 50px;
-    background: #fff;
+
+
+    &__cards {
+      display: flex;
+      flex-wrap: wrap;
+    }
 
     &__body {
       display: flex;
@@ -374,6 +513,7 @@
       padding: 20px;
       box-sizing: border-box;
       box-shadow: 0 1px 2px 0 rgba(99, 99, 99, .3), 0 1px 3px 1px rgba(99, 99, 99, .15);
+      background: white;
     }
 
     &__table {
@@ -445,10 +585,15 @@
       justify-content: center;
     }
   }
+
   .check-box {
     display: flex;
+    margin-top: 6px;
+
     &__text {
       font-family: Myriad400;
+      margin-left: 7px;
+      margin-top: 2px;
     }
   }
 

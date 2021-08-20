@@ -1290,6 +1290,24 @@
     }
   }
 
+  .datepicker-custom-filter-185 {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 185px;
+    height: 32px;
+    transition: .1s ease-out;
+    cursor: pointer;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
   .datepicker-height-30 {
     font-size: 14px;
     color: $text;

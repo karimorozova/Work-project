@@ -2,28 +2,44 @@
   .wrapper
     .paid PAID
     .card
-      .card__price € 157
-      .card__date 12-12-2345 12:12
+      .card__price € {{ cardInfo.paidAmount }}
+      .card__date {{ customFormatter(cardInfo.paymentDate) }}
       .row
         .row__title Payment method:
-        .row__value Paypal
+        .row__value {{ cardInfo.paymentMethod }}
       .row
         .row__title Currency:
         .row__value EUR
       .row
         .row__title Unpaid amount:
-        .row__value 0.00 €
+        .row__value {{ cardInfo.unpaidAmount }} €
       .row
         .row__title Expected payment date:
-        .row__value 12-12-1212 12:21
+        .row__value {{ customFormatter(paymentDetails.expectedPaymentDate) }}
 
-      .card__notes Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea incidunt nisi porro quaerat. Cupiditate dolores est illo ipsam minima minus molestiae quas quos reprehenderit saepe. Assumenda officia repellendus repudiandae suscipit?
+      .card__notes(v-if="cardInfo.notes") {{ cardInfo.notes }}
 
 
 </template>
 
 <script>
-	export default {}
+	import moment from "moment"
+
+	export default {
+		props: {
+			cardInfo: {
+				type: Object
+			},
+			paymentDetails: {
+				type: Object
+			}
+		},
+		methods: {
+			customFormatter(date) {
+				return moment(date).format('DD-MM-YYYY, HH:mm')
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -32,13 +48,13 @@
   .paid {
     position: absolute;
     right: 20px;
-    color: $green;
-    font-size: 14px;
+    color: $green-approve;
+    font-size: 12px;
     border: 2px solid;
     padding: 5px;
     border-radius: 4px;
     font-family: 'Myriad600';
-    top: 27px;
+    top: 26.5px;
   }
 
   .row {
@@ -64,22 +80,22 @@
     }
 
     &__price {
-      font-size: 32px;
+      font-size: 28px;
       font-family: 'Myriad900';
     }
 
     &__date {
-      font-size: 18px;
+      font-size: 17px;
       margin-bottom: 20px;
-      margin-top: 3px;
+      margin-top: 2px;
       font-family: 'Myriad300';
     }
   }
 
   .wrapper {
     width: 300px;
-    margin-top: 30px;
-    margin-right: 30px;
+    margin-top: 40px;
+    margin-right: 40px;
     background: white;
     border-radius: 4px;
     padding: 20px;
