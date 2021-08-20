@@ -31,6 +31,7 @@ const InvoicingReportsSchema = new mongoose.Schema({
 	paymentDetails: {
 		paymentMethod: {
 			type: String,
+			default: ''
 		},
 		file: {
 			type: Object,
