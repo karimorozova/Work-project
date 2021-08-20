@@ -33,6 +33,26 @@
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
             Button(value="Confirm" @clicked="approveReport")
 
+          .body__submission
+            .row
+              .row__title Upload Invoice:
+              .row__value
+                input.file-button(type="file" @change="uploadFile")
+                .file-fake-button
+                  i(class="fas fa-upload")
+                .file-name(v-if="invoiceFile") {{ invoiceFile.name }}
+
+            .row
+              .row__title Payment Method:
+              .row__valueDrops
+                SelectSingle(
+                  :options="['test1', 'test2', 'test3']",
+                  placeholder="Option",
+                  :selectedOption="''",
+                  @chooseOption="setPaymentMethod"
+                )
+            Button(style="margin-top: 20px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
+
         .body__table
           GeneralTable(
             :fields="fields",
@@ -72,11 +92,13 @@
 	import GeneralTable from "../../../../components/pangea/GeneralTable"
 	import moment from 'moment'
 	import Button from "../../../../components/pangea/Button"
+	import SelectSingle from "../../../../components/pangea/SelectSingle"
 
 	export default {
-		components: { Button, GeneralTable },
+		components: { SelectSingle, Button, GeneralTable },
 		data() {
 			return {
+				invoiceFile: null,
 				reportDetailsInfo: {},
 				fields: [
 					{
@@ -113,6 +135,26 @@
 			}
 		},
 		methods: {
+			uploadFile(e) {
+				const files = e.target.files
+				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 50)
+				if (filteredFiles.length) {
+					this.invoiceFile = files[0]
+				}
+				if (!filteredFiles.length) this.clearInputFiles(".file-button")
+			},
+			clearInputFiles(str) {
+				let inputFiles = document.querySelectorAll(str)
+				for (let elem of inputFiles) {
+					elem.value = ''
+				}
+			},
+			setPaymentMethod() {
+				alert('asd')
+			},
+			submitReport() {
+				console.log(this.invoiceFile)
+			},
 			async approveReport() {
 				try {
 					const result = await this.$axios.post(`/vendor/approve-report`, {
@@ -158,9 +200,47 @@
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors";
 
+  .file-name{
+    position: absolute;
+    width: 130px;
+    top: 5px;
+    left: 50px;
+    opacity: 0.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .file-fake-button {
+    height: 30px;
+    width: 40px;
+    background-color: $red;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: white;
+  }
+
+  .file-button {
+    padding-left: 0;
+    padding-right: 0;
+    width: 40px;
+    height: 30px;
+    border: none;
+    outline: none;
+    opacity: 0;
+    z-index: 2;
+    position: absolute;
+    cursor: pointer;
+    font-size: 0;
+  }
+
   .row {
     display: flex;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    align-items: center;
 
     &__vendor {
       font-size: 18px;
@@ -183,14 +263,28 @@
       font-family: Myriad600;
     }
 
+    &__valueDrops {
+      height: 32px;
+      width: 186px;
+      position: relative;
+    }
+
     &__value {
       width: 170px;
+      position: relative;
     }
   }
 
   .body {
     display: flex;
     justify-content: space-between;
+
+    &__submission {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid $border;
+      margin-right: 20px;
+    }
 
     &__approve {
       display: flex;
