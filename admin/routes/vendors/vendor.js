@@ -13,7 +13,7 @@ const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
-const { getReportByVendorId, setReportsNextStatus, getReport, clearReportsStepsPrivateKeys } = require('../../invoicingReports')
+const { getReportByVendorId, setReportsNextStatus, getReport, clearReportsStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingReports')
 
 
 router.get("/reports", checkVendor, async (req, res) => {
@@ -24,7 +24,7 @@ router.get("/reports", checkVendor, async (req, res) => {
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
-		res.status(500).send("Error on getting Vendor info. Try later.")
+		res.status(500).send("Error on getting reports info. Try later.")
 	}
 })
 
@@ -36,7 +36,7 @@ router.get("/get-report", checkVendor, async (req, res) => {
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
-		res.status(500).send("Error on getting Vendor info. Try later.")
+		res.status(500).send("Error on getting report info. Try later.")
 	}
 })
 
@@ -49,7 +49,31 @@ router.post("/approve-report", checkVendor, async (req, res) => {
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
-		res.status(500).send("Error on getting Vendor info. Try later.")
+		res.status(500).send("Error on approve-report.")
+	}
+})
+
+router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
+	try {
+		const { invoiceFile } = req.files
+		const { reportId, paymentMethod, expectedPaymentDate } = req.body
+		await invoiceSubmission({ reportId, paymentMethod, expectedPaymentDate, invoiceFile })
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error / Cannot add invoice file (invoice-submission)')
+	}
+})
+
+router.post('/invoice-reload', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
+	try {
+		const { invoiceFile } = req.files
+		const { reportId, paymentMethod, expectedPaymentDate, oldPath } = req.body
+		await invoiceReloadFile({ reportId, paymentMethod, expectedPaymentDate, invoiceFile, oldPath })
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error / Cannot add invoice file (invoice-submission)')
 	}
 })
 

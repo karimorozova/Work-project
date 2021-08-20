@@ -1,5 +1,11 @@
 <template lang="pug">
   .container
+    ValidationErrors(
+      v-if="errors.length"
+      :errors="errors"
+      :isAbsolute="true"
+      @closeErrors="errors = []"
+    )
     .title Invoice Details
     .report
       .body
@@ -16,7 +22,7 @@
             .row__title Status:
             .row__value {{ reportDetailsInfo.status }}
           .row
-            .row__title Created On:
+            .row__title Created on:
             .row__value(v-if="reportDetailsInfo.firstPaymentDate") {{ formattedDate(reportDetailsInfo.createdAt) }}
           .row
             .row__title Date range:
@@ -30,12 +36,32 @@
               span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
               span(v-html="'&euro;'")
 
+          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Received'")
+            .row
+              .row__title Invoice:
+              .row__value2
+                input.file-button(type="file" @change="uploadFile")
+                .file-fake-button
+                  i(class="fas fa-upload")
+                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                  i(class="fas fa-download")
+                .file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
+            .row
+              .row__title Payment method:
+              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
+
+            .row
+              .row__title Expected payment date:
+              .row__value {{date(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
+
+            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Save new invoice" @clicked="submitFile")
+
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
             Button(value="Confirm" @clicked="approveReport")
 
-          .body__submission
+          .body__submission(v-if="reportDetailsInfo.status === 'Approved'")
             .row
-              .row__title Upload Invoice:
+              .row__title Upload invoice:
               .row__value
                 input.file-button(type="file" @change="uploadFile")
                 .file-fake-button
@@ -43,12 +69,12 @@
                 .file-name(v-if="invoiceFile") {{ invoiceFile.name }}
 
             .row
-              .row__title Payment Method:
+              .row__title Payment method:
               .row__valueDrops
                 SelectSingle(
                   :options="['test1', 'test2', 'test3']",
                   placeholder="Option",
-                  :selectedOption="''",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
                   @chooseOption="setPaymentMethod"
                 )
             Button(style="margin-top: 20px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
@@ -88,17 +114,19 @@
 
 <script>
 
-	import { mapGetters } from "vuex"
+	import { mapActions, mapGetters } from "vuex"
 	import GeneralTable from "../../../../components/pangea/GeneralTable"
 	import moment from 'moment'
 	import Button from "../../../../components/pangea/Button"
 	import SelectSingle from "../../../../components/pangea/SelectSingle"
+	import ValidationErrors from "../../../../components/pangea/ValidationErrors"
 
 	export default {
-		components: { SelectSingle, Button, GeneralTable },
+		components: { ValidationErrors, SelectSingle, Button, GeneralTable },
 		data() {
 			return {
 				invoiceFile: null,
+				errors: [],
 				reportDetailsInfo: {},
 				fields: [
 					{
@@ -135,9 +163,19 @@
 			}
 		},
 		methods: {
+			...mapActions(['alertToggle']),
+			date(date) {
+				return moment(date).format('DD-MM-YYYY, HH:mm')
+			},
+			downloadFile(href) {
+				let link = document.createElement('a')
+				link.href = this.domain + href
+				link.target = "_blank"
+				link.click()
+			},
 			uploadFile(e) {
 				const files = e.target.files
-				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 50)
+				const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 40)
 				if (filteredFiles.length) {
 					this.invoiceFile = files[0]
 				}
@@ -149,11 +187,54 @@
 					elem.value = ''
 				}
 			},
-			setPaymentMethod() {
-				alert('asd')
+			setPaymentMethod({ option }) {
+				this.reportDetailsInfo = Object.assign({}, this.reportDetailsInfo, {
+					...this.reportDetailsInfo,
+					paymentDetails: {
+						...this.reportDetailsInfo.paymentDetails,
+						paymentMethod: option
+					}
+				})
 			},
-			submitReport() {
-				console.log(this.invoiceFile)
+			async submitFile(){
+				const fileData = new FormData()
+				const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
+				fileData.append("invoiceFile", this.invoiceFile)
+				fileData.append("reportId", this.$route.params.id)
+				fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+				fileData.append("expectedPaymentDate", expectedPaymentDate)
+				fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
+
+				try {
+					await this.$axios.post(`/vendor/invoice-reload`, fileData)
+					this.clearInputFiles(".file-button")
+          this.invoiceFile = null
+					await this.getReport()
+					this.alertToggle({ message: "Invoice reloaded!", isShow: true, type: "success" })
+				} catch (err) {
+					console.log(err)
+				}
+
+      },
+			async submitReport() {
+				this.errors = []
+				if (!this.invoiceFile) this.errors.push('Please upload invoice file')
+				if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
+				if (this.errors.length) return
+
+				const fileData = new FormData()
+				const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
+				fileData.append("invoiceFile", this.invoiceFile)
+				fileData.append("reportId", this.$route.params.id)
+				fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+				fileData.append("expectedPaymentDate", expectedPaymentDate)
+
+				try {
+					await this.$axios.post(`/vendor/invoice-submission`, fileData)
+					await this.getReport()
+				} catch (err) {
+					console.log(err)
+				}
 			},
 			async approveReport() {
 				try {
@@ -188,6 +269,7 @@
 		},
 		async created() {
 			await this.getReport()
+			this.domain = process.env.domain
 		},
 		computed: {
 			...mapGetters({
@@ -200,11 +282,22 @@
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors";
 
-  .file-name{
+  .file-name {
     position: absolute;
     width: 130px;
     top: 5px;
     left: 50px;
+    opacity: 0.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .file-name2 {
+    position: absolute;
+    width: 70px;
+    top: 5px;
+    left: 110px;
     opacity: 0.5;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -246,20 +339,20 @@
       font-size: 18px;
       font-family: 'Myriad900';
       height: 27px;
-      width: 290px;
+      width: 300px;
     }
 
     &__address {
       font-size: 15px;
       font-family: Myriad300;
-      width: 290px;
+      width: 300px;
       line-height: 1.2;
       padding-bottom: 10px;
       letter-spacing: .2px;
     }
 
     &__title {
-      width: 120px;
+      width: 130px;
       font-family: Myriad600;
     }
 
@@ -273,11 +366,25 @@
       width: 170px;
       position: relative;
     }
+
+    &__value2 {
+      width: 170px;
+      position: relative;
+      display: flex;
+      gap: 15px;
+    }
   }
 
   .body {
     display: flex;
     justify-content: space-between;
+
+    &__invoiceReceived {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid $border;
+      margin-right: 20px;
+    }
 
     &__submission {
       margin-top: 20px;
@@ -307,6 +414,7 @@
 
   .container {
     margin: 50px;
+    position: relative;
   }
 
   .title {

@@ -11,6 +11,8 @@ const {
 const {
 	setReportsNextStatus,
 	paidOrAddPaymentInfo,
+	invoiceSubmission,
+	invoiceReloadFile,
 } = require('./updateReports')
 
 const {
@@ -27,6 +29,8 @@ const {
 } = require('./getReports')
 
 module.exports = {
+	invoiceReloadFile,
+	invoiceSubmission,
 	clearReportsStepsPrivateKeys,
 	setReportsNextStatus,
 	getReportByVendorId,

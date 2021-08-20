@@ -37,8 +37,7 @@ const InvoicingReportsSchema = new mongoose.Schema({
 			default: () => ({})
 		},
 		expectedPaymentDate: {
-			type: Date,
-			default: new Date()
+			type: Date
 		},
 	},
 	paymentInformation: [{
