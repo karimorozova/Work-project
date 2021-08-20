@@ -10,6 +10,7 @@ const {
 
 const {
 	setReportsNextStatus,
+	paidOrAddPaymentInfo,
 } = require('./updateReports')
 
 const {
@@ -38,4 +39,5 @@ module.exports = {
 	addStepsToRequest,
 	stepsFiltersQuery,
 	reportsFiltersQuery,
+	paidOrAddPaymentInfo,
 }

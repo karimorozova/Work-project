@@ -42,7 +42,7 @@
                 input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
               .payment-info__block-flex
                 .payment-info__title Unpaid Amount:
-                .payment-info__value {{(getStepsPayables(reportDetailsInfo.steps)) | roundTwoDigit}} €
+                .payment-info__value {{ (getStepsPayables(reportDetailsInfo.steps) - this.getPaymentRemainder) | roundTwoDigit}} €
               .payment-info__block
                 .payment-info__title Payment Method:
                 .payment-info__select
@@ -67,7 +67,7 @@
                 )
               .payment-info__block
                 .payment-info__title Notes:
-                textarea
+                textarea(v-model="notes")
               Button(value="Submit" @clicked="reportToPayment")
 
 
@@ -189,6 +189,7 @@
         paymentMethod: '',
         paymentDate: new Date(),
         amount: 0,
+        notes: '',
 
         isFull: false
 
@@ -210,20 +211,22 @@
       customFormatter(date) {
         return moment(date).format('DD-MM-YYYY, HH:mm')
       },
-      reportToPayment() {
+      async reportToPayment() {
         const data = {
-          paidAmount: this.paidAmount,
+          paidAmount: this.amount,
+          unpaidAmount: this.getPaymentRemainder - this.amount,
           paymentMethod: this.paymentMethod,
           paymentDate: this.paymentDate,
           notes: this.notes,
         }
-        console.log(this.reportDetailsInfo._id)
-        this.$http.post(`/invoicing-reports/report-final-status/${this.reportDetailsInfo._id}` , {data})
+        await this.$http.post(`/invoicing-reports/report-final-status/${this.reportDetailsInfo._id}` , data)
+        this.amount = 0
+        await this.refreshReports()
       },
       updatePaidAmount(event) {
         const value = event.target.value
         console.log(value, this.amount)
-        if (value <= this.getStepsPayables(this.reportDetailsInfo.steps)) {
+        if (value <= (this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder)) {
           this.amount = value
         }
         this.$forceUpdate()
@@ -231,7 +234,7 @@
       togglePaidFull(val) {
 			  this.isFull = val
         if (val) {
-          this.amount = this.getStepsPayables(this.reportDetailsInfo.steps)
+          this.amount = this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder
         }
       },
 			formattedDate(date) {
@@ -271,7 +274,13 @@
 			}
 		},
     computed: {
-
+      getPaymentRemainder() {
+        const {paymentInformation = []} = this.reportDetailsInfo
+        return paymentInformation.reduce((sum, item) => {
+          sum += item.paidAmount
+          return sum
+        } ,0)
+      },
     },
 		created() {
 			this.openDetails(this.$route.params.id)

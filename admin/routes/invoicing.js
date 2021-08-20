@@ -12,6 +12,7 @@ const {
 	reportsFiltersQuery,
 	setReportsNextStatus,
 	reportDelete,
+	paidOrAddPaymentInfo,
 } = require('../invoicingReports')
 
 const ObjectId = require("mongodb").ObjectID
@@ -73,12 +74,12 @@ router.post("/reports", async (req, res) => {
 
 router.post("/report-final-status/:reportId", async (req, res) => {
 	const {reportId} = req.params
-	const {data} = req.body
-	console.log(data)
+	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body
+
 	try {
-		// const query = paidOrAddPaymentInfo(filters)
+		await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
 		// const reports = await getAllReports( countToSkip, countToGet, query )
-		res.send(reports);
+		res.send("test");
 	} catch(err) {
 		console.log(err);
 		res.status(500).send('Something wrong on getting steps');

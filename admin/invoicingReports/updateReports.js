@@ -5,8 +5,9 @@ const setReportsNextStatus = async (reportsIds, nextStatus) => {
 	await InvoicingReports.updateMany({_id: {$in: reportsIds}}, { status: nextStatus })
 }
 
-const paidOrAddPaymentInfo = async (reportId) => {
-	const test = {}
-	await InvoicingReports.updateOne({_id: reportId}, {$push: test })
+const paidOrAddPaymentInfo = async (reportId, data) => {
+
+	await InvoicingReports.updateOne({_id: reportId}, {$push: { paymentInformation: data } })
+
 }
-module.exports = { setReportsNextStatus }
+module.exports = { setReportsNextStatus, paidOrAddPaymentInfo }
