@@ -263,18 +263,30 @@
 		methods: {
 			...mapActions(['alertToggle']),
 			async manageReportActions() {
-				const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
-				try {
-					await this.$http.post('/invoicing-reports/manage-report-status', {
-						reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+        if (this.selectedReportAction === "Delete") {
+          await this.deleteChecked()
+        }else {
+          await this.changeTaskStatus()
+        }
+			},
+      async deleteChecked() {
+        await this.$http.post('/invoicing-reports/delete-reports', {
+          reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+        })
+        this.closeApproveActionModal()
+        await this.getReports()
+      },
+      async changeTaskStatus() {
+        try {
+          const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
+          await this.$http.post('/invoicing-reports/manage-report-status', {
+            reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
             nextStatus
           })
-          this.closeApproveActionModal()
-          this.getReports()
-				} catch (error) {
-					this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
-				}
-			},
+        } catch (error) {
+          this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
+        }
+      },
 			openApproveActionModal({ option }) {
 				this.selectedReportAction = option
 				this.isActionModal = true
@@ -403,7 +415,7 @@
 			availableActionOptions() {
 				if (this.reports && this.reports.length) {
 					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
-						return [ 'Send Report' ]
+						return [ 'Send Report', "Delete" ]
 					}
 				}
 			},

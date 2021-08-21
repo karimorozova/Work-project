@@ -106,7 +106,9 @@
             .table__data {{ row.steps.stepId }}
 
           template(slot="vendorName" slot-scope="{ row, index }")
-            .table__data(v-if="row.currentVendor != null") {{ row.currentVendor.firstName  +' '+ row.currentVendor.surname || '' }}
+            .table__data(v-if="row.currentVendor != null")
+              router-link(class="link-to" :to="{path: `?vendors=${row.currentVendor._id}`}")
+                span {{ row.currentVendor.firstName  +' '+ row.currentVendor.surname || '' }}
             .table__data(v-else) n/a
 
           template(slot="startDate" slot-scope="{ row, index }")
@@ -570,6 +572,15 @@
 
     &:hover {
       color: $text;
+    }
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: .2s ease-out;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 

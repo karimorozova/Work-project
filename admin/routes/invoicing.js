@@ -77,9 +77,9 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body
 
 	try {
-		await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
+		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
 		// const reports = await getAllReports( countToSkip, countToGet, query )
-		res.send("test");
+		res.send(result);
 	} catch(err) {
 		console.log(err);
 		res.status(500).send('Something wrong on getting steps');
@@ -105,6 +105,20 @@ router.get("/report/:id/delete", async (req, res) => {
 	} catch(err) {
 		console.log(err);
 		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.post("/delete-reports", async (req, res) => {
+	const { reportIds } = req.body
+	try {
+		for await (const reportId of reportIds) {
+			await reportDelete(reportId)
+		}
+
+		res.send("success");
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on deleting reports');
 	}
 });
 

@@ -243,14 +243,18 @@
 					paymentDate: this.paymentDate,
 					notes: this.notes
 				}
-				await this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data)
+				const reuslt = (await (this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
+        if (reuslt === "Moved") {
+          await this.$router.push('/pangea-finance/invoicing-reports/reports')
+        }else {
+          await this.refreshReports()
+        }
 				this.amount = 0
-				await this.refreshReports()
 			},
 			updatePaidAmount(event) {
 				const value = event.target.value
 				console.log(value, this.amount)
-				if (value <= (this.getStepsPayables(this.reportDetailsInfo.steps) - this.getPaymentRemainder) && value >= 0) {
+				if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
 					this.amount = (parseFloat(value)).toFixed(2)
 				}
 				this.$forceUpdate()
