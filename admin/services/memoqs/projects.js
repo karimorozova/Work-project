@@ -70,7 +70,7 @@ async function assignedDefaultTranslator(projectId, step) {
 		console.log(err);
 		throw new Error(err.message);
 	}
-};
+}
 
 async function createMemoqProjectWithTemplate(projectData) {
 	const targets = projectData.targets.reduce((acc, cur) => acc + `<arr:string>${ cur.memoq }</arr:string>\n`, '');
@@ -325,11 +325,11 @@ function getRoles(users) {
 	}, '')
 }
 
-async function getProjectTranslationDocs(projectId) {
+async function getProjectTranslationDocs(memoqProjectId) {
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
                 <ns:ListProjectTranslationDocuments>
-                    <ns:serverProjectGuid>${ projectId }</ns:serverProjectGuid>
+                    <ns:serverProjectGuid>${ memoqProjectId }</ns:serverProjectGuid>
                 </ns:ListProjectTranslationDocuments>
                 </soapenv:Body>
             </soapenv:Envelope>`;
@@ -348,15 +348,15 @@ async function getProjectTranslationDocs(projectId) {
 async function getProjectAnalysis(projectId) {
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
-                <ns:RunAnalysis>
-                    <ns:serverProjectGuid>${ projectId }</ns:serverProjectGuid>
-                    <ns:options>
+						      <ns:RunAnalysis>
+						         <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
+						         <ns:options>
                         <ns:RepetitionPreferenceOver100>false</ns:RepetitionPreferenceOver100>
                         <ns:StoreReportInProject>false</ns:StoreReportInProject>
                         <ns:TagWeightChar>0</ns:TagWeightChar>
                         <ns:TagWeightWord>0</ns:TagWeightWord>
-                    </ns:options>
-                </ns:RunAnalysis>
+						         </ns:options>
+						      </ns:RunAnalysis>
                 </soapenv:Body>
             </soapenv:Envelope>`;
 	const headers = headerWithoutAction('RunAnalysis');

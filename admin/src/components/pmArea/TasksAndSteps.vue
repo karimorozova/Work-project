@@ -192,8 +192,8 @@
 			},
 			async saveProjectTasks(tasksData) {
 				try {
-					await this.addProjectTasks(tasksData)
 					this.isTaskData = false
+					await this.addProjectTasks(tasksData)
 					this.clearTasksData()
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" })
@@ -203,8 +203,8 @@
 			},
 			async saveProjectWordsTasks(tasksData) {
 				try {
-					await this.addProjectWordsTasks(tasksData)
 					this.isTaskData = false
+					await this.addProjectWordsTasks(tasksData)
 					this.clearTasksData()
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" })
@@ -289,9 +289,10 @@
     }
 
     &__info {
+      display: flex;
       position: absolute;
       z-index: 1000;
-      color: $text;
+      color: $red;
       background-color: $white;
       padding: 20px;
       border-radius: 4px;
@@ -300,12 +301,12 @@
       margin-right: auto;
       left: 0;
       right: 0;
-      width: 300px;
+      width: fit-content;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     }
 
     &__file-counter {
-      margin-top: 10px;
+      margin-left: 7px;
       text-align: center;
     }
 

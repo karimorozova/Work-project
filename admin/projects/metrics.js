@@ -8,41 +8,42 @@ const { setTaskFinance, getProjectFinance } = require('./helpers');
 const ObjectId = require('mongodb').ObjectID;
 
 
-async function updateProjectMetrics(projectId, tasks) {
+async function updateProjectMetricsAndCreateSteps(projectId, tasks) {
 	try {
 		const project = await getProject({ "_id": projectId });
 		let { steps, customer, tasks: existingTasks, industry, discounts, finance, minimumCharge } = project;
-		if(!tasks) tasks = project.tasks.filter(task => !task.hasOwnProperty('metrics'));
-		filterExistingTasks();
 		let isMetricsExist = true;
 
-		for (let task of tasks) {
+		if(!tasks)  tasks = existingTasks
+				.filter(task => !task.hasOwnProperty('metrics'));
+
+		filterExistingTasks();
+
+		await timeout(3000)
+		for await (let task of tasks) {
 			const { stepsAndUnits } = task;
 			const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');
 
 			if(!!isIncludesWordCount && task.status === "Created") {
 				const analysis = await getProjectAnalysis(task.memoqProjectId);
-				const { AnalysisResultForLang } = analysis;
-				if(analysis && AnalysisResultForLang) {
+				if(analysis) {
+
 					const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis });
 					task.metrics = !task.finance.Price.receivables ? { ...taskMetrics } : task.metrics;
 					let newSteps = await getTaskSteps(task, industry, customer, discounts, projectId);
 					newSteps = checkIsSameVendor(newSteps);
+
 					const stepWithVendor = newSteps.find(step => step.vendor);
 					if(stepWithVendor) {
 						const vendor = await Vendors.findOne({ _id: stepWithVendor.vendor._id });
-						if(vendor) {
-							task.metrics = setTaskMetrics({
-								metrics: task.metrics,
-								matrix: vendor.matrix,
-								prop: 'vendor'
-							});
-						}
+						if(vendor) task.metrics = setTaskMetrics({ metrics: task.metrics, matrix: vendor.matrix, prop: 'vendor' });
 					}
+
 					task.finance = {
 						Wordcount: setTaskFinance(newSteps, 'Wordcount'),
 						Price: setTaskFinance(newSteps, 'Price'),
 					};
+
 					steps.push(...newSteps);
 				} else {
 					isMetricsExist = false;
@@ -53,22 +54,19 @@ async function updateProjectMetrics(projectId, tasks) {
 		existingTasks.push(...tasks);
 		const { projectFinance, roi } = getProjectFinance(existingTasks, finance, minimumCharge);
 
-		return await updateProject({ "_id": projectId }, {
-			tasks: existingTasks,
-			steps,
-			isMetricsExist,
-			finance: projectFinance,
-			roi
-		});
+		return await updateProject({ "_id": projectId }, { tasks: existingTasks, steps, isMetricsExist, finance: projectFinance, roi });
 
 		function filterExistingTasks() {
 			const newTasksIds = tasks.map(i => i.taskId);
 			existingTasks = existingTasks.filter(({ taskId }) => !newTasksIds.includes(taskId));
 		}
+		function timeout(ms) {
+			return new Promise(resolve => setTimeout(resolve, ms));
+		}
 
 	} catch (err) {
 		console.log(err);
-		console.log("Error in updateProjectMetrics");
+		console.log("Error in updateProjectMetricsAndCreateSteps");
 	}
 }
 
@@ -131,9 +129,9 @@ async function getProjectWithUpdatedFinance(project) {
 
 async function getTaskSteps(task, industry, customer, discounts, projectId) {
 	let { sourceLanguage, targetLanguage, metrics, service, stepsAndUnits } = task;
-
 	const newSteps = [];
 	let counter = 1;
+
 	for (let i = 0; i < task.stepsDates.length; i++) {
 		let stepsIdCounter = counter < 10 ? `S0${ counter }` : `S${ counter }`;
 		const { _id: stepId } = await Step.findOne({ title: stepsAndUnits[i].step });
@@ -146,18 +144,17 @@ async function getTaskSteps(task, industry, customer, discounts, projectId) {
 			title: stepsAndUnits[i].step
 		};
 		const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step: serviceStep.step, industry });
+
 		if(vendorId) {
 			const vendor = await Vendors.findOne({ _id: vendorId });
-			task.metrics = setTaskMetrics({
-				metrics: metrics,
-				matrix: vendor.matrix,
-				prop: 'vendor'
-			});
+			task.metrics = setTaskMetrics({ metrics: metrics, matrix: vendor.matrix, prop: 'vendor' });
 		}
+
 		const quantity = getWordcountStepQuantity(type, metrics, stepsAndUnits[i]);
-		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
-			customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId
-		}, true);
+
+		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } =
+				await getStepFinanceData({ customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId }, true);
+
 		const step = {
 			stepId: `${ task.taskId } ${ stepsIdCounter }`,
 			taskId: task.taskId,
@@ -185,6 +182,7 @@ async function getTaskSteps(task, industry, customer, discounts, projectId) {
 			nativeFinance,
 			nativeVendorRate
 		};
+
 		if(type !== 'CAT Wordcount' && type !== 'Packages') {
 			delete step.totalWords;
 			Object.assign(step, { hours: stepsAndUnits[i].hours, size: stepsAndUnits[i].size });
@@ -235,4 +233,4 @@ const getWordcountStepQuantity = (type, metrics, stepAndUnit) => {
 	}
 };
 
-module.exports = { updateProjectMetrics, getProjectWithUpdatedFinance };
+module.exports = { updateProjectMetricsAndCreateSteps, getProjectWithUpdatedFinance };

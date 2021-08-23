@@ -6,10 +6,12 @@ const state = {
     requests: [],
     tasksData: {},
     memoqProjectMessages: {
-        memoqProject: "Creating Project in memoQ ...",
-        memoqFiles: "Importing files to the Project in memoQ ...",
-        dbTasks: "Adding tasks to the Project in DB ...",
-        dbSteps: "Adding steps to the Project  in DB ..."
+        memoqProject: "Creating project in Memoq...",
+        memoqFiles: "Uploading files in Memoq...",
+        dbFiles: "Downloading metrics...",
+        dbTasks: "Creating tasks...",
+        dbSteps: "Creating steps... / Searching translators...",
+        dbFinance: "Finishing..."
     },
     memoqProjectMessage: "",
     fileCounter: 0,

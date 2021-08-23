@@ -7,11 +7,11 @@ const { getMemoqFileId, getMemoqFileIdNativeFormat } = require("./projects");
 const url = `https://memoq.pangea.global:8080/memoQServices/FileManager/FileManagerService`;
 const headerWithoutAction = getHeaders('IFileManagerService');
 
-async function uploadFileToMemoq(name) {
+async function beginFileUpload(filePath) {
     const xml = `${xmlHeader}
                 <soapenv:Body>
                     <ns:BeginChunkedFileUpload>
-                        <ns:fileName>./dist${name}</ns:fileName>
+                        <ns:fileName>${filePath}</ns:fileName>
                         <ns:isZipped>false</ns:isZipped>
                     </ns:BeginChunkedFileUpload>
                 </soapenv:Body>
@@ -23,15 +23,15 @@ async function uploadFileToMemoq(name) {
         return result["s:Envelope"]["s:Body"].BeginChunkedFileUploadResponse.BeginChunkedFileUploadResult;
     } catch(err) {
         console.log(err);
-        console.log("Error in uploadFileToMemoq");
+        console.log("Error in beginFileUpload");
         throw new Error(err.message);
     }
 }
 
 async function addProjectFile(projectId, filePath) {
     try {
-        const fileId = await uploadFileToMemoq(filePath);
-        await addFilesToMemoq(fileId, filePath);
+        const fileId = await beginFileUpload(filePath);
+        await continueAndFinishUploadFilesToMemoq(fileId, filePath);
         await moveMemoqFileToProject(projectId, fileId);
         return fileId;
     } catch(err) {
@@ -41,9 +41,9 @@ async function addProjectFile(projectId, filePath) {
     }
 }
 
-async function addFilesToMemoq(fileId, name) {
+async function continueAndFinishUploadFilesToMemoq(fileId, filePath) {
     try {
-        const chunksArr = await getChunks(fileId, name);
+        const chunksArr = await getChunks(fileId, filePath);
         const headers = headerWithoutAction('AddNextFileChunk');
         let results = [];
         for(let xml of chunksArr) {
@@ -53,13 +53,13 @@ async function addFilesToMemoq(fileId, name) {
         return await finishMemoqFileMove(fileId, results);
     } catch(err) {
         console.log(err);
-        console.log("Error in addFilesToMemoq");
+        console.log("Error in continueAndFinishUploadFilesToMemoq");
         throw new Error(err.message);
     }
 }
 
-function getChunks(fileId, name) {
-    const readStream = fs.createReadStream(`${name}`, {highWaterMark: 128 * 1024});
+function getChunks(fileId, filePath) {
+    const readStream = fs.createReadStream(`${filePath}`, {highWaterMark: 128 * 1024});
     let chunksArr = [];
     return new Promise((resolve,reject) => {
         readStream.on('data', (chunk) => {
@@ -221,8 +221,6 @@ async function finishMemoqFileDownload(sessionId) {
 
 module.exports = {
     moveMemoqFileToProject,
-    addFilesToMemoq,
-    finishMemoqFileMove,
     addProjectFile,
     exportMemoqFile,
     getMemoqFileChunks,

@@ -28,7 +28,7 @@ const { getMemoqTemplates } = require("../services/memoqs/resources");
 const { assignProjectManagers } = require('../projects/updates');
 const { storeFiles } = require("../projects/files");
 const { getMemoqUsers } = require("../services/memoqs/users");
-const { updateProjectMetrics } = require("../projects/metrics");
+const { updateProjectMetricsAndCreateSteps } = require("../projects/metrics");
 
 const {
   getFilteredOtherProjects,
@@ -40,7 +40,11 @@ const {
 	replaceQueryStatus
 } = require('../services/memoqs/otherProjects');
 
-const { updateProjectFinanceOnDiscountsUpdate } = require('../projects');
+const {
+	updateProjectFinanceOnDiscountsUpdate,
+	manageProjectName
+} = require('../projects');
+
 const _ = require('lodash');
 
 
@@ -95,35 +99,23 @@ router.get('/templates', async (req, res) => {
 
 router.post('/memoq-project', upload.fields([{ name: 'sourceFiles' }, { name: 'refFiles' }]), async (req, res) => {
 	let tasksInfo = { ...req.body };
-	tasksInfo.nativeProjectName = tasksInfo.nativeProjectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim()
-	if(!tasksInfo.nativeProjectName.trim().length) tasksInfo.nativeProjectName = "Png"
-	if(Number.isInteger(+tasksInfo.nativeProjectName.charAt(0)))  tasksInfo.nativeProjectName = 'Png ' + tasksInfo.nativeProjectName
+	tasksInfo = manageProjectName(tasksInfo)
 	tasksInfo.projectName = `${tasksInfo.internalProjectId} - ${tasksInfo.nativeProjectName}`
 	try {
-		if(tasksInfo.isRequest) {
-			tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
-			await assignProjectManagers({
-				managerIds: [tasksInfo.projectManager, tasksInfo.accountManager],
-				memoqProjectId: tasksInfo.memoqProjectId
-			});
-			return res.send({ tasksInfo });
-		}
-		if(tasksInfo.source) {
-			tasksInfo.source = JSON.parse(tasksInfo.source);
-		}
+		tasksInfo.source = JSON.parse(tasksInfo.source);
 		tasksInfo.targets = JSON.parse(tasksInfo.targets);
 		tasksInfo.service = JSON.parse(tasksInfo.service);
 		tasksInfo.stepsDates = tasksInfo.stepsDates ? JSON.parse(tasksInfo.stepsDates) : [];
+
 		const { sourceFiles, refFiles } = req.files;
 		tasksInfo.translateFiles = await storeFiles(sourceFiles, tasksInfo.projectId);
 		tasksInfo.referenceFiles = refFiles ? await storeFiles(refFiles, tasksInfo.projectId) : [];
 		tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo);
-		await assignProjectManagers({
-			manager: tasksInfo.projectManager,
-			memoqProjectId: tasksInfo.memoqProjectId
-		});
-		await Projects.updateOne({_id: tasksInfo.projectId}, {projectName: tasksInfo.nativeProjectName})
+		await assignProjectManagers({ manager: tasksInfo.projectManager, memoqProjectId: tasksInfo.memoqProjectId });
+		await Projects.updateOne({ _id: tasksInfo.projectId }, { projectName: tasksInfo.nativeProjectName })
+
 		res.send({ tasksInfo });
+
 	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on creating a Project in memoQ");
@@ -136,7 +128,7 @@ router.post('/add-project-file', async (req, res) => {
 		const fileGuid = await addProjectFile(memoqProjectId, filePath);
 		res.send(fileGuid);
 	} catch (err) {
-		console.log(err);
+		console.log(err, 'in /add-project-file');
 		res.status(500).send(err);
 	}
 })
@@ -165,8 +157,8 @@ router.get('/project-users', async (req, res) => {
 router.get('/project-docs', async (req, res) => {
 	const { id } = req.query;
 	try {
-		const result = await getProjectTranslationDocs(id);
-		res.send(result);
+		const listProjectTranslationDocuments = await getProjectTranslationDocs(id);
+		res.send(listProjectTranslationDocuments);
 	} catch (err) {
 		console.log(err);
 		res.status(500).send(err);
@@ -176,7 +168,7 @@ router.get('/project-docs', async (req, res) => {
 router.post('/metrics', async (req, res) => {
 	const { projectId, tasks } = req.body;
 	try {
-		const updatedProject = await updateProjectMetrics(projectId, tasks);
+		const updatedProject = await updateProjectMetricsAndCreateSteps(projectId, tasks);
 		res.send(updatedProject);
 	} catch (err) {
 		console.log(err);

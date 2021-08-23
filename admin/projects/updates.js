@@ -636,21 +636,12 @@ const assignProjectManagers = async ({ manager, memoqProjectId }) => {
 
 const checkAndCreateManager = async (memoqUsers, manager) => {
 	const memoqManager = memoqUsers.find(user => user.email === manager.email);
+
 	if(memoqManager) {
-		return {
-			id: memoqManager.id,
-			isPm: true
-		};
+		return { id: memoqManager.id, isPm: true };
 	} else {
-		const guid = await createMemoqUser({
-			firstName: manager.firstName,
-			email: manager.email,
-			surname: manager.lastName
-		});
-		return {
-			id: guid,
-			isPm: true,
-		};
+		const guid = await createMemoqUser({ firstName: manager.firstName, email: manager.email, surname: manager.lastName });
+		return { id: guid, isPm: true, };
 	}
 };
 

@@ -101,10 +101,12 @@ const {
 } = require('./delivery')
 
 const {
-	getPriceAfterApplyingDiscounts
+	getPriceAfterApplyingDiscounts,
+	manageProjectName
 } = require('./helpers')
 
 module.exports = {
+	manageProjectName,
 	copyProjectFiles,
 	setStepDeadlineProjectAndMemoq,
 	saveCertificateTODR1Files,

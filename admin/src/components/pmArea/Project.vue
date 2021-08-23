@@ -326,7 +326,9 @@
 					if (!this.project._id) {
 						if (!this.clients.length) {
 							let result = await this.$http.get(`/active-clients`)
-							this.clients = [ ...result.body ]
+							this.clients = [ ...result.body ].sort((a, b) => {
+								return a.name.localeCompare(b.name);
+							})
 						}
 					}
 				} catch (err) {

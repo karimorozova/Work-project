@@ -46,21 +46,29 @@ export const addProjectWordsTasks = async ({ dispatch }, payload) => {
 		dispatch('setMemoqProjectMessage', 'memoqProject');
 		const memoqProject = await Vue.http.post('/memoqapi/memoq-project', payload);
 		let { tasksInfo } = memoqProject.data;
+
 		dispatch('setMemoqProjectMessage', 'memoqFiles');
 		tasksInfo.memoqFiles = [];
-		for (let filePath of tasksInfo.translateFiles) {
+		for await (let filePath of tasksInfo.translateFiles) {
 			dispatch('incrementFileCounter');
 			const addFileResult = await Vue.http.post("/memoqapi/add-project-file", { memoqProjectId: tasksInfo.memoqProjectId, filePath });
-			tasksInfo.memoqFiles.push({ name: filePath.split("/").pop(), fileGuid: addFileResult.body });
+			tasksInfo.memoqFiles.push({ name: filePath.split("/").pop(), fileGuid: addFileResult.data });
 		}
+
 		dispatch('resetFileCounter');
+		dispatch('setMemoqProjectMessage', 'dbFiles');
+		const listProjectTranslationDocuments = await Vue.http.get(`/memoqapi/project-docs?id=${ tasksInfo.memoqProjectId }`);
+
 		dispatch('setMemoqProjectMessage', 'dbTasks');
-		const translationDocs = await Vue.http.get(`/memoqapi/project-docs?id=${ tasksInfo.memoqProjectId }`);
-		const { body: tasks } = await Vue.http.post('/pm-manage/project-words-tasks', { tasksInfo, docs: translationDocs.data });
+		const tasks = await Vue.http.post('/pm-manage/project-words-tasks', { tasksInfo, docs: listProjectTranslationDocuments.data });
+
 		dispatch('setMemoqProjectMessage', 'dbSteps');
-		await Vue.http.post('/memoqapi/metrics', { projectId: tasksInfo.projectId, tasks });
+		await Vue.http.post('/memoqapi/metrics', { projectId: tasksInfo.projectId, tasks: tasks.data });
+
+		dispatch('setMemoqProjectMessage', 'dbFinance');
 		const updatedProject = await Vue.http.get(`/pm-manage/costs?projectId=${ tasksInfo.projectId }`);
 		await dispatch('setCurrentProject', updatedProject.data);
+
 		dispatch('alertToggle', { message: "Tasks were added", isShow: true })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data || err.message, isShow: true, type: "error" });
