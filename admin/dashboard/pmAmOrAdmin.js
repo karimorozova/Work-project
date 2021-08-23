@@ -8,7 +8,7 @@ async function getProjectsForDashboard() {
 	// 				$lte: new Date(moment().set({ hour: 23, minute: 59, second: 59 }).toString())
 	// 			},
 	// }
-	const STATUSES = ["Closed", "Cancelled", "Cancelled Halfway"]
+	const STATUSES = ["Closed", "Cancelled", "Cancelled Halfway", "Rejected"]
 	const filters = {status: {$not: {$in: STATUSES}}, isTest: false}
 	return await getProjects(filters)
 }
