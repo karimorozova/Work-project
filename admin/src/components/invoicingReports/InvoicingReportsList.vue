@@ -277,15 +277,17 @@
         await this.getReports()
       },
       async changeTaskStatus() {
-        try {
-          const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
-          await this.$http.post('/invoicing-reports/manage-report-status', {
-            reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
-            nextStatus
-          })
-        } catch (error) {
-          this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
-        }
+	      const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
+	      try {
+		      await this.$http.post('/invoicing-reports/manage-report-status', {
+			      reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+			      nextStatus
+		      })
+		      this.closeApproveActionModal()
+		      this.getReports()
+	      } catch (error) {
+		      this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
+	      }
       },
 			openApproveActionModal({ option }) {
 				this.selectedReportAction = option
