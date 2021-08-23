@@ -19,11 +19,13 @@ const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate,
 	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
 	await moveProjectFile(invoiceFile[0], `./dist${ newPath }`)
 
+
 	await InvoicingReports.updateOne({ _id: reportId }, {
 		status: 'Invoice Received',
 		paymentDetails: {
 			paymentMethod,
-			expectedPaymentDate,
+			//expectedPaymentDate: new Date(expectedPaymentDate),
+			expectedPaymentDate: new Date(),
 			file: {
 				fileName,
 				path: newPath
