@@ -8,7 +8,7 @@ const pmMail = function(project, client, user) {
       secure: false, // upgrade later with STARTTLS
       auth: {
         user: 'translation@pangea.global',
-        pass: '@Png2021!!'
+        pass: '@Png2022!!'
       }
     });
     const msg = `<li>Dear ${user.firstName}</li>` + `<p>The Quote with Id ${project.projectId} was rejected ` + `by the client ${client.name}</p>`;
