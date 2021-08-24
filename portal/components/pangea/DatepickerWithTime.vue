@@ -1,8 +1,8 @@
 <template lang="pug">
   .vdp-datepicker(:class="[wrapperClass, isRtl ? 'rtl' : '']")
-    div(:class="{'input-group' : bootstrapStyling}")
+    div(style="position: relative;" :class="{'input-group' : false}")
       <!-- Calendar Button -->
-      span(v-if="calendarButton" class="vdp-datepicker__calendar-button" :class="{'input-group-addon' : bootstrapStyling}" @click="showCalendar"
+      span(v-if="calendarButton" class="vdp-datepicker__calendar-button" :class="{'input-group-addon' : false}" @click="showCalendar"
         v-bind:style="{'cursor:not-allowed;' : disabledPicker}")
         i.calendarButtonIcon {{ calendarButtonIconContent }}
           span(v-if="!calendarButtonIcon") &hellip;
@@ -23,8 +23,12 @@
         :required="required"
         :readonly="isReadonly"
       )
+      <!-- Clear Icon -->
+      span.clear-icon(v-if="isClearIcon && selectedDate" @click="removeSelectedDate()")
+        i.fas.fa-backspace
+
       <!-- Clear Button -->
-      span(v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : bootstrapStyling}" @click="clearDate()")
+      span(v-if="clearButton && selectedDate" class="vdp-datepicker__clear-button" :class="{'input-group-addon' : false}" @click="clearDate()")
         i.clearButtonIcon
           span(v-if="!clearButtonIcon") &times;
 
@@ -57,7 +61,7 @@
             @click="setDay(day)"
           ) {{ day.date }}
 
-        .time-select
+        .time-select(v-if="isTime")
           .change-time.hour
             span(
               @click="() => checkHours(+hours+1)"
@@ -83,7 +87,8 @@
               class="next"
             )
               i.fa.fa-chevron-down
-        Button.select-date(value="Select" @clicked="selectDate()")
+
+        Button.select-date(value="Set date" @clicked="setDateAndTime()")
 
 
     <!-- Month View -->
@@ -131,17 +136,14 @@
 </template>
 
 <script>
-	import DateUtils from "../utils/DateUtils"
-	import DateLanguages from "../utils/DateLanguages"
+	import DateUtils from '../../utils/DateUtils.js'
+	import DateLanguages from '../../utils/DateLanguages.js'
 	import moment from 'moment'
-	import Button from "./buttons/Button"
+	import Button from "./Button"
 
 	export default {
 		components: { Button },
 		props: {
-			bootstrapStyling: {
-				type: Boolean,
-			},
 			value: {
 				validator: function (val) {
 					return val === null || val instanceof Date || typeof val === 'string' || typeof val === 'number'
@@ -167,7 +169,10 @@
 			disabled: Object,
 			highlighted: Object,
 			placeholder: String,
-			inline: Boolean,
+			inline: {
+				type: Boolean,
+        default: false,
+      },
 			isReadonly: {
 				type: Boolean,
 				default: true
@@ -192,32 +197,21 @@
 			maximumView: {
 				type: String,
 				default: 'year'
+			},
+			isTime: { type: Boolean, default: true },
+			isClearIcon: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
 			return {
-				/*
-         * Vue cannot observe changes to a Date Object so date must be stored as a timestamp
-         * This represents the first day of the current viewing month
-         * {Number}
-         */
 				pageTimestamp: startDate.setDate(1),
-				/*
-         * Selected Date
-         * {Date}
-         */
 				selectedDate: null,
-				/*
-         * Flags to show calendar views
-         * {Boolean}
-         */
 				showDayView: false,
 				showMonthView: false,
 				showYearView: false,
-				/*
-         * Positioning
-         */
 				calendarHeight: 0,
 				day: '',
 				hours: moment().hour(),
@@ -256,7 +250,6 @@
 				if (!this.initialView) {
 					return this.minimumView
 				}
-
 				return this.initialView
 			},
 			pageDate() {
@@ -281,11 +274,6 @@
 			currYear() {
 				return this.pageDate.getFullYear()
 			},
-			/**
-			 * Returns the day number of the week less one for the first of the current month
-			 * Used to show amount of empty cells before the first in the day calendar layout
-			 * @return {Number}
-			 */
 			blankDays() {
 				const d = this.pageDate
 				let dObj = new Date(d.getFullYear(), d.getMonth(), 1, d.getHours(), d.getMinutes())
@@ -355,7 +343,6 @@
 			years() {
 				const d = this.pageDate
 				let years = []
-				// set up a new date object to the beginning of the current 'page'
 				let dObj = new Date(Math.floor(d.getFullYear() / 10) * 10, d.getMonth(), d.getDate(), d.getHours(), d.getMinutes())
 				for (let i = 0; i < 10; i++) {
 					years.push({
@@ -387,9 +374,10 @@
 			}
 		},
 		methods: {
-			/**
-			 * Close all calendar layers
-			 */
+			removeSelectedDate() {
+				this.selectedDate = null
+				this.$emit('removeSelectedDate')
+			},
 			close(full) {
 				this.showDayView = this.showMonthView = this.showYearView = false
 				if (!this.isInline) {
@@ -404,10 +392,6 @@
 				}
 				this.setPageDate(this.selectedDate)
 			},
-			/**
-			 * Effectively a toggle to show/hide the calendar
-			 * @return {mixed} [description]
-			 */
 			showCalendar() {
 				if (!this.isOpen) {
 					this.$emit('isOpened')
@@ -419,6 +403,7 @@
 					return this.close(true)
 				}
 				this.setInitialView()
+
 				if (!this.isInline) {
 					this.$emit('opened')
 				}
@@ -454,7 +439,6 @@
 				}
 				this.$emit('scrollDrop', { drop: !this.isOpen, offsetTop: top, offsetHeight: height })
 			},
-			// Setting date manually by input
 			setDateManually(e) {
 				const value = e.target.value
 				const dateParts = value.split(", ")
@@ -466,7 +450,6 @@
 				this.$emit('selected', newDate)
 				this.$emit('input', newDate)
 			},
-			//
 			setInitialView() {
 				const initialView = this.computedInitialView
 
@@ -535,15 +518,20 @@
 				this.$emit('input', null)
 				this.$emit('cleared')
 			},
-			/**
-			 * @param {Object} day
-			 */
-			selectDate() {
+			setDateAndTime() {
 				if (this.day.isDisabled) {
 					this.$emit('selectedDisabled', this.day)
 					return false
 				}
-				this.setDate(moment(this.day.timestamp).set({ hour: this.hours, minute: this.minutes }).format())
+
+				if(!this.day){
+          const str = moment(this.value).format('YYYY-MM-DD');
+					const now = moment(str).unix();
+					this.setDate(moment(now*1000).set({ hour: this.hours, minute: this.minutes }).format())
+        }else{
+					this.setDate(moment(this.day.timestamp).set({ hour: this.hours, minute: this.minutes }).format())
+        }
+
 				if (!this.isInline) {
 					this.close(true)
 				}
@@ -554,9 +542,6 @@
 					this.day = day
 				}
 			},
-			/**
-			 * @param {Object} month
-			 */
 			selectMonth(month) {
 				if (month.isDisabled) {
 					return false
@@ -574,9 +559,6 @@
 					}
 				}
 			},
-			/**
-			 * @param {Object} year
-			 */
 			selectYear(year) {
 				if (year.isDisabled) {
 					return false
@@ -594,27 +576,15 @@
 					}
 				}
 			},
-			/**
-			 * @return {Number}
-			 */
 			getPageDate() {
 				return this.pageDate.getDate()
 			},
-			/**
-			 * @return {Number}
-			 */
 			getPageMonth() {
 				return this.pageDate.getMonth()
 			},
-			/**
-			 * @return {Number}
-			 */
 			getPageYear() {
 				return this.pageDate.getFullYear()
 			},
-			/**
-			 * @return {String}
-			 */
 			getPageDecade() {
 				const decadeStart = Math.floor(this.pageDate.getFullYear() / 10) * 10
 				const decadeEnd = decadeStart + 9
@@ -702,19 +672,9 @@
 				}
 				return Math.ceil(this.disabled.from.getFullYear() / 10) * 10 <= Math.ceil(this.pageDate.getFullYear() / 10) * 10
 			},
-			/**
-			 * Whether a day is selected
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isSelectedDate(dObj) {
 				return this.selectedDate && this.selectedDate.toDateString() === dObj.toDateString()
 			},
-			/**
-			 * Whether a day is disabled
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isDisabledDate(date) {
 				let disabled = false
 
@@ -757,11 +717,6 @@
 				}
 				return disabled
 			},
-			/**
-			 * Whether a day is highlighted (only if it is not disabled already except when highlighted.includeDisabled is true)
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isHighlightedDate(date) {
 				if (!(this.highlighted && this.highlighted.includeDisabled) && this.isDisabledDate(date)) {
 					return false
@@ -800,12 +755,6 @@
 
 				return highlighted
 			},
-			/**
-			 * Whether a day is highlighted and it is the first date
-			 * in the highlighted range of dates
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isHighlightStart(date) {
 				return this.isHighlightedDate(date) &&
 						(this.highlighted.from instanceof Date) &&
@@ -813,12 +762,6 @@
 						(this.highlighted.from.getMonth() === date.getMonth()) &&
 						(this.highlighted.from.getDate() === date.getDate())
 			},
-			/**
-			 * Whether a day is highlighted and it is the first date
-			 * in the highlighted range of dates
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isHighlightEnd(date) {
 				return this.isHighlightedDate(date) &&
 						(this.highlighted.to instanceof Date) &&
@@ -826,29 +769,15 @@
 						(this.highlighted.to.getMonth() === date.getMonth()) &&
 						(this.highlighted.to.getDate() === date.getDate())
 			},
-			/**
-			 * Helper
-			 * @param  {mixed}  prop
-			 * @return {Boolean}
-			 */
 			isDefined(prop) {
 				return typeof prop !== 'undefined' && prop
 			},
-			/**
-			 * Whether the selected date is in this month
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
+
 			isSelectedMonth(date) {
 				return (this.selectedDate &&
 						this.selectedDate.getFullYear() === date.getFullYear() &&
 						this.selectedDate.getMonth() === date.getMonth())
 			},
-			/**
-			 * Whether a month is disabled
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isDisabledMonth(date) {
 				let disabled = false
 
@@ -875,19 +804,9 @@
 				}
 				return disabled
 			},
-			/**
-			 * Whether the selected date is in this year
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isSelectedYear(date) {
 				return this.selectedDate && this.selectedDate.getFullYear() === date.getFullYear()
 			},
-			/**
-			 * Whether a year is disabled
-			 * @param {Date}
-			 * @return {Boolean}
-			 */
 			isDisabledYear(date) {
 				let disabled = false
 				if (typeof this.disabled === 'undefined' || !this.disabled) {
@@ -907,10 +826,6 @@
 
 				return disabled
 			},
-			/**
-			 * Set the datepicker value
-			 * @param {Date|String|Number|null} date
-			 */
 			setValue(date) {
 				if (typeof date === 'string' || typeof date === 'number') {
 					let parsed = new Date(date)
@@ -936,10 +851,6 @@
 				}
 				this.pageTimestamp = (new Date(date)).setDate(1)
 			},
-			/**
-			 * Close the calendar if clicked outside the datepicker
-			 * @param  {Event} event
-			 */
 			clickOutside(event) {
 				if (this.$el && !this.$el.contains(event.target)) {
 					if (this.isInline) {
@@ -1015,8 +926,21 @@
 </script>
 
 <style lang="scss" scoped>
-  input:disabled {
-    background-color: #F2EFEB;
+  @import '../../assets/scss/colors.scss';
+
+
+  .fa-backspace {
+    font-size: 16px;
+    transition: .2s ease-out;
+    color: $dark-border;
+    cursor: pointer;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+
+    &:hover {
+      color: $text;
+    }
   }
 
   .vdp-datepicker__calendar div .cell {
@@ -1040,13 +964,8 @@
     position: absolute;
     z-index: 100;
     background: #fff;
-    border: 1px solid #eee;
-  }
-
-  @media (max-width: 350px) {
-    .vdp-datepicker__calendar {
-      left: -25px;
-    }
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    border-radius: 4px;
   }
 
   .vdp-datepicker__calendar header {
@@ -1112,7 +1031,7 @@
   .vdp-datepicker__calendar header .prev:not(.disabled):hover,
   .vdp-datepicker__calendar header .next:not(.disabled):hover,
   .vdp-datepicker__calendar header .up:not(.disabled):hover {
-    background: #eee;
+    background: $light-border;
   }
 
   .vdp-datepicker__calendar .disabled {
@@ -1154,6 +1073,18 @@
     font-family: 'Myriad600';
   }
 
+  /*.vdp-datepicker__calendar .cell.selected:hover {*/
+  /*  font-family: Myriad600;*/
+  /*}*/
+
+  /*.vdp-datepicker__calendar .cell.selected.highlighted {*/
+  /*  background: #4bd;*/
+  /*}*/
+
+  .vdp-datepicker__calendar .cell.highlighted {
+    /*background: #daeded;*/
+  }
+
   .vdp-datepicker__calendar .cell.today {
     background-color: #D15F45;
     color: #FFF !important;
@@ -1161,7 +1092,7 @@
   }
 
   .vdp-datepicker__calendar .cell.beforeToday {
-    color: #c5bfb5;
+    color: $border;
   }
 
   .vdp-datepicker__calendar .cell.highlighted.disabled {
@@ -1202,19 +1133,21 @@
   }
 
   .vdp-datepicker__calendar .cell.notCurrentMonth {
-    color: #c5bfb566;
+    color: $border;
   }
 
+
+  /* Custom styles for different components */
   .vendor__calendar-custom {
     width: 260px;
     margin-right: 20px;
 
     .cell.beforeToday {
-      color: #67573e;
+      color: #66563d;
     }
 
     .cell.day {
-      color: #67573e;
+      color: #66563d;
     }
 
     .cell.today {
@@ -1230,51 +1163,91 @@
   }
 
   .datepicker-custom-project-info {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #68573E;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    width: 191px;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .datepicker-custom-compliance {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .datepicker-custom {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #68573E;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .datepicker-custom-client {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #68573E;
-    height: 30px;
-    color: #68573E;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    padding-left: 5px;
-    width: 100%;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .datepicker-custom-mod {
-    width: 191px;
+    width: 220px;
   }
 
   .steps__custom-input {
-    color: #68573E;
+    color: $text;
     border: none;
     width: 100%;
     background-color: transparent;
     cursor: pointer;
+    margin: 0;
     outline: 0;
+    padding: 0;
   }
 
   .steps__calendar-custom {
-    width: 200px;
     right: -6px;
-    top: 24px;
+    top: 26px;
   }
 
   .filters .datepicker-custom {
@@ -1282,20 +1255,86 @@
     height: 30px;
   }
 
-  .datepicker-height-30 {
+  .filters .datepicker-custom-filter {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
     border-radius: 4px;
-    border: 1px solid #68573E;
-    height: 30px;
-    color: #68573E;
-    padding-left: 5px;
+    box-sizing: border-box;
+    padding: 0 7px;
     outline: none;
-    width: 166px;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .datepicker-custom-filter {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+    cursor: pointer;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .datepicker-custom-filter-185 {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 185px;
+    height: 32px;
+    transition: .1s ease-out;
+    cursor: pointer;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .datepicker-height-30 {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 220px;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .calendar-custom {
     width: 260px;
     right: 0;
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+  }
+
+  .calendar-custom .cell,
+  .steps__calendar-custom .cell {
+    /*height: 26px;*/
+    /*line-height: 26px;*/
   }
 
   .cell.day-header {
@@ -1376,8 +1415,7 @@
   }
 
   ::-webkit-input-placeholder {
-    opacity: 0.5;
-    color: #67573e;
+    opacity: 0.45;
   }
 
   .prev,

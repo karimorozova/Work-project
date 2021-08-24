@@ -47,8 +47,8 @@
 				domain: '',
 				dropdownVisible: false,
 				newProject: [
-					{ title: "Compliance", path: "/compliance" },
-					{ title: "Translation", path: "/translation" }
+					{ title: "Translation", path: "/translation" },
+					{ title: "Compliance", path: "/compliance" }
 					// { title: "Copywriting", path: "/copywriting" },
 					// { title: "Marketing", path: "/marketing" },
 					// {title: "Proofing/QA", path: "/proofing"},

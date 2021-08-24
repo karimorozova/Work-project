@@ -6,7 +6,7 @@ const { managerNotifyMail } = require('../utils/mailTemplate')
 
 
 const complianceService = async (formData, client) => {
-	const { billingInfo: { paymentType: paymentProfile }, _id, accountManager } = client
+	const { billingInfo: { paymentType: paymentProfile }, _id } = client
 	const { deadline, projectName, brief, startOption } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)

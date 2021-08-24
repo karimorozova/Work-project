@@ -32,6 +32,7 @@
     font-family: Myriad400;
     font-size: 14px;
     color: #333;
+    background-color: #fcfcfc;
   }
 
   .slide-fade-enter-active {

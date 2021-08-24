@@ -29,7 +29,24 @@ const { secretKey } = require('../configs')
 const { upload } = require('../utils/')
 const { setClientsContactNewPassword, updateAccountDetails } = require('../users')
 
-router.post('/compliance-service', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
+
+router.post('/translation-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
+	try {
+		const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
+		let client = await getClient({ "_id": verificationResult.clientId })
+
+		console.log(req.body, req.files)
+		// const request = await complianceService(req.body, client)
+		// await createComplianceFiles(request, req.files)
+		// notifyAMsRequestCreated(request)
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Server Error on incoming request")
+	}
+})
+
+router.post('/compliance-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
 		let client = await getClient({ "_id": verificationResult.clientId })
