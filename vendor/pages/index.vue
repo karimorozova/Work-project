@@ -1,10 +1,24 @@
 <template lang="pug">
-  .vendor-portal
-    .vendor-portal__top
-      .vendor-portal__admin-name
+  .wrapper
+    .navbar
+      .navbar__logo
+        img(src="../assets/images/navbar/navbar-logo.svg")
+      .navbar__menu
+        .item(v-for="(item, index) in navbarList" :key="index" @click="switchSection(index)" :class="{'active__item': item.active}")
+          .item__image
+            img(:src="item.img")
+          .item__title {{ item.title }}
+
+    .content
+      Header
+      .content__body
+        nuxt-child
+
+    //.vendor-portal__top
+      //.vendor-portal__admin-name
         h2.vendor-portal__adminPortal VENDOR PORTAL
         //h2.vendor-portal__adminPortal(v-if="vendorvendor.competencies || vendor.competencies.length") VENDOR PORTAL
-      .vendor-portal__account(v-click-outside="hideAccountMenu")
+      //.vendor-portal__account(v-click-outside="hideAccountMenu")
         .vendor-portal__photo-wrapper
           img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
           img.vendor-portal__photo(v-else :src="domain+vendor.photo")
@@ -29,9 +43,7 @@
             img(v-if="!this.isAccountMenu" src="../assets/images/down-icon.png")
             img(v-else src="../assets/images/up-icon.png")
 
-
-    .vendor-portal__main
-      .vendor-portal__nav
+      //.vendor-portal__nav
         .vendor-portal__sidebar
           ul.vendor-portal__nav-menu
             router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
@@ -39,11 +51,11 @@
                 .vendor-portal__image(v-if="!note.active && note.imgWhite")
                   img.image.navbar_no-filter(:src="note.imgWhite")
                 .vendor-portal__image(v-else)
-                  img(:src="note.imgBrown")
+                  img(:src="note.img")
                 .vendor-portal__nav-title
                   span {{ note.title }}
           .vendor-portal__balloons
-      nuxt-child
+
 
 </template>
 
@@ -51,69 +63,61 @@
 
 	import ClickOutside from "vue-click-outside"
 	import { mapGetters, mapActions } from "vuex"
+	import Header from "../components/pangea/Header"
 
 	export default {
+		components: { Header },
 		middleware: [ 'authenticated', 'new-user-redirect' ],
 		data() {
 			return {
 				navbarList: [
 					{
-						title: "DASHBOARD",
+						title: "Dashboard",
 						path: "/dashboard",
-						imgBrown: require("../assets/images/CATEGORIES/DASHBOARD.png"),
-						active: true
+						img: require("../assets/images/navbar/Dashboard.png"),
+						active: false
 					},
 					{
-						title: "COMPLETED JOBS",
+						title: "Completed Jobs",
 						path: "/completed-jobs",
-						imgBrown: require("../assets/images/CATEGORIES/COMPLETE-JOBS.png"),
+						img: require("../assets/images/navbar/Dashboard.png"),
 						active: false
 					},
 					{
-						title: "COMPETENCIES & RATE",
+						title: "Competencies & Rate",
 						path: "/competency-and-rate",
-						imgBrown: require("../assets/images/CATEGORIES/competencies.png"),
-						imgWhite: require("../assets/images/CATEGORIES/competencies(selected).png"),
-						// imgBrown: require("../assets/images/CATEGORIES/quotes.png"),
+						img: require("../assets/images/navbar/Dashboard.png"),
 						active: false
 					},
 					{
-						title: "ASSESSMENT",
+						title: "Assessment",
 						path: "/qualification-and-assessment",
-						imgBrown: require("../assets/images/CATEGORIES/assessment.png"),
-						imgWhite: require("../assets/images/CATEGORIES/assessment(selected).png"),
-						// imgBrown: require("../assets/images/CATEGORIES/rate.png"),
+						img: require("../assets/images/navbar/Dashboard.png"),
 						active: false
 					},
 					{
-						title: "EXPERIENCE & EDUCATION",
+						title: "Experience & Education",
 						path: "/experience-and-education",
-						imgBrown: require("../assets/images/CATEGORIES/experience-education.png"),
-						imgWhite: require("../assets/images/CATEGORIES/experience-education(selected).png"),
-						// imgBrown: require("../assets/images/CATEGORIES/languages.png"),
+						img: require("../assets/images/navbar/Dashboard.png"),
 						active: false
 					},
 					{
-						title: "DOCUMENTS",
+						title: "Documents",
 						path: "/documents",
-						imgBrown: require("../assets/images/CATEGORIES/documents.png"),
-						imgWhite: require("../assets/images/CATEGORIES/documents(selected).png"),
-						// imgBrown: require("../assets/images/CATEGORIES/projects-brown.png"),
+						img: require("../assets/images/navbar/Dashboard.png"),
 						active: false
 					},
 					{
-						title: "INVOICES",
+						title: "Invoices",
 						path: "/invoices",
-						imgBrown: require("../assets/images/CATEGORIES/documents.png"),
-						imgWhite: require("../assets/images/CATEGORIES/documents(selected).png"),
+						img: require("../assets/images/navbar/Dashboard.png"),
+
 						active: false
 					},
 					{
-						title: "PROFILE",
+						title: "Profile",
 						path: "/account",
-						imgBrown: require("../assets/images/CATEGORIES/my-account.png"),
-						imgWhite: require("../assets/images/CATEGORIES/my-account(selected).png"),
-
+						img: require("../assets/images/navbar/Dashboard.png"),
 						active: false
 					}
 				],
@@ -206,15 +210,12 @@
 					}
 				}
 			},
-			signOut() {
-				this.$router.push('/login')
-				this.logout()
-			},
+
 			switchSection(index) {
 				this.navbarList.forEach((item, i) => {
 					item.active = i === index
 				})
-				// this.$router.push(this.navbarList[index].path)
+				this.$router.push(this.navbarList[index].path)
 			},
 			showAccountMenu() {
 				this.isAccountMenu = !this.isAccountMenu
@@ -225,11 +226,11 @@
 			// },
 			hideAccountMenu() {
 				this.isAccountMenu = false
-			},
-			setToken() {
-				const vendorToken = this.$cookie.get("vendor")
-				this.$store.commit("SET_TOKEN", vendorToken)
 			}
+			// setToken() {
+			// 	const vendorToken = this.$cookie.get("vendor")
+			// 	this.$store.commit("SET_TOKEN", vendorToken)
+			// }
 		},
 		computed: {
 			...mapGetters({
@@ -261,259 +262,76 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../assets/scss/colors";
 
-  .vendor-portal {
+  .active__item {
+    color: $green;
+  }
 
-    &__top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #67573e;
-      position: fixed;
-      height: 40px;
-      width: 100%;
-      z-index: 10000;
-    }
+  .item {
+    display: flex;
+    transition: .1s ease-in-out;
+    cursor: pointer;
+    padding: 9px 12px 9px 20px;
+    align-items: center;
 
-    &__admin-name {
-      width: 35%;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      margin-left: 150px;
-    }
-
-    &__adminPortal {
-      color: #fff;
-      width: 100%;
-      font-size: 22px;
+    &__title {
       font-family: Myriad600;
-    }
-
-    &__account {
-      display: flex;
-      align-items: center;
-      height: 40px;
-    }
-
-    &__dropdown-wrapper {
-      height: 34px;
-      width: 36px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    &__imgwrap {
-      display: flex;
-      align-items: center;
-      position: relative;
-      cursor: pointer;
-
-      .spwrap {
-        color: #fff;
-        visibility: visible;
-        position: absolute;
-        right: 41px;
-      }
-    }
-
-    &__photo-wrapper {
-      margin: 0 3px 7px 15px;
-      border-radius: 30px;
-      width: 33px;
-      height: 33px;
-      position: relative;
-    }
-
-    &__photo {
-      border-radius: 50%;
-      background-color: white;
-      width: 35px;
-      height: 35px;
-      object-fit: cover;
-    }
-
-    &__account-block {
-      width: 200px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
-      position: absolute;
-      top: 44px;
-      right: -120px;
-      border-radius: 4px;
-      z-index: 5;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
-
-    &__info {
-      display: flex;
-      justify-content: flex-start;
-      border-bottom: 1px solid #c5bfb5;
-      height: 36px;
-      padding: 5px 0;
-    }
-
-    &__icon {
-      width: 40px;
-      text-align: center;
-    }
-
-    &__personal {
-      color: #67573e;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    &__item {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      border-bottom: 1px solid #c5bfb5;
-      cursor: pointer;
-      height: 36px;
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      &:hover {
-        background-color: #f4f2f1;
-      }
-    }
-
-    &__list-label {
-      color: #67573e;
-    }
-
-    &__arrow-block {
-      width: 150px;
-    }
-
-    &__arrow {
-      cursor: pointer;
       margin-left: 10px;
+      font-size: 15px;
     }
 
-    &__main {
-      box-sizing: border-box;
-      padding-top: 40px;
-      padding-left: 135px;
-      display: flex;
-      height: 100%;
-      position: relative;
-    }
-
-    &__inner {
-      width: 90%;
-    }
-
-    &__nav {
-      position: fixed;
-      left: 0;
-      z-index: 999;
-      display: flex;
-      min-height: calc(100vh - 40px);
-    }
-
-    &__sidebar {
-      padding: 25px 0;
-      background-color: #948977;
-      width: 135px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 0 10px rgba(104, 87, 62, 0.6);
-      z-index: 2;
-      overflow: hidden;
-    }
-
-    &__nav-menu {
-      list-style: none;
-      font-size: 14px;
-      padding: 0;
-      width: 155px;
-      height: 77vh;
-      margin-bottom: 0;
-      overflow-y: scroll;
-      font-family: Myriad900;
-
-      a {
-        text-decoration: none;
-        display: block;
-        margin-bottom: 20px;
-      }
-
-    }
-
-    &__nav-item {
-      padding-bottom: 10px;
-      padding-top: 5px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin-left: 0;
-      margin-right: 0;
-      cursor: pointer;
-
-      &:hover {
-
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    &__nav-title {
-      /*font-family: Myriad900;*/
-      color: #fff;
-      padding: 0 20px;
-      text-align: center;
-    }
-
-    &__image {
-      img {
-        filter: brightness(300%);
-      }
-
-      .navbar_no-filter {
-        filter: none;
-      }
-    }
-
-    &_active {
-      background-color: white;
-
-      .vendor-portal__nav-title {
-        /*font-family: Myriad900;*/
-        color: #978d7e;
-      }
-
-      .vendor-portal__image {
-        img {
-          filter: none;
-        }
-      }
-    }
-
-    &__balloons {
-      transition: all 0.4s;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: url("../assets/images/balloons.png");
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 100%;
-      height: 100px;
-      box-shadow: -2px -5px 5px rgba(103, 87, 62, 0.4);
+    &:hover {
+      background: $light-border;
     }
   }
 
+  .wrapper {
+    display: flex;
+  }
+
+  .navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 270px;
+    z-index: 99999;
+    box-sizing: border-box;
+    background: white;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+
+    &__menu {
+      height: calc(100vh - 140px);
+      overflow-y: auto;
+      scrollbar-width: none;
+      margin-top: 5px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 0px;
+    }
+
+    &__logo {
+      margin: 0 auto;
+      padding: 20px 0 10px 0;
+      width: 200px;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  .content {
+    width: 100%;
+    min-width: fit-content;
+    margin-left: 270px;
+
+    &__body {
+      padding: 50px 0px 50px 50px;
+    }
+  }
 
 </style>
 

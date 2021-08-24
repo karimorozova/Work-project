@@ -120,8 +120,6 @@
   @import '../../../assets/scss/colors.scss';
 
   .dashboard {
-    width: 100%;
-    padding: 20px 40px;
 
     .jobs_block {
       color: $main-color;

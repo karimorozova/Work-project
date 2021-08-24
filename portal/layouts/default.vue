@@ -31,6 +31,7 @@
   body {
     font-family: Myriad400;
     font-size: 14px;
+    color: #333;
   }
 
   .slide-fade-enter-active {

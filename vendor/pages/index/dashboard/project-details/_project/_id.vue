@@ -210,8 +210,9 @@
   @import "../../../../../assets/scss/colors";
 
   .title {
-    margin: 30px 0 10px;
-    font-size: 20px;
+    font-size: 18px;
+    font-family: Myriad600;
+    margin-bottom: 10px;
   }
 
   .details {
