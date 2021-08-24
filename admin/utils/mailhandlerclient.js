@@ -27,7 +27,7 @@ const sendMailClient = function(request) {
       secure: false, // upgrade later with STARTTLS
       auth: {
         user: 'translation@pangea.global', //2a629a8646758c2140a8aced91f03dcb
-        pass: '@Png122019!' //fc72170d536b40480711bfad6ff1a8c1
+        pass: '@Png2021!!' //fc72170d536b40480711bfad6ff1a8c1
       }
     });
     let msg = `<div class="emailWrapper" style="width: 600px; padding:10px;">
