@@ -5,6 +5,8 @@
         img(src="../assets/images/latest-version/navbar-logo.svg")
       .navbar__menu
         Menu(:elements="elements" :path='path')
+      .navbar__name ADMIN PORTAL
+
     .content
       Header
       router-view
@@ -38,11 +40,11 @@
 								name: 'Overall View',
 								path: '/pangea-dashboard/overall-view'
 							},
-              {
+							{
 								type: 'link',
 								name: 'Activities',
 								path: '/pangea-dashboard/activities'
-							},
+							}
 							// {
 							// 	type: 'link',
 							// 	name: 'Sales Performance',
@@ -288,25 +290,25 @@
 							// 	name: 'Finance',
 							// 	path: '/pangea-finance/finance'
 							// },
-              {
-                type: 'group',
-                path: 'invoicing-reports',
-                name: 'Payables',
-                isOpen: false,
-                children: [
-                  {
-                    type: 'link',
-                    path: '/pangea-finance/invoicing-reports/reports',
-                    name: 'Reports'
-                  },
-                  {
-                    type: 'link',
-                    path: '/pangea-finance/invoicing-reports/create-reports',
-                    name: 'Add Reports'
-                  },
-                ]
+							{
+								type: 'group',
+								path: 'invoicing-reports',
+								name: 'Payables',
+								isOpen: false,
+								children: [
+									{
+										type: 'link',
+										path: '/pangea-finance/invoicing-reports/reports',
+										name: 'Reports'
+									},
+									{
+										type: 'link',
+										path: '/pangea-finance/invoicing-reports/create-reports',
+										name: 'Add Reports'
+									}
+								]
 
-              }
+							}
 						]
 					},
 					{
@@ -435,7 +437,7 @@
 				setAllUsers: "setAllUsers",
 				setIndustries: "setIndustries",
 				setSteps: "setSteps",
-        setVendorsForOption: 'setVendorsForOption'
+				setVendorsForOption: 'setVendorsForOption'
 			}),
 			async getCurrentUserGroup() {
 				try {
@@ -456,7 +458,7 @@
 				const params = this.$route.path.split('/')
 				params.shift()
 				return params
-			},
+			}
 		},
 		created() {
 			this.getCurrentUserGroup()
@@ -496,9 +498,20 @@
     background: white;
     box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
 
+    &__name {
+      text-align: center;
+      font-size: 20px;
+      font-family: Myriad900;
+      border-top: 1px solid $border;
+      padding-top: 22px;
+      cursor: default;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+    }
 
     &__menu {
-      height: calc(100vh - 140px);
+      height: calc(100vh - 165px);
       overflow-y: auto;
       scrollbar-width: none;
     }

@@ -8,6 +8,7 @@
           .item__image
             img(:src="item.img")
           .item__title {{ item.title }}
+      .navbar__name VENDOR PORTAL
 
     .content
       Header
@@ -301,8 +302,20 @@
     background: white;
     box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
 
+    &__name {
+      text-align: center;
+      font-size: 20px;
+      font-family: Myriad900;
+      border-top: 1px solid $border;
+      padding-top: 22px;
+      cursor: default;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+    }
+
     &__menu {
-      height: calc(100vh - 140px);
+      height: calc(100vh - 170px);
       overflow-y: auto;
       scrollbar-width: none;
       margin-top: 5px;
