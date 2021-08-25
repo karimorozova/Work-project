@@ -65,6 +65,7 @@
 	import ClickOutside from "vue-click-outside"
 	import { mapGetters, mapActions } from "vuex"
 	import Header from "../components/pangea/Header"
+  import { testtt } from "../store/actions/vendors/info"
 
 	export default {
 		components: { Header },
@@ -132,7 +133,8 @@
 				"alertToggle",
 				"logout",
 				"setOriginallyUnits",
-				"setReports"
+				"setReports",
+				"setReportsPaid",
 			]),
 
 			mainPageRender() {
@@ -160,9 +162,17 @@
 					const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
 					const decode = window.atob(result.data)
 					const data = JSON.parse(decode)
-					console.log('reppp', data)
 					this.setReports(data)
 				} catch (err) {
+				}
+			},
+			async getVendorPaidReports() {
+				try {
+					const result = await this.$axios.get(`/vendor/paid-reports?token=${ this.$store.state.token }`)
+					const decode = window.atob(result.data)
+					const data = JSON.parse(decode)
+					this.setReportsPaid(data)
+        } catch (err) {
 				}
 			},
 			async getAllIndustries() {
@@ -244,6 +254,7 @@
 			await this.getOriginallyUnits()
 			await this.getVendorInfo()
 			await this.getVendorReports()
+			await this.getVendorPaidReports()
 			await this.getAllIndustries()
 			await this.getAllLanguages()
 			await this.getAllSteps()

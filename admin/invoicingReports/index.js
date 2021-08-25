@@ -28,6 +28,12 @@ const {
 	getReportByVendorId,
 } = require('./getReports')
 
+const {
+	getAllPaidReports,
+	getPaidReport,
+	getReportPaidByVendorId,
+} = require('./getPaidReports')
+
 module.exports = {
 	invoiceReloadFile,
 	invoiceSubmission,
@@ -44,4 +50,7 @@ module.exports = {
 	stepsFiltersQuery,
 	reportsFiltersQuery,
 	paidOrAddPaymentInfo,
+	getAllPaidReports,
+	getPaidReport,
+	getReportPaidByVendorId,
 }

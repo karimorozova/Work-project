@@ -46,4 +46,8 @@ export const SET_REPORTS = (state, payload) => {
     state.reports = payload;
 }
 
+export const SET_REPORTS_PAID = (state, payload) => {
+    state.reportsPaid = payload;
+}
+
 

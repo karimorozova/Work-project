@@ -4,8 +4,6 @@
       .invoicing-details__details
         .title
           .title__text {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
-          .title__button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")')
-            Button(value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
           .invoicing-details__text
@@ -35,55 +33,6 @@
               .text__value
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
                   i(class="fas fa-download")
-
-
-            .payment-info(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
-
-              .payment-info__doublePay
-                .payment-info__payBlock
-                  .amount__title Paid Amount:
-                  input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
-                .check-box
-                  CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
-                  span(class="check-box__text") Paid full
-
-              .payment-info__amountAndFile
-                .payment-info__amount
-                  .amount__title Unpaid Amount:
-                  .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
-
-              .payment-info__double
-                .payment-info__block
-                  .payment-info__title Payment Method:
-                  .payment-info__select
-                    SelectSingle(
-                      :selectedOption="paymentMethod"
-                      :options="['test1', 'test2', 'test3' ]"
-                      placeholder="Option"
-                      @chooseOption="setPaymentMethod"
-                    )
-                .payment-info__block
-                  .payment-info__title Payment Date:
-                  DatepickerWithTime(
-                    :value="paymentDate"
-                    @selected="setFromDate"
-                    placeholder="Date"
-                    :isTime="true"
-                    :highlighted="highlighted"
-                    :monday-first="true"
-                    inputClass="datepicker-custom-filter-185"
-                    calendarClass="calendar-custom"
-                    :format="customFormatter"
-                    :disabled="disabled"
-                  )
-
-
-              .payment-info__notes
-                .payment-info__title Notes:
-                textarea(type="text" rows="3" v-model="notes")
-
-              Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
-
 
           .invoicing-details__table
             ApproveModal(
@@ -126,19 +75,16 @@
                   span.currency(v-html="'&euro;'")
                   span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
 
-              template(slot="icons", slot-scope="{ row, index }")
-                .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
-                  i(class="fas fa-trash" @click="requestToDelete(row._id)")
 
-      .invoicing-details__add-steps
-        .add-steps__body
-          AddStepsToInvoicing.add-steps__table(
-            v-if="toggleAddSteps"
-            :steps="steps"
-            :invoicingEditId="reportDetailsInfo._id"
-            @refreshReports="refreshReports"
-            @closeTable="changeToggleAddSteps"
-          )
+      //.invoicing-details__add-steps
+      //  .add-steps__body
+      //    AddStepsToInvoicing.add-steps__table(
+      //      v-if="toggleAddSteps"
+      //      :steps="steps"
+      //      :invoicingEditId="reportDetailsInfo._id"
+      //      @refreshReports="refreshReports"
+      //      @closeTable="changeToggleAddSteps"
+      //    )
 
     .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
       .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
@@ -152,7 +98,7 @@
 <script>
 	import GeneralTable from '../GeneralTable'
 	import moment from "moment"
-	import AddStepsToInvoicing from "./AddStepsToInvoicing"
+	// import AddStepsToInvoicing from "./AddStepsToInvoicing"
 	import ApproveModal from '../ApproveModal'
 	import Button from "../Button"
 	import SelectSingle from "../SelectSingle"
@@ -176,41 +122,35 @@
 						label: "Step",
 						headerKey: "headerService",
 						key: "service",
-						style: { width: "17%" }
+						style: { width: "19%" }
 					},
 					{
 						label: "Billing Date",
 						headerKey: "headerBilling",
 						key: "billing",
-						style: { width: "17%" }
+						style: { width: "19%" }
 					},
 					{
 						label: "Language Pair",
 						headerKey: "headerLangPair",
 						key: "langPair",
-						style: { width: "17%" }
+						style: { width: "19%" }
 					},
 					{
 						label: "Fee ",
 						headerKey: "headerPayables",
 						key: "payables",
-						style: { width: "17%" }
+						style: { width: "18%" }
 					},
-					{
-						label: "",
-						headerKey: "headerIcons",
-						key: "icons",
-						style: { width: "7%" }
-					}
 				],
-				toggleAddSteps: false,
+				// toggleAddSteps: false,
 				deleteInfo: {},
 				isDeletingStep: false,
 				steps: [],
-				paymentMethod: '',
-				paymentDate: new Date(),
+				// paymentMethod: '',
+				// paymentDate: new Date(),
 				amount: 0,
-				notes: '',
+				// notes: '',
 
 				isFull: false,
 
@@ -226,75 +166,75 @@
 					return sum
 				}, 0)
 			},
-			setPaymentMethod({ option }) {
-				this.paymentMethod = option
-			},
-			setFromDate(e) {
-				this.paymentDate = e
-			},
-			customFormatter(date) {
-				return moment(date).format('DD-MM-YYYY, HH:mm')
-			},
-			async reportToPayment() {
-				const data = {
-					paidAmount: this.amount,
-					unpaidAmount: (this.getUnpaidAmount - +this.amount).toFixed(2),
-					paymentMethod: this.paymentMethod,
-					paymentDate: this.paymentDate,
-					notes: this.notes
-				}
-				const reuslt = (await (this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-        if (reuslt === "Moved") {
-          await this.$router.push('/pangea-finance/invoicing-reports/paid-invoices/' + this.reportDetailsInfo._id)
-        }else {
-          await this.refreshReports()
-        }
-				this.amount = 0
-			},
-			updatePaidAmount(event) {
-				const value = event.target.value
-				console.log(value, this.amount)
-				if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
-					this.amount = (parseFloat(value)).toFixed(2)
-				}
-				this.$forceUpdate()
-			},
-			togglePaidFull(val) {
-				this.isFull = val
-				if (val) {
-					this.amount = this.getUnpaidAmount
-				}
-			},
+			// setPaymentMethod({ option }) {
+			// 	this.paymentMethod = option
+			// },
+			// setFromDate(e) {
+			// 	this.paymentDate = e
+			// },
+			// customFormatter(date) {
+			// 	return moment(date).format('DD-MM-YYYY, HH:mm')
+			// },
+			// async reportToPayment() {
+			// 	const data = {
+			// 		paidAmount: this.amount,
+			// 		unpaidAmount: this.getUnpaidAmount - +this.amount,
+			// 		// paymentMethod: this.paymentMethod,
+			// 		// paymentDate: this.paymentDate,
+			// 		// notes: this.notes
+			// 	}
+			// 	const reuslt = (await (this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
+      //   if (reuslt === "Moved") {
+      //     await this.$router.push('/pangea-finance/invoicing-reports/reports')
+      //   }else {
+      //     await this.refreshReports()
+      //   }
+			// 	this.amount = 0
+			// },
+			// updatePaidAmount(event) {
+			// 	const value = event.target.value
+			// 	console.log(value, this.amount)
+			// 	if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
+			// 		this.amount = (parseFloat(value)).toFixed(2)
+			// 	}
+			// 	this.$forceUpdate()
+			// },
+			// togglePaidFull(val) {
+			// 	this.isFull = val
+			// 	if (val) {
+			// 		this.amount = this.getUnpaidAmount
+			// 	}
+			// },
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY ")
 			},
-			async refreshReports() {
-				await this.openDetails(this.$route.params.id)
-				await this.getSteps()
-			},
-			changeToggleAddSteps() {
-				this.toggleAddSteps = !this.toggleAddSteps
-				if (this.toggleAddSteps) {
-					this.getSteps()
-				}
-			},
-			requestToDelete(stepId) {
-				this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
-				this.isDeletingStep = true
-			},
-			async deleteStep() {
-				const { reportId, stepId } = this.deleteInfo
-				this.closeModalStep()
-				await this.$http.post(`/invoicing-reports/report/${ reportId }/delete/${ stepId }`)
-				await this.refreshReports()
-
-			},
+			// async refreshReports() {
+			// 	await this.openDetails(this.$route.params.id)
+			// 	await this.getSteps()
+			// },
+			// changeToggleAddSteps() {
+			// 	this.toggleAddSteps = !this.toggleAddSteps
+			// 	if (this.toggleAddSteps) {
+			// 		this.getSteps()
+			// 	}
+			// },
+			// requestToDelete(stepId) {
+			// 	this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
+			// 	this.isDeletingStep = true
+			// },
+			// async deleteStep() {
+			// 	const { reportId, stepId } = this.deleteInfo
+			// 	this.closeModalStep()
+			// 	await this.$http.post(`/invoicing-reports/report/${ reportId }/delete/${ stepId }`)
+			// 	await this.refreshReports()
+      //
+			// },
 			closeModalStep() {
 				this.deleteInfo = {}
 				this.isDeletingStep = false
 			},
 			async openDetails(id) {
-				this.reportDetailsInfo = (await this.$http.post('/invoicing-reports/report/' + id)).data[0]
+				this.reportDetailsInfo = (await this.$http.post('/invoicing-reports/paid-report/' + id)).data[0]
 			},
 			async getSteps() {
 				this.steps = (await this.$http.post('/invoicing-reports/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
@@ -315,14 +255,13 @@
 				return +(parseFloat(rawUnpaidAmount)).toFixed(2)
 			}
 		},
-		async created() {
-			await this.openDetails(this.$route.params.id)
-      this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
+		created() {
+			this.openDetails(this.$route.params.id)
 		},
 		components: {
 			Button,
 			GeneralTable,
-			AddStepsToInvoicing,
+			// AddStepsToInvoicing,
 			ApproveModal,
 			SelectSingle,
 			DatepickerWithTime,

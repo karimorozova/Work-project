@@ -37,13 +37,44 @@
               i(class="fas fa-chalkboard-teacher")
 
     .title Old Invoices
-    .reports soon...
+    .reports
+      GeneralTable(
+        :fields="fields"
+        :tableData="reportsPaid"
+        :isBodyShort="true"
+      )
+        template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+          .table__header {{ field.label }}
 
+        template(slot="reportId" slot-scope="{ row, index }" )
+          .table__data {{ row.reportId }}
+
+        template(slot="dateRange" slot-scope="{ row, index }")
+          .table__data(v-html="dateRange(row)")
+
+        template(slot="status" slot-scope="{ row, index }")
+          .table__data {{ row.status }}
+
+        template(slot="jobs" slot-scope="{ row, index }")
+          .table__data {{ row.steps.length }}
+
+        template(slot="amount" slot-scope="{ row, index }")
+          .table__data
+            span.currency(v-html="'&euro;'")
+            span {{ getStepsPayables(row.steps).toFixed(2) }}
+
+        template(slot="created" slot-scope="{ row, index }")
+          .table__data {{ getTime( row.createdAt) }}
+
+        template(slot="details" slot-scope="{ row, index }")
+          .table__icon
+            router-link(:to="'/invoices/details-paid/' + row._id" target="_blank")
+              i(class="fas fa-chalkboard-teacher")
 
 </template>
 
 <script>
-	import { mapGetters, mapActions } from "vuex"
+	import { mapGetters } from "vuex"
 	import GeneralTable from "../../../components/pangea/GeneralTable"
 	import moment from "moment"
 
@@ -111,12 +142,16 @@
 			},
 			dateRange(row) {
 				return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999; margin: 0 1px;"> / </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
-			}
+			},
+      test() {
+        console.log(this.dava)
+      }
 		},
 		computed: {
 			...mapGetters({
-				reports: "getReports"
-			})
+        reportsPaid: "getReportsPaid",
+        reports: "getReports",
+			}),
 		},
 		components: { GeneralTable }
 	}

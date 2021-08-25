@@ -42,7 +42,6 @@ const paidOrAddPaymentInfo = async (reportId, data) => {
 	if ("Paid" === status) {
 		await InvoicingReports.aggregate([
 			{	"$match": {"_id" : ObjectId(reportId) } },
-			{"$unset" : [	"_id"	]	},
 			{
 				"$merge" : {
 					"into" : {

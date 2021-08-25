@@ -13,7 +13,7 @@ const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
-const { getReportByVendorId, setReportsNextStatus, getReport, clearReportsStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingReports')
+const { getReportByVendorId, getReportPaidByVendorId, setReportsNextStatus, getPaidReport, getReport, clearReportsStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingReports')
 
 
 router.get("/reports", checkVendor, async (req, res) => {
@@ -28,10 +28,34 @@ router.get("/reports", checkVendor, async (req, res) => {
 	}
 })
 
+router.get("/paid-reports", checkVendor, async (req, res) => {
+	const { token } = req.query
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		const reports = await getReportPaidByVendorId(verificationResult.vendorId)
+		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting reports info. Try later.")
+	}
+})
+
 router.get("/get-report", checkVendor, async (req, res) => {
 	const { reportId } = req.query
 	try {
 		let reports = await getReport(reportId)
+		reports = await clearReportsStepsPrivateKeys(reports)
+		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting report info. Try later.")
+	}
+})
+
+router.get("/get-report-paid", checkVendor, async (req, res) => {
+	const { reportId } = req.query
+	try {
+		let reports = await getPaidReport(reportId)
 		reports = await clearReportsStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {

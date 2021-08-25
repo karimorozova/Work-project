@@ -7,6 +7,7 @@ export const getAlertMessage = state => state.alertMessage;
 export const getAlertType = state => state.alertType;
 export const getToken = state => state.token;
 export const getVendor = state => state.vendor;
+export const getReportsPaid = state => state.reportsPaid;
 export const getReports = state => state.reports;
 export const getAccountInfo = state => state.accountInfo;
 export const getNewPassword = state => state.newPassword;

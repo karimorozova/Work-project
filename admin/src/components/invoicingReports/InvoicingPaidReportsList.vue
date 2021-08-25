@@ -19,17 +19,17 @@
             input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
             .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
               i.fas.fa-backspace
-        .filter__item
-          label Status:
-          .filter__input
-            SelectSingle(
-              :selectedOption="selectedStatus"
-              :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
-              placeholder="Option"
-              @chooseOption="setStatus"
-              :isRemoveOption="true"
-              @removeOption="removeStatus"
-            )
+        //.filter__item
+        //  label Status:
+        //  .filter__input
+        //    SelectSingle(
+        //      :selectedOption="selectedStatus"
+        //      :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Paid']"
+        //      placeholder="Option"
+        //      @chooseOption="setStatus"
+        //      :isRemoveOption="true"
+        //      @removeOption="removeStatus"
+        //    )
         .filter__item
           label Vendors:
           .filter__input
@@ -111,17 +111,17 @@
           @bottomScrolled="bottomScrolled"
         )
           template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-            .table__header(v-if="field.headerKey === 'headerCheck'")
-              CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-            .table__header(v-else) {{ field.label }}
+            //.table__header(v-if="field.headerKey === 'headerCheck'")
+            //  CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+            .table__header {{ field.label }}
 
-          template(slot="check" slot-scope="{ row, index }")
-            .table__data
-              CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+          //template(slot="check" slot-scope="{ row, index }")
+          //  .table__data
+          //    CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
           template(slot="reportId" slot-scope="{ row, index }" )
             .table__data
-              router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/reports/${row._id}`}")
+              router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/paid-invoices/${row._id}`}")
                 span {{ row.reportId }}
 
           template(slot="dateRange" slot-scope="{ row, index }")
@@ -148,10 +148,6 @@
 
           template(slot="updated" slot-scope="{ row, index }")
             .table__data {{ getTime( row.updatedAt) }}
-
-          template(slot="icon" slot-scope="{ row, index }")
-            .table__icon
-              i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
         .table__empty(v-if="!reports.length") Nothing found...
 
@@ -180,67 +176,55 @@
 					days: [ 6, 0 ]
 				},
 				fields: [
-					{
-						label: "",
-						headerKey: "headerCheck",
-						key: "check",
-						style: { width: "35px" }
-					},
-					{
-						label: "Report Id",
-						headerKey: "headerReportId",
-						key: "reportId",
-						style: { width: "150px" }
-					},
-					{
-						label: "Vendor Name",
-						headerKey: "headerVendorName",
-						key: "vendorName",
-						style: { width: "210px" }
-					},
-					{
-						label: "Date Range",
-						headerKey: "headerDateRange",
-						key: "dateRange",
-						style: { width: "210px" }
-					},
-					{
-						label: "Status",
-						headerKey: "headerStatus",
-						key: "status",
-						style: { width: "140px" }
-					},
-					{
-						label: "Jobs",
-						headerKey: "headerJobs",
-						key: "jobs",
-						style: { width: "140px" }
-					},
-					{
-						label: "Amount",
-						headerKey: "headerAmount",
-						key: "amount",
-						style: { width: "140px" }
-					},
-					{
-						label: "Created On",
-						headerKey: "headerCreated",
-						key: "created",
-						style: { width: "190px" }
-					},
-					{
-						label: "Updated On",
-						headerKey: "headerUpdated",
-						key: "updated",
-						style: { width: "190px" }
-					},
-					{
-						label: "",
-						headerKey: "headerIcon",
-						key: "icon",
-						style: { width: "57px" }
-					}
-				],
+          {
+            label: "Report Id",
+            headerKey: "headerReportId",
+            key: "reportId",
+            style: { width: "197px" }
+          },
+          {
+            label: "Vendor Name",
+            headerKey: "headerVendorName",
+            key: "vendorName",
+            style: { width: "210px" }
+          },
+          {
+            label: "Date Range",
+            headerKey: "headerDateRange",
+            key: "dateRange",
+            style: { width: "210px" }
+          },
+          {
+            label: "Status",
+            headerKey: "headerStatus",
+            key: "status",
+            style: { width: "155px" }
+          },
+          {
+            label: "Jobs",
+            headerKey: "headerJobs",
+            key: "jobs",
+            style: { width: "155px" }
+          },
+          {
+            label: "Amount",
+            headerKey: "headerAmount",
+            key: "amount",
+            style: { width: "155px" }
+          },
+          {
+            label: "Created On",
+            headerKey: "headerCreated",
+            key: "created",
+            style: { width: "190px" }
+          },
+          {
+            label: "Updated On",
+            headerKey: "headerUpdated",
+            key: "updated",
+            style: { width: "190px" }
+          }
+        ],
 				isDataRemain: true,
 
 				reportId: '',
@@ -300,9 +284,9 @@
 			setStatus({ option }) {
 				this.replaceRoute('status', option)
 			},
-			removeStatus() {
-				this.replaceRoute('status', '')
-			},
+			// removeStatus() {
+			// 	this.replaceRoute('status', '')
+			// },
 			getTime(time) {
 				return moment(time).format('DD-MM-YYYY, HH:mm')
 			},
@@ -392,7 +376,7 @@
 				this.deleteRequestId = ''
 			},
 			async getReports() {
-				this.reports = (await this.$http.post('/invoicing-reports/reports', {
+				this.reports = (await this.$http.post('/invoicing-reports/paid-reports', {
 					countToSkip: 0,
 					countToGet: 100,
 					filters: this.allFilters
@@ -400,7 +384,7 @@
 			},
 			async bottomScrolled() {
 				if (this.isDataRemain) {
-					const result = await this.$http.post("/invoicing-reports/reports", {
+					const result = await this.$http.post("/invoicing-reports/paid-reports", {
 						filters: this.allFilters,
 						countToSkip: this.reports.length,
 						countToGet: 100
@@ -429,9 +413,9 @@
 			ifSomeCheck() {
 				return this.reports.length && this.reports.some(item => item.isCheck)
 			},
-			selectedStatus() {
-				return this.$route.query.status || ''
-			},
+			// selectedStatus() {
+			// 	return this.$route.query.status || ''
+			// },
 			selectedVendors() {
 				return this.$route.query.vendors && this.vendorsList.length
 						? this.$route.query.vendors.split(',').map(_id => {

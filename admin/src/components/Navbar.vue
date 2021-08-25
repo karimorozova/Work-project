@@ -290,23 +290,28 @@
 							// 	name: 'Finance',
 							// 	path: '/pangea-finance/finance'
 							// },
-							{
-								type: 'group',
-								path: 'invoicing-reports',
-								name: 'Payables',
-								isOpen: false,
-								children: [
-									{
-										type: 'link',
-										path: '/pangea-finance/invoicing-reports/reports',
-										name: 'Reports'
-									},
-									{
-										type: 'link',
-										path: '/pangea-finance/invoicing-reports/create-reports',
-										name: 'Add Reports'
-									}
-								]
+              {
+                type: 'group',
+                path: 'invoicing-reports',
+                name: 'Payables',
+                isOpen: false,
+                children: [
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/invoicing-reports/reports',
+                    name: 'Invoices'
+                  },
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/invoicing-reports/paid-invoices',
+                    name: 'Paid Invoices'
+                  },
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/invoicing-reports/create-reports',
+                    name: 'Add Invoices'
+                  },
+                ]
 
 							}
 						]
