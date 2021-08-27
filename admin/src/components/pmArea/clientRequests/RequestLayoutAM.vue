@@ -1059,6 +1059,7 @@
       padding: 20px 30px;
       border: 1px solid $light-border;
       border-radius: 4px;
+      height: fit-content;
     }
 
     &__projectName {
