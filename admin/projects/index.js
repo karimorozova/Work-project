@@ -52,11 +52,11 @@ const {
 const {
 	createProject,
 	createTasks,
-	createTasksFromRequest,
 	createRequestTasks,
 	updateRequestTasks,
 	createProjectFromRequest,
-	autoCreatingTaskInProject
+	autoCreatingTaskInProject,
+	autoCreatingTranslationTaskInProject
 } = require('./create')
 
 // const {
@@ -106,6 +106,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	autoCreatingTranslationTaskInProject,
 	manageProjectName,
 	copyProjectFiles,
 	setStepDeadlineProjectAndMemoq,
@@ -153,7 +154,6 @@ module.exports = {
 	getProjectAfterFinanceUpdated,
 	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
-	createTasksFromRequest,
 	createTasksForWordcount,
 	downloadCompletedFiles,
 	notifyManagerStepStarted,

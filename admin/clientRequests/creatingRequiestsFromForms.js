@@ -5,16 +5,16 @@ const { allManagersMessageRequestIsCreated } = require('../emailMessages/interna
 const { managerNotifyMail } = require('../utils/mailTemplate')
 
 
-const complianceService = async (formData, client) => {
+const translationServiceRequest = async (formData, client) => {
 	const { billingInfo: { paymentType: paymentProfile }, _id } = client
 	const { deadline, projectName, brief, startOption } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
 	const targetLanguages = JSON.parse(formData.targetLanguages)
 	const industry = JSON.parse(formData.industry)
-	const complianceTemplate = JSON.parse(formData.complianceTemplate)
 	const clientContacts = JSON.parse(formData.clientContacts)
 	const createdBy = JSON.parse(formData.createdBy)
+
 	return await ClientRequest.create({
 		projectId: "Req " + moment(new Date()).format("YYYY MM DD") + " " + await getNextNumberForProjectName(),
 		projectName,
@@ -30,7 +30,44 @@ const complianceService = async (formData, client) => {
 		status: "Client Request",
 		notes: brief,
 		createdBy,
+		checkedForm: {
+			isCheckComplianceTemplate: true
+		},
+		requestForm: {
+			sourceLanguage,
+			targetLanguages,
+			startOption,
+			service: await Services.findOne({ title: 'Translation' }),
+		}
+	})
+}
 
+const complianceServiceRequest = async (formData, client) => {
+	const { billingInfo: { paymentType: paymentProfile }, _id } = client
+	const { deadline, projectName, brief, startOption } = formData
+
+	const sourceLanguage = JSON.parse(formData.sourceLanguage)
+	const targetLanguages = JSON.parse(formData.targetLanguages)
+	const industry = JSON.parse(formData.industry)
+	const complianceTemplate = JSON.parse(formData.complianceTemplate)
+	const clientContacts = JSON.parse(formData.clientContacts)
+	const createdBy = JSON.parse(formData.createdBy)
+
+	return await ClientRequest.create({
+		projectId: "Req " + moment(new Date()).format("YYYY MM DD") + " " + await getNextNumberForProjectName(),
+		projectName,
+		clientContacts,
+		paymentProfile,
+		startDate: new Date(),
+		deadline,
+		billingDate: deadline,
+		industry,
+		customer: _id,
+		projectManager: null,
+		accountManager: null,
+		status: "Client Request",
+		notes: brief,
+		createdBy,
 		requestForm: {
 			sourceLanguage,
 			targetLanguages: [ targetLanguages ],
@@ -39,19 +76,9 @@ const complianceService = async (formData, client) => {
 			complianceOptions: complianceTemplate
 		}
 	})
-
-	//internal functions
-	async function getNextNumberForProjectName() {
-		let todayStart = new Date()
-		let todayEnd = new Date(todayStart)
-		todayStart.setUTCHours(0, 0, 0, 0)
-		todayEnd.setUTCHours(23, 59, 59, 0)
-		const todayProjects = await ClientRequest.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
-		return todayProjects.length < 10 ? "[0" + (todayProjects.length + 1) + "]" : "[" + (todayProjects.length + 1) + "]"
-	}
 }
 
-const createComplianceFiles = async (request, files) => {
+const createRequestFiles = async (request, files) => {
 	const { _id, requestForm } = request
 	const sourceFiles = files.sourceFiles ? await storeRequestFiles(files.sourceFiles, _id) : []
 	const refFiles = files.refFiles ? await storeRequestFiles(files.refFiles, _id) : []
@@ -69,9 +96,30 @@ const notifyAMsRequestCreated = async (request) => {
 	}
 }
 
+const getNextNumberForProjectName = async () => {
+	let todayStart = new Date()
+	let todayEnd = new Date(todayStart)
+
+	todayStart.setUTCHours(0, 0, 0, 0)
+	todayEnd.setUTCHours(23, 59, 59, 0)
+
+	const todayProjects = await ClientRequest.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
+
+	let currNumber = 0
+	if (todayProjects.length) {
+		const pa = new RegExp(/(\[(?<num>\d.*)\])/)
+		const lastProject = todayProjects[todayProjects.length - 1]
+		const res = pa.exec(lastProject.projectId)
+		if (res) currNumber = parseFloat(res.groups.num)
+	}
+
+	return currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
+}
+
 
 module.exports = {
-	complianceService,
+	translationServiceRequest,
+	complianceServiceRequest,
 	notifyAMsRequestCreated,
-	createComplianceFiles
+	createRequestFiles
 }

@@ -85,15 +85,17 @@
           .input-title
             .input-title__text Industry:
             span.require *
-          input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" :disabled="!canUpdateRequest")
-          .project__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="project.industry.name"
-              :options="industriesList"
-              @chooseOption="setIndustry"
-              placeholder="Industry"
-              :isDisabled="!canUpdateRequest"
-            )
+          input.project__input-text(type="text" :value="project.industry.name" :disabled="true")
+          // TODO: (not delete) add ability to change industry....
+          //input.project__input-text( v-if="project.tasks && project.tasks.length" type="text" :value="project.industry.name" :disabled="!canUpdateRequest")
+          //.project__drop-menu(v-else)
+          //  SelectSingle(
+          //    :selectedOption="project.industry.name"
+          //    :options="industriesList"
+          //    @chooseOption="setIndustry"
+          //    placeholder="Industry"
+          //    :isDisabled="!canUpdateRequest"
+          //  )
         .hide-elem
         .hide-elem
       //TODO: delete
@@ -109,10 +111,10 @@
       .project__info-row.project_no-margin
         .project__textarea
           LabelValue(label="Project Brief" customClass="project_textarea")
-            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.brief" aria-disabled="!canUpdateRequest")
+            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.brief" )
         .project__textarea
           LabelValue(label="Internal Notes" customClass="project_textarea")
-            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.notes" aria-disabled="!canUpdateRequest")
+            textarea.project__text(type="text" disabled="true" rows="9" v-model="project.notes" )
 
       .project__button(v-if="!project.projectId")
         Button(
@@ -178,7 +180,7 @@
 			async changeProjectName(projectName) {
 				this.errors = []
 				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) this.errors.push("Please, enter valid Project name.")
-				if (!this.project.projectName ) this.errors.push("Please, enter valid Project name.")
+				if (!this.project.projectName) this.errors.push("Please, enter valid Project name.")
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					return
@@ -252,7 +254,7 @@
 			async checkForErrors() {
 				this.errors = []
 				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
-				if (!this.project.projectName ) {
+				if (!this.project.projectName) {
 					this.errors.push("Please, enter valid Project name.")
 					this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 				}

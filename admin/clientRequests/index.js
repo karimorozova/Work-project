@@ -1,41 +1,43 @@
-const  {
+const {
 	getClientRequestById,
-  getClientRequestAfterUpdate,
+	getClientRequestAfterUpdate,
 	getClientsRequests,
-	removeClientRequestById,
+	removeClientRequestById
 } = require('./getClientsRequests')
 
 const {
-	complianceService,
-	createComplianceFiles,
-	notifyAMsRequestCreated
+	complianceServiceRequest,
+	createRequestFiles,
+	notifyAMsRequestCreated,
+	translationServiceRequest
 } = require('./creatingRequiestsFromForms')
 
 
 const {
 	uploadRequestFiles,
 	checkRequestedFiles,
-	manageClientContacts,
-} =  require('./clientRequestStep1')
+	manageClientContacts
+} = require('./clientRequestStep1')
 
 const {
-  updateClientRequestProps,
-  updateClientContacts,
-  removeContactClientRequest,
-  sendMailToClient,
-} =  require('./clientRequestStep2')
+	updateClientRequestProps,
+	updateClientContacts,
+	removeContactClientRequest,
+	sendMailToClient
+} = require('./clientRequestStep2')
 
 const {
 	storeRequestFilesForTasksAndSteps,
 	getTaskCopiedFiles,
-	getTaskCopiedFilesFromRequestToProject,
+	getTaskCopiedFilesFromRequestToProject
 } = require('./files')
 
 
 module.exports = {
+	translationServiceRequest,
 	notifyAMsRequestCreated,
-	complianceService,
-	createComplianceFiles,
+	complianceServiceRequest,
+	createRequestFiles,
 	uploadRequestFiles,
 	checkRequestedFiles,
 	manageClientContacts,
@@ -46,8 +48,8 @@ module.exports = {
 	getClientRequestById,
 	updateClientRequestProps,
 	getClientRequestAfterUpdate,
-  updateClientContacts,
+	updateClientContacts,
 	removeClientRequestById,
-  removeContactClientRequest,
-  sendMailToClient,
+	removeContactClientRequest,
+	sendMailToClient
 }

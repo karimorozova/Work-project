@@ -1,15 +1,15 @@
 <template lang="pug">
   .layout(v-if="currentClientRequest._id")
     .content(v-if="currentClientRequest.status === 'Client Request'")
-      FormLayoutCompliance
+      RequestLayoutAM
     .content(v-if="currentClientRequest.status === 'Request Approved'")
-      RequestLayout
+      RequestLayoutPM
 </template>
 
 <script>
 	import { mapGetters, mapActions } from "vuex"
-	import FormLayoutCompliance from "./FormLayoutCompliance"
-	import RequestLayout from "./RequestLayout"
+	import RequestLayoutAM from "./RequestLayoutAM"
+	import RequestLayoutPM from "./RequestLayoutPM"
 
 	export default {
 		data() {
@@ -33,7 +33,7 @@
 				currentClientRequest: "getCurrentClientRequest"
 			})
 		},
-		components: { RequestLayout, FormLayoutCompliance },
+		components: { RequestLayoutAM, RequestLayoutPM },
 		created() {
 			this.getClientRequest()
 		},

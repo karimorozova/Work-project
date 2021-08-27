@@ -1,7 +1,7 @@
 <template lang="pug">
   .tasks-data
     .tasks-data__main
-      .tasks-data__item(v-if="currentProject._id")
+      .tasks-data__item(v-if="currentProject._id && templates.length")
         RequestServiceAndWorkflow(
           :currentProject="currentProject"
           :originallyLanguages="originallyLanguages"
@@ -72,19 +72,13 @@
 </template>
 
 <script>
-	// import TasksFiles from "./TasksFiles"
-	// import TasksFilesRequested from "./TasksFilesRequested"
-	// import JobSettings from "./JobSettings"
-	// import SelectSingle from "../../../SelectSingle"
 	import RequestServiceAndWorkflow from "./RequestServiceAndWorkflow"
-	// import BigToggler from "@/components/BigToggler"
 	import { mapGetters, mapActions } from "vuex"
 	import RequestTasksLangs from "./RequestTasksLangs"
 	import RequestTasksLangsDuo from "./RequestTasksLangsDuo"
 	import RequestJobSettings from "./RequestJobSettings"
 	import RequestTasksFiles from "./RequestTasksFiles"
 	import Button from "../../../Button"
-	// import DataTable from "../../../DataTable"
 
 	export default {
 		props: {
@@ -100,14 +94,14 @@
 				templates: [],
 				sourceLanguages: [],
 				targetLanguages: [],
-				// errors: [],
+				errors: [],
 				setPossibleTargetsAction: false
 			}
 		},
 		methods: {
 			...mapActions([ "alertToggle", "setTasksDataValueRequest", "setRequestValue", "setCurrentClientRequest" ]),
 			endOfSettingTaskData() {
-        this.$emit('endOfSettingTaskData')
+				this.$emit('endOfSettingTaskData')
 			},
 			setSourceLang({ symbol }) {
 				const language = this.originallyLanguages.find((item) => item.symbol === symbol)
@@ -123,15 +117,6 @@
 				this.setTasksDataValueRequest({ prop: "targets", value: targets })
 				this.targetLanguages = [ ...targets ]
 			},
-			// isRefFilesHasSource() {
-			// 	const { sourceFiles, refFiles } = this.tasksData
-			// 	if (!refFiles || !refFiles.length) return false
-			// 	for (let file of refFiles) {
-			// 		const sourceFile = sourceFiles.find((item) => item.name === file.name)
-			// 		if (sourceFile) return true
-			// 	}
-			// 	return false
-			// },
 			async checkForErrors() {
 				this.errors = []
 				const {
@@ -141,7 +126,8 @@
 					refFiles,
 					workflow,
 					stepsDates,
-					stepsAndUnits
+					stepsAndUnits,
+					sourceFilesVault
 				} = this.tasksData
 
 				if (workflow.id === 2917) {
@@ -153,29 +139,28 @@
 				if (!targets || !targets.length) this.errors.push("Please, select Target language(s).")
 
 				if (this.currentUnit === "CAT Wordcount") {
-					if (!sourceFiles || !sourceFiles.length) this.errors.push("Please, upload Source file(s).")
+					if (this.currentTaskIdForUpdate) {
+						const taskData = this.currentProject.tasksAndSteps.find(({ taskId }) => taskId === this.currentTaskIdForUpdate)
+						if (!taskData.sourceFiles.length) {
+							if ((!sourceFilesVault || !sourceFilesVault.length) && (!sourceFiles || !sourceFiles.length)) this.errors.push("Please, upload Source file(s).")
+						}
+					} else {
+						if ((!sourceFilesVault || !sourceFilesVault.length) && (!sourceFiles || !sourceFiles.length)) this.errors.push("Please, upload Source file(s).")
+					}
 				}
 
 				if (this.isDeadlineMissed()) this.errors.push("Please, update deadline (Project's or tasks).")
 
-				if((refFiles && refFiles.length) && (sourceFiles && sourceFiles.length)) {
-					if (new Set( [...sourceFiles, ...refFiles].map(({name})=> name)).size !==  [...sourceFiles, ...refFiles].length) this.errors.push("Reference file cannot be the same as Source.")
+				if ((refFiles && refFiles.length) && (sourceFiles && sourceFiles.length)) {
+					if (new Set([ ...sourceFiles, ...refFiles ].map(({ name }) => name)).size !== [ ...sourceFiles, ...refFiles ].length) this.errors.push("Reference file cannot be the same as Source.")
 				}
 
-				const isUnitCAT = stepsAndUnits.map((i) => i.unit).includes("CAT Wordcount")
-
+				const isUnitCAT = stepsAndUnits.map(i => i.unit).includes("CAT Wordcount")
 				const isStepLanguageOnTargetLanguage = targets.map((i) => i.lang).includes(source.lang)
-
 				if (isUnitCAT && isStepLanguageOnTargetLanguage) this.errors.push('Target and Source Languages cannot be a same if a unit "CAT Wordcount" is selected')
 
 				if (this.countCATWordcount >= 1) {
-					let isCATWordcount = []
-					stepsAndUnits.forEach((element) => {
-						isCATWordcount.push(element.hasOwnProperty("template"))
-					})
-					if (!isCATWordcount.includes(true)) {
-						this.errors.push("Please, select Template.")
-					}
+					if (!Object.keys(stepsAndUnits.find(item => item.hasOwnProperty('template')).template).length) this.errors.push("Please, select Template.")
 				} else {
 					if (workflow.id === 2917) {
 						const [ elem1, elem2 ] = stepsAndUnits
@@ -217,50 +202,12 @@
 					}
 				}
 			},
-			checkRequestFies() {
-				// const { sourceFiles, refFiles } = this.currentProject
-				//
-				// if (this.currentUnit === "CAT Wordcount" && !sourceFiles.length)
-				// 	this.errors.push("Please, upload Source file(s).")
-				//
-				// reference file is not mandatory!
-				// if (this.currentUnit !== "CAT Wordcount" && !refFiles.length)
-				//   this.errors.push("Please, upload Reference file(s).");
-			},
-			// checkHoursSteps() {
-			//     if(this.currentUnit === 'Hours') {
-			//         const steps = [...this.tasksData.service.steps];
-			//         const length = +this.tasksData.workflow.name.split(" ")[0];
-			//         for(let i = 0; i < length; i++) {
-			//             if(!this.tasksData[`${steps[i].step.symbol}-quantity`]
-			//              || !this.tasksData[`${steps[i].step.symbol}-hours`]) {
-			//                 this.errors.push("Please, set Hours and Quantity for all service steps.");
-			//                 return;
-			//             }
-			//         }
-			//     }
-			// },
-			async assignManager() {
-				// await this.setRequestValue({
-				// 	id: this.currentProject._id,
-				// 	prop: "isAssigned",
-				// 	value: !this.currentProject.isAssigned,
-				// 	isEmail: true
-				// })
-			},
 			async addTasks() {
-				this.$emit("addTasks", { ...this.tasksData, refFiles: this.tasksData.refFiles || [] })
-				// this.clearInputFiles(".tasks-data__source-file")
-				// this.clearInputFiles(".tasks-data__ref-file")
-			},
-			clearInputFiles(str) {
-				// let inputFiles = document.querySelectorAll(str)
-				// for (let elem of inputFiles) {
-				// 	elem.value = ""
-				// }
-			},
-			setServiceForm() {
-				// this.isMonoService = this.tasksData.service.languageForm === "Mono"
+				this.$emit("addTasks", {
+					...this.tasksData,
+					refFiles: this.tasksData.refFiles || [],
+					sourceFiles: this.tasksData.sourceFiles || []
+				})
 			},
 			async getMemoqTemplates() {
 				try {
@@ -277,11 +224,9 @@
 				tasksData: "getTasksDataRequest"
 			}),
 			countCATWordcount() {
-				// if (this.tasksData.stepsAndUnits) {
-				// 	return this.tasksData.stepsAndUnits.filter(
-				// 			(item) => item.unit === "CAT Wordcount"
-				// 	).length
-				// }
+				if (this.tasksData.stepsAndUnits) {
+					return this.tasksData.stepsAndUnits.filter(item => item.unit === "CAT Wordcount").length
+				}
 			},
 			sortedJobs() {
 				if (this.tasksData.stepsAndUnits) return this.tasksData.stepsAndUnits.sort((a, b) => a.stepCounter - b.stepCounter)
@@ -293,7 +238,7 @@
 			},
 			currentUnit() {
 				if (this.tasksData.stepsAndUnits) {
-					return this.tasksData.stepsAndUnits.find((item) => item.unit === "CAT Wordcount") ? this.tasksData.stepsAndUnits.find((item) => item.unit === "CAT Wordcount").unit : ""
+					return this.tasksData.stepsAndUnits.find(item => item.unit === "CAT Wordcount") ? this.tasksData.stepsAndUnits.find(item => item.unit === "CAT Wordcount").unit : ""
 				}
 			},
 			areAllFilesApproved() {
@@ -328,10 +273,6 @@
 			// BigToggler
 		},
 		async created() {
-			// if (!this.currentProject.customer) {
-			// 	const curClientRequest = await this.$http.post(`/clients-requests/by-id/${ id }`)
-			// 	this.setCurrentClientRequest(curClientRequest.data)
-			// }
 			await this.getMemoqTemplates()
 		}
 	}
@@ -343,7 +284,7 @@
   .tasks-data {
     position: relative;
 
-    &__files{
+    &__files {
       padding: 0 10px 20px;
     }
 

@@ -1,27 +1,25 @@
 <template lang="pug">
   .tasks-files
-    .tasks-files__table
-      DataTable(
+    .table
+      GeneralTable(
         :fields="fields"
         :tableData="filesData"
-        :bodyClass="filesData.length < 6 ? 'tbody_visible-overflow' : ''"
-        :tableheadRowClass="filesData.length < 6 ? 'tbody_visible-overflow' : ''"
-        bodyRowClass="steps-table-row"
       )
         template(slot="headerFileName" slot-scope="{ field }")
-          span.step-files__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerCategory" slot-scope="{ field }")
-          span.step-files__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerIcon" slot-scope="{ field }")
-          span.step-files__label {{ field.label }}
+          .table__header {{ field.label }}
 
         template(slot="fileName" slot-scope="{ row, index }")
-          span.step-files__data {{ row.name }}
+          .table__data {{ row.name }}
         template(slot="category" slot-scope="{ row, index }")
-          span.step-files__data {{ row.category }}
+          .table__data {{ row.category }}
         template(slot="icon" slot-scope="{ row, index }")
-          span.step-files__data.step-files__dataIcon(@click="removeFile(row.name, row.category)")
-            img(src="../../../assets/images/Other/delete-icon-qa-form.png")
+          .table__icons
+            .table__icon(@click="removeFile(row.name, row.category)")
+              img(src="../../../assets/images/Other/delete-icon-qa-form.png")
 
     .tasks-files__tableAdd(id="add")
       Add(@add="openUploadModal")
@@ -70,6 +68,7 @@
 	import { mapActions } from 'vuex'
 	import DataTable from "../../DataTable"
 	import Add from "../../Add"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -80,9 +79,9 @@
 		data() {
 			return {
 				fields: [
-					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "60%", padding: 0 },
-					{ label: "Category", headerKey: "headerCategory", key: "category", width: "30%", padding: 0 },
-					{ label: "", headerKey: "headerIcon", key: "icon", width: "10%", padding: 0, cellClass: "step-files_centered" }
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", style: { width: "60%" } },
+					{ label: "Category", headerKey: "headerCategory", key: "category", style: { width: "30%" } },
+					{ label: "", headerKey: "headerIcon", key: "icon", style: { width: "10%" } }
 				],
 				sourceFiles: [],
 				refFiles: [],
@@ -161,6 +160,7 @@
 					this.clearInputFiles(".files-upload__source-file")
 				}
 				this.setDataValue({ prop: "sourceFiles", value: this.sourceFiles })
+				this.closeUploadModal()
 			},
 			uploadRefFiles({ files }) {
 				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 50)
@@ -168,8 +168,8 @@
 					this.showFileSizeWarning = true
 				}
 				const filteredFiles = Array.from(files).filter(item => {
-          return item.size / 1000000 <= 50
-        })
+					return item.size / 1000000 <= 50
+				})
 				if (filteredFiles.length) {
 					for (let file of files) {
 						const isExist = this.refFiles.find(item => item.name === file.name)
@@ -182,6 +182,7 @@
 					this.clearInputFiles(".files-upload__ref-file")
 				}
 				this.setDataValue({ prop: "refFiles", value: this.refFiles })
+				this.closeUploadModal()
 			},
 			deleteFile({ index }, prop) {
 				this[prop].splice(index, 1)
@@ -212,6 +213,7 @@
 			}
 		},
 		components: {
+			GeneralTable,
 			Add,
 			DataTable,
 			FilesUpload,
@@ -236,6 +238,27 @@
 </script>
 
 <style lang="scss" scoped>
+
+  .table {
+    &__header,
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__icons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      height: 40px;
+    }
+
+    &__icon {
+      cursor: pointer;
+    }
+  }
+
   .step-files {
     &__data {
       display: flex;
@@ -252,7 +275,7 @@
   .tasks-files {
     position: relative;
 
-    &__tableAdd{
+    &__tableAdd {
       width: 100px;
     }
 

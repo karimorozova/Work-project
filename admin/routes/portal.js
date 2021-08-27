@@ -17,9 +17,10 @@ const {
 	// updateClientRequest,
 	// clientRequestNotification,
 	// notifyRequestCancelled,
-	complianceService,
-	createComplianceFiles,
-	notifyAMsRequestCreated
+	complianceServiceRequest,
+	createRequestFiles,
+	notifyAMsRequestCreated,
+	translationServiceRequest
 } = require('../clientRequests')
 
 const { getAfterTaskStatusUpdate } = require('../clients')
@@ -34,10 +35,9 @@ router.post('/translation-service-request', checkClientContact, upload.fields([ 
 	try {
 		const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
 		let client = await getClient({ "_id": verificationResult.clientId })
-
-		console.log(req.body, req.files)
-		// const request = await complianceService(req.body, client)
-		// await createComplianceFiles(request, req.files)
+		const request = await translationServiceRequest(req.body, client)
+		await createRequestFiles(request, req.files)
+		//  TODO setup
 		// notifyAMsRequestCreated(request)
 		res.send('Done')
 	} catch (err) {
@@ -50,8 +50,8 @@ router.post('/compliance-service-request', checkClientContact, upload.fields([ {
 	try {
 		const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
 		let client = await getClient({ "_id": verificationResult.clientId })
-		const request = await complianceService(req.body, client)
-		await createComplianceFiles(request, req.files)
+		const request = await complianceServiceRequest(req.body, client)
+		await createRequestFiles(request, req.files)
 		notifyAMsRequestCreated(request)
 		res.send('Done')
 	} catch (err) {

@@ -80,10 +80,12 @@
 				this.setPossibleTargets()
 				this.targetChosen = this.targetAll
 				this.targetAll = []
+				this.emitTargets()
 			},
 			removeAll() {
 				this.setPossibleTargets()
 				this.targetChosen = []
+				this.emitTargets()
 			},
 			...mapActions({
 				storeProject: "setCurrentProject",

@@ -12,6 +12,7 @@
           @close="setDefault"
         )
       .form__wrapper(v-if="!canUpdateRequest()")
+      .form__title General Information
       .form__group
         .form__inputsGroup
           .form__inputs
@@ -19,17 +20,6 @@
               .input__title Project Name:
               input(type="text" :disabled="currentClientRequest.checkedForm.isCheckProjectName" v-model="currentClientRequest.projectName" @change="changeProjectName('projectName', currentClientRequest.projectName)" placeholder="Project Name")
               Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
-            .form__assignedPm
-              .input__title Assign to Project Manager:
-              SelectSingle(
-                :options="managers",
-                placeholder="Project Manager",
-                :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
-                @chooseOption="setPM"
-              )
-
-
-          .form__inputs
             .form__projectDeadline
               .input__title Suggested Deadline:
               DatepickerWithTime(
@@ -48,40 +38,52 @@
                 i.calendar.far.fa-calendar-alt
               Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
 
-            .form__assignedPm
-              .input__title Assign to Account Manager:
-              SelectSingle(
-                :options="accountManagers",
-                placeholder="Account Manager",
-                :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
-                @chooseOption="approveChangeAM"
-              )
 
-        .form__contacts
-          .input__title Client Contacts
-          DataTable(
-            :fields="fields3"
-            :tableData="currentClientRequest.clientContacts"
-            :bodyClass="['form-table-body', {'tbody_visible-overflow': currentClientRequest.clientContacts.length < 10}]"
-            :tableheadRowClass="currentClientRequest.clientContacts.length < 10 ? 'tbody_visible-overflow' : ''"
-            :headCellClass="'padding-with-check-box'"
-            :tableheadClass="'hideHead'"
-          )
-            div(slot="name" slot-scope="{ row, index }")
-              .contacts__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
-              .contacts__dataDrop(v-else)
+          .form__inputs
+            .form__assignedPm
+              .input__title Assign to Project Manager:
+              .drop-white
                 SelectSingle(
-                  :isTableDropMenu="true"
-                  :options="availableContacts"
-                  @chooseOption="setContact"
+                  :options="managers",
+                  placeholder="Option",
+                  :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
+                  @chooseOption="setPM"
                 )
 
-            .contacts__dataIcon(slot="icon" slot-scope="{ row, index }")
-              span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
-                i.fas.fa-trash
+            .form__assignedPm
+              .input__title Assign to Account Manager:
+              .drop-white
+                SelectSingle(
+                  :options="accountManagers",
+                  placeholder="Option",
+                  :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
+                  @chooseOption="approveChangeAM"
+                )
+
+        .form__contacts
+          .table
+            GeneralTable(
+              :fields="fields3"
+              :tableData="currentClientRequest.clientContacts"
+            )
+              .table__header(slot="headerName" slot-scope="{ field }") {{ field.label }}
+
+              .table__col(slot="name" slot-scope="{ row, index }")
+                .table__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
+                .table__dataDrop(v-else)
+                  SelectSingle(
+                    :isTableDropMenu="true"
+                    :options="availableContacts"
+                    @chooseOption="setContact"
+                  )
+
+              .table__dataIcon(slot="icon" slot-scope="{ row, index }")
+                span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
+                  i.fas.fa-trash
 
           Add(v-if="canUpdateRequest()" @add="addContact")
 
+      .form__title Files Preparation & Options
       .form__table-box
         .form__table
           .approveModal(v-if="isDeleteModal")
@@ -93,84 +95,84 @@
               @notApprove="closeDeleteFileApprovalModal"
               @close="closeDeleteFileApprovalModal"
             )
-          DataTable(
-            :fields="fields"
-            :tableData="files"
-            :bodyClass="['form-table-body', {'tbody_visible-overflow': files.length < 10}]"
-            :tableheadRowClass="files.length < 10 ? 'tbody_visible-overflow' : ''"
-          )
-            .form__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
-            .form__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
-            .form__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
+          .table
+            GeneralTable(
+              :fields="fields"
+              :tableData="files"
+            )
+              .table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
+              .table__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
+              .table__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
 
-            .form__data(slot="file" slot-scope="{ row }") {{row.filename}}
-            .form__data(slot="type" slot-scope="{ row }") {{row.type}}
-            .form__dataIcons(slot="icon" slot-scope="{ row }")
-              img(src="../../../assets/images/latest-version/download-file.png" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}" @click="downloadFile(row.path, row.isCheck)")
-              span(@click="(e) => openDeleteFileApprovalModal(row.type, row.path, row.isCheck)" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}")
-                i.fas.fa-trash
-              Check(@click="(e) => checkFile(e, row)", :isApproved="row.isCheck")
+              .table__data(slot="file" slot-scope="{ row }") {{row.filename}}
+              .table__data(slot="type" slot-scope="{ row }") {{row.type}}
+              .table__dataIcons(slot="icon" slot-scope="{ row }")
+                img(src="../../../assets/images/latest-version/download-file.png" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}" @click="downloadFile(row.path, row.isCheck)")
+                span(@click="(e) => openDeleteFileApprovalModal(row.type, row.path, row.isCheck)" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}")
+                  i.fas.fa-trash
+                Check(@click="(e) => checkFile(e, row)", :isApproved="row.isCheck")
 
-          .tasks-files__add(id="add")
-            Add(v-if="canUpdateRequest()" @add="openUploadModal")
+            .tasks-files__add(id="add")
+              Add(v-if="canUpdateRequest()" @add="openUploadModal")
 
-          .tasks-files__main(v-if="isUploadModal" id="modal")
-            .tasks-files__items
-              span.tasks-files__close(@click="closeUploadModal") &#215;
-              .tasks-files__item
-                span Source file:
-                span.tasks-files__label-red
-                .tasks-files__upload-file
-                  FilesUpload(
-                    inputClass="files-upload__source-file"
-                    :files="sourceFiles"
-                    @uploadFiles="uploadSourceFiles"
-                    @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
-                  )
-              .tasks-files__item
-                span Reference file:
-                span.tasks-files__label-red
-                .tasks-files__upload-file
-                  FilesUpload(
-                    inputClass="files-upload__ref-file"
-                    :files="refFiles"
-                    @uploadFiles="uploadRefFiles"
-                    @deleteFile="(e) => deleteFile(e, 'refFiles')"
-                  )
-            .tasks-files__tooltip
-              div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
-              div Reference: each file can be <= 50Mb
+            .tasks-files__main(v-if="isUploadModal" id="modal")
+              .tasks-files__items
+                span.tasks-files__close(@click="closeUploadModal") &#215;
+                .tasks-files__item
+                  span Source file:
+                  span.tasks-files__label-red
+                  .tasks-files__upload-file
+                    FilesUpload(
+                      inputClass="files-upload__source-file"
+                      :files="sourceFiles"
+                      @uploadFiles="uploadSourceFiles"
+                      @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
+                    )
+                .tasks-files__item
+                  span Reference file:
+                  span.tasks-files__label-red
+                  .tasks-files__upload-file
+                    FilesUpload(
+                      inputClass="files-upload__ref-file"
+                      :files="refFiles"
+                      @uploadFiles="uploadRefFiles"
+                      @deleteFile="(e) => deleteFile(e, 'refFiles')"
+                    )
+              .tasks-files__tooltip
+                div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
+                div Reference: each file can be <= 50Mb
 
         .form__table
-          DataTable(
-            :fields="fields2"
-            :tableData="[currentClientRequest.requestForm.complianceOptions]"
-            :bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
-            :tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
-          )
-            .form__header(slot="headerTemplate" slot-scope="{ field }") {{ field.label }}
-            .form__header(slot="headerDescriptions" slot-scope="{ field }") {{ field.label }}
-            .form__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
+          .table(style="margin-top: 20px;")
+            GeneralTable(
+              :fields="fields2"
+              :tableData="[currentClientRequest.requestForm.complianceOptions]"
+              :bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
+              :tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
+            )
+              .table__header(slot="headerTemplate" slot-scope="{ field }") {{ field.label }}
+              .table__header(slot="headerDescriptions" slot-scope="{ field }") {{ field.label }}
+              .table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
 
-            template(slot="template" slot-scope="{ row, index }")
-              .form__data(v-if="currentActive !== index") {{row.title}}
-              .contacts__dataDrop(v-else)
-                SelectSingle(
-                  :isTableDropMenu="true",
-                  placeholder="Select",
-                  :selectedOption="currentTemplate.title",
-                  :options="complianceTemplates.map(({title}) => title)",
-                  @chooseOption="setTemplate"
-                )
+              .table__col(slot="template" slot-scope="{ row, index }")
+                .table__data(v-if="currentActive !== index") {{row.title}}
+                .table__dataDrop(v-else)
+                  SelectSingle(
+                    :isTableDropMenu="true",
+                    placeholder="Select",
+                    :selectedOption="currentTemplate.title",
+                    :options="complianceTemplates.map(({title}) => title)",
+                    @chooseOption="setTemplate"
+                  )
 
-            template(slot="description" slot-scope="{ row, index }")
-              .form__description(v-if="currentActive !== index") {{ replaceDescription(row.description) }}
-              .form__description(v-else) {{ replaceDescription(currentTemplate.description) }}
+              template(slot="description" slot-scope="{ row, index }")
+                .table__dataDescription(v-if="currentActive !== index") {{ replaceDescription(row.description) }}
+                .table__dataDescription(v-else) {{ replaceDescription(currentTemplate.description) }}
 
-            template(slot="icons" slot-scope="{ row, index }")
-              .form__icons
-                img.form__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="[{'opacity-1': isActive(key, index)}, {'opacity-04': currentClientRequest.checkedForm.isCheckComplianceTemplate}]")
-                Check(@click="(e) => checkTemplate(e)", :isApproved="currentClientRequest.checkedForm.isCheckComplianceTemplate" :isDisabled="currentActive === index")
+              template(slot="icons" slot-scope="{ row, index }")
+                .form__icons
+                  img.form__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="[{'opacity-1': isActive(key, index)}, {'opacity-04': currentClientRequest.checkedForm.isCheckComplianceTemplate}]")
+                  Check(@click="(e) => checkTemplate(e)", :isApproved="currentClientRequest.checkedForm.isCheckComplianceTemplate" :isDisabled="currentActive === index")
 
       .form__comments
         .form__commentsBlock
@@ -199,7 +201,6 @@
         .form__project
           .form__project-title
             span(id="id") {{ currentClientRequest.projectId }}
-            span.order__details {{ currentClientRequest.startOption === 'Send' ? 'Send a Quote' : 'Start Immediately' }}
           .form__project-icons
             .icon
               span(class="click-copy" @click="copyId")
@@ -221,8 +222,10 @@
         .order__row
           .order__subTitle Target:
           .order__value {{ currentClientRequest.requestForm.targetLanguages[0].lang }}
-        Button(customClass="middle"  @clicked="setCurrentAm" :isDisabled="isAmSet() || !isAm()" value="Get This Project" )
-        Button(customClass="middle" color="#d15f45" :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request" )
+
+        .order__buttons
+          Button(v-if="(isAdmin || isAm()) && !isAmSet()" customClass="middle"  class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
+          Button(v-if="isAdmin || isAm()" customClass="middle" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
 
 
       //.side__contacts
@@ -265,6 +268,7 @@
 	import SelectSingle from "../../SelectSingle"
 	import Button from "../../Button"
 	import ApproveModal from "../../ApproveModal"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -276,18 +280,18 @@
 				},
 				files: [],
 				fields: [
-					{ label: "File Name", headerKey: "headerFile", key: "file", width: "54%", padding: 0 },
-					{ label: "File Type", headerKey: "headerType", key: "type", width: "30%", padding: 0 },
-					{ label: "", headerKey: "headerIcon", key: "icon", width: "16%", padding: 0 }
+					{ label: "File Name", headerKey: "headerFile", key: "file", style: { width: "55%" } },
+					{ label: "File Type", headerKey: "headerType", key: "type", style: { width: "30%" } },
+					{ label: "", headerKey: "headerIcon", key: "icon", style: { width: "15%" } }
 				],
 				fields2: [
-					{ label: "Template", headerKey: "headerTemplate", key: "template", width: "47%", padding: 0 },
-					{ label: "Description", headerKey: "headerDescriptions", key: "description", width: "30%", padding: 0 },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "23%", padding: 0 }
+					{ label: "Template", headerKey: "headerTemplate", key: "template", style: { width: "55%" } },
+					{ label: "Description", headerKey: "headerDescriptions", key: "description", style: { width: "30%" } },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "15%" } }
 				],
 				fields3: [
-					{ label: "Name", headerKey: "headerName", key: "name", width: "70%", padding: 0 },
-					{ label: "", headerKey: "headerIcon", key: "icon", width: "30%", padding: 0 }
+					{ label: "Client Contacts", headerKey: "headerName", key: "name", style: { width: "80%" } },
+					{ label: "", headerKey: "headerIcon", key: "icon", style: { width: "20%" } }
 				],
 				complianceTemplates: [
 					{
@@ -350,7 +354,7 @@
 				refFiles: [],
 				currentTemplate: '',
 				selected: '',
-        deleteCurrentRequest: false,
+				deleteCurrentRequest: false
 			}
 		},
 		methods: {
@@ -359,21 +363,21 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
-      isDeleteRequest() {
-        this.deleteCurrentRequest = true
-      },
-      async deleteRequest() {
-        const { id } = this.$route.params
-        await this.$http.post(`/clients-requests/${id}/delete`)
-        if(window.history.length > 2) {
-          this.$router.go(-1)
-        }else {
-          this.$router.push('/pangea-dashboard/overall-view')
-        }
-      },
-      doNotDelete() {
-        this.deleteCurrentRequest = false
-      },
+			isDeleteRequest() {
+				this.deleteCurrentRequest = true
+			},
+			async deleteRequest() {
+				const { id } = this.$route.params
+				await this.$http.post(`/clients-requests/${ id }/delete`)
+				if (window.history.length > 2) {
+					this.$router.go(-1)
+				} else {
+					this.$router.push('/pangea-dashboard/overall-view')
+				}
+			},
+			doNotDelete() {
+				this.deleteCurrentRequest = false
+			},
 			copyId() {
 				let id = document.getElementById('id')
 				let elementText = id.textContent
@@ -395,6 +399,14 @@
 			},
 			setCurrentAm() {
 				if (this.isAmSet()) return
+				if (this.isAdmin) {
+					const { _id } = this.users.find(item => {
+						const { group: { name } } = item
+						return name === "Account Managers"
+					})
+					this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": _id } })
+					return
+				}
 				this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "accountManager": this.user._id } })
 			},
 			canUpdateRequest() {
@@ -406,6 +418,7 @@
 
 				return isAdmin || currentAm
 			},
+
 			approveRequest() {
 				if (!this.canUpdateRequest()) return
 				try {
@@ -770,6 +783,10 @@
 				users: "getUsers",
 				currentClientRequest: "getCurrentClientRequest"
 			}),
+			isAdmin() {
+				const { group: { name } } = this.user
+				return name === "Administrators" || name === "Developers"
+			},
 			availableContacts() {
 				return this.currentClientRequest.customer.contacts
 						.map(item => `${ item.firstName } ${ item.surname }`)
@@ -806,6 +823,7 @@
 		},
 
 		components: {
+			GeneralTable,
 			ApproveModal,
 			Button,
 			SelectSingle,
@@ -814,9 +832,6 @@
 			DataTable,
 			Check,
 			DatepickerWithTime
-		},
-		created() {
-			// this.currentClientRequest = this.
 		}
 	}
 </script>
@@ -825,9 +840,71 @@
   @import "../../../assets/styles/settingsTable";
   @import "../../../assets/scss/colors";
 
-  .button-m-top {
-    margin-top: 20px;
+  input[type="text"]:disabled {
+    background: white;
   }
+
+  .table {
+    position: relative;
+    width: 100%;
+
+    &__header {
+      padding: 0 0 0 7px;
+    }
+
+    &__data {
+      padding: 0 7px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    &__col {
+      width: 100%;
+    }
+
+    &__dataDescription {
+      overflow-x: auto;
+      height: 40px;
+      padding: 0 7px;
+      display: grid;
+      align-items: center;
+    }
+
+    &__dataDrop {
+      position: relative;
+      height: 32px;
+      margin: 0 7px;
+    }
+
+    &__dataIcons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    &__dataIcon {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .fa-trash {
+      cursor: pointer;
+    }
+  }
+
+  .drop-white {
+    height: 32px;
+    background: white;
+    border-radius: 4px;
+  }
+
+  .button-m-top {
+    margin-bottom: 15px;
+  }
+
   .approve__delete {
     position: absolute;
     bottom: 20px;
@@ -876,6 +953,13 @@
     border-radius: 4px;
     background: white;
 
+    &__title {
+      font-size: 16px;
+      margin-top: 30px;
+      padding-bottom: 8px;
+      font-family: 'Myriad600'
+    }
+
     &__project-icons {
       color: #66563d;
       font-size: 16px;
@@ -896,8 +980,10 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, .2);
-      z-index: 2;
+      background: rgba(33, 33, 33, .1);
+      z-index: 20;
+      cursor: no-drop;
+
     }
 
     &__description {
@@ -930,23 +1016,23 @@
     &__commentsBlock {
       display: block;
       position: relative;
-      width: 48%;
+      width: 48.5%;
     }
 
     &__table-box {
-      display: flex;
-      justify-content: space-between;
+      border: 2px solid $light-border;
+      border-radius: 4px;
+      padding: 30px;
+      margin-bottom: 25px;
     }
 
     &__table {
-      margin-bottom: 20px;
       position: relative;
-      width: 48%;
     }
 
     &__contacts {
-      width: 240px;
-      margin-left: 150px;
+      width: 340px;
+      margin-left: 90px;
     }
 
     &__dataIcons {
@@ -959,7 +1045,7 @@
     &__inputs {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     &__group {
@@ -968,13 +1054,15 @@
 
     &__inputsGroup {
       flex-grow: 1;
-      margin-bottom: 40px;
-
+      background-color: $table-list;
+      position: relative;
+      padding: 20px 30px;
+      border: 1px solid $light-border;
+      border-radius: 4px;
     }
 
     &__projectName {
       position: relative;
-      /*margin-right: 40px;*/
     }
 
     &__projectDeadline {
@@ -990,6 +1078,7 @@
     &__icons {
       @extend %table-icons;
       justify-content: center;
+      margin-left: 10px;
     }
 
     &__icon {
@@ -1126,6 +1215,12 @@
   }
 
   .order {
+    &__buttons {
+      padding-top: 25px;
+      margin-top: 5px;
+      border-top: 1px solid $light-border;
+    }
+
     &__details {
       font-size: 12px;
       font-family: 'Myriad400';
@@ -1148,10 +1243,7 @@
 
     &__row {
       display: -webkit-box;
-      //margin-bottom: 15px;
       width: 100%;
-      //display: -ms-flexbox;
-      //display: flex;
       height: 40px;
     }
 
@@ -1170,6 +1262,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 40;
   }
 
   textarea {

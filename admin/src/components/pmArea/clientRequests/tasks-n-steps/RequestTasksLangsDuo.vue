@@ -26,32 +26,10 @@
           :list="targetChosen.map(i=> i.lang)"
           @moveItem="moveFromChosen"
         )
-        //.target__from
-        //  span.target__search-value(v-model="langSearchValue", v-if="isSearching && langSearchValue") {{ langSearchValue }}
-        //  Languages(
-        //    tabIndex="0",
-        //    :languages="targetAll",
-        //    :langSearchValue="langSearchValue",
-        //    @forceMove="forceMoveFromAll",
-        //    @searching="isSearching = true",
-        //    @searchValue="(e) => searchValue(e, 'targetAll')",
-        //    @slice="slice",
-        //    @sortBySearch="(e) => sortBySearch(e, 'targetAll')",
-        //    @clearSearch="(e) => clearSearch(e, 'targetAll')"
-        //  )
-        //.target__arrows
-        //  Arrows(
-        //    @forward="(e) => moveTargets(e, 'targetAll', 'targetChosen')",
-        //    @back="(e) => moveTargets(e, 'targetChosen', 'targetAll')"
-        //  )
-        //.target__to
-        //  Languages(tabIndex="1", :languages="targetChosen", @forceMove="forceMoveFromChosen")
 </template>
 
 <script>
 	import SelectSingle from "../../../SelectSingle"
-	// import Languages from "@/components/finance/langs/Languages"
-	// import Arrows from "@/components/finance/langs/Arrows"
 	import { mapGetters, mapActions } from "vuex"
 	import TasksLanguages from "../../../../mixins/TasksLanguages"
 	import ListManagement from "../../../ListManagement"
@@ -97,10 +75,12 @@
 				this.setPossibleTargets()
 				this.targetChosen = this.targetAll
 				this.targetAll = []
+				this.emitTargets()
 			},
 			removeAll() {
 				this.setPossibleTargets()
 				this.targetChosen = []
+				this.emitTargets()
 			},
 			...mapActions({
 				storeProject: "setCurrentProject",
@@ -120,47 +100,12 @@
 
 			setPossibleTargets() {
 				if (this.tasksData.hasOwnProperty('service')) {
-					this.targetAll = this.currentProject.requestForm.targetLanguages
+					this.targetAll = [ ...this.currentProject.requestForm.targetLanguages ]
 				}
-				// if (this.tasksData.hasOwnProperty('service')) {
-				// 	const { source, service } = this.tasksData
-				// 	const { customer: { services }, industry } = this.currentProject
-				//
-				// 	this.targetAll = services
-				// 			.filter(({ industries, services, sourceLanguage }) =>
-				// 					services[0] === service._id &&
-				// 					industries[0] === industry._id &&
-				// 					sourceLanguage === source._id
-				// 			)
-				// 			.map(({ targetLanguages }) =>
-				// 					this.originallyLanguages.find(({ _id }) => targetLanguages[0] === _id)
-				// 			)
-				// }
 			},
 			emitTargets() {
 				this.$emit("setTargets", { targets: this.targetChosen })
 			},
-			// forceMoveFromAll({ index }) {
-			// 	const lang = this.targetAll.splice(index, 1)
-			// 	this.targetChosen.push(lang[0])
-			// 	this.emitTargets()
-			// 	this.sortLanguages("targetChosen")
-			// },
-			// forceMoveFromChosen({ index }) {
-			// 	const lang = this.targetChosen.splice(index, 1)
-			// 	this.targetAll.push(lang[0])
-			// 	this.emitTargets()
-			// 	this.sortLanguages("targetAll")
-			// },
-			// moveTargets(e, from, to) {
-			// 	const checked = this[from].filter((item) => item.check)
-			// 	this[from] = this[from].filter((item) => !item.check)
-			// 	this[to].push(...checked)
-			// 	this.sortLanguages(from)
-			// 	this.sortLanguages(to)
-			// 	this.clearChecks(to)
-			// 	this.emitTargets()
-			// },
 			searchValue({ value }, prop) {
 				this.langSearchValue += value.toLowerCase()
 				this[prop].filter(item => item.lang.toLowerCase().indexOf(this.langSearchValue) !== -1)
@@ -188,7 +133,7 @@
 			},
 			runPossibleTargetsForEditing() {
 				const { taskData: { targets } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
-				this.targetAll = this.currentProject.requestForm.targetLanguages.filter(item => !targets.map(item => item.lang).includes(item.lang))
+				this.targetAll = [ ...this.currentProject.requestForm.targetLanguages.filter(item => !targets.map(item => item.lang).includes(item.lang)) ]
 				this.targetChosen.push(...targets)
 				this.$emit("setTargets", { targets: this.targetChosen })
 				this.$emit("endOfSettingTaskData")
@@ -223,8 +168,6 @@
 		components: {
 			ListManagementButtons,
 			ListManagement,
-			// Languages,
-			// Arrows,
 			SelectSingle
 		}
 	}
@@ -244,6 +187,7 @@
 
   .tasks-langs {
     padding: 0 10px;
+
     &__title {
       &-source {
         margin-bottom: 3px;

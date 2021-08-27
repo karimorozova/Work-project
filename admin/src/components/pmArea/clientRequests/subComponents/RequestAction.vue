@@ -35,16 +35,16 @@
         @close="doNotDelete"
         @notApprove="doNotDelete"
       )
-
-    Button(customClass="middle" color="#d15f45" :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
+    .delete-button
+      Button(customClass="middle" color="#d15f45" :isDisabled="!!requestCounter" :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
 
 </template>
 
 <script>
-	import SelectSingle from '../../../SelectSingle';
-	import { mapGetters, mapActions } from 'vuex';
-	import ApproveModal from '../../../ApproveModal';
-  import Button from "../../../Button"
+	import SelectSingle from '../../../SelectSingle'
+	import { mapActions, mapGetters } from 'vuex'
+	import ApproveModal from '../../../ApproveModal'
+	import Button from "../../../Button"
 
 	export default {
 		props: {
@@ -54,92 +54,97 @@
 		},
 		data() {
 			return {
-        deleteCurrentRequest:false,
-        approveChangePM: false,
-        selectedPM: {},
-				managers: [],
-			};
+				deleteCurrentRequest: false,
+				approveChangePM: false,
+				selectedPM: {},
+				managers: []
+			}
 		},
 		methods: {
 			...mapActions({
-        updateClientsRequestsProps: 'updateClientsRequestsProps',
+				updateClientsRequestsProps: 'updateClientsRequestsProps'
 			}),
-      isDeleteRequest() {
-        this.deleteCurrentRequest = true
-      },
-      async deleteRequest() {
-        const { id } = this.$route.params
-        await this.$http.post(`/clients-requests/${id}/delete`)
-        if(window.history.length > 2) {
-          this.$router.go(-1)
-        }else {
-          this.$router.push('/pangea-dashboard/overall-view')
-        }
-      },
-      doNotDelete() {
-        this.deleteCurrentRequest = false
-      },
-			closeModal() {
-				this.approveChangePM = false;
+			isDeleteRequest() {
+				this.deleteCurrentRequest = true
 			},
-			async showModalPM({ option }) {
-				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option);
-				// if(manager._id === this.project.projectManger._id) return;
-				this.selectedPM = manager
-				this.approveChangePM = true
-			},
-      async setPM () {
-        await this.updateClientsRequestsProps({projectId: this.project._id, value: { projectManager: this.selectedPM }});
-        this.approveChangePM = false
-        this.selectedPM = {}
-      },
-			async getManagers() {
-				try {
-					const result = await this.$http.get('/users');
-					this.managers = result.data;
-				} catch (err) {
-					this.alertToggle({message: 'Error on getting managers', isShow: true, type: 'error'});
+			async deleteRequest() {
+				const { id } = this.$route.params
+				await this.$http.post(`/clients-requests/${ id }/delete`)
+				if (window.history.length > 2) {
+					this.$router.go(-1)
+				} else {
+					this.$router.push('/pangea-dashboard/overall-view')
 				}
 			},
+			doNotDelete() {
+				this.deleteCurrentRequest = false
+			},
+			closeModal() {
+				this.approveChangePM = false
+			},
+			async showModalPM({ option }) {
+				this.selectedPM = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option)
+				this.approveChangePM = true
+			},
+			async setPM() {
+				await this.updateClientsRequestsProps({ projectId: this.project._id, value: { projectManager: this.selectedPM } })
+				this.approveChangePM = false
+				this.selectedPM = {}
+			},
+			async getManagers() {
+				try {
+					const result = await this.$http.get('/users')
+					this.managers = result.data
+				} catch (err) {
+					this.alertToggle({ message: 'Error on getting managers', isShow: true, type: 'error' })
+				}
+			}
 		},
 		computed: {
 			...mapGetters({
 				currentClient: 'getCurrentClient',
-				user: 'getUser'
+				user: 'getUser',
+				requestCounter: 'getRequestCounter'
 			}),
-      canUpdateRequest() {
-        return this.user.group.name === "Administrators"
-            ||  this.user.group.name === "Developers"
-            ||  this.project.projectManager._id === this.user._id
-      },
+			canUpdateRequest() {
+				return this.user.group.name === "Administrators"
+						|| this.user.group.name === "Developers"
+						|| this.project.projectManager._id === this.user._id
+			},
 			projManagers() {
-				let result = [];
-				if(this.managers.length) {
-					result = this.managers.filter(item => item.group.name === "Project Managers");
-					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
+				let result = []
+				if (this.managers.length) {
+					result = this.managers.filter(item => item.group.name === "Project Managers")
+					result = result.map(item => `${ item.firstName } ${ item.lastName }`)
 				}
-				return result;
+				return result
 			},
 			selectedAccManager() {
-				return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : "";
+				return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : ""
 			},
 			selectedProjManager() {
-				return  this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : "";
-			},
+				return this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : ""
+			}
 		},
 		components: {
-      Button,
+			Button,
 			ApproveModal,
-			SelectSingle,
+			SelectSingle
 		},
 		async created() {
-			await this.getManagers();
+			await this.getManagers()
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors.scss";
+
+  .delete-button {
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid $light-border;
+  }
 
   .button-m-top {
     margin-top: 10px;
@@ -156,8 +161,9 @@
     justify-content: flex-start;
     border-radius: 4px;
     background: white;
+    position: relative;
 
-    &__dropBody{
+    &__dropBody {
       position: relative;
       width: 200px;
       height: 30px;
@@ -294,7 +300,8 @@
         width: 220px;
         height: 32px;
       }
-      &__menuTitle{
+
+      &__menuTitle {
         width: 220px;
         height: 32px;
         display: flex;
@@ -333,10 +340,13 @@
 
   .approve-action {
     position: absolute;
-    margin-top: 50px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 222;
   }
 
-  .project-details{
+  .project-details {
     margin-bottom: 4px;
   }
 </style>

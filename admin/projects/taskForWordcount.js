@@ -48,14 +48,11 @@ function getWordCountTasks({ project, newTasksInfo, memoqDocs }) {
     let idNumber = tasksLength < 10 ? `T0${ tasksLength }` : `T${ tasksLength }`;
     let taskId = project.projectId + ` ${ idNumber }`;
 
-    // TODO refactoring field and create scheme
     tasks.push({
       taskId,
       service,
-      stepsAndUnits: JSON.parse(stepsAndUnits),
+      stepsAndUnits: typeof stepsAndUnits === 'string' ? JSON.parse(stepsAndUnits) : stepsAndUnits,
       memoqProjectId,
-      // start: project.startDate,
-      // deadline: project.deadline,
       stepsDates,
       sourceLanguage: source.symbol,
       targetLanguage: targets[i].symbol,
@@ -64,10 +61,8 @@ function getWordCountTasks({ project, newTasksInfo, memoqDocs }) {
       memoqDocs: memoqDocs.filter(item => `${item.TargetLangCode}` === `${targets[i].memoq}`),
       memoqFiles: memoqFiles,
       status: "Created",
-      // cost: "",
       sourceFiles: translateFiles,
       refFiles: referenceFiles,
-      // check: false,
       finance: {
         Wordcount: { receivables: 0, payables: 0 },
         Price: { receivables: 0, payables: 0 }

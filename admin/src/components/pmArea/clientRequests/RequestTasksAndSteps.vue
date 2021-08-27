@@ -1,7 +1,13 @@
 <template lang="pug">
   .tasks-steps
     .tasks-steps__tasks-title Tasks and Steps
-      img.tasks-steps__arrow(v-if="canUpdateRequest" src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
+
+      .tasks-steps__addTask(v-if="canUpdateRequest && !isTaskData" @click="toggleTaskData")
+        i.fas.fa-plus-circle
+      .tasks-steps__closeAddTask(v-if="canUpdateRequest && isTaskData" @click="toggleTaskData")
+        i.fas.fa-times-circle
+
+      //img.tasks-steps__arrow(v-if="canUpdateRequest" src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     div(v-if="canUpdateRequest")
       RequestTasksData(
         v-if="isTaskData"
@@ -21,7 +27,7 @@
       .tasks__tabs
         Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
       .tasks__table(v-if="isTasksShow")
-        DataTable(
+        GeneralTable(
           :fields="fields1"
           :tableData="currentTasks"
           :bodyClass="currentTasks.length < 7 ? 'tbody_visible-overflow' : ''"
@@ -42,9 +48,9 @@
           template(slot="deadline" slot-scope="{ row, index }")
             .tasks__data {{ row.deadline }}
           template(slot="source" slot-scope="{ row, index }")
-            .tasks__data {{ row.source }}
+            .tasks__data {{ row.sourceLength }}
           template(slot="ref" slot-scope="{ row, index }")
-            .tasks__data {{ row.ref }}
+            .tasks__data {{ row.refLength }}
           template(slot="icons" slot-scope="{ row, index }")
             .tasks__icons(v-if="canUpdateRequest")
               .tasks__icon(@click="editTasksData(row.taskId)")
@@ -58,7 +64,7 @@
                 img(src="../../../assets/images/latest-version/lock.png")
 
       .tasks__table(v-if="isStepsShow")
-        DataTable(
+        GeneralTable(
           :fields="fields2"
           :tableData="currentSteps"
           :bodyClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
@@ -78,9 +84,9 @@
           template(slot="step" slot-scope="{ row, index }")
             .tasks__data {{ row.step }}
           template(slot="unit" slot-scope="{ row, index }")
-            .tasks__data {{ row.unit }}
+            .tasks__data {{ row.unit  }}
           template(slot="quantity" slot-scope="{ row, index }")
-            .tasks__data {{ row.quantitySize }}
+            .tasks__data {{ currentProject.requestForm.service.title === 'Translation' ? '-' : row.quantitySize }}
           template(slot="start" slot-scope="{ row, index }")
             .tasks__data {{ row.start }}
           template(slot="deadline" slot-scope="{ row, index }")
@@ -88,7 +94,7 @@
 
     .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
       .button__convert
-        Button(value="Convert into Project" @clicked="convertIntoProject")
+        Button(value="Convert into Project" :isDisabled="!!requestCounter" @clicked="convertIntoProject")
 
 </template>
 
@@ -100,6 +106,7 @@
 	import DataTable from "../../DataTable"
 	import moment from 'moment'
 	import Button from "../../Button"
+	import GeneralTable from "../../GeneralTable"
 
 	export default {
 		props: {
@@ -126,24 +133,24 @@
 				currentTaskId: '',
 				currentTaskIdForUpdate: '',
 				fields1: [
-					{ label: "Task Id", headerKey: "headerId", key: "id", width: "19%", padding: 0 },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
-					{ label: "Service", headerKey: "headerService", key: "service", width: "15%", padding: 0 },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 },
-					{ label: "# Source", headerKey: "headerSource", key: "source", width: "8%", padding: 0 },
-					{ label: "# Ref.", headerKey: "headerRef", key: "ref", width: "8%", padding: 0 },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "9%", padding: 0 }
+					{ label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
+					{ label: "Service", headerKey: "headerService", key: "service", style: { width: "15%" } },
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { width: "12%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { width: "12%" } },
+					{ label: "# Source", headerKey: "headerSource", key: "source", style: { width: "7%" } },
+					{ label: "# Ref.", headerKey: "headerRef", key: "ref", style: { width: "7%" } },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "8%" } }
 				],
 
 				fields2: [
-					{ label: "Step Id", headerKey: "headerId", key: "id", width: "19%", padding: 0 },
-					{ label: "Language", headerKey: "headerLanguage", key: "language", width: "15%", padding: 0 },
-					{ label: "Step", headerKey: "headerStep", key: "step", width: "13%", padding: 0 },
-					{ label: "Unit", headerKey: "headerUnit", key: "unit", width: "13%", padding: 0 },
-					{ label: "", headerKey: "headerSize", key: "quantity", width: "14%", padding: 0 },
-					{ label: "Start", headerKey: "headerStart", key: "start", width: "13%", padding: 0 },
-					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "13%", padding: 0 }
+					{ label: "Step Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
+					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
+					{ label: "Step", headerKey: "headerStep", key: "step", style: { width: "12%" } },
+					{ label: "Unit", headerKey: "headerUnit", key: "unit", style: { width: "12%" } },
+					{ label: "", headerKey: "headerSize", key: "quantity", style: { width: "13%" } },
+					{ label: "Start", headerKey: "headerStart", key: "start", style: { width: "12%" } },
+					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { width: "12%" } }
 				]
 			}
 		},
@@ -154,13 +161,56 @@
 				"setCurrentClientRequest",
 				"setTasksDataValueRequest"
 			]),
+			checkTranslationSourceFiles(title, tasksAndSteps) {
+				if (title === 'Translation') {
+					if (tasksAndSteps.length) {
+						if (!tasksAndSteps.every(item => item.sourceFiles.length)) {
+							this.errors = []
+							this.errors.push('Each task should exist source file')
+						}
+					}
+				}
+			},
 			async convertIntoProject() {
+				const { requestForm: { service: { title } }, tasksAndSteps } = this.currentProject
+				this.checkTranslationSourceFiles(title, tasksAndSteps)
+				if (this.errors.length) {
+					this.showErrors({ errors: this.errors })
+					return
+				}
+
+				if (title === 'Translation') {
+					try {
+						const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
+						const { creatorUserId: creatorUserForMemoqId } = memoqCreatorUser.data
+						if (!creatorUserForMemoqId) {
+							this.alertToggle({ message: 'Error on converting project! Not such user on Memoq', isShow: true, type: "error" })
+							return
+						}
+						await this.convertCATUnitsProject(creatorUserForMemoqId)
+					} catch (err) {
+						this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
+					}
+				} else {
+					await this.convertCustomUnitsProject()
+				}
+			},
+			async convertCustomUnitsProject() {
 				try {
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
 					const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
 					window.open(route.href, "_self")
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
+				}
+			},
+			async convertCATUnitsProject(creatorUserForMemoqId) {
+				try {
+					const projectId = await this.$http.post('/pm-manage/convert-translation-request-into-project', { projectId: this.currentProject._id, creatorUserForMemoqId })
+					const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
+					window.open(route.href, "_self")
+				} catch (err) {
+					this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
 				}
 			},
 			async deleteTask(taskId) {
@@ -188,9 +238,6 @@
 			showErrors({ errors }) {
 				this.errors = [ ...errors ]
 				this.areErrorsExist = true
-			},
-			updateTasks(data) {
-				// this.currentProject.tasks = data
 			},
 			setDefaultIsTaskData() {
 				if (!this.currentProject.tasksAndSteps.length) {
@@ -230,11 +277,10 @@
 			},
 			async addTasks(dataForTasks) {
 				let tasksData = this.getDataForTasks(dataForTasks)
-				const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
-				const { sourceFiles, refFiles } = dataForTasks
+				// const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
 
+				const { sourceFiles, refFiles } = dataForTasks
 				if (sourceFiles && sourceFiles.length) {
-					this.translateFilesAmount = sourceFiles.length
 					for (let file of sourceFiles) {
 						tasksData.append('sourceFiles', file)
 					}
@@ -245,25 +291,7 @@
 					}
 				}
 
-				for (const iterator of calculationUnit) {
-					if (iterator === 'CAT Wordcount') {
-						try {
-							const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
-							const { creatorUserId } = memoqCreatorUser.data
-							if (!creatorUserId) throw new Error("No such user in memoq")
-							tasksData.append('creatorUserId', creatorUserId)
-							this.isInfo = true
-						} catch (err) {
-							this.alertToggle({ message: err.message, isShow: true, type: "error" })
-						}
-					}
-				}
-
-				if (calculationUnit.includes('CAT Wordcount')) {
-					await this.saveProjectWordsTasks(tasksData)
-				} else {
-					await this.saveProjectTasks(tasksData)
-				}
+				await this.saveProjectTasks(tasksData)
 			},
 			async saveProjectTasks(tasksData) {
 				try {
@@ -284,27 +312,14 @@
 					this.currentTaskId = ''
 					this.currentTaskIdForUpdate = ''
 				}
-			},
-			async saveProjectWordsTasks(tasksData) {
-				// try {
-				// 	await this.addProjectWordsTasks(tasksData)
-				// 	this.isTaskData = false
-				// 	this.clearTasksDataRequest()
-				// } catch (err) {
-				// 	this.alertToggle({ message: err.message, isShow: true, type: "error" })
-				// } finally {
-				// 	this.isInfo = false
-				// }
-			},
-			getMetrics() {
-				// this.$emit("getMetrics")
 			}
 		},
 		computed: {
 			...mapGetters({
 				currentProject: 'getCurrentClientRequest',
 				tasksData: "getTasksDataRequest",
-				user: "getUser"
+				user: "getUser",
+				requestCounter: 'getRequestCounter'
 			}),
 			currentTasks() {
 				return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
@@ -320,12 +335,12 @@
 
 					return {
 						taskId,
-						language: `${ source.symbol } >> ${ targets[0].symbol }`,
+						language: `${ source.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
 						service: service.title,
-						start: moment(start).format('DD-MM-YYYY, HH:mm'),
-						deadline: moment(deadline).format('DD-MM-YYYY, HH:mm'),
-						source: sourceFiles.length,
-						ref: refFiles.length
+						start: moment(start).format('MMM D, HH:mm'),
+						deadline: moment(deadline).format('MMM D, HH:mm'),
+						sourceLength: sourceFiles.length,
+						refLength: refFiles.length
 					}
 				})
 			},
@@ -337,30 +352,17 @@
 						const item = stepsAndUnits[i]
 						result.push({
 							stepId: `${ taskId } S0${ i + 1 }`,
-							language: `${ source.symbol } >> ${ targets[0].symbol }`,
+							language: `${ source.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
 							step: item.step,
 							unit: item.unit,
 							quantitySize: item.hasOwnProperty('hours') ? `${ item.hours } / ${ item.size }` : `${ item.quantity } / ${ item.size }`,
-							start: moment(stepsDates[i].start).format('DD-MM-YYYY, HH:mm'),
-							deadline: moment(stepsDates[i].deadline).format('DD-MM-YYYY, HH:mm')
+							start: moment(stepsDates[i].start).format('MMM D, HH:mm'),
+							deadline: moment(stepsDates[i].deadline).format('MMM D, HH:mm')
 						})
 					}
 					return result
 				})
 				return a.flat()
-			},
-
-			metricsButton() {
-				// const wordsUnit = this.currentProject.tasks.find(item => item.service.calculationUnit === 'Words')
-				// return !wordsUnit || this.currentProject.isMetricsExist ? "Refresh metrics" : "Get metrics"
-			},
-			isDisabled() {
-				// const statuses = [ "Closed", "Cancelled" ]
-				// return statuses.indexOf(this.currentProject.status) !== -1
-			},
-			isProjectFinished() {
-				// const { status } = this.currentProject
-				// return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
 			},
 			canUpdateRequest() {
 				return this.user.group.name === "Administrators"
@@ -369,6 +371,7 @@
 			}
 		},
 		components: {
+			GeneralTable,
 			Button,
 			DataTable,
 			Tabs,
@@ -388,7 +391,7 @@
     &__convert {
       display: flex;
       justify-content: center;
-      padding-top: 10px;
+      padding-top: 20px;
     }
   }
 
@@ -401,6 +404,26 @@
     position: relative;
     background: white;
     border-radius: 4px;
+
+    &__addTask,
+    &__closeAddTask {
+      font-size: 16px;
+      border: 1px solid $border;
+      border-radius: 4px;
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: .2s ease-out;
+      justify-content: center;
+      color: $dark-border;
+
+      &:hover {
+        color: $text;
+
+      }
+    }
 
     &__info {
       position: absolute;
@@ -455,10 +478,15 @@
 
   .tasks {
     &__data {
-      display: flex;
+      padding: 0px 7px;
+      display: grid;
+      height: 40px;
       align-items: center;
-      padding-left: 5px;
-      height: 30px;
+      overflow: auto;
+    }
+
+    &__head-title {
+      padding: 0 7px;
     }
 
     &__icons {
@@ -466,6 +494,7 @@
       justify-content: space-evenly;
       align-items: center;
       height: 31px;
+      width: 100%;
     }
 
     &__icon {

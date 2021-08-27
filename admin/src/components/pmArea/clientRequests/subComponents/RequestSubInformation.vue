@@ -31,7 +31,7 @@
           label(for="urgent")
 
     .client-table
-      SettingsTable(
+      GeneralTable(
         :fields="fields",
         :tableData="projectClientContacts",
         :errors="errors",
@@ -43,12 +43,12 @@
         @closeModal="setDefaults"
       )
         template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-          .client-table__head-title {{ field.label }}
+          .client-table__header {{ field.label }}
 
         template(slot="client", slot-scope="{ row, index }")
           .client-table__data(v-if="currentActive !== index")
-            span.client-table__client(v-if="row.firstName") {{ row.firstName }}
-          .client-table__drop-menu(v-else)
+            span(v-if="row.firstName") {{ row.firstName }}
+          .client-table__drop(v-else)
             SelectSingle(
               placeholder="Select",
               :isTableDropMenu="isTableDropMenu",
@@ -59,23 +59,21 @@
             )
 
         template(slot="icons", slot-scope="{ row, index }")
-          .client-table__height
-            .client-table__icons
-              span(v-if="!isProjectFinished && canUpdateRequest")
-                i.client-table__icon.fa.fa-envelope(
-                  @click="openWYSIWYG(index)",
-                  :class="{ 'client-table_opacity': true }",
-                  aria-hidden="true"
-                )
-                i.client-table__icon.fas.fa-info-circle(:class="{ 'client-table_opacity': true }", aria-hidden="true")
-                img.client-table__icon(
-                  v-for="(icon, key) in icons",
-                  :src="icon.icon",
-                  @click="makeAction(index, key)",
-                  :class="{ 'client-table_opacity': isActive(key, index) }"
-                )
-              span(v-else)
-                img(src="../../../../assets/images/latest-version/lock.png")
+          .client-table__icons
+            span(v-if="!isProjectFinished && canUpdateRequest")
+              i.client-table__icon.fa.fa-envelope(
+                @click="openWYSIWYG(index)",
+                :class="{ 'client-table_opacity': true }",
+                aria-hidden="true"
+              )
+              img.client-table__icon(
+                v-for="(icon, key) in icons",
+                :src="icon.icon",
+                @click="makeAction(index, key)",
+                :class="{ 'client-table_opacity': isActive(key, index) }"
+              )
+            .client-table__icons(v-else)
+              img(src="../../../../assets/images/latest-version/lock.png")
 
     Add(@add="addData" v-if="!isProjectFinished && canUpdateRequest")
 </template>
@@ -88,6 +86,7 @@
 	import SettingsTable from "../../../Table/SettingsTable"
 	import SelectSingle from "@/components/SelectSingle"
 	import WYSIWYG from "../../../vendors/WYSIWYG"
+	import GeneralTable from "../../../GeneralTable"
 
 	export default {
 		mixins: [ scrollDrop, crudIcons ],
@@ -101,15 +100,13 @@
 						label: "Client Contact",
 						headerKey: "headerClient",
 						key: "client",
-						width: "50%",
-						padding: "0"
+						style: { width: "60%" }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "50%",
-						padding: "0"
+						style: { width: "40%" }
 					}
 				],
 
@@ -387,6 +384,7 @@
 			this.project && this.getClientContacts()
 		},
 		components: {
+			GeneralTable,
 			Add,
 			SettingsTable,
 			SelectSingle,
@@ -398,6 +396,39 @@
 <style lang="scss" scoped>
   @import "../../../../assets/scss/colors.scss";
   @import "../../../../assets/styles/settingsTable";
+
+  .client-table {
+    width: 100%;
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
+
+    &__drop {
+      position: relative;
+      height: 32px;
+      width: 100%;
+      margin: 0 7px;
+    }
+
+    &__icons {
+      display: flex;
+      align-items: center;
+      padding-left: 7px;
+    }
+
+    &__icon {
+      @extend %table-icon;
+    }
+
+    &_opacity {
+      opacity: 1;
+    }
+  }
 
   .sub-information {
     box-sizing: border-box;

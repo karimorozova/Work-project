@@ -38,7 +38,6 @@ const {
 	updateProjectStatus,
 	getProjectWithUpdatedFinance,
 	manageDeliveryFile,
-	createTasksFromRequest,
 	setStepsStatus,
 	// getDeliverablesLink,
 	getAfterReopenSteps,
@@ -66,7 +65,8 @@ const {
 	createProjectFromRequest,
 	autoCreatingTaskInProject,
 	saveCertificateTODR1Files,
-	setStepDeadlineProjectAndMemoq
+	setStepDeadlineProjectAndMemoq,
+	autoCreatingTranslationTaskInProject
 } = require('../../projects')
 
 const {
@@ -241,6 +241,18 @@ router.post('/convert-request-into-project', async (req, res) => {
 		const { projectId: requestId } = req.body
 		const project = await createProjectFromRequest(requestId)
 		await autoCreatingTaskInProject(project, requestId)
+		res.send(project._id)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on converting project')
+	}
+})
+
+router.post('/convert-translation-request-into-project', async (req, res) => {
+	try {
+		const { projectId: requestId, creatorUserForMemoqId } = req.body
+		const project = await createProjectFromRequest(requestId)
+		await autoCreatingTranslationTaskInProject(project, requestId, creatorUserForMemoqId)
 		res.send(project._id)
 	} catch (err) {
 		console.log(err)
@@ -879,20 +891,6 @@ router.post('/project-value', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Error on saving project property value')
 	}
-})
-// TODO: refactoring client request
-router.post('/request-tasks', async (req, res) => {
-	// const { dataForTasks, request, isWords } = req.body
-	// const { _id, service, style, type, structure, tones, seo, designs, packageSize, isBriefApproved, isDeadlineApproved, ...project } = request
-	// try {
-	// 	const updatedProject = await createProject(project)
-	// 	const newProject = await createTasksFromRequest({ project: updatedProject, dataForTasks, isWords })
-	// 	await removeClientRequest(_id)
-	// 	res.send(newProject)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on adding tasks')
-	// }
 })
 
 router.post('/step-target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {

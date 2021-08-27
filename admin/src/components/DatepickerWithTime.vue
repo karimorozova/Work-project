@@ -1190,6 +1190,7 @@
     width: 220px;
     height: 32px;
     transition: .1s ease-out;
+    background: white;
 
     &:focus {
       border: 1px solid $border-focus;

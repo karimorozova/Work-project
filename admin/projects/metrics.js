@@ -19,7 +19,8 @@ async function updateProjectMetricsAndCreateSteps(projectId, tasks) {
 
 		filterExistingTasks();
 
-		await timeout(3000)
+		await timeout(3500)
+
 		for await (let task of tasks) {
 			const { stepsAndUnits } = task;
 			const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount');

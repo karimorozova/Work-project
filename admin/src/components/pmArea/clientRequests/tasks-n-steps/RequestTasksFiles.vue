@@ -1,29 +1,26 @@
 <template lang="pug">
   .tasks-files
-    .tasks-files__table
-      DataTable(
+    .table
+      GeneralTable(
         :fields="fields"
         :tableData="filesData"
-        :bodyClass="filesData.length < 6 ? 'tbody_visible-overflow' : ''"
-        :tableheadRowClass="filesData.length < 6 ? 'tbody_visible-overflow' : ''"
-        bodyRowClass="steps-table-row"
       )
         template(slot="headerFileName" slot-scope="{ field }")
-          span.step-files__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerCategory" slot-scope="{ field }")
-          span.step-files__label {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerIcon" slot-scope="{ field }")
-          span.step-files__label {{ field.label }}
+          .table__header {{ field.label }}
 
         template(slot="fileName" slot-scope="{ row, index }")
-          span.step-files__data {{ row.name }}
+          .table__data {{ row.name }}
         template(slot="category" slot-scope="{ row, index }")
-          span.step-files__data {{ row.category }}
+          .table__data {{ row.category }}
         template(slot="icon" slot-scope="{ row, index }")
-          .step-files__icons
-            span.step-files__data.step-files__dataIcon(v-if="!!row.path" @click="downloadFile(row.path)")
+          .table__icons
+            .table__icon(v-if="!!row.path" @click="downloadFile(row.path)")
               img(src="../../../../assets/images/latest-version/download-file.png" )
-            span.step-files__data.step-files__dataIcon(@click="removeFile(row)")
+            .table__icon(@click="removeFile(row)")
               img(src="../../../../assets/images/Other/delete-icon-qa-form.png")
 
     .tasks-files__tableAdd(id="add")
@@ -31,34 +28,32 @@
 
     .tasks-files__vault(v-if="isVaultModal" id="modal")
       .tasks-files__title Client's Vault
-      .tasks-files__items
+      .tasks-files__table
         span.tasks-files__close(@click="closeVaultModal") &#215;
-        DataTable(
-          :fields="fields2"
-          :tableData="filesVaultAll"
-          :bodyClass="filesVaultAll.length < 6 ? 'tbody_visible-overflow' : ''"
-          :tableheadRowClass="filesVaultAll.length < 6 ? 'tbody_visible-overflow' : ''"
-          bodyRowClass="cursor-default"
-        )
-          .vault-table__header.vault-table__check-cell(slot="headerCheck" slot-scope="{ field }")
-            CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
-          .vault-table__header(slot="headerFileName" slot-scope="{ field }") {{ field.label }}
-          .vault-table__header(slot="headerCategory" slot-scope="{ field }") {{ field.label }}
+        .table
+          GeneralTable(
+            :fields="fields2"
+            :tableData="filesVaultAll"
+          )
+            .table__header(slot="headerCheck" slot-scope="{ field }")
+              CheckBox(:isChecked="isAllChecked" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+            .table__header(slot="headerFileName" slot-scope="{ field }") {{ field.label }}
+            .table__header(slot="headerCategory" slot-scope="{ field }") {{ field.label }}
 
-          .vault-table__data.vault-table__check-cell(slot="check" slot-scope="{ row, index }")
-            CheckBox(:isChecked="row.isCheck" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
+            .table__data(slot="check" slot-scope="{ row, index }")
+              CheckBox(:isChecked="row.isCheck" @check="(e)=>toggle(e, index, true)" @uncheck="(e)=>toggle(e, index, false)" customClass="tasks-n-steps")
 
-          template(slot="fileName" slot-scope="{ row, index }")
-            span.step-files__data {{ row.filename }}
-          template(slot="category" slot-scope="{ row, index }")
-            span.step-files__data {{ row.category }}
+            template(slot="fileName" slot-scope="{ row, index }")
+              .table__data {{ row.filename }}
+            template(slot="category" slot-scope="{ row, index }")
+              .table__data {{ row.category }}
 
       .tasks-files__items
         .tasks-files__button
           Button(@clicked="addFileToAllTypes" value="Add")
 
       .tasks-files__browse
-        Button(@clicked="openUploadModal()" value="Browse my computer" :color="'#938676'")
+        Button(@clicked="openUploadModal()" value="Browse my computer" :outline="true" )
 
     .tasks-files__main(v-if="isUploadModal" id="modal2")
       .tasks-files__items
@@ -105,6 +100,7 @@
 	import FilesUpload from "../../tasks-n-steps/tasksFiles/FilesUpload"
 	import Button from "../../../Button"
 	import CheckBox from "../../../CheckBox"
+	import GeneralTable from "../../../GeneralTable"
 
 	export default {
 		props: {
@@ -121,14 +117,14 @@
 		data() {
 			return {
 				fields: [
-					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "60%", padding: 0 },
-					{ label: "Category", headerKey: "headerCategory", key: "category", width: "30%", padding: 0 },
-					{ label: "", headerKey: "headerIcon", key: "icon", width: "10%", padding: 0, cellClass: "step-files_centered" }
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", style: { width: "60%" } },
+					{ label: "Category", headerKey: "headerCategory", key: "category", style: { width: "30%" } },
+					{ label: "", headerKey: "headerIcon", key: "icon", style: { width: "10%" } }
 				],
 				fields2: [
-					{ label: "", headerKey: "headerCheck", key: "check", width: "5%", padding: 0 },
-					{ label: "File Name", headerKey: "headerFileName", key: "fileName", width: "65%", padding: 0 },
-					{ label: "Category", headerKey: "headerCategory", key: "category", width: "30%", padding: 0 }
+					{ label: "", headerKey: "headerCheck", key: "check", style: { width: "5%" } },
+					{ label: "File Name", headerKey: "headerFileName", key: "fileName", style: { width: "65%" } },
+					{ label: "Category", headerKey: "headerCategory", key: "category", style: { width: "30%" } }
 				],
 
 				filesVaultAll: [],
@@ -195,6 +191,7 @@
 				this.setDataValue({ prop: "sourceFilesVault", value: this.sourceFilesVault })
 				this.setDataValue({ prop: "refFilesVault", value: this.refFilesVault })
 				this.toggleAll(1, false)
+				this.closeVaultModal()
 			},
 			toggleAll(e, bool) {
 				this.filesVaultAll = this.filesVaultAll.map(item => {
@@ -284,6 +281,7 @@
 					return
 				}
 				this.setDataValue({ prop: "sourceFiles", value: this.sourceFiles })
+				this.closeUploadModal()
 			},
 			uploadRefFiles({ files }) {
 				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 50)
@@ -306,6 +304,7 @@
 					return
 				}
 				this.setDataValue({ prop: "refFiles", value: this.refFiles })
+				this.closeUploadModal()
 			},
 			deleteFile({ index }, prop) {
 				this[prop].splice(index, 1)
@@ -336,6 +335,7 @@
 			}
 		},
 		components: {
+			GeneralTable,
 			CheckBox,
 			Button,
 			FilesUpload,
@@ -371,6 +371,27 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../../../assets/scss/colors";
+
+  .table {
+    &__header,
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__icons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      height: 40px;
+    }
+
+    &__icon {
+      cursor: pointer;
+    }
+  }
 
   .vault-table {
     &__check-cell {
@@ -410,19 +431,25 @@
   .tasks-files {
     position: relative;
 
+    &__table {
+      width: 100%;
+    }
+
     &__title {
-      font-size: 18px;
       margin-bottom: 20px;
+      font-size: 16px;
+      font-family: Myriad600;
     }
 
     &__button {
       margin-bottom: 20px;
       display: flex;
       justify-content: center;
+      margin-top: 20px;
     }
 
     &__browse {
-      border-top: 1px solid #c5bfb5;
+      border-top: 1px solid $light-border;
       padding-top: 20px;
     }
 
@@ -460,6 +487,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       width: 600px;
+      border-radius: 4px;
     }
 
     &__main {

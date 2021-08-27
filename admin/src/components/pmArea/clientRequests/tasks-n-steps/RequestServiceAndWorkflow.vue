@@ -60,10 +60,8 @@
 	import SelectSingle from "../../../SelectSingle"
 	import RequestStepsDefaultDateModified from "./RequestStepsDefaultDateModified"
 	import { mapGetters, mapActions } from "vuex"
-	// import TasksLanguages from "../../../../mixins/TasksLanguages"
 
 	export default {
-		// mixins: [ TasksLanguages ],
 		props: {
 			currentTaskId: { type: String },
 			originallyLanguages: {
@@ -148,14 +146,14 @@
 					const { taskData: { stepsAndUnits } } = this.currentProject.tasksAndSteps.find(item => item.taskId === this.currentTaskId)
 					if (option === "2 Steps") {
 						this.stepsAndUnits = stepsAndUnits
-          }else{
+					} else {
 						this.stepsAndUnitsMono = stepsAndUnits
-          }
+					}
 					this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
 					return
-        }
+				}
 
-				let defaultStepsAndUnits
+				let defaultStepsAndUnits = null
 				const currentSteps = this.services.find(item => item.title === this.service)
 
 				if (option === "2 Steps") {
@@ -173,56 +171,55 @@
 						}
 					}
 					defaultStepsAndUnits = [
-						{
-							step: currentSteps.steps[0].step.title,
-							unit: firstUnit,
-							stepCounter: 1,
-							size: null
-						},
-						{
-							step: currentSteps.steps[1].step.title,
-							unit: secondUnit,
-							stepCounter: 2,
-							size: null
-						}
+						{ step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1, size: null },
+						{ step: currentSteps.steps[1].step.title, unit: secondUnit, stepCounter: 2, size: null }
 					]
+
 					this.stepsAndUnits = defaultStepsAndUnits
 				} else {
 					let firstUnit = returnUnit(0, this.originallySteps)
+
 					defaultStepsAndUnits = [
-						{
-							step: currentSteps.steps[0].step.title,
-							unit: firstUnit,
-							stepCounter: 1,
-							size: null
-						}
+						{ step: currentSteps.steps[0].step.title, unit: firstUnit, stepCounter: 1, size: null }
 					]
 
-          if(this.currentProject.status === "Request Approved"){
-          	const { requestForm: { complianceOptions: { title } } } = this.currentProject
-            if(currentSteps.steps[0].step.title === 'Compliance'){
-	            let templateNumber = /(\d+)/.exec(title) !== null ? /(\d+)/.exec(title) : ["1"]
-	            defaultStepsAndUnits[0].size = templateNumber[0]
-            }
-          }
-
+					if (this.service === "Compliance") {
+						const { requestForm: { complianceOptions: { title } } } = this.currentProject
+						if (currentSteps.steps[0].step.title === 'Compliance') {
+							let templateNumber = /(\d+)/.exec(title) !== null ? /(\d+)/.exec(title) : [ "1" ]
+							defaultStepsAndUnits[0].size = templateNumber[0]
+						}
+					}
 					this.stepsAndUnitsMono = defaultStepsAndUnits
 				}
 
 				this.setDataValue({ prop: "stepsAndUnits", value: defaultStepsAndUnits })
 
 				function returnUnit(index, array) {
-					return array.find((item) => item.title === currentSteps.steps[index].step.title
-					).calculationUnit[0].type
+					return array.find((item) => item.title === currentSteps.steps[index].step.title).calculationUnit[0].type
 				}
 			},
-			setDefaultTemplate() {
+			setDefaultStartTemplate() {
 				let catUnit = this.tasksData.stepsAndUnits.find(item => item.unit === 'CAT Wordcount')
 				if (catUnit) {
 					let stepsAndUnits = this.tasksData.stepsAndUnits
 					let template = {
 						template: {
 							...this.templates[0]
+						}
+					}
+					Object.assign(stepsAndUnits[catUnit.stepCounter - 1], stepsAndUnits[catUnit.stepCounter - 1], template)
+					this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
+				}
+			},
+			setDefaultEditsTemplate() {
+				let catUnit = this.tasksData.stepsAndUnits.find(item => item.unit === 'CAT Wordcount')
+				if (catUnit) {
+					let stepsAndUnits = this.tasksData.stepsAndUnits
+					let currTemplate = stepsAndUnits.find(item => item.hasOwnProperty('template')).template
+					let template = {
+						template: {
+							...currTemplate
 						}
 					}
 					Object.assign(stepsAndUnits[catUnit.stepCounter - 1], stepsAndUnits[catUnit.stepCounter - 1], template)
@@ -244,8 +241,14 @@
 					if (+workflowSteps.id === 2890) this.setNotDefaultStepDates()
 					else this.setDefaultStepDates()
 				}
+
 				this.setDefaultStepsAndUnits(this.workFlowOption)
-				this.setDefaultTemplate()
+
+				if (this.currentTaskId) {
+					this.setDefaultEditsTemplate()
+				} else {
+					this.setDefaultStartTemplate()
+				}
 			},
 			setNotDefaultStepDates() {
 				if (this.currentTaskId) {
@@ -300,6 +303,7 @@
 			}
 		},
 		created() {
+			console.log('start vsego - pr', this.currentProject)
 			this.setDefaultService()
 		},
 		computed: {

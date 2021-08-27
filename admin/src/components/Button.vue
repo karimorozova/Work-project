@@ -52,7 +52,7 @@
       padding: 0 24px 0 24px;
       height: 32px;
       font-size: 14px;
-      border-radius: 4px;
+      border-radius: 3px;
       background-color: white;
       outline: none;
       letter-spacing: 0.2px;
@@ -82,7 +82,7 @@
       height: 32px;
       color: $white;
       font-size: 14px;
-      border-radius: 4px;
+      border-radius: 3px;
       background-color: $red;
       border: none;
       transition: .2s ease-out;
@@ -109,29 +109,7 @@
 
   .disabled {
     opacity: 0.3;
-/*    .action-button__button {
-      opacity: 0.3;
-      min-width: 110px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      color: $white;
-      font-size: 14px;
-      border-radius: 4px;
-      background-color: $orange;
-      border: none;
-      transition: .1s ease;
-      outline: none;
-      letter-spacing: 0.2px;
-      cursor: default;
-
-      &:hover {
-        box-shadow: none;
-      }
-
-      &:active {
-        box-shadow: none;
-      }
-    }*/
+    cursor: default;
   }
 
   .middle {

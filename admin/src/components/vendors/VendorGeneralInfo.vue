@@ -140,7 +140,7 @@
             placeholder="Select"
             :hasSearch="true"
             :selectedOptions="currentVendor.hasOwnProperty('aliases') ? currentVendor.aliases : currentVendorAliases"
-            :options="vendorAliases"
+            :options="['test1', 'test2']"
             @chooseOptions="setAlias"
           )
 </template>
@@ -204,18 +204,18 @@
 					console.log(err)
 				}
 			},
-			async getAliases() {
-				try {
-					const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
-					this.aliases = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Aliases",
-						isShow: true,
-						type: "error"
-					})
-				}
-			}
+			// async getAliases() {
+			// 	try {
+			// 		const result = await this.$http.get(`/memoqapi/memoq-vendor-aliases/${ this.$route.params.id }`)
+			// 		this.aliases = result.body
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Error in Aliases",
+			// 			isShow: true,
+			// 			type: "error"
+			// 		})
+			// 	}
+			// }
 		},
 		computed: {
 			...mapGetters({
@@ -256,7 +256,7 @@
 		},
 		created() {
 			this.getTimezones()
-			this.getAliases()
+			// this.getAliases()
 		}
 	}
 </script>

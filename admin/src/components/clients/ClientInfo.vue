@@ -1038,7 +1038,7 @@
       letter-spacing: 0.2px;
 
       &-grey {
-        background-color: $table-list;
+        background-color: white;
       }
 
       .title {
@@ -1062,7 +1062,7 @@
 
     &__block {
       box-sizing: border-box;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       position: relative;
       border-radius: 4px;

@@ -374,6 +374,7 @@
 
   .tasks-data {
     position: relative;
+    margin-top: 20px;
 
     &__files{
       padding: 0 10px 20px;
