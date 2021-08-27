@@ -5,7 +5,7 @@ const { checkClientContact } = require('../middleware')
 const { getClient } = require('../clients')
 const { getService } = require('../services')
 const {
-	getProject, getProjects, updateProjectStatusForClientPortalProject
+	getProject, getProjects, getProjectsForPortal, updateProjectStatusForClientPortalProject
 	// getDeliverablesLink
 } = require("../projects/")
 const { getProjectDeliverables } = require('../projects/files')
@@ -14,6 +14,7 @@ const {
 	// createRequest,
 	// storeRequestFiles,
 	getClientsRequests,
+	getClientsRequestsForPortal,
 	// updateClientRequest,
 	// clientRequestNotification,
 	// notifyRequestCancelled,
@@ -139,14 +140,14 @@ router.get('/projects', checkClientContact, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		const client = await getClient({ '_id': verificationResult.clientId })
-		const projects = await getProjects({ $and: [ { status: { $nin: [ 'Draft', 'Cost Quote' ] } }, { 'customer': verificationResult.clientId } ] })
+		const projects = await getProjectsForPortal({ $and: [ { status: { $nin: [ 'Draft', 'Cost Quote' ] } }, { 'customer': verificationResult.clientId } ] })
 
 		//Not Delete this section
 		// const memoqProjects = await getMemoqProjectsForClientPortal(
 		//   { $and: [{ customer: verificationResult.clientId }, { status: { $ne: null } }] }
 		// );
 
-		const requests = await getClientsRequests({
+		const requests = await getClientsRequestsForPortal({
 			'clientIdFilter': verificationResult.clientId,
 			status: { $ne: 'Closed' }
 		})

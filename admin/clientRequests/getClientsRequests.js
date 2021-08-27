@@ -77,6 +77,23 @@ async function getClientsRequests(filters) {
 	}
 }
 
+async function getClientsRequestsForPortal(filters) {
+	try {
+		return await ClientRequest.find({ customer: ObjectId(filters.clientIdFilter),"status": {     "$ne": "Closed"   }  }).sort({startDate: -1}).limit(25).populate([
+		  "requestForm.sourceLanguage",
+		  "requestForm.targetLanguages",
+		  "requestForm.service",
+		  "industry",
+		  "accountManager",
+		  "projectManager",
+		])
+
+	} catch(err) {
+		console.log(err);
+		console.log("Error on getting filtered client requests");
+	}
+}
+
 
 async function getClientRequestById(id) {
 	try {
@@ -135,4 +152,5 @@ module.exports = {
 	getClientRequestById,
   getClientRequestAfterUpdate,
 	removeClientRequestById,
+	getClientsRequestsForPortal,
 }

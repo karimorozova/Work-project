@@ -163,7 +163,7 @@
             .order__subTitle Deadline:
             .order__value {{ customFormatter(currentDeadline) }}
 
-    //client-request-completed(v-else :values="groupAllData()")
+    ClientRequestTranslationCompleted(v-else :values="groupAllData()")
 
 
 </template>
@@ -179,7 +179,7 @@
 	import Add from "../../../../components/pangea/Add"
 	import ClientTable from "../../../../components/ClientTable"
 	import Button from "../../../../components/buttons/Button"
-	import ClientRequestCompleted from "../../../../components/completedOrder/clientRequestCompleted"
+	import ClientRequestTranslationCompleted from "../../../../components/completedOrder/clientRequestTranslationCompleted"
 	import ValidationErrors from "../../../../components/ValidationErrors"
 	import GeneralTable from "../../../../components/pangea/GeneralTable"
 	import SelectMulti from "../../../../components/pangea/SelectMulti"
@@ -429,7 +429,7 @@
 			SelectMulti,
 			GeneralTable,
 			ValidationErrors,
-			ClientRequestCompleted,
+      ClientRequestTranslationCompleted,
 			Button,
 			Add,
 			DataTable,

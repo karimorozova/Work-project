@@ -20,16 +20,19 @@
               slot(:name="headerKey" :field="{ headerKey, sortInfo, style, dataKey, key, filterInfo, ...rest }")
 
               .th__sortIcons(v-if="sortInfo && sortInfo.isSort")
-
-                i.fas.fa-times-circle(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'" @click.stop="removeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
-                span(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'")
-                  i.fas.fa-caret-down(v-if="sortInfo.order === 'asc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'desc'})")
-                  i.fas.fa-caret-up(v-else-if="sortInfo.order === 'desc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
-                i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+                span.icon-wrapper(v-show="sortInfo.order === 'asc' || sortInfo.order === 'desc'" @click.stop="removeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+                  i.fas.fa-times-circle
+                span.icon-wrapper(v-show="sortInfo.order === 'asc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'desc'})")
+                  i.fas.fa-caret-down
+                span.icon-wrapper(v-show="sortInfo.order === 'desc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+                  i.fas.fa-caret-up
+                span.icon-wrapper(v-show="sortInfo.order !== 'asc' && sortInfo.order !== 'desc'" @click.stop="addSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
+                  i.fas.fa-sort
 
             .th__filter(v-if="filterInfo && filterInfo.isFilter && showFilters")
               input(:ref='key' @keyup="(e) => setFilter({filterInfo, value: e.target.value, key: dataKey, filterField: key})")
-              i.fas.fa-backspace.th__filter-close(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
+              span.icon-wrapper(v-if="filterInfo.isFilterSet" @click.stop="removeFilter({ filterInfo, filterField: key})")
+                i.fas.fa-backspace.th__filter-close
 
       tbody(:class="[{'scroll': tableData.length >= elementToScroll},{'shortBody': isBodyShort}]" ref="tableBody" @scroll="handleBodyScroll")
         tr.data(v-for="(row, index) of tableData" :class="{'active': activeField === index}")
@@ -284,8 +287,8 @@
 
       &-close {
         position: absolute;
-        right: 14px;
-        top: 8px;
+        right: 8px;
+        top: 0px;
       }
     }
   }

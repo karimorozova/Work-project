@@ -1,35 +1,31 @@
 <template lang="pug">
   .dashboard
-    .dashboard__item
-      .dashboard__title My Quotes
-      .dashboard__table
-        Table(:projects="myFilteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'myFilteredQuotes')")
-    .dashboard__item
-      .dashboard__title My Open Requests
-      .dashboard__table
-        Table(:projects="myFilteredRequest"  @getDetails="getMyRequestDetails" :isOpenRequest="true" )
-    .dashboard__item
-      .dashboard__title My Open Projects
-      .dashboard__table
-        Table(:projects="myFilteredProjects" @getDetails="(e) => getDetails(e, 'myFilteredProjects')" :isOpenProjects="true")
-    .dashboard__item
-      .dashboard__title All Quotes
-      .dashboard__table
-        Table(:projects="filteredQuotes" @iconClicked="makeQuoteAction" @getDetails="(e) => getDetails(e, 'filteredQuotes')")
-    .dashboard__item
-      .dashboard__title All Open Requests
-      .dashboard__table
-        Table(:projects="filteredRequest"  @getDetails="getRequestDetails" :isOpenRequest="true" )
-    .dashboard__item
-      .dashboard__title All Open Projects
-      .dashboard__table
-        Table(:projects="filteredProjects" @getDetails="(e) => getDetails(e, 'filteredProjects')" :isOpenProjects="true")
+    .row
+      .col
+        AllOpenRequests( :allRequests="filteredRequest")
+      .col
+        MyOpenRequests( :myRequests="myFilteredRequest")
+    .row
+      .col
+        AllOpenQuotes( :allQuotes="filteredQuotes" @changeQuoteStatus="makeQuoteAction")
+      .col
+        MyOpenQuotes( :myQuotes="myFilteredQuotes")
+    .row
+      .col
+        AllOpenProjects( :allProjects="filteredProjects")
+      .col
+        MyOpenProjects( :myProjects="myFilteredProjects")
 </template>
 
 <script>
-	import Table from "../../components/projects/Table"
+	import AllOpenRequests from "../../../components/Tables/dashboard/AllOpenRequests"
+	import MyOpenRequests from "../../../components/Tables/dashboard/MyOpenRequests"
+	import AllOpenQuotes from "../../../components/Tables/dashboard/AllOpenQuotes"
+	import MyOpenQuotes from "../../../components/Tables/dashboard/MyOpenQuotes"
+	import AllOpenProjects from "../../../components/Tables/dashboard/AllOpenProjects"
+	import MyOpenProjects from "../../../components/Tables/dashboard/MyOpenProjects"
 	import { mapActions, mapGetters } from "vuex"
-  import {getClientInfo, getToken, getUserInfo} from "../../../store/getters";
+  import moment from "moment"
 
 	export default {
 		props: {
@@ -57,22 +53,45 @@
 				const id = this[prop][index]._id
 				this.$router.push(`/dashboard/details/${ id }`)
 			},
-      getMyRequestDetails({ index }) {
-        const id = this.myFilteredRequest[index]._id
-        this.$router.push(`/client-request/details/${ id }`)
-      },
-      getRequestDetails({index}) {
-        const id = this.filteredRequest[index]._id
-        this.$router.push(`/client-request/details/${ id }`)
-      },
-			async makeQuoteAction({ index, key }) {
-				const quote = this.filteredQuotes[index]
+      // getMyRequestDetails({ index }) {
+      //   const id = this.myFilteredRequest[index]._id
+      //   this.$router.push(`/client-request/details/${ id }`)
+      // },
+      // getRequestDetails({index}) {
+      //   const id = this.filteredRequest[index]._id
+      //   this.$router.push(`/client-request/details/${ id }`)
+      // },
+			async makeQuoteAction({ _id, status }) {
+        const quote = this.filteredQuotes.find((quote) => quote._id === _id)
 				try {
-					await this.updateQuoteStatus({ quote, key })
+					await this.updateQuoteStatus({ quote, key: status })
 				} catch (err) {
 
 				}
-			}
+			},
+      // getCreatedBy(createdBy) {
+      //   return createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+      // },
+      // customFormatter(date) {
+      //   return moment(date).format('MMM D, HH:mm')
+      // },
+      // setFields() {
+      //   if(this.isOpenProjects) {
+      //     let progressElement = {...this.fields[this.fields.length-1], label: 'Progress', key: 'progress', width: "11.5%"};
+      //     this.fields.pop();
+      //     this.fields.splice(3, 0, progressElement);
+      //   }
+      //   if(this.isOpenRequest) {
+      //     this.fields = [
+      //       {label: "Project ID", headerKey: "headerProjectId", key: "projectId", width: "20%", padding: "0"},
+      //       {label: "Project Name", headerKey: "headerProjectName", key: "projectName", width: "20%", padding: "0"},
+      //       {label: "Status", headerKey: "headerStatus", key: "status", width: "20%", padding: "0"},
+      //       {label: "Request On", headerKey: "headerRequestDate", key: "requestDate", width: "15%", padding: "0"},
+      //       {label: "Deadline", headerKey: "headerDeadline", key: "deadline", width: "15%", padding: "0"},
+      //       {label: "Created By", headerKey: "headerCreatedBy", key: "createdBy", width: "10%", padding: "0"},
+      //     ]
+      //   }
+      // },
 		},
 		computed: {
 		  ...mapGetters({
@@ -93,83 +112,60 @@
 				return this.clientRequests.filter(clientRequest => clientRequest.status !== 'Closed')
 			},
       myFilteredQuotes() {
-		    return this.filteredQuotes.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
+		    return this.filteredQuotes.filter(quote =>  quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
+          // return quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ firstName, surname }) => firstName + surname).includes(this.user.firstName + this.user.surname )})
       },
       myFilteredProjects() {
-		    return this.filteredProjects.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
+		    return this.filteredProjects.filter(project => project.hasOwnProperty('clientContacts') && project.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
       },
       myFilteredRequest() {
-		    return this.filteredRequest.filter(quote => quote.hasOwnProperty('createdBy') && quote.createdBy._id === this.user._id)
+		    return this.filteredRequest.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
       }
 		},
 		components: {
-			Table
+			// Table,
+      AllOpenRequests,
+      MyOpenRequests,
+      AllOpenQuotes,
+      MyOpenQuotes,
+      AllOpenProjects,
+      MyOpenProjects
 		},
   }
 
 </script>
 
 <style lang="scss" scoped>
+.dashboard {
+  width: 1530px;
+  //margin: 50px;
 
-  .dashboard {
-    width: 100%;
+  .row {
     display: flex;
-    flex-direction: column;
-
-    &__item {
-      width: 1040px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-
-    }
-
-    &__drop-menu {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px 0 rgba(103, 87, 62, .3), 0 2px 16px 0 rgba(103, 87, 62, .2);
-      margin-right: 36px;
-      margin-bottom: 10px;
-      padding: 0 14px;
-      color: #67573e;
-      transition: all 0.2s;
-    }
-
-    &__select {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding: 20px;
-      cursor: pointer;
-      font-size: 18px;
-    }
-
-    &__title{
-      margin: 30px 0 10px;
-      font-family: Myriad400;
-      font-size: 20px;
-      color: #67573e;
-    }
-
-    &__table {
-      box-shadow: rgba(103, 87, 62, .3) 0px 2px 5px, rgba(103, 87, 62, .15) 0px 2px 6px 2px;
-      padding: 20px;
-    }
-
-    &_cornered {
-      border-radius: 0;
-      border: none;
-      margin-bottom: 0;
-    }
-
-    &_rotate-180 {
-      transform: rotate(180deg);
-    }
+    justify-content: space-between;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
   }
+
+  .col {
+    width: 750px;
+    padding: 10px 20px 20px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 4px;
+    position: relative;
+    align-self: baseline;
+  }
+}
+
+@media (max-width: 1860px) {
+  .dashboard {
+    width: 750px;
+  }
+  .row .col:first-child {
+    margin-bottom: 35px;
+  }
+}
 
 </style>

@@ -2,7 +2,9 @@ const {
 	getClientRequestById,
 	getClientRequestAfterUpdate,
 	getClientsRequests,
-	removeClientRequestById
+	removeClientRequestById,
+	removeClientRequestById,
+	getClientsRequestsForPortal,
 } = require('./getClientsRequests')
 
 const {
@@ -51,5 +53,8 @@ module.exports = {
 	updateClientContacts,
 	removeClientRequestById,
 	removeContactClientRequest,
-	sendMailToClient
+	sendMailToClient,
+	removeContactClientRequest,
+	sendMailToClient,
+	getClientsRequestsForPortal,
 }

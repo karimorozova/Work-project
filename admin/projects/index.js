@@ -1,6 +1,7 @@
 const {
 	getProject,
 	getProjects,
+	getProjectsForPortal,
 	updateProject,
 	getFilteredProjects,
 	getProjectAfterUpdate
@@ -179,4 +180,5 @@ module.exports = {
 	changeNameLang,
 	// getClientsRequests,
 	// getClientRequestById,
+	getProjectsForPortal,
 }
