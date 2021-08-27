@@ -1,4 +1,4 @@
-const { Projects, Clients, CurrencyRatio } = require('../models');
+const { Projects, Clients, CurrencyRatio, ClientRequest } = require('../models');
 const { getProject } = require('./getProjects');
 const { createTasksWithPackagesUnit } = require('./taskForPackages');
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon');

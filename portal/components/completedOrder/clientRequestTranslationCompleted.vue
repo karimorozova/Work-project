@@ -23,6 +23,11 @@
                 .form__input-title Industry:
                 .width-220 {{ values.currentIndustries.name}}
 
+            .form__col
+              .form__select(style="margin-top: 20px;")
+                .form__input-title Service:
+                .width-220 {{ values.currentService}}
+
         .form__title Languages
         .form__part
           .form__row
@@ -49,14 +54,14 @@
                 .table__data(slot="type" slot-scope="{ row }") {{row.type}}
 
 
-        .form__title Project Details
-        .form__part
-          .form__row
-            .form__col
-              .form__select(style="margin-top: 20px;")
-                .form__input-title-margin9 Enter a short brief:
-                div(style="width: 575px")
-                  textarea.form__textarea(rows="4" v-model="values.currentBrief" disabled="true")
+        //.form__title Project Details
+        //.form__part
+        //  .form__row
+        //    .form__col
+        //      .form__select(style="margin-top: 20px;")
+        //        .form__input-title-margin9 Enter a short brief:
+        //        div(style="width: 575px")
+        //          textarea.form__textarea(rows="4" v-model="values.currentBrief" disabled="true")
         .form__submit
           Button(@clicked="goToMainPage" value="Go to Main Page")
 

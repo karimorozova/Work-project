@@ -141,7 +141,7 @@
           .table__header(slot="headerStatus" slot-scope="{ field }") {{ field.label }}
           .table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
 
-          .table__data(slot="check" slot-scope="{ index, row }")
+          .table__checkbox(slot="check" slot-scope="{ index, row }")
             CheckBox(:isChecked="!!row.isChecked" @check="()=> toggle(row, true)" @uncheck="()=>toggle(row, false)" customClass="tasks-n-steps")
           .table__data(slot="ID" slot-scope="{ row }") {{ row.deliveryInternalId }}
           .table__data(slot="name" slot-scope="{ row }") {{ row.deliveryName }}
@@ -802,6 +802,14 @@
       align-items: center;
       height: 40px;
       overflow: auto;
+    }
+
+
+    &__checkbox {
+      padding: 0 6px;
+      width: 100%;
+      display: flex;
+      align-items: center;
     }
 
     &__icons {

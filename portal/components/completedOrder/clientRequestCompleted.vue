@@ -23,6 +23,11 @@
                 .form__input-title Industry:
                 .width-220 {{ values.currentIndustries.name}}
 
+            .form__col
+              .form__select(style="margin-top: 20px;")
+                .form__input-title Service:
+                .width-220 {{ values.currentService}}
+
         .form__title languages
         .form__part
           .form__row
@@ -33,7 +38,7 @@
             .form__col
               .form__select
                 .form__input-title Target Language:
-                .width-220 {{ values.currentTargetLang.lang}}
+                .width-220 {{ values.currentTargetLang[0].lang}}
         .form__title Files
         .form__part
           .form__row
@@ -62,12 +67,12 @@
                 .width-310
                   ul(v-html="values.currentComplianceTemplate.description" )
 
-          .form__row
-            .form__col
-              .form__select(style="margin-top: 20px;")
-                .form__input-title-margin9 Enter a short brief:
-                div(style="width: 575px")
-                  textarea.form__textarea(rows="4" v-model="values.currentBrief" disabled="true")
+          //.form__row
+          //  .form__col
+          //    .form__select(style="margin-top: 20px;")
+          //      .form__input-title-margin9 Enter a short brief:
+          //      div(style="width: 575px")
+          //        textarea.form__textarea(rows="4" v-model="values.currentBrief" disabled="true")
 
         //.form__ckeckbox(v-if="isStartOption")
         //  TextRadio(

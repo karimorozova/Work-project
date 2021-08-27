@@ -1,6 +1,7 @@
 <template lang="pug">
   .details(v-if="clientRequests.length")
-    ClientRequestCompleted(v-if="clientRequests.length" :isStartOption="false" :values="groupAllData()")
+    ClientRequestTranslationCompleted(v-if="currentClientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
+    ClientRequestCompleted(v-else :isStartOption="false" :values="groupAllData()")
 </template>
 
 <script>
@@ -8,6 +9,7 @@
 	// import OtherInfo from "./OtherInfo"
 	import { mapGetters } from "vuex"
   import ClientRequestCompleted from "../../../../components/completedOrder/clientRequestCompleted";
+  import ClientRequestTranslationCompleted from "../../../../components/completedOrder/clientRequestTranslationCompleted";
   import moment from "moment";
 
 	export default {
@@ -24,7 +26,8 @@
           currentDeadline: this.customFormatter(this.currentClientRequest.deadline),
           currentIndustries: this.currentClientRequest.industry,
           currentSourceLang: this.currentClientRequest.requestForm.sourceLanguage,
-          currentTargetLang: this.currentClientRequest.requestForm.targetLanguages[0],
+          currentTargetLang: this.currentClientRequest.requestForm.targetLanguages,
+          currentService: this.currentClientRequest.requestForm.service.title,
           files: this.files,
           currentComplianceTemplate: this.currentClientRequest.requestForm.complianceOptions,
           currentBrief: this.currentClientRequest.brief,
@@ -63,7 +66,8 @@
 			// }
 		},
 		components: {
-      ClientRequestCompleted
+      ClientRequestCompleted,
+      ClientRequestTranslationCompleted,
 			// MainInfo,
 			// OtherInfo
 		},
