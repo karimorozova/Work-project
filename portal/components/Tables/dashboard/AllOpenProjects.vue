@@ -38,7 +38,7 @@
           .table__data
             .short {{ row.projectName }}
             .tooltip(v-if="row.projectName.length >= 15")
-              .tooltipData(v-html="row.projectName")
+              .tooltip-data(v-html="row.projectName")
               i(class="fas fa-info")
 
         template(slot="startDate", slot-scope="{ row, index }")
@@ -61,7 +61,7 @@
         template(slot="createdBy", slot-scope="{ row, index }")
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
             .tooltip.user
-              .tooltipData(v-html="getCreatedBy(row.createdBy).createdBy")
+              .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
               i(class="fas fa-user")
 
 
@@ -161,8 +161,8 @@
       },
       getCreatedBy(createdBy) {
         return {
-        	isCreatedBy: !!(createdBy && createdBy.hasOwnProperty('firstName')),
-	        createdBy: createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+          isCreatedBy: !!(createdBy && createdBy.hasOwnProperty('firstName')),
+          createdBy: createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
         }
       },
       progress(steps, project) {
@@ -263,34 +263,44 @@
       color: $text;
     }
   }
-  .user{
-    height: 32px;
-    width: 32px;
-    background: $light-border;
-    border-radius: 50%;
-    justify-content: center;
-    align-items: center;
-    color: $dark-border;
-  }
+
   .tooltip {
     position: relative;
     display: flex;
     cursor: help;
+    color: $dark-border;
 
 
-    .tooltipData {
+    &.user{
+      height: 32px;
+      width: 32px;
+      background: $light-border;
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
+      color: $dark-border;
+    }
+
+    &-data{
       visibility: hidden;
       font-size: 14px;
       width: max-content;
       background: white;
       border-radius: 4px;
-      right: 40px;
+      right: 15px;
+      top: -7px;
       padding: 7px 7px 5px 7px;
       position: absolute;
       z-index: 555;
       opacity: 0;
       transition: opacity .3s;
       border: 1px solid $text;
+      color: $text;
+      &.user{
+        right: 40px;
+        top: 1px;
+        color: $text;
+      }
 
       &::after {
         content: "";
@@ -305,7 +315,7 @@
     }
 
     &:hover {
-      .tooltipData {
+      .tooltip-data {
         visibility: visible;
         opacity: 1;
       }

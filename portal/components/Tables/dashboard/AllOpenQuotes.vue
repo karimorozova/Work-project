@@ -37,8 +37,8 @@
         template(slot="projectName", slot-scope="{ row, index }")
           .table__data
             .short {{ row.projectName }}
-            .tooltip
-              .tooltipData(v-html="row.projectName")
+            .tooltip(v-if="row.projectName.length >= 15")
+              .tooltip-data(v-html="row.projectName")
               i(class="fas fa-info")
 
 
@@ -57,10 +57,10 @@
             span.data-table__currency(v-if="row.finance.Price.receivables")
 
         template(slot="createdBy", slot-scope="{ row, index }")
-          .table__icons
-            .tooltip
-              .tooltipData(v-html="getCreatedBy(row.createdBy)")
-              i(class="fas fa-info")
+          .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
+            .tooltip.user
+              .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
+              i(class="fas fa-user")
 
 
         template(slot="icons", slot-scope="{ row, index }")
@@ -177,7 +177,10 @@
         this.closeDeleteModal()
       },
       getCreatedBy(createdBy) {
-        return createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+        return {
+          isCreatedBy: !!(createdBy && createdBy.hasOwnProperty('firstName')),
+          createdBy: createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+        }
       },
       quotesAction(_id,status) {
         this.isChangeStatus = true
@@ -287,21 +290,39 @@
     position: relative;
     display: flex;
     cursor: help;
+    color: $dark-border;
 
-    .tooltipData {
+
+    &.user{
+      height: 32px;
+      width: 32px;
+      background: $light-border;
+      border-radius: 50%;
+      justify-content: center;
+      align-items: center;
+      color: $dark-border;
+    }
+
+    &-data{
       visibility: hidden;
       font-size: 14px;
       width: max-content;
       background: white;
       border-radius: 4px;
-      right: 25px;
+      right: 15px;
+      top: -7px;
       padding: 7px 7px 5px 7px;
       position: absolute;
       z-index: 555;
       opacity: 0;
       transition: opacity .3s;
       border: 1px solid $text;
-      transform: translate(0,-30%);
+      color: $text;
+      &.user{
+        right: 40px;
+        top: 1px;
+        color: $text;
+      }
 
       &::after {
         content: "";
@@ -316,7 +337,7 @@
     }
 
     &:hover {
-      .tooltipData {
+      .tooltip-data {
         visibility: visible;
         opacity: 1;
       }
