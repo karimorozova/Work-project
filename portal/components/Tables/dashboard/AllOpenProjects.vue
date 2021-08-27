@@ -37,7 +37,7 @@
         template(slot="projectName", slot-scope="{ row, index }")
           .table__data
             .short {{ row.projectName }}
-            .tooltip
+            .tooltip(v-if="row.projectName.length >= 15")
               .tooltipData(v-html="row.projectName")
               i(class="fas fa-info")
 
@@ -59,10 +59,10 @@
             span(v-html="currencyIconDetected(row.projectCurrency)")
 
         template(slot="createdBy", slot-scope="{ row, index }")
-          .table__icons
-            .tooltip
-              .tooltipData(v-html="getCreatedBy(row.createdBy)")
-              i(class="fas fa-info")
+          .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
+            .tooltip.user
+              .tooltipData(v-html="getCreatedBy(row.createdBy).createdBy")
+              i(class="fas fa-user")
 
 
 </template>
@@ -160,7 +160,10 @@
         this.closeDeleteModal()
       },
       getCreatedBy(createdBy) {
-        return createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+        return {
+        	isCreatedBy: !!(createdBy && createdBy.hasOwnProperty('firstName')),
+	        createdBy: createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+        }
       },
       progress(steps, project) {
         if(project.hasOwnProperty('fromXTRF')) {
@@ -188,6 +191,10 @@
 
 <style scoped lang="scss">
   @import "../../../assets/scss/colors";
+
+  .fa-info{
+    color: $dark-border;
+  }
 
   .component {
     &__title {
@@ -256,10 +263,20 @@
       color: $text;
     }
   }
+  .user{
+    height: 32px;
+    width: 32px;
+    background: $light-border;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    color: $dark-border;
+  }
   .tooltip {
     position: relative;
     display: flex;
     cursor: help;
+
 
     .tooltipData {
       visibility: hidden;
@@ -267,14 +284,13 @@
       width: max-content;
       background: white;
       border-radius: 4px;
-      right: 25px;
+      right: 40px;
       padding: 7px 7px 5px 7px;
       position: absolute;
       z-index: 555;
       opacity: 0;
       transition: opacity .3s;
       border: 1px solid $text;
-      transform: translate(0,-30%);
 
       &::after {
         content: "";
