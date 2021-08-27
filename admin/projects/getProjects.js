@@ -11,6 +11,31 @@ async function getProjects(obj) {
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
 }
 
+async function getProjectsForPortal(obj) {
+	return (await Projects.find(
+			obj,
+				{
+					projectId:1,
+						projectName:1,
+						status: 1,
+						clientContacts: 1,
+						tasks: 1,
+						steps:1,
+						startDate: 1,
+						deadline: 1,
+						finance: 1,
+						createdBy: 1,
+						tasksDeliverables: 1,
+						tasksDR2: 1,
+				}
+			)
+			.populate('industry')
+			.populate('service')
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
+}
+
 async function getProject(obj) {
 	const project = await Projects.findOne(obj)
 			.populate('industry')
@@ -141,4 +166,4 @@ async function getFilteredProjects(filters) {
 	}
 }
 
-module.exports = { getProject, getProjects, updateProject, getFilteredProjects, getProjectAfterUpdate }
+module.exports = { getProject, getProjects, getProjectsForPortal, updateProject, getFilteredProjects, getProjectAfterUpdate }

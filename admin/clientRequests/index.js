@@ -3,6 +3,7 @@ const  {
   getClientRequestAfterUpdate,
 	getClientsRequests,
 	removeClientRequestById,
+	getClientsRequestsForPortal,
 } = require('./getClientsRequests')
 
 const {
@@ -50,4 +51,5 @@ module.exports = {
 	removeClientRequestById,
   removeContactClientRequest,
   sendMailToClient,
+	getClientsRequestsForPortal,
 }
