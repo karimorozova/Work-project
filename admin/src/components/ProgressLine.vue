@@ -1,6 +1,6 @@
 <template lang="pug">
   .progress-line
-    .progress-line__filler(:style="{width: currentProgress + '%'}")
+    .progress-line__filler(:style="[{width: currentProgress + '%'}, {'background-color': getProgressColor(status)}]")
     .progress-line__tooltip
       span.progress-line__value {{ currentProgress }}%
 </template>
@@ -10,6 +10,14 @@
 		props: {
 			progress: {
 				type: [ Number, String ]
+			},
+			status: {
+				type: String
+			}
+		},
+		methods: {
+			getProgressColor(status) {
+				return status === 'Pending Approval [DR1]' || status === 'Completed' || status === 'Closed' ? '#47A6A6' : '#f6cb64'
 			}
 		},
 		computed: {
@@ -48,7 +56,6 @@
     }
 
     &__filler {
-      background-color: $green;
       height: 100%;
       max-width: 100%;
     }

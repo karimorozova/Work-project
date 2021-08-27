@@ -118,7 +118,7 @@
           .table__statusAndProgress
             .status {{ row.status | stepsAndTasksStatusFilter }}
             .progress
-              ProgressLineStep(:progress="progress(row.progress)" :lastProgress="lastProgress(row, index)")
+              ProgressLineStep(:progress="progress(row.progress)" :status="row.status" :lastProgress="lastProgress(row, index)")
 
         template(slot="receivables" slot-scope="{ row }")
           .table__finance

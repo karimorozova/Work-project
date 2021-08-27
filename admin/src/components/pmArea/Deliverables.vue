@@ -147,9 +147,8 @@
           .table__data(slot="name" slot-scope="{ row }") {{ row.deliveryName }}
           .table__data-langs(slot="pair" slot-scope="{ row }" v-html="row.pair")
           .table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
-          .table__data-tasks(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
-          .table__data(slot="status" slot-scope="{ row }")
-            .table__data-status
+          .table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
+          .table__dataStatus(slot="status" slot-scope="{ row }")
               .tooltip(v-if="row.status === 'Delivered'")
                 span#myTooltip2.tooltiptext-left(v-html="getDeliveryTimeAndPerson(row)")
                 i.far.fa-clock
@@ -404,13 +403,13 @@
 			getLangPair(row, type) {
 				const source = this.allLang.find(({ _id }) => row.sourceLanguage.toString() === _id.toString())
 				const target = this.allLang.find(({ _id }) => row.targetLanguage.toString() === _id.toString())
-				return source[type] + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + target[type]
+				return '<div>' + source[type] + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + target[type] + '</div>'
 			},
 			getLangPairByTasks(tasks) {
 				const filteredTasks = this.currentProject.tasks.filter(item => tasks.includes(item.taskId))
 
 				return [ ...new Set(filteredTasks.reduce((acc, curr) => {
-					acc.push(curr.sourceLanguage + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + curr.targetLanguage)
+					acc.push('<div>' + curr.sourceLanguage + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + curr.targetLanguage + '</div>')
 					return acc
 				}, [])) ].join(', ')
 			},
@@ -780,25 +779,29 @@
       padding: 0 0 0 6px;
     }
 
-    &__data-tasks,
     &__data-langs {
+      padding: 0 6px;
+      width: 100%;
+      display: grid;
+      align-items: center;
+      height: 40px;
+      overflow: auto;
+    }
+
+    &__dataStatus {
       padding: 0 6px;
       width: 100%;
       display: flex;
       align-items: center;
-      height: 40px;
-      overflow-y: hidden;
-    }
-
-    &__data-status {
-      display: flex;
     }
 
     &__data {
       padding: 0 6px;
       width: 100%;
-      display: flex;
+      display: grid;
       align-items: center;
+      height: 40px;
+      overflow: auto;
     }
 
     &__icons {

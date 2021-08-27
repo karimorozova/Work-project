@@ -101,7 +101,7 @@
 
         template(slot="progress" slot-scope="{ row, index }")
           .table__data(style="width: 100%" v-if="originallyServices.length && originallyUnits.length")
-            ProgressLine(:progress="progress(row)")
+            ProgressLine(:progress="progress(row)" :status="row.status")
 
         template(slot="discounts" slot-scope="{ row, index }")
           .table__data(v-html="discounts(row.discounts)")

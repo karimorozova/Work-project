@@ -4,7 +4,8 @@
       .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
         .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
 
-    .tasks-steps__tasks-title Tasks and Steps
+    .tasks-steps__tasks-title(v-if="isProjectFinished" style="margin-bottom: 20px;") Tasks and Steps
+    .tasks-steps__tasks-title(v-else) Tasks and Steps
 
       .tasks-steps__addTask(v-if="!isProjectFinished && !isTaskData" @click="toggleTaskData")
         i.fas.fa-plus-circle
@@ -43,7 +44,7 @@
         @setDate="setDate"
         @showTab="showTab"
       )
-      Button(v-if="currentProject.tasks.length && !isProjectFinished" :value="metricsButton" @clicked="getMetrics" :isDisabled="isDisabled")
+      Button(style="margin-top: 20px;" v-if="currentProject.tasks.length && !isProjectFinished" :value="metricsButton" :outline="true" @clicked="getMetrics" :isDisabled="isDisabled")
 </template>
 
 <script>

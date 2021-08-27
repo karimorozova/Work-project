@@ -133,7 +133,7 @@
           .table__data {{ formatDate(row).deadline }}
         template(slot="progress" slot-scope="{ row, index }")
           .table__data(style="width: 100%")
-            ProgressLine(:progress="progress(row, index)")
+            ProgressLine(:progress="progress(row, index)" :status="row.status")
         template(slot="status" slot-scope="{ row }")
           .table__data {{ row.status | stepsAndTasksStatusFilter }}
 

@@ -1,7 +1,7 @@
 <template lang="pug">
   .progress-line
     .progress-line__filler2(:style="{width: lastProgress + '%'}")
-    .progress-line__filler(:style="{width: (+currentProgress) - (+lastProgress) + '%'}")
+    .progress-line__filler(:style="[{width: (+currentProgress) - (+lastProgress) + '%'}, {'background-color': getProgressColor(status)}]")
     .progress-line__tooltip
       span.progress-line__value {{ currentProgress }}%
 </template>
@@ -12,8 +12,16 @@
 			progress: {
 				type: [ Number, String ]
 			},
+			status: {
+				type: String
+			},
 			lastProgress: {
 				type: [ Number, String ]
+			}
+		},
+		methods: {
+			getProgressColor(status) {
+				return status === 'Completed' ? '#47A6A6' : '#f6cb64'
 			}
 		},
 		computed: {
@@ -53,7 +61,7 @@
     }
 
     &__filler {
-      background-color: $green;
+      /*      background-color: $green;*/
       height: 100%;
       max-width: 100%;
     }
