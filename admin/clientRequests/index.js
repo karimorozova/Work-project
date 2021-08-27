@@ -3,7 +3,6 @@ const {
 	getClientRequestAfterUpdate,
 	getClientsRequests,
 	removeClientRequestById,
-	removeClientRequestById,
 	getClientsRequestsForPortal,
 } = require('./getClientsRequests')
 

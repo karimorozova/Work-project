@@ -35,7 +35,11 @@
 
 
         template(slot="projectName", slot-scope="{ row, index }")
-          .table__data {{ row.projectName }}
+          .table__data
+            .short {{ row.projectName }}
+            .tooltip
+              .tooltipData(v-html="row.projectName")
+              i(class="fas fa-info")
 
         template(slot="startDate", slot-scope="{ row, index }")
           .table__data {{ customFormatter(row.startDate) }}
@@ -221,6 +225,7 @@
       width: 100%;
       display: flex;
       justify-content: space-between;
+      box-sizing: border-box;
     }
     &__actions {
       justify-content: center;
@@ -235,6 +240,12 @@
       width: 100%;
       padding: 0 6px;
     }
+  }
+  .short {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 90%;
   }
   .icon-button{
     transition: .2s ease-out;

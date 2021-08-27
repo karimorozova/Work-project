@@ -35,8 +35,11 @@
 
 
         template(slot="projectName", slot-scope="{ row, index }")
-          .table__data {{ row.projectName }}
-
+          .table__data
+            .short {{ row.projectName }}
+            .tooltip
+              .tooltipData(v-html="row.projectName")
+              i(class="fas fa-info")
         template(slot="status", slot-scope="{ row, index }")
           .table__statusAndProgress
             .status {{ row.status  }}
@@ -222,6 +225,7 @@
       width: 100%;
       display: flex;
       justify-content: space-between;
+      box-sizing: border-box;
     }
 
     &__icons {
@@ -246,6 +250,12 @@
     &:hover {
       color: $text;
     }
+  }
+  .short {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 90%;
   }
   .tooltip {
     position: relative;
