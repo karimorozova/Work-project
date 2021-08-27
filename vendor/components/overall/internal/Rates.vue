@@ -169,6 +169,8 @@
     box-sizing: border-box;
     padding: 20px 20px 20px 20px;
     position: relative;
+    margin-bottom: 50px;
+
 
     &__table_msg {
       margin-top: 5px;

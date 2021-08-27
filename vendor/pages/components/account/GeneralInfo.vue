@@ -32,6 +32,7 @@
     width: 1040px;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 50px;
 
     &__photo-block {
       width: 20%;

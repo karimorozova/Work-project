@@ -1,7 +1,7 @@
 <template lang="pug">
-  .tasks-data
+  .tasks-data(v-if="originallySteps && originallyServices && originallyUnits && currentProject._id && templates.length")
     .tasks-data__main
-      .tasks-data__item(v-if="currentProject._id && templates.length")
+      .tasks-data__item
         RequestServiceAndWorkflow(
           :currentProject="currentProject"
           :originallyLanguages="originallyLanguages"

@@ -82,44 +82,44 @@
 					{
 						title: "Completed Jobs",
 						path: "/completed-jobs",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/CompleteJobs.png"),
 						active: false
 					},
 					{
 						title: "Competencies & Rate",
 						path: "/competency-and-rate",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Competencies.png"),
 						active: false
 					},
 					{
 						title: "Assessment",
 						path: "/qualification-and-assessment",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Assessment.png"),
 						active: false
 					},
 					{
 						title: "Experience & Education",
 						path: "/experience-and-education",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/ExperienceEducation.png"),
 						active: false
 					},
 					{
 						title: "Documents",
 						path: "/documents",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Documents.png"),
 						active: false
 					},
 					{
 						title: "Invoices",
 						path: "/invoices",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Invoices.png"),
 
 						active: false
 					},
 					{
 						title: "Profile",
 						path: "/account",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Profile.png"),
 						active: false
 					}
 				],

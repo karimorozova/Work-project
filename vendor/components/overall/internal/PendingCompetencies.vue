@@ -177,6 +177,7 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
     box-sizing: border-box;
     padding: 20px 20px 20px 20px;
     position: relative;
+    margin-bottom: 50px;
 
     &__data {
       @extend %table-data;

@@ -87,8 +87,6 @@
   .account-info {
     width: 100%;
     box-sizing: border-box;
-    padding: 20px 40px;
-    color: $main-color;
     position: relative;
 
     &__rates {
@@ -100,11 +98,13 @@
       justify-content: flex-end;
       width: 1040px;
       position: absolute;
+      top: -25px;
     }
 
     &__title {
-      font-size: 20px;
-      margin: 30px 0 10px;
+      font-size: 18px;
+      font-family: Myriad600;
+      margin-bottom: 10px;
     }
   }
 </style>

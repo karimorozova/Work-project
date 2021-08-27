@@ -24,8 +24,7 @@
 
 <style lang="scss" scoped>
   .container {
-    color: #67573E;
-    padding: 20px 40px;
+
   }
 
   .title {

@@ -107,13 +107,13 @@
 					{
 						title: "Projects",
 						path: "/projects",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Projects.png"),
 						active: false
 					},
 					{
 						title: "Profile",
 						path: "/account",
-						img: require("../assets/images/navbar/Dashboard.png"),
+						img: require("../assets/images/navbar/Profile.png"),
 						active: false
 					}
 					// {

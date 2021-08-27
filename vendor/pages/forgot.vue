@@ -85,14 +85,12 @@
 
     &__comment {
       font-size: 18px;
-      color: $main-color;
     }
 
     &__email {
       height: 40px;
       width: 100%;
       font-size: 18px;
-      color: $main-color;
       padding: 0 10px;
       box-sizing: border-box;
       border-radius: 4px;
@@ -156,7 +154,6 @@
       background-color: $white;
       padding: 40px;
       box-sizing: border-box;
-      color: $main-color;
     }
 
     &__message {

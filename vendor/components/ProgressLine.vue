@@ -45,7 +45,6 @@ export default {
     }
     &__value {
         background-color: $white;
-        color: $main-color;
         font-size: 14px;
         padding: 0 7px;
     }

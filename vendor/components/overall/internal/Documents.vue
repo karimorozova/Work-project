@@ -385,6 +385,6 @@
   }
 
   a {
-    color: $main-color;
+    color: $text;
   }
 </style>

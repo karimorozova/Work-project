@@ -9,18 +9,19 @@
 
       //img.tasks-steps__arrow(v-if="canUpdateRequest" src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     div(v-if="canUpdateRequest")
-      RequestTasksData(
-        v-if="isTaskData"
-        :originallyLanguages="originallyLanguages"
-        :originallyUnits="originallyUnits"
-        :originallySteps="originallySteps"
-        :originallyServices="originallyServices"
-        :currentTaskId="currentTaskId"
-        :currentTaskIdForUpdate="currentTaskIdForUpdate"
-        @endOfSettingTaskData="endOfSettingTaskData"
-        @addTasks="addTasks"
-        @showErrors="showErrors"
-      )
+      transition(name="slide-fade")
+        RequestTasksData(
+          v-if="isTaskData"
+          :originallyLanguages="originallyLanguages"
+          :originallyUnits="originallyUnits"
+          :originallySteps="originallySteps"
+          :originallyServices="originallyServices"
+          :currentTaskId="currentTaskId"
+          :currentTaskIdForUpdate="currentTaskIdForUpdate"
+          @endOfSettingTaskData="endOfSettingTaskData"
+          @addTasks="addTasks"
+          @showErrors="showErrors"
+        )
       ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
 
     .tasks-steps__tables
@@ -502,4 +503,16 @@
     }
   }
 
+  .slide-fade-enter-active {
+    transition: all .3s ease;
+  }
+
+  .slide-fade-leave-active {
+    transition: all .1s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  }
+
+  .slide-fade-enter, .slide-fade-leave-to {
+    transform: translateY(10px);
+    opacity: 0;
+  }
 </style>

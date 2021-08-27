@@ -423,7 +423,6 @@
   }
 
   .container {
-    margin: 50px;
     position: relative;
   }
 

@@ -205,15 +205,14 @@
 
   .closed-jobs {
     width: 100%;
-    padding: 20px 40px;
 
     .jobs_block {
-      color: $main-color;
+      margin-bottom: 50px;
 
       &__title {
-        margin: 30px 0 10px;
-        font-family: Myriad400;
-        font-size: 20px;
+        font-size: 18px;
+        font-family: Myriad600;
+        margin-bottom: 10px;
       }
 
       .jobs {
@@ -247,7 +246,6 @@
           width: 100%;
           border: none;
           outline: none;
-          color: $main-color;
         }
 
         &__icons {

@@ -47,8 +47,6 @@
 
 <style lang="scss" scoped>
   .container {
-    color: #67573E;
-    padding: 20px 40px;
     position: relative;
   }
 
@@ -59,7 +57,7 @@
   }
   .button {
     position: absolute;
-    top: 30px;
+    top: -25px;
     right: 40px;
   }
 </style>

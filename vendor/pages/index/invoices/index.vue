@@ -200,7 +200,6 @@
   }
 
   .container {
-    margin: 50px;
   }
 
   .title {

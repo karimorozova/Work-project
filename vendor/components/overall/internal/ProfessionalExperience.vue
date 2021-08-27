@@ -322,6 +322,8 @@
     box-sizing: border-box;
     padding: 20px 20px 20px 20px;
     position: relative;
+    margin-bottom: 50px;
+
 
     &__data {
       height: 30px;

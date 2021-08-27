@@ -216,9 +216,7 @@
   }
 
   .details {
-    color: $main-color;
     width: 100%;
-    padding: 20px 40px;
 
     &__data {
       width: 1040px;
