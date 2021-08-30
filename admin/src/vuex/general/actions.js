@@ -63,8 +63,7 @@ export const getSteps = async ({ commit, dispatch }) => {
 export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
     commit('startRequest')
     try {
-      const {status, reason} = payload;
-      const id = state.currentProject._id;
+      const { id, status, reason } = payload;
       const updatedProject = await Vue.http.put("/pm-manage/project-status", { id, status, reason});
       await commit('storeCurrentProject', updatedProject.body);
     } catch(err) {
@@ -77,9 +76,9 @@ export const setProjectStatus = async ({commit, dispatch, state}, payload) => {
 export const sendCancelProjectMessage = async ({ commit, state, dispatch }, payload) => {
     commit('startRequest');
     try {
-        const id = state.currentProject._id;
-        const { message } = payload;
-        await Vue.http.put("/pm-manage/send-cancel-message", { id, message });
+        const { id, message, isNotify } = payload;
+        const updatedProject = await Vue.http.put("/pm-manage/sendCancelMessage-and-cancelProjectInMemoq", { id, message, isNotify });
+        await commit('storeCurrentProject', updatedProject.body);
     } catch (err) {
         dispatch('alertToggle', { message: err.body, isShow: true, type: "error" });
     } finally {
@@ -117,6 +116,7 @@ export const setStepVendor = async ({ commit, dispatch, state }, payload) => {
         if(step.vendor) {
             await Vue.http.post('/pm-manage/vendor-assignment', {step, vendor});
         }
+
         await commit('storeCurrentProject', updatedProject.body);
         dispatch('alertToggle', {message: "Step data updated", isShow: true})
     } catch(err) {
@@ -181,8 +181,8 @@ export const sendClientCostQuote = async ({commit, state, dispatch}, payload) =>
 export const sendClientQuote = async ({commit, state, dispatch}, payload) => {
     commit('startRequest');
     try {
-        const { message, arrayOfEmails } = payload;
-        const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: state.currentProject._id, message, arrayOfEmails});
+        const { message, arrayOfEmails, projectId } = payload;
+        const updatedProject = await Vue.http.post('/pm-manage/send-quote', {id: projectId, message, arrayOfEmails});
         await commit('storeCurrentProject', updatedProject.data);
     } catch(err) {
         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});

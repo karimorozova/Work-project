@@ -51,7 +51,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(102, 86, 61, 0.3);
+    background-color: #3333;
     border-radius: 32px;
     transition: 0.2s ease-out;
   }

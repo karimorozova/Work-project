@@ -32,7 +32,8 @@ const {
 	assignProjectManagers,
 	updateProjectStatusForClientPortalProject,
 	regainWorkFlowStatusByStepId,
-	setStepDeadlineProjectAndMemoq
+	setStepDeadlineProjectAndMemoq,
+	cancelProjectInMemoq
 } = require('./updates')
 
 const {
@@ -41,9 +42,7 @@ const {
 	taskCompleteNotifyPM,
 	notifyManagerStepStarted,
 	notifyStepDecisionMade,
-	// notifyDeliverablesDownloaded,
 	stepCompletedNotifyPM,
-	// notifyReadyForDr2,
 	notifyStepReopened,
 	notifyVendorStepStart,
 	sendQuoteMessage,
@@ -60,11 +59,6 @@ const {
 	autoCreatingTranslationTaskInProject
 } = require('./create')
 
-// const {
-// 	getClientsRequests,
-// 	getClientRequestById,
-// 	updateClientRequestProps,
-// } = require('../clientRequests/getClientsRequests')
 
 const {
 	createTasksForWordcount
@@ -107,6 +101,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	cancelProjectInMemoq,
 	autoCreatingTranslationTaskInProject,
 	manageProjectName,
 	copyProjectFiles,
@@ -147,7 +142,6 @@ module.exports = {
 	createTasks,
 	getMessage,
 	taskCompleteNotifyPM,
-	// notifyDeliverablesDownloaded,
 	getProjectWithUpdatedFinance,
 	updateProjectProgress,
 	updateWithApprovedTasks,
@@ -160,7 +154,6 @@ module.exports = {
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,
-	// notifyReadyForDr2,
 	notifyStepReopened,
 	getPdf,
 	notifyVendorStepStart,
@@ -178,7 +171,5 @@ module.exports = {
 	addMultiLangDR2,
 	removeMultiDR2,
 	changeNameLang,
-	// getClientsRequests,
-	// getClientRequestById,
 	getProjectsForPortal,
 }

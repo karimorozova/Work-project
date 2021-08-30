@@ -127,7 +127,7 @@ export default {
     },
     async setStatus({ option }) {
       try {
-        await this.setProjectStatus({ status: option })
+        await this.setProjectStatus({ id: this.$route.params.id, status: option })
         this.alertToggle({ message: "Project's status changed", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: err.message, isShow: true, type: "error" })

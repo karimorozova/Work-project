@@ -34,8 +34,8 @@
 						this.message,
 				editorConfig: {
 					allowedContent: true,
-					uiColor: "#f7f7f7",
-					height: 350,
+					uiColor: "#ffffff",
+					height: 380,
 				}
 			};
 		},
@@ -79,19 +79,17 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: black;
-    opacity: 0.5;
+    background-color: $text;
+    opacity: 0.3;
     overflow: hidden;
   }
 
   .preview {
     position: fixed;
     z-index: 1600;
-    background-color: $white;
-    min-width: 1000px;
+    background-color: #fff;
+    min-width: 950px;
     max-width: 100%;
-    top: 10%;
-    left: 20%;
     right: 20%;
     margin: 0 auto;
     padding: 20px;
@@ -100,6 +98,11 @@
     align-items: center;
     box-sizing: border-box;
     max-height: 720px;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border-radius: 4px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
 
     &__mails {
       width: 100%;

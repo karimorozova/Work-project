@@ -3,7 +3,7 @@ const { Projects } = require('../models')
 const { getProject, updateProjectStatus, updateWithApprovedTasks } = require('../projects')
 const { emitter } = require('../events')
 const { getProjectManageToken } = require("../middleware")
-const { notifyManagerProjectStarts } = require('../utils')
+const { notifyManagerProjectStarts, sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
 const {
 	generateTemplateForAcceptQuote,
 	generateTemplateForRejectQuote,
@@ -46,21 +46,22 @@ router.get('/accept-decline-tasks-quote', getProjectManageToken, async (req, res
 			tasksIds = tasksIds.replace(/[%]/g, ' ')
 			tasksIds = tasksIds.split(';')
 			tasksIds.pop()
+
+			const neededSteps = steps.filter(step => tasksIds.includes(step.taskId)).map(step => step._id)
+
 			if (prop === 'Rejected') {
-				const neededSteps = steps.filter(step => tasksIds.includes(step.taskId)).map(step => step._id)
 				steps = steps.map(step => {
-					if (neededSteps.includes(step._id)) {
-						step.status = prop
-					}
+					if (neededSteps.includes(step._id)) step.status = prop
 					return step
 				})
 			}
 			tasks = tasks.map(task => {
-				if (task.status === 'Quote sent' && tasksIds.includes(task.taskId)) {
-					task.status = prop
-				}
+				if (task.status === 'Quote sent' && tasksIds.includes(task.taskId)) task.status = prop
 				return task
 			})
+
+			if(prop === 'Approved') await sendQuoteToVendorsAfterProjectAccepted(steps, project)
+
 			await Projects.updateOne({ "_id": projectId }, { isClientOfferClicked: true, tasks, steps })
 			prop === 'Rejected' ?
 					emitter.emit('projectRejectedNotification', project) :

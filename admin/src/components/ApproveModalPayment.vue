@@ -11,11 +11,13 @@
         )
       .approve-modal__payment
         .approve-modal__payment-span
-          span Partial Payment
+          span Partial Payment:
         .approve-modal__checkbox
-          label.switch
-            input(type='checkbox' :checked="isPay" v-model="isPay")
-            span.slider.round
+          Toggler(
+            :isDisabled="false"
+            :isActive="isPay"
+            @toggle="isPay = !isPay"
+          )
 
       .approve-modal__buttons
         .approve-modal__button(@click="returnData")
@@ -33,8 +35,9 @@
 </template>
 
 <script>
-	import Button from "./Button";
-	import SelectSingle from "./SelectSingle";
+	import Button from "./Button"
+	import SelectSingle from "./SelectSingle"
+	import Toggler from "./Toggler"
 
 	export default {
 		props: {
@@ -57,31 +60,32 @@
 				reasons: [],
 				selectedReason: "",
 				isPay: false
-			};
+			}
 		},
 		methods: {
 			approve() {
-				this.$emit("approve");
+				this.$emit("approve")
 			},
 			returnData() {
-				this.approve();
-				this.$emit("returnData", { reason: this.selectedReason, isPay: this.isPay });
+				this.approve()
+				this.$emit("returnData", { reason: this.selectedReason, isPay: this.isPay })
 			},
 			notApprove() {
-				this.$emit("notApprove");
+				this.$emit("notApprove")
 			},
 			close() {
-				this.$emit("close");
+				this.$emit("close")
 			},
 			setReason({ option }) {
-				this.selectedReason = option;
+				this.selectedReason = option
 			},
 			onKeyDown(e) {
-				e.keyCode === 27 && this.notApprove();
-				e.keyCode === 13 && this.approve();
-			},
+				e.keyCode === 27 && this.notApprove()
+				e.keyCode === 13 && this.approve()
+			}
 		},
 		components: {
+			Toggler,
 			Button,
 			SelectSingle
 		},
@@ -89,11 +93,11 @@
 			document.removeEventListener('keydown', this.onKeyDown)
 		},
 		async created() {
-			const reasons = await this.$http.get("/api/reasons");
-			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);
+			const reasons = await this.$http.get("/api/reasons")
+			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason)
 			document.addEventListener('keydown', this.onKeyDown)
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -139,81 +143,21 @@
 
     &__payment {
       margin-bottom: 10px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: start;
 
       &-span {
-        vertical-align: sub;
-        display: inline-block;
-        font-size: 18px;
+        font-size: 14px;
       }
     }
 
     &__extra-choice {
-      display: contents;
     }
 
     &__checkbox {
-      display: inline-flex;
-
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 28px;
-        margin-left: 28px;
-
-        input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ebebe4;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 19px;
-          width: 19px;
-          left: 7px;
-          bottom: 5px;
-          background-color: #fff;
-          transition: 0.4s;
-        }
-      }
-
-      input {
-        &:checked {
-          + {
-            .slider {
-              background-color: #66563d;
-
-              &:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
-              }
-            }
-          }
-        }
-      }
-
-      .slider.round {
-        border-radius: 28px;
-
-        &:before {
-          border-radius: 50%;
-        }
-      }
+      margin-left: 15px;
     }
   }
 </style>

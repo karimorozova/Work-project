@@ -3,12 +3,8 @@ const fs = require('fs')
 
 const {
 	User,
-	Clients,
-	Delivery,
 	Projects,
 	Pricelist,
-	Units,
-	Languages,
 	Vendors,
 	Discounts,
 	ClientRequest
@@ -19,7 +15,6 @@ const {
 } = require('../../clients')
 
 const {
-	setDefaultStepVendors,
 	calcCost,
 	updateProjectCosts
 } = require('../../сalculations/wordcount')
@@ -36,20 +31,13 @@ const {
 	updateProject,
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
-	getProjectWithUpdatedFinance,
-	manageDeliveryFile,
 	setStepsStatus,
-	// getDeliverablesLink,
 	getAfterReopenSteps,
-	notifyVendorsProjectCancelled,
 	getProjectAfterFinanceUpdated,
 	updateProjectProgress,
 	updateNonWordsTaskTargetFiles,
 	storeFiles,
-	// notifyProjectDelivery,
-	// notifyReadyForDr2,
 	notifyStepReopened,
-	getPdf,
 	notifyVendorStepStart,
 	updateOtherProject,
 	getProjectAfterUpdate,
@@ -66,11 +54,11 @@ const {
 	autoCreatingTaskInProject,
 	saveCertificateTODR1Files,
 	setStepDeadlineProjectAndMemoq,
-	autoCreatingTranslationTaskInProject
+	autoCreatingTranslationTaskInProject,
+	cancelProjectInMemoq
 } = require('../../projects')
 
 const {
-	sendQuotes,
 	getMessage,
 	getCostMessage
 } = require('../../projects/emails')
@@ -81,7 +69,6 @@ const {
 	stepVendorsRequestSending,
 	sendEmailToContact,
 	stepReassignedNotification,
-	managerNotifyMail,
 	sendEmail,
 	notifyClientProjectCancelled,
 	notifyClientTasksCancelled
@@ -98,30 +85,18 @@ const {
 } = require('../../projectTasks')
 
 const {
-	// getClientRequest,
-	// updateClientRequest,
-	// addRequestFile,
-	// removeRequestFile,
-	// removeRequestFiles,
-	// sendNotificationToManager,
-	// removeClientRequest
 	getClientRequestById
 } = require('../../clientRequests')
 
 const {
 	updateMemoqProjectUsers,
-	cancelMemoqDocs,
-	setCancelledNameInMemoq
+	cancelMemoqDocs
 } = require('../../services/memoqs/projects')
 
-const {
-	getMemoqUsers
-} = require('../../services/memoqs/users')
 
 const {
 	projectCancelledMessage,
 	projectMiddleCancelledMessage,
-	projectDeliveryMessage,
 	tasksMiddleCancelledMessage
 } = require('../../emailMessages/clientCommunication')
 
@@ -445,21 +420,13 @@ router.put('/project-status', async (req, res) => {
 	}
 })
 
-router.put('/send-cancel-message', async (req, res) => {
-	const { id, message } = req.body
+router.put('/sendCancelMessage-and-cancelProjectInMemoq', async (req, res) => {
+	const { id, message, isNotify } = req.body
 	try {
 		const project = await getProject({ '_id': id })
-		await notifyClientProjectCancelled(project, message)
-
-		if (project.status === 'Cancelled') {
-			const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation')
-			if (wordsTasks.length) {
-				await cancelMemoqDocs(wordsTasks)
-				await setCancelledNameInMemoq(wordsTasks, `${ project.projectId } - ${ project.projectName }`)
-			}
-		}
-
-		res.send('Message sent')
+		isNotify && await notifyClientProjectCancelled(project, message)
+		await cancelProjectInMemoq(project)
+		res.send(project)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Internal server error / Cannot change Project\'s status')
@@ -613,9 +580,7 @@ router.post('/vendor-request', async (req, res) => {
 router.post('/vendor-assignment', async (req, res) => {
 	const { step } = req.body
 	try {
-		const project = await getProject({ 'steps._id': step._id })
 		await stepReassignedNotification(step)
-		await updateMemoqProjectUsers(project.steps)
 		res.send('messages sent')
 	} catch (err) {
 		console.log(err)
@@ -1190,7 +1155,7 @@ router.post('/update-filters-and-fields/:userId', async (req, res) => {
 	const { userId } = req.params
 	const { data } = req.body
 	try {
-		await  User.updateOne({_id: userId}, {$set: {layoutsSettings:{ project: data}}})
+		await User.updateOne({ _id: userId }, { $set: { layoutsSettings: { project: data } } })
 		res.send("done!")
 	} catch (err) {
 		console.log(err)
@@ -1204,26 +1169,26 @@ const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projec
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
-	const { projectId } = req.params;
+	const { projectId } = req.params
 	res.send(await createXtrfProjectWithFinance(projectId))
 })
 
 router.get('/updateXtrfProject/:projectId', async (req, res) => {
-	const { projectId } = req.params;
+	const { projectId } = req.params
 	await updateFianceXTRF(projectId)
 	res.send('Done!')
 })
 
 router.post('/createXtrfTasksWithFinance/:projectId', async (req, res) => {
-	const { projectId } = req.params;
+	const { projectId } = req.params
 	await createSendAllTasksToXtrf(projectId)
 	res.send('test')
 })
 
 router.post('/updateXtrfTasks/:projectId', async (req, res) => {
-	const { projectId } = req.params;
+	const { projectId } = req.params
 	const { xtrfId, taskId } = req.body
-	await updateTaskFianceXTRF(projectId, xtrfId, taskId )
+	await updateTaskFianceXTRF(projectId, xtrfId, taskId)
 	res.send('Done!')
 })
 

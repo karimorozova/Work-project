@@ -22,7 +22,9 @@ async function notifyManagerProjectStarts(project) {
 	try {
 		const projectManager = await User.findOne({ "_id": project.projectManager._id });
 		const accountManager = await User.findOne({ "_id": project.accountManager._id });
-		const steps = await notifyVendorsProjectAccepted(project.steps, project);
+
+		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project);
+
 		await Projects.updateOne({ "_id": project._id }, { steps });
 		const notAssignedStep = steps.find(item => !item.vendor);
 		if(notAssignedStep) {
@@ -48,7 +50,7 @@ async function notifyMangerProjectAppoved({ project, projectManager, accountMana
 	}
 }
 
-async function notifyVendorsProjectAccepted(projectSteps, project) {
+async function sendQuoteToVendorsAfterProjectAccepted(projectSteps, project) {
 	let steps = [];
 	try {
 		for (let step of projectSteps) {
@@ -63,7 +65,7 @@ async function notifyVendorsProjectAccepted(projectSteps, project) {
 		return steps;
 	} catch (err) {
 		console.log(err);
-		console.log("Error in notifyVendorsProjectAccepted");
+		console.log("Error in sendQuoteToVendorsAfterProjectAccepted");
 	}
 }
 
@@ -83,8 +85,11 @@ async function managerEmailsSend({ project, projectManager, accountManager }) {
 
 async function stepReassignedNotification(step, reason) {
 	try {
+		const { vendor, status, stepId } = step
+		if(status === 'Created') return
+
 		const message = vendorReassignmentMessage(step, reason);
-		await sendEmail({ to: step.vendor.email, subject: `Step ${ step.stepId } has been reassigned (ID V001.1)` }, message);
+		await sendEmail({ to: vendor.email, subject: `Step ${ stepId } has been reassigned (ID V001.1)` }, message);
 	} catch (err) {
 		console.log(err);
 		console.log("Error in stepReassignedNotification")
@@ -238,5 +243,6 @@ module.exports = {
 	notifyClientProjectCancelled,
 	notifyClientTasksCancelled,
 	stepMiddleReassignedNotification,
-	stepMiddleAssignNotification
+	stepMiddleAssignNotification,
+	sendQuoteToVendorsAfterProjectAccepted
 };

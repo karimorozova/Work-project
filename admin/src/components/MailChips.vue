@@ -15,7 +15,7 @@
             type="text"
             ref="input"
             v-on:keyup.enter="addSelectedEmailByEnter"
-            placeholder="Enter or choose an email address"
+            placeholder="Enter or choose an email address..."
           )
     .selectBox(ref="option")
       .selectBox__container(v-if="isAllEmails && availableAllEmails.length")
@@ -103,8 +103,7 @@
   @import "../assets/scss/colors";
 
   .selectBox {
-    margin: 10px 30px;
-    color: #66563d;
+    margin: 15px 30px;
     z-index: 5555;
     position: relative;
 
@@ -119,38 +118,37 @@
     &__body {
       border: 1px solid $border;
       border-radius: 4px;
-/*      box-shadow: 0 10px 6px -6px #333;*/
       max-height: 260px;
       overflow-y: auto;
     }
 
     &__option {
       display: flex;
-      margin: 5px 0;
       padding: 10px;
-      font-weight: bold;
       cursor: pointer;
       transition: all .1s ease-out;
+      align-items: center;
 
       &:hover {
-        background: #DED3C7;
+        background: $list-hover;
       }
 
       &-icon {
-        height: 25px;
-        width: 25px;
-        background: $text;
-        color: white;
+        height: 32px;
+        width: 32px;
+        background: $light-border;
+        color: $dark-border;
         border-radius: 50%;
-        text-align: center;
-        line-height: 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Myriad600';
+        font-size: 16px;
       }
 
       &-text {
-        font-size: 16px;
-        margin-left: 10px;
-        line-height: 25px;
-        letter-spacing: .5px;
+        font-size: 14px;
+        margin-left: 12px;
       }
     }
   }
@@ -162,8 +160,10 @@
 
 
     &__to {
-      font-weight: bold;
-      margin-top: 15px;
+      font-family: Myriad600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
     }
 
     &__mails {
@@ -176,7 +176,7 @@
     }
 
     &__input {
-      margin-left: 10px;
+      margin-left: 12px;
 
       input {
         width: 230px;
@@ -188,12 +188,12 @@
     }
 
     &__chips {
-      padding: 5px 12px;
-      margin-left: 10px;
+      padding: 6px 12px;
+      margin-left: 15px;
       border: 1px solid $border;
       border-radius: 4px;
-      min-height: 10px;
-      margin-top: 10px;
+      min-height: 12px;
+      margin-top: 12px;
       width: fit-content;
       cursor: default;
 
@@ -202,14 +202,17 @@
 
         &__mail {
           font-size: 14px;
-          line-height: 18px;
         }
 
         &__close {
-          margin-left: 8px;
-          line-height: 18px;
+          margin-left: 12px;
           font-size: 14px;
           cursor: pointer;
+          color: $dark-border;
+
+          &:hover{
+            color: $text;
+          }
         }
       }
     }

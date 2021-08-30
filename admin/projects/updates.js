@@ -20,10 +20,22 @@ const {
 	setMemoqProjectUsers,
 	assignMemoqTranslators,
 	setMemoqDocsDeadline,
+	setCancelledNameInMemoq,
+	cancelMemoqDocs,
 } = require('../services/memoqs/projects');
 
 const { downloadMemoqFile } = require('../services/memoqs/files');
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users');
+
+const cancelProjectInMemoq = async (project) => {
+	if (project.status !== 'Cancelled') return
+
+		const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation')
+		if (wordsTasks.length) {
+			await cancelMemoqDocs(wordsTasks)
+			await setCancelledNameInMemoq(wordsTasks, `${ project.projectId } - ${ project.projectName }`)
+		}
+}
 
 async function updateProjectProgress(project, isCatTool) {
 	let { steps, tasks } = project;
@@ -67,6 +79,7 @@ async function cancelTasks(tasks, project) {
 	let projectSteps = [...project.steps];
 	const tasksIds = tasks.map(item => item.taskId);
 	let inCompletedSteps = [];
+
 	if(projectSteps.length) {
 		inCompletedSteps = projectSteps.map(item => {
 			if(item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) {
@@ -74,6 +87,7 @@ async function cancelTasks(tasks, project) {
 			}
 		}).filter(item => !!item);
 	}
+
 	const stepIdentify = inCompletedSteps.length ? inCompletedSteps.map(step => step.stepId) : [];
 	const changedSteps = stepIdentify.length ? cancelSteps({ stepIdentify, steps: projectSteps }) : [];
 	try {
@@ -313,34 +327,27 @@ async function updateProjectStatusForClientPortalProject(projectId, action) {
 async function updateProjectStatus(id, status, reason) {
 	try {
 		const project = await getProject({ "_id": id });
+
 		if(status === 'fromCancelled') return await reOpenProject(project);
 		if(status === 'fromClosed') return await reOpenProject(project, false);
 		if(status !== "Cancelled" && status !== "Cancelled Halfway") return await setNewProjectDetails(project, status, reason);
 
-		const { tasks, steps } = project;
-		const notifySteps = steps.length ? steps.map(item => {
-			return { ...item._doc };
-		}) : [];
-		const { changedTasks, changedSteps } = await cancelTasks(tasks, project);
-		//MM
-		// const projectStatus = getProjectNewStatus(changedTasks, status);
-		const projectStatus = status;
-		//MM - сбрасывает цену проекта на 0 или на сумму отменненых тасков на пол пути.
-		const Price = getUpdatedProjectFinanceToZero(changedTasks);
-		if(notifySteps.length) {
-			await stepCancelNotifyVendor(notifySteps);
-		}
-		return await updateProject(
-				{ "_id": id },
-				{
-					status: projectStatus,
-					reason: reason,
+		if(status === "Cancelled" || status === "Cancelled Halfway"){
+			const { tasks, steps } = project;
+			const { changedTasks, changedSteps } = await cancelTasks(tasks, project);
+			const Price = getUpdatedProjectFinanceToZero(changedTasks);
+
+			if(steps.length) await stepCancelNotifyVendor(steps)
+			return await updateProject({ "_id": id }, {
+					status,
+					reason,
 					isPriceUpdated: false,
 					finance: { ...project.finance, Price },
 					tasks: changedTasks,
 					steps: changedSteps
-				}
-		);
+			})
+		}
+
 	} catch (err) {
 		console.log(err);
 		console.log("Error in updateProjectStatus");
@@ -743,6 +750,7 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 }
 
 module.exports = {
+	cancelProjectInMemoq,
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
 	setStepsStatus,

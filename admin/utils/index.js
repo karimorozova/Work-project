@@ -8,6 +8,7 @@ const { sendMail } = require("./mailhandler");
 const { sendMailClient } = require("./mailhandlerclient");
 const { sendMailPortal } = require("./mailhandlerportal");
 const { pmMail } = require("./mailtopm");
+
 const {
   notifyManagerProjectStarts,
   notifyManagerProjectRejected,
@@ -18,13 +19,16 @@ const {
   stepMiddleReassignedNotification,
   stepMiddleAssignNotification,
   notifyClientProjectCancelled,
-  notifyClientTasksCancelled
+  notifyClientTasksCancelled,
+  sendQuoteToVendorsAfterProjectAccepted,
 } = require("./projectMails");
+
 const upload = require("./uploads");
 const { moveFile } = require("./movingFile");
 const { archiveFile } = require("./archiving");
 
 module.exports = {
+  sendQuoteToVendorsAfterProjectAccepted,
   sendEmail,
   sendFlexibleEmail,
   clientQuoteEmail,

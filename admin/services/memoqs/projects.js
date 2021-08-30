@@ -125,26 +125,25 @@ async function moveMemoqFileToProject(fileId) {
 }
 
 async function updateMemoqProjectUsers(steps) {
-
-	//NEWER WORK??
-	const stepsStatuses = ["Ready to Start", "Waiting to Start", "Started", "Completed"];
-	const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
-	const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
-		acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
-		return acc;
-	}, {})
-	try {
-		if(wordsUnitSteps.length) {
-			for (let id in splittedByIdSteps) {
-				const error = await setMemoqTranlsators(id, splittedByIdSteps[id]);
-				if(error) throw error;
-			}
-		}
-	} catch (err) {
-		console.log(err);
-		console.log("Error in updateMemoqProjectUsers");
-		throw new Error(err.message);
-	}
+	// TODO: refactoring, choose vendor => set in memoq
+	// const stepsStatuses = ["Ready to Start", "Waiting to Start", "Started", "Completed"];
+	// const wordsUnitSteps = steps.filter(item => item.serviceStep.calculationUnit === 'Words' && stepsStatuses.indexOf(item.status) !== -1);
+	// const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
+	// 	acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
+	// 	return acc;
+	// }, {})
+	// try {
+	// 	if(wordsUnitSteps.length) {
+	// 		for (let id in splittedByIdSteps) {
+	// 			const error = await setMemoqTranlsators(id, splittedByIdSteps[id]);
+	// 			if(error) throw error;
+	// 		}
+	// 	}
+	// } catch (err) {
+	// 	console.log(err);
+	// 	console.log("Error in updateMemoqProjectUsers");
+	// 	throw new Error(err.message);
+	// }
 }
 
 async function getProjectUsers(projectId) {

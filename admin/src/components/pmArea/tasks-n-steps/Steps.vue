@@ -381,10 +381,13 @@
 				const relatedStep = this.allSteps.find(item => item.stepId !== stepId && item.taskId === taskId)
 				if (doesHaveAccess) {
 					this.$emit("setVendor", { vendor: person, index })
-				} else if (!relatedStep.vendor || relatedStep.vendor.toString() !== person._id.toString()) {
-					this.$emit("setVendor", { vendor: person, index })
-				} else {
-					this.showErrors([ 'This vendor has already been assigned to a related step' ])
+				}
+				//else if (!relatedStep.vendor || relatedStep.vendor.toString() !== person._id.toString()) {
+					// this.$emit("setVendor", { vendor: person, index })
+				//}
+				else {
+					this.alertToggle({ message: "Error can't assign Vendor to Step", isShow: true, type: 'error' })
+					// this.showErrors([ 'This vendor has already been assigned to a related step' ])
 				}
 			},
 			async setAction({ option }) {

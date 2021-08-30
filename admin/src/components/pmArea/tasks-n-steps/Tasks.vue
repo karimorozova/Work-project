@@ -2,6 +2,7 @@
   .tasks
     .tasks__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
+
     .tasks__preview(v-if="isEditAndSendQuote")
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
 
@@ -161,13 +162,13 @@
           .table__data
             img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
 
-    .tasks__approve-action(v-if="isApproveActionShow")
+    .tasks__approve-action(v-if="isCancelApproveModal")
       ApproveModalPayment(
         :isCheckbox="isAppearCheckBox()"
         :text="modalTexts.main"
         :approveValue="modalTexts.approve"
         :notApproveValue="modalTexts.notApprove"
-        @approve="approveAction"
+        @approve="approveCancelAction"
         @notApprove="notApproveAction"
         @close="closeApproveModal"
         @returnData="getApproveModalData"
@@ -252,7 +253,7 @@
 				fileUploadStatus: [ "Created", "Started", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
 				tabs: [ 'Tasks', 'Steps' ],
 				modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
-				isApproveActionShow: false,
+				isCancelApproveModal: false,
 				isDeliveryReview: false,
 				isEditAndSend: false,
 				isEditAndSendQuote: false,
@@ -424,8 +425,8 @@
 						await this.manageDR1()
 						break
 					case 'Cancel':
-						this.setModalTexts(option)
-						this.isApproveActionShow = true
+						this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
+						this.isCancelApproveModal = true
 						break
 					case 'Upload reference files':
 						this.openFileModal = true
@@ -457,32 +458,17 @@
 				})
 				this.storeProject({ ...this.currentProject, tasks: unchecked })
 			},
-			setModalTexts(option) {
-				this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
-			},
-			async approveAction() {
+			async approveCancelAction() {
 				const checkedTasks = this.allTasks.filter(item => item.isChecked)
-				if (!checkedTasks.length) {
-					return this.closeApproveModal()
-				}
-				await this.doTasksApproveAction(checkedTasks)
-			},
-			async doTasksApproveAction(checkedTasks) {
-				try {
-					switch (this.selectedAction) {
-						case 'Cancel':
-							await this.cancelTasks(checkedTasks)
-							break
-							// case 'Deliver':
-							// 	await this.deliverTasks({ tasks: checkedTasks, user: this.user })
-							// 	break
-					}
-				} catch (err) {
-					this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
-				} finally {
-					this.closeApproveModal()
-					this.unCheckAllTasks()
-				}
+				if (!checkedTasks.length) return this.closeApproveModal()
+        try {
+	        await this.cancelTasks(checkedTasks)
+	        this.alertToggle({ message: "Cancelled", isShow: true, type: "success" })
+	        this.closeApproveModal()
+	        this.unCheckAllTasks()
+        }catch (e) {
+	        this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
+        }
 			},
 			notApproveAction() {
 				this.closeApproveModal()
@@ -492,13 +478,14 @@
 				const filteredTasks = tasks.filter(item => this.validCancelStatuses.indexOf(item.status) !== -1)
 				if (!filteredTasks.length) return
 				try {
-					if (this.allTasks.length === tasks.length) {
-						await this.setProjectStatus({ status: "Cancelled" })
-					} else {
-						const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
-						await this.storeProject(updatedProject.data)
-						await this.messageTemplateFormation(filteredTasks)
-					}
+					const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
+					await this.storeProject(updatedProject.data)
+					await this.messageTemplateFormation(filteredTasks)
+
+					// if (this.allTasks.length === tasks.length) {
+					// 	await this.setProjectStatus({ status: "Cancelled" })
+					// } else {
+					// }
 					this.alertToggle({ message: "Tasks cancelled", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error" })
@@ -645,7 +632,7 @@
 				this.setProjectProp({ value: tasks, prop: 'tasks' })
 			},
 			closeApproveModal() {
-				this.isApproveActionShow = false
+				this.isCancelApproveModal = false
 				this.selectedAction = ""
 			},
 			closeReview() {

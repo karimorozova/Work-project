@@ -7,8 +7,8 @@
     .project-action__preview(v-if="isEditAndSendCostQuote")
       PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageCostQuotes")
 
-    .project-action__preview(v-if="isEditAndSend")
-      Preview(@closePreview="closePreview" :templates="templatesWysiwyg" :message="previewMessage" @send="sendMessage")
+    .project-action__preview(v-if="isEditAndSendCancel")
+      Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessageCancel")
 
     .project-action__title(:style="{'padding-bottom': '5px'}")
       .project-action__title-text Project Action
@@ -55,9 +55,9 @@
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getDeliveryMessage")
 
-    .project-action__setting(v-if="isAction('Send Project Details')")
-      .project-action__confirm
-        Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
+    //.project-action__setting(v-if="isAction('Send Project Details')")
+    //  .project-action__confirm
+    //    Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
 
     .project-action__setting(v-if="isAction('Cancel')")
       .project-action__drop-menu
@@ -67,18 +67,21 @@
           placeholder="Select Reason"
           @chooseOption="setReason"
         )
-      span More Information:
-      textarea(type="text" v-model="moreInformation" rows="4" class="project-action__text-input")
       .project-action__setting(v-if="project.status === 'In progress'")
         .project-action__payment
           .project-action__payment-span
-            span Partial Payment
+            span Partial Payment:
           .project-action__checkbox
-            label.switch
-              input(type='checkbox' :checked="isPay" v-model="isPay")
-              span.slider.round
-      .project-action__confirm
-        Button(:value="'Confirm'" @clicked="getCancelMessage")
+            Toggler(
+              :isDisabled="false"
+              :isActive="isPay"
+              @toggle="isPay = !isPay"
+            )
+      .project-action__buttonRow
+        .project-action__confirm
+          Button(:value="'Confirm'" @clicked="getCancelMessage")
+        .project-action__confirm
+          Button(:value="'Confirm Without Notification'" @clicked="cancelProjectWithoutNotification")
 
     .project-action__title#sub-line
     .drops
@@ -125,14 +128,15 @@
 </template>
 
 <script>
-	import Preview from '../vendors/WYSIWYG';
-	import SelectSingle from '../SelectSingle';
-	import SelectMulti from '../SelectMulti';
-	import Button from '../Button';
-	import { mapGetters, mapActions } from 'vuex';
-	import ApproveModal from '../ApproveModal';
-	import PreviewQuote from "./WYSIWYGMultiMails";
+	import Preview from '../vendors/WYSIWYG'
+	import SelectSingle from '../SelectSingle'
+	import SelectMulti from '../SelectMulti'
+	import Button from '../Button'
+	import { mapGetters, mapActions } from 'vuex'
+	import ApproveModal from '../ApproveModal'
+	import PreviewQuote from "./WYSIWYGMultiMails"
 	import { deleteProject } from "../../vuex/pmarea/actions"
+	import Toggler from "../Toggler"
 
 	export default {
 		props: {
@@ -145,26 +149,21 @@
 				previewMessage: '',
 				selectedAction: '',
 				selectedReason: '',
-				moreInformation: '',
+				// moreInformation: '',
 				reasons: [],
 				managers: [],
-				templatesWysiwyg: [
-					{
-						title: 'tempate',
-						message: '<p>test message</p>'
-					}
-				],
-				actions: ['Cancel'],
+				actions: [ 'Cancel' ],
 				approveButtonValue: 'Confirm',
 				alternativeButtonValue: 'Reject',
 				isAlternativeAction: false,
-				isEditAndSend: false,
-				isEditAndSendQuote: false,
 				isPay: false,
 				approveAction: false,
 				approveActionToDraft: false,
+
 				isEditAndSendCostQuote: false,
-			};
+				isEditAndSendQuote: false,
+				isEditAndSendCancel: false
+			}
 		},
 		methods: {
 			...mapActions({
@@ -176,43 +175,42 @@
 				sendClientQuote: 'sendClientQuote',
 				sendProjectDetails: 'sendProjectDetails',
 				deleteProject: 'deleteProject',
-				// deliverProjectToClient: 'deliverProjectToClient',
 				sendCancelProjectMessage: 'sendCancelProjectMessage',
-				sendClientCostQuote: 'sendClientCostQuote',
+				sendClientCostQuote: 'sendClientCostQuote'
 			}),
 			closeModal() {
-				this.approveAction = false;
-				this.approveActionToDraft = false;
+				this.approveAction = false
+				this.approveActionToDraft = false
 			},
 			approveModal() {
-				this.reOpenProject();
-				this.approveAction = false;
-				this.selectedAction = '';
+				this.reOpenProject()
+				this.approveAction = false
+				this.selectedAction = ''
 			},
 			approveModalToDraft() {
-				this.reOpenProjectToDraft();
-				this.approveActionToDraft = false;
-				this.selectedAction = '';
+				this.reOpenProjectToDraft()
+				this.approveActionToDraft = false
+				this.selectedAction = ''
 			},
 			closePreview() {
-				this.isEditAndSend = false;
-				this.isEditAndSendQuote = false;
-				this.isEditAndSendCostQuote = false;
-				this.previewMessage = "";
-				this.selectedAction = "";
-				this.selectedReason = "";
+				this.isEditAndSendCancel = false
+				this.isEditAndSendQuote = false
+				this.isEditAndSendCostQuote = false
+				this.previewMessage = ""
+				this.selectedAction = ""
+				this.selectedReason = ""
 			},
-			openPreview() {
-				this.isEditAndSend = true;
+			openPreviewCancel() {
+				this.isEditAndSendCancel = true
 			},
 			openPreviewQuote() {
-				this.isEditAndSendQuote = true;
+				this.isEditAndSendQuote = true
 			},
 			openPreviewCostQuote() {
-				this.isEditAndSendCostQuote = true;
+				this.isEditAndSendCostQuote = true
 			},
 			getCancelStatus() {
-				if(
+				if (
 						this.project.status === 'Draft' ||
 						this.project.status === "Quote sent" ||
 						this.project.status === "Approved" ||
@@ -226,239 +224,227 @@
 				}
 			},
 			async getCancelMessage() {
-				let cancelStatus = this.getCancelStatus();
+				let cancelStatus = this.getCancelStatus()
 				try {
-					const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay });
-					this.previewMessage = template.data.message;
-					this.openPreview();
+					const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay })
+					this.previewMessage = template.data.message
+					this.openPreviewCancel()
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async getSendCostQuoteMessage() {
 				try {
-					const template = await this.$http.get(`/pm-manage/quote-cost-message?projectId=${ this.project._id }`);
-					this.previewMessage = template.data.message;
-					this.openPreviewCostQuote();
+					const template = await this.$http.get(`/pm-manage/quote-cost-message?projectId=${ this.project._id }`)
+					this.previewMessage = template.data.message
+					this.openPreviewCostQuote()
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async getSendQuoteMessage() {
 				try {
-					const template = await this.$http.get(`/pm-manage/quote-message?projectId=${ this.project._id }`);
-					this.previewMessage = template.data.message;
-					this.openPreviewQuote();
+					const template = await this.$http.get(`/pm-manage/quote-message?projectId=${ this.project._id }`)
+					this.previewMessage = template.data.message
+					this.openPreviewQuote()
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
-			async getProjectDetailsMessage() {
-				try {
-					const template = await this.$http.get(`/pm-manage/project-details?projectId=${ this.project._id }`);
-					this.previewMessage = template.data.message;
-					this.openPreview();
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				}
-			},
+			// async getProjectDetailsMessage() {
+			// 	try {
+			// 		const template = await this.$http.get(`/pm-manage/project-details?projectId=${ this.project._id }`);
+			// 		this.previewMessage = template.data.message;
+			// 		this.openPreview();
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" });
+			// 	}
+			// },
 			async sendMessageCostQuotes({ message, arrayOfEmails }) {
 				try {
-					await this.sendClientCostQuote({ message, arrayOfEmails });
-					this.alertToggle({ message: "Cost Quote sent", isShow: true, type: "success" });
+					await this.sendClientCostQuote({ message, arrayOfEmails })
+					this.alertToggle({ message: "Cost Quote sent", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				} finally {
-					this.setDefaults();
-					this.closePreview();
+					this.setDefaults()
+					this.closePreview()
 				}
 			},
 			async sendMessageQuotes({ message, arrayOfEmails }) {
 				try {
-					await this.clientQuote(message, arrayOfEmails);
-					this.alertToggle({message: "Quote sent", isShow: true, type: "success"});
+					await this.clientQuote(message, arrayOfEmails)
+					this.alertToggle({ message: "Quote sent", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({message: err.message, isShow: true, type: "error"});
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				} finally {
-					this.setDefaults();
-					this.closePreview();
+					this.setDefaults()
+					this.closePreview()
 				}
 			},
-			async sendMessage(message) {
+			async sendMessageCancel(message) {
+				let cancelStatus = this.getCancelStatus()
 				try {
-					this.makeApprovedAction(message);
+					await this.setProjectStatus({ id: this.$route.params.id, status: cancelStatus, reason: this.selectedReason || "" })
+					await this.sendCancelProjectMessage({ id: this.project._id, message, isNotify: true })
+					this.alertToggle({ message: "Sent successfully", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
+				} finally {
+					this.setDefaults()
+					this.closePreview()
 				}
-				this.closePreview();
+			},
+			async cancelProjectWithoutNotification() {
+				let cancelStatus = this.getCancelStatus()
+				try {
+					await this.setProjectStatus({ id: this.$route.params.id, status: cancelStatus, reason: this.selectedReason || "" })
+					await this.sendCancelProjectMessage({ id: this.project._id, message: null, isNotify: false })
+					this.alertToggle({ message: "Sent successfully", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
+				} finally {
+					this.setDefaults()
+					this.closePreview()
+				}
 			},
 			isAction(action) {
-				return this.selectedAction === action;
+				return this.selectedAction === action
 			},
 			setDefaults() {
-				this.selectedAction = "";
-				this.approveButtonValue = "Confirm";
-				this.isAlternativeAction = false;
+				this.selectedAction = ""
+				this.approveButtonValue = "Confirm"
+				this.isAlternativeAction = false
 			},
 			setReason({ option }) {
-				this.selectedReason = option;
+				this.selectedReason = option
 			},
 			setAction({ option }) {
-				this.selectedAction = option;
-				this.isAlternativeAction = false;
-				if(this.selectedAction === "Accept/Reject Quote") {
-					this.approveButtonValue = "Accept";
-					this.alternativeButtonValue = "Reject";
-					this.isAlternativeAction = true;
+				this.selectedAction = option
+				this.isAlternativeAction = false
+				if (this.selectedAction === "Accept/Reject Quote") {
+					this.approveButtonValue = "Accept"
+					this.alternativeButtonValue = "Reject"
+					this.isAlternativeAction = true
 				}
 			},
 			async makeApprovedAction(message) {
 				try {
 					switch (this.selectedAction) {
 						case "Send Project Details":
-							await this.projectDetails(message);
-							break;
+							await this.projectDetails(message)
+							break
 						case "Close Project":
-							const updatedProject = await this.$http.post('/pm-manage/close-project', {projectId: this.project._id})
+							const updatedProject = await this.$http.post('/pm-manage/close-project', { projectId: this.project._id })
 							await this.storeProject(updatedProject.data)
 							break
 						case "Accept/Reject Quote":
-							await this.acceptQuote();
-							break;
-						case "Cancel":
-							await this.cancelProjectMessage(message);
-							break;
+							await this.acceptQuote()
+							break
 						case "Delete":
-							await this.deleteProjectAction();
-							break;
+							await this.deleteProjectAction()
+							break
 					}
 				} catch (err) {
-					this.alertToggle({ message: "Internal server error. Cannot execute chosen action.", isShow: true, type: "error" });
+					this.alertToggle({ message: "Internal server error. Cannot execute chosen action.", isShow: true, type: "error" })
 				} finally {
-					this.setDefaults();
+					this.setDefaults()
 				}
 			},
 			async deleteProjectAction() {
 				try {
 					await this.deleteProject({ projectId: this.project._id })
 					this.$router.back()
-					this.alertToggle({message: "Project deleted!", isShow: true, type: "success"});
-				}catch (err) {
-					this.alertToggle({message: "Project not deleted!", isShow: true, type: "error"});
+					this.alertToggle({ message: "Project deleted!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Project not deleted!", isShow: true, type: "error" })
 				}
 			},
 			async reOpenProjectToDraft() {
-				await this.setStatus('Draft', "");
+				await this.setStatus('Draft', "")
 			},
 			async reOpenProject() {
-				let status;
-				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-					status = 'fromCancelled';
+				let status
+				if (this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
+					status = 'fromCancelled'
 				} else {
-					status = 'fromClosed';
+					status = 'fromClosed'
 				}
-				await this.setStatus(status, '');
+				await this.setStatus(status, '')
 			},
 			async clientQuote(message, arrayOfEmails) {
 				try {
-					await this.sendClientQuote({ message, arrayOfEmails });
-					this.alertToggle({
-						message: 'Details sent',
-						isShow: true,
-						type: 'success'
-					});
+					await this.sendClientQuote({ projectId: this.$route.params.id, message, arrayOfEmails })
+					this.alertToggle({ message: 'Details sent', isShow: true, type: 'success' })
 				} catch (err) {
-					this.alertToggle({
-						message: err.message,
-						isShow: true,
-						type: "error"
-					});
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async projectDetails(message) {
 				try {
-					await this.sendProjectDetails({ message });
-					this.alertToggle({message: "Details sent", isShow: true, type: "success"});
+					await this.sendProjectDetails({ message })
+					this.alertToggle({ message: "Details sent", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({message: err.message, isShow: true, type: "error"});
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async makeAlterAction() {
 				try {
-					if(this.selectedAction === "Accept/Reject Quote") {
-						await this.rejectQuote();
-					}
+					if (this.selectedAction === "Accept/Reject Quote") await this.rejectQuote()
 				} catch (err) {
-					this.alertToggle({
-						message: "Internal server error. Cannot execute chosen action.",
-						isShow: true,
-						type: "error"
-					});
+					this.alertToggle({ message: "Internal server error. Cannot execute chosen action.", isShow: true, type: "error" })
 				} finally {
-					this.setDefaults();
-				}
-			},
-			async cancelProjectMessage(message) {
-				let cancelStatus = this.getCancelStatus();
-				if(this.project.status === "Delivered" || this.project.status === "Closed")
-					return;
-				try {
-					await this.setProjectStatus({status: cancelStatus, reason: this.selectedReason || "",});
-					await this.sendCancelProjectMessage({ message });
-					this.alertToggle({message: "Letter sent successfully", isShow: true, type: "success"});
-				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
-				} finally {
-					this.selectedReason = "";
+					this.setDefaults()
 				}
 			},
 			async setStatus(status, reason) {
 				try {
-					await this.setProjectStatus({status, reason});
-					this.alertToggle({message: "Project's status changed", isShow: true, type: "success"});
+					const id = this.$route.params.id
+					await this.setProjectStatus({ id, status, reason })
+					this.alertToggle({ message: "Project's status changed", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async acceptQuote() {
-				const status = this.project.isStartAccepted ? "Started" : "Approved";
+				const status = this.project.isStartAccepted ? "Started" : "Approved"
 				try {
-					await this.setStatus(status);
+					await this.setStatus(status)
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async rejectQuote() {
 				try {
-					await this.setStatus("Rejected");
+					await this.setStatus("Rejected")
 				} catch (err) {
-					this.alertToggle({ message: err.message, isShow: true, type: "error" });
+					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
 			async setManager({ option }, prop) {
-				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option);
-				if(manager._id === this.project[prop]._id) return;
-				if(this.type === "project") {
-					await this.setProjectValue({id: this.project._id, prop, value: manager});
+				const manager = this.managers.find(item => `${ item.firstName } ${ item.lastName }` === option)
+				if (manager._id === this.project[prop]._id) return
+				if (this.type === "project") {
+					await this.setProjectValue({ id: this.project._id, prop, value: manager })
 				}
 			},
 			async getManagers() {
 				try {
-					const result = await this.$http.get('/users');
-					this.managers = result.data;
+					const result = await this.$http.get('/users')
+					this.managers = result.data
 				} catch (err) {
-					this.alertToggle({message: 'Error on getting managers', isShow: true, type: 'error'});
+					this.alertToggle({ message: 'Error on getting managers', isShow: true, type: 'error' })
 				}
 			},
-			isAllDeliveredTasks(tasksDR2){
+			isAllDeliveredTasks(tasksDR2) {
 				let statuses = []
-				if(tasksDR2.hasOwnProperty('singleLang')){
+				if (tasksDR2.hasOwnProperty('singleLang')) {
 					const { singleLang } = tasksDR2
-					for (const {status} of singleLang) statuses.push(status)
+					for (const { status } of singleLang) statuses.push(status)
 				}
-				if(tasksDR2.hasOwnProperty('multiLang')){
+				if (tasksDR2.hasOwnProperty('multiLang')) {
 					const { multiLang } = tasksDR2
-					for (const {status} of multiLang) statuses.push(status)
+					for (const { status } of multiLang) statuses.push(status)
 				}
 				return statuses.every(item => item === 'Delivered')
 			}
@@ -466,88 +452,89 @@
 		computed: {
 			...mapGetters({
 				currentClient: 'getCurrentClient',
-				user: 'getUser',
+				user: 'getUser'
 			}),
-			isProjectFinished(){
+			isProjectFinished() {
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
 			},
-			canDelete(){
+			canDelete() {
 				return status !== 'Closed'
-						&& (this.project.projectManager._id === this.user._id || this.user.group.name === 'Administrators'  || this.user.group.name === 'Developers' )
+						&& (this.project.projectManager._id === this.user._id || this.user.group.name === 'Administrators' || this.user.group.name === 'Developers')
 			},
 			projectClientContacts() {
 				return this.project.clientContacts.map(({ email }) => email)
 			},
 			type() {
-				return this.project.projectId ? 'project' : 'request';
+				return this.project.projectId ? 'project' : 'request'
 			},
 			accManagers() {
-				let result = [];
-				if(this.managers.length) {
-					result = this.managers.filter(item => item.group.name === 'Account Managers');
-					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
+				let result = []
+				if (this.managers.length) {
+					result = this.managers.filter(item => item.group.name === 'Account Managers')
+					result = result.map(item => `${ item.firstName } ${ item.lastName }`)
 				}
-				return result;
+				return result
 			},
 			projManagers() {
-				let result = [];
-				if(this.managers.length) {
-					result = this.managers.filter(item => item.group.name === "Project Managers");
-					result = result.map(item => `${ item.firstName } ${ item.lastName }`);
+				let result = []
+				if (this.managers.length) {
+					result = this.managers.filter(item => item.group.name === "Project Managers")
+					result = result.map(item => `${ item.firstName } ${ item.lastName }`)
 				}
-				return result;
+				return result
 			},
 			selectedAccManager() {
-				return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : "";
+				return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : ""
 			},
 			selectedProjManager() {
-				return this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : "";
+				return this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : ""
 			},
 			filteredActions() {
-				let result = this.actions;
+				let result = this.actions
 				const nonStartedStatuses = [
-          "Draft",
-          "Cost Quote",
-          "Quote sent",
-          //"Requested",
-          "Cancelled"
-        ];
+					"Draft",
+					"Cost Quote",
+					"Quote sent",
+					//"Requested",
+					"Cancelled"
+				]
 
-				if(this.project.status === "Approved") {
-					result = ["Cancel"];
+				if (this.project.status === "Approved") {
+					result = [ "Cancel" ]
 				}
 
-				if(this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
-					result = ["Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel"];
+				if (this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
+					result = [ "Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel" ]
 				}
 
-				if(this.project.status === 'Started' || this.project.status === 'In progress') {
+				if (this.project.status === 'Started' || this.project.status === 'In progress') {
 					const { tasks, tasksDR2 } = this.project
-					const isAllTasksCompleted = tasks.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({status}) => status === 'Completed')
+					const isAllTasksCompleted = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({ status }) => status === 'Completed')
 
-					if(isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = ["Close Project"];
-          else result = ["Send Project Details", "Cancel"];
+					if (isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = [ "Close Project" ]
+					else result = [ "Send Project Details", "Cancel" ]
 				}
 
-				if(this.project.status === 'Closed') {
-					result = ['ReOpen'];
+				if (this.project.status === 'Closed') {
+					result = [ 'ReOpen' ]
 				}
 
-				if(this.project.status === 'Rejected') {
-					result = ['ReOpen', 'Cancel'];
+				if (this.project.status === 'Rejected') {
+					result = [ 'ReOpen', 'Cancel' ]
 				}
 
-				if(this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-					result = ['ReOpen'];
+				if (this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
+					result = [ 'ReOpen' ]
 				}
 
-				if(!result.includes('Delete')) result.push('Delete')
+				if (!result.includes('Delete')) result.push('Delete')
 
-				return result;
-			},
+				return result
+			}
 		},
 		components: {
+			Toggler,
 			PreviewQuote,
 			ApproveModal,
 			SelectSingle,
@@ -556,11 +543,11 @@
 			Button
 		},
 		async created() {
-			const reasons = await this.$http.get("/api/reasons");
-			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason);
-			await this.getManagers();
+			const reasons = await this.$http.get("/api/reasons")
+			for (let key in reasons.data) this.reasons.push(reasons.data[key].reason)
+			await this.getManagers()
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
@@ -578,7 +565,12 @@
     background: white;
     border-radius: 4px;
 
-    &__dropBody{
+    &__buttonRow {
+      display: flex;
+      gap: 20px;
+    }
+
+    &__dropBody {
       position: relative;
       width: 220px;
       height: 32px;
@@ -591,12 +583,14 @@
     }
 
     &__payment {
-      margin-bottom: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
 
       &-span {
         vertical-align: sub;
         display: inline-block;
-        font-size: 18px;
+        font-size: 14px;
       }
     }
 
@@ -642,68 +636,7 @@
     }
 
     &__checkbox {
-      display: inline-flex;
-
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 28px;
-        margin-left: 28px;
-
-        input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ebebe4;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 19px;
-          width: 19px;
-          left: 7px;
-          bottom: 4px;
-          background-color: #fff;
-          transition: 0.4s;
-        }
-      }
-
-      input {
-        &:checked {
-          + {
-            .slider {
-              background-color: #66563d;
-
-              &:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
-              }
-            }
-          }
-        }
-      }
-
-      .slider.round {
-        border-radius: 28px;
-
-        &:before {
-          border-radius: 50%;
-        }
-      }
+      margin-left: 15px;
     }
 
     .drops {
@@ -715,7 +648,8 @@
         width: 220px;
         height: 32px;
       }
-      &__menuTitle{
+
+      &__menuTitle {
         width: 220px;
         height: 32px;
         display: flex;
@@ -757,7 +691,7 @@
     margin-top: 50px;
   }
 
-  .project-details{
+  .project-details {
     margin-bottom: 4px;
   }
 </style>

@@ -14,7 +14,7 @@ const sendEmailFromUser = async function (from, obj, msg) {
 			from: `${ sender } translation@pangea.global`,
 			to: `${ obj.to }`,
 			subject: `${ obj.subject }`,
-			text: "plain text",
+			text: "",
 			html: msg
 		}
 
@@ -28,7 +28,7 @@ const sendEmailFromUser = async function (from, obj, msg) {
 				rej(error)
 			}
 			if (info) {
-				console.log('sendEmailFromUser', sender, 'Message sent: %s', info.messageId)
+				// console.log('sendEmailFromUser', sender, 'Message sent: %s', info.messageId)
 				res(info.messageId)
 			} else {
 				console.log('Error in sendEmail')
@@ -44,7 +44,7 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 			from: 'translation@pangea.global', // sender address
 			to: `${ obj.to }`, // pm@pangea.global list of receivers
 			subject: `${ obj.subject }`, // Subject line
-			text: "plain text", // plain text body
+			text: "", // plain text body
 			html: "<b>" + msg + "</b>" // html body
 		}
 		mailOptions.attachments = obj.attachments || []
@@ -60,7 +60,7 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 				rej(error)
 			}
 			if (info) {
-				console.log('sendEmail', 'Message sent: %s', info.messageId)
+				// console.log('sendEmail', 'Message sent: %s', info.messageId)
 				res(info.messageId)
 				mailOptions = {}
 			} else {
@@ -77,7 +77,7 @@ const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 			from: mailSettings.from, // sender address
 			to: `${ mailSettings.to }`, // pm@pangea.global list of receivers
 			subject: `${ mailSettings.subject }`, // Subject line
-			text: "plain text", // plain text body
+			text: "", // plain text body
 			html: "<b>" + msg + "</b>" // html body
 		}
 		mailOptions.attachments = mailSettings.attachments || []
@@ -93,7 +93,7 @@ const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 				rej(error)
 			}
 			if (info) {
-				console.log('sendEmail', 'Message sent: %s', info.messageId)
+				// console.log('sendEmail', 'Message sent: %s', info.messageId)
 				res(info.messageId)
 				mailOptions = {}
 			} else {
@@ -110,7 +110,7 @@ const sendEmailCandidates = function (obj, msg, withoutImage = false) {
 			from: 'career@pangea.global', // sender address
 			to: `${ obj.to }`, // pm@pangea.global list of receivers
 			subject: `${ obj.subject }`, // Subject line
-			text: "plain text", // plain text body
+			text: "", // plain text body
 			html: "<b>" + msg + "</b>" // html body
 		}
 		mailOptions.attachments = obj.attachments || []
@@ -126,7 +126,7 @@ const sendEmailCandidates = function (obj, msg, withoutImage = false) {
 				rej(error)
 			}
 			if (info) {
-				console.log('sendEmail', 'Message sent: %s', info.messageId)
+				// console.log('sendEmail', 'Message sent: %s', info.messageId)
 				res(info.messageId)
 				mailOptions = {}
 			} else {
@@ -144,7 +144,7 @@ const clientQuoteToEmails = async function (from, obj, message) {
 			from: `${ sender } translation@pangea.global`,
 			to: obj.email,
 			subject: obj.subject,
-			text: "plain text",
+			text: "",
 			html: message
 		}
 		mailOptions.attachments = obj.attachments || []
@@ -159,8 +159,8 @@ const clientQuoteToEmails = async function (from, obj, message) {
 				console.log(error)
 				rej(error)
 			}
-			const messageId = info && info.messageId ? info.messageId : "Error"
-			console.log('clientQuoteToEmails', sender, 'Message sent: %s', messageId)
+			// const messageId = info && info.messageId ? info.messageId : "Error"
+			// console.log('clientQuoteToEmails:', sender, 'To:', obj.email, 'Message sent: %s', messageId)
 			res()
 		})
 	})
@@ -173,7 +173,7 @@ const clientQuoteEmail = function (obj, msg) {
 			from: 'Michal <michal@pangea.global>',
 			to: contact.email,
 			subject: obj.subject,
-			text: "plain text",
+			text: "",
 			html: msg
 		}
 		mailOptions.attachments = obj.attachments || []
@@ -188,8 +188,8 @@ const clientQuoteEmail = function (obj, msg) {
 				console.log(error)
 				rej(error)
 			}
-			const messageId = info && info.messageId ? info.messageId : "Error"
-			console.log('clientQuoteEmail', 'Message sent: %s', messageId)
+			// const messageId = info && info.messageId ? info.messageId : "Error"
+			// console.log('clientQuoteEmail', 'To:', contact.email, 'Message sent: %s', messageId)
 			res()
 		})
 	})
@@ -201,7 +201,7 @@ const managerNotifyMail = function (obj, msg, subject) {
 			from: 'translation@pangea.global',
 			to: obj.email,
 			subject,
-			text: "plain text",
+			text: "",
 			html: msg
 		}
 		mailOptions.attachments = obj.attachments || []
@@ -215,7 +215,7 @@ const managerNotifyMail = function (obj, msg, subject) {
 			if (error) {
 				rej(error)
 			}
-			console.log('managerNotifyMail', 'Message sent: %s', info.messageId)
+			// console.log('managerNotifyMail', 'To:', obj.email, 'Message sent: %s', info.messageId)
 			res(info.messageId)
 		})
 	})

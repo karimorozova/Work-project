@@ -132,6 +132,7 @@ const sendQuoteMessage = async (project, message, arrayOfEmails, tasksIds = []) 
 	}
 
 	const allArrayOfEmail = [ ...arrayOfEmails, project.accountManager.email, project.projectManager.email, 'am@pangea.global' ]
+
 	for (let contactEmail of allArrayOfEmail) {
 		const pdf = tasksIds.length ? await getPdf(allUnits, allSettingsSteps, project, tasksIds) : await getPdf(allUnits, allSettingsSteps, project)
 		const attachments = [ { content: fs.createReadStream(pdf), filename: 'quote.pdf' } ]
