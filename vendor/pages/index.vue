@@ -155,6 +155,8 @@
 					this.$store.commit("SET_VENDOR", data)
 					this.$store.commit("SET_ACCOUNT_INFO")
 				} catch (err) {
+				  this.logout()
+          this.$router.push('/login')
 				}
 			},
 			async getVendorReports() {
@@ -251,8 +253,8 @@
 			})
 		},
 		async created() {
-			await this.getOriginallyUnits()
-			await this.getVendorInfo()
+      await this.getVendorInfo()
+      await this.getOriginallyUnits()
 			await this.getVendorReports()
 			await this.getVendorPaidReports()
 			await this.getAllIndustries()

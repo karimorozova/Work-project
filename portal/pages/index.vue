@@ -226,11 +226,11 @@
 			}
 		},
 		mounted() {
-			this.domain = process.env.domain
-			this.mainPageRender()
-			this.setToken()
-			this.getServices()
-			this.getProjectsAndRequests()
+      this.domain = process.env.domain
+      this.getProjectsAndRequests()
+      this.mainPageRender()
+      this.setToken()
+      this.getServices()
 			this.breadCrumb1 = this.$route.path.split('/')[1]
 			this.breadCrumb2 = this.$route.path.split('/')[2]
 		},

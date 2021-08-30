@@ -5,7 +5,7 @@ const { secretKey } = require('../configs')
 router.post("/vendor", async (req, res, next) => {
 	const { vendorId } = req.body
 
-	const token = await jwt.sign({ vendorId: vendorId }, secretKey, { expiresIn: '2h' })
+	const token = await jwt.sign({ vendorId: vendorId }, secretKey, { expiresIn: '12h' })
 	res.statusCode = 200
 	res.cookie("testt", 'value', {domain: 'localhost'}).send(token)
 

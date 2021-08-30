@@ -69,7 +69,7 @@ router.post("/auth", async (req, res, next) => {
 				res.status(401).send("Wrong email or password.")
 			} else {
 				try {
-					const clientToken = await jwt.sign({ clientId: data.client.id, contactEmail: data.contact.email }, secretKey, { expiresIn: '12h' })
+					const clientToken = await jwt.sign({ clientId: data.client.id, contactEmail: data.contact.email }, secretKey, { expiresIn: "12h" })
 					res.statusCode = 200
 					res.send({ clientToken })
 				} catch (err) {

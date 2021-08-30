@@ -41,8 +41,13 @@ export const getProjectsAndRequests = async function({ commit, dispatch, state})
     commit('SET_LANGUAGES', languages);
     dispatch('setLangCombinations', JSON.parse(window.atob(client)));
   } catch(err) {
-      console.log(err);
-      dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+    const redirectErrors = ["jwt malformed", "jwt expired"]
+    console.log(err);
+    if (redirectErrors.includes(err.response.data)) {
+      this.dispatch('logout')
+      this.$router.replace({ path: '/login' })
+    }
+    dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
   }
 }
 
