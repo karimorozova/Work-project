@@ -525,7 +525,8 @@
 				}
 
 				if(!this.day){
-          const str = moment(this.value).format('YYYY-MM-DD');
+					const time = this.value || new Date()
+					const str = moment(time).format('YYYY-MM-DD');
 					const now = moment(str).unix();
 					this.setDate(moment(now*1000).set({ hour: this.hours, minute: this.minutes }).format())
         }else{
