@@ -309,7 +309,7 @@
 				const servicesIndustries = [
 					...new Set(
 							this.clientInfo.services
-									.filter(i => i.services[0].title === "Compliance")
+									.filter(i => i.services[0].title === "Translation")
 									.map(i => i.industries[0])
 					)
 				]
