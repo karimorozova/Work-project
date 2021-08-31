@@ -420,7 +420,7 @@
 										.map(i => i.industries[0].name)
 						)
 					]
-					if (servicesIndustries.length === 1) this.setIndustry({ option: servicesIndustries[0].name })
+					if (servicesIndustries.length === 1 && servicesIndustries[0].hasOwnProperty('name')) this.setIndustry({ option: servicesIndustries[0].name })
 					return servicesIndustries
 				}
 			},
