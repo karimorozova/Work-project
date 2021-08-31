@@ -114,18 +114,14 @@
         template(slot="sourceLanguage", slot-scope="{ row, index }")
           .competencies__data {{ row.sourceLanguage.lang }}
 
-
         template(slot="targetLanguage", slot-scope="{ row, index }")
           .competencies__data  {{ row.targetLanguage.lang }}
-
 
         template(slot="industry", slot-scope="{ row, index }")
           .competencies__data  {{ row.industry.name }}
 
-
         template(slot="step", slot-scope="{ row, index }")
           .competencies__data  {{ row.step.title }}
-
 
         template(slot="icons", slot-scope="{ row, index }")
           .competencies__icons
@@ -435,21 +431,14 @@
 						langPairs: this.getArrayLanguagesCombinations(this.currentSource, this.currentTargets)
 					})
 
-					this.alertToggle({
-						message: "Competencies are saved",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Competencies are saved", isShow: true, type: "success" })
 				} catch (err) {
 					console.log(err)
-					this.alertToggle({
-						message: "Error in save Competencies",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error in save Competencies", isShow: true, type: "error" })
 				} finally {
 					this.setDefaults()
 					this.newRow = false
+					this.$emit('updateRateCombinationFromSettings')
 				}
 			},
 			getArrayLanguagesCombinations(source, targets) {
@@ -472,6 +461,7 @@
 				}
 				this.deleteIndex = index
 				this.isDeleting = true
+        this.$emit('updateRateCombinationFromSettings')
 			},
 
 			closeModal() {

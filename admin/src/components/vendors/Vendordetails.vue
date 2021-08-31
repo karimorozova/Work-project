@@ -110,8 +110,9 @@
             :languages="languages",
             :steps="steps",
             :industries="industries",
-            :vendorIndustries="currentVendor.industries.map((i) => i.name)",
+            :vendorIndustries="industries.map((i) => i.name)",
             @updateRates="updateRates"
+            @updateRateCombinationFromSettings="setNewStepCombination"
           )
 
       .vendor-info__block
@@ -332,7 +333,7 @@
 				updateCurrentVendor: "updateCurrentVendor",
 				deleteCurrentVendor: "deleteCurrentVendor",
 				storeCurrentVendor: "storeCurrentVendor",
-				updateIndustry: "updateIndustry",
+				// updateIndustry: "updateIndustry",
 				getDuoCombinations: "getVendorDuoCombinations",
 				updateVendorStatus: "updateVendorStatus",
 				setVendorsMatrixData: "setVendorsMatrixData",
@@ -532,7 +533,7 @@
 					}
 					// if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
 					if (!this.getVendorUpdatedData.surname) this.errors.push("Please, enter valid surname.")
-					if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
+					// if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
 					if (!this.getVendorUpdatedData.status) this.errors.push("Please, choose status.")
 					await this.checkEmail()
 					if (this.errors.length) {
@@ -812,7 +813,7 @@
       align-items: center;
       letter-spacing: 0.2px;
 
-      &-grey{
+      &-grey {
         background-color: white;
       }
 

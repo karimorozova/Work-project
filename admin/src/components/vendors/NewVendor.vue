@@ -73,19 +73,18 @@
           .block-item
             label WhatsApp:
             input.block-item__input-field(type="text" placeholder="WhatsApp" :value="vendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
-          .block-item
-            label.block-item__label.block-item_relative Industries:
-              Asterisk(:customStyle="asteriskStyle")
-            .block-item__drop-menu(:class="{'block-item_error-shadow': !vendor.industries.length && isSaveClicked}")
-              SelectMulti(
-                :hasSearch="true"
-                :allOptionsButtons="true"
-                placeholder="Select"
-                :selectedOptions="vendor.industries.length ? vendor.industries.map(i => i.name) : []"
-                :options="getAllIndustries.map(i => i.name)"
-                @chooseOptions="setIndustries"
-              )
-
+          //.block-item
+          //  label.block-item__label.block-item_relative Industries:
+          //    Asterisk(:customStyle="asteriskStyle")
+          //  .block-item__drop-menu(:class="{'block-item_error-shadow': !vendor.industries.length && isSaveClicked}")
+          //    SelectMulti(
+          //      :hasSearch="true"
+          //      :allOptionsButtons="true"
+          //      placeholder="Select"
+          //      :selectedOptions="vendor.industries.length ? vendor.industries.map(i => i.name) : []"
+          //      :options="getAllIndustries.map(i => i.name)"
+          //      @chooseOptions="setIndustries"
+          //    )
       .buttons
         input.button(type="button" value="Save" @click="checkForErrors")
         input.button(type="button" value="Cancel" @click="cancel")
@@ -170,7 +169,7 @@
 					whatsapp: "",
 					languageCombinations: [],
 					languagePairs: [],
-					industries: [],
+					// industries: [],
 					test: false,
 					position: [],
 					isTest: false,
@@ -230,8 +229,8 @@
 				}
 				if (this.vendor.surname && !textReg.test(this.vendor.surname))
 					this.errors.push("Please, enter valid surname.")
-				if (!this.vendor.industries.length)
-					this.errors.push("Please, choose at least one industry.")
+				// if (!this.vendor.industries.length)
+				// 	this.errors.push("Please, choose at least one industry.")
 				if (!this.vendor.status) this.errors.push("Please, choose status.")
 				if (this.checkEmail()) {
 					this.errors.push("Please provide a valid email.")
@@ -272,12 +271,12 @@
 				const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
 				this.vendor.native = { _id, lang }
 			},
-			setIndustries({ option }) {
-				let industries = this.vendor.industries
-				const position = industries.findIndex(item => item.name === option)
-				if (position !== -1) industries.splice(position, 1)
-				else industries.push(this.getAllIndustries.find(item => item.name === option))
-			},
+			// setIndustries({ option }) {
+			// 	let industries = this.vendor.industries
+			// 	const position = industries.findIndex(item => item.name === option)
+			// 	if (position !== -1) industries.splice(position, 1)
+			// 	else industries.push(this.getAllIndustries.find(item => item.name === option))
+			// },
 			async getTimezones() {
 				try {
 					const result = await this.$http.get('/api/timezones')
@@ -313,7 +312,7 @@
 			...mapGetters({
 				currentVendor: "getCurrentVendor",
 				languages: "getAllLanguages",
-				getAllIndustries: "getAllIndustries"
+				// getAllIndustries: "getAllIndustries"
 			}),
 			filteredLanguages() {
 				let result = this.languages

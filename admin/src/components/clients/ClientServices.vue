@@ -25,7 +25,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentSource.lang",
-            :options="sourceLanguagesClient | firstEnglishLanguage",
+            :options="mappedLanguages | firstEnglishLanguage",
             @chooseOption="setSource",
             @scrollDrop="scrollDrop"
           )
@@ -35,7 +35,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentTargets[0].lang",
-            :options="targetLanguagesClient",
+            :options="mappedLanguages",
             @chooseOption="setTarget"
           )
 
@@ -45,7 +45,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOptions="currentTargets.map((i) => i.lang)",
-            :options="targetLanguagesClient",
+            :options="mappedLanguages",
             @chooseOptions="setTargets"
             :allOptionsButtons="true"
           )
@@ -75,7 +75,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOption="currentIndustries[0].name",
-            :options="clientIndustries",
+            :options="mappedIndustries",
             @chooseOption="setIndustry"
           )
         .clientService__editing-item(v-if=" newRow" style="width: 20%; background: white;")
@@ -84,7 +84,7 @@
             placeholder="Select",
             :hasSearch="true",
             :selectedOptions="currentIndustries.map((i) => i.name)",
-            :options="clientIndustries",
+            :options="mappedIndustries",
             @chooseOptions="setIndustries"
             :allOptionsButtons="true"
           )
@@ -133,18 +133,14 @@
         template(slot="sourceLanguage", slot-scope="{ row, index }")
           .clientService__data {{ row.sourceLanguage.lang }}
 
-
         template(slot="targetLanguages", slot-scope="{ row, index }")
           .clientService__data {{ row.targetLanguages[0].lang }}
-
 
         template(slot="services", slot-scope="{ row, index }")
           .clientService__data {{ row.services[0].title }}
 
-
         template(slot="industries", slot-scope="{ row, index }")
           .clientService__data {{ row.industries[0].name }}
-
 
         template(slot="icons", slot-scope="{ row, index }")
           .clientService__icons
@@ -166,14 +162,13 @@
 	import GeneralTable from "../GeneralTable"
 	import crudIcons from "@/mixins/crudIcons"
 	import scrollDrop from "@/mixins/scrollDrop"
-	import scrollEnd from "../../mixins/scrollEnd"
 	import checkCombinations from "../../mixins/combinationsChecker"
   import tableSortAndFilter from "../../mixins/tableSortAndFilter"
   import ValidationErrors from "../ValidationErrors"
   import ApproveModal from "../ApproveModal"
 
 	export default {
-		mixins: [ scrollDrop, crudIcons, scrollEnd, checkCombinations,tableSortAndFilter ],
+		mixins: [ scrollDrop, crudIcons, checkCombinations,tableSortAndFilter ],
 		props: {
 			clientServices: {
 				type: Array
@@ -181,22 +176,28 @@
 			defaultPriceList: {
 				type: Object
 			},
-			clientIndustries: {
-				type: Array
-			},
-			sourceLanguagesClient: {
-				type: Array
-			},
-			targetLanguagesClient: {
-				type: Array
-			},
+			// mappedIndustries: {
+			// 	type: Array
+			// },
+			// sourceLanguagesClient: {
+			// 	type: Array
+			// },
+			// targetLanguagesClient: {
+			// 	type: Array
+			// },
+      industries: {
+	      type: Array
+      },
 			languages: {
+				type: Array
+			},
+			mappedLanguages: {
 				type: Array
 			},
 			services: {
 				type: Array
 			},
-			industries: {
+			mappedIndustries: {
 				type: Array
 			}
 		},
@@ -471,6 +472,7 @@
 				} finally {
 					this.setDefaults()
 					this.newRow = false
+					this.$emit('updateRateCombinationFromSettings')
 				}
 			},
 
@@ -491,6 +493,7 @@
 				}
 				this.deleteIndex = index
 				this.isDeleting = true
+				this.$emit('updateRateCombinationFromSettings')
 			},
 
 			closeModal() {
@@ -525,9 +528,6 @@
 					industries: []
 				})
 				this.setEditingData(this.clientServices.length - 1)
-				this.$nextTick(() => {
-					this.scrollToEnd()
-				})
 			},
 
 			closeErrors() {
