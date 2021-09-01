@@ -41,6 +41,11 @@ const STEP_IDS = {
 		calculationUnitId: 1,
 		jobTypeId: 4,
 	},
+	TranslationOnly: {
+		services: 82,
+		calculationUnitId: 1,
+		jobTypeId: 4,
+	},
 	Compliance: {
 		services: 79,
 		calculationUnitId: 11,
@@ -83,7 +88,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			isTest,
 		} = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
 
-		const currentServices = getServices(tasks)
+		const currentServices = getServices(tasks, steps)
 
 		const { stepsInfo, stepsSource, stepsTarget, noFoundVendors } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, currentServices.name)
 
@@ -137,11 +142,14 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 
 }
 
-function getServices(tasks) {
+function getServices(tasks, steps) {
 	try {
 		const uniqueServices = Array.from(new Set(tasks.map(({ service }) => service.title)))
 
-		const currentServices = uniqueServices.sort((a, b) => a.localeCompare(b)).join('')
+		let currentServices = uniqueServices.sort((a, b) => a.localeCompare(b)).join('')
+		if (currentServices === 'Translation') {
+			currentServices =  steps.map(({name}) => name).includes('Revising') ? 'Translation' : 'TranslationOnly'
+		}
 		const service = currentServices ? STEP_IDS[currentServices].services : false
 		if (!service) {
 			return { isSuccess: false, message: errorMessages['cannotFindServices'] }
@@ -342,7 +350,7 @@ const updateFianceXTRF = async (id) => {
 
 	const { stepsInfo } = getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors)
 	// const currentServices = Array.from(new Set(tasks.map(({ service }) => service.title).filter((servicesTitle) => Object.keys(services).includes(servicesTitle)))).pop()
-	const currentServices = getServices(tasks)
+	const currentServices = getServices(tasks, steps)
 	await setProjectFinance(xtrfId, stepsInfo, currentServices.name)
 
 }
