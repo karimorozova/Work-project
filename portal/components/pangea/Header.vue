@@ -12,13 +12,17 @@
               .dropdown__icon
                 img(src="../../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
             .dropdown__dropbox(v-if="dropdownVisible")
-              .dropdown__item(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)')
+              .dropdown__item(v-if="client.name === 'eToro (Europe) Limited'" v-for='(proj, ind) in newProjectOnlyComplianceOption' @click='dataForRequest(ind, "newProjectOnlyComplianceOption")')
+                .dropdown__item-text {{ proj.title }}
+              .dropdown__item(v-else v-for='(proj, ind) in newProject' @click='dataForRequest(ind, "newProject")')
                 .dropdown__item-text {{ proj.title }}
           //Button(value="FOO BAR" @clicked="gotoRequestPage")
 
         div(v-click-outside="clickOutside")
           .header__user(@click="toggleMenu")
-            .user__name {{ user.firstName || '' }} {{ user.lastName || '' }}
+            .user__name {{ client.name || '' }}
+            .user__splitter(style="margin-right: 10px") |
+            .user__name {{ user.firstName || '' }} {{ user.surname || '' }}
             .user__image
               img(v-if="!user.photo" src='../../assets/images/signin-background.jpg')
               img(v-else :src="domain+user.photo")
@@ -46,9 +50,13 @@
 				isDropBox: false,
 				domain: '',
 				dropdownVisible: false,
+        newProjectOnlyComplianceOption: [
+	        { title: "Compliance", path: "/compliance" }
+        ],
 				newProject: [
 					{ title: "Translation", path: "/translation" },
-					{ title: "Compliance", path: "/compliance" }
+          { title: "Compliance", path: "/compliance" }
+
 					// { title: "Copywriting", path: "/copywriting" },
 					// { title: "Marketing", path: "/marketing" },
 					// {title: "Proofing/QA", path: "/proofing"},
@@ -63,12 +71,12 @@
 			...mapActions([
 				"logout"
 			]),
-			dataForRequest(ind) {
-				this.serviceType = this.newProject[ind].title
+			dataForRequest(ind, dataArr) {
+				this.serviceType = this[dataArr][ind].title
 				// this.navbarList.forEach((item, i) => {
 				// 	item.active = i === ind
 				// })
-				this.$router.push(`/client-request${ this.newProject[ind].path }`)
+				this.$router.push(`/client-request${ this[dataArr][ind].path }`)
 				this.dropdownVisible = false
 			},
 			showDropdown() {
@@ -93,7 +101,8 @@
 		},
 		computed: {
 			...mapGetters({
-				user: "getUserInfo"
+				user: "getUserInfo",
+				client: "getClientInfo"
 			})
 		}
 	}

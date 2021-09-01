@@ -239,7 +239,7 @@
 					},
 					{
 						title: '[2] POA (Proof of Address Documents)',
-						description: '<li>Full name</li><li>Address</li><li>Issue date</li>'
+						description: '<li>Full name</li><li>Address</li><li>Issue date</li><li>Who Issued</li>'
 					},
 					{
 						title: '[3] Tax declarations',

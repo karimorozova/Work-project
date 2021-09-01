@@ -139,6 +139,7 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) }
+															${ additionalCostsRow(obj) }
 	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
@@ -285,6 +286,7 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 60%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) }
+															${ additionalCostsRow(obj) }
 	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
@@ -417,6 +419,7 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 	                        <table class="details__table"
 	                            style="color:#66563E;width: 100%;border-width:1px;border-style:solid;border-color:#66563E;border-collapse:collapse;">
 															${ generateSubTotalAndTMDiscountsRow(taskInfoSubTotal, taskInfoWithoutDiscounts, fromMinimumCharge, obj) }
+															${ additionalCostsRow(obj) }
 	                            ${ discountsRows(obj, taskInfoWithoutDiscounts, fromMinimumCharge, taskInfoSubTotal) }
 	                            <tr>
 	                                <td class="main_weight600"
@@ -453,6 +456,20 @@ function showCostHeader(fromMinimumCharge) {
 	return !fromMinimumCharge ? `<td class="main_weight600"
 						style="color:#fff; width: 12%; background: #66563E; border-width:1px;border-style:solid;border-color:#66563E;padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
     			Cost</td>` : `<td style="display: none"></td>`
+}
+
+function additionalCostsRow(obj){
+	return obj.paymentAdditions.length  ?
+			obj.paymentAdditions.reduce((acc, curr, index) => {
+				let color = (index+1) % 2 ? '#fff' : '#f7f7f7'
+				acc += `<tr><td class="main_weight600"
+				style="border:none;background: ${ color };padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;font-weight:600;">
+						${ curr.name }</td>
+						<td style="border:none;background: ${ color };padding-top:5px;padding-bottom:5px;padding-right:5px;padding-left:5px;">
+                ${ returnIconCurrencyByStringCode(obj.projectCurrency) } ${ curr.value }</td></tr>`
+				return acc
+			}, '') :
+			`<tr style="display: none;"></tr>`
 }
 
 //generate discounts and amounts
@@ -512,11 +529,12 @@ function getTasksInfo(obj, fromMinimumCharge, tasks, steps, allUnits, allSetting
 					cost = +(totalQuantity * curStep.clientRate.value).toFixed(4)
 				}
 			}
+			const unitPrice = obj.minimumCharge.value && !obj.minimumCharge.toIgnore ? '-' : +curStep.clientRate.value.toFixed(4)
 			acc.push({
 				task: curTask.service.title,
 				langPair: `${ langPair }`,
 				jobType: title,
-				unitPrice: +curStep.clientRate.value.toFixed(4),
+				unitPrice,
 				unit: type,
 				quantity: totalQuantity,
 				cost,
