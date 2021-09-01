@@ -37,7 +37,7 @@
               i(class="fas fa-save"  @click="checkErrors")
               i(class="fas fa-times" @click="cancelAdding")
             .new-payment-additions(v-else)
-              i( class="fas fa-trash" @click="deleteDiscount(item._id)")
+              i( class="fas fa-trash" @click="deleteDiscount(item)")
             //img.icon( :src="icons.delete.icon" @click="deleteDiscount(item._id)")
             //img.icon(v-if="item._id" :src="icons.delete.icon" @click="deleteDiscount(item._id)")
             //img.icon(v-else :src="icons.save.icon" @click="checkErrors()")
@@ -129,25 +129,25 @@
 			},
 			async saveChanges() {
 				this.enumPaymentAdditions = this.enumPaymentAdditions.filter(({ name }) => name)
-				const updatedArray = this.enumPaymentAdditions
-				updatedArray.push({name: this.name, value: this.value})
+				// const updatedArray = this.enumPaymentAdditions
+				// updatedArray.push()
 				try {
-					await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray })
-					// const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray })
-          await this.getEnumDiscounts()
-					this.alertToggle({ message: "Payment Additions Saved!", isShow: true, type: "success" })
+          const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, addItem: {name: this.name, value: this.value} })
+          await this.updateEnumData(result)
+          this.enumPaymentAdditions = result.data.paymentAdditions
+          this.alertToggle({ message: "Payment Additions Saved!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Payment Additions", isShow: true, type: "error" })
 				} finally {
 					this.cancel()
 				}
 			},
-			async deleteDiscount(id) {
-				this.enumPaymentAdditions = this.enumPaymentAdditions.filter(item => item._id.toString() !== id.toString())
+			async deleteDiscount(deleteItem) {
 				try {
-					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray: this.enumPaymentAdditions })
-					this.updateEnumData(result)
-					this.alertToggle({ message: "Payment Additions Saved!", isShow: true, type: "success" })
+          const result = await this.$http.post(this.setCurrentRoutes.delete, { _id: this.$route.params.id, deleteItem})
+					await this.updateEnumData(result)
+          this.enumPaymentAdditions = result.data.paymentAdditions
+					this.alertToggle({ message: "Payment Additions Deleted!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Error on deleting", isShow: true, type: "error" })
 				} finally {
@@ -196,7 +196,8 @@
 					case 'PngSysProject':
 						return {
 							get: '/pm-manage/get-project-payment-additions/?id=',
-							update: '/pm-manage/update-project-payment-additions'
+							update: '/pm-manage/update-project-payment-additions',
+							delete: '/pm-manage/delete-project-payment-additions'
 						}
 					// case 'XTRFProject':
 					// 	return {

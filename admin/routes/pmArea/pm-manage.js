@@ -57,6 +57,7 @@ const {
 	autoCreatingTranslationTaskInProject,
 	cancelProjectInMemoq,
 	addPaymentAdditions,
+	deletePaymentAddition,
 } = require('../../projects')
 
 const {
@@ -1114,9 +1115,20 @@ router.post('/update-project-discounts', async (req, res) => {
 })
 
 router.post('/update-project-payment-additions', async (req, res) => {
-	const { _id, updatedArray } = req.body
+	const { _id, addItem } = req.body
 	try {
-		const updatedProject = await addPaymentAdditions(_id,updatedArray)
+		const updatedProject = await addPaymentAdditions(_id,addItem)
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on updating project\'s discounts')
+	}
+})
+
+router.post('/delete-project-payment-additions', async (req, res) => {
+	const { _id, deleteItem } = req.body
+	try {
+		const updatedProject = await deletePaymentAddition(_id,deleteItem)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

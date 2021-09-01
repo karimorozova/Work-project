@@ -66,6 +66,7 @@ async function getProjectAfterCancelTasks(tasks, project) {
 		const Price = getProjectFinancePrice(project.tasks);
 		const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps;
 		await stepCancelNotifyVendor(notifySteps);
+		Price.receivables += +project.paymentAdditions.reduce((acc, {value}) => acc += +value, 0);
 		return await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps, finance: { ...project.finance, Price } });
 	} catch (err) {
 		console.log(err);

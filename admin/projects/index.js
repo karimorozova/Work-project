@@ -72,7 +72,8 @@ const {
 const {
 	getProjectAfterFinanceUpdated,
 	updateProjectFinanceOnDiscountsUpdate,
-	addPaymentAdditions
+	addPaymentAdditions,
+	deletePaymentAddition,
 } = require('./porjectFinance')
 
 const {
@@ -176,4 +177,5 @@ module.exports = {
 	changeNameLang,
 	getProjectsForPortal,
 	addPaymentAdditions,
+	deletePaymentAddition,
 }

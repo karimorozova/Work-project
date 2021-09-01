@@ -35,7 +35,7 @@ async function receivablesCalc({ task, project, step }) {
 
 async function getAfterWordcountPayablesUpdated({ project, step }) {
 	try {
-		let { tasks, steps, customer, industry, discounts, _id: projectId } = project
+		let { tasks, steps, customer, industry, discounts, _id: projectId, paymentAdditions  } = project
 		const taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
 		const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId)
 		tasks[taskIndex].metrics = setTaskMetrics({
@@ -323,7 +323,7 @@ function getProjectFinanceData(project, prop) {
 		acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables
 		acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables
 		return acc
-	}, {})
+	}, {receivables: +project.paymentAdditions.reduce((acc, {value}) => acc += +value, 0)})
 }
 
 module.exports = {
