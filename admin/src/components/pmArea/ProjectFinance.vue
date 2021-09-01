@@ -75,6 +75,12 @@
               :enum="'PngSysProject'"
             )
 
+          .additional-functions
+            PaymentAdditions(
+              :paramsIsEdit="paramsIsEdit"
+              :enum="'PngSysProject'"
+            )
+
         .project-finance__total
           .project-finance__total-title Total:
           .project-finance__total-value
@@ -86,6 +92,7 @@
 <script>
 	import { mapGetters, mapActions } from "vuex"
 	import Discounts from "../clients/pricelists/Discounts"
+	import PaymentAdditions from "../clients/pricelists/PaymentAdditions"
 	import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 	export default {
@@ -203,7 +210,8 @@
 			}
 		},
 		components: {
-			Discounts
+			Discounts,
+      PaymentAdditions,
 		}
 	}
 </script>
@@ -492,5 +500,9 @@
 
   input:focus {
     outline: none;
+  }
+
+  .additional-functions {
+    margin-top: 10px;
   }
 </style>

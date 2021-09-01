@@ -95,6 +95,31 @@ const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tabl
   }
 };
 
+const addPaymentAdditions = async (_id, paymentAdditions, tableName = Projects) => {
+  // let project = await Projects.findOne({ _id });
+  // let { finance, tasks, steps } = project;
+  // const {
+  //   steps: updatedSteps,
+  //   tasks: updatedTasks,
+  //   finance: updatedFinance,
+  //   roi
+  // } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts);
+  // const itemsToUpdate = {
+  //   finance: updatedFinance,
+  //   tasks: updatedTasks,
+  //   steps: updatedSteps,
+  //   discounts: updatedDiscounts,
+  //   roi
+  // };
+  return await getProjectAfterUpdate({ _id }, { paymentAdditions: paymentAdditions });
+
+  // if (tableName === Projects) {
+  //   return await getProjectAfterUpdate({ _id }, { paymentAdditions: paymentAdditions });
+  // } else {
+  //   return await getMemoqProjectAfterUpdate({ _id }, { ...itemsToUpdate });
+  // }
+};
+
 /**
  *
  * @param {Object} finance
@@ -150,4 +175,4 @@ const findStepMultiplier = (step) => {
   }
 }
 
-module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinanceToZero, updateProjectFinanceOnDiscountsUpdate, getProjectFinancePrice };
+module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinanceToZero, updateProjectFinanceOnDiscountsUpdate, getProjectFinancePrice, addPaymentAdditions };

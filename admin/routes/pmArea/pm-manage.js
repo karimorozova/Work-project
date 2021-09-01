@@ -55,7 +55,8 @@ const {
 	saveCertificateTODR1Files,
 	setStepDeadlineProjectAndMemoq,
 	autoCreatingTranslationTaskInProject,
-	cancelProjectInMemoq
+	cancelProjectInMemoq,
+	addPaymentAdditions,
 } = require('../../projects')
 
 const {
@@ -1090,10 +1091,32 @@ router.get('/get-project-discounts', async (req, res) => {
 	}
 })
 
+router.get('/get-project-payment-additions', async (req, res) => {
+	const { id } = req.query
+	try {
+		const paymentAdditions = await Projects.findOne({ "_id": id }, { paymentAdditions: 1 })
+		res.send(paymentAdditions)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on getting project discounts')
+	}
+})
+
 router.post('/update-project-discounts', async (req, res) => {
 	const { _id, updatedArray } = req.body
 	try {
 		const updatedProject = await updateProjectFinanceOnDiscountsUpdate(_id, updatedArray)
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on updating project\'s discounts')
+	}
+})
+
+router.post('/update-project-payment-additions', async (req, res) => {
+	const { _id, updatedArray } = req.body
+	try {
+		const updatedProject = await addPaymentAdditions(_id,updatedArray)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

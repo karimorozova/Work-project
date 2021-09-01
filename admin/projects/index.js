@@ -70,7 +70,8 @@ const {
 
 const {
 	getProjectAfterFinanceUpdated,
-	updateProjectFinanceOnDiscountsUpdate
+	updateProjectFinanceOnDiscountsUpdate,
+	addPaymentAdditions
 } = require('./porjectFinance')
 
 const {
@@ -172,4 +173,5 @@ module.exports = {
 	removeMultiDR2,
 	changeNameLang,
 	getProjectsForPortal,
+	addPaymentAdditions,
 }
