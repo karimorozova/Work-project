@@ -217,6 +217,30 @@ function vendorReassignmentMessage(obj, reason) {
             </div>`
 }
 
+function vendorCanStartStartedSecondStep(obj) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
+                <header style="background-color:#66563E;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+                </header>
+                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName } ${ obj.vendor.surname || '' }</span></p>
+                    <p style="font-weight: 400;">
+                    	Step <b>${obj.step.stepId}: ${obj.step.name}</b> is now ready to start.
+										</p>
+                    <p style="font-weight: 400;">
+                    	You can go to the system at the link below.
+										</p>
+                    <p style="font-weight: 400;">
+                    	<a href="https://vendor.pangea.global/dashboard/" target="_blank">Vendor Portal</a>
+										</p>
+                </div>
+                <footer>
+                    <hr size="15" color="#66563E">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                </footer>
+            </div>`
+}
+
 function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
 	const { type } = allUnits.find(({ _id }) => _id.toString() === obj.serviceStep.unit.toString())
 	const progress = type === "CAT Wordcount" ?
@@ -349,5 +373,6 @@ module.exports = {
 	stepReopenedMessage,
 	stepReadyToStartMessage,
 	sendMemoqCredentials,
-	vendorRegistration
+	vendorRegistration,
+	vendorCanStartStartedSecondStep
 }

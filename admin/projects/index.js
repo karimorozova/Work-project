@@ -46,7 +46,8 @@ const {
 	notifyStepReopened,
 	notifyVendorStepStart,
 	sendQuoteMessage,
-	sendCostQuoteMessage
+	sendCostQuoteMessage,
+	nextVendorCanStartWorkNotification,
 } = require('./emails')
 
 const {
@@ -102,6 +103,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	nextVendorCanStartWorkNotification,
 	cancelProjectInMemoq,
 	autoCreatingTranslationTaskInProject,
 	manageProjectName,

@@ -26,7 +26,8 @@ const {
 	stepCancelledMessage,
 	stepMiddleCancelledMessage,
 	stepReopenedMessage,
-	stepReadyToStartMessage
+	stepReadyToStartMessage,
+	vendorCanStartStartedSecondStep
 } = require('../emailMessages/vendorCommunication')
 
 const { getProject } = require("./getProjects")
@@ -174,7 +175,7 @@ async function getQuoteInfo(projectId, tasksIds) {
 
 async function stepCompletedNotifyPM(project, step) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
-	const subject = `Step completed: ${ step.stepId } ${ project.projectName } (I003.0)`
+	const subject = `Step completed: ${ step.stepId } - ${ step.name } - ${ project.projectName } (I003.0)`
 	const messagePM = stepCompletedMessage({ ...project._doc, step }, projectManager)
 
 	// TODO (refactoring later, temporary hide notification for AM)
@@ -534,7 +535,29 @@ async function notifyVendorStepStart(steps, allSteps, project) {
 	}
 }
 
+const nextVendorCanStartWorkNotification = async ({ task, steps, jobId }) => {
+	const { service, taskId } = task
+	const { steps: serviceSteps } = service
+	const { serviceStep: { step: stepId } } = steps.find(({ _id }) => `${ _id }` === `${ jobId }`)
+	const { stage } = serviceSteps.find(({ step }) => `${ step._id }` === `${ stepId }`)
+
+	if (serviceSteps.length === 2 && stage === 'stage1') {
+		const [ firstStep, secondStep ] = steps
+				.filter(({ taskId: id }) => id === taskId)
+				.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+
+		if (!!secondStep.vendor) {
+			const message = vendorCanStartStartedSecondStep({ vendor: secondStep.vendor, step: secondStep })
+			const subject = `STEP-${ secondStep.name } is ready to start (V001.21)`
+			await sendEmail({ to: secondStep.vendor.email, subject }, message)
+		}
+	}
+
+}
+
+
 module.exports = {
+	nextVendorCanStartWorkNotification,
 	stepCancelNotifyVendor,
 	getMessage,
 	taskCompleteNotifyPM,
