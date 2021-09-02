@@ -155,12 +155,12 @@
                 :clientServices="currentClient.services"
                 :defaultPricelist="currentClient.defaultPricelist"
                 :languages="languages"
-                :sourceLanguagesClient="sourceLanguagesClientData"
-                :targetLanguagesClient="targetLanguagesClientData"
+                :mappedLanguages="languages.map(i => i.lang).sort((a, b) => a.localeCompare(b))"
                 :industries="industries"
+                :mappedIndustries="industries.map(i => i.name)"
                 :services="services"
-                :clientIndustries="currentClient.industries.map(i => i.name)"
                 @updateRates="updateRates"
+                @updateRateCombinationFromSettings="setNewStepCombination"
               )
 
           .client-info__block(v-if="!isIndividual")
@@ -866,16 +866,16 @@
 					}
 				}
 			},
-			sourceLanguagesClientData() {
-				if (this.clientDataInCreated.sourceLanguages.length) {
-					return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
-				}
-			},
-			targetLanguagesClientData() {
-				if (this.clientDataInCreated.targetLanguages.length) {
-					return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
-				}
-			},
+			// sourceLanguagesClientData() {
+			// 	if (this.clientDataInCreated.sourceLanguages.length) {
+			// 		return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
+			// 	}
+			// },
+			// targetLanguagesClientData() {
+			// 	if (this.clientDataInCreated.targetLanguages.length) {
+			// 		return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
+			// 	}
+			// },
 			isIndividual() {
 				return this.currentClientOverallData.clientType === 'Individual'
 			}

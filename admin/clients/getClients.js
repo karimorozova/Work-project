@@ -174,8 +174,9 @@ const getClientRates = async (obj) => {
  * @returns {Array} - returns an array of clients with needed values
  */
 const getClientsForNewProject = () => {
-	return Clients.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, industries: 1 })
-			.populate('industries')
+	return Clients
+			.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, services: 1 })
+			.populate('services.industries')
 }
 
 module.exports = {

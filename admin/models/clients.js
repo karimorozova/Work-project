@@ -22,10 +22,10 @@ const ClientSchema = new mongoose.Schema({
 		type: String,
 		trim: true
 	},
-	aliases: {
-		type: Array,
-		default: []
-	},
+	// aliases: {
+	// 	type: Array,
+	// 	default: []
+	// },
 	nativeLanguage: {
 		type: Schema.Types.ObjectId, ref: 'Language',
 	},
@@ -149,15 +149,15 @@ const ClientSchema = new mongoose.Schema({
 		// 	default: 0
 		// }
 	},
-	sourceLanguages: [{
-		type: Schema.Types.ObjectId, ref: 'Language'
-	}],
-	targetLanguages: [{
-		type: Schema.Types.ObjectId, ref: 'Language'
-	}],
-	industries: [
-		{ type: Schema.Types.ObjectId, ref: 'Industries' }
-	],
+	// sourceLanguages: [{
+	// 	type: Schema.Types.ObjectId, ref: 'Language'
+	// }],
+	// targetLanguages: [{
+	// 	type: Schema.Types.ObjectId, ref: 'Language'
+	// }],
+	// industries: [
+	// 	{ type: Schema.Types.ObjectId, ref: 'Industries' }
+	// ],
 	services: [{
 		sourceLanguage: {
 			type: Schema.Types.ObjectId, ref: 'Language',

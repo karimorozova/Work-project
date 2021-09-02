@@ -37,10 +37,10 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	aliases: {
-		type: Array,
-		default: []
-	},
+	// aliases: {
+	// 	type: Array,
+	// 	default: []
+	// },
 	email: {
 		type: String,
 		default: '',
@@ -298,9 +298,9 @@ const VendorSchema = new mongoose.Schema({
 			default: 0
 		}
 	} ],
-	industries: [
-		{ type: Schema.Types.ObjectId, ref: 'Industries' }
-	],
+	// industries: [
+	// 	{ type: Schema.Types.ObjectId, ref: 'Industries' }
+	// ],
 	languagePairs: [ {
 		source: {
 			type: Schema.Types.ObjectId, ref: 'Language'

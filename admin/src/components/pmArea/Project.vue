@@ -87,10 +87,10 @@
           .input-title
             .input-title__text Industry:
             span.require *
-          input.project__input-text( v-if="project.tasks && project.tasks.length"  type="text" :value="project.industry.name" disabled)
+          input.project__input-text( v-if="project.industry.name"  type="text" :value="project.industry.name" disabled)
           .project__drop-menu(v-else)
             SelectSingle(
-              :selectedOption="selectedIndustry.name || project.industry.name"
+              :selectedOption="selectedIndustry.name"
               :options="industriesList"
               @chooseOption="setIndustry"
               placeholder="Industry"
@@ -251,8 +251,8 @@
 			},
 			setValue({ option }, prop) {
 				this.$emit('setValue', { option, prop })
-				if (prop === 'customer' && option.industries.length === 1) {
-					this.selectedIndustry = option.industries[0]
+				if (prop === 'customer') {
+					this.selectedIndustry = ""
 				}
 			},
 			setIndustry({ option }) {
@@ -268,7 +268,7 @@
 			async checkForErrors() {
 				this.errors = []
 				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
-				if (!this.project.projectName ) {
+				if (!this.project.projectName) {
 					this.errors.push("Please, enter valid Project name.")
 					// this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 				}
@@ -327,7 +327,7 @@
 						if (!this.clients.length) {
 							let result = await this.$http.get(`/active-clients`)
 							this.clients = [ ...result.body ].sort((a, b) => {
-								return a.name.localeCompare(b.name);
+								return a.name.localeCompare(b.name)
 							})
 						}
 					}
@@ -363,15 +363,15 @@
 				}
 			},
 			industriesList() {
-				let result = []
+				let res = []
 				if (this.project.customer.name) {
-					const industries = this.project.customer.industries
-					if (industries[0].name) {
-						return result = industries
-					}
-					return result = result.filter(item => industries.indexOf(item._id) !== -1)
+					const { customer: { services } } = this.project
+          for (let industry of services.map(i => i.industries[0])){
+          	if(!res.length) res.push(industry)
+            if(!res.map(i => i.name).includes(industry.name)) res.push(industry)
+          }
+					return res
 				}
-				return result
 			},
 			nameOfProject() {
 				return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName

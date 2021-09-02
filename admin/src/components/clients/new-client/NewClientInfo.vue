@@ -257,9 +257,9 @@
 				this.clearErrors()
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 				if (!this.client.name) this.errors.push('Company name cannot be empty.')
-				if (!this.client.industries.length) this.errors.push('Please, choose at least one industry.')
-				if (!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.')
-				if (!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.')
+				// if (!this.client.industries.length) this.errors.push('Please, choose at least one industry.')
+				// if (!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.')
+				// if (!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.')
 				if (this.clientType !== "Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
 				if (!this.client.currency.length) this.errors.push('Please, add currency.')
 				if (this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.')

@@ -100,7 +100,7 @@ router.get("/finance", async (req, res) => {
 
 		const today = moment().format('YYYY-MM-DD')
 		const projectFinance = await Projects.find({
-					status: { $not: { $in: [ 'Created', 'Draft', 'Cost Quote', 'Quote sent', 'Cancelled' ] } },
+					status: { $not: { $in: [ 'Created', 'Draft', 'Cost Quote', 'Quote sent', 'Cancelled', 'Rejected' ] } },
 					isTest: false, isSendToXtrf: false, startDate: { $gte: new Date(today + 'T00:00:00.000Z'), $lt: new Date(today + 'T23:00:00.000Z') }
 				}, { finance: 1, projectCurrency: 1, crossRate: 1, projectId: 1 })
 		const sum = projectFinance.reduce((acc, cur) => {
@@ -112,7 +112,7 @@ router.get("/finance", async (req, res) => {
 		const startMonth = moment().startOf('month').format('YYYY-MM-DD')
 		const endMonth = moment().endOf('month').format('YYYY-MM-DD')
 		const projectFinanceMonth = await Projects.find({
-			status: { $not: { $in: [ 'Created', 'Draft', 'Cost Quote', 'Quote sent', 'Cancelled' ] } },
+			status: { $not: { $in: [ 'Created', 'Draft', 'Cost Quote', 'Quote sent', 'Cancelled', 'Rejected' ] } },
 			isTest: false, isSendToXtrf: false, billingDate: { $gte: new Date(startMonth + 'T00:00:00.000Z'), $lt: new Date(endMonth + 'T23:00:00.000Z') }
 		}, { finance: 1, projectCurrency: 1, crossRate: 1, projectId: 1 })
 

@@ -119,30 +119,30 @@
           :value="currentVendor.whatsapp",
           @change="(e) => updateVendorProp(e.target.value,  'whatsapp')"
         )
-      .block-item
-        label Industries:
-          span.require *
-        .block-item__drop-menu(
-          :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
-        )
-          SelectMulti(
-            :hasSearch="true"
-            :allOptionsButtons="true"
-            placeholder="Select"
-            :selectedOptions="currentVendor.industries.length ? currentVendor.industries.map(i => i.name) : []"
-            :options="getAllIndustries.map(i => i.name)"
-            @chooseOptions="setIndustries"
-          )
-      .block-item.no-margin
-        label Aliases:
-        .block-item__drop-menu
-          SelectMulti(
-            placeholder="Select"
-            :hasSearch="true"
-            :selectedOptions="currentVendor.hasOwnProperty('aliases') ? currentVendor.aliases : currentVendorAliases"
-            :options="['test1', 'test2']"
-            @chooseOptions="setAlias"
-          )
+      //.block-item
+      //  label Industries:
+      //    span.require *
+      //  .block-item__drop-menu(
+      //    :class="{ 'block-item_error-shadow': isSaveClicked && !currentVendor.industries.length }"
+      //  )
+      //    SelectMulti(
+      //      :hasSearch="true"
+      //      :allOptionsButtons="true"
+      //      placeholder="Select"
+      //      :selectedOptions="currentVendor.industries.length ? currentVendor.industries.map(i => i.name) : []"
+      //      :options="getAllIndustries.map(i => i.name)"
+      //      @chooseOptions="setIndustries"
+      //    )
+      //.block-item.no-margin
+      //  label Aliases:
+      //  .block-item__drop-menu
+      //    SelectMulti(
+      //      placeholder="Select"
+      //      :hasSearch="true"
+      //      :selectedOptions="currentVendor.hasOwnProperty('aliases') ? currentVendor.aliases : currentVendorAliases"
+      //      :options="['test1', 'test2']"
+      //      @chooseOptions="setAlias"
+      //    )
 </template>
 
 <script>
@@ -168,14 +168,14 @@
 			...mapActions({
 				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData"
 			}),
-			setAlias(e) {
-				let currVendorAliases = [ ...this.currentVendor.aliases ]
-				const position = currVendorAliases.findIndex(item => item === e.option)
-				if (position !== -1) currVendorAliases.splice(position, 1)
-				else currVendorAliases.push(e.option)
-
-				this.updateCurrentVendorGeneralData({ key: 'aliases', value: currVendorAliases })
-			},
+			// setAlias(e) {
+			// 	let currVendorAliases = [ ...this.currentVendor.aliases ]
+			// 	const position = currVendorAliases.findIndex(item => item === e.option)
+			// 	if (position !== -1) currVendorAliases.splice(position, 1)
+			// 	else currVendorAliases.push(e.option)
+      //
+			// 	this.updateCurrentVendorGeneralData({ key: 'aliases', value: currVendorAliases })
+			// },
 			previewPhoto(e, name) {
 				this.updateCurrentVendorGeneralData({ key: name, value: e.target.value })
 			},
@@ -186,13 +186,13 @@
 			updateVendorTimeZone({ option }) {
 				this.updateCurrentVendorGeneralData({ key: 'timezone', value: option })
 			},
-			setIndustries({ option }) {
-				let industries = [ ...this.currentVendor.industries ]
-				const position = industries.findIndex(item => item.name === option)
-				if (position !== -1) industries.splice(position, 1)
-				else industries.push(this.getAllIndustries.find(item => item.name === option))
-				this.updateCurrentVendorGeneralData({ key: "industries", value: industries })
-			},
+			// setIndustries({ option }) {
+			// 	let industries = [ ...this.currentVendor.industries ]
+			// 	const position = industries.findIndex(item => item.name === option)
+			// 	if (position !== -1) industries.splice(position, 1)
+			// 	else industries.push(this.getAllIndustries.find(item => item.name === option))
+			// 	this.updateCurrentVendorGeneralData({ key: "industries", value: industries })
+			// },
 			updateVendorProp(value, key) {
 				this.updateCurrentVendorGeneralData({ key, value })
 			},
@@ -220,7 +220,7 @@
 		computed: {
 			...mapGetters({
 				currentVendor: "getCurrentVendorGeneralData",
-				getAllIndustries: "getAllIndustries",
+				// getAllIndustries: "getAllIndustries",
 				languages: "getAllLanguages"
 			}),
 			filteredLanguages() {
@@ -235,11 +235,11 @@
 				})
 				return result
 			},
-			vendorAliases() {
-				if (this.aliases) {
-					return this.aliases
-				}
-			},
+			// vendorAliases() {
+			// 	if (this.aliases) {
+			// 		return this.aliases
+			// 	}
+			// },
 			selectedIndNames() {
 				let result = []
 				if (this.currentVendor.industries && this.currentVendor.industries.length) {
