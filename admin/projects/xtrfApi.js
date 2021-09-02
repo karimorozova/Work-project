@@ -178,9 +178,9 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, current
 	let stepsTarget = new Set()
 	let noFoundVendors = new Set()
 	steps = steps.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
-	for (let { sourceLanguage, targetLanguage, finance, nativeFinance, vendor, serviceStep, _id } of steps) {
-		const sourceLang = findLanguageId(allLanguages, "symbol", sourceLanguage) ? findLanguageId(allLanguages, "symbol", sourceLanguage).id : ''
-		const targetLang = findLanguageId(allLanguages, "symbol", targetLanguage) ? findLanguageId(allLanguages, "symbol", targetLanguage).id : ''
+	for (let { sourceLanguage, targetLanguage, finance, nativeFinance, vendor, serviceStep, _id, memoqSource, memoqTarget } of steps) {
+		const sourceLang = findLanguageId(allLanguages, sourceLanguage, memoqSource ) || ''
+		const targetLang = findLanguageId(allLanguages, targetLanguage, memoqTarget ) || ''
 		const vendorId = vendor ? vendors[vendor.firstName + " " + vendor.surname] : ''
 		stepsSource.add(sourceLang)
 		stepsTarget.add(targetLang)
@@ -297,12 +297,18 @@ function findInXtrf(response, field, value) {
 	return Array.isArray(found) ? found[0] : found
 }
 
-function findLanguageId(response, field, value) {
-	if (!value) return false
-	const langSymbolParts = value.split('-')
-	value = langSymbolParts[0] === 'spa' ? value.replace('spa','ES') : value
-	const found = response.data.filter((elem) => elem[field].toLowerCase().includes(value.toLowerCase()))
-	return Array.isArray(found) ? found[0] : found
+function findLanguageId(allXTRFLanguages, langSymbol, langMemoq) {
+	if (!langSymbol && !langMemoq) return false
+	if(!!langMemoq) return getLangBySymbolCode('iso6392', langMemoq)
+
+	const langSymbolParts = langSymbol.split('-')
+	langSymbol = langSymbolParts[0] === 'spa' ? value.replace('spa','ES') : langSymbol
+	return getLangBySymbolCode('symbol', langSymbol)
+
+	function getLangBySymbolCode(code, language){
+		const found = allXTRFLanguages.data.filter((elem) => elem[code].toLowerCase().includes(language.toLowerCase()))
+		return Array.isArray(found) ? found[0].id || false : found.id || false
+	}
 }
 
 async function sendRequest(method, path, data) {
