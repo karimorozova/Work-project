@@ -139,8 +139,8 @@ async function manageStatuses({ project, steps, jobId, status }) {
 async function manageCompletedStatus({ project, jobId, steps, task }) {
 	const step = steps.find(item => item.id === jobId)
 	const stage1step = task.service.steps.find(item => item.stage === 'stage1')
-	const ifThisIsFirstStep = step.serviceStep.step.toString() === stage1step.step._id.toString()
-
+	const stage1stepId = typeof stage1step.step === 'string' ? stage1step.step.toString() : stage1step.step._id.toString()
+	const ifThisIsFirstStep = step.serviceStep.step.toString() === stage1stepId
 	try {
 		await stepCompletedNotifyPM(project, step)
 
