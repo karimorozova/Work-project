@@ -539,7 +539,8 @@ const nextVendorCanStartWorkNotification = async ({ task, steps, jobId }) => {
 	const { service, taskId } = task
 	const { steps: serviceSteps } = service
 	const { serviceStep: { step: stepId } } = steps.find(({ _id }) => `${ _id }` === `${ jobId }`)
-	const { stage } = serviceSteps.find(({ step }) => `${ step._id }` === `${ stepId }`)
+
+	const { stage } = serviceSteps.find(({ step }) => `${ typeof step === 'string' ? step : step._id }` === `${ stepId }`)
 
 	if (serviceSteps.length === 2 && stage === 'stage1') {
 		const [ firstStep, secondStep ] = steps
