@@ -14,7 +14,7 @@
             .dropdown__dropbox(v-if="dropdownVisible")
               .dropdown__item(v-if="client.name === 'eToro (Europe) Limited'" v-for='(proj, ind) in newProjectOnlyComplianceOption' @click='dataForRequest(ind, "newProjectOnlyComplianceOption")')
                 .dropdown__item-text {{ proj.title }}
-              .dropdown__item(v-else v-for='(proj, ind) in newProject' @click='dataForRequest(ind, "newProject")')
+              .dropdown__item(v-if="client.name !== 'eToro (Europe) Limited'" v-for='(proj, ind) in newProject' @click='dataForRequest(ind, "newProject")')
                 .dropdown__item-text {{ proj.title }}
           //Button(value="FOO BAR" @clicked="gotoRequestPage")
 

@@ -95,7 +95,7 @@
 
     .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
       .button__convert
-        Button(value="Convert into Project" :isDisabled="!!requestCounter" @clicked="convertIntoProject")
+        Button(value="Convert into Project" :isDisabled="isButtonDisable" @clicked="convertIntoProject")
 
 </template>
 
@@ -133,6 +133,7 @@
 				selectedTab: 'Tasks',
 				currentTaskId: '',
 				currentTaskIdForUpdate: '',
+        isButtonDisable: false,
 				fields1: [
 					{ label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
 					{ label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
@@ -173,6 +174,7 @@
 				}
 			},
 			async convertIntoProject() {
+				this.isButtonDisable = true
 				const { requestForm: { service: { title } }, tasksAndSteps } = this.currentProject
 				this.checkTranslationSourceFiles(title, tasksAndSteps)
 				if (this.errors.length) {
@@ -201,6 +203,7 @@
 					const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
 					const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
 					window.open(route.href, "_self")
+					this.isButtonDisable = false
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
 				}
@@ -210,6 +213,7 @@
 					const projectId = await this.$http.post('/pm-manage/convert-translation-request-into-project', { projectId: this.currentProject._id, creatorUserForMemoqId })
 					const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
 					window.open(route.href, "_self")
+					this.isButtonDisable = false
 				} catch (err) {
 					this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
 				}

@@ -78,7 +78,7 @@ const createProjectFromRequest = async (requestId) => {
     projectName,
     industry,
     customer,
-    startDate,
+    startDate: new Date(),
     deadline,
     billingDate,
     notes,
