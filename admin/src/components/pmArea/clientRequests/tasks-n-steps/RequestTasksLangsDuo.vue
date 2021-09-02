@@ -26,6 +26,9 @@
           :list="targetChosen.map(i=> i.lang)"
           @moveItem="moveFromChosen"
         )
+
+      .select-target-count Selected languages: {{ targetChosen.length }}
+
 </template>
 
 <script>
@@ -235,5 +238,11 @@
 
   .asterisk {
     color: red;
+  }
+
+  .select-target-count{
+    margin-top: 8px;
+    opacity: 0.5;
+    float: right;
   }
 </style>

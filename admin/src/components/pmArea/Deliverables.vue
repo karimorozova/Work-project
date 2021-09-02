@@ -411,7 +411,7 @@
 				return [ ...new Set(filteredTasks.reduce((acc, curr) => {
 					acc.push('<div>' + curr.sourceLanguage + ' <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ' + curr.targetLanguage + '</div>')
 					return acc
-				}, [])) ].join(', ')
+				}, [])) ].join('')
 			},
 			getTasksId(row) {
 				const mySet = new Set(row.tasks.map((field) => field.substring(field.length - 3)))

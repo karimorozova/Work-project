@@ -517,7 +517,8 @@
 				}
 
 				if (this.project.status === 'Closed') {
-					result = [ 'ReOpen' ]
+					// result = [ 'ReOpen' ]
+          result = []
 				}
 
 				if (this.project.status === 'Rejected') {
@@ -528,7 +529,7 @@
 					result = [ 'ReOpen' ]
 				}
 
-				if (!result.includes('Delete')) result.push('Delete')
+				if (!result.includes('Delete') && this.project.status !== 'Closed') result.push('Delete')
 
 				return result
 			}
