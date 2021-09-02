@@ -152,7 +152,7 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 
 		if (ifThisIsFirstStep) {
 			const updatedSteps = getWithReadyToStartSteps({ task, steps })
-			await nextVendorCanStartWorkNotification({ task, steps, jobId })
+			//await nextVendorCanStartWorkNotification({ task, steps, jobId })
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
