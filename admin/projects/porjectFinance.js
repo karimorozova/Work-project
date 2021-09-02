@@ -12,8 +12,9 @@ const { Projects } = require('../models');
  */
 async function getProjectAfterFinanceUpdated ({ project, steps, tasks }) {
   try {
-    let { finance, isPriceUpdated, status } = project;
+    let { finance, isPriceUpdated, status, paymentAdditions } = project;
     finance.Price = getProjectFinancePrice(tasks);
+    finance.Price.receivables += +paymentAdditions.reduce((acc, {value}) => acc += +value, 0);
     const { receivables, payables } = finance.Price;
     const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
     const checkStatuses = ['Quote sent', 'Approved'];
@@ -74,13 +75,13 @@ function getUpdatedProjectFinanceToZero(tasks) {
  */
 const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tableName = Projects) => {
   let project = await tableName.findOne({ _id });
-  let { finance, tasks, steps } = project;
+  let { finance, tasks, steps, paymentAdditions } = project;
   const {
     steps: updatedSteps,
     tasks: updatedTasks,
     finance: updatedFinance,
     roi
-  } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts);
+  } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts, paymentAdditions);
   const itemsToUpdate = {
     finance: updatedFinance,
     tasks: updatedTasks,
@@ -95,29 +96,22 @@ const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tabl
   }
 };
 
-const addPaymentAdditions = async (_id, paymentAdditions, tableName = Projects) => {
-  // let project = await Projects.findOne({ _id });
-  // let { finance, tasks, steps } = project;
-  // const {
-  //   steps: updatedSteps,
-  //   tasks: updatedTasks,
-  //   finance: updatedFinance,
-  //   roi
-  // } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts);
-  // const itemsToUpdate = {
-  //   finance: updatedFinance,
-  //   tasks: updatedTasks,
-  //   steps: updatedSteps,
-  //   discounts: updatedDiscounts,
-  //   roi
-  // };
-  return await getProjectAfterUpdate({ _id }, { paymentAdditions: paymentAdditions });
+const addPaymentAdditions = async (_id, paymentAddition) => {
+  const { finance } = await Projects.findOne({_id: _id} )
 
-  // if (tableName === Projects) {
-  //   return await getProjectAfterUpdate({ _id }, { paymentAdditions: paymentAdditions });
-  // } else {
-  //   return await getMemoqProjectAfterUpdate({ _id }, { ...itemsToUpdate });
-  // }
+  return await getProjectAfterUpdate({ _id }, {
+    $push: {paymentAdditions: paymentAddition},
+    "finance.Price.receivables": +finance.Price.receivables + +paymentAddition.value
+  });
+};
+
+const deletePaymentAddition = async (_id, { _id: paymentAdditionId, value }) => {
+  const { finance } = await Projects.findOne({_id: _id} )
+
+  return await getProjectAfterUpdate({ _id }, {
+    $pull: { "paymentAdditions":  {_id: paymentAdditionId } },
+    "finance.Price.receivables": +finance.Price.receivables - +value
+  });
 };
 
 /**
@@ -126,9 +120,11 @@ const addPaymentAdditions = async (_id, paymentAdditions, tableName = Projects) 
  * @param {Array} tasks
  * @param {Array} steps
  * @param {Array} discounts
+ * @param {Array} paymentAdditions
  * @returns {{steps: [], roi: String, tasks: [], finance: {}}}
  */
-const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
+const recalculateProjectFinance = (finance, tasks, steps, discounts = [], paymentAdditions) => {
+  steps = steps.filter(({status}) => status !== 'Cancelled' )
   for (let step of steps) {
     let { finance: { Price: { receivables } }, clientRate: { value } } = step;
     const multiplier = findStepMultiplier(step);
@@ -146,6 +142,7 @@ const recalculateProjectFinance = (finance, tasks, steps, discounts = []) => {
     task.finance.Price.receivables = sumReceivables(taskSteps);
   }
   finance.Price.receivables = sumReceivables(tasks);
+  finance.Price.receivables += +paymentAdditions.reduce((acc, {value}) => acc += +value, 0);
   const roi = ((+finance.Price.receivables - +finance.Price.payables) / +finance.Price.payables).toFixed(2);
   return { steps, tasks, finance, roi };
 
@@ -175,4 +172,4 @@ const findStepMultiplier = (step) => {
   }
 }
 
-module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinanceToZero, updateProjectFinanceOnDiscountsUpdate, getProjectFinancePrice, addPaymentAdditions };
+module.exports = { getProjectAfterFinanceUpdated, getUpdatedProjectFinanceToZero, updateProjectFinanceOnDiscountsUpdate, getProjectFinancePrice, addPaymentAdditions, deletePaymentAddition };
