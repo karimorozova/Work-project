@@ -2,15 +2,20 @@
   .projectToXtrf
     .projectToXtrf__buttons
       Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color="#47A6A6" :outline="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
-      span(v-else) {{ project.projectId}} : &nbsp;
+      span(v-else) Xtrf : &nbsp;
         a( target="_blank" :href="project.xtrfLink")
           i(class="fas fa-link")
         | &nbsp;&nbsp;
-        i(class="fas fa-sync-alt cursor-pointer" @click="updateFinance")
+        i(class="fas fa-check-circle cursor-pointer" @click="updateFinance")
 
 
 
     .projectToXtrf__info
+      .red
+        span Pressing &nbsp;
+        i(class="fas fa-check-circle cursor-pointer")
+        span : Updates the finance, re-assigns the vendors, and closes the project and jobs.
+        .sub-text (In case of failure press again, or contact the administrator)
       span If a step has the same language pair, they will be grouped. Accounts payable and receivable will be added.
       .dont-close-text If the project is not closed, click the button again.
 </template>
@@ -102,7 +107,10 @@
         margin: 5px 0 0 0;
       }
     }
-
+    .red {
+      color: #d15f45;
+      margin-bottom: 3px;
+    }
     a {
       text-decoration: none;
       color: inherit;

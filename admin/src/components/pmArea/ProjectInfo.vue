@@ -253,6 +253,7 @@ export default {
 
       const closedCheck = tasks.length && (
 		       tasks.every(({ service }) => service.title === 'Translation')
+          || tasks.every(({ service }) => service.title === 'TransCreation')
 		      || (tasks.every(({ service }) => service.title === 'Copywriting') && tasks.length === 1)
 		      || (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2)
       )

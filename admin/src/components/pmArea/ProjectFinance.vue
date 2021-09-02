@@ -78,6 +78,7 @@
           .additional-functions
             PaymentAdditions(
               :paramsIsEdit="paramsIsEdit"
+              :projectStatus="currentProject.status"
               :enum="'PngSysProject'"
             )
 
