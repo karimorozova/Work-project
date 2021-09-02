@@ -5,7 +5,7 @@
         .payment-additions__title-name Receivables Additions:
         .payment-additions__title-value {{allDiscountsValue}} €
         .payment-additions__title-add-new
-          .add-button(@click="addData")
+          .add-button(v-if="projectStatus === 'Draft'" @click="addData")
             .add-button__icon
               i.fas.fa-plus
 
@@ -17,34 +17,18 @@
 
           .payment-additions__list-dropMenu(v-else)
             input(type="text" v-model="name" )
-            //SelectSingle(
-            //  :isTableDropMenu="true",
-            //  placeholder="Select",
-            //  :hasSearch="true",
-            //  :selectedOption="currentPaymentAdditions.name || ''",
-            //  :options="filteredDiscounts",
-            //  @chooseOption="setDiscount"
-            //)
 
           .payment-additions__list-value
             span(v-if="item.value") {{item.value}} €
-            input(v-else type="number" v-model="value" )
-            //span(v-if="currentPaymentAdditions.value && !item.value") {{currentPaymentAdditions.value}} &#37;
+            input(v-else type="number" :value="value" @change="changeValue" )
 
-          //.payment-additions__list-icons(v-if="paramsIsEdit")
           .payment-additions__list-icons
-            .new-payment-additions(v-if="!item.value")
+            .new-payment-additions(v-if="!item.value && projectStatus === 'Draft'")
               i(class="fas fa-save"  @click="checkErrors")
               i(class="fas fa-times" @click="cancelAdding")
+            .new-payment-additions(v-else-if="projectStatus === 'Draft'")
+              i( class="fas fa-trash trash" @click="deleteDiscount(item)")
             .new-payment-additions(v-else)
-              i( class="fas fa-trash" @click="deleteDiscount(item)")
-            //img.icon( :src="icons.delete.icon" @click="deleteDiscount(item._id)")
-            //img.icon(v-if="item._id" :src="icons.delete.icon" @click="deleteDiscount(item._id)")
-            //img.icon(v-else :src="icons.save.icon" @click="checkErrors()")
-          //.payment-additions__list-icons(v-else)
-          //  img.icon(:src="icons.delete.icon")
-
-    //.payment-additions__add(v-if="paramsIsEdit")
 
 </template>
 
@@ -57,10 +41,10 @@
 	export default {
 		mixins: [ crudIcons ],
 		props: {
-			// paramsIsEdit: {
-			// 	type: Boolean
-			// },
 			enum: {
+				type: String
+			},
+			projectStatus: {
 				type: String
 			}
 		},
@@ -68,21 +52,16 @@
 			return {
 				textMargin: { 'padding-left': '7px' },
 				enumPaymentAdditions: [],
-				// allDiscounts: [],
 				currentActive: -1,
 				currentPaymentAdditions: {},
-				// areErrors: false,
 				errors: [],
         name: '',
-        value: '',
+        value: 0,
 			}
 		},
 		methods: {
 			...mapActions([ 'alertToggle', 'setCurrentProject' ]),
 
-			// setDiscount({ option }) {
-			// 	this.currentPaymentAdditions = this.allDiscounts.find(item => item.name === option)
-			// },
 			setEditionData(index) {
 				this.currentActive = index
 				this.currentPaymentAdditions = this.enumPaymentAdditions[index]
@@ -94,16 +73,11 @@
 					value: "",
 				})
 				this.setEditionData(this.enumPaymentAdditions.length - 1)
-				// this.$nextTick(() => this.scrollToEnd());
 			},
 			cancelAdding() {
         this.enumPaymentAdditions.pop()
         this.cancel()
       },
-			// scrollToEnd() {
-			// 	const element = this.$el.querySelector('.payment-additions__lists');
-			// 	element.scrollTop = element.scrollHeight
-			// },
 			cancel() {
 			  this.name = ''
 			  this.value = ''
@@ -116,7 +90,6 @@
 				if(!this.name) this.errors.push("Name should not be empty!");
 				if(!this.value && isNaN(parseFloat(this.value)))  this.errors.push("Value should be numeric!");
 				if (this.errors.length) {
-					// this.areErrors = true
           this.alertToggle({ message: this.errors[0], isShow: true, type: "error" })
 					return
 				}
@@ -124,13 +97,9 @@
 			},
 			updateEnumData(result) {
         this.setCurrentProject(result.data)
-				// this.enum === 'PngSysProject' && this.setCurrentProject(result.data)
-				// this.enum === 'XTRFProject' && this.$emit('updateXTRFProject', result.data)
 			},
 			async saveChanges() {
 				this.enumPaymentAdditions = this.enumPaymentAdditions.filter(({ name }) => name)
-				// const updatedArray = this.enumPaymentAdditions
-				// updatedArray.push()
 				try {
           const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, addItem: {name: this.name, value: this.value} })
           await this.updateEnumData(result)
@@ -157,33 +126,21 @@
 			async getEnumDiscounts() {
 				try {
 					const result = await this.$http.get(this.setCurrentRoutes.get + `${ this.$route.params.id }`)
-          console.log(result.data)
 					this.enumPaymentAdditions = result.data.paymentAdditions
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Payment Additions", isShow: true, type: "error" })
 				}
 			},
-			// async getDiscounts() {
-			// 	try {
-			// 		const result = await this.$http.get("/pm-manage/payment-additions")
-			// 		this.allDiscounts = result.data
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: "Error on getting All Discounts", isShow: true, type: "error" })
-			// 	}
-			// }
-		},
-		watch: {
-			// paramsIsEdit(newValue, oldValue) {
-			// 	// if (oldValue && !newValue) this.enumPaymentAdditions = this.enumPaymentAdditions.filter(({ name }) => name)
-			// 	if (!newValue) {
-			// 		this.enumPaymentAdditions = this.enumPaymentAdditions.filter(item => !!item.name)
-			// 		this.cancel()
-			// 	}
-			// }
+      changeValue(event) {
+        const value = event.target.value
+        // if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
+        this.value = (parseFloat(value)).toFixed(2)
+        // }
+        this.$forceUpdate()
+      },
 		},
 		created() {
 			this.getEnumDiscounts()
-			// this.getDiscounts()
 		},
 		computed: {
 			setCurrentRoutes() {
@@ -218,8 +175,8 @@
 				return this.enumPaymentAdditions.filter(item => item.name).reduce((acc, curr) => {
 					acc += +curr.value
 					return acc
-				}, 0)
-			}
+				}, 0).toFixed(2)
+			},
 		},
 		components: {
 			Add,
@@ -324,6 +281,10 @@
           align-items: center;
           font-size: 18px;
           justify-content: space-around;
+
+          .trash {
+            font-size: 16px;
+          }
         }
         
         & i {

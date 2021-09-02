@@ -8,7 +8,7 @@
           i(class="fas fa-link")
         | &nbsp;|&nbsp;
         span(class="cursor-pointer" @click="updateFinance(xtrfTask.xtrfId, xtrfTask.taskId)")
-          i(class="fas fa-sync-alt") &nbsp;
+          i(class="fas fa-check-circle") &nbsp;
           | Update & Close
 
 
@@ -20,6 +20,11 @@
 
 
     .projectToXtrf__info
+      .red
+        span Pressing &nbsp;
+        i(class="fas fa-check-circle cursor-pointer")
+        span : Updates the finance, re-assigns the vendors, and closes the project and jobs.
+        .sub-text (In case of failure press again, or contact the administrator)
       span If a step has the same language pair, they will be grouped. Accounts payable and receivable will be added.
       .dont-close-text If the project is not closed, click the button again.
 </template>
@@ -135,6 +140,10 @@
       color: inherit;
     }
 
+    .red {
+      color: #d15f45;
+      margin-bottom: 3px;
+    }
     .margin-bottom {
       margin-bottom: 10px;
     }
