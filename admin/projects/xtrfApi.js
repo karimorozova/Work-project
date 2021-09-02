@@ -46,6 +46,16 @@ const STEP_IDS = {
 		calculationUnitId: 1,
 		jobTypeId: 4,
 	},
+	TransCreation: {
+		services: 83,
+		calculationUnitId: 1,
+		jobTypeId: 65,
+	},
+	TransCreationOnly: {
+		services: 84,
+		calculationUnitId: 1,
+		jobTypeId: 43,
+	},
 	Compliance: {
 		services: 79,
 		calculationUnitId: 11,
@@ -109,12 +119,12 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: isTest })
 
 		// Set AM
-		try {
-			if (accountManager.firstName && accountManager.lastName) {
-				await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
-			}
-		} catch (e) {
-		}
+		// try {
+		// 	if (accountManager.firstName && accountManager.lastName) {
+		// 		await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
+		// 	}
+		// } catch (e) {
+		// }
 
 
 		await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/sourceLanguage`, {
@@ -145,11 +155,13 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 function getServices(tasks, steps) {
 	try {
 		const uniqueServices = Array.from(new Set(tasks.map(({ service }) => service.title)))
-
 		let currentServices = uniqueServices.sort((a, b) => a.localeCompare(b)).join('')
-		if (currentServices === 'Translation') {
-			currentServices =  steps.map(({name}) => name).includes('Revising') ? 'Translation' : 'TranslationOnly'
+
+		const stepsWithTwoState = ["Translation", "TransCreation"]
+		if (stepsWithTwoState.includes(currentServices)) {
+			currentServices =  steps.map(({name}) => name).includes('Revising') ? currentServices : currentServices + 'Only'
 		}
+
 		const service = currentServices ? STEP_IDS[currentServices].services : false
 		if (!service) {
 			return { isSuccess: false, message: errorMessages['cannotFindServices'] }
@@ -176,11 +188,12 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, current
 		if (!vendorId) {
 			noFoundVendors.add(vendor.firstName + " " + vendor.surname)
 		}
-
+		serviceStep = serviceStep.toJSON()
+		// console.log({val: serviceStep, test:serviceStep.hasOwnProperty("memoqAssignmentRole") ? serviceStep.memoqAssignmentRole + 1 : +serviceStep.stepCounter})
 		const subInfo = {
 			payables: nativeFinance.Price.payables,
 			vendor: vendorId ? vendorPriceProfileId[vendorId] : false,
-			memoqAssignmentRole: serviceStep.memoqAssignmentRole != null ? serviceStep.memoqAssignmentRole + 1 : 1
+			memoqAssignmentRole: serviceStep.hasOwnProperty("memoqAssignmentRole") ? serviceStep.memoqAssignmentRole + 1 : +serviceStep.stepCounter
 		}
 		const stepInfo = {
 			receivables: finance.Price.receivables,
@@ -246,7 +259,7 @@ async function setProjectFinance(xtrfProjectId, stepsInfo, currentServices) {
 		}
 
 		for await (let { id, stepNumber } of task) {
-			const { payables, vendor } = subInfo.find((step) => step.memoqAssignmentRole === stepNumber)
+			const { payables, vendor } = subInfo.find((step) => step.memoqAssignmentRole === stepNumber )
 
 			const payablesData = {
 				...baseData,
@@ -331,8 +344,7 @@ const updateFianceXTRF = async (id) => {
 	})
 
 	for await (let jobId of xtrfProjectJobs.data.map(item => item.id))
-		for await (let status of ['ACCEPTED' , 'STARTED', 'READY'])
-			await sendRequest('put', `v2/jobs/${ jobId }/status`, { status })
+		await sendRequest('put', `v2/jobs/${ jobId }/status`, { status: 'OPEN' })
 
 	const finance = await sendRequest('get', `v2/projects/${ xtrfId }/finance`)
 	let { receivables, payables } = finance.data
@@ -353,6 +365,9 @@ const updateFianceXTRF = async (id) => {
 	const currentServices = getServices(tasks, steps)
 	await setProjectFinance(xtrfId, stepsInfo, currentServices.name)
 
+	for await (let jobId of xtrfProjectJobs.data.map(item => item.id))
+		for await (let status of ['ACCEPTED' , 'STARTED', 'READY'])
+			await sendRequest('put', `v2/jobs/${ jobId }/status`, { status })
 }
 
 	module.exports = { createXtrfProjectWithFinance, updateFianceXTRF, sendRequest }
