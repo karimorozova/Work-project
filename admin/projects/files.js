@@ -1,13 +1,24 @@
+const { Projects, Languages, Vendors } = require('../models')
+const htmlToPdf = require('html-pdf');
+let  apiUrl = require('../helpers/apiurl');
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
+
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveProjectFile, moveFile } = require('../utils/movingFile');
 const { getProject, getProjectAfterUpdate } = require('./getProjects');
 const { getPdfOfQuote } = require("../emailMessages/clientCommunication");
-const fs = require('fs');
-const { Projects, Languages } = require('../models')
-const htmlToPdf = require('html-pdf');
-let  apiUrl = require('../helpers/apiurl');
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+const { generatePO } = require('../emailMessages/vendorCommunication')
 const { getCertificateTemplate } = require('../emailMessages/complianceCecertificate')
+const fs = require('fs');
+
+const pdfConfig = {
+    type: 'pdf',
+    width: '814',
+    height: '1054',
+    orientation: "landscape",
+    base: apiUrl,
+    border: 0
+}
 
 async function storeFiles(filesArr, projectId) {
     try {
@@ -159,19 +170,34 @@ async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     }
 }
 
-const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
-    const allLanguages = await Languages.find()
-    const template = getCertificateTemplate({ project, allLanguages, tasks, deliveryData })
-    const pdf = new Promise((resolve, reject) => {
+const generatePOFile = async (requestInfo, project) => {
+    const { vendor } = requestInfo
+    const fullVendor = await Vendors.findOne({ "_id": vendor._id })
+    const template = await generatePO(requestInfo, fullVendor, project)
+    return new Promise((resolve, reject) => {
         htmlToPdf.create(
             template,
             {
-                type: 'pdf',
-                width: '814',
-                height: '1054',
-                orientation: "landscape",
-                base: apiUrl,
-                border: 0
+               ...pdfConfig
+            })
+            .toFile(`./dist/vendorsDocs/${vendor._id}/PO.pdf`, function (err, res) {
+                if (err) {
+                    console.log(err)
+                    reject(err)
+                }
+                resolve(`./dist/vendorsDocs/${vendor._id}/PO.pdf`)
+            })
+    })
+}
+
+const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
+    const allLanguages = await Languages.find()
+    const template = getCertificateTemplate({ project, allLanguages, tasks, deliveryData })
+    return new Promise((resolve, reject) => {
+        htmlToPdf.create(
+            template,
+            {
+                ...pdfConfig
             })
             .toFile('./dist/uploads/certificatePdf.pdf', function (err, res) {
                 if (err) {
@@ -181,12 +207,6 @@ const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
                 resolve('./dist/uploads/certificatePdf.pdf')
             })
     })
-    return pdf
-    // pdf.then((path) => {
-    //     fs.unlink(path.toString(), (err) => {
-    //         if (err) console.log(err)
-    //     })
-    // })
 }
 
 const copyProjectFiles = (project, originalFile) => {
@@ -202,6 +222,7 @@ const copyProjectFiles = (project, originalFile) => {
 }
 
 module.exports = {
+    generatePOFile,
     storeFiles,
     createArchiveForDeliverableItem,
     // getDeliverablesLink,

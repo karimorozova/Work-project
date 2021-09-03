@@ -13,7 +13,8 @@ const {
 	manageDeliveryFile,
 	getPdf,
 	generateAndSaveCertificate,
-	copyProjectFiles
+	copyProjectFiles,
+	generatePOFile
 } = require('./files')
 
 const {
@@ -104,6 +105,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	generatePOFile,
 	nextVendorCanStartWorkNotification,
 	cancelProjectInMemoq,
 	autoCreatingTranslationTaskInProject,

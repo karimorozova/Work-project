@@ -437,6 +437,7 @@
 			},
 
 			async approveAction() {
+				this.isApproveActionShow = false
 				const checkedSteps = this.getCheckedSteps()
 				!checkedSteps.length ? this.closeApproveModal() : await this.doStepApproveAction(checkedSteps)
 			},

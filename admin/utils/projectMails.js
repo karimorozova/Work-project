@@ -3,6 +3,8 @@ const { managerNotifyMail, sendEmail, clientQuoteEmail, clientQuoteToEmails, sen
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication");
+const { generatePOFile } = require('../projects')
+const fs = require('fs')
 
 async function notifyManagerProjectRejected(project) {
 	try {
@@ -155,13 +157,20 @@ async function stepEmailToVendor(project, step) {
 
 async function sendRequestToVendor(project, step) {
 	try {
-		let requestInfo = { ...step._doc };
-		requestInfo.projectId = project.id;
-		requestInfo.projectName = project.projectName;
-		requestInfo.industry = project.industry.name;
-		requestInfo.brief = project.brief;
-		const message = requestMessageForVendor(requestInfo);
-		await sendEmailFromUser(project.projectManager,{ to: step.vendor.email, subject: `Availability approval for a Step ${ step.stepId } (${ step.serviceStep.title }) (ID V001.0)` }, message);
+		let requestInfo = { ...step._doc }
+		requestInfo.projectId = project.id
+		requestInfo.projectName = project.projectName
+		requestInfo.industry = project.industry.name
+		requestInfo.brief = project.brief
+		const message = requestMessageForVendor(requestInfo, project._id, )
+
+		const pdf = await generatePOFile(requestInfo, project)
+		const attachments = [ { content: fs.createReadStream(pdf), filename: 'PO.pdf' } ]
+
+		await sendEmailFromUser(project.projectManager,{ to: step.vendor.email, attachments, subject: `Availability approval for a Step ${ step.stepId } (${ step.serviceStep.title }) (ID V001.0)` }, message)
+		fs.unlink(pdf, (err) => {
+			if (err) console.log(err)
+		})
 	} catch (err) {
 		console.log(err);
 		console.log('Error in sendRequestToVendor');

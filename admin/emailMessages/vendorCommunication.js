@@ -3,14 +3,18 @@ let apiUrl = require("../helpers/apiurl")
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
+const logo = apiUrl + '/static/certificate-images/logo.png'
+const { Units } = require('../models')
 
-function applicationMessage (obj, infoForMail) {
+const moment = require('moment')
+
+function applicationMessage(obj, infoForMail) {
 	let cvFiles = ""
 	let industries = obj.industries.reduce((acc, curr) => {
-		acc = `${acc} ${curr.name};`
-		return acc;
-	},'')
-	const langPair = infoForMail.targetLanguages.map(({lang}) => infoForMail.sourceLanguage.lang + " >> " + lang)
+		acc = `${ acc } ${ curr.name };`
+		return acc
+	}, '')
+	const langPair = infoForMail.targetLanguages.map(({ lang }) => infoForMail.sourceLanguage.lang + " >> " + lang)
 	let coverLetterFiles = ""
 	if (obj.cvFiles.length) {
 		cvFiles = obj.cvFiles.reduce((acc, cur, index) => {
@@ -31,8 +35,8 @@ function applicationMessage (obj, infoForMail) {
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span style="color:#66563E;">Hello Recruitment Team,</span></p>
                     <p style="font-size: 14px; font-weight: 400;"><span id="client-name-row" style="color:#66563E;">A new applicant has submitted a form.</span></p>
                     <p style="font-size: 14px; font-weight: 400;"><span id="client-name-row" style="color:#66563E;">Here is the initial information:</span></p>
-                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;color:#66563E;"> Name: </b> ${obj.firstName} </p>
-                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;color:#66563E;"> Surname: </b> ${obj.surname} </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;color:#66563E;"> Name: </b> ${ obj.firstName } </p>
+                    <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;color:#66563E;"> Surname: </b> ${ obj.surname } </p>
                     <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Email: </b> <span>${ obj.email }</span> </p>
                     <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Phone Number: </b> <span>${ obj.phone }</span> </p>
                     <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Mother tongue: </b> <span>${ obj.lang }</span> </p>
@@ -50,6 +54,7 @@ function applicationMessage (obj, infoForMail) {
                 </footer>
             </div>`
 }
+
 function vendorRegistration(obj) {
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
                 <header style="background-color:#66563E;text-align:center;" >
@@ -92,8 +97,8 @@ function requestMessageForVendor(obj) {
 	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `
 	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '24h' })
 	const stepId = obj.stepId.replace(/ /g, '%20')
-	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I accept - ${ obj.name }, ${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
-	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" style="color: #D15F46;">I reject - ${ obj.name }, ${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" >I accept - ${ obj.name }, ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" >I reject - ${ obj.name }, ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
 	const start = obj.start.split('T')[0].split('-').reverse().join('-')
 	const deadline = obj.deadline.split('T')[0].split('-').reverse().join('-')
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
@@ -225,7 +230,7 @@ function vendorCanStartStartedSecondStep(obj) {
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName } ${ obj.vendor.surname || '' }</span></p>
                     <p style="font-weight: 400;">
-                    	Step <b>${obj.step.stepId}: ${obj.step.name}</b> is now ready to start.
+                    	Step <b>${ obj.step.stepId }: ${ obj.step.name }</b> is now ready to start.
 										</p>
                     <p style="font-weight: 400;">
                     	You can go to the system at the link below.
@@ -362,7 +367,137 @@ function sendMemoqCredentials(obj) {
             </div>`
 }
 
+async function generatePO(requestInfo, fullVendor, project) {
+	const { firstName, surname } = fullVendor
+	let { stepId, start, deadline, name, sourceLanguage, targetLanguage, industry, nativeFinance, serviceStep, totalWords, size, taskId } = requestInfo
+	const { Wordcount, Price } = nativeFinance
+	const { unit: unitId } = serviceStep
+	const { type } = await Units.findOne({ "_id": unitId })
+	const isTranslationJob = name === 'Translation'
+	start = moment(start).format('DD-MM-YYYY, HH:mm')
+	deadline = moment(deadline).format('DD-MM-YYYY, HH:mm')
+	let col1 = ''
+	let col2 = ''
+
+	if (type === 'Packages') {
+		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Quantity:</div><div class="value">${ requestInfo.quantity }</div>`
+		if(size > 1) col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Size:</div><div class="value">${ size }</div>`
+	} else if (type === 'CAT Wordcount' && isTranslationJob) {
+		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Total Wordcount:</div><div class="value">${ totalWords }</div>`
+		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Weighted Wordcount:</div><div class="value">${ Wordcount.payables }</div>`
+	} else if (type === 'CAT Wordcount' && !isTranslationJob) {
+		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Total Wordcount:</div><div class="value">${ totalWords }</div>`
+	} else {
+		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">${type}:</div><div class="value">${ requestInfo.hours }</div>`
+		if(size > 1) col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Size:</div><div class="value">${ size }</div>`
+	}
+
+	let table = ''
+	if(isTranslationJob){
+		const { tasks } = project
+		const { metrics } = tasks.find(item => item.taskId === taskId)
+		delete metrics.totalWords
+		const tableStart = `<div class="table" style="padding: 0px 25px;">
+				<table style="font-size: 14px;color: #333;width: 100%;text-align: left;border-collapse: collapse;border-bottom: 1px solid #999;border-left: 1px solid #999;margin-top: -30px;">
+        <tr>
+            <th style="width: 40%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;"></th>
+            <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">%</th>
+            <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">Source Word</th>
+            <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">Rate</th>
+        </tr>`
+		const tableBody = Object.values(metrics).reduce((acc, {vendor, text, value}) => {
+			acc = acc + `<tr>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;font-weight: 600;">${text}</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${vendor}</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${value}</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${+(vendor * (value / 100)).toFixed(1)}</td>
+     </tr>`
+			return acc
+		}, '')
+		const tableEnd = `</table></div>`
+
+		table = tableStart + tableBody + tableEnd
+	}
+
+	return `<div class="pdf" style="height: 1054px;width: 814px;font-family: Arial, sans-serif;color: #333;padding: 30px;position: relative;">
+			    <div class="header" style="display: -webkit-box;justify-content: space-between;">
+			        <div class="header__logo">
+			            <img src="${ logo }" alt="">
+			        </div>
+			        <div class="header__details" style="margin-left: 271px;">
+			            <div class="header__details--line"
+			                style="height: 24px;background: #48A6A6;width: 320px;margin-right: -30px;margin-bottom: 5px;"></div>
+			            <div class="header__details--title" style="font-size: 26px;margin-bottom: 5px;">Purchase Order</div>
+			            <div class="header__details--stepId" style="font-size: 14px;">${ stepId }</div>
+			        </div>
+			    </div>
+			    <div class="body" style="padding: 25px;margin-top: 80px;">
+			        <div class="body__to" style="font-size: 16px;margin-bottom: 15px;">To: </div>
+			        <div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ firstName } ${ surname || '' }</div>
+			        <div class="body__address" style="margin-bottom: 50px;">Ofice 302, Block B 82A, Mezhyhirska Street, 04080 Kyiv,
+			            Ukraine</div>
+			        <div class="body__line" style="background-color: #b5dbdb;height: 1px;"></div>
+			    </div>
+			    <div class="details" style="padding: 25px;">
+			        <div class="cols" style="display: -webkit-box;">
+			            <div class="col" style="width: 360px;margin-right: 50px;font-size: 14px;">
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Start Date & Time:</div>
+			                    <div class="value">${ start }</div>
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Job Type:</div>
+			                    <div class="value">${ name }</div>
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Source Language:</div>
+			                    <div class="value">${ sourceLanguage }</div>
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    ${ col1 }
+			                </div>
+			            </div>
+			            <div class="col" style="width: 360px;margin-right: 50px;font-size: 14px;">
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Deadline:</div>
+			                    <div class="value">${ deadline }</div>
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Industry:</div>
+			                    <div class="value">${ industry }</div>
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Target Language:</div>
+			                    <div class="value">${ targetLanguage }</div>
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                	${ col2 }
+			                </div>
+			            </div>
+			        </div>
+			        <div class="paybles" style="font-size: 14px;margin-top: 40px;margin-bottom: 40px;">
+			            <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                <div class="key" style="font-weight: 600;margin-right: 10px;">Total Payables:</div>
+			                <div class="value">${ +(Price.payables).toFixed(2) } EUR</div>
+			            </div>
+			        </div>
+			    </div>
+					${table}
+			    <div class="footer"
+			        style="position: absolute;width: 764px;border-top: 3px solid #c8e4e4;margin-left: 25px;bottom: 0;padding: 15px 0 12px;">
+			        <div class="text-line" style="font-size: 12px;text-align: center;font-weight: 600;">Pangea Translation Services
+			            (Cyprus) LTD</div>
+			        <div class="text-line" style="font-size: 12px;text-align: center;font-weight: 600;">Arch. Leontiou A’ 254, 3020
+			            Limassol, Cyprus</div>
+			        <div class="text-line" style="font-size: 12px;text-align: center;font-weight: 600;">Office : +357 25 252 150 |
+			            www.pangea.global</div>
+			        <div class="text-line" style="font-size: 12px;text-align: center;font-weight: 600;">Reg. No. HE362046</div>
+			    </div>
+			</div>`
+}
+
 module.exports = {
+	generatePO,
 	applicationMessage,
 	requestMessageForVendor,
 	stepCancelledMessage,
