@@ -15,6 +15,7 @@ import TableLanguages from '@/components/Table/TableLanguagesNew'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
 import TableUnits from '@/components/Table/TableUnits'
+import TablePaymentTerms from "@/components/Table/TablePaymentTerms"
 import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
@@ -221,6 +222,11 @@ const router = new Router({
 							path: 'units',
 							name: 'units',
 							component: TableUnits
+						},
+						{
+							path: 'payment-terms',
+							name: 'payment-terms',
+							component: TablePaymentTerms
 						}
 					]
 				},

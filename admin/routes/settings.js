@@ -1,8 +1,20 @@
 const router = require('express').Router()
 const fs = require('fs')
 const { upload, moveFile } = require('../utils/')
-const { updateLanguage, getTierInfo, updateTierInfo, getIndustryTier, updateIndustryTier, getClientsApi } = require('../settings')
-const { getSimpleClients  } = require('../clients')
+
+const {
+	updateLanguage,
+	getTierInfo,
+	updateTierInfo,
+	getIndustryTier,
+	updateIndustryTier,
+	getClientsApi,
+	getPaymentTerms,
+	managePaymentTerms,
+	deletePaymentTerms
+} = require('../settings')
+
+const { getSimpleClients } = require('../clients')
 const { Languages, ClientsApiSetting } = require('../models')
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
@@ -34,6 +46,37 @@ router.get('/tier-info', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on language setting saving')
+	}
+})
+
+router.get('/payment-terms', async (req, res) => {
+	try {
+		const result = await getPaymentTerms()
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /payment-terms')
+	}
+})
+
+router.delete('/payment-terms/:_id', async (req, res) => {
+	try {
+		const { _id } = req.params
+		const result = await deletePaymentTerms(_id)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /deleting | payment-terms')
+	}
+})
+
+router.put('/manage-payment-terms', async (req, res) => {
+	try {
+		const result = await managePaymentTerms(req.body)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /manage-payment-terms')
 	}
 })
 
@@ -79,20 +122,20 @@ router.get('/clients-api', async (req, res) => {
 	}
 })
 
-router.post('/clients-api/new', upload.fields([{ name: 'logo' }]), async (req, res) => {
-	let { affiliation,clientName,industry,isDisplay } = req.body
-	const iconFile = req.files["logo"];
+router.post('/clients-api/new', upload.fields([ { name: 'logo' } ]), async (req, res) => {
+	let { affiliation, clientName, industry, isDisplay } = req.body
+	const iconFile = req.files["logo"]
 
 	try {
 		let logoPath
-		const date = new Date();
-		const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
-		if(iconFile) {
-			const newIconPath = `./dist/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
-			await moveFile(iconFile[0], newIconPath);
-			logoPath = `/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
+		const date = new Date()
+		const formattedDate = `${ date.getDate() }-${ date.getMonth() + 1 }-${ date.getFullYear() }`
+		if (iconFile) {
+			const newIconPath = `./dist/apiSettingsLogo/${ formattedDate }-${ iconFile[0].filename }`
+			await moveFile(iconFile[0], newIconPath)
+			logoPath = `/apiSettingsLogo/${ formattedDate }-${ iconFile[0].filename }`
 		}
-		await ClientsApiSetting.create( { logo: logoPath, affiliation,clientName,industry: JSON.parse(industry),isDisplay })
+		await ClientsApiSetting.create({ logo: logoPath, affiliation, clientName, industry: JSON.parse(industry), isDisplay })
 		const clientsApi = await ClientsApiSetting.find()
 		res.send('ok')
 	} catch (err) {
@@ -101,23 +144,23 @@ router.post('/clients-api/new', upload.fields([{ name: 'logo' }]), async (req, r
 	}
 })
 
-router.post('/clients-api/:id', upload.fields([{ name: 'logo' }]), async (req, res) => {
+router.post('/clients-api/:id', upload.fields([ { name: 'logo' } ]), async (req, res) => {
 	let { id } = req.params
-	let { affiliation,clientName,industry,isDisplay } = req.body
-	const iconFile = req.files["logo"];
+	let { affiliation, clientName, industry, isDisplay } = req.body
+	const iconFile = req.files["logo"]
 
 	try {
 		let logoPath
-		let updateData = {  affiliation, clientName, industry: JSON.parse(industry), isDisplay }
-		const date = new Date();
-		const formattedDate = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
-		if(iconFile) {
-			const newIconPath = `./dist/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
-			await moveFile(iconFile[0], newIconPath);
-			logoPath = `/apiSettingsLogo/${formattedDate}-${iconFile[0].filename}`;
-			updateData.logo =  logoPath
+		let updateData = { affiliation, clientName, industry: JSON.parse(industry), isDisplay }
+		const date = new Date()
+		const formattedDate = `${ date.getDate() }-${ date.getMonth() + 1 }-${ date.getFullYear() }`
+		if (iconFile) {
+			const newIconPath = `./dist/apiSettingsLogo/${ formattedDate }-${ iconFile[0].filename }`
+			await moveFile(iconFile[0], newIconPath)
+			logoPath = `/apiSettingsLogo/${ formattedDate }-${ iconFile[0].filename }`
+			updateData.logo = logoPath
 		}
-		await ClientsApiSetting.updateOne({_id: id}, updateData)
+		await ClientsApiSetting.updateOne({ _id: id }, updateData)
 		const clientsApi = await ClientsApiSetting.find()
 		res.send('ok')
 	} catch (err) {
@@ -129,7 +172,7 @@ router.post('/clients-api/:id', upload.fields([{ name: 'logo' }]), async (req, r
 router.post('/clients-api/:id/delete', async (req, res) => {
 	let { id } = req.params
 	try {
-		await ClientsApiSetting.deleteOne({_id: id})
+		await ClientsApiSetting.deleteOne({ _id: id })
 		const clientsApi = await ClientsApiSetting.find()
 		res.send(clientsApi)
 	} catch (err) {
@@ -140,7 +183,7 @@ router.post('/clients-api/:id/delete', async (req, res) => {
 
 router.post('/all-clients', async (req, res) => {
 	try {
-		const clients = await getSimpleClients({}, {'name': 1, industry: 1})
+		const clients = await getSimpleClients({}, { 'name': 1, industry: 1 })
 		res.send(clients)
 	} catch (err) {
 		console.log(err)

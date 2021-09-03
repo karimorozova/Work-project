@@ -390,6 +390,11 @@
 							},
 							{
 								type: 'link',
+								name: 'Payment Terms',
+								path: '/pangea-settings/payment-terms'
+							},
+							{
+								type: 'link',
 								name: 'Cancellation Reasons',
 								path: '/pangea-settings/cancel-reasons'
 							},
