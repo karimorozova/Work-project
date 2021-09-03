@@ -369,7 +369,7 @@ function sendMemoqCredentials(obj) {
 
 async function generatePO(requestInfo, fullVendor, project) {
 	const { firstName, surname } = fullVendor
-	let { stepId, start, deadline, name, sourceLanguage, targetLanguage, industry, nativeFinance, serviceStep, totalWords, size, taskId } = requestInfo
+	let { stepId, start, deadline, name, sourceLanguage, targetLanguage, industry, nativeFinance, serviceStep, totalWords, taskId, nativeVendorRate: { value: rate } } = requestInfo
 	const { Wordcount, Price } = nativeFinance
 	const { unit: unitId } = serviceStep
 	const { type } = await Units.findOne({ "_id": unitId })
@@ -381,19 +381,19 @@ async function generatePO(requestInfo, fullVendor, project) {
 
 	if (type === 'Packages') {
 		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Quantity:</div><div class="value">${ requestInfo.quantity }</div>`
-		if(size > 1) col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Size:</div><div class="value">${ size }</div>`
+		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Unit:</div><div class="value">Packages</div>`
 	} else if (type === 'CAT Wordcount' && isTranslationJob) {
 		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Total Wordcount:</div><div class="value">${ totalWords }</div>`
 		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Weighted Wordcount:</div><div class="value">${ Wordcount.payables }</div>`
 	} else if (type === 'CAT Wordcount' && !isTranslationJob) {
 		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Total Wordcount:</div><div class="value">${ totalWords }</div>`
 	} else {
-		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">${type}:</div><div class="value">${ requestInfo.hours }</div>`
-		if(size > 1) col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Size:</div><div class="value">${ size }</div>`
+		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Quantity:</div><div class="value">${ requestInfo.hours }</div>`
+		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Unit:</div><div class="value">${ type }</div>`
 	}
 
 	let table = ''
-	if(isTranslationJob){
+	if (isTranslationJob) {
 		const { tasks } = project
 		const { metrics } = tasks.find(item => item.taskId === taskId)
 		delete metrics.totalWords
@@ -405,12 +405,12 @@ async function generatePO(requestInfo, fullVendor, project) {
             <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">Source Word</th>
             <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">Rate</th>
         </tr>`
-		const tableBody = Object.values(metrics).reduce((acc, {vendor, text, value}) => {
+		const tableBody = Object.values(metrics).reduce((acc, { vendor, text, value }) => {
 			acc = acc + `<tr>
-	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;font-weight: 600;">${text}</td>
-	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${vendor}</td>
-	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${value}</td>
-	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${+(vendor * (value / 100)).toFixed(1)}</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;font-weight: 600;">${ text }</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${ vendor }</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${ value }</td>
+	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${ +(vendor * (value / 100)).toFixed(1) }</td>
      </tr>`
 			return acc
 		}, '')
@@ -434,8 +434,7 @@ async function generatePO(requestInfo, fullVendor, project) {
 			    <div class="body" style="padding: 25px;margin-top: 80px;">
 			        <div class="body__to" style="font-size: 16px;margin-bottom: 15px;">To: </div>
 			        <div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ firstName } ${ surname || '' }</div>
-			        <div class="body__address" style="margin-bottom: 50px;">Ofice 302, Block B 82A, Mezhyhirska Street, 04080 Kyiv,
-			            Ukraine</div>
+			        <div class="body__address" style="margin-bottom: 50px;">ADDRESS</div>
 			        <div class="body__line" style="background-color: #b5dbdb;height: 1px;"></div>
 			    </div>
 			    <div class="details" style="padding: 25px;">
@@ -455,6 +454,10 @@ async function generatePO(requestInfo, fullVendor, project) {
 			                </div>
 			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
 			                    ${ col1 }
+			                </div>
+			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
+			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Rate:</div>
+			                    <div class="value">${ +rate.toFixed(4) }</div>
 			                </div>
 			            </div>
 			            <div class="col" style="width: 360px;margin-right: 50px;font-size: 14px;">
@@ -482,7 +485,7 @@ async function generatePO(requestInfo, fullVendor, project) {
 			            </div>
 			        </div>
 			    </div>
-					${table}
+					${ table }
 			    <div class="footer"
 			        style="position: absolute;width: 764px;border-top: 3px solid #c8e4e4;margin-left: 25px;bottom: 0;padding: 15px 0 12px;">
 			        <div class="text-line" style="font-size: 12px;text-align: center;font-weight: 600;">Pangea Translation Services
