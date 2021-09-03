@@ -355,6 +355,11 @@
 					else return 'Not transferred yet'
 				}
 
+				if (tasks.length && tasks.every(({ service }) => service.title === 'TransCreation')) {
+					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					else return 'Not transferred yet'
+				}
+
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Copywriting')) {
 					if (isSendToXtrf) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
 					else return 'Not transferred yet'

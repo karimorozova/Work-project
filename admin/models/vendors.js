@@ -3,6 +3,10 @@ const bcrypt = require('bcryptjs')
 const Schema = mongoose.Schema
 
 const VendorSchema = new mongoose.Schema({
+	vendorId: {
+		type: String,
+		trim: true,
+	},
 	guid: {
 		type: String,
 		default: null

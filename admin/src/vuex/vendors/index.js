@@ -30,7 +30,8 @@ const state = {
       status: null,
       matrix: null,
       professionalLevel: null,
-      notes: null
+      notes: null,
+      vendorId: null
     },
 }
 

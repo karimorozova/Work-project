@@ -207,6 +207,7 @@
 
     .vendor-subinfo(v-if="currentVendor._id")
       .vendor-subinfo__general
+        .vendor-subinfo__title {{getVendorUpdatedData.vendorId}}
         .block-item-subinfo
           label.block-item-subinfo__label Vendor Status:
             span.require *
@@ -783,6 +784,14 @@
   }
 
   .vendor-subinfo {
+
+    &__title {
+      font-size: 21px;
+      border-bottom: 1px solid $border;
+      padding-bottom: 5px;
+      margin-bottom: 25px;
+    }
+
     &__general {
       padding: 20px;
       width: 350px;

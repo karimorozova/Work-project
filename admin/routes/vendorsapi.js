@@ -355,6 +355,11 @@ router.post('/new-vendor', upload.fields([ { name: 'photo' } ]), async (req, res
 	try {
 		const { discountChart } = await Pricelist.findOne({ isVendorDefault: true })
 		vendor.matrix = { ...discountChart }
+
+		const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) ||  false
+		let lastIntIndex = lastIndex.toJSON().hasOwnProperty('vendorId') ? parseInt(lastIndex.vendorId.split('_').pop()) : 0
+		vendor.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
+
 		const saveVendor = await Vendors.create(vendor)
 		const id = saveVendor.id
 		if (photoFile) {

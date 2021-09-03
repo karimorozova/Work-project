@@ -11,6 +11,10 @@ async function manageNewApplication({person, cvFiles, coverLetterFiles, infoForM
     const pendingCompetencies = JSON.parse(person['pendingCompetencies'])
     const industries = JSON.parse(person['parsing-industries'])
     try {
+        const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) ||  false
+        let lastIntIndex = lastIndex.toJSON().hasOwnProperty('vendorId') ? parseInt(lastIndex.vendorId.split('_').pop()) : 0
+        person.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
+
         let vendor = await Vendors.create({...person,industries, pendingCompetencies, softData , status: "Potential"});
         vendor.documents = await setDocuments(cvFiles, 'Resume', vendor.id);
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');

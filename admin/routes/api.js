@@ -15,6 +15,7 @@ const {
   User,
   ClientRequest,
   TierLqa,
+  Vendors,
   Units
 } = require('../models');
 const { getFilteredProjects, getPdf } = require('../projects/');
@@ -100,6 +101,25 @@ router.get('/requests-quantity', async (req, res) => {
     try {
         const quantity = await ClientRequest.countDocuments({status: {$ne: 'Cancelled'}});
         res.send({quantity});
+    } catch(err) {
+        console.log(err);
+        res.status(500).send('Something wrong with DB while getting requests quantity');
+    }
+})
+//TODO: remove
+router.get('/set-vendor-id', async (req, res) => {
+    try {
+      const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) ||  false
+      let lastIntIndex = lastIndex.toJSON().hasOwnProperty('vendorId') ? parseInt(lastIndex.vendorId.split('_').pop()) : 0
+      // person.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
+      
+      const vendors = await Vendors.find({status: {$ne: 'Cancelled'}});
+
+      for (const vendor of vendors) {
+        vendor.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
+        await Vendors.updateOne({_id: vendor._id}, {vendorId: vendor.vendorId})
+      }
+      res.send('Success');
     } catch(err) {
         console.log(err);
         res.status(500).send('Something wrong with DB while getting requests quantity');

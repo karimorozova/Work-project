@@ -18,7 +18,7 @@ export const mutations = {
 	},
 
 	setCurrentVendorGeneralData(state, payload) {
-		let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'matrix', 'professionalLevel', 'notes' ]
+		let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'matrix', 'professionalLevel', 'notes', 'vendorId' ]
 
 		for (const key of keys) {
 			state.currentVendorGeneralData[key] = payload[key]
