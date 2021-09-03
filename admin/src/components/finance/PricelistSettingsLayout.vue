@@ -91,8 +91,8 @@
 		data() {
 			return {
 				icons: {
-					edit: { icon: require("../../assets/images/latest-version/edit.png") },
-					cancel: { icon: require("../../assets/images/cancel-icon.png") }
+					edit: { icon: require("../../assets/images/latest-version/i-edit.png") },
+					cancel: { icon: require("../../assets/images/latest-version/i-cancel.png") }
 				},
 				paramsIsEdit: false,
 				priceId: null,
