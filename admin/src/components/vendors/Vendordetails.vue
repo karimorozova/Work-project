@@ -179,7 +179,7 @@
           .icon(v-else)
             i.fas.fa-chevron-right
         .block__data(v-if="isBillingInformation")
-          VendorBillingInfo(:vendor="currentVendor" @changeBillingProp="changeBillingProp")
+          VendorBillingInfo
 
       .vendor-info__block
         .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
@@ -355,7 +355,7 @@
 				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
 				updateVendorGeneralData: "updateVendorGeneralData",
 				updateVendorRatesByKey: 'updateVendorRatesFromServer',
-        updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo',
+				updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo'
 			}),
 			toggleBlock(prop) {
 				this[prop] = !this[prop]
@@ -539,6 +539,7 @@
 				const textReg = /^[-\sa-zA-Z]+$/
 				try {
 					this.errors = []
+          // TODO: don't delete commits
 					// if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
 					if (!this.getVendorUpdatedData.firstName)
 						this.errors.push("Please, enter valid first name.")
@@ -569,17 +570,9 @@
 					this.oldEmail = this.getVendorUpdatedData.email
 					this.$socket.emit('updatedVendorData', { id: this.$route.params.id })
 					// this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
-					this.alertToggle({
-						message: "Vendor info updated",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Vendor info updated", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Server error / Cannot update Vendor info",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
 				} finally {
 					this.closeErrors()
 				}
@@ -621,10 +614,7 @@
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
 				}
-			},
-      changeBillingProp({ key, value }) {
-        this.updateCurrentVendorGeneralDataBillingInfo({  key, value })
-      },
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -636,27 +626,18 @@
 				industries: "getAllIndustries",
 				getVendorUpdatedData: "getCurrentVendorGeneralData"
 			}),
-			vendorAliases() {
-				if (this.aliases) {
-					return this.aliases
-				}
-			},
 			isChangedVendorGeneralInfo() {
 				if (this.currentVendor.hasOwnProperty('firstName')) {
-					let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'professionalLevel', 'notes' ]
-					for (let key of keys) {
-						if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
-							return true
-						}
+					let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'gender', 'status', 'professionalLevel', 'notes' ]
+					let billKeys = [ 'officialName', 'paymentTerm', 'address', 'email' ]
+
+					for (let key of keys) if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
+						return true
+					}
+					for (let key of billKeys) if (JSON.stringify(this.getVendorUpdatedData.billingInfo[key]) !== JSON.stringify(this.currentVendor.billingInfo[key])) {
+						return true
 					}
 				}
-			},
-			selectedIndNames() {
-				let result = []
-				if (this.currentVendor.industries && this.currentVendor.industries.length) {
-					for (let ind of this.currentVendor.industries) result.push(ind.name)
-				}
-				return result
 			},
 			optionProfessionalLevel() {
 				return this.getVendorUpdatedData.hasOwnProperty("professionalLevel") ? this.getVendorUpdatedData.professionalLevel : ""
@@ -688,7 +669,7 @@
 			StepTable,
 			IndustryTable,
 			ResultTable,
-      VendorBillingInfo
+			VendorBillingInfo
 		},
 		directives: {
 			ClickOutside

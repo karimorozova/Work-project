@@ -381,6 +381,7 @@ export const initCurrentVendorGeneralData = async ({ commit, state }, payload) =
 export const updateCurrentVendorGeneralData = async ({ commit, state }, payload) => {
 	commit("updateCurrentVendorGeneralData", payload)
 }
+
 export const updateCurrentVendorGeneralDataBillingInfo = async ({ commit, state }, payload) => {
 	commit("updateCurrentVendorGeneralDataBillingInfo", payload)
 }

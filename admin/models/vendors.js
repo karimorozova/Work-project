@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 const VendorSchema = new mongoose.Schema({
 	vendorId: {
 		type: String,
-		trim: true,
+		trim: true
 	},
 	guid: {
 		type: String,
@@ -203,9 +203,9 @@ const VendorSchema = new mongoose.Schema({
 		default: []
 	},
 	billingInfo: {
-		officialCompanyName: {
+		officialName: {
 			type: String,
-			trim:true,
+			trim: true,
 			default: ''
 		},
 		email: {

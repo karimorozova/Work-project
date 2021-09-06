@@ -24,8 +24,8 @@ const state = {
       skype: null,
       linkedin: null,
       whatsapp: null,
-      industries: null,
-      aliases: null,
+      // industries: null,
+      // aliases: null,
       gender: null,
       status: null,
       matrix: null,
@@ -33,17 +33,10 @@ const state = {
       notes: null,
       vendorId: null,
       billingInfo: {
-        isSameInfo: null,
-        officialCompanyName: null,
-        paymentTerm: null,
-        address: null,
-
-        // vatId: null,
-        // address: null,
-        // invoiceSending: null,
-        // officialCompanyName: null,
-        // dueDate: null,
-        // paymentType: null,
+        officialName: '',
+        paymentTerm: '',
+        address: '',
+        email: ''
       }
     },
 }
