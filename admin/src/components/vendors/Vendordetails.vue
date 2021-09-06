@@ -172,6 +172,16 @@
           TableEducation(:educationData="currentVendor.educations", :vendorId="vendorId")
 
       .vendor-info__block
+        .block__header(@click="toggleBlock('isBillingInformation')" :class="{'block__header-grey': !isBillingInformation}")
+          .title Billing Information
+          .icon(v-if="!isBillingInformation")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isBillingInformation")
+          VendorBillingInfo(:vendor="currentVendor" @changeBillingProp="changeBillingProp")
+
+      .vendor-info__block
         .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
           .title Candidate & Notes
           .icon(v-if="!isNotes")
@@ -266,6 +276,7 @@
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Tabs from "../Tabs"
 	import FinanceMatrixWithReset from "./pricelists/FinanceMatrixWithReset"
+	import VendorBillingInfo from "./VendorBillingInfo"
 
 	export default {
 		mixins: [ photoPreview ],
@@ -280,6 +291,7 @@
 				isDocuments: false,
 				isProfessionalExperience: false,
 				isEducation: false,
+				isBillingInformation: false,
 				isNotes: false,
 
 				icons: {
@@ -342,7 +354,8 @@
 				initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
 				updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
 				updateVendorGeneralData: "updateVendorGeneralData",
-				updateVendorRatesByKey: 'updateVendorRatesFromServer'
+				updateVendorRatesByKey: 'updateVendorRatesFromServer',
+        updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo',
 			}),
 			toggleBlock(prop) {
 				this[prop] = !this[prop]
@@ -608,7 +621,10 @@
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
 				}
-			}
+			},
+      changeBillingProp({ key, value }) {
+        this.updateCurrentVendorGeneralDataBillingInfo({  key, value })
+      },
 		},
 		computed: {
 			...mapGetters({
@@ -671,7 +687,8 @@
 			LangTable,
 			StepTable,
 			IndustryTable,
-			ResultTable
+			ResultTable,
+      VendorBillingInfo
 		},
 		directives: {
 			ClickOutside

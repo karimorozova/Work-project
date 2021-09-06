@@ -31,7 +31,20 @@ const state = {
       matrix: null,
       professionalLevel: null,
       notes: null,
-      vendorId: null
+      vendorId: null,
+      billingInfo: {
+        isSameInfo: null,
+        officialCompanyName: null,
+        paymentTerm: null,
+        address: null,
+
+        // vatId: null,
+        // address: null,
+        // invoiceSending: null,
+        // officialCompanyName: null,
+        // dueDate: null,
+        // paymentType: null,
+      }
     },
 }
 

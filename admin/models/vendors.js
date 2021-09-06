@@ -202,6 +202,30 @@ const VendorSchema = new mongoose.Schema({
 		type: Array,
 		default: []
 	},
+	billingInfo: {
+		officialCompanyName: {
+			type: String,
+			trim:true,
+			default: ''
+		},
+		email: {
+			type: String,
+			trim: true,
+			default: ''
+		},
+		paymentMethod: {
+			type: Array,
+			default: []
+		},
+		paymentTerm: {
+			type: Object,
+			default: {}
+		},
+		address: {
+			type: String,
+			default: ''
+		}
+	},
 	profExperiences: {
 		type: Array,
 		default: []

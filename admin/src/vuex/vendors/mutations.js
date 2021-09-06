@@ -1,3 +1,5 @@
+import { updateCurrentVendorGeneralDataBillingInfo } from "./actions"
+
 export const mutations = {
 	setCurrentVendor(state, payload) {
 		state.currentVendor = { ...payload }
@@ -19,13 +21,23 @@ export const mutations = {
 
 	setCurrentVendorGeneralData(state, payload) {
 		let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'industries', 'aliases', 'gender', 'status', 'matrix', 'professionalLevel', 'notes', 'vendorId' ]
+		const billingKeys = ['isSameInfo',	'officialCompanyName', 'paymentTerm', 'address']
 
 		for (const key of keys) {
 			state.currentVendorGeneralData[key] = payload[key]
 		}
+
+		if(payload.billingInfo.length) {
+			for(let key of billingKeys) state.currentVendorGeneralData.billingInfo[key] = payload.billingInfo[key]
+		}
 	},
+
 	updateCurrentVendorGeneralData(state, payload) {
 		state.currentVendorGeneralData[payload.key] = payload.value
+	},
+
+	updateCurrentVendorGeneralDataBillingInfo(state, payload) {
+		state.currentVendorGeneralData.billingInfo[payload.key] = payload.value
 	},
 
 	SET_CURRENT_VENDOR_EDUCATION(state, payload) {
