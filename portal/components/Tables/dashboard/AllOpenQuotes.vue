@@ -64,7 +64,7 @@
 
 
         template(slot="icons", slot-scope="{ row, index }")
-          .table__icons
+          //.table__icons
             .icon.accept(@click="() => quotesAction(row._id, 'approve')")
               i(class="fas fa-check icon-elem ")
             .icon.reject(@click="() => quotesAction(row._id, 'reject')")

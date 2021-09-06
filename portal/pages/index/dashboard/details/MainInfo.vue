@@ -26,12 +26,12 @@
         :project="project"
       )
 
-    .main-info__buttons(v-if="project.status === 'Quote sent' && !project.hasOwnProperty('fromXTRF')")
+    //.main-info__buttons(v-if="project.status === 'Quote sent' && !project.hasOwnProperty('fromXTRF')")
       .main-info__button
         Button(value="Approve Quote" :color="'#48A6A6'" buttonClass="tasks-approve" @clicked="updateQuote('approve')")
       .main-info__button
         Button(value="Reject Quote" @clicked="updateQuote('reject')")
-    .main-info__buttons(v-if="project.status === 'Requested'")
+    //.main-info__buttons(v-if="project.status === 'Requested'")
       .main-info__button
         Button(value="Cancel Quote" @clicked="showModal")
     .main-info__modal(v-if="isApproveModal")
