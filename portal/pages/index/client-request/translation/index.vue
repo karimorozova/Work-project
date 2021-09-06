@@ -552,6 +552,7 @@
     }
 
     &__value {
+      width: 220px;
       font-size: 14px;
     }
 
