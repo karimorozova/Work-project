@@ -1,6 +1,54 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
+const contacts = {
+	firstName: {
+		type: String,
+		trim: true
+	},
+	surname: {
+		type: String,
+		trim: true
+	},
+	email: {
+		type: String,
+		trim: true
+	},
+	password: {
+		type: String,
+	},
+	gender: {
+		type: String,
+		trim: true
+	},
+	position: {
+		type: String,
+		trim: true
+	},
+	phone: {
+		type: String,
+		trim: true
+	},
+	photo: {
+		type: String,
+	},
+	country: {
+		type: String,
+		trim: true
+	},
+	timezone: {
+		type: String,
+		default: ''
+	},
+	notes: {
+		type: String,
+	},
+	leadContact: {
+		type: Boolean,
+		default: false
+	}
+}
+const {password, photo, ...billingContacts} = contacts
 
 const ClientSchema = new mongoose.Schema({
 	name: {
@@ -98,57 +146,59 @@ const ClientSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-	billingInfo: {
-		officialCompanyName: {
+	billingInfo: [{
+		officialName: {
 			type: String,
 			trim: true
-		},
-		// contactName: {
-		// 	type: String,
-		// 	trim: true
-		// },
-		// email: {
-		// 	type: String,
-		// 	trim: true
-		// },
-		vat: {
-			type: Boolean,
-			default: false
-		},
-		vatId: {
-			type: String,
-			default: ''
-		},
-		dueDate: {
-			type: String,
-			trim: true
-		},
-		address: {
-			type: String,
-			default: '',
-			trim: true
-		},
-		invoiceSending: {
-			type: Boolean,
-			default: false,
 		},
 		paymentType: {
 			type: String,
 			trim: true,
 		},
-		// startingBalance: {
-		// 	type: Number,
-		// 	default: 0
-		// },
-		// balance: {
-		// 	type: Number,
-		// 	default: 0
-		// },
-		// minimumBalance: {
-		// 	type: Number,
-		// 	default: 0
-		// }
-	},
+		paymentTerm: {
+			type: Object,
+			default: {}
+		},
+		address: {
+			country: {
+				type: String,
+				trim: true,
+			},
+			street1: {
+				type: String,
+				trim: true,
+			},
+			street2: {
+				type: String,
+				trim: true,
+			},
+			city: {
+				type: String,
+				trim: true,
+			},
+			state: {
+				type: String,
+				trim: true,
+			},
+			zipCode: {
+				type: String,
+				trim: true,
+			},
+			vat: {
+				type: String,
+				default: ''
+			},
+		},
+		notes: {
+			type: String,
+			trim: true,
+		},
+		reports: {
+			type: Array,
+			default: []
+		},
+		contacts: [billingContacts]
+	}],
 	// sourceLanguages: [{
 	// 	type: Schema.Types.ObjectId, ref: 'Language'
 	// }],
@@ -294,65 +344,7 @@ const ClientSchema = new mongoose.Schema({
 			}
 		}]
 	},
-	contacts: [{
-		firstName: {
-			type: String,
-			trim: true
-		},
-		surname: {
-			type: String,
-			trim: true
-		},
-		email: {
-			type: String,
-			trim: true
-		},
-		password: {
-			type: String,
-		},
-		gender: {
-			type: String,
-			trim: true
-		},
-		position: {
-			type: String,
-			trim: true
-		},
-		phone: {
-			type: String,
-			trim: true
-		},
-		photo: {
-			type: String,
-		},
-		whatsApp: {
-			type: String,
-			trim: true
-		},
-		skype: {
-			type: String,
-			trim: true
-		},
-		linkedIn: {
-			type: String,
-			trim: true
-		},
-		country: {
-			type: String,
-			trim: true
-		},
-		timezone: {
-			type: String,
-			default: ''
-		},
-		notes: {
-			type: String,
-		},
-		leadContact: {
-			type: Boolean,
-			default: false
-		}
-	}],
+	contacts: [contacts],
 	discounts: [{
 		type: Schema.Types.ObjectId, ref: 'Discounts',
 	}],
