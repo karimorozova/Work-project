@@ -2,48 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
-let billingContacts = {
-	firstName: {
-		type: String,
-		trim: true
-	},
-	surname: {
-		type: String,
-		trim: true
-	},
-	email: {
-		type: String,
-		trim: true
-	},
-	gender: {
-		type: String,
-		trim: true
-	},
-	position: {
-		type: String,
-		trim: true
-	},
-	phone: {
-		type: String,
-		trim: true
-	},
-	country: {
-		type: String,
-		trim: true
-	},
-	timezone: {
-		type: String,
-		default: ''
-	},
-	notes: {
-		type: String,
-	},
-	leadContact: {
-		type: Boolean,
-		default: false
-	}
-}
-
 const contacts = {
 	password: {
 		type: String,
@@ -91,6 +49,10 @@ const contacts = {
 		default: false
 	}
 }
+
+const billingContacts = { ...contacts}
+delete billingContacts.password
+delete billingContacts.photo
 
 const ClientSchema = new mongoose.Schema({
 	name: {
