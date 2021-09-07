@@ -50,7 +50,9 @@ const contacts = {
 	}
 }
 
-const billingContacts = { ...contacts}
+const billingContacts = {}
+for (let key in contacts) billingContacts[key] = contacts[key];
+
 delete billingContacts.password
 delete billingContacts.photo
 
