@@ -6,7 +6,7 @@ const {
 	notifyVendorStepStart
 } = require('./emails');
 
-const { notifyManagerProjectStarts } = require('../utils');
+const { notifyManagerProjectStarts } = require('../utils/projectMails');
 const { pmMail } = require('../utils/mailtopm');
 
 const {
