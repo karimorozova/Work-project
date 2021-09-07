@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { checkVendor } = require('../../middleware')
 const jwt = require("jsonwebtoken")
 const { secretKey } = require('../../configs')
-const { Vendors } = require('../../models')
+const { Vendors, PaymentTerms } = require('../../models')
 const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp, hasVendorCompetenciesAndPending } = require('../../vendors')
 const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
@@ -385,6 +385,28 @@ router.post("/pending-competencies", checkVendor, async (req, res) => {
 		const { vendorId } = jwt.verify(token, secretKey)
 		await Vendors.updateOne({ "_id": vendorId }, { pendingCompetencies })
 		res.send('done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message)
+	}
+})
+
+router.get("/payment-terms", checkVendor, async (req, res) => {
+	try {
+		const getPaymentTerms = await PaymentTerms.find()
+		res.send(getPaymentTerms)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message)
+	}
+})
+
+router.post("/payment-terms/:id/update", checkVendor, async (req, res) => {
+	const {id} = req.params
+	const {billingInfo} = req.body
+	try {
+		const vendor = await Vendors.updateOne({_id: id}, {billingInfo})
+		res.send(vendor)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send(err.message)

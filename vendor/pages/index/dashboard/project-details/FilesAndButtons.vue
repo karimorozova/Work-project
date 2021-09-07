@@ -1,5 +1,5 @@
 <template lang="pug">
-  .files-buttons
+  .files-buttons(v-if="originallyUnits.length")
     Files
 
     .files-buttons__upload(v-if="isFileUpload")

@@ -98,6 +98,12 @@
 						active: false
 					},
 					{
+						title: "Billing Information",
+						path: "/billing-information",
+						img: require("../assets/images/navbar/Invoices.png"),
+						active: false
+					},
+					{
 						title: "Experience & Education",
 						path: "/experience-and-education",
 						img: require("../assets/images/navbar/ExperienceEducation.png"),

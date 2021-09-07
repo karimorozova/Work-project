@@ -14,6 +14,11 @@ export const SET_CONFIRMED_PASSWORD = (state, payload) => {
     state.newPassword.confirmedPassword = payload;
 }
 
+export const SET_BILLING_INFO = (state, payload) => {
+    console.log(payload)
+    state.vendor.billingInfo = payload;
+}
+
 export const SET_ACCOUNT_INFO = (state) => {
     let info = {};
     for(let key in state.vendor) {
