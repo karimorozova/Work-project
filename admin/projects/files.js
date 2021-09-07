@@ -13,8 +13,8 @@ const fs = require('fs');
 
 const pdfConfig = {
     type: 'pdf',
-    width: '814px',
-    height: '1054px',
+    width: '814',
+    height: '1054',
     orientation: "landscape",
     base: apiUrl,
     border: 0
@@ -174,11 +174,15 @@ const generatePOFile = async (requestInfo, project) => {
     const { vendor } = requestInfo
     const fullVendor = await Vendors.findOne({ "_id": vendor._id })
     const template = await generatePO(requestInfo, fullVendor, project)
+    const conf  = { ...pdfConfig }
+    conf.width = '914'
+    conf.height = '1154'
+
     return new Promise((resolve, reject) => {
         htmlToPdf.create(
             template,
             {
-               ...pdfConfig
+               ...conf
             })
             .toFile(`./dist/vendorsDocs/${vendor._id}/PO.pdf`, function (err, res) {
                 if (err) {
