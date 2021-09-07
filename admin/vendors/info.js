@@ -5,6 +5,12 @@ const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
 const ObjectId = require('mongodb').ObjectID;
 
+const managePaymentMethods = async ({ vendorId, paymentTypeObj, index }) => {
+  const Q = { _id: vendorId }
+  if (index !== null) return await getVendorAfterUpdate(Q, { $set: { [`billingInfo.paymentMethod.${index}`]: paymentTypeObj} })
+  return await getVendorAfterUpdate(Q, { $push: { "billingInfo.paymentMethod": paymentTypeObj } })
+}
+
 async function saveVendorDocumentDefault({ vendorId, category }) {
   try {
     const vendor = await Vendors.findOne({ _id: vendorId });
@@ -247,5 +253,6 @@ module.exports = {
   updateVendorEducation,
   removeVendorEdu,
   updateVendorAssessment,
-  saveNotPassedTest
+  saveNotPassedTest,
+  managePaymentMethods
 };

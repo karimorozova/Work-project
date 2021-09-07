@@ -562,8 +562,13 @@
 			},
 			async updateVendor() {
 				let sendData = new FormData()
-				sendData.append("vendor", JSON.stringify({ ...this.getVendorUpdatedData, _id: this.$route.params.id }))
+
+        const data = { ...this.getVendorUpdatedData }
+        data.billingInfo.paymentMethod = this.currentVendor.billingInfo.paymentMethod
+
+				sendData.append("vendor", JSON.stringify({ ...data, _id: this.$route.params.id }))
 				sendData.append("photo", this.photoFile[0])
+
 				try {
 					await this.updateCurrentVendor(sendData)
 					this.initCurrentVendorGeneralData(this.currentVendor)
