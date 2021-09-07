@@ -15,6 +15,8 @@ function messageForClientSendQuote(obj, allUnits, allSettingsSteps) {
 			obj.selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0) :
 			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0)
 
+	if(!obj.selectedTasks.length) total += obj.paymentAdditions.reduce((acc, curr) => acc + curr.value, 0)
+
 	const fromMinimumCharge = !toIgnore ? (value > total) : false
 	const tasksInfo = obj.selectedTasks.length ?
 			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
@@ -184,6 +186,7 @@ function messageForClientSendCostQuote(obj, allUnits, allSettingsSteps) {
 	let total = obj.selectedTasks.length ?
 			obj.selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0) :
 			activeTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0)
+	total += obj.paymentAdditions.reduce((acc, curr) => acc + curr.value, 0)
 	const fromMinimumCharge = !toIgnore ? (value > total) : false
 	const tasksInfo = obj.selectedTasks.length ?
 			getTasksInfo(obj, fromMinimumCharge, obj.selectedTasks, obj.steps, allUnits, allSettingsSteps) :
@@ -324,6 +327,7 @@ function getPdfOfQuote(allUnits, allSettingsSteps, obj, tasksIds = []) {
 	const selectedTasks = !tasksIds.length ? obj.tasks.filter(item => item.status !== "Cancelled") : obj.tasks.filter(task => tasksIds.includes(task.taskId))
 	const { minimumCharge: { value, toIgnore } } = obj
 	let total = selectedTasks.reduce((acc, curr) => acc + curr.finance.Price.receivables, 0)
+	if(!tasksIds.length) total += obj.paymentAdditions.reduce((acc, curr) => acc + curr.value, 0)
 	const fromMinimumCharge = !toIgnore ? (value > total) : false
 	const tasksInfo = getTasksInfo(obj, fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps)
 	const tasksInfoArr = getTasksInfo(obj, fromMinimumCharge, selectedTasks, obj.steps, allUnits, allSettingsSteps, true)
@@ -459,6 +463,7 @@ function showCostHeader(fromMinimumCharge) {
 }
 
 function additionalCostsRow(obj){
+	if(obj.status !== 'Draft') return
 	return obj.paymentAdditions.length  ?
 			obj.paymentAdditions.reduce((acc, curr, index) => {
 				let color = (index+1) % 2 ? '#fff' : '#f7f7f7'
