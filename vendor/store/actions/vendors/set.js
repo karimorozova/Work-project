@@ -19,6 +19,5 @@ export const setVendorProp = ({ commit }, payload) => {
 }
 
 export const setVendorBillingInfo = async ({ commit }, payload) => {
-    console.log({ payload })
     commit("SET_BILLING_INFO", payload.billingInfo);
 }
