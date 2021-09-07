@@ -13,8 +13,8 @@ const fs = require('fs');
 
 const pdfConfig = {
     type: 'pdf',
-    width: '814',
-    height: '1054',
+    width: '814px',
+    height: '1054px',
     orientation: "landscape",
     base: apiUrl,
     border: 0
