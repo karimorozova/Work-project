@@ -338,12 +338,9 @@
 					'officialCompanyName',
 					'email',
 					'website',
-					'industries',
 					'nativeLanguage',
 					'timeZone',
 					'aliases',
-					'targetLanguages',
-					'sourceLanguages',
 					'status',
 					'accountManager',
 					'salesManager',
@@ -571,12 +568,12 @@
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 				if (!this.currentClientOverallData.name)
 					this.errors.push("Company name cannot be empty.")
-				if (!this.currentClientOverallData.industries.length)
-					this.errors.push("Please, choose at least one industry.")
-				if (!this.currentClientOverallData.sourceLanguages.length)
-					this.errors.push("Please, choose source language.")
-				if (!this.currentClientOverallData.targetLanguages.length)
-					this.errors.push("Please, choose target language.")
+				// if (!this.currentClientOverallData.industries.length)
+				// 	this.errors.push("Please, choose at least one industry.")
+				// if (!this.currentClientOverallData.sourceLanguages.length)
+				// 	this.errors.push("Please, choose source language.")
+				// if (!this.currentClientOverallData.targetLanguages.length)
+				// 	this.errors.push("Please, choose target language.")
 				if (!this.currentClientOverallData.contacts.length)
 					this.errors.push("Please, add at least one contact.")
 				if (!this.contactLeadError())
