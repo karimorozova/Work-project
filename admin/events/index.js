@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const emitter = new EventEmitter();
 const { Vendors, Projects } = require('../models');
-const { sendEmail, notifyManagerProjectStarts, notifyManagerProjectRejected } = require('../utils');
+const { sendEmail, notifyManagerProjectRejected } = require('../utils');
 const { notifyStepDecisionMade } = require('../projects/emails');
 const { setStepsStatus } = require('../projects/updates');
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects');

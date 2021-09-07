@@ -6,7 +6,6 @@ const {
 	notifyVendorStepStart
 } = require('./emails');
 
-const { notifyManagerProjectStarts } = require('../utils/projectMails');
 const { pmMail } = require('../utils/mailtopm');
 
 const {
@@ -26,6 +25,9 @@ const {
 
 const { downloadMemoqFile } = require('../services/memoqs/files');
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users');
+
+const { notifyManagerProjectStarts } = require('../utils');
+
 
 const cancelProjectInMemoq = async (project) => {
 	if (project.status !== 'Cancelled') return
