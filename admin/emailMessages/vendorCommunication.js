@@ -434,7 +434,7 @@ async function generatePO(requestInfo, fullVendor, project) {
 			    <div class="body" style="padding: 25px;margin-top: 80px;">
 			        <div class="body__to" style="font-size: 16px;margin-bottom: 15px;">To: </div>
 			        <div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ firstName } ${ surname || '' }</div>
-			        <div class="body__address" style="margin-bottom: 50px;">ADDRESS</div>
+			        <div class="body__address" style="margin-bottom: 50px;">${ fullVendor.billingInfo.address || '' }</div>
 			        <div class="body__line" style="background-color: #b5dbdb;height: 1px;"></div>
 			    </div>
 			    <div class="details" style="padding: 25px;">
