@@ -175,8 +175,8 @@ const generatePOFile = async (requestInfo, project) => {
     const fullVendor = await Vendors.findOne({ "_id": vendor._id })
     const template = await generatePO(requestInfo, fullVendor, project)
     const conf  = { ...pdfConfig }
-    conf.width = '914'
-    conf.height = '1154'
+    conf.width = '882'
+    conf.height = '1130'
 
     return new Promise((resolve, reject) => {
         htmlToPdf.create(
