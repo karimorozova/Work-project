@@ -12,9 +12,7 @@
         label.block-item__label.block-item_relative Email:
           Asterisk(:customStyle="asteriskStyle")
         input(type="text" placeholder="Email" :value="currentClient.email" @change="(e) => changeProperty(e, 'email')" :class="{'general-info_error-shadow': !currentClient.email && isSaveClicked}")
-      .block-item(v-if="!isIndividual")
-        label.block-item__label Website:
-        input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
+
       //.block-item
       //  label.block-item__label.block-item_relative Industry:
       //    Asterisk(:customStyle="asteriskStyle")
@@ -48,6 +46,9 @@
             :options="targetLanguages"
             @chooseOption="setLanguage"
           )
+      .block-item(v-if="!isIndividual")
+        label.block-item__label Website:
+        input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
       //.block-item
       //  label.block-item__label.block-item_relative Source Languages:
       //    Asterisk(:customStyle="asteriskStyle")

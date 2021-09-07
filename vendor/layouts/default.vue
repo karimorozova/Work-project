@@ -35,7 +35,12 @@ body {
   font-family: Myriad400;
 }
 
-/*.fa-angle-double-right{*/
+  input::-webkit-input-placeholder {
+    opacity: 0.5;
+  }
+
+
+  /*.fa-angle-double-right{*/
 /*  font-size: 14px;*/
 /*  margin: 0 5px;*/
 /*}*/

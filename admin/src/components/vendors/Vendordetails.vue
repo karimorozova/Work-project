@@ -789,10 +789,11 @@
   .vendor-subinfo {
 
     &__title {
-      font-size: 21px;
-      border-bottom: 1px solid $border;
+      font-size: 19px;
+      border-bottom: 1px solid $light-border;
       padding-bottom: 5px;
       margin-bottom: 25px;
+      font-family: 'Myriad600';
     }
 
     &__general {

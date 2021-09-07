@@ -11,16 +11,11 @@
           @chooseOption="setStatus"
         )
     .block-item
-      label.block-item__label Test:
-      .block-item__check-item.checkbox
-        input(type="checkbox" id="test" :checked="client.isTest" @change="setTest")
-        label(for="test")
-    .block-item
       label.block-item__label Account Manager:
         span.require *
       .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
         SelectSingle(
-          :placeholder="'Select'",
+          placeholder="Option",
           :options="users.filter(i => i.group.name === 'Account Managers').map(i => `${i.firstName} ${i.lastName}`)",
           :selectedOption="getFullName(client.accountManager)",
           @chooseOption="(data) => setManager(data, 'accountManager')"
@@ -35,11 +30,17 @@
         span.require *
       .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.projectManager}")
         SelectSingle(
-          :placeholder="'Select'",
+          placeholder="Option",
           :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
           :selectedOption="getFullName(client.projectManager)",
           @chooseOption="(data) => setManager(data, 'projectManager')"
         )
+
+    .block-item
+      label.block-item__label Test:
+      .block-item__check-item.checkbox
+        input(type="checkbox" id="test" :checked="client.isTest" @change="setTest")
+        label(for="test")
 </template>
 
 <script>
