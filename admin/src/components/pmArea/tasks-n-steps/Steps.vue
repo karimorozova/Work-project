@@ -269,7 +269,8 @@
 				areErrorsExist: false,
 				currentStepIdForRemoveVendor: null,
 				deadlineModal: false,
-				dateNow: new Date()
+				dateNow: new Date(),
+				selectedAction: ''
 			}
 		},
 		methods: {
@@ -516,6 +517,7 @@
 				try {
 					const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id })
 					await this.setCurrentProject(result.data)
+					this.selectedAction = ""
 					this.alertToggle({ message: "Requests has been sent.", isShow: true, type: 'success' })
 				} catch (err) {
 					this.alertToggle({ message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error' })
