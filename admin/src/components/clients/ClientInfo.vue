@@ -210,7 +210,7 @@
               .icon(v-else)
                 i.fas.fa-chevron-right
             .block__data(v-if="isBillingInformation")
-              ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+              ClientBillInfoTable(:client="currentClientOverallData" @changeProperty="changeBillingProp")
 
           .client-info__block
             .block__header(@click="toggleBlock('isLogs')" :class="{'block__header-grey': !isLogs}")
@@ -253,7 +253,7 @@
 	import ValidationErrors from "../ValidationErrors"
 	import ContactsInfo from "./ContactsInfo"
 	import ClientSalesInfo from "./ClientSalesInfo"
-	import ClientBillInfo from "./ClientBillInfo"
+	import ClientBillInfoTable from "./ClientBillInfoTable"
 	import IndustryTable from "./pricelists/IndustryTable"
 	import StepTable from "./pricelists/StepTable"
 	import LangTable from "./pricelists/LangTable"
@@ -893,7 +893,7 @@
 			ContactsInfo,
 			IndustryTable,
 			ClientSalesInfo,
-			ClientBillInfo,
+      ClientBillInfoTable,
 			StepTable,
 			LangTable,
 			ResultTable,
