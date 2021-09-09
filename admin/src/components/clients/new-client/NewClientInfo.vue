@@ -87,6 +87,7 @@
         NewSideGeneral(
           :client="client"
           :isSaveClicked="isSaveClicked"
+          :clientType="clientType"
         )
 </template>
 
@@ -233,15 +234,11 @@
 				}
 				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) this.errors.push('Please provide a valid email in General Information.')
 
-				// TODO: PayTyp
-				// if (this.clientType !== "Individual" && this.client.paymentType === '') {
-				// 	this.errors.push('Please, add Payment type.')
-				// 	this.billErrors.push('payment')
-				// }
-				// if (!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
-				// 	this.errors.push('Please provide a valid email in Billing Informations.')
-				// 	this.billErrors.push('email')
-				// }
+				if (this.clientType === "Individual") this.client.paymentType = 'PPP'
+
+				if (this.clientType !== "Individual" && this.client.paymentType === '') {
+					this.errors.push('Please, add Payment type.')
+				}
 				if (!this.client.accountManager || !this.client.projectManager) this.errors.push('All managers should be assigned.')
 
 				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)
@@ -342,7 +339,7 @@
 		computed: {
 			...mapGetters({
 				allClients: "getClients",
-				languages: "getAllLanguages",
+				languages: "getAllLanguages"
 			}),
 			isIndividual() {
 				return this.clientType === 'Individual'

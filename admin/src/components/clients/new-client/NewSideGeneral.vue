@@ -10,7 +10,7 @@
           :selectedOption="clientStatus",
           @chooseOption="setStatus"
         )
-    .block-item
+    .block-item(v-if="clientType !== 'Individual'")
       label.block-item__label Payment Type:
         span.require *
       .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.paymentType}")
@@ -64,6 +64,9 @@
 			},
 			isSaveClicked: {
 				type: Boolean
+			},
+			clientType: {
+				type: String
 			}
 		},
 		data() {
@@ -73,9 +76,9 @@
 			setManager({ option }, prop) {
 				this.client[prop] = this.users.find(i => `${ i.firstName } ${ i.lastName }` === option)
 			},
-      setPaymentType({option}) {
-        this.$set(this.client, 'paymentType', option)
-      },
+			setPaymentType({ option }) {
+				this.$set(this.client, 'paymentType', option)
+			},
 			setTest() {
 				this.client.isTest = event.target.checked
 			},
