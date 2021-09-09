@@ -7,7 +7,7 @@
       :isAbsolute="true"
     )
     .contact__photo-n-info
-      .contact__photo
+      .contact__photo(v-if="!withoutImageMode")
         .photo-wrap(v-if="!contact.photo")
           input.photo-file(type="file" @change="previewPhoto")
           .photo-text(v-if="!isImageExist")
@@ -96,7 +96,11 @@
 		props: {
 			contact: {
 				type: Object
-			}
+			},
+			withoutImageMode: {
+				type: Boolean,
+        default: false
+      }
 		},
 		data() {
 			return {
@@ -121,8 +125,12 @@
 				if (this.contact.surname && !textReg.test(this.contact.surname)) this.errors.push("Please, enter valid contact's surname.")
 
 				if (!this.previousEmail || this.previousEmail !== this.contact.email) {
-					if (!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.")
-					if (this.contact.email && emailValidReg.test(this.contact.email)) await this.checkEmailUniq()
+					if(this.withoutImageMode){
+						if (!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.")
+          }else {
+						if (!this.contact.email || !emailValidReg.test(this.contact.email)) this.errors.push("Please, enter valid e-mail address.")
+						if (this.contact.email && emailValidReg.test(this.contact.email)) await this.checkEmailUniq()
+          }
 				}
 
 				if (/^\s+$/.exec(this.contact.firstName) || /^\s+$/.exec(this.contact.firstName)) this.errors.push("Please, enter valid contact's first name or e-mail address.")

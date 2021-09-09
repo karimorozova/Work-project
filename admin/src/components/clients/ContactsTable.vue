@@ -70,19 +70,6 @@
 				isContactsManageModal: false,
 				deletingContactIndex: -1,
 				editingIndex: -1
-				// icons: {
-				// 	delete: { name: 'delete', active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png') }
-				// },
-
-				// currentEditingIndex: -1,
-				// isErrorShow: false,
-				// currentEmail: "",
-				// currentPhone: "",
-				// oldEmail: "",
-				// currentPosition: "",
-				// currentNotes: "",
-				// areErrorsExist: false,
-				// errors: [],
 			}
 		},
 		methods: {
@@ -108,7 +95,7 @@
 			},
 			showContactDetails(index) {
 				this.editingIndex = index
-				this.controlContact = { ...this.contacts[index]}
+				this.controlContact = { ...this.contacts[index] }
 				this.isContactsManageModal = true
 			},
 			closeContactModal() {
@@ -118,10 +105,10 @@
 			},
 			contactSave(data) {
 				if (this.editingIndex !== -1) {
-					this.$emit('contactUpdate', { ...data, index: this.editingIndex  })
-				}else{
+					this.$emit('contactUpdate', { ...data, index: this.editingIndex })
+				} else {
 					this.$emit('contactSave', { ...data })
-        }
+				}
 			},
 			cancelDelete() {
 				this.isDeleteMessageShow = false
@@ -131,103 +118,11 @@
 				this.deletingContactIndex = index
 				this.isDeleteMessageShow = true
 			},
-			// closeErrorMessage() {
-			// 	this.isErrorShow = false
-			// },
-			// closeValidErrorsBlock() {
-			// 	this.areErrorsExist = false
-			// },
 			approveDelete() {
 				if (this.deletingContactIndex === -1) return
 				this.$emit('approveDelete', { index: this.deletingContactIndex })
 				this.cancelDelete()
 			}
-			// isIconClass(index, key) {
-			// 	if (this.currentEditingIndex !== index) {
-			// 		return key === 'save' || key === 'cancel'
-			// 	}
-			// 	if (this.currentEditingIndex === index) {
-			// 		return key === 'edit'
-			// 	}
-			// },
-			// setCurrentEditionValues(index) {
-			// 	this.currentEditingIndex = index
-			// 	this.currentEmail = this.client.contacts[index].email
-			// 	this.oldEmail = this.client.contacts[index].email
-			// 	this.currentPosition = this.client.contacts[index].position
-			// 	this.currentNotes = this.client.contacts[index].notes
-			// 	this.currentPhone = this.client.contacts[index].phone
-			// },
-			// setCurrentDefaults() {
-			// 	this.currentEditingIndex = -1
-			// 	this.currentEmail = ""
-			// 	this.oldEmail = ""
-			// 	this.currentPosition = ""
-			// 	this.currentNotes = ""
-			// 	this.currentPhone = ""
-			// },
-			// makeAction(index, key) {
-			// 	if (this.currentEditingIndex !== -1 && this.currentEditingIndex !== index) {
-			// 		this.errors = []
-			// 		this.errors.push('Please finish the current edition first!')
-			// 		return this.areErrorsExist = true
-			// 	}
-			// 	if (key === 'edit') {
-			// 		this.setCurrentEditionValues(index)
-			// 	}
-			// 	if (key === 'save') {
-			// 		this.checkForValidation(index)
-			// 	}
-			// 	if (key === 'cancel') {
-			// 		this.setCurrentDefaults()
-			// 	}
-			// 	if (key === 'delete') {
-
-			// 	}
-			// },
-			// async checkEmailUniquenes(index) {
-			// 	if (this.oldEmail === this.currentEmail) return
-			// 	const sameEmail = this.client.contacts.find((item, i) => {
-			// 		return i !== index && this.currentEmail === item.email
-			// 	})
-			// 	if (sameEmail) {
-			// 		return this.errors.push("The email you entered is already used")
-			// 	}
-			// 	try {
-			// 		const result = await this.$http.get(`/clientsapi/unique-email?email=${ this.currentEmail }`)
-			// 		if (result.body === "exist") {
-			// 			this.errors.push("The email you entered is already used in our system.")
-			// 		}
-			// 	} catch (err) {
-			//
-			// 	}
-			// },
-			// async checkForValidation(index) {
-			// 	this.errors = []
-			// 	const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-			// 	const positionReg = /^[-\sa-zA-Z]+$/
-			// 	if (!this.currentPosition || !positionReg.test(this.currentPosition)) this.errors.push("Please, enter valid contact's position.")
-			// 	if (!this.currentEmail || !emailValidReg.test(this.currentEmail)) this.errors.push("Please, enter valid e-mail address.")
-			// 	if (this.currentEmail && emailValidReg.test(this.currentEmail)) {
-			// 		await this.checkEmailUniquenes(index)
-			// 	}
-			// 	if (this.errors.length) {
-			// 		this.areErrorsExist = true
-			// 		return
-			// 	}
-			// 	this.saveContactUpdates(index)
-			// },
-			// saveContactUpdates(index) {
-			// 	const contact = {
-			// 		...this.client.contacts[index],
-			// 		email: this.currentEmail,
-			// 		position: this.currentPosition,
-			// 		notes: this.currentNotes,
-			// 		phone: this.currentPhone
-			// 	}
-			// 	this.$emit("saveContactUpdates", { index, contact })
-			// 	this.setCurrentDefaults()
-			// },
 		},
 		mounted() {
 			this.domain = __WEBPACK__API_URL__

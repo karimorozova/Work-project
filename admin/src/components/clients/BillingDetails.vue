@@ -1,5 +1,21 @@
 <template lang="pug">
   .billing-info
+    .billing-info__contactModal(v-show="isDeletingModal")
+      ApproveModal(
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="deleteContact"
+        @close="closeApproveModal"
+        @notApprove="closeApproveModal"
+      )
+    .billing-info__contactModal(v-if="isContactModal")
+      ContactsManageModal(
+        :contact="controlContact"
+        @closeModal="closeContactModal"
+        @contactSave="contactSave"
+        :withoutImageMode="true"
+      )
     .billing-info__body
       .billing-info__field
         label Company Name:
@@ -63,14 +79,14 @@
 
       .billing-info__title
         span Billing Contact
-        Add(:isDefaultMargin="false")
+        Add(@add="openContactModal")
 
       .item(v-for="(item, index) in billingInfoCopy.contacts")
         .item__header
           .item__header--name {{ item.firstName }}
 
-          .item__header--icons(v-if="deletingIndex === null && editingIndex === null")
-            .item__header--icon(@click="openModalForEdition(item, index)")
+          .item__header--icons(v-if="deletingContactIndex === -1 && editingIndex === -1")
+            .item__header--icon(@click="openModalForEdition(index)")
               i(class="fas fa-pen")
             .item__header--icon(@click="openApproveModal(index)")
               i(class="fas fa-trash")
@@ -87,96 +103,157 @@
           .item__body--key leadContact:
           .item__body--value {{ item.leadContact || '-' }}
     .billing-info__buttons
-      Button(value="Continue" @clicked="checkErrors")
-      Button(value="Cancel" @clicked="closeModal")
+      Button(value="Save" @clicked="checkErrors")
+      Button(value="Cancel" :outline="true" @clicked="closeModal")
 </template>
 
 <script>
-import SelectSingle from "../SelectSingle"
-import Add from "../Add"
-import Button from "../Button"
-import CheckBox from "../CheckBox"
+	import SelectSingle from "../SelectSingle"
+	import Add from "../Add"
+	import Button from "../Button"
+	import CheckBox from "../CheckBox"
+	import ContactsManageModal from "./ContactsManageModal"
+	import ApproveModal from "../ApproveModal"
 
-
-export default {
-  props: {
-    billingInfo: {
-      type: Object,
-      default: {
-        address: {}
-      }
-    }
-  },
-  data() {
-    return {
-      isVat: true,
-      paymentTerms: [],
-      billingInfoCopy: JSON.parse(JSON.stringify(this.billingInfo))
-    }
-  },
-  name: "BillingDetails",
-  methods: {
-    toggleVat() {
-      this.isVat = !this.isVat
-      if(this.isVat) {
-        this.billingInfoCopy.address.vat = ''
-      }
-    },
-    setPaymentType({option}) {
-      this.$set(this.billingInfoCopy, 'paymentType', option)
-    },
-    setCountry({option}) {
-      this.$set(this.billingInfoCopy.address, 'country', option)
-    },
-    setState({option}) {
-      this.$set(this.billingInfoCopy.address, 'state', option)
-    },
-    setPaymentTerms({option}) {
-      console.log(this.paymentTerms.find(i => i.name === option))
-      this.$set(this.billingInfoCopy, 'paymentTerms', this.paymentTerms.find(i => i.name === option))
-    },
-    closeModal() {
-      this.billingInfoCopy = JSON.parse(JSON.stringify(this.billingInfo))
-      this.$emit('closeBillingInfo')
-    },
-    checkErrors() {
-      this.createBillingInfo()
-    },
-    createBillingInfo() {
-      this.$http.post(`/clientsapi/update-billing-info/${this.$route.params.id}`, {billingInfo: this.billingInfoCopy})
-      this.$emit('updateBillingInfo')
-    },
-    async getAndSetPaymentTerms() {
-      try {
-        const result = await this.$http.get("/api-settings/payment-terms")
-        this.paymentTerms = result.data.filter(i => !!i.isActive)
-      } catch (err) {
-        this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
-      }
-    }
-  },
-  async created() {
-    await this.getAndSetPaymentTerms()
-  },
-  components: {
-    SelectSingle,
-    Add,
-    Button,
-    CheckBox,
-  }
-}
+	export default {
+		name: "BillingDetails",
+		props: {
+			billingInfo: {
+				type: Object,
+				default: {
+					address: {}
+				}
+			}
+		},
+		data() {
+			return {
+				isVat: true,
+				paymentTerms: [],
+				billingInfoCopy: JSON.parse(JSON.stringify(this.billingInfo)),
+				isContactModal: false,
+				controlContact: {},
+				deletingContactIndex: -1,
+				editingIndex: -1,
+				isDeletingModal: false
+			}
+		},
+		methods: {
+			deleteContact() {
+				this.billingInfoCopy.contacts.splice(this.deletingContactIndex, 1)
+				this.closeApproveModal()
+			},
+			openApproveModal(index) {
+				this.deletingContactIndex = index
+				this.isDeletingModal = true
+			},
+			closeApproveModal() {
+				this.deletingContactIndex = -1
+				this.isDeletingModal = false
+			},
+			openModalForEdition(index) {
+				this.editingIndex = index
+				this.controlContact = { ...this.billingInfoCopy.contacts[index] }
+				this.isContactModal = true
+			},
+			contactSave({ contact }) {
+				if (this.editingIndex !== -1) this.billingInfoCopy.contacts[this.editingIndex] = contact
+				else this.billingInfoCopy.contacts.push(contact)
+				this.closeContactModal()
+			},
+			closeContactModal() {
+				this.controlContact = {}
+				this.isContactModal = false
+				this.editingIndex = -1
+				this.deletingContactIndex = -1
+			},
+			openContactModal() {
+				this.controlContact = {
+					timezone: "",
+					leadContact: false,
+					firstName: "",
+					surname: "",
+					email: "",
+					gender: "",
+					position: "",
+					phone: "",
+					photo: "",
+					country: "",
+					notes: ""
+				}
+				this.isContactModal = true
+			},
+			toggleVat() {
+				this.isVat = !this.isVat
+				if (this.isVat) {
+					this.billingInfoCopy.address.vat = ''
+				}
+			},
+			setPaymentType({ option }) {
+				this.$set(this.billingInfoCopy, 'paymentType', option)
+			},
+			setCountry({ option }) {
+				this.$set(this.billingInfoCopy.address, 'country', option)
+			},
+			setState({ option }) {
+				this.$set(this.billingInfoCopy.address, 'state', option)
+			},
+			setPaymentTerms({ option }) {
+				console.log(this.paymentTerms.find(i => i.name === option))
+				this.$set(this.billingInfoCopy, 'paymentTerms', this.paymentTerms.find(i => i.name === option))
+			},
+			closeModal() {
+				this.billingInfoCopy = JSON.parse(JSON.stringify(this.billingInfo))
+				this.$emit('closeBillingInfo')
+			},
+			checkErrors() {
+				this.createBillingInfo()
+			},
+			createBillingInfo() {
+				this.$http.post(`/clientsapi/update-billing-info/${ this.$route.params.id }`, { billingInfo: this.billingInfoCopy })
+				this.$emit('updateBillingInfo')
+			},
+			async getAndSetPaymentTerms() {
+				try {
+					const result = await this.$http.get("/api-settings/payment-terms")
+					this.paymentTerms = result.data.filter(i => !!i.isActive)
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
+				}
+			}
+		},
+		async created() {
+			await this.getAndSetPaymentTerms()
+		},
+		components: {
+			ApproveModal,
+			ContactsManageModal,
+			SelectSingle,
+			Add,
+			Button,
+			CheckBox
+		}
+	}
 </script>
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
+
   .billing-info {
     box-sizing: border-box;
     margin-bottom: 20px;
-    box-shadow: 0 1px 2px 0 rgba(99,99,99,.3),0 1px 3px 1px rgba(99,99,99,.15);
+    box-shadow: $box-shadow;
     position: relative;
     border-radius: 4px;
-    background-color: #fff;
-    padding: 15px;
+    background-color: white;
+    padding: 25px;
+
+    &__contactModal {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
 
     &__header {
       display: flex;
@@ -186,8 +263,9 @@ export default {
 
     &__buttons {
       display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
+      justify-content: center;
+      gap: 25px;
+      margin-top: 25px;
     }
 
     &__label-group {
@@ -208,17 +286,20 @@ export default {
     label {
       display: block;
     }
+
     .field__select-single {
       position: relative;
       height: 30px;
       width: 220px;
     }
+
     &__field-row {
       display: flex;
       justify-content: space-between;
       margin: 10px 0;
 
     }
+
     &__row {
       display: flex;
       justify-content: space-between;
@@ -244,9 +325,11 @@ export default {
     .long {
       width: 460px;
     }
+
     .small {
       width: 140px;
     }
+
     .middle {
       width: 150px;
     }
@@ -259,9 +342,11 @@ export default {
     }
 
   }
+
   .mt10 {
     margin-top: 10px;
   }
+
   .item {
     width: 220px;
     box-sizing: border-box;

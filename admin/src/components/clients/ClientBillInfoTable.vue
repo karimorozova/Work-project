@@ -36,7 +36,7 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
-          i(class="fas fa-edit" @click="editBillingInfo(row)")
+          i(class="fas fa-pen" @click="editBillingInfo(row)")
           i(class="fas fa-trash" @click="deleteBillingInfoRequest(row)")
 
     Add(@add="openModalBillingInfo")
@@ -175,8 +175,8 @@
   .table__icons {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    font-size: 16px;
+    gap: 13px;
+    font-size: 15px;
     width: 100%;
     i{
       cursor: pointer;
