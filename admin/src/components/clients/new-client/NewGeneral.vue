@@ -31,7 +31,7 @@
             :hasSearch="true"
             placeholder="Select"
             :selectedOption="client.hasOwnProperty('nativeLanguage') ? client.nativeLanguage.lang : currentLanguage"
-            :options="targetLanguages"
+            :options="languages.map(i => i.lang)"
             @chooseOption="setLanguage"
           )
       .block-item(v-if="!isIndividual")
@@ -61,7 +61,10 @@
 			},
 			timezones: {
 				type: Array
-			}
+			},
+      languages: {
+	      type: Array
+      }
 		},
 		data() {
 			return {

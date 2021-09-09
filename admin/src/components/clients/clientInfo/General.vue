@@ -31,7 +31,7 @@
             :hasSearch="true"
             placeholder="Select"
             :selectedOption="currentClient.hasOwnProperty('nativeLanguage') && currentClient.nativeLanguage !== null  ? currentClient.nativeLanguage.lang : currentLanguage"
-            :options="targetLanguages"
+            :options="languages.map(i => i.lang)"
             @chooseOption="setLanguage"
           )
       .block-item(v-if="!isIndividual")

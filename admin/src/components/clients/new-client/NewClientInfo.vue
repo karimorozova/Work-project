@@ -12,6 +12,7 @@
           :isIndividual="isIndividual"
           :isSaveClicked="isSaveClicked"
           :timezones="timezones"
+          :languages="languages"
         )
 
       .new-client-info__block(v-if="!isIndividual" :class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
@@ -169,7 +170,6 @@
 				}
 			},
 			resetFieldsToIndividualType() {
-				this.client.industries = [ this.industries.find(({ name }) => name === "Other") ]
 				this.client.leadSource = "Online Search"
 			},
 			async getTimezones() {
@@ -342,17 +342,8 @@
 		computed: {
 			...mapGetters({
 				allClients: "getClients",
-				industries: "getAllIndustries"
+				languages: "getAllLanguages",
 			}),
-			selectedIndNames() {
-				let result = []
-				if (this.client.industries.length) {
-					for (let ind of this.client.industries) {
-						result.push(ind.name)
-					}
-				}
-				return result
-			},
 			isIndividual() {
 				return this.clientType === 'Individual'
 			}
