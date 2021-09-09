@@ -171,7 +171,7 @@
                 i.fas.fa-chevron-right
             .block__data(v-if="isContactDetails")
               ContactsTable(
-                :contacts="currentClientOverallData.contacts"
+                :contacts="[...currentClientOverallData.contacts]"
                 @setLeadContact="setLeadContact"
                 @approveDelete="approveContactDelete"
                 @contactSave="contactSave"
@@ -467,12 +467,10 @@
 			contactUpdate({ index, contact, file }) {
 				this.contactsPhotos.push(file)
 				this.updateClientContact({ index, contact })
-				console.log(this.currentClientOverallData.contacts, this.currentClient.contacts)
 			},
 			contactSave({ contact, file }) {
 				this.contactsPhotos.push(file)
-				// this.storeClientContactOverAll(contact)
-				console.log(this.currentClientOverallData.contacts, this.currentClient.contacts)
+				this.storeClientContactOverAll(contact)
 			},
 			deleteClient() {
 				this.isApproveModal = true
@@ -568,7 +566,7 @@
 				sendData.append("client", JSON.stringify(dataForClient))
 
 				for (let i = 0; i < this.contactsPhotos.length; i++) {
-					if(this.contactsPhotos[i]) sendData.append("photos", this.contactsPhotos[i])
+					if (this.contactsPhotos[i]) sendData.append("photos", this.contactsPhotos[i])
 				}
 				try {
 					const result = await this.$http.post("/clientsapi/update-client", sendData)
@@ -615,15 +613,16 @@
 					notes: ""
 				} ]
 
-				clientForSave.billingInfo = {
-					officialCompanyName: this.currentClientOverallData.name,
-					vat: false,
-					vatId: '',
-					dueDate: '',
-					address: '',
-					invoiceSending: false,
-					paymentType: "PPP"
-				}
+        // TODO: refacoring
+				// clientForSave.billingInfo = {
+				// 	officialCompanyName: this.currentClientOverallData.name,
+				// 	vat: false,
+				// 	vatId: '',
+				// 	dueDate: '',
+				// 	address: '',
+				// 	invoiceSending: false,
+				// 	paymentType: "PPP"
+				// }
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
@@ -747,7 +746,6 @@
 				if (this.currentClient.hasOwnProperty('name')) {
 					let keys = [ ...this.generalKeys ]
 					for (let key of keys) {
-						console.log(key, JSON.stringify(this.currentClientOverallData[key]) !== JSON.stringify(this.currentClient[key]), JSON.stringify(this.currentClientOverallData[key]), JSON.stringify(this.currentClient[key]))
 						if (JSON.stringify(this.currentClientOverallData[key]) !== JSON.stringify(this.currentClient[key])) {
 							return true
 						}

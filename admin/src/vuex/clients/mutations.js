@@ -47,31 +47,23 @@ export const mutations = {
         state.currentClient.contacts.push(payload)
     },
     addContactOverAll(state, payload) {
-        state.currentClientOverallData.contacts.push(payload)
+        const previousState = [ ...state.currentClientOverallData.contacts ]
+        previousState.push(payload)
+        state.currentClientOverallData.contacts = previousState
     },
     updateContact(state, payload) {
         const { index, contact } = payload;
-        console.log(index, contact)
-        state.currentClientOverallData.contacts[index] = contact;
-        // const lead = state.currentClientOverallData.contacts.find(item => item.leadContact);
-        // if(contact.leadContact) {
-        //     state.currentClientOverallData.contacts = state.currentClientOverallData.contacts.map((item, ind) => {
-        //         item.leadContact = ind === index;
-        //         return item;
-        //     });
-        // } else if(!contact.leadContact && !lead) {
-        //     state.currentClientOverallData.contacts[0].leadContact = true;
-        // }
-
+        const previousState = [ ...state.currentClientOverallData.contacts ]
+        previousState[index] = contact
+        state.currentClientOverallData.contacts = previousState
     },
     setLeadContact(state, payload) {
-        if(state.currentClientOverallData.contacts[payload].leadContact) {
-            return
+        const previousState = [ ...state.currentClientOverallData.contacts ]
+        for(let index in previousState) {
+            previousState[index].leadContact = false;
         }
-        for(let index in state.currentClientOverallData.contacts) {
-            state.currentClientOverallData.contacts[index].leadContact = false;
-        }
-        state.currentClientOverallData.contacts[payload].leadContact = true;
+        previousState[payload].leadContact = true
+        state.currentClientOverallData.contacts = previousState
     },
     updateClientRatesProp(state, payload) {
       state.currentClient.rates[payload.key] = payload.data

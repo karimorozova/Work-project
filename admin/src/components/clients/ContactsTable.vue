@@ -119,9 +119,9 @@
 			contactSave(data) {
 				if (this.editingIndex !== -1) {
 					this.$emit('contactUpdate', { ...data, index: this.editingIndex  })
-					return
-				}
-				this.$emit('contactSave', { ...data })
+				}else{
+					this.$emit('contactSave', { ...data })
+        }
 			},
 			cancelDelete() {
 				this.isDeleteMessageShow = false
