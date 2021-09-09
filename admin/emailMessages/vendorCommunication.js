@@ -395,7 +395,8 @@ async function generatePO(requestInfo, fullVendor, project) {
 	let table = ''
 	if (isTranslationJob) {
 		const { tasks } = project
-		const { metrics } = tasks.find(item => item.taskId === taskId)
+		const { metrics: original } = tasks.find(item => item.taskId === taskId)
+		const metrics = { ...original }
 		delete metrics.totalWords
 		const tableStart = `<div class="table" style="padding: 0px 25px;">
 				<table style="font-size: 14px;color: #333;width: 100%;text-align: left;border-collapse: collapse;border-bottom: 1px solid #999;border-left: 1px solid #999;margin-top: -30px;">
