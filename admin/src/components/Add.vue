@@ -1,17 +1,11 @@
 <template lang="pug">
-  .add-button(:class="{'mt10': isDefaultMargin}" @click="click")
+  .add-button(@click="click")
     .add-button__icon
       i.fas.fa-plus
 </template>
 
 <script>
 	export default {
-    props: {
-      isDefaultMargin: {
-        type: Boolean,
-        default: true
-      }
-    },
 		methods: {
 			click() {
 				this.$emit("add")
@@ -33,10 +27,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
-    &.mt10 {
-      margin-top: 10px;
-    }
 
     &:hover {
       .add-button__icon {
