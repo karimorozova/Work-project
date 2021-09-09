@@ -95,10 +95,11 @@ router.get('/acceptquote', getProjectManageToken, async (req, res) => {
 			if (project.isClientOfferClicked || project.status !== "Quote sent") {
 				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
 			}
-			await notifyManagerProjectStarts(project)
 
 			const { tasks, steps } = updateWithApprovedTasks({ taskIds: project.tasks.map(i => i.taskId), project })
 			await Projects.updateOne({ "_id": projectId }, { $set: { tasks, steps, status: "Approved", isClientOfferClicked: true } })
+			await notifyManagerProjectStarts(project)
+
 			res.send(generateTemplateForAlertAcceptQuote(currentProject))
 		}
 	} catch (err) {
@@ -128,12 +129,12 @@ router.get('/declinequote', async (req, res) => {
 			if (project.isClientOfferClicked || project.status !== "Quote sent") {
 				return res.send(generateTemplateForDefaultMessage('Sorry. Link is not valid anymore.'))
 			}
-			emitter.emit('projectRejectedNotification', project)
 			const tasks = project.tasks.map(task => {
 				if (task.status === 'Quote sent') task.status = 'Rejected'
 				return task
 			})
 			await Projects.updateOne({ "_id": projectId }, { $set: { tasks, status: "Rejected", isClientOfferClicked: true } })
+			emitter.emit('projectRejectedNotification', project)
 			res.send(generateTemplateForAlertRejectQuote(currentProject))
 		}
 	} catch (err) {
