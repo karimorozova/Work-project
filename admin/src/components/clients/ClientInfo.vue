@@ -208,7 +208,7 @@
               .icon(v-else)
                 i.fas.fa-chevron-right
             .block__data(v-if="isBillingInformation")
-              ClientBillInfoTable(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+              ClientBillInfoTable(:client="currentClient")
 
           .client-info__block
             .block__header(@click="toggleBlock('isLogs')" :class="{'block__header-grey': !isLogs}")
