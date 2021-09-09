@@ -18,6 +18,7 @@ const state = {
 		nativeLanguage: null,
 		timeZone: null,
 		status: null,
+		paymentType: null,
 		accountManager: null,
 		salesManager: null,
 		projectManager: null,

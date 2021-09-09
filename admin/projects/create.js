@@ -25,7 +25,7 @@ async function createProject(project, user) {
 
   try {
     const { USD, GBP } = await CurrencyRatio.findOne();
-    const { contacts, billingInfo, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
+    const { contacts, paymentType, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
     const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lte: todayEnd } });
 
     const currNumber = getNextProjectNumber(todayProjects)
@@ -35,7 +35,7 @@ async function createProject(project, user) {
     project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber;
     project.projectManager  = (role === 'Project Managers') ? roleId : projectManager._id
     project.accountManager = accountManager._id;
-    project.paymentProfile = billingInfo.hasOwnProperty('paymentType') ? billingInfo.paymentType : '';
+    project.paymentProfile = paymentType;
     project.clientContacts = [contacts.find(({ leadContact }) => leadContact)];
     project.discounts = discounts;
     project.minimumCharge = { value: minPrice, toIgnore: false };

@@ -11,6 +11,16 @@
           @chooseOption="setStatus"
         )
     .block-item
+      label.block-item__label Payment Type:
+        span.require *
+      .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.paymentType}")
+        SelectSingle(
+          :options="['PPP', 'Pre-Payment', 'Monthly', 'Custom']",
+          placeholder="Payment Type",
+          :selectedOption="client.paymentType",
+          @chooseOption="setPaymentType"
+        )
+    .block-item
       label.block-item__label Account Manager:
         span.require *
       .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.accountManager}")
@@ -63,6 +73,9 @@
 			setManager({ option }, prop) {
 				this.client[prop] = this.users.find(i => `${ i.firstName } ${ i.lastName }` === option)
 			},
+      setPaymentType({option}) {
+        this.$set(this.client, 'paymentType', option)
+      },
 			setTest() {
 				this.client.isTest = event.target.checked
 			},

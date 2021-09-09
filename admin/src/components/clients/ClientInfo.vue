@@ -313,6 +313,7 @@
 					'nativeLanguage',
 					'timeZone',
 					'status',
+					'paymentType',
 					'accountManager',
 					'salesManager',
 					'projectManager',

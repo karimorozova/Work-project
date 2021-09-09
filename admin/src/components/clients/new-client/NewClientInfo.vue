@@ -234,7 +234,7 @@
 				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) this.errors.push('Please provide a valid email in General Information.')
 
 				// TODO: PayTyp
-				// if (this.clientType !== "Individual" && this.client.billingInfo.paymentType === '') {
+				// if (this.clientType !== "Individual" && this.client.paymentType === '') {
 				// 	this.errors.push('Please, add Payment type.')
 				// 	this.billErrors.push('payment')
 				// }

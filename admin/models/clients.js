@@ -152,14 +152,14 @@ const ClientSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
+	paymentType: {
+		type: String,
+		trim: true,
+	},
 	billingInfo: [{
 		officialName: {
 			type: String,
 			trim: true
-		},
-		paymentType: {
-			type: String,
-			trim: true,
 		},
 		paymentTerms: {
 			type: Object,

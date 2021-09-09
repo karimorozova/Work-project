@@ -19,6 +19,7 @@ export const mutations = {
             'nativeLanguage',
             'timeZone',
             'status',
+            'paymentType',
             'accountManager',
             'salesManager',
             'projectManager',
