@@ -1,44 +1,47 @@
 <template lang="pug">
-.custom-radio(@click.stop="toggle")
+  .custom-radio(@click.stop="toggle")
     .custom-radio__inside-circle(:class="{'custom-radio_checked': isChecked}")
 </template>
 
 <script>
-export default {
-    props: {
-        isChecked: {
-            type: Boolean,
-            default: false
-        }
-    },
-    methods: {
-        toggle() {
-            this.$emit('toggleRadio')
-        }
-    }
-}
+	export default {
+		props: {
+			isChecked: {
+				type: Boolean,
+				default: false
+			}
+		},
+		methods: {
+			toggle() {
+				this.$emit('toggleRadio')
+			}
+		}
+	}
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/scss/colors.scss";
+  @import "../assets/scss/colors.scss";
 
-.custom-radio {
-    width: 14px;
-    height: 14px;
+  .custom-radio {
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     border: 1px solid $border;
     display: flex;
     justify-content: center;
     align-items: center;
-    /*cursor: pointer;*/
+    cursor: pointer;
+    background-color: white;
+
     &__inside-circle {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
     }
+
     &_checked {
-        background-color: $text;
+      background-color: $border-focus;
     }
-}
+  }
 
 </style>

@@ -18,7 +18,6 @@ export const mutations = {
             'website',
             'nativeLanguage',
             'timeZone',
-            'aliases',
             'status',
             'accountManager',
             'salesManager',
@@ -29,19 +28,7 @@ export const mutations = {
             'contacts'
         ]
 
-        let billingKeys = [
-            'vat',
-            'vatId',
-            'address',
-            'invoiceSending',
-            'officialCompanyName',
-            'dueDate',
-            'paymentType'
-        ]
-
         for(let key of keys) state.currentClientOverallData[key] = payload[key]
-        for(let key of billingKeys) state.currentClientOverallData.billingInfo[key] = payload.billingInfo[key]
-
     },
     setClientPropertyOverallData(state, payload) {
         state.currentClientOverallData[payload.prop] = payload.value;
@@ -64,16 +51,17 @@ export const mutations = {
     },
     updateContact(state, payload) {
         const { index, contact } = payload;
+        console.log(index, contact)
         state.currentClientOverallData.contacts[index] = contact;
-        const lead = state.currentClientOverallData.contacts.find(item => item.leadContact);
-        if(contact.leadContact) {
-            state.currentClientOverallData.contacts = state.currentClientOverallData.contacts.map((item, ind) => {
-                item.leadContact = ind === index;
-                return item;
-            });
-        } else if(!contact.leadContact && !lead) {
-            state.currentClientOverallData.contacts[0].leadContact = true;
-        }
+        // const lead = state.currentClientOverallData.contacts.find(item => item.leadContact);
+        // if(contact.leadContact) {
+        //     state.currentClientOverallData.contacts = state.currentClientOverallData.contacts.map((item, ind) => {
+        //         item.leadContact = ind === index;
+        //         return item;
+        //     });
+        // } else if(!contact.leadContact && !lead) {
+        //     state.currentClientOverallData.contacts[0].leadContact = true;
+        // }
 
     },
     setLeadContact(state, payload) {

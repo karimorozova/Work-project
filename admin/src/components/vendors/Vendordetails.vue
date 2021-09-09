@@ -825,6 +825,7 @@
       transition: .2s ease;
       align-items: center;
       letter-spacing: 0.2px;
+      border-radius: 4px;
 
       &-grey {
         background-color: white;

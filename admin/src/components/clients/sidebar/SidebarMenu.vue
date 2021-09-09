@@ -117,7 +117,6 @@
       &-button {
         font-size: 16px;
         letter-spacing: .2px;
-        color: $green;
         cursor: pointer;
 
         &:hover {
@@ -149,7 +148,7 @@
       display: flex;
       padding: 0 20px 20px 20px;
       align-items: center;
-      gap: 12px;
+      gap: 15px;
     }
 
     &__activityDetails {
@@ -171,10 +170,10 @@
       height: 40px;
       min-width: 40px;
       width: 40px;
-      background: $light-green;
+      background: $table-list-hover;
       font-size: 18px;
       border-radius: 40px;
-      color: $green;
+      color: $border-focus;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -186,7 +185,7 @@
 
       &:hover {
         cursor: pointer;
-        background: #c8e4e4;
+        background: $light-green
       }
     }
 
@@ -229,17 +228,16 @@
   }
 
   i {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .icon {
     height: 40px;
     min-width: 40px;
     width: 40px;
-    background: $light-green;
-    font-size: 18px;
+    background: $table-list-hover;
     border-radius: 40px;
-    color: $green;
+    color: $border-focus;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -247,7 +245,7 @@
 
     &:hover {
       cursor: pointer;
-      background: #c8e4e4;
+      background: $light-green;
     }
   }
 </style>

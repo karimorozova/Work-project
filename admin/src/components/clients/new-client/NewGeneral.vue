@@ -13,19 +13,6 @@
           Asterisk(:customStyle="asteriskStyle")
         input(type="text" placeholder="Email" v-model="client.email" :class="{'general-info_error-shadow': !client.email && isSaveClicked}")
 
-      //.block-item
-      //  label.block-item__label.block-item_relative Industry:
-      //    Asterisk(:customStyle="asteriskStyle")
-      //  .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !client.industries.length}")
-      //    SelectMulti(
-      //      :hasSearch="true"
-      //      :allOptionsButtons="true"
-      //      placeholder="Select"
-      //      :selectedOptions="client.industries.length ? client.industries.map(i => i.name) : []"
-      //      :options="getAllIndustries.map(i => i.name)"
-      //     @chooseOptions="setIndustries"
-      //  )
-
     .general-info__block
       .block-item(v-if="!isIndividual")
         label.block-item__label.block-item_relative Time Zone:
@@ -50,30 +37,7 @@
       .block-item(v-if="!isIndividual")
         label.block-item__label Website:
         input(type="text" placeholder="Website" v-model="client.website")
-      //.block-item
-      //  label.block-item__label.block-item_relative Source Languages:
-      //    Asterisk(:customStyle="asteriskStyle")
-      //  .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.sourceLanguages.length}")
-      //    SelectMulti(
-      //      placeholder="Select"
-      //      :hasSearch="true"
-      //      :selectedOptions="client.hasOwnProperty('sourceLanguages') ? makeStringLanguage(client.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
-      //      :options="sourceLanguages | firstEnglishLanguage"
-      //      @chooseOptions="setSource"
-      //      :allOptionsButtons="true"
-      //    )
-      //.block-item
-      //  label.block-item__label.block-item_relative Target Languages:
-      //    Asterisk(:customStyle="asteriskStyle")
-      //  .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.targetLanguages.length}")
-      //    SelectMulti(
-      //      placeholder="Select"
-      //      :hasSearch="true"
-      //      :selectedOptions="client.hasOwnProperty('targetLanguages') ? makeStringLanguage(client.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
-      //      :options="targetLanguages"
-      //      @chooseOptions="setTarget"
-      //      :allOptionsButtons="true"
-      //    )
+
 </template>
 
 <script>
@@ -81,7 +45,6 @@
 	import scrollDrop from "@/mixins/scrollDrop"
 	import SelectSingle from "../../SelectSingle"
 	import SelectMulti from "../../SelectMulti"
-	import { mapGetters } from "vuex"
 
 	export default {
 		mixins: [ scrollDrop ],
@@ -96,9 +59,6 @@
 			isSaveClicked: {
 				type: Boolean
 			},
-			languages: {
-				type: Array
-			},
 			timezones: {
 				type: Array
 			}
@@ -107,24 +67,10 @@
 			return {
 				asteriskStyle: { top: "-4px" },
 				currentZone: "",
-				currentLanguage: "",
-				// currentSourceLanguages: [],
-				// currentTargetLanguages: []
+				currentLanguage: ""
 			}
 		},
 		methods: {
-			// setIndustries({ option }) {
-			// 	const curr = this.getAllIndustries.find(item => item.name === option)
-			// 	if (!this.client.industries.length) {
-			// 		return this.client.industries.push(curr)
-			// 	}
-			// 	const position = this.client.industries.findIndex(item => item.name === option)
-			// 	if (position !== -1) return this.client.industries.splice(position, 1)
-			// 	this.client.industries.push(curr)
-			// },
-			// makeStringLanguage(langArray) {
-			// 	return langArray.map(item => item.lang)
-			// },
 			setLanguage({ option }) {
 				this.currentLanguage = option
 				this.client.nativeLanguage = this.languages.find(item => item.lang === option)
@@ -132,54 +78,9 @@
 			setTimezone({ option }) {
 				this.currentZone = option
 				this.client.timeZone = this.timezones.find(item => item.zone === option)
-			},
-			// setTarget({ option }) {
-			// 	if (!this.client.targetLanguages.length) {
-			// 		const lang = this.languages.find(item => item.lang === option)
-			// 		return this.client.targetLanguages.push(lang)
-			// 	}
-			// 	const position = this.client.targetLanguages
-			// 			.map(item => item.lang)
-			// 			.indexOf(option)
-      //
-			// 	if (position !== -1) {
-			// 		return this.client.targetLanguages.splice(position, 1)
-			// 	} else {
-			// 		const lang = this.languages.find(item => item.lang === option)
-			// 		return this.client.targetLanguages.push(lang)
-			// 	}
-			// },
-			// setSource({ option }) {
-			// 	if (!this.client.sourceLanguages.length) {
-			// 		const lang = this.languages.find(item => item.lang === option)
-			// 		return this.client.sourceLanguages.push(lang)
-			// 	}
-			// 	const position = this.client.sourceLanguages
-			// 			.map(item => item.lang)
-			// 			.indexOf(option)
-      //
-			// 	if (position !== -1) {
-			// 		return this.client.sourceLanguages.splice(position, 1)
-			// 	} else {
-			// 		const lang = this.languages.find(item => item.lang === option)
-			// 		return this.client.sourceLanguages.push(lang)
-			// 	}
-			// }
+			}
 		},
 		computed: {
-			...mapGetters({
-				// getAllIndustries: "getAllIndustries"
-			}),
-			// sourceLanguages() {
-			// 	if (this.languages) {
-			// 		return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b))
-			// 	}
-			// },
-			// targetLanguages() {
-			// 	if (this.languages) {
-			// 		return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b))
-			// 	}
-			// },
 			timezoneData() {
 				if (this.timezones) {
 					return this.timezones.map(item => item.zone)

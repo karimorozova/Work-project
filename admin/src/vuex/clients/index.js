@@ -1,46 +1,36 @@
-import * as actions from './actions';
-import * as getters from './getters';
-import { mutations } from './mutations';
+import * as actions from './actions'
+import * as getters from './getters'
+import { mutations } from './mutations'
 
 const state = {
-    currentClient: {
-      rates: {
-        pricelistTable: null,
-      }
-    },
+	currentClient: {
+		rates: {
+			pricelistTable: null
+		}
+	},
 
-    currentClientOverallData: {
-        name: null,
-        clientType: null,
-        officialCompanyName: null,
-        email: null,
-        website: null,
-        nativeLanguage: null,
-        timeZone: null,
-        aliases: null,
-        status: null,
-        accountManager: null,
-        salesManager: null,
-        projectManager: null,
-        otherInfo: null,
-        leadGeneration: null,
-        leadSource: null,
-        billingInfo: {
-            vat: null,
-            vatId: null,
-            address: null,
-            invoiceSending: null,
-            officialCompanyName: null,
-            dueDate: null,
-            paymentType: null,
-        },
-        contacts: []
-    }
+	currentClientOverallData: {
+		name: null,
+		clientType: null,
+		officialCompanyName: null,
+		email: null,
+		website: null,
+		nativeLanguage: null,
+		timeZone: null,
+		status: null,
+		accountManager: null,
+		salesManager: null,
+		projectManager: null,
+		otherInfo: null,
+		leadGeneration: null,
+		leadSource: null,
+		contacts: []
+	}
 }
 
 export const clients = {
-    state,
-    actions,
-    mutations,
-    getters
+	state,
+	actions,
+	mutations,
+	getters
 }

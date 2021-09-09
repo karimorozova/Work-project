@@ -21,7 +21,6 @@ import CancelReasons from '@/components/Table/CancelReasons'
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
 import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
-import NewClient from '@/components/clients/new-client/NewClient'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewVendor from '@/components/vendors/NewVendor'
 import AccountInfo from '@/components/account/AccountInfo'
@@ -62,10 +61,7 @@ import AllVendorsTable from '@/components/vendors/lists/AllVendorsTable'
 import ActiveVendors from '@/components/vendors/lists/ActiveVendors'
 import PotentialVendors from '@/components/vendors/lists/PotentialVendors'
 import InactiveVendors from '@/components/vendors/lists/InactiveVendors'
-import ContactDetailsAddInNewClient from "../components/clients/new-client/ContactDetailsAddInNewClient"
-import ContactDetailsInNewClient from "../components/clients/new-client/ContactDetailsInNewClient"
-import ContactDetailsAddExistingClient from "../components/clients/ContactDetailsAddExistingClient"
-import ContactDetailsExistingClient from "../components/clients/ContactDetailsExistingClient"
+
 import InvoicingReportsList from "../components/invoicingReports/InvoicingReportsList"
 import InvoicingPaidReportsList from "../components/invoicingReports/InvoicingPaidReportsList"
 import InvoicingDetails from "../components/invoicingReports/InvoicingDetails"
@@ -312,14 +308,9 @@ const router = new Router({
 						},
 						{
 							path: 'all/details/:id',
-							name: '',
-							component: clearRouterView,
-							props: true,
-							children: [
-								{ path: '', name: 'all-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'all-new-contact', component: ContactDetailsAddExistingClient, props: true },
-								{ path: 'contact/:index', name: 'all-contact', component: ContactDetailsExistingClient, props: true }
-							]
+							name: 'all-client-info',
+							component: ClientInfo,
+							props: true
 						},
 						{
 							path: 'active',
@@ -329,14 +320,9 @@ const router = new Router({
 						},
 						{
 							path: 'active/details/:id',
-							name: '',
-							component: clearRouterView,
-							props: true,
-							children: [
-								{ path: '', name: 'active-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'active-new-contact', component: ContactDetailsAddExistingClient, props: true },
-								{ path: 'contact/:index', name: 'active-contact', component: ContactDetailsExistingClient, props: true }
-							]
+							name: 'active-client-info',
+							component: ClientInfo,
+							props: true
 						},
 						{
 							path: 'inactive',
@@ -346,14 +332,9 @@ const router = new Router({
 						},
 						{
 							path: 'inactive/details/:id',
-							name: '',
-							component: clearRouterView,
-							props: true,
-							children: [
-								{ path: '', name: 'inactive-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'inactive-new-contact', component: ContactDetailsAddExistingClient, props: true },
-								{ path: 'contact/:index', name: 'inactive-contact', component: ContactDetailsExistingClient, props: true }
-							]
+							name: 'inactive-client-info',
+							component: ClientInfo,
+							props: true
 						},
 						{
 							path: 'potential',
@@ -363,40 +344,15 @@ const router = new Router({
 						},
 						{
 							path: 'potential/details/:id',
-							name: '',
-							component: clearRouterView,
-							props: true,
-							children: [
-								{ path: '', name: 'potential-client-info', component: ClientInfo, props: true },
-								{ path: 'new-contact', name: 'potential-new-contact', component: ContactDetailsAddExistingClient, props: true },
-								{ path: 'contact/:index', name: 'potential-contact', component: ContactDetailsExistingClient, props: true }
-							]
+							name: 'potential-client-info',
+							component: ClientInfo,
+							props: true
 						},
 						{
 							path: 'new-client',
 							name: 'new-client',
-							component: NewClient,
-							props: true,
-							children: [
-								{
-									path: '',
-									name: '_info',
-									component: NewClientInfo,
-									props: true
-								},
-								{
-									path: 'new_contact',
-									name: 'new_contact',
-									component: ContactDetailsAddInNewClient,
-									props: true
-								},
-								{
-									path: '_contact/:index',
-									name: '_contact',
-									component: ContactDetailsInNewClient,
-									props: true
-								}
-							]
+							component: NewClientInfo,
+							props: true
 						}
 					]
 				},
@@ -655,7 +611,7 @@ const router = new Router({
 							path: 'invoicing-reports/create-reports',
 							name: 'invoicing-reports',
 							component: AddInvoicing
-						},
+						}
 
 					]
 				},
