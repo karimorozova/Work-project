@@ -23,6 +23,7 @@
     border: 1px solid $border;
     border-radius: 4px;
     cursor: pointer;
+    margin-top: 10px;
     transition: .2s ease-out;
     display: flex;
     justify-content: center;
