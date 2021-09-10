@@ -563,6 +563,8 @@
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
+
+        clientForSave.billingInfo = []
 				this.getClientDocumentInfo().then((result) => (dataForClient.documents = result.data.documents))
 				sendData.append("client", JSON.stringify(dataForClient))
 

@@ -53,11 +53,11 @@
           .billing-info__field
             label Reports:
             .field__select-single
-              SelectSingle(
+              SelectMulti(
                 placeholder="Option"
-                :options="['test1', 'test2']"
-                :selectedOption=" billingInfoCopy.reports || ''"
-                @chooseOption="setReports"
+                :options="['Report1', 'Report2', 'Report3']"
+                :selectedOptions="billingInfoCopy.reports || []"
+                @chooseOptions="setReports"
               )
 
           .billing-info__field
@@ -250,8 +250,16 @@
 				}
 				this.isContactModal = true
 			},
-			setReports() {
-
+			setReports({option}) {
+			  if(!this.billingInfoCopy.hasOwnProperty('reports')) {
+          this.$set(this.billingInfoCopy, 'reports', [])
+        }
+        const position = this.billingInfoCopy.reports.indexOf(option) ;
+        if(position === -1) {
+          this.billingInfoCopy.reports.push( option);
+        } else {
+          this.billingInfoCopy.reports.splice(position, 1);
+        }
 			},
 			setPaymentType({ option }) {
 				this.$set(this.billingInfoCopy, 'paymentType', option)
@@ -488,7 +496,10 @@
   textarea {
     color: $text;
     height: 64px;
+    min-height: 64px;
     width: 220px;
+    min-width: 220px;
+    max-width: 220px;
     border: 1px solid $border;
     border-radius: 4px;
     outline: none;
