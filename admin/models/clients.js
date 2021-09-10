@@ -54,7 +54,6 @@ const billingContacts = {}
 for (let key in contacts) billingContacts[key] = contacts[key];
 
 delete billingContacts.password
-delete billingContacts.photo
 
 const ClientSchema = new mongoose.Schema({
 	name: {

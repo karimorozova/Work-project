@@ -1,6 +1,21 @@
 <template lang="pug">
   .billing-info
-    .billing-info__contactModal(v-show="isDeletingModal")
+    .billing-info__contactModalAuto(v-if="isContactModalAuto")
+      .contactModalAuto
+        .contactModalAuto__title Clients contacts:
+        .contactModalAuto__drops
+          SelectMulti(
+            :hasSearch="true"
+            placeholder="Options"
+            :selectedOptions="controlContacts.length ? controlContacts.map(item => `${ item.firstName } ${ item.surname }`) : []"
+            :options="clientContacts.map(item => `${ item.firstName } ${ item.surname }`)"
+            @chooseOptions="setControlContacts"
+          )
+        .billing-info__buttons
+          Button(value="Add" @clicked="addContactsModalAuto")
+          Button(value="Cancel" @clicked="closeContactModalAuto" :outline="true")
+
+    .billing-info__approveModal(v-show="isDeletingModal")
       ApproveModal(
         text="Are you sure?"
         approveValue="Yes"
@@ -22,11 +37,11 @@
           .billing-info__title Billing Details
 
           .billing-info__field
-            label Company Name:
-            input(v-model="billingInfoCopy.officialName" placeholder="Company Name")
+            label Company name:
+            input(v-model="billingInfoCopy.officialName" placeholder="Value")
 
           .billing-info__field
-            label Payment Terms:
+            label Payment terms:
             .field__select-single
               SelectSingle(
                 placeholder="Select"
@@ -36,10 +51,10 @@
               )
 
           .billing-info__field
-            label Report:
+            label Reports:
             .field__select-single
               SelectSingle(
-                placeholder="Select"
+                placeholder="Option"
                 :options="['test1', 'test2']"
                 :selectedOption=" billingInfoCopy.reports || ''"
                 @chooseOption="setReports"
@@ -53,10 +68,10 @@
           .billing-info__title Billing Address
 
           .billing-info__field
-            label Country/Region:
+            label Country / Region:
             .field__select-single
               SelectSingle(
-                placeholder="Select"
+                placeholder="Option"
                 :options="countries"
                 :selectedOption="billingInfoCopy.address.country"
                 @chooseOption="setCountry"
@@ -65,56 +80,70 @@
 
           .billing-info__field
             label City:
-            input( v-model="billingInfoCopy.address.city")
+            input(v-model="billingInfoCopy.address.city" placeholder="Value")
 
           .billing-info__field
             label State:
             .field__select-single
-              input(v-model="billingInfoCopy.address.state")
+              input(v-model="billingInfoCopy.address.state" placeholder="Value")
 
           .billing-info__field
             label Zip-code:
-            input(v-model="billingInfoCopy.address.zipCode")
+            input(v-model="billingInfoCopy.address.zipCode" placeholder="Value")
 
         .billing-info__part-three
           .billing-info__field
             .billing-info__label-group
               label VAT:
-            input(v-model="billingInfoCopy.address.vat")
+            input(v-model="billingInfoCopy.address.vat" placeholder="Value")
 
           .billing-info__field
-            label Address:
+            label Address 1:
             textarea(v-model="billingInfoCopy.address.street1")
+
+          .billing-info__field
+            label Address 2:
             textarea(v-model="billingInfoCopy.address.street2")
 
-      .billing-info__title
-        span Billing Contact
-        Add(@add="openContactModal")
+      .billing-info__addContactsRow
+        span Billing Contacts
+        .adds
+          .addContacts(@click="openContactModal")
+            i.fas.fa-plus
+            span Add manually
+          .addContacts(@click="openContactModalAuto")
+            i.fas.fa-plus
+            span Add existing contacts
+          //Add(@add="openContactModal" style="margin-top: -6px;")
 
-      .item(v-for="(item, index) in billingInfoCopy.contacts")
-        .item__header
-          .item__header--name {{ item.firstName }}
 
-          .item__header--icons(v-if="deletingContactIndex === -1 && editingIndex === -1")
-            .item__header--icon(@click="openModalForEdition(index)")
-              i(class="fas fa-pen")
-            .item__header--icon(@click="openApproveModal(index)")
-              i(class="fas fa-trash")
-          .item__header--icons(v-else)
-            .item__header--icon
-              i(class="fas fa-pen")
-            .item__header--icon
-              i(class="fas fa-trash")
+      .items
+        .item(v-for="(item, index) in billingInfoCopy.contacts")
+          .item__header
+            .item__header--name {{ item.firstName }} {{ item.surname || '' }}
 
-        .item__body
-          .item__body--key Email:
-          .item__body--value {{ item.email || '-' }}
-        .item__body
-          .item__body--key leadContact:
-          .item__body--value {{ item.leadContact || '-' }}
+            .item__header--icons(v-if="deletingContactIndex === -1 && editingIndex === -1")
+              .item__header--icon(@click="openModalForEdition(index)")
+                i(class="fas fa-pen")
+              .item__header--icon(@click="openApproveModal(index)")
+                i(class="fas fa-trash")
+            .item__header--icons(v-else)
+              .item__header--icon
+                i(class="fas fa-pen")
+              .item__header--icon
+                i(class="fas fa-trash")
+
+          .item__body
+            .item__body--key Email:
+            .item__body--value {{ item.email || '-' }}
+
+          .item__footer
+            .item__footer--title {{ item.position }}
+
     .billing-info__buttons
-      Button(value="Save" @clicked="checkErrors")
-      Button(value="Cancel" :outline="true" @clicked="closeModal")
+      Button(value="Save" :isDisabled="isContactModal || isContactModalAuto" @clicked="checkErrors")
+      Button(value="Cancel" :isDisabled="isContactModal || isContactModalAuto" :outline="true" @clicked="closeModal")
+
 </template>
 
 <script>
@@ -124,6 +153,7 @@
 	import CheckBox from "../CheckBox"
 	import ContactsManageModal from "./ContactsManageModal"
 	import ApproveModal from "../ApproveModal"
+	import SelectMulti from "../SelectMulti"
 
 	export default {
 		name: "BillingDetails",
@@ -133,21 +163,49 @@
 				default: {
 					address: {}
 				}
+			},
+			clientContacts: {
+				type: Array
 			}
 		},
 		data() {
 			return {
-        countries: [],
+				countries: [],
 				paymentTerms: [],
 				billingInfoCopy: JSON.parse(JSON.stringify(this.billingInfo)),
 				isContactModal: false,
+				isContactModalAuto: false,
 				controlContact: {},
+				controlContacts: [],
 				deletingContactIndex: -1,
 				editingIndex: -1,
 				isDeletingModal: false
 			}
 		},
 		methods: {
+			addContactsModalAuto() {
+				if (!this.controlContacts.length) {
+					this.closeContactModalAuto()
+					return
+				}
+				this.billingInfoCopy.hasOwnProperty('contacts')
+						? this.billingInfoCopy.contacts.push(...this.controlContacts.filter(({ email }) => !this.billingInfoCopy.contacts.map(({ email }) => email).includes(email)))
+						: this.billingInfoCopy.contacts = [ ...this.controlContacts ]
+				this.closeContactModalAuto()
+			},
+			openContactModalAuto() {
+				this.controlContacts = []
+				this.isContactModalAuto = true
+			},
+			closeContactModalAuto() {
+				this.isContactModalAuto = false
+				this.controlContacts = []
+			},
+			setControlContacts({ option }) {
+				const position = this.controlContacts.findIndex(item => `${ item.firstName } ${ item.surname }` === option)
+				if (position !== -1) this.controlContacts.splice(position, 1)
+				else this.controlContacts.push(this.clientContacts.find(item => `${ item.firstName } ${ item.surname }` === option))
+			},
 			deleteContact() {
 				this.billingInfoCopy.contacts.splice(this.deletingContactIndex, 1)
 				this.closeApproveModal()
@@ -167,7 +225,7 @@
 			},
 			contactSave({ contact }) {
 				if (this.editingIndex !== -1) this.billingInfoCopy.contacts[this.editingIndex] = contact
-				else this.billingInfoCopy.contacts.push(contact)
+				else this.billingInfoCopy.hasOwnProperty('contacts') ? this.billingInfoCopy.contacts.push(contact) : this.billingInfoCopy.contacts = [ contact ]
 				this.closeContactModal()
 			},
 			closeContactModal() {
@@ -192,9 +250,9 @@
 				}
 				this.isContactModal = true
 			},
-      setReports() {
+			setReports() {
 
-      },
+			},
 			setPaymentType({ option }) {
 				this.$set(this.billingInfoCopy, 'paymentType', option)
 			},
@@ -227,20 +285,21 @@
 					this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
 				}
 			},
-      async getCountries() {
-        try {
-          const result = await this.$http.get('/api/countries')
-          this.countries = result.data
-        } catch (err) {
-          console.log(err)
-        }
-      },
+			async getCountries() {
+				try {
+					const result = await this.$http.get('/api/countries')
+					this.countries = result.data
+				} catch (err) {
+					console.log(err)
+				}
+			}
 		},
 		async created() {
 			await this.getAndSetPaymentTerms()
 			await this.getCountries()
 		},
 		components: {
+			SelectMulti,
 			ApproveModal,
 			ContactsManageModal,
 			SelectSingle,
@@ -254,45 +313,116 @@
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
 
+  .contactModalAuto {
+    padding: 25px;
+    background: white;
+    z-index: 15;
+    border-radius: 4px;
+    box-shadow: $box-shadow;
+
+    &__title {
+      margin-bottom: 3px;
+    }
+
+    &__drops {
+      width: 220px;
+      height: 32px;
+      position: relative;
+    }
+  }
+
+  .adds {
+    display: flex;
+    gap: 25px;
+  }
+
+  .addContacts {
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid $border;
+    border-radius: 4px;
+    padding: 0px 10px;
+    cursor: pointer;
+    align-items: center;
+    font-family: 'Myriad400';
+    color: $dark-border;
+    transition: .2s ease-out;
+
+    &:hover {
+      color: $text;
+    }
+  }
+
   .billing-info {
     box-sizing: border-box;
-    margin-bottom: 20px;
+    margin-bottom: 60px;
     box-shadow: $box-shadow;
     position: relative;
     border-radius: 4px;
     background-color: white;
     padding: 25px;
+    width: 786px;
 
-    &__contactModal {
+    &__addContactsRow {
+      font-size: 16px;
+      font-family: Myriad600;
+      margin-top: 16px;
+      padding-top: 24px;
+      border-top: 1px solid $border;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      align-items: center;
+      height: 33px;
+    }
+
+    &__title {
+      font-size: 16px;
+      font-family: 'Myriad600';
+      margin-bottom: 20px;
+    }
+
+
+    &__contactModalAuto {
       position: absolute;
       z-index: 10;
+      left: 33%;
+      top: 48%;
+    }
+
+    &__approveModal {
+      position: absolute;
+      z-index: 15;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
     }
-    //
-    //&__header {
-    //  display: flex;
-    //  justify-content: space-between;
-    //  align-items: center;
-    //}
+
+    &__contactModal {
+      position: absolute;
+      z-index: 10;
+      left: 18%;
+      top: 6%;
+    }
+
     &__splited-part {
       display: flex;
-      gap: 20px;
     }
 
     &__buttons {
       display: flex;
       justify-content: center;
       gap: 25px;
-      margin-top: 25px;
+      margin-top: 24px;
     }
 
     &__label-group {
       display: flex;
       justify-content: space-between;
     }
-
 
 
     label {
@@ -302,24 +432,27 @@
 
     .field__select-single {
       position: relative;
-      height: 30px;
+      height: 32px;
       width: 220px;
     }
 
     &__field {
-      margin-bottom: 20px;
-    }
-    &__part-one {
-      border-right: 1px solid #dedede;
-      padding-right: 20px;
-    }
-    &__part-three {
-      margin-top: 15px;
-    }
-    &__splited-part {
-      border-bottom: 1px solid #e1e1e1;
+      margin-bottom: 15px;
     }
 
+    &__part-one {
+      border-right: 1px solid $light-border;
+      padding-right: 30px;
+      margin-right: 30px;
+    }
+
+    &__part-two {
+      margin-right: 15px;
+    }
+
+    &__part-three {
+      margin-top: 37px;
+    }
 
     &__row {
       display: flex;
@@ -343,7 +476,6 @@
       }
     }
 
-
     .input-group {
       display: flex;
       flex-direction: column;
@@ -352,18 +484,18 @@
     }
 
   }
+
   textarea {
     color: $text;
-    height: 50px;
-    width: 205px;
-    max-width: 205px;
-    min-width: 205px;
+    height: 64px;
+    width: 220px;
     border: 1px solid $border;
     border-radius: 4px;
     outline: none;
     transition: .1s ease-out;
     padding: 7px;
     background-color: white;
+    box-sizing: border-box;
 
     &:focus {
       border: 1px solid $border-focus;
@@ -371,10 +503,9 @@
   }
 
   .item {
-    width: 220px;
+    width: 358px;
     box-sizing: border-box;
     border-radius: 4px;
-    margin-top: 10px;
     border: 1px solid $light-border;
     height: fit-content;
 
@@ -386,7 +517,7 @@
       color: #666;
       font-family: 'Myriad300';
       letter-spacing: 0.3px;
-      font-size: 13px;
+      font-size: 14px;
       margin-top: 10px;
     }
 
@@ -400,14 +531,14 @@
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid $border;
-      padding: 15px 15px 10px 15px;
+      padding: 14px 14px 10px 14px;
       margin-bottom: 10px;
       min-height: 18px;
 
       &--name {
         font-size: 14px;
         font-family: 'Myriad600';
-        width: 210px;
+        width: 260px;
       }
 
       &--icons {
@@ -425,5 +556,11 @@
         }
       }
     }
+  }
+
+  .items {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
   }
 </style>

@@ -17,7 +17,7 @@
 
         .table__dataImage(slot="name" slot-scope="{ row }")
           img.image(v-if="$route.params.id && row.photo" :src="row.photo")
-          img.image(v-else :src="require('../../assets/images/avatar.png')")
+          img.image(v-else :src="require('../../assets/images/avatars/avatar-grey.png')")
           span {{ getFullName(row) }}
         .table__data(slot="email" slot-scope="{ row, index }")  {{ row.email }}
         .table__data(slot="position" slot-scope="{ row, index }") {{ row.position }}
@@ -167,7 +167,7 @@
       height: 40px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       padding: 0 7px;
     }
 
@@ -193,9 +193,9 @@
   }
 
   .image {
-    height: 28px;
-    width: 28px;
-    border-radius: 28px;
+    height: 24px;
+    width: 24px;
+    border-radius: 24px;
     object-fit: cover;
   }
 </style>
