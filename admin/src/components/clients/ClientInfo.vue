@@ -607,23 +607,41 @@
 					position: "Manager",
 					phone: "",
 					photo: "",
-					whatsApp: "",
-					skype: "",
-					linkedIn: "",
 					country: "",
 					notes: ""
 				} ]
 
         // TODO: refacoring
-				// clientForSave.billingInfo = {
-				// 	officialCompanyName: this.currentClientOverallData.name,
-				// 	vat: false,
-				// 	vatId: '',
-				// 	dueDate: '',
-				// 	address: '',
-				// 	invoiceSending: false,
-				// 	paymentType: "PPP"
-				// }
+        clientForSave.paymentType = "PPP"
+				clientForSave.billingInfo = {
+					officialName: this.currentClientOverallData.name,
+          paymentTerms: '',
+          address: {
+            country: '',
+            street1: '',
+            street2: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            vat: '',
+          },
+          notes: '',
+          reports: [],
+          contacts: [
+            {
+              leadContact: true,
+              firstName: this.currentClientOverallData.name,
+              surname: "",
+              email: this.currentClientOverallData.email,
+              gender: "",
+              position: "Manager",
+              phone: "",
+              country: "",
+              notes: ""
+            }
+          ],
+
+				}
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
