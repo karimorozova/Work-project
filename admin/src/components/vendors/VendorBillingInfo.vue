@@ -12,6 +12,11 @@
         )
 
     .payment-methods__modal(v-if="isModal")
+      template(v-if="currentPaymentType === 'PayPal'")
+        input.hugeInput(v-model="paypalType.name" placeholder="Payment Type Name")
+      template(v-if="currentPaymentType === 'Bank Details'")
+        input.hugeInput(v-model="bankType.name" placeholder="Payment Type Name")
+
       .modalRow
         .modalRow__key Payment type:
         .modalRow__value
@@ -25,19 +30,11 @@
 
       template(v-if="currentPaymentType === 'PayPal'")
         .modalRow
-          .modalRow__key Payment Type Name:
-          .modalRow__value
-            input(v-model="paypalType.name" placeholder="Name")
-        .modalRow
           .modalRow__key Email:
           .modalRow__value
             input(v-model="paypalType.email" placeholder="Email")
 
       template(v-if="currentPaymentType === 'Bank Details'")
-        .modalRow
-          .modalRow__key Payment Type Name:
-          .modalRow__value
-            input(v-model="bankType.name" placeholder="Name")
         .modalRow
           .modalRow__key Bank Account Name:
           .modalRow__value
@@ -91,7 +88,7 @@
 
     .payment-methods
       .payment-methods__header
-        .payment-methods__header--title Payment methods:
+        .payment-methods__header--title Payment methods
         .payment-methods__header--add
           Add(@add="isModal = true")
 
@@ -265,6 +262,13 @@
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
 
+  .hugeInput {
+    height: 39px;
+    width: 360px;
+    margin-bottom: 15px;
+    font-size: 16px;
+  }
+
   .wrapper {
     position: relative;
   }
@@ -371,6 +375,11 @@
     &__header {
       display: flex;
       justify-content: space-between;
+
+      &--title {
+        font-size: 16px;
+        font-family: Myriad600;
+      }
 
       &--add {
         margin-top: -17px;

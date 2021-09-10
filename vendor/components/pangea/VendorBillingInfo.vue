@@ -12,6 +12,11 @@
         )
 
     .payment-methods__modal(v-if="isModal")
+      template(v-if="currentPaymentType === 'PayPal'")
+        input.hugeInput(v-model="paypalType.name" placeholder="Payment Type Name")
+      template(v-if="currentPaymentType === 'Bank Details'")
+        input.hugeInput(v-model="bankType.name" placeholder="Payment Type Name")
+
       .modalRow
         .modalRow__key Payment type:
         .modalRow__value
@@ -25,19 +30,11 @@
 
       template(v-if="currentPaymentType === 'PayPal'")
         .modalRow
-          .modalRow__key Payment Type Name:
-          .modalRow__value
-            input(v-model="paypalType.name" placeholder="Name")
-        .modalRow
           .modalRow__key Email:
           .modalRow__value
             input(v-model="paypalType.email" placeholder="Email")
 
       template(v-if="currentPaymentType === 'Bank Details'")
-        .modalRow
-          .modalRow__key Payment Type Name:
-          .modalRow__value
-            input(v-model="bankType.name" placeholder="Name")
         .modalRow
           .modalRow__key Bank Account Name:
           .modalRow__value
@@ -58,7 +55,7 @@
     .billing-info(v-if="currentVendor.billingInfo")
       .billing-info__col
         .colRow
-          .colRow__key Same as in General Information:
+          .colRow__key Same as in Profile:
           .colRow__value
             CheckBox(:isChecked="isSameAsInGeneralInformation" @check="toggleCheck(true)" @unCheck="toggleCheck(false)")
 
@@ -83,13 +80,9 @@
                 @chooseOption="({option}) => changeBillingProp('paymentTerm', paymentTerms.find(i => i.name === option))"
               )
 
-        //.colRow(v-if="someChanged")
-        //  Button.colRow__key(value="Save" @clicked="checkErrors")
-        //  Button.colRow__value(value="Cancel" @clicked="cancelChanges")
-
         .billing-info__buttons(v-if="someChanged")
           Button(value="Save" @clicked="checkErrors")
-          Button(value="Cancel" @clicked="cancelChanges")
+          Button(value="Cancel" :outline="true" @clicked="cancelChanges")
 
       .billing-info__col
         .addressRow
@@ -99,7 +92,7 @@
 
     .payment-methods
       .payment-methods__header
-        .payment-methods__header--title Payment methods:
+        .payment-methods__header--title Payment methods
         .payment-methods__header--add
           Add(@add="isModal = true")
 
@@ -307,6 +300,14 @@
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
+
+  .hugeInput {
+    height: 39px;
+    width: 360px;
+    margin-bottom: 15px;
+    font-size: 16px;
+  }
+
   .wrapper {
     position: relative;
   }
@@ -336,7 +337,7 @@
       color: #666;
       font-family: 'Myriad300';
       letter-spacing: 0.3px;
-      font-size: 13px;
+      font-size: 14px;
       margin-top: 10px;
     }
 
@@ -414,19 +415,20 @@
       display: flex;
       justify-content: space-between;
 
+      &--title {
+        font-size: 16px;
+        font-family: Myriad600;
+      }
+
       &--add {
         margin-top: -17px;
       }
     }
   }
+
   .billing-info {
     display: flex;
     justify-content: space-between;
-
-    &__buttons {
-      display: flex;
-      gap: 20px;
-    }
   }
 
   .colRow {
