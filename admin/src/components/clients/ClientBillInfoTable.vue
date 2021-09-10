@@ -45,8 +45,8 @@
             .image(v-for="(item, index) in row.contacts")
               img.image__first(style="z-index: 100" v-if="item.photo && index === 0" :src="item.photo")
               img.image__first(style="z-index: 100" v-if="!item.photo && index === 0" :src="require('../../assets/images/avatars/avatar-grey.png')")
-              img.image__next(:style="{'z-index': `${100 - index}`, 'margin-left': `${-10 * index + 'px'}` }" v-if="item.photo && index" :src="item.photo")
-              img.image__next(:style="{'z-index': `${100 - index}`, 'margin-left': `${-10 * index + 'px'}`  }" v-if="!item.photo && index" :src="require('../../assets/images/avatars/avatar-grey.png')")
+              img.image__next(:style="{'z-index': `${20 - index}`, 'margin-left': `${-10 * index + 'px'}` }" v-if="item.photo && index" :src="item.photo")
+              img.image__next(:style="{'z-index': `${20 - index}`, 'margin-left': `${-10 * index + 'px'}`  }" v-if="!item.photo && index" :src="require('../../assets/images/avatars/avatar-grey.png')")
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
@@ -184,9 +184,9 @@
   .billing-table {
     &__modal-wrapper {
       position: absolute;
-      z-index: 2;
       top: 50%;
       left: 50%;
+      z-index: 120;
       transform: translate(-50%, -50%);
     }
   }
