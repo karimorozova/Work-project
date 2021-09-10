@@ -17,65 +17,75 @@
         :withoutImageMode="true"
       )
     .billing-info__body
-      .billing-info__field
-        label Company Name:
-        input(class="long" v-model="billingInfoCopy.officialName")
-      .billing-info__field-row
-        .billing-info__field
-          label Payment Type:
-          .field__select-single
-            SelectSingle(
-              placeholder="Select"
-              :options="['PPP', 'Pre-Payment', 'Monthly', 'Custom']"
-              :selectedOption="billingInfoCopy.paymentType"
-              @chooseOption="setPaymentType"
-            )
-        .billing-info__field
-          label Payment Terms:
-          .field__select-single
-            SelectSingle(
-              placeholder="Select"
-              :options="paymentTerms.map(({name}) => name)"
-              :selectedOption="(billingInfoCopy.paymentTerms && billingInfoCopy.paymentTerms.name) || ''"
-              @chooseOption="setPaymentTerms"
-            )
-      .billing-info__title Billing Address
-      .billing-info__field-row
-        .billing-info__field
-          label Country/Region:
-          .field__select-single
-            SelectSingle(
-              placeholder="Select"
-              :options="['PPP', 'MONTHLY']"
-              :selectedOption="billingInfoCopy.address.country"
-              @chooseOption="setCountry"
-            )
-        .billing-info__field
-          .billing-info__label-group
-            label VAT:
-            CheckBox(customClass="size-small" :isChecked="isVat" @check="toggleVat" @uncheck="toggleVat")
-          input(v-model="billingInfoCopy.address.vat" :disabled="isVat")
-      .billing-info__field
-        label Address:
-        .billing-info__row
-          input(v-model="billingInfoCopy.address.street1")
-          input(v-model="billingInfoCopy.address.street2")
-      .billing-info__field-row
-        .billing-info__field
-          label City:
-          input(class="middle" v-model="billingInfoCopy.address.city")
-        .billing-info__field
-          label State:
-          .field__select-single.small
-            SelectSingle(
-              placeholder="Select"
-              :options="['test1', 'test2']"
-              :selectedOption="billingInfoCopy.address.state"
-              @chooseOption="setState"
-            )
-        .billing-info__field
-          label Zip-code:
-          input(class="small" v-model="billingInfoCopy.address.zipCode")
+      .billing-info__splited-part
+        .billing-info__part-one
+          .billing-info__title Billing Details
+
+          .billing-info__field
+            label Company Name:
+            input(v-model="billingInfoCopy.officialName" placeholder="Company Name")
+
+          .billing-info__field
+            label Payment Terms:
+            .field__select-single
+              SelectSingle(
+                placeholder="Select"
+                :options="paymentTerms.map(({name}) => name)"
+                :selectedOption="(billingInfoCopy.paymentTerms && billingInfoCopy.paymentTerms.name) || ''"
+                @chooseOption="setPaymentTerms"
+              )
+
+          .billing-info__field
+            label Report:
+            .field__select-single
+              SelectSingle(
+                placeholder="Select"
+                :options="['test1', 'test2']"
+                :selectedOption=" billingInfoCopy.reports || ''"
+                @chooseOption="setReports"
+              )
+
+          .billing-info__field
+            label Notes:
+            textarea(v-model="billingInfoCopy.notes")
+
+        .billing-info__part-two
+          .billing-info__title Billing Address
+
+          .billing-info__field
+            label Country/Region:
+            .field__select-single
+              SelectSingle(
+                placeholder="Select"
+                :options="countries"
+                :selectedOption="billingInfoCopy.address.country"
+                @chooseOption="setCountry"
+              )
+
+
+          .billing-info__field
+            label City:
+            input( v-model="billingInfoCopy.address.city")
+
+          .billing-info__field
+            label State:
+            .field__select-single
+              input(v-model="billingInfoCopy.address.state")
+
+          .billing-info__field
+            label Zip-code:
+            input(v-model="billingInfoCopy.address.zipCode")
+
+        .billing-info__part-three
+          .billing-info__field
+            .billing-info__label-group
+              label VAT:
+            input(v-model="billingInfoCopy.address.vat")
+
+          .billing-info__field
+            label Address:
+            textarea(v-model="billingInfoCopy.address.street1")
+            textarea(v-model="billingInfoCopy.address.street2")
 
       .billing-info__title
         span Billing Contact
@@ -127,7 +137,7 @@
 		},
 		data() {
 			return {
-				isVat: true,
+        countries: [],
 				paymentTerms: [],
 				billingInfoCopy: JSON.parse(JSON.stringify(this.billingInfo)),
 				isContactModal: false,
@@ -182,12 +192,9 @@
 				}
 				this.isContactModal = true
 			},
-			toggleVat() {
-				this.isVat = !this.isVat
-				if (this.isVat) {
-					this.billingInfoCopy.address.vat = ''
-				}
-			},
+      setReports() {
+
+      },
 			setPaymentType({ option }) {
 				this.$set(this.billingInfoCopy, 'paymentType', option)
 			},
@@ -219,10 +226,19 @@
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
 				}
-			}
+			},
+      async getCountries() {
+        try {
+          const result = await this.$http.get('/api/countries')
+          this.countries = result.data
+        } catch (err) {
+          console.log(err)
+        }
+      },
 		},
 		async created() {
 			await this.getAndSetPaymentTerms()
+			await this.getCountries()
 		},
 		components: {
 			ApproveModal,
@@ -254,11 +270,15 @@
       top: 50%;
       transform: translate(-50%, -50%);
     }
-
-    &__header {
+    //
+    //&__header {
+    //  display: flex;
+    //  justify-content: space-between;
+    //  align-items: center;
+    //}
+    &__splited-part {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      gap: 20px;
     }
 
     &__buttons {
@@ -273,18 +293,11 @@
       justify-content: space-between;
     }
 
-    &__title {
-      font-family: 'Myriad600';
-      font-size: 18px;
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      align-items: center;
-    }
 
 
     label {
       display: block;
+      padding-bottom: 3px;
     }
 
     .field__select-single {
@@ -293,12 +306,20 @@
       width: 220px;
     }
 
-    &__field-row {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0;
-
+    &__field {
+      margin-bottom: 20px;
     }
+    &__part-one {
+      border-right: 1px solid #dedede;
+      padding-right: 20px;
+    }
+    &__part-three {
+      margin-top: 15px;
+    }
+    &__splited-part {
+      border-bottom: 1px solid #e1e1e1;
+    }
+
 
     &__row {
       display: flex;
@@ -322,17 +343,6 @@
       }
     }
 
-    .long {
-      width: 460px;
-    }
-
-    .small {
-      width: 140px;
-    }
-
-    .middle {
-      width: 150px;
-    }
 
     .input-group {
       display: flex;
@@ -342,9 +352,22 @@
     }
 
   }
+  textarea {
+    color: $text;
+    height: 50px;
+    width: 205px;
+    max-width: 205px;
+    min-width: 205px;
+    border: 1px solid $border;
+    border-radius: 4px;
+    outline: none;
+    transition: .1s ease-out;
+    padding: 7px;
+    background-color: white;
 
-  .mt10 {
-    margin-top: 10px;
+    &:focus {
+      border: 1px solid $border-focus;
+    }
   }
 
   .item {
