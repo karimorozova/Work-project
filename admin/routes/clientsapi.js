@@ -242,6 +242,19 @@ router.post('/update-client-status', async (req, res) => {
 	}
 })
 
+router.post('/update-client-leadContact', async (req, res) => {
+	const { id, contactId } = req.body
+	try {
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$[].leadContact': false })
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$.leadContact': true  })
+		const client = await Clients.findOne({ "_id": id }, { contacts: 1 })
+		res.send(client.contacts)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating Client status")
+	}
+})
+
 router.get('/rates/:id', async (req, res) => {
 	const { id: clientId } = req.params
 	try {

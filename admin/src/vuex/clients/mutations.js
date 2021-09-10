@@ -58,6 +58,10 @@ export const mutations = {
         previousState[index] = contact
         state.currentClientOverallData.contacts = previousState
     },
+    updateContacts(state, payload) {
+        state.currentClient.contacts = payload
+        state.currentClientOverallData.contacts = payload
+    },
     setLeadContact(state, payload) {
         const previousState = [ ...state.currentClientOverallData.contacts ]
         for(let index in previousState) {

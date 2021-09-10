@@ -44,17 +44,17 @@
             :isSaveClicked="isSaveClicked"
           )
 
-      .new-client-info__block
-        .block__header(@click="toggleBlock('isDocuments')")
-          .title Documents
-          .icon(v-if="!isDocuments")
-            i.fas.fa-chevron-down
-          .icon(v-else)
-            i.fas.fa-chevron-right
-        .block__data(v-if="isDocuments")
-          NewClientDocuments(
-            @uploadFiles="uploadFiles"
-          )
+      //.new-client-info__block
+      //  .block__header(@click="toggleBlock('isDocuments')")
+      //    .title Documents
+      //    .icon(v-if="!isDocuments")
+      //      i.fas.fa-chevron-down
+      //    .icon(v-else)
+      //      i.fas.fa-chevron-right
+      //  .block__data(v-if="isDocuments")
+      //    NewClientDocuments(
+      //      @uploadFiles="uploadFiles"
+      //    )
 
       .new-client-info__block
         .block__header(@click="toggleBlock('isSalesInformation')")
@@ -93,7 +93,7 @@
 
 <script>
 	import NewRates from './NewRates'
-	import NewClientDocuments from './NewClientDocuments'
+	// import NewClientDocuments from './NewClientDocuments'
 	import NewGeneral from './NewGeneral'
 	import Button from "../../Button"
 	import ValidationErrors from "../../ValidationErrors"
@@ -131,7 +131,7 @@
 
 				isContactDetails: true,
 				isRatesParameters: true,
-				isDocuments: true,
+				// isDocuments: true,
 				isSalesInformation: true,
 				timezones: [],
 				errors: [],
@@ -143,7 +143,7 @@
 				contactInd: 0,
 				contractFile: [],
 				ndaFile: [],
-				documentsFiles: [],
+				// documentsFiles: [],
 				clientType: 'Company',
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
 			}
@@ -249,12 +249,12 @@
 						this.errors.push("The website field must contain a link")
 					}
 				}
-				const filesSize = this.documentsFiles.filter(item => item.file)
-				if (filesSize.length) {
-					if (filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
-						this.errors.push("The file should not exceed 40 MB!")
-					}
-				}
+				// const filesSize = this.documentsFiles.filter(item => item.file)
+				// if (filesSize.length) {
+				// 	if (filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
+				// 		this.errors.push("The file should not exceed 40 MB!")
+				// 	}
+				// }
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					this.isSaveClicked = true
@@ -268,9 +268,9 @@
 				const arrayOfMails = clientMails.body.map(key => key.email)
 				return arrayOfMails.includes(clientEmail)
 			},
-			uploadFiles(data) {
-				this.documentsFiles = data
-			},
+			// uploadFiles(data) {
+			// 	this.documentsFiles = data
+			// },
 			async saveClientIndividual() {
 				let sendData = new FormData()
 
@@ -328,9 +328,9 @@
 				for (let i = 0; i < this.contactsPhotos.length; i++) {
 					sendData.append('photos', this.contactsPhotos[i])
 				}
-				for (const document of this.documentsFiles) {
-					sendData.append(document.category, document.file)
-				}
+				// for (const document of this.documentsFiles) {
+				// 	sendData.append(document.category, document.file)
+				// }
 				try {
 					const result = await this.$http.post('/clientsapi/update-client', sendData)
 					const newClient = { ...result.data.client }
@@ -378,7 +378,7 @@
 
 				sendData.append('client', JSON.stringify(this.client))
 				for (let i = 0; i < this.contactsPhotos.length; i++) sendData.append('photos', this.contactsPhotos[i])
-				for (const document of this.documentsFiles) sendData.append(document.category, document.file)
+				// for (const document of this.documentsFiles) sendData.append(document.category, document.file)
 
 				try {
 					const result = await this.$http.post('/clientsapi/update-client', sendData)
@@ -411,7 +411,7 @@
 			Button,
 			ValidationErrors,
 			NewClientSalesInfo,
-			NewClientDocuments,
+			// NewClientDocuments,
 			NewSideGeneral,
 			NewRates
 		}

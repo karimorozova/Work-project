@@ -23,7 +23,7 @@
         .table__data(slot="position" slot-scope="{ row, index }") {{ row.position }}
 
         .table__radio(slot="lead" slot-scope="{ row, index }")
-          CustomRadio(:isChecked="row.leadContact" @toggleRadio="setLeadContact(index)")
+          CustomRadio(:isChecked="row.leadContact" @toggleRadio="setLeadContact(row._id)")
 
         .table__icons(slot="icons" slot-scope="{ row, index }")
           .table__icon(@click="showContactDetails(index)")
@@ -77,8 +77,8 @@
 		},
 		methods: {
 			getFullName: (contact) => (`${ contact.firstName } ${ contact.surname || '' }`),
-			setLeadContact(index) {
-				this.$emit("setLeadContact", { index })
+			setLeadContact(id) {
+				this.$emit("setLeadContact", { id })
 			},
 			addContact() {
 				this.controlContact = {
