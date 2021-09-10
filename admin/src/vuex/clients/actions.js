@@ -135,6 +135,19 @@ export const updateClientStatus = async ({ commit, dispatch }, payload) => {
 	}
 }
 
+export const updateClientLeadContact = async ({ commit, dispatch }, payload) => {
+	commit("startRequest")
+	try {
+		const result = await Vue.http.post("/clientsapi/update-client-leadContact", payload)
+		const contacts = result.body
+		commit('updateContacts', contacts)
+	} catch (err) {
+		dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" })
+	} finally {
+		commit("endRequest")
+	}
+}
+
 export const updateClientRatesProp = async ({commit, dispatch, state}, payload) => {
    const rates = await Vue.http.get("/clientsapi/rates/" + state.currentClient._id)
   commit('updateClientRatesProp', {data: rates.body[payload.key], key: payload.key})

@@ -685,8 +685,8 @@
 					this.alertToggle({ message: "Internal server error on deleting the Client", isShow: true, type: "error" })
 				}
 			},
-			setLeadContact({ index }) {
-				this.updateLeadContact(index)
+			setLeadContact({ id }) {
+				this.updateClientLeadContact( {contactId: id, id: this.$route.params.id})
 			},
 			async getClientDocumentInfo() {
 				return await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
@@ -735,7 +735,8 @@
 				storeClientPropertyOverallData: "storeClientPropertyOverallData",
 				storeClientPropertyOverallDataBilling: "storeClientPropertyOverallDataBilling",
 				updateClientRatesProp: 'updateClientRatesProp',
-				storeClientContactOverAll: "storeClientContactOverAll"
+				storeClientContactOverAll: "storeClientContactOverAll",
+        updateClientLeadContact: "updateClientLeadContact"
 			}),
 			async getTimezones() {
 				try {
