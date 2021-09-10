@@ -13,7 +13,7 @@
       .clientsNotes__commentsBody(v-if="currentClient.notes.length")
         .clientsNotes__comments(v-for="({user, message, updatedAT}, index) in currentClient.notes" )
           .comment__image
-            img(:src="'https://pbs.twimg.com/profile_images/1323162426897010689/o8A3lLhv_400x400.jpg'")
+            img(:src="require('../../assets/images/signin-background.jpg')")
           .comment__body
             .comment__triangle
             .comment__titleRow
@@ -49,9 +49,9 @@
 		data() {
 			return {
 				icons: {
-					edit: { icon: require('../../assets/images/Other/edit-icon-qa.png') },
-					cancel: { icon: require('../../assets/images/Other/cancel-icon.png') },
-					delete: { icon: require('../../assets/images/Other/delete-icon-qa-form.png') }
+					edit: { icon: require('../../assets/images/latest-version/i-edit.png') },
+					cancel: { icon: require('../../assets/images/latest-version/i-cancel.png') },
+					delete: { icon: require('../../assets/images/latest-version/i-delete.png') }
 				},
 				isAlert: false,
 				isNotesShow: false,
@@ -168,10 +168,15 @@
     }
 
     &__commentsBody {
-      background: $table-list-hover;
+      background: white;
       padding: 20px 20px 0;
       max-height: 500px;
       overflow-y: auto;
+      border-top: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+      border-right: 1px solid #ccc;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
     }
 
     &__input {
@@ -212,17 +217,17 @@
 
   .comment {
     &__text {
-      padding: 5px 10px 10px;
+      padding: 10px;
     }
 
     &__icons {
       display: flex;
-      gap: 7px;
+      gap: 10px;
     }
 
     &__titleRow {
       display: flex;
-      padding: 10px 10px 5px;
+      padding: 10px;
       justify-content: space-between;
     }
 
@@ -234,17 +239,17 @@
     &__triangle {
       width: 0;
       height: 0;
-      border-top: 12px solid transparent;
-      border-bottom: 12px solid transparent;
-      border-right: 12px solid white;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-right: 10px solid $table-list;
       position: absolute;
-      margin-left: -12px;
-      margin-top: 15px;
+      margin-left: -10px;
+      margin-top: 7px;
     }
 
     &__body {
       min-width: 360px;
-      background: white;
+      background: $table-list;
       margin-left: 20px;
       border-radius: 4px;
       position: relative;
@@ -252,17 +257,17 @@
 
     &__image {
       img {
-        height: 50px;
-        width: 50px;
+        height: 32px;
+        width: 32px;
         object-fit: cover;
-        border-radius: 50%;
+        border-radius: 32px;
       }
     }
   }
 
   .name {
     font-size: 16px;
-    font-weight: bold;
+    font-family: Myriad600;
     margin-right: 10px;
   }
 

@@ -1,7 +1,7 @@
 <template lang="pug">
   .documents
     .documents__table
-      SettingsTable(
+      GeneralTable(
         :fields="fields"
         :tableData="documentsData"
         :errors="errors"
@@ -17,10 +17,12 @@
           .documents__head-title {{ field.label }}
 
         template(slot="fileName" slot-scope="{ row, index }")
-          .documents__editing-data(v-if="currentActive === index && currentFile")
+          .documents__data(v-if="currentActive === index && currentFile")
             span.documents__input {{ currentFile.name }}
           .documents__data(v-else)
-            a( :href="domain + row.path" ) {{ row.fileName }}
+            span(v-if="row.fileName")
+              a(:href="domain + row.path" ) {{ row.fileName }}
+            span(style="opacity: 0.6" v-else) No file...
 
         template(slot="category" slot-scope="{ row, index }")
           .documents__data {{row.category}}
@@ -42,6 +44,7 @@
 	import Add from "../Add"
 	import crudIcons from "@/mixins/crudIcons"
 	import { mapGetters, mapActions } from "vuex"
+	import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -57,22 +60,19 @@
 						label: "File Name",
 						headerKey: "headerFileName",
 						key: "fileName",
-						width: "64%",
-						padding: "0"
+						style: { width: "60%" }
 					},
 					{
 						label: "Category",
 						headerKey: "headerCategory",
 						key: "category",
-						width: "18%",
-						padding: "0"
+						style: { width: "20%" }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "18%",
-						padding: "0"
+						style: { width: "20%" }
 					}
 				],
 				currentCategory: "",
@@ -206,6 +206,7 @@
 			})
 		},
 		components: {
+			GeneralTable,
 			SettingsTable,
 			SelectSingle,
 			Add
@@ -220,13 +221,17 @@
   @import "../../assets/styles/settingsTable";
 
   a {
-    color: #d15f45;
+    color: $text;
   }
 
   .documents {
+    &__head-title {
+      padding: 0 7px;
+    }
+
     &__upload {
       position: relative;
-      background: url("../../assets/images/Other/upload-icon.png");
+      background: url("../../assets/images/latest-version/upload-file.png");
       background-position: center;
       background-repeat: no-repeat;
       height: 30px;
@@ -267,8 +272,10 @@
 
     &__icons {
       @extend %table-icons;
-      height: 30px;
-      justify-content: flex-end;
+      display: flex;
+      width: 100%;
+      gap: 1px;
+      justify-content: center;
     }
 
     &__icon {
