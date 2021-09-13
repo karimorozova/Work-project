@@ -371,6 +371,9 @@
 				this.selectedTab = this.tabs.find((item, index) => index === i)
 			},
 			toggleRadio({ value }) {
+			  if (value === 'Company') {
+          this.currentClient.billingInfo = []
+        }
 				this.storeClientPropertyOverallData({ prop: "clientType", value })
 			},
 			backToMainPage() {
@@ -564,7 +567,6 @@
 				let sendData = new FormData()
 				let dataForClient = clientForSave
 
-        clientForSave.billingInfo = []
 				this.getClientDocumentInfo().then((result) => (dataForClient.documents = result.data.documents))
 				sendData.append("client", JSON.stringify(dataForClient))
 
