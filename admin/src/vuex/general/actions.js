@@ -50,7 +50,7 @@ export const setClientsForOption = async ({ commit, dispatch }) => {
   commit('startRequest')
   try {
     const result = await Vue.http.get('/pm-manage/clients-for-options')
-    const customers = result.data.sort((a, b) => `${a.name}`.localeCompare(`${b.name}`))
+    const customers = result.data.sort((a, b) => a.name.localeCompare(b.name))
     commit('storeClientsForOptions', customers);
   } catch(err) {
     dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
