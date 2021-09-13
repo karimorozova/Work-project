@@ -395,8 +395,9 @@ async function generatePO(requestInfo, fullVendor, project) {
 	let table = ''
 	if (isTranslationJob) {
 		const { tasks } = project
-		const { metrics } = tasks.find(item => item.taskId === taskId)
-		delete metrics.totalWords
+		const { metrics: original } = tasks.find(item => item.taskId === taskId)
+		const metricsData = { ...original }
+		delete metricsData.totalWords
 		const tableStart = `<div class="table" style="padding: 0px 25px;">
 				<table style="font-size: 14px;color: #333;width: 100%;text-align: left;border-collapse: collapse;border-bottom: 1px solid #999;border-left: 1px solid #999;margin-top: -30px;">
         <tr>
@@ -405,7 +406,7 @@ async function generatePO(requestInfo, fullVendor, project) {
             <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">Source Word</th>
             <th style="width: 20%; padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">Rate</th>
         </tr>`
-		const tableBody = Object.values(metrics).reduce((acc, { vendor, text, value }) => {
+		const tableBody = Object.values(metricsData).reduce((acc, { vendor, text, value }) => {
 			acc = acc + `<tr>
 	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;font-weight: 600;">${ text }</td>
 	    <td style="padding: 8px 7px;border-right: 1px solid #999;border-top: 1px solid #999;">${ vendor }</td>
@@ -434,7 +435,7 @@ async function generatePO(requestInfo, fullVendor, project) {
 			    <div class="body" style="padding: 25px;margin-top: 80px;">
 			        <div class="body__to" style="font-size: 16px;margin-bottom: 15px;">To: </div>
 			        <div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ firstName } ${ surname || '' }</div>
-			        <div class="body__address" style="margin-bottom: 50px;">ADDRESS</div>
+			        <div class="body__address" style="margin-bottom: 50px;">${ fullVendor.billingInfo.address || '' }</div>
 			        <div class="body__line" style="background-color: #b5dbdb;height: 1px;"></div>
 			    </div>
 			    <div class="details" style="padding: 25px;">

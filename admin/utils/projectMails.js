@@ -3,7 +3,7 @@ const { managerNotifyMail, sendEmail, clientQuoteEmail, clientQuoteToEmails, sen
 const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
 const { emailMessageForContact } = require("../emailMessages/clientCommunication");
 const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication");
-const { generatePOFile } = require('../projects')
+const { generatePOFile } = require('../projects/files')
 const fs = require('fs')
 
 async function notifyManagerProjectRejected(project) {

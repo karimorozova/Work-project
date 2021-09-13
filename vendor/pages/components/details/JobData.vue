@@ -1,6 +1,6 @@
 <template lang="pug">
   .job-data
-    .data-block
+    .data-block(v-if="currentUnit")
       .data-block__item
         LabelValue(title="Start Date" :isColon="true" :value="outputData.start")
       .data-block__item
@@ -66,17 +66,19 @@
 				}
 			},
 			customUnit() {
-				const { type } = this.currentUnit
-				return type
+        if (this.units && this.currentUnit) {
+          const { type } = this.currentUnit
+          return type
+        }
 			},
 			isPackageUnit() {
-				if (this.units) {
+				if (this.units && this.currentUnit) {
 					const { type } = this.currentUnit
 					return type === "Packages"
 				}
 			},
 			isWordcount() {
-				if (this.units) {
+				if (this.units && this.currentUnit) {
 					const { type } = this.currentUnit
 					return type === "CAT Wordcount"
 				}

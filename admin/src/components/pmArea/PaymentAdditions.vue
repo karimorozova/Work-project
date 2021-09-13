@@ -3,7 +3,8 @@
     .payment-additions__block
       .payment-additions__title
         .payment-additions__title-name Receivables Additions:
-        .payment-additions__title-value {{allDiscountsValue}} €
+        .payment-additions__title-value {{allDiscountsValue}}
+          span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
         .payment-additions__title-add-new
           .add-button(v-if="projectStatus === 'Draft'" @click="addData")
             .add-button__icon
@@ -19,7 +20,8 @@
             input(type="text" v-model="name" )
 
           .payment-additions__list-value
-            span(v-if="item.value") {{item.value}} €
+            span(v-if="item.value") {{item.value}}
+              span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
             input(v-else type="number" :value="value" @change="changeValue" )
 
           .payment-additions__list-icons
@@ -34,17 +36,21 @@
 
 <script>
 	import crudIcons from "@/mixins/crudIcons"
-	import SelectSingle from "../../SelectSingle"
-	import Add from "../../Add"
+	import SelectSingle from "../SelectSingle"
+	import returnIconCurrencyByStringCode from "../../mixins/currencyIconDetected"
+	import Add from "../Add"
 	import { mapActions } from 'vuex'
 
 	export default {
-		mixins: [ crudIcons ],
+		mixins: [ crudIcons, returnIconCurrencyByStringCode ],
 		props: {
 			enum: {
 				type: String
 			},
 			projectStatus: {
+				type: String
+			},
+			projectCurrency: {
 				type: String
 			}
 		},
@@ -55,8 +61,8 @@
 				currentActive: -1,
 				currentPaymentAdditions: {},
 				errors: [],
-        name: '',
-        value: 0,
+				name: '',
+				value: 0
 			}
 		},
 		methods: {
@@ -70,41 +76,41 @@
 				if (this.currentActive !== -1) return this.isEditing()
 				this.enumPaymentAdditions.push({
 					name: "",
-					value: "",
+					value: ""
 				})
 				this.setEditionData(this.enumPaymentAdditions.length - 1)
 			},
 			cancelAdding() {
-        this.enumPaymentAdditions.pop()
-        this.cancel()
-      },
+				this.enumPaymentAdditions.pop()
+				this.cancel()
+			},
 			cancel() {
-			  this.name = ''
-			  this.value = ''
+				this.name = ''
+				this.value = ''
 				this.currentActive = -1
 				this.currentPaymentAdditions = {}
 			},
 			async checkErrors() {
 				if (this.currentActive === -1) return
 				this.errors = []
-				if(!this.name) this.errors.push("Name should not be empty!");
-				if(!this.value && isNaN(parseFloat(this.value)))  this.errors.push("Value should be numeric!");
+				if (!this.name) this.errors.push("Name should not be empty!")
+				if (!this.value && isNaN(parseFloat(this.value))) this.errors.push("Value should be numeric!")
 				if (this.errors.length) {
-          this.alertToggle({ message: this.errors[0], isShow: true, type: "error" })
+					this.alertToggle({ message: this.errors[0], isShow: true, type: "error" })
 					return
 				}
 				await this.saveChanges()
 			},
 			updateEnumData(result) {
-        this.setCurrentProject(result.data)
+				this.setCurrentProject(result.data)
 			},
 			async saveChanges() {
 				this.enumPaymentAdditions = this.enumPaymentAdditions.filter(({ name }) => name)
 				try {
-          const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, addItem: {name: this.name, value: this.value} })
-          await this.updateEnumData(result)
-          this.enumPaymentAdditions = result.data.paymentAdditions
-          this.alertToggle({ message: "Payment Additions Saved!", isShow: true, type: "success" })
+					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, addItem: { name: this.name, value: this.value } })
+					await this.updateEnumData(result)
+					this.enumPaymentAdditions = result.data.paymentAdditions
+					this.alertToggle({ message: "Payment Additions Saved!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Payment Additions", isShow: true, type: "error" })
 				} finally {
@@ -113,9 +119,9 @@
 			},
 			async deleteDiscount(deleteItem) {
 				try {
-          const result = await this.$http.post(this.setCurrentRoutes.delete, { _id: this.$route.params.id, deleteItem})
+					const result = await this.$http.post(this.setCurrentRoutes.delete, { _id: this.$route.params.id, deleteItem })
 					await this.updateEnumData(result)
-          this.enumPaymentAdditions = result.data.paymentAdditions
+					this.enumPaymentAdditions = result.data.paymentAdditions
 					this.alertToggle({ message: "Payment Additions Deleted!", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Error on deleting", isShow: true, type: "error" })
@@ -131,13 +137,13 @@
 					this.alertToggle({ message: "Error on getting Payment Additions", isShow: true, type: "error" })
 				}
 			},
-      changeValue(event) {
-        const value = event.target.value
-        // if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
-        this.value = (parseFloat(value)).toFixed(2)
-        // }
-        this.$forceUpdate()
-      },
+			changeValue(event) {
+				const value = event.target.value
+				// if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
+				this.value = (parseFloat(value)).toFixed(2)
+				// }
+				this.$forceUpdate()
+			}
 		},
 		created() {
 			this.getEnumDiscounts()
@@ -145,22 +151,22 @@
 		computed: {
 			setCurrentRoutes() {
 				if (this.enum) switch (this.enum) {
-					// case 'client':
-					// 	return {
-					// 		get: '/clientsapi/get-client-payment-additions/?id=',
-					// 		update: '/clientsapi/update-client-payment-additions'
-					// 	}
+						// case 'client':
+						// 	return {
+						// 		get: '/clientsapi/get-client-payment-additions/?id=',
+						// 		update: '/clientsapi/update-client-payment-additions'
+						// 	}
 					case 'PngSysProject':
 						return {
 							get: '/pm-manage/get-project-payment-additions/?id=',
 							update: '/pm-manage/update-project-payment-additions',
 							delete: '/pm-manage/delete-project-payment-additions'
 						}
-					// case 'XTRFProject':
-					// 	return {
-					// 		get: '/memoqapi/get-project-payment-additions/?id=',
-					// 		update: '/memoqapi/update-project-payment-additions'
-					// 	}
+						// case 'XTRFProject':
+						// 	return {
+						// 		get: '/memoqapi/get-project-payment-additions/?id=',
+						// 		update: '/memoqapi/update-project-payment-additions'
+						// 	}
 				}
 
 			},
@@ -172,11 +178,11 @@
 						.map(item => item.name)
 			},
 			allDiscountsValue() {
-				return this.enumPaymentAdditions.filter(item => item.name).reduce((acc, curr) => {
+				return +this.enumPaymentAdditions.filter(item => item.name).reduce((acc, curr) => {
 					acc += +curr.value
 					return acc
 				}, 0).toFixed(2)
-			},
+			}
 		},
 		components: {
 			Add,
@@ -186,8 +192,8 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
+  @import "../../assets/scss/colors";
+  @import "../../assets/styles/settingsTable";
 
   .payment-additions {
     display: block;
@@ -206,17 +212,19 @@
       align-items: center;
 
       &-name {
-        width: 225px;
+        width: 210px;
         font-size: 14px;
         height: 40px;
         font-family: 'Myriad600';
       }
 
       &-value {
-        width: 75px;
+        width: 89px;
         font-size: 14px;
         font-family: 'Myriad600';
+        text-align: center;
       }
+
       &-add-new {
         width: 50px;
         font-size: 14px;
@@ -269,7 +277,6 @@
       }
 
 
-
       &-icons {
         width: 50px;
         border-left: 1px solid $light-border;
@@ -283,14 +290,14 @@
           justify-content: space-around;
 
           .trash {
-            font-size: 16px;
+            font-size: 15.5px;
           }
         }
-        
+
         & i {
           cursor: pointer;
         }
-        
+
       }
     }
   }

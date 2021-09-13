@@ -34,5 +34,12 @@
     height: 19px;
     width: 19px;
   }
+  .checkbox.size-small {
+    height: 15px;
+    width: 15px;
+    img {
+      width: 15px;
+    }
+  }
 
 </style>

@@ -54,7 +54,6 @@
                 :isIndividual="isIndividual"
                 :languages="languages"
                 :timezones="timezones"
-                :allClientAliases="aliases"
               )
 
           .client-info__block
@@ -171,13 +170,12 @@
               .icon(v-else)
                 i.fas.fa-chevron-right
             .block__data(v-if="isContactDetails")
-              ContactsInfo(
-                :client="currentClientOverallData"
-                @contactDetails="contactDetails"
-                @saveContactUpdates="saveContactUpdates"
+              ContactsTable(
+                :contacts="[...currentClientOverallData.contacts]"
                 @setLeadContact="setLeadContact"
-                @newContact="addNewContact"
                 @approveDelete="approveContactDelete"
+                @contactSave="contactSave"
+                @contactUpdate="contactUpdate"
               )
 
           .client-info__block
@@ -210,7 +208,7 @@
               .icon(v-else)
                 i.fas.fa-chevron-right
             .block__data(v-if="isBillingInformation")
-              ClientBillInfo(:client="currentClientOverallData" @changeProperty="changeBillingProp")
+              ClientBillInfoTable(:client="currentClient")
 
           .client-info__block
             .block__header(@click="toggleBlock('isLogs')" :class="{'block__header-grey': !isLogs}")
@@ -235,11 +233,6 @@
             @closeErrors="closeErrorsBlock"
           )
 
-        .client-subinfo(v-if="currentClient._id")
-          //.client-subinfo__general
-            SideGeneral(:isSaveClicked="isSaveClicked")
-
-
 </template>
 
 <script>
@@ -251,9 +244,8 @@
 	import SideGeneral from "./clientInfo/SideGeneral"
 	import Button from "../Button"
 	import ValidationErrors from "../ValidationErrors"
-	import ContactsInfo from "./ContactsInfo"
 	import ClientSalesInfo from "./ClientSalesInfo"
-	import ClientBillInfo from "./ClientBillInfo"
+	import ClientBillInfoTable from "./ClientBillInfoTable"
 	import IndustryTable from "./pricelists/IndustryTable"
 	import StepTable from "./pricelists/StepTable"
 	import LangTable from "./pricelists/LangTable"
@@ -261,7 +253,6 @@
 	import { mapGetters, mapActions } from "vuex"
 	import DiscountChart from "./DiscountChart"
 	import ClientsNotes from "./ClientsNotes"
-	import vatChecker from "../../mixins/Client/vatChecker"
 	import SaveCancelPopUp from "../SaveCancelPopUp"
 	import Sidebar from "./sidebar/SidebarMenu"
 	import AddTask from "./activity/AddTask"
@@ -271,23 +262,9 @@
 	import RadioButton from "../RadioButton"
 	import Tabs from "../Tabs"
 	import Discounts from "./pricelists/Discounts"
+	import ContactsTable from "./ContactsTable"
 
 	export default {
-		mixins: [ vatChecker ],
-		props: {
-			contactsPhotos: {
-				type: Array,
-				default: () => []
-			},
-			contractFiles: {
-				type: Array,
-				default: () => []
-			},
-			ndaFiles: {
-				type: Array,
-				default: () => []
-			}
-		},
 		data() {
 			return {
 				isComments: false,
@@ -298,6 +275,7 @@
 				isSalesInformation: false,
 				isBillingInformation: false,
 				isLogs: false,
+				contactsPhotos: [],
 
 				icons: {
 					edit: { icon: require("../../assets/images/latest-version/edit.png") },
@@ -310,10 +288,6 @@
 				aliases: [],
 				timezones: [],
 				currentDocuments: [],
-				clientDataInCreated: {
-					sourceLanguages: [],
-					targetLanguages: []
-				},
 				paramsIsEdit: false,
 
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/,
@@ -323,10 +297,8 @@
 				contactShow: false,
 				contactInd: 0,
 				newContact: false,
-				fromRoute: "/clients",
 				areErrorsExist: false,
 				errors: [],
-				billErrors: [],
 				isLeadEmpty: "",
 				isSaveClicked: false,
 				isRefreshResultTable: false,
@@ -338,13 +310,10 @@
 					'officialCompanyName',
 					'email',
 					'website',
-					'industries',
 					'nativeLanguage',
 					'timeZone',
-					'aliases',
-					'targetLanguages',
-					'sourceLanguages',
 					'status',
+					'paymentType',
 					'accountManager',
 					'salesManager',
 					'projectManager',
@@ -353,16 +322,6 @@
 					'leadSource',
 					'contacts'
 				],
-				billingKeys: [
-					'vat',
-					'vatId',
-					'address',
-					'invoiceSending',
-					'officialCompanyName',
-					'dueDate',
-					'paymentType'
-				],
-
 				createTaskModal: false,
 				createNoteModal: false,
 				allActivitiesModal: false,
@@ -412,6 +371,9 @@
 				this.selectedTab = this.tabs.find((item, index) => index === i)
 			},
 			toggleRadio({ value }) {
+			  if (value === 'Company') {
+          this.currentClient.billingInfo = []
+        }
 				this.storeClientPropertyOverallData({ prop: "clientType", value })
 			},
 			backToMainPage() {
@@ -506,8 +468,13 @@
 			cancel() {
 				this.storeCurrentClientOverallData(this.currentClient)
 			},
-			saveContactUpdates({ index, contact }) {
-				// this.updateClientContact({ index, contact })
+			contactUpdate({ index, contact, file }) {
+				this.contactsPhotos.push(file)
+				this.updateClientContact({ index, contact })
+			},
+			contactSave({ contact, file }) {
+				this.contactsPhotos.push(file)
+				this.storeClientContactOverAll(contact)
 			},
 			deleteClient() {
 				this.isApproveModal = true
@@ -519,9 +486,8 @@
 				this.clientShow = true
 				this.contactShow = false
 				try {
-					if (this.currentClient.contacts.length === 1) {
-						return this.alertToggle({ message: "Error! At least one contact should remain!", isShow: true, type: "error" })
-					}
+					if (this.currentClient.contacts.length === 1) return this.alertToggle({ message: "Error! At least one contact should remain!", isShow: true, type: "error" })
+
 					const contacts = this.updateLeadWhenDeleted(index)
 					const result = await this.$http.post("/clientsapi/deleteContact", { id: this.currentClient._id, contacts })
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
@@ -532,13 +498,9 @@
 				}
 			},
 			updateLeadWhenDeleted(index) {
-				let contacts = this.currentClient.contacts.filter(
-						(item, ind) => ind !== index
-				)
+				let contacts = this.currentClient.contacts.filter((item, ind) => ind !== index)
 				const leadContact = contacts.find((item) => item.leadContact)
-				if (!leadContact) {
-					contacts[0].leadContact = true
-				}
+				if (!leadContact) contacts[0].leadContact = true
 				return contacts
 			},
 			cancelApprove() {
@@ -550,60 +512,32 @@
 			changeBillingProp({ prop, value }) {
 				this.storeClientPropertyOverallDataBilling({ prop, value })
 			},
-			contactDetails({ contactIndex }) {
-				const name = this.$route.name.split('-').shift()
-				this.$router.push({ name: `${ name }-contact`, params: { index: contactIndex } })
-			},
-			addNewContact(data) {
-				const name = this.$route.name.split('-').shift()
-				this.$router.push({ name: `${ name }-new-contact` })
-			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
 			},
 			clearErrors() {
 				this.errors = []
-				this.billErrors = []
 				this.isLeadEmpty = false
 			},
 			async checkForErrors() {
 				this.clearErrors()
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-				if (!this.currentClientOverallData.name)
-					this.errors.push("Company name cannot be empty.")
-				if (!this.currentClientOverallData.industries.length)
-					this.errors.push("Please, choose at least one industry.")
-				if (!this.currentClientOverallData.sourceLanguages.length)
-					this.errors.push("Please, choose source language.")
-				if (!this.currentClientOverallData.targetLanguages.length)
-					this.errors.push("Please, choose target language.")
-				if (!this.currentClientOverallData.contacts.length)
-					this.errors.push("Please, add at least one contact.")
-				if (!this.contactLeadError())
-					this.errors.push("Please set Lead Contact of the Client.")
-				if (!this.currentClientOverallData.status)
-					this.errors.push("Please, choose status.")
+				if (!this.currentClientOverallData.name) this.errors.push("Company name cannot be empty.")
+				if (!this.currentClientOverallData.contacts.length) this.errors.push("Please, add at least one contact.")
+				if (!this.contactLeadError()) this.errors.push("Please set Lead Contact of the Client.")
+				if (!this.currentClientOverallData.status) this.errors.push("Please, choose status.")
 				if (!this.currentClientOverallData.leadSource) {
 					this.errors.push("Please, choose lead source.")
 					this.isLeadEmpty = true
 				}
-				this.vatChecker({ newClient: false })
-				if (!this.currentClientOverallData.email || !emailValidRegex.test(this.currentClientOverallData.email.toLowerCase())) {
-					this.errors.push("Please provide a valid email in General Informations.")
-				}
-				if (
-						!this.currentClientOverallData.accountManager ||
-						// !this.currentClientOverallData.salesManager ||
-						!this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
-
+				if (!this.currentClientOverallData.email || !emailValidRegex.test(this.currentClientOverallData.email.toLowerCase())) this.errors.push("Please provide a valid email in General Informations.")
+				if (!this.currentClientOverallData.accountManager || !this.currentClientOverallData.projectManager) this.errors.push("All managers should be assigned.")
 				// const isSameEmailsExists = await this.checkSameClientEmails(this.currentClientOverallData.email, this.currentClientOverallData._id)
 				// if (isSameEmailsExists) {
 				// 	this.errors.push("A client with such Email already exists, the client's Email should be unique!")
 				// }
 				if (this.currentClientOverallData.website) {
-					if (this.websiteRegEx.exec(this.currentClientOverallData.website) === null) {
-						this.errors.push("The website field must contain a link")
-					}
+					if (this.websiteRegEx.exec(this.currentClientOverallData.website) === null) this.errors.push("The website field must contain a link")
 				}
 				if (this.errors.length) {
 					this.areErrorsExist = true
@@ -613,6 +547,7 @@
 				this.currentClientOverallData.clientType !== 'Individual'
 						? await this.updateClient()
 						: await this.updateClientIndividual()
+
 				this.refreshResultTable()
 			},
 
@@ -627,18 +562,16 @@
 			async updateClient() {
 				let clientForSave = { ...this.currentClient }
 				let keys = [ ...this.generalKeys ]
-				let billingKeys = [ ...this.billingKeys ]
 				for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
-				for (let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
-				this.getClientDocumentInfo().then(
-						(result) => (dataForClient.documents = result.data.documents)
-				)
+
+				this.getClientDocumentInfo().then((result) => (dataForClient.documents = result.data.documents))
 				sendData.append("client", JSON.stringify(dataForClient))
+
 				for (let i = 0; i < this.contactsPhotos.length; i++) {
-					sendData.append("photos", this.contactsPhotos[i])
+					if (this.contactsPhotos[i]) sendData.append("photos", this.contactsPhotos[i])
 				}
 				try {
 					const result = await this.$http.post("/clientsapi/update-client", sendData)
@@ -661,9 +594,7 @@
 			async updateClientIndividual() {
 				let clientForSave = { ...this.currentClient }
 				let keys = [ ...this.generalKeys ]
-				// let billingKeys
 				for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
-				// for (let key of billingKeys) clientForSave.billingInfo[key] = this.currentClientOverallData.billingInfo[key]
 
 				clientForSave.nativeLanguage = null
 				clientForSave.timeZone = null
@@ -674,27 +605,46 @@
 					leadContact: true,
 					firstName: this.currentClientOverallData.name,
 					surname: "",
-					password: "12345",
+					password: "11111",
 					email: this.currentClientOverallData.email,
 					gender: "",
 					position: "Manager",
 					phone: "",
 					photo: "",
-					whatsApp: "",
-					skype: "",
-					linkedIn: "",
 					country: "",
 					notes: ""
 				} ]
 
+        // TODO: refacoring
+        clientForSave.paymentType = "PPP"
 				clientForSave.billingInfo = {
-					officialCompanyName: this.currentClientOverallData.name,
-					vat: false,
-					vatId: '',
-					dueDate: '',
-					address: '',
-					invoiceSending: false,
-					paymentType: "PPP"
+					officialName: this.currentClientOverallData.name,
+          paymentTerms: '',
+          address: {
+            country: '',
+            street1: '',
+            street2: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            vat: '',
+          },
+          notes: '',
+          reports: [],
+          contacts: [
+            {
+              leadContact: true,
+              firstName: this.currentClientOverallData.name,
+              surname: "",
+              email: this.currentClientOverallData.email,
+              gender: "",
+              position: "Manager",
+              phone: "",
+              country: "",
+              notes: ""
+            }
+          ],
+
 				}
 
 				let sendData = new FormData()
@@ -729,13 +679,9 @@
 				try {
 					const hasRelatedDocs = await this.$http.get(`/clientsapi/any-doc?id=${ id }`)
 					if (hasRelatedDocs.body) {
-						return this.alertToggle({
-							message: "The client has related documents and cannot be deleted",
-							isShow: true,
-							type: "error"
-						})
+						return this.alertToggle({ message: "The client has related documents and cannot be deleted", isShow: true, type: "error" })
 					}
-					const result = await this.$http.delete(`/clientsapi/deleteclient/${ id }`)
+					await this.$http.delete(`/clientsapi/deleteclient/${ id }`)
 					await this.removeClient(id)
 					this.alertToggle({ message: "Client has been removed", isShow: true, type: "success" })
 					await this.$router.push("/pangea-clients/all")
@@ -743,21 +689,16 @@
 					this.alertToggle({ message: "Internal server error on deleting the Client", isShow: true, type: "error" })
 				}
 			},
-			setLeadContact({ index }) {
-				// this.updateLeadContact(index)
+			setLeadContact({ id }) {
+				this.updateClientLeadContact( {contactId: id, id: this.$route.params.id})
 			},
 			async getClientDocumentInfo() {
 				return await this.$http.get(`/clientsapi/client?id=${ this.$route.params.id }`)
 			},
-			async getClientInfoLangs() {
-				const client = await this.$http.get(`/clientsapi/client-languages?id=${ this.$route.params.id }`)
-				this.clientDataInCreated.sourceLanguages = client.body.sourceLanguages
-				this.clientDataInCreated.targetLanguages = client.body.targetLanguages
-			},
 			async setDocumentsDefaults(category) {
 				let defaultDocument = { clientId: this.$route.params.id, category: category }
 				try {
-					const result = await this.$http.post("/clientsapi/client-document-default", defaultDocument)
+					await this.$http.post("/clientsapi/client-document-default", defaultDocument)
 				} catch (err) {
 					this.alertToggle({ message: "Error in creating default documents", isShow: true, type: "error" })
 				}
@@ -782,12 +723,6 @@
 					this.setNewClientDocuments(client.data)
 				}
 			},
-			async getClientInfoWithoutOverallData() {
-				if (!this.currentClient._id) {
-					const client = await this.$http.get(`/clientsapi/client-with-activities?id=${ this.$route.params.id }`)
-					this.storeCurrentClient(client.data)
-				}
-			},
 			...mapActions({
 				alertToggle: "alertToggle",
 				storeClient: "storeClient",
@@ -803,21 +738,10 @@
 				setUpClientProp: "setUpClientProp",
 				storeClientPropertyOverallData: "storeClientPropertyOverallData",
 				storeClientPropertyOverallDataBilling: "storeClientPropertyOverallDataBilling",
-				updateClientRatesProp: 'updateClientRatesProp'
+				updateClientRatesProp: 'updateClientRatesProp',
+				storeClientContactOverAll: "storeClientContactOverAll",
+        updateClientLeadContact: "updateClientLeadContact"
 			}),
-
-			async getAliases() {
-				try {
-					const result = await this.$http.get("/memoqapi/memoq-client-aliases")
-					this.aliases = result.body
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Aliases",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
 			async getTimezones() {
 				try {
 					const result = await this.$http.get("/api/timezones")
@@ -830,13 +754,6 @@
 					})
 				}
 			}
-			// mutateRatesFields() {
-			// 	const { rates: { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } } = this.currentClient
-			// 	this.currentClient.rates.basicPricesTable = basicPricesTable.map(i => ({ ...i, isCheck: false }))
-			// 	this.currentClient.rates.stepMultipliersTable = stepMultipliersTable.map(i => ({ ...i, isCheck: false }))
-			// 	this.currentClient.rates.industryMultipliersTable = industryMultipliersTable.map(i => ({ ...i, isCheck: false }))
-			// 	this.currentClient.rates.pricelistTable = pricelistTable.map(i => ({ ...i, isCheck: false }))
-			// }
 		},
 		computed: {
 			...mapGetters({
@@ -852,36 +769,19 @@
 			detectedForSave() {
 				if (this.currentClient.hasOwnProperty('name')) {
 					let keys = [ ...this.generalKeys ]
-					let billingKeys = [ ...this.billingKeys ]
-
 					for (let key of keys) {
 						if (JSON.stringify(this.currentClientOverallData[key]) !== JSON.stringify(this.currentClient[key])) {
 							return true
 						}
 					}
-					for (let key of billingKeys) {
-						if (JSON.stringify(this.currentClientOverallData.billingInfo[key]) !== JSON.stringify(this.currentClient.billingInfo[key])) {
-							return true
-						}
-					}
 				}
 			},
-			// sourceLanguagesClientData() {
-			// 	if (this.clientDataInCreated.sourceLanguages.length) {
-			// 		return this.clientDataInCreated.sourceLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
-			// 	}
-			// },
-			// targetLanguagesClientData() {
-			// 	if (this.clientDataInCreated.targetLanguages.length) {
-			// 		return this.clientDataInCreated.targetLanguages.map(i => i.lang).sort((a, b) => a.localeCompare(b))
-			// 	}
-			// },
 			isIndividual() {
 				return this.currentClientOverallData.clientType === 'Individual'
 			}
-
 		},
 		components: {
+			ContactsTable,
 			Discounts,
 			Tabs,
 			AllActivitiesFullScrean,
@@ -893,10 +793,9 @@
 			General,
 			Button,
 			ValidationErrors,
-			ContactsInfo,
 			IndustryTable,
 			ClientSalesInfo,
-			ClientBillInfo,
+			ClientBillInfoTable,
 			StepTable,
 			LangTable,
 			ResultTable,
@@ -910,9 +809,8 @@
 			RadioButton
 		},
 		created() {
-			this.getClientInfoLangs()
+			this.getClientInfo()
 			this.getTimezones()
-			this.getAliases()
 			this.$socket.on('refreshClientData', ({ _id, data }) => {
 				if (_id.toString() === this.$route.params.id.toString()) {
 					this.storeCurrentClient({ ...this.currentClient, ...data })
@@ -920,21 +818,8 @@
 				}
 			})
 		},
-		// mounted() {
-		// 	this.mutateRatesFields()
-		// },
 		beforeDestroy() {
 			this.storeCurrentClient({})
-		},
-		beforeRouteEnter(to, from, next) {
-			next((vm) => {
-				if (from.name && from.name.includes('contact')) {
-					vm.getClientInfoWithoutOverallData()
-				} else {
-					vm.getClientInfo()
-				}
-				vm.fromRoute = from.path
-			})
 		}
 	}
 </script>
@@ -1036,6 +921,7 @@
       transition: .2s ease;
       align-items: center;
       letter-spacing: 0.2px;
+      border-radius: 4px;
 
       &-grey {
         background-color: white;
@@ -1090,7 +976,7 @@
       margin-bottom: 20px;
 
       .radio {
-        margin-right: 20px;
+        margin-right: 15px;
       }
     }
 

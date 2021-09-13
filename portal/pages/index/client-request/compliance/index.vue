@@ -616,6 +616,7 @@
 
     &__value {
       font-size: 14px;
+      width: 220px;
     }
 
     &__projectName {

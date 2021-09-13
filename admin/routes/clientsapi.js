@@ -242,6 +242,19 @@ router.post('/update-client-status', async (req, res) => {
 	}
 })
 
+router.post('/update-client-leadContact', async (req, res) => {
+	const { id, contactId } = req.body
+	try {
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$[].leadContact': false })
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$.leadContact': true  })
+		const client = await Clients.findOne({ "_id": id }, { contacts: 1 })
+		res.send(client.contacts)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating Client status")
+	}
+})
+
 router.get('/rates/:id', async (req, res) => {
 	const { id: clientId } = req.params
 	try {
@@ -623,5 +636,46 @@ router.delete('/activity/note/:id', async (req, res) => {
 
 // End Notes
 // End Activities
+
+router.post('/get-billing-info/:_id', async (req, res) => {
+	try {
+		const { _id } = req.params
+		const billingInfo = await Clients.findOne({ _id }, {billingInfo: 1})
+		res.send(billingInfo.billingInfo)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /deleting | payment-terms')
+	}
+})
+
+
+router.post('/update-billing-info/:_id', async (req, res) => {
+	try {
+		const { _id } = req.params
+		const { billingInfo } = req.body
+		let updated
+		if(!billingInfo.hasOwnProperty("_id")) {
+			updated = await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo }})
+		} else  {
+			updated = await Clients.updateOne({_id}, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
+		}
+		res.send(updated)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /deleting | payment-terms')
+	}
+})
+
+router.post('/delete-billing-info/:_id', async (req, res) => {
+	try {
+		const { _id } = req.params
+		const { billingInfoId } = req.body
+		const updated = await Clients.updateOne({ _id }, { $pull: { "billingInfo": {_id: billingInfoId } } })
+		res.send(updated)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /deleting | payment-terms')
+	}
+})
 
 module.exports = router

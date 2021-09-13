@@ -18,7 +18,8 @@ const {
 	updateVendorEducation,
 	removeVendorEdu,
 	updateVendorAssessment,
-	saveNotPassedTest
+	saveNotPassedTest,
+	managePaymentMethods
 } = require('./info')
 
 const { getJobs, updateStepProp } = require('./jobs')
@@ -48,6 +49,7 @@ const {
 } = require('./pendingCompetencies')
 
 module.exports = {
+	managePaymentMethods,
 	getVendor,
 	getVendors,
 	getVendorAfterUpdate,

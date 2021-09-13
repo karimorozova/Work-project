@@ -11,8 +11,8 @@
           :client="client"
           :isIndividual="isIndividual"
           :isSaveClicked="isSaveClicked"
-          :languages="languages"
           :timezones="timezones"
+          :languages="languages"
         )
 
       .new-client-info__block(v-if="!isIndividual" :class="{'new-client-info_error-shadow': !client.contacts.length && isSaveClicked}")
@@ -23,12 +23,11 @@
           .icon(v-else)
             i.fas.fa-chevron-right
         .block__data(v-if="isContactDetails")
-          NewContactsInfo(
-            :client="client"
-            @contactDetails="contactDetails"
+          ContactsTable(
+            :contacts="client.contacts"
             @setLeadContact="setLeadContact"
-            @saveContactUpdates="saveContactUpdates"
-            @newContact="addNewContact"
+            @contactSave="contactSave"
+            @contactUpdate="contactUpdate"
             @approveDelete="approveContactDelete"
           )
 
@@ -45,17 +44,17 @@
             :isSaveClicked="isSaveClicked"
           )
 
-      .new-client-info__block
-        .block__header(@click="toggleBlock('isDocuments')")
-          .title Documents
-          .icon(v-if="!isDocuments")
-            i.fas.fa-chevron-down
-          .icon(v-else)
-            i.fas.fa-chevron-right
-        .block__data(v-if="isDocuments")
-          NewClientDocuments(
-            @uploadFiles="uploadFiles"
-          )
+      //.new-client-info__block
+      //  .block__header(@click="toggleBlock('isDocuments')")
+      //    .title Documents
+      //    .icon(v-if="!isDocuments")
+      //      i.fas.fa-chevron-down
+      //    .icon(v-else)
+      //      i.fas.fa-chevron-right
+      //  .block__data(v-if="isDocuments")
+      //    NewClientDocuments(
+      //      @uploadFiles="uploadFiles"
+      //    )
 
       .new-client-info__block
         .block__header(@click="toggleBlock('isSalesInformation')")
@@ -71,20 +70,6 @@
             :isEmpty="isLeadEmpty"
           )
 
-      .new-client-info__block(v-if="!isIndividual")
-        .block__header(@click="toggleBlock('isBillingInformation')")
-          .title Billing Information
-          .icon(v-if="!isBillingInformation")
-            i.fas.fa-chevron-down
-          .icon(v-else)
-            i.fas.fa-chevron-right
-        .block__data(v-if="isBillingInformation")
-          NewClientBillInfo(
-            :client="client"
-            :errorFields="billErrors"
-            @changeProperty="setBillInfo"
-          )
-
       ValidationErrors(
         v-if="areErrorsExist"
         :errors="errors"
@@ -95,80 +80,87 @@
         .button
           Button(value="Save" @clicked="checkForErrors")
         .button
-          Button(value="Cancel" @clicked="cancel")
+          Button(value="Cancel" @clicked="cancel" :outline="true")
 
     .new-client-subinfo
       .new-client-subinfo__general
         NewSideGeneral(
           :client="client"
           :isSaveClicked="isSaveClicked"
+          :clientType="clientType"
         )
 </template>
 
 <script>
 	import NewRates from './NewRates'
-	import NewClientDocuments from './NewClientDocuments'
+	// import NewClientDocuments from './NewClientDocuments'
 	import NewGeneral from './NewGeneral'
 	import Button from "../../Button"
 	import ValidationErrors from "../../ValidationErrors"
-	import ContactsInfo from '../ContactsInfo'
 	import NewClientSalesInfo from './NewClientSalesInfo'
-	import NewClientBillInfo from './NewClientBillInfo'
 	import NewSideGeneral from './NewSideGeneral'
 	import { mapGetters, mapActions } from "vuex"
-	import vatChecker from "../../../mixins/Client/vatChecker"
-	import NewContactsInfo from "./NewContactsInfo"
 	import RadioButton from "../../RadioButton"
+	import ContactsTable from "../ContactsTable"
 
 	export default {
-		mixins: [ vatChecker ],
-		props: {
-			client: {
-				type: Object
-			},
-			contactsPhotos: {
-				type: Array,
-				default: () => []
-			},
-			contractFiles: {
-				type: Array,
-				default: () => []
-			},
-			ndaFiles: {
-				type: Array,
-				default: () => []
-			}
-		},
 		data() {
 			return {
+				client: {
+					name: "",
+					status: "",
+					clientType: "Company",
+					website: "",
+					contract: "",
+					isTest: false,
+					nda: "",
+					accountManager: "",
+					salesManager: null,
+					projectManager: "",
+					leadSource: "",
+					languageCombinations: [],
+					nativeLanguage: '',
+					timeZone: '',
+					contacts: [],
+					currency: '',
+					defaultPricelist: '',
+					officialCompanyName: '',
+					email: ''
+				},
+				contactsPhotos: [],
+
 				isContactDetails: true,
 				isRatesParameters: true,
-				isDocuments: true,
+				// isDocuments: true,
 				isSalesInformation: true,
-				isBillingInformation: true,
-
 				timezones: [],
-				languages: [],
 				errors: [],
 				areErrorsExist: false,
 				isSaveClicked: false,
-				billErrors: [],
 				isLeadEmpty: false,
 				clientShow: true,
 				contactShow: false,
 				contactInd: 0,
 				contractFile: [],
 				ndaFile: [],
-				documentsFiles: [],
+				// documentsFiles: [],
 				clientType: 'Company',
 				websiteRegEx: /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
 			}
 		},
 		created() {
-			this.getLangs()
 			this.getTimezones()
 		},
 		methods: {
+			contactUpdate({ contact, file, index }) {
+				this.contactsPhotos.push(file)
+				this.client.contacts[index] = contact
+			},
+			contactSave({ contact, file }) {
+				this.contactsPhotos.push(file)
+				this.client.contacts.push(contact)
+				if (this.client.contacts.length === 1) this.client.contacts[0].leadContact = true
+			},
 			toggleBlock(prop) {
 				this[prop] = !this[prop]
 			},
@@ -179,20 +171,7 @@
 				}
 			},
 			resetFieldsToIndividualType() {
-				this.client.industries = [ this.industries.find(({ name }) => name === "Other") ]
 				this.client.leadSource = "Online Search"
-			},
-			async getLangs() {
-				try {
-					const result = await this.$http.get("/api/languages")
-					this.languages = Array.from(result.body)
-				} catch (err) {
-					this.alertToggle({
-						message: "Error in Languages",
-						isShow: true,
-						type: "error"
-					})
-				}
 			},
 			async getTimezones() {
 				try {
@@ -207,7 +186,7 @@
 				}
 			},
 			loadFile({ files, prop }) {
-				this.$emit("loadFile", { files, prop })
+				this[prop] = [ files[0] ]
 			},
 			cancel() {
 				this.$router.push("/pangea-clients/all")
@@ -224,30 +203,17 @@
 			setLeadSource({ option }) {
 				this.client.leadSource = option
 			},
-			setBillInfo({ prop, value }) {
-				this.client.billingInfo[prop] = value
-			},
-			contactDetails({ contactIndex }) {
-				this.$router.push({ name: "_contact", params: { index: contactIndex } })
-			},
-			addNewContact() {
-				this.$router.push({ name: "new_contact" })
-			},
 			setLeadContact({ index }) {
 				for (let contact of this.client.contacts) {
 					contact.leadContact = false
 				}
 				this.client.contacts[index].leadContact = true
 			},
-			saveContactUpdates({ index, contact }) {
-				this.client.contacts[index] = contact
-			},
 			closeErrorsBlock() {
 				this.areErrorsExist = false
 			},
 			clearErrors() {
 				this.errors = []
-				this.billErrors = []
 				this.isLeadEmpty = false
 			},
 			contactLeadError() {
@@ -257,9 +223,6 @@
 				this.clearErrors()
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 				if (!this.client.name) this.errors.push('Company name cannot be empty.')
-				// if (!this.client.industries.length) this.errors.push('Please, choose at least one industry.')
-				// if (!this.client.sourceLanguages.length) this.errors.push('Please, choose at least one source language.')
-				// if (!this.client.targetLanguages.length) this.errors.push('Please, choose at least one target language.')
 				if (this.clientType !== "Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
 				if (!this.client.currency.length) this.errors.push('Please, add currency.')
 				if (this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.')
@@ -269,63 +232,47 @@
 					this.errors.push('Please, choose lead source.')
 					this.isLeadEmpty = true
 				}
+				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) this.errors.push('Please provide a valid email in General Information.')
 
-				this.vatChecker({ newClient: true })
+				if (this.clientType === "Individual") this.client.paymentType = 'PPP'
 
-				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) {
-					this.errors.push('Please provide a valid email in General Information.')
-				}
-				if (this.clientType !== "Individual" && this.client.billingInfo.paymentType === '') {
+				if (this.clientType !== "Individual" && this.client.paymentType === '') {
 					this.errors.push('Please, add Payment type.')
-					this.billErrors.push('payment')
 				}
-				// if (!this.client.billingInfo.email || !emailValidRegex.test(this.client.billingInfo.email.toLowerCase())) {
-				// 	this.errors.push('Please provide a valid email in Billing Informations.')
-				// 	this.billErrors.push('email')
-				// }
-				if (
-						!this.client.accountManager ||
-						// !this.client.salesManager ||
-						!this.client.projectManager) this.errors.push('All managers should be assigned.')
+				if (!this.client.accountManager || !this.client.projectManager) this.errors.push('All managers should be assigned.')
 
 				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)
-				if (isSameEmailsExists) {
-					this.errors.push("A client with such Email already exists, the client's Email should be unique!")
-				}
+				if (isSameEmailsExists) this.errors.push("A client with such Email already exists, the client's Email should be unique!")
+
 				if (this.clientType !== "Individual" && this.client.website) {
 					if (this.websiteRegEx.exec(this.client.website) === null) {
 						this.errors.push("The website field must contain a link")
 					}
 				}
-				const filesSize = this.documentsFiles.filter(item => item.file)
-				if (filesSize.length) {
-					if (filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
-						this.errors.push("The file should not exceed 40 MB!")
-					}
-				}
-
+				// const filesSize = this.documentsFiles.filter(item => item.file)
+				// if (filesSize.length) {
+				// 	if (filesSize.map(item => item.file).map(item => item.size).some(item => item > 40000000)) {
+				// 		this.errors.push("The file should not exceed 40 MB!")
+				// 	}
+				// }
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					this.isSaveClicked = true
 					return
 				}
 				this.clientType === "Company" ? await this.saveClient() : await this.saveClientIndividual()
-
 			},
 
 			async checkSameClientEmails(clientEmail) {
 				const clientMails = await this.$http.get('/clientsapi/all-clients-emails')
-				const arrayOfMails = clientMails.body
-						.map(key => key.email)
+				const arrayOfMails = clientMails.body.map(key => key.email)
 				return arrayOfMails.includes(clientEmail)
 			},
-
-			uploadFiles(data) {
-				this.documentsFiles = data
-			},
+			// uploadFiles(data) {
+			// 	this.documentsFiles = data
+			// },
 			async saveClientIndividual() {
 				let sendData = new FormData()
-
 
 				this.client.nativeLanguage = null
 				this.client.timeZone = null
@@ -333,42 +280,58 @@
 				this.client.officialCompanyName = this.client.name
 				this.client.clientType = "Individual"
 
-				this.client.billingInfo = {
-					officialCompanyName: this.client.name,
-					vat: false,
-					vatId: '',
-					dueDate: '',
-					address: '',
-					invoiceSending: false,
-					paymentType: "PPP"
-				}
-
 				this.client.contacts = [ {
 					leadContact: true,
 					firstName: this.client.name,
 					surname: "",
-					password: "12345",
+					password: "11111",
 					email: this.client.email,
 					gender: "",
 					position: "Manager",
 					phone: "",
 					photo: "",
-					whatsApp: "",
-					skype: "",
-					linkedIn: "",
 					country: "",
 					notes: ""
 				} ]
+
+        this.client.paymentType = "PPP"
+        this.client.billingInfo = {
+          officialName: this.client.name,
+          paymentTerms: '',
+          address: {
+            country: '',
+            street1: '',
+            street2: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            vat: '',
+          },
+          notes: '',
+          reports: [],
+          contacts: [
+            {
+              leadContact: true,
+              firstName: this.client.name,
+              surname: "",
+              email: this.client.email,
+              gender: "",
+              position: "Manager",
+              phone: "",
+              country: "",
+              notes: ""
+            }
+          ],
+        }
 
 				sendData.append('client', JSON.stringify(this.client))
 				for (let i = 0; i < this.contactsPhotos.length; i++) {
 					sendData.append('photos', this.contactsPhotos[i])
 				}
-				for (const document of this.documentsFiles) {
-					sendData.append(document.category, document.file)
-				}
+				// for (const document of this.documentsFiles) {
+				// 	sendData.append(document.category, document.file)
+				// }
 				try {
-					// console.log(this.client)
 					const result = await this.$http.post('/clientsapi/update-client', sendData)
 					const newClient = { ...result.data.client }
 					await this.addNewClient(newClient)
@@ -381,20 +344,14 @@
 			async saveClient() {
 				let sendData = new FormData()
 
-				if (this.client.timeZone === '') {
-					this.client.timeZone = null
-				}
-				if (this.client.nativeLanguage === '') {
-					this.client.nativeLanguage = null
-				}
+				if (this.client.timeZone === '') this.client.timeZone = null
+				if (this.client.nativeLanguage === '') this.client.nativeLanguage = null
+        this.client.billingInfo = []
 
 				sendData.append('client', JSON.stringify(this.client))
-				for (let i = 0; i < this.contactsPhotos.length; i++) {
-					sendData.append('photos', this.contactsPhotos[i])
-				}
-				for (const document of this.documentsFiles) {
-					sendData.append(document.category, document.file)
-				}
+				for (let i = 0; i < this.contactsPhotos.length; i++) sendData.append('photos', this.contactsPhotos[i])
+				// for (const document of this.documentsFiles) sendData.append(document.category, document.file)
+
 				try {
 					const result = await this.$http.post('/clientsapi/update-client', sendData)
 					const newClient = { ...result.data.client }
@@ -413,31 +370,20 @@
 		computed: {
 			...mapGetters({
 				allClients: "getClients",
-				industries: "getAllIndustries"
+				languages: "getAllLanguages"
 			}),
-			selectedIndNames() {
-				let result = []
-				if (this.client.industries.length) {
-					for (let ind of this.client.industries) {
-						result.push(ind.name)
-					}
-				}
-				return result
-			},
 			isIndividual() {
 				return this.clientType === 'Individual'
 			}
 		},
 		components: {
+			ContactsTable,
 			RadioButton,
-			NewContactsInfo,
 			NewGeneral,
 			Button,
 			ValidationErrors,
-			ContactsInfo,
 			NewClientSalesInfo,
-			NewClientBillInfo,
-			NewClientDocuments,
+			// NewClientDocuments,
 			NewSideGeneral,
 			NewRates
 		}
@@ -487,7 +433,6 @@
 
       .title {
         font-size: 15px;
-        font-family: Myriad600;
       }
 
       .icon {
@@ -541,7 +486,7 @@
       margin-bottom: 20px;
 
       .radio {
-        margin-right: 10px;
+        margin-right: 15px;
       }
     }
   }
@@ -582,10 +527,6 @@
     .approve-block {
       margin-bottom: 15px;
     }
-  }
-
-  input {
-    color: #66563d;
   }
 
 </style>

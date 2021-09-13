@@ -12,21 +12,7 @@
         label.block-item__label.block-item_relative Email:
           Asterisk(:customStyle="asteriskStyle")
         input(type="text" placeholder="Email" :value="currentClient.email" @change="(e) => changeProperty(e, 'email')" :class="{'general-info_error-shadow': !currentClient.email && isSaveClicked}")
-      .block-item(v-if="!isIndividual")
-        label.block-item__label Website:
-        input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
-      //.block-item
-      //  label.block-item__label.block-item_relative Industry:
-      //    Asterisk(:customStyle="asteriskStyle")
-      //  .block-item__drop.block-item_high-index(:class="{'general-info_error-shadow': isSaveClicked && !currentClient.industries.length}")
-      //    SelectMulti(
-      //      :hasSearch="true"
-      //      :allOptionsButtons="true"
-      //      placeholder="Select"
-      //      :selectedOptions="currentClient.industries.length ? currentClient.industries.map(i => i.name) : []"
-      //      :options="getAllIndustries.map(i => i.name)"
-      //      @chooseOptions="setIndustries"
-      //    )
+
     .general-info__block
       .block-item(v-if="!isIndividual")
         label.block-item__label.block-item_relative Time Zone:
@@ -45,43 +31,12 @@
             :hasSearch="true"
             placeholder="Select"
             :selectedOption="currentClient.hasOwnProperty('nativeLanguage') && currentClient.nativeLanguage !== null  ? currentClient.nativeLanguage.lang : currentLanguage"
-            :options="targetLanguages"
+            :options="languages.map(i => i.lang)"
             @chooseOption="setLanguage"
           )
-      //.block-item
-      //  label.block-item__label.block-item_relative Source Languages:
-      //    Asterisk(:customStyle="asteriskStyle")
-      //  .block-item__drop
-      //    SelectMulti(
-      //      placeholder="Select"
-      //      :hasSearch="true"
-      //      :selectedOptions="currentClient.sourceLanguages.length ? makeStringLanguage(currentClient.sourceLanguages) : makeStringLanguage(currentSourceLanguages)"
-      //      :options="sourceLanguages | firstEnglishLanguage"
-      //      @chooseOptions="setSource"
-      //      :allOptionsButtons="true"
-      //    )
-      //.block-item
-      //  label.block-item__label.block-item_relative Target Languages:
-      //    Asterisk(:customStyle="asteriskStyle")
-      //  .block-item__drop
-      //    SelectMulti(
-      //      placeholder="Select"
-      //      :hasSearch="true"
-      //      :selectedOptions="currentClient.targetLanguages.length ? makeStringLanguage(currentClient.targetLanguages) : makeStringLanguage(currentTargetLanguages)"
-      //      :options="targetLanguages"
-      //      @chooseOptions="setTarget"
-      //      :allOptionsButtons="true"
-      //    )
-      //.block-item
-      //  label.block-item__label.block-item_relative Aliases:
-      //  .block-item__drop
-      //    SelectMulti(
-      //      placeholder="Select"
-      //      :hasSearch="true"
-      //      :selectedOptions="currentClient.hasOwnProperty('aliases') ? currentClient.aliases : currentClientAliases"
-      //      :options="clientAliases"
-      //      @chooseOptions="setAlias"
-      //    )
+      .block-item(v-if="!isIndividual")
+        label.block-item__label Website:
+        input(type="text" placeholder="Website" :value="currentClient.website" @change="(e) => changeProperty(e, 'website')")
 </template>
 
 <script>
@@ -107,19 +62,13 @@
 			},
 			timezones: {
 				type: Array
-			},
-			allClientAliases: {
-				type: Array
 			}
 		},
 		data() {
 			return {
 				asteriskStyle: { top: "-4px" },
 				currentZone: "",
-				currentLanguage: "",
-				// currentSourceLanguages: [],
-				// currentTargetLanguages: [],
-				// currentClientAliases: []
+				currentLanguage: ""
 			}
 		},
 		methods: {
@@ -127,17 +76,6 @@
 			changeProperty(e, prop) {
 				this.storeClientPropertyOverallData({ prop, value: e.target.value })
 			},
-			// makeStringLanguage(langArray) {
-			// 	return langArray.map(item => item.lang)
-			// },
-			// setIndustries({ option }) {
-			// 	let industries = [ ...this.currentClient.industries ]
-			// 	const position = industries.findIndex(item => item.name === option)
-			// 	if (position !== -1) industries.splice(position, 1)
-			// 	else industries.push(this.getAllIndustries.find(item => item.name === option))
-      //
-			// 	this.storeClientPropertyOverallData({ prop: "industries", value: industries })
-			// },
 			setLanguage({ option }) {
 				this.currentLanguage = option
 				const lang = this.languages.find(item => item.lang == option)
@@ -147,119 +85,18 @@
 				this.currentZone = option
 				const timezone = this.timezones.find(item => item.zone == option)
 				this.storeClientPropertyOverallData({ prop: "timeZone", value: timezone })
-			},
-			// setAlias({ option }) {
-			// 	if (this.currentClient.hasOwnProperty('aliases')) {
-			// 		if (this.currentClient.aliases.length) {
-			// 			this.currentClientAliases = [ ...this.currentClient.aliases ]
-			// 		}
-			// 	}
-			// 	const position = this.currentClientAliases.indexOf(option)
-      //
-			// 	if (position !== -1) {
-			// 		this.currentClientAliases.splice(position, 1)
-			// 		this.storeClientPropertyOverallData({
-			// 			prop: "aliases",
-			// 			value: this.currentClientAliases
-			// 		})
-			// 	} else {
-			// 		this.currentClientAliases.push(option)
-			// 		this.storeClientPropertyOverallData({
-			// 			prop: "aliases",
-			// 			value: this.currentClientAliases
-			// 		})
-			// 	}
-			// },
-			// setTarget({ option }) {
-			// 	if (this.currentClient.hasOwnProperty('targetLanguages')) {
-			// 		if (this.currentClient.targetLanguages.length) {
-			// 			this.currentTargetLanguages = [ ...this.currentClient.targetLanguages ]
-			// 		}
-			// 	}
-			// 	const position = this.currentTargetLanguages
-			// 			.map(item => item.lang)
-			// 			.indexOf(option)
-      //
-			// 	if (position !== -1) {
-			// 		this.currentTargetLanguages.splice(position, 1)
-			// 		this.storeClientPropertyOverallData({
-			// 			prop: "targetLanguages",
-			// 			value: this.currentTargetLanguages
-			// 		})
-			// 	} else {
-			// 		const lang = this.languages.find(item => item.lang === option)
-			// 		this.currentTargetLanguages.push(lang)
-			// 		this.storeClientPropertyOverallData({
-			// 			prop: "targetLanguages",
-			// 			value: this.currentTargetLanguages
-			// 		})
-			// 	}
-			// },
-			// setSource({ option }) {
-			// 	if (this.currentClient.hasOwnProperty('sourceLanguages')) {
-			// 		if (this.currentClient.sourceLanguages.length) {
-			// 			this.currentSourceLanguages = [ ...this.currentClient.sourceLanguages ]
-			// 		}
-			// 	}
-			// 	const position = this.currentSourceLanguages
-			// 			.map(item => item.lang)
-			// 			.indexOf(option)
-      //
-			// 	if (position !== -1) {
-			// 		this.currentSourceLanguages.splice(position, 1)
-			// 		this.storeClientPropertyOverallData({
-			// 			prop: "sourceLanguages",
-			// 			value: this.currentSourceLanguages
-			// 		})
-			// 	} else {
-			// 		const lang = this.languages.find(item => item.lang === option)
-			// 		this.currentSourceLanguages.push(lang)
-			// 		this.storeClientPropertyOverallData({
-			// 			prop: "sourceLanguages",
-			// 			value: this.currentSourceLanguages
-			// 		})
-			// 	}
-			// },
-			selectedSource() {
 			}
 		},
 		computed: {
 			...mapGetters({
-				currentClient: "currentClientOverallData",
-				// getAllIndustries: "getAllIndustries"
+				currentClient: "currentClientOverallData"
 			}),
-			// clientAliases() {
-			// 	if (this.allClientAliases) {
-			// 		return this.allClientAliases
-			// 	}
-			// },
-			// sourceLanguages() {
-			// 	if (this.languages) {
-			// 		return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b))
-			// 	}
-			// },
-			// targetLanguages() {
-			// 	if (this.languages) {
-			// 		return this.languages.map(item => item.lang).sort((a, b) => a.localeCompare(b))
-			// 	}
-			// },
+
 			timezoneData() {
 				if (this.timezones) {
 					return this.timezones.map(item => item.zone)
 				}
-			},
-			// selectedIndNames() {
-			// 	let result = []
-			// 	if (
-			// 			this.currentClient.industries &&
-			// 			this.currentClient.industries.length
-			// 	) {
-			// 		for (let industry of this.currentClient.industries) {
-			// 			result.push(industry.name)
-			// 		}
-			// 	}
-			// 	return result
-			// }
+			}
 		},
 		components: {
 			Asterisk,

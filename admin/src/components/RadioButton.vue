@@ -35,8 +35,9 @@
 
   .radio {
     &__text {
-      margin-left: 5px;
+      margin-left: 6px;
       cursor: pointer;
+      margin-top: 1px;
     }
 
     &__wrapper {
@@ -63,7 +64,7 @@
     }
 
     &_checked {
-      background-color: $dark-border;
+      background-color: $border-focus;
     }
   }
 

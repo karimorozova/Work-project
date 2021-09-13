@@ -52,22 +52,22 @@
         Button(@clicked="manageModalState" :isDisabled="!bankType.name && !paypalType.name" value="Save")
         Button(@clicked="closeModal" value="Cancel" :outline="true")
 
-    .billing-info
+    .billing-info(v-if="currentVendor.billingInfo")
       .billing-info__col
         .colRow
-          .colRow__key Same as in General Information:
+          .colRow__key Same as in Profile:
           .colRow__value
-            CheckBox(:isChecked="isSameAsInGeneralInformation" @check="toggleCheck(true)" @uncheck="toggleCheck(false)")
+            CheckBox(:isChecked="isSameAsInGeneralInformation" @check="toggleCheck(true)" @unCheck="toggleCheck(false)")
 
         .colRow
           .colRow__key Official Name:
           .colRow__value
-            input(:value='currentVendor.billingInfo.officialName' @change="(e) => changeBillingProp('officialName', e.target.value)")
+            input(:value='billingInfo.officialName' @change="(e) => changeBillingProp('officialName', e.target.value)")
 
         .colRow
           .colRow__key Email:
           .colRow__value
-            input(:value='currentVendor.billingInfo.email' @change="(e) => changeBillingProp('email', e.target.value)")
+            input(:value='billingInfo.email' @change="(e) => changeBillingProp('email', e.target.value)")
 
         .colRow
           .colRow__key Payment term:
@@ -76,15 +76,19 @@
               SelectSingle(
                 placeholder="Select"
                 :options="paymentTerms.map(i => i.name)"
-                :selectedOption="currentVendor.billingInfo.paymentTerm.name || ''"
+                :selectedOption="billingInfo.paymentTerm.name || ''"
                 @chooseOption="({option}) => changeBillingProp('paymentTerm', paymentTerms.find(i => i.name === option))"
               )
+
+        .billing-info__buttons(v-if="someChanged")
+          Button(value="Save" @clicked="checkErrors")
+          Button(value="Cancel" :outline="true" @clicked="cancelChanges")
 
       .billing-info__col
         .addressRow
           .addressRow__key Address:
           .addressRow__value
-            textarea(:value="currentVendor.billingInfo.address" @change="(e) => changeBillingProp('address', e.target.value)")
+            textarea(@change="(e) => changeBillingProp('address', e.target.value)") {{billingInfo.address}}
 
     .payment-methods
       .payment-methods__header
@@ -93,7 +97,7 @@
           Add(@add="isModal = true")
 
       .payment-methods__body
-        .item(v-for="(item, index) in currentFullVendor.billingInfo.paymentMethod")
+        .item(v-for="(item, index) in billingInfo.paymentMethod")
           .item__header
             .item__header--name {{ item.name }}
 
@@ -126,135 +130,170 @@
 
           .item__footer
             .item__footer--title {{ item.type  }}
-
-
 </template>
 
 <script>
 	import CheckBox from "../CheckBox"
-	import SelectSingle from "../SelectSingle"
-	import { mapActions, mapGetters } from "vuex"
-	import Add from "../Add"
-	import Button from "../Button"
-	import ApproveModal from "../ApproveModal"
+	import SelectSingle from "./SelectSingle"
+	import Button from "./Button"
+	import Add from "./Add"
+	import ApproveModal from "./ApproveModal"
+  import { mapActions } from "vuex"
+  import { setVendorBillingInfo } from "../../store/actions/vendors/set"
+
 
 	export default {
+	  props: {
+	    currentVendor: {
+          type: Object
+      }
+    },
 		data() {
 			return {
 				paymentTerms: [],
-				paymentTypes: [ 'Bank Details', 'PayPal' ],
-				currentPaymentType: '',
-				isModal: false,
+        billingInfo: JSON.parse(JSON.stringify( this.currentVendor.billingInfo)),
+        paymentTypes: [ 'Bank Details', 'PayPal' ],
+        currentPaymentType: '',
+        isModal: false,
 
-				paypalType: {},
-				bankType: {},
-				editingIndex: null,
-				deletingIndex: null,
-				isDeletingModal: false
+        paypalType: {},
+        bankType: {},
+        editingIndex: null,
+        deletingIndex: null,
+        isDeletingModal: false
 			}
 		},
 		methods: {
-			...mapActions({
-				updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo',
-				alertToggle: 'alertToggle',
-				storeCurrentVendor: "storeCurrentVendor"
-			}),
-			async manageModalState() {
-				const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
-				Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
-				try {
-					const result = await this.$http.post("/vendorsapi/manage-payment-methods", {
-						index: this.editingIndex,
-						vendorId: this.$route.params.id,
-						paymentTypeObj: neededPaymentTypeObj
-					})
-					await this.storeCurrentVendor(result.data)
-				} catch (err) {
-					this.alertToggle({ message: "Error on updating payment methods", isShow: true, type: "error" })
-				} finally {
-					this.closeModal()
-				}
-			},
-			closeApproveModal() {
-				this.deletingIndex = null
-				this.isDeletingModal = false
-			},
-			openApproveModal(index) {
-				this.deletingIndex = index
-				this.isDeletingModal = true
-			},
-			async deletePaymentMethod() {
-				try {
-					const result = await this.$http.delete(`/vendorsapi/manage-payment-methods/${ this.$route.params.id }/${ this.deletingIndex }`)
-					await this.storeCurrentVendor(result.data)
-					this.alertToggle({ message: "Removed", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Error on removing!", isShow: true, type: "error" })
-				} finally {
-					this.closeModal()
-					this.closeApproveModal()
-				}
-			},
-			openModalForEdition(item, index) {
-				this.editingIndex = index
-				this.isModal = true
-				const { type, ...rest } = item
-				this.currentPaymentType = type
+      ...mapActions({
+        setVendorBillingInfo: "setVendorBillingInfo",
+        alertToggle: "alertToggle",
+      }),
 
-				item.type === 'PayPal'
-						? this.paypalType = { ...rest }
-						: this.bankType = { ...rest }
-			},
-			closeModal() {
-				this.editingIndex = null
-				this.isModal = false
-				this.currentPaymentType = ''
-				this.setDefaultPaymentObjectsState()
-			},
-			setPaymentType({ option }) {
-				this.currentPaymentType = option
-				this.setDefaultPaymentObjectsState()
-			},
-			setDefaultPaymentObjectsState() {
-				this.paypalType = {}
-				this.bankType = {}
-			},
+      async manageModalState() {
+        const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
+        Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
+        try {
+          const result = await this.$axios.post("/vendor/manage-payment-methods", {
+            index: this.editingIndex,
+            vendorId: this.currentVendor._id,
+            paymentTypeObj: neededPaymentTypeObj
+          })
+          await this.setVendorBillingInfo({billingInfo: result.data.billingInfo})
+          this.billingInfo = JSON.parse(JSON.stringify( this.currentVendor.billingInfo))
+
+        } catch (err) {
+          this.alertToggle({ message: "Error on updating payment methods", isShow: true, type: "error" })
+        } finally {
+          this.closeModal()
+        }
+      },
+      closeApproveModal() {
+        this.deletingIndex = null
+        this.isDeletingModal = false
+      },
+      openApproveModal(index) {
+        this.deletingIndex = index
+        this.isDeletingModal = true
+      },
+      async deletePaymentMethod() {
+        try {
+          const result = await this.$axios.post(`/vendor/manage-payment-methods/${ this.currentVendor._id }/${ this.deletingIndex }/delete`)
+          await this.setVendorBillingInfo({ billingInfo: result.data.billingInfo })
+          this.billingInfo = JSON.parse(JSON.stringify( this.currentVendor.billingInfo))
+
+          this.alertToggle({ message: "Removed", isShow: true, type: "success" })
+        } catch (err) {
+          this.alertToggle({ message: "Error on removing!", isShow: true, type: "error" })
+        } finally {
+          this.closeModal()
+          this.closeApproveModal()
+        }
+      },
+      openModalForEdition(item, index) {
+        this.editingIndex = index
+        this.isModal = true
+        const { type, ...rest } = item
+        this.currentPaymentType = type
+
+        item.type === 'PayPal'
+            ? this.paypalType = { ...rest }
+            : this.bankType = { ...rest }
+      },
+      closeModal() {
+        this.editingIndex = null
+        this.isModal = false
+        this.currentPaymentType = ''
+        this.setDefaultPaymentObjectsState()
+      },
+      setPaymentType({ option }) {
+        this.currentPaymentType = option
+        this.setDefaultPaymentObjectsState()
+      },
+      setDefaultPaymentObjectsState() {
+        this.paypalType = {}
+        this.bankType = {}
+      },
+
 			changeBillingProp(key, value) {
-				this.updateCurrentVendorGeneralDataBillingInfo({ key, value })
+			  this.billingInfo[key] = value
 			},
 			toggleCheck(bool) {
 				if (bool) {
 					const { firstName, surname, email } = this.currentVendor
-					this.updateCurrentVendorGeneralDataBillingInfo({ key: 'officialName', value: `${ firstName } ${ surname || '' }` })
-					this.updateCurrentVendorGeneralDataBillingInfo({ key: 'email', value: `${ email }` })
+          this.billingInfo.email = email
+          this.billingInfo.officialName = `${ firstName } ${ surname || '' }`
 				}
 			},
 			async getAndSetPaymentTerms() {
 				try {
-					const result = await this.$http.get("/api-settings/payment-terms")
+					const result = await this.$axios.get(`/vendor/payment-terms`)
 					this.paymentTerms = result.data.filter(i => !!i.isActive)
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
 				}
-			}
+			},
+      isEqualBillingInfo (billingInfo, secondBillingInfo) {
+			  return billingInfo.email === secondBillingInfo.email
+            && billingInfo.address === secondBillingInfo.address
+            && billingInfo.officialName === secondBillingInfo.officialName
+            && billingInfo.paymentTerm.name === secondBillingInfo.paymentTerm.name
+      },
+      checkErrors() {
+        this.saveChanges()
+      },
+      async saveChanges() {
+        try{
+          await this.$axios.post(`/vendor/payment-terms/${this.currentVendor._id}/update`, {billingInfo: this.billingInfo})
+
+          this.setVendorBillingInfo({billingInfo:  JSON.parse(JSON.stringify( this.billingInfo))})
+
+          this.alertToggle({ message: "Saved", isShow: true, type: "success" })
+        }catch (e) {
+          this.alertToggle({ message: "Error on saving changes Billing Information", isShow: true, type: "error" })
+        }
+      },
+      cancelChanges () {
+			  this.billingInfo = JSON.parse(JSON.stringify( this.currentVendor.billingInfo))
+      }
 		},
 		computed: {
-			...mapGetters({
-				currentVendor: "getCurrentVendorGeneralData",
-				currentFullVendor: "getCurrentVendor"
-			}),
 			isSameAsInGeneralInformation() {
 				if (this.currentVendor.hasOwnProperty('firstName')) {
-					const { firstName, surname, email, billingInfo } = this.currentVendor
+					const { firstName, surname, email } = this.currentVendor
 					const name = `${ firstName } ${ surname || '' }`
-					return name === billingInfo.officialName && email === billingInfo.email
+					return name === this.billingInfo.officialName && email === this.billingInfo.email
+				}
+			},
+			someChanged() {
+				if (this.currentVendor.hasOwnProperty('firstName')) {
+					return !this.isEqualBillingInfo(this.billingInfo, this.currentVendor.billingInfo)
 				}
 			}
 		},
 		created() {
 			this.getAndSetPaymentTerms()
-		},
-		components: { ApproveModal, Button, Add, CheckBox, SelectSingle }
+    },
+		components: { CheckBox, SelectSingle, Button, ApproveModal, Add }
 
 	}
 </script>

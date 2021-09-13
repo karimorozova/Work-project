@@ -6,7 +6,7 @@ const { managerNotifyMail } = require('../utils/mailTemplate')
 
 
 const translationServiceRequest = async (formData, client) => {
-	const { billingInfo: { paymentType: paymentProfile }, _id } = client
+	const {  paymentType: paymentProfile , _id } = client
 	const { deadline, projectName, brief, startOption } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
@@ -43,7 +43,7 @@ const translationServiceRequest = async (formData, client) => {
 }
 
 const complianceServiceRequest = async (formData, client) => {
-	const { billingInfo: { paymentType: paymentProfile }, _id } = client
+	const {  paymentType: paymentProfile , _id } = client
 	const { deadline, projectName, brief, startOption } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)

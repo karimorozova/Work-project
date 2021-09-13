@@ -2,8 +2,8 @@ const router = require('express').Router()
 const { checkVendor } = require('../../middleware')
 const jwt = require("jsonwebtoken")
 const { secretKey } = require('../../configs')
-const { Vendors } = require('../../models')
-const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp, hasVendorCompetenciesAndPending } = require('../../vendors')
+const { Vendors, PaymentTerms } = require('../../models')
+const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp, hasVendorCompetenciesAndPending, managePaymentMethods } = require('../../vendors')
 const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
 const { createMemoqUser } = require('../../services/memoqs/users')
@@ -390,6 +390,52 @@ router.post("/pending-competencies", checkVendor, async (req, res) => {
 		res.status(500).send(err.message)
 	}
 })
+
+router.get("/payment-terms", checkVendor, async (req, res) => {
+	try {
+		const getPaymentTerms = await PaymentTerms.find()
+		res.send(getPaymentTerms)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message)
+	}
+})
+
+router.post("/payment-terms/:id/update", checkVendor, async (req, res) => {
+	const {id} = req.params
+	const {billingInfo} = req.body
+	try {
+		const vendor = await Vendors.updateOne({_id: id}, {billingInfo})
+		res.send(vendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message)
+	}
+})
+
+router.post('/manage-payment-methods', async (req, res) => {
+	const { vendorId, paymentTypeObj, index } = req.body
+	try {
+		const updatedVendor = await managePaymentMethods({ vendorId, paymentTypeObj, index })
+		res.send(updatedVendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on /manage-payment-methods")
+	}
+})
+
+router.post('/manage-payment-methods/:_id/:index/delete', async (req, res) => {
+	try {
+		const { _id, index } = req.params
+		await getVendorAfterUpdate({ _id }, { $unset: { [`billingInfo.paymentMethod.${ index }`]: 1 } })
+		const updatedVendor = await getVendorAfterUpdate({ _id }, { $pull: { "billingInfo.paymentMethod": null } })
+		res.send(updatedVendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /deleting | payment-terms')
+	}
+})
+
 
 
 module.exports = router

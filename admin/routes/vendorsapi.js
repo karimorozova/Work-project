@@ -9,7 +9,7 @@ const {
 	getVendorAfterUpdate,
 	getFilteredVendors,
 	getFilteredVendorsPotential,
-  getFilteredVendorsWithCustomFilters,
+	getFilteredVendorsWithCustomFilters,
 	updateVendorEducation,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
@@ -35,7 +35,8 @@ const {
 	rejectedPendingCompetence,
 	deletePendingCompetence,
 	saveNotPassedTest,
-	updateClientRatesFromSettings
+	updateClientRatesFromSettings,
+	managePaymentMethods
 } = require('../vendors')
 
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
@@ -298,6 +299,29 @@ router.delete('/competencies/:vendorId/:competenceId', async (req, res) => {
 	}
 })
 
+router.post('/manage-payment-methods', async (req, res) => {
+	const { vendorId, paymentTypeObj, index } = req.body
+	try {
+		const updatedVendor = await managePaymentMethods({ vendorId, paymentTypeObj, index })
+		res.send(updatedVendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on /manage-payment-methods")
+	}
+})
+
+router.delete('/manage-payment-methods/:_id/:index', async (req, res) => {
+	try {
+		const { _id, index } = req.params
+		await getVendorAfterUpdate({ _id }, { $unset: { [`billingInfo.paymentMethod.${ index }`]: 1 } })
+		const updatedVendor = await getVendorAfterUpdate({ _id }, { $pull: { "billingInfo.paymentMethod": null } })
+		res.send(updatedVendor)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on get /deleting | payment-terms')
+	}
+})
+
 router.post('/step-email', async (req, res) => {
 	const { projectId, step } = req.body
 	try {
@@ -356,7 +380,7 @@ router.post('/new-vendor', upload.fields([ { name: 'photo' } ]), async (req, res
 		const { discountChart } = await Pricelist.findOne({ isVendorDefault: true })
 		vendor.matrix = { ...discountChart }
 
-		const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) ||  false
+		const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) || false
 		let lastIntIndex = lastIndex.toJSON().hasOwnProperty('vendorId') ? parseInt(lastIndex.vendorId.split('_').pop()) : 0
 		vendor.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
 
@@ -655,9 +679,9 @@ router.post('/approve-pending-competence', async (req, res) => {
 })
 
 router.post('/get-reject-pc-message', async (req, res) => {
-	let { pendingCompetence , vendorId } = req.body
+	let { pendingCompetence, vendorId } = req.body
 	try {
-    pendingCompetence.vendorName = !pendingCompetence.vendorName ?  (await Vendors.findOne({_id: vendorId})).firstName: pendingCompetence.vendorName
+		pendingCompetence.vendorName = !pendingCompetence.vendorName ? (await Vendors.findOne({ _id: vendorId })).firstName : pendingCompetence.vendorName
 		const template = await rejectedPendingCompetenceTemplate(pendingCompetence)
 		res.send(template)
 	} catch (err) {
@@ -687,8 +711,6 @@ router.post('/delete-pending-competence', async (req, res) => {
 		res.status(500).send("Error on getting filtered Vendors")
 	}
 })
-
-
 
 
 module.exports = router

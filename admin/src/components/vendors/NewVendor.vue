@@ -48,15 +48,6 @@
                 placeholder="Native Language"
                 @chooseOption="setNative"
               )
-          .block-item.no-margin
-            label Gender:
-            .block-item__drop-menu
-              SelectSingle(
-                :options="genders"
-                :selectedOption="vendor.gender"
-                placeholder="Gender"
-                @chooseOption="updateGender"
-              )
         .gen-info__block
           .block-item
             label Company Name:
@@ -73,6 +64,15 @@
           .block-item
             label WhatsApp:
             input.block-item__input-field(type="text" placeholder="WhatsApp" :value="vendor.whatsapp" @change="(e) => updateProp(e,'whatsapp')")
+          .block-item.no-margin
+            label Gender:
+            .block-item__drop-menu
+              SelectSingle(
+                :options="genders"
+                :selectedOption="vendor.gender"
+                placeholder="Gender"
+                @chooseOption="updateGender"
+              )
           //.block-item
           //  label.block-item__label.block-item_relative Industries:
           //    Asterisk(:customStyle="asteriskStyle")

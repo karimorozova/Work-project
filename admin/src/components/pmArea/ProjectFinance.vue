@@ -80,6 +80,7 @@
               :paramsIsEdit="paramsIsEdit"
               :projectStatus="currentProject.status"
               :enum="'PngSysProject'"
+              :projectCurrency="currentProject.projectCurrency"
             )
 
         .project-finance__total
@@ -93,8 +94,8 @@
 <script>
 	import { mapGetters, mapActions } from "vuex"
 	import Discounts from "../clients/pricelists/Discounts"
-	import PaymentAdditions from "../clients/pricelists/PaymentAdditions"
 	import currencyIconDetected from "../../mixins/currencyIconDetected"
+	import PaymentAdditions from "./PaymentAdditions"
 
 	export default {
 		mixins: [ currencyIconDetected ],
@@ -211,8 +212,8 @@
 			}
 		},
 		components: {
+			PaymentAdditions,
 			Discounts,
-      PaymentAdditions,
 		}
 	}
 </script>

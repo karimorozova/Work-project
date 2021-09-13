@@ -69,15 +69,6 @@
             :hasSearch="true"
             @chooseOption="updateVendorNative"
           )
-      .block-item.no-margin
-        label Gender:
-        .block-item__drop-menu
-          SelectSingle(
-            :options="genders",
-            :selectedOption="currentVendor.gender",
-            placeholder="Gender",
-            @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
-          )
     .gen-info__block
       .block-item
         label Company Name:
@@ -119,6 +110,15 @@
           :value="currentVendor.whatsapp",
           @change="(e) => updateVendorProp(e.target.value,  'whatsapp')"
         )
+      .block-item.no-margin
+        label Gender:
+        .block-item__drop-menu
+          SelectSingle(
+            :options="genders",
+            :selectedOption="currentVendor.gender",
+            placeholder="Gender",
+            @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
+          )
       //.block-item
       //  label Industries:
       //    span.require *
