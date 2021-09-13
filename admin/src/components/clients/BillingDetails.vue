@@ -31,6 +31,12 @@
         @contactSave="contactSave"
         :withoutImageMode="true"
       )
+    .billing-info__approveModal(v-if="errors.length")
+      ValidationErrors(
+        :errors="errors"
+        :isAbsolute="true"
+        @closeErrors="closeErrors"
+      )
     .billing-info__body
       .billing-info__splited-part
         .billing-info__part-one
@@ -154,6 +160,7 @@
 	import ContactsManageModal from "./ContactsManageModal"
 	import ApproveModal from "../ApproveModal"
 	import SelectMulti from "../SelectMulti"
+	import ValidationErrors from "../ValidationErrors"
 
 	export default {
 		name: "BillingDetails",
@@ -179,7 +186,8 @@
 				controlContacts: [],
 				deletingContactIndex: -1,
 				editingIndex: -1,
-				isDeletingModal: false
+				isDeletingModal: false,
+        errors: [],
 			}
 		},
 		methods: {
@@ -279,12 +287,26 @@
 				this.$emit('closeBillingInfo')
 			},
 			checkErrors() {
-				this.createBillingInfo()
+			  const allErrors = []
+        this.errors = []
+			  if (!this.billingInfoCopy.hasOwnProperty('officialName') || !this.billingInfoCopy.officialName.trim().length) {
+          allErrors.push('Official Name name cannot be empty.')
+        }
+			  if (!this.billingInfoCopy.hasOwnProperty('paymentTerms') || !this.billingInfoCopy.paymentTerms.hasOwnProperty('name')) {
+          allErrors.push('Please select Payment Terms.')
+        }
+			  this.errors.push(...allErrors)
+			  if (!this.errors.length) {
+				  this.createBillingInfo()
+        }
 			},
 			createBillingInfo() {
 				this.$http.post(`/clientsapi/update-billing-info/${ this.$route.params.id }`, { billingInfo: this.billingInfoCopy })
 				this.$emit('updateBillingInfo')
 			},
+      closeErrors() {
+			  this.errors = []
+      },
 			async getAndSetPaymentTerms() {
 				try {
 					const result = await this.$http.get("/api-settings/payment-terms")
@@ -313,7 +335,8 @@
 			SelectSingle,
 			Add,
 			Button,
-			CheckBox
+			CheckBox,
+      ValidationErrors
 		}
 	}
 </script>
