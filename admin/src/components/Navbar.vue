@@ -313,6 +313,30 @@
                   },
                 ]
 
+							},
+              {
+                type: 'group',
+                path: 'receivables',
+                name: 'Receivables',
+                isOpen: false,
+                children: [
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/receivables/reports',
+                    name: 'Invoices'
+                  },
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/receivables/paid-invoices',
+                    name: 'Paid Invoices'
+                  },
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/receivables/create-reports',
+                    name: 'Add Invoices'
+                  },
+                ]
+
 							}
 						]
 					},

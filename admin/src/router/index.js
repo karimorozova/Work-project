@@ -67,6 +67,13 @@ import InvoicingPaidReportsList from "../components/invoicingReports/InvoicingPa
 import InvoicingDetails from "../components/invoicingReports/InvoicingDetails"
 import AddInvoicing from "../components/invoicingReports/AddInvoicing"
 import InvoicingPaidDetails from "../components/invoicingReports/InvoicingPaidDetails"
+
+
+import ReceivablesReportsList from "../components/receivables/ReceivablesReportsList"
+import ReceivablesPaidReportsList from "../components/receivables/ReceivablesPaidReportsList"
+import ReceivablesDetails from "../components/receivables/ReceivablesDetails"
+import ReceivablesAdd from "../components/receivables/ReceivablesAdd"
+import ReceivablesPaidDetails from "../components/receivables/ReceivablesPaidDetails"
 // =====================================================================================================
 
 
@@ -611,7 +618,32 @@ const router = new Router({
 							path: 'invoicing-reports/create-reports',
 							name: 'invoicing-reports',
 							component: AddInvoicing
-						}
+						},
+						{
+							path: 'receivables/reports',
+							name: 'receivables',
+							component: ReceivablesReportsList
+						},
+						{
+							path: 'receivables/paid-invoices',
+							name: 'receivables',
+							component: ReceivablesPaidReportsList
+						},
+						{
+							path: 'receivables/paid-invoices/:id',
+							name: 'receivables',
+							component: ReceivablesPaidDetails
+						},
+						{
+							path: 'receivables/reports/:id',
+							name: 'receivables',
+							component: ReceivablesDetails
+						},
+						{
+							path: 'receivables/create-reports',
+							name: 'receivables',
+							component: ReceivablesAdd
+						},
 
 					]
 				},
