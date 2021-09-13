@@ -68,7 +68,7 @@
 			},
 			getDetails({ index }) {
 				const id = this.projects[index]._id
-				this.$router.push(`/projects/all/details/${ id }`)
+				this.$router.push(`/projects/details/${ id }`)
 			}
 		},
 		components: {
