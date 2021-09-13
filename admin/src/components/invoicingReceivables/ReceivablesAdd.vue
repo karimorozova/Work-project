@@ -3,17 +3,17 @@
     .invoicing-reports-add__container
       .filter
         .filter__item
-          label Vendors:
+          label Clients:
           .filter__input
             SelectMulti(
-              :selectedOptions="selectedVendors"
-              :options="allVendors"
+              :selectedOptions="selectedClients"
+              :options="allClients"
               :hasSearch="true"
               placeholder="Options"
-              @chooseOptions="setVendors"
+              @chooseOptions="setClient"
               :isSelectedWithIcon="true"
               :isRemoveOption="true"
-              @removeOption="removeVendors"
+              @removeOption="removeClients"
             )
         .filter__item
           label Billing Date From:
@@ -74,23 +74,25 @@
               @removeOption="removeTargetLanguages"
             )
         .filter__item
-          label Step:
+          label Service:
           .filter__input
             SelectSingle(
-              :selectedOption="selectedStep"
-              :options="allSettingSteps"
+              :hasSearch="true"
+              :selectedOption="selectedService"
+              :options="allSettingServices"
               placeholder="Option"
-              @chooseOption="setSettingStep"
+              @chooseOption="setSettingService"
               :isRemoveOption="true"
-              @removeOption="removeSettingStep"
+              @removeOption="removeSettingService"
             )
+
       .invoicing-reports-add__table
         LayoutsTable(
           :fields="fields",
-          :tableData="steps",
+          :tableData="tasks",
           :customNumberOfFilterRows="2"
-         @bottomScrolled="bottomScrolled"
-       )
+          @bottomScrolled="bottomScrolled"
+        )
 
           template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .table__header(v-if="field.headerKey === 'headerCheck'")
@@ -101,15 +103,11 @@
             .table__data
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-          template(slot="stepId" slot-scope="{ row, index }")
+          template(slot="taskId" slot-scope="{ row, index }")
+            .table__data {{ row.tasks.taskId }}
 
-            .table__data {{ row.steps.stepId }}
-
-          template(slot="vendorName" slot-scope="{ row, index }")
-            .table__data(v-if="row.currentVendor != null")
-              router-link(class="link-to" :to="{path: `?vendors=${row.currentVendor._id}`}")
-                span {{ row.currentVendor.firstName  +' '+ row.currentVendor.surname || '' }}
-            .table__data(v-else) n/a
+          template(slot="company" slot-scope="{ row, index }")
+            .table__data foo boo
 
           template(slot="startDate" slot-scope="{ row, index }")
             .table__data {{ formattedDate(row.startDate) }}
@@ -121,28 +119,29 @@
             .table__data {{ formattedDate(row.billingDate) }}
 
           template(slot="service" slot-scope="{ row, index }")
-            .table__data {{ row.steps.service.title }}
+            .table__data {{ row.tasks.service.title }}
 
           template(slot="jobStatus" slot-scope="{ row, index }")
-            .table__data {{ row.steps.status }}
+            .table__data {{ row.tasks.status }}
 
           template(slot="langPair" slot-scope="{ row, index }")
-            .table__data {{ row.steps.sourceLanguage}}
+            .table__data(v-if="row.tasks.sourceLanguage === row.tasks.targetLanguage") {{ row.tasks.targetLanguage }}
+            .table__data(v-else) {{ row.tasks.sourceLanguage }}
               span(style="font-size: 12px;color: #9c9c9c;margin: 0 4px;")
                 i(class="fas fa-angle-double-right")
-              | {{ row.steps.targetLanguage }}
+              | {{ row.tasks.targetLanguage }}
 
-          template(slot="payables" slot-scope="{ row, index }")
+          template(slot="price" slot-scope="{ row, index }")
             .table__data
-              span.currency(v-html="'&euro;'")
-              span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit }}
+              span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+              span {{ row.tasks.finance.Price.receivables | roundTwoDigit }}
 
-        .table__empty(v-if="!steps.length") Nothing found...
+        .table__empty(v-if="!tasks.length") Nothing found...
 
       .footer
         .footer__button
           Button(value="Create Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
-        .footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndVendors }}
+        //.footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndClients }}
 
 
 </template>
@@ -157,15 +156,17 @@
 	import SelectSingle from "../SelectSingle"
 	import LayoutsTable from "../LayoutsTable"
 	import DatepickerWithTime from "../DatepickerWithTime"
+	import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 	export default {
+		mixins: [ currencyIconDetected ],
 		data() {
 			return {
 				highlighted: {
 					days: [ 6, 0 ]
 				},
 				isDataRemain: true,
-				steps: [],
+				tasks: [],
 				fields: [
 					{
 						label: "",
@@ -174,15 +175,15 @@
 						style: { width: "36px" }
 					},
 					{
-						label: "Step Id",
-						headerKey: "headerStepId",
-						key: "stepId",
+						label: "Task ID",
+						headerKey: "headerTaskId",
+						key: "taskId",
 						style: { width: "205px" }
 					},
 					{
-						label: "Vendor",
-						headerKey: "headerVendorName",
-						key: "vendorName",
+						label: "Company name",
+						headerKey: "headerCompany",
+						key: "company",
 						style: { width: "220px" }
 					},
 					{
@@ -204,7 +205,7 @@
 						style: { width: "140px" }
 					},
 					{
-						label: "Step",
+						label: "Service",
 						headerKey: "headerService",
 						key: "service",
 						style: { width: "150px" }
@@ -223,30 +224,35 @@
 					},
 					{
 						label: "Fee ",
-						headerKey: "headerPayables",
-						key: "payables",
+						headerKey: "headerPrice",
+						key: "price",
 						style: { width: "140px" }
 					}
 				],
 
-				vendors: '',
+				clients: '',
 				sourceLanguages: '',
 				targetLanguages: '',
 				to: '',
 				from: '',
-				step: '',
+				service: '',
 
 				dataVariables: [
-					'vendors',
+					'clients',
 					'sourceLanguages',
 					'targetLanguages',
 					'to',
 					'from',
-					'step'
+					'service'
 				]
 			}
 		},
 		methods: {
+			replaceRoute(key, value) {
+				let query = this.$route.query
+				delete query[key]
+				this.$router.replace({ path: this.$route.path, query: { ...query, [key]: value } })
+			},
 			removeFromDate() {
 				this.replaceRoute('from', '')
 			},
@@ -259,69 +265,65 @@
 			setToDate(data) {
 				this.replaceRoute('to', moment(data).format('YYYY-MM-DD'))
 			},
+			async sendTasks() {
+				alert("FOO BOO")
+				// const checkedProjects = this.steps.filter(step => step.isCheck)
+				// try {
+				// 	await this.$http.post('/invoicing-reports/create', { checkedProjects, createdBy: this.user._id })
+				// 	await this.getSteps()
+				// 	this.$emit('refreshReports')
+				// } catch (e) {
+				// 	console.log(e)
+				// }
+			},
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY")
 			},
-			async bottomScrolled() {
-				if (this.isDataRemain) {
-					const result = await this.$http.post("/invoicing-reports/not-selected-steps-list", {
-						filters: this.allFilters,
-						countToSkip: this.steps.length,
-						countToGet: 100
-					})
-					this.steps.push(...result.data.map(i => ({ ...i, isCheck: false })))
-					this.isDataRemain = result.data.length === 100
-				}
-			},
 			toggleCheck(index, val) {
-				this.steps[index].isCheck = val
+				this.tasks[index].isCheck = val
 			},
 			toggleAll(val) {
-				this.steps = this.steps.reduce((acc, cur) => {
+				this.tasks = this.tasks.reduce((acc, cur) => {
 					acc.push({ ...cur, isCheck: val })
 					return acc
 				}, [])
 			},
-			async sendTasks() {
-				const checkedProjects = this.steps.filter(step => step.isCheck)
-				try {
-					await this.$http.post('/invoicing-reports/create', { checkedProjects, createdBy: this.user._id })
-					await this.getSteps()
-					this.$emit('refreshReports')
-				} catch (e) {
-					console.log(e)
-				}
-			},
-			async getSteps() {
-				this.steps = (
-						await this.$http.post('/invoicing-reports/not-selected-steps-list', {
+			async getTasks() {
+				this.tasks = (
+						await this.$http.post('/invoicing-receivables/not-selected-tasks-list', {
 							countToSkip: 0,
 							countToGet: 100,
 							filters: this.allFilters
 						})
 				).data.map(i => ({ ...i, isCheck: false }))
 			},
-			replaceRoute(key, value) {
-				let query = this.$route.query
-				delete query[key]
-				this.$router.replace({ path: this.$route.path, query: { ...query, [key]: value } })
+			async bottomScrolled() {
+				if (this.isDataRemain) {
+					const result = await this.$http.post("/invoicing-receivables/not-selected-tasks-list", {
+						filters: this.allFilters,
+						countToSkip: this.tasks.length,
+						countToGet: 100
+					})
+					this.tasks.push(...result.data.map(i => ({ ...i, isCheck: false })))
+					this.isDataRemain = result.data.length === 100
+				}
 			},
-			setVendors({ option }) {
-				if (!this.$route.query.vendors) {
-					this.replaceRoute('vendors', this.getVendorsIdByFullName(option))
+			setClient({ option }) {
+				if (!this.$route.query.clients) {
+					this.replaceRoute('clients', this.getClientsIdByName(option))
 					return
 				}
-				let _ids = this.$route.query.vendors.split(',')
-				if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
-				else _ids.push(this.getVendorsIdByFullName(option))
-				this.replaceRoute('vendors', _ids.join(','))
+				let _ids = this.$route.query.clients.split(',')
+				if (_ids.includes(this.getClientsIdByName(option))) _ids = _ids.filter(_id => _id !== this.getClientsIdByName(option))
+				else _ids.push(this.getClientsIdByName(option))
+				this.replaceRoute('clients', _ids.join(','))
 			},
-			getVendorsIdByFullName(option) {
-				const { _id } = this.vendorsList.find(({ firstName, surname }) => `${ firstName } ${ surname }` === option)
+			getClientsIdByName(option) {
+				const { _id } = this.clientsList.find(({ name }) => `${ name }` === option)
 				return _id
 			},
-			removeVendors() {
-				this.replaceRoute('vendors', '')
+			removeClients() {
+				this.replaceRoute('clients', '')
 			},
 			chooseSourceLanguages({ option }) {
 				if (!this.$route.query.sourceLanguages) {
@@ -353,57 +355,56 @@
 			removeTargetLanguages() {
 				this.replaceRoute('targetLanguages', '')
 			},
-			setSettingStep({ option }) {
-				const { title } = this.settingSteps.find(({ title }) => title === option)
-				this.replaceRoute('step', title)
+			setSettingService({ option }) {
+				const { title } = this.settingServices.find(({ title }) => title === option)
+				this.replaceRoute('service', title)
 			},
-			removeSettingStep() {
-				this.replaceRoute('step', '')
+			removeSettingService() {
+				this.replaceRoute('service', '')
 			},
 			querySetter(vm, to) {
 				for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
 			},
-
 			defaultSetter() {
 				for (let variable of this.dataVariables) this[variable] = ''
 			}
 		},
 		computed: {
 			...mapGetters({
-				user: "getUser",
-				vendorsList: "getAllVendorsForOptions",
+				// 	user: "getUser",
+				clientsList: "getAllClientsForOptions",
 				languages: "getAllLanguages",
-				settingSteps: "getAllSteps"
+				settingServices: "getAllServices"
 			}),
 			allFilters() {
 				const filters = {}
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
 				return filters
 			},
-			calculatingJobsAndVendors() {
-				if (this.isOptionToCreateReport) {
-					const vendors = [ ...new Set(this.steps.filter(item => item.isCheck).map(item => item.currentVendor._id.toString())) ].length
-					const steps = this.steps.filter(item => item.isCheck).length
-					return `Vendors Selected : ${ vendors }, Jobs Selected: ${ steps }`
-				}
-			},
+			// calculatingJobsAndClients() {
+			// 	if (this.isOptionToCreateReport) {
+			// 		const vendors = [ ...new Set(this.steps.filter(item => item.isCheck).map(item => item.currentVendor._id.toString())) ].length
+			// 		const steps = this.steps.filter(item => item.isCheck).length
+			// 		return `Vendors Selected : ${ vendors }, Jobs Selected: ${ steps }`
+			// 	}
+			// },
 			isOptionToCreateReport() {
-				if (this.steps.length) {
-					return this.steps.some(item => item.isCheck)
+				if (this.tasks.length) {
+					return this.tasks.some(item => item.isCheck)
 				}
 				return false
 			},
-			allSettingSteps() {
-				return this.settingSteps.map(({ title }) => title)
+			allSettingServices() {
+				return this.settingServices.map(({ title }) => title)
 			},
-			allVendors() {
-				return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
+			allClients() {
+				return this.clientsList.map(({ name }) => `${ name }`)
 			},
-			selectedVendors() {
-				return this.$route.query.vendors && this.vendorsList.length
-						? this.$route.query.vendors.split(',').map(_id => {
-							const vendor = this.vendorsList.find(vendor => _id === vendor._id)
-							return vendor ? `${ vendor.firstName } ${ vendor.surname }` : ''
+			selectedClients() {
+				return this.$route.query.clients && this.clientsList.length
+						? this.$route.query.clients.split(',').map(_id => {
+							const client = this.clientsList.find(item => _id === item._id)
+							return client ? `${ client.name }` : ''
 						})
 						: []
 			},
@@ -420,8 +421,8 @@
 						? this.$route.query.targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
 						: []
 			},
-			selectedStep() {
-				return this.$route.query.step || ''
+			selectedService() {
+				return this.$route.query.service || ''
 			},
 			fromDateValue() {
 				return this.$route.query.from || ''
@@ -430,7 +431,7 @@
 				return this.$route.query.to || ''
 			},
 			isAllSelected() {
-				 if(this.steps && this.steps.length) return this.steps.every(i => i.isCheck)
+				if (this.tasks && this.tasks.length) return this.tasks.every(i => i.isCheck)
 			}
 		},
 		components: {
@@ -446,14 +447,14 @@
 			next((vm) => {
 				vm.defaultSetter()
 				vm.querySetter(vm, to)
-				vm.getSteps()
+				vm.getTasks()
 			})
 		},
 		watch: {
 			$route(to, from) {
 				if (to.path === from.path) {
 					this.querySetter(this, to)
-					this.getSteps()
+					this.getTasks()
 				}
 			}
 		}
@@ -574,6 +575,7 @@
       color: $text;
     }
   }
+
   a {
     color: inherit;
     text-decoration: none;

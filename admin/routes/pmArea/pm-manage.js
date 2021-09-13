@@ -7,7 +7,8 @@ const {
 	Pricelist,
 	Vendors,
 	Discounts,
-	ClientRequest
+	ClientRequest,
+	Clients
 } = require('../../models')
 
 const {
@@ -57,7 +58,7 @@ const {
 	autoCreatingTranslationTaskInProject,
 	cancelProjectInMemoq,
 	addPaymentAdditions,
-	deletePaymentAddition,
+	deletePaymentAddition
 } = require('../../projects')
 
 const {
@@ -1117,7 +1118,7 @@ router.post('/update-project-discounts', async (req, res) => {
 router.post('/update-project-payment-additions', async (req, res) => {
 	const { _id, addItem } = req.body
 	try {
-		const updatedProject = await addPaymentAdditions(_id,addItem)
+		const updatedProject = await addPaymentAdditions(_id, addItem)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -1128,7 +1129,7 @@ router.post('/update-project-payment-additions', async (req, res) => {
 router.post('/delete-project-payment-additions', async (req, res) => {
 	const { _id, deleteItem } = req.body
 	try {
-		const updatedProject = await deletePaymentAddition(_id,deleteItem)
+		const updatedProject = await deletePaymentAddition(_id, deleteItem)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -1183,6 +1184,16 @@ router.get('/vendors-for-options', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on vendors-for-project!')
+	}
+})
+
+router.get('/clients-for-options', async (req, res) => {
+	try {
+		const result = await Clients.find({ status: "Active" }, { "name": 1 })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on clients-for-options!')
 	}
 })
 

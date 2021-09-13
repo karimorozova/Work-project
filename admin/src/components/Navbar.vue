@@ -316,23 +316,23 @@
 							},
               {
                 type: 'group',
-                path: 'receivables',
+                path: 'invoicing-receivables',
                 name: 'Receivables',
                 isOpen: false,
                 children: [
+                  // {
+                  //   type: 'link',
+                  //   path: '/pangea-finance/invoicing-receivables/reports',
+                  //   name: 'Invoices'
+                  // },
+                  // {
+                  //   type: 'link',
+                  //   path: '/pangea-finance/invoicing-receivables/paid-invoices',
+                  //   name: 'Paid Invoices'
+                  // },
                   {
                     type: 'link',
-                    path: '/pangea-finance/receivables/reports',
-                    name: 'Invoices'
-                  },
-                  {
-                    type: 'link',
-                    path: '/pangea-finance/receivables/paid-invoices',
-                    name: 'Paid Invoices'
-                  },
-                  {
-                    type: 'link',
-                    path: '/pangea-finance/receivables/create-reports',
+                    path: '/pangea-finance/invoicing-receivables/create-reports',
                     name: 'Add Invoices'
                   },
                 ]
@@ -471,7 +471,8 @@
 				setAllUsers: "setAllUsers",
 				setIndustries: "setIndustries",
 				setSteps: "setSteps",
-				setVendorsForOption: 'setVendorsForOption'
+				setVendorsForOption: 'setVendorsForOption',
+				setClientsForOption: 'setClientsForOption'
 			}),
 			async getCurrentUserGroup() {
 				try {
@@ -505,6 +506,7 @@
 			this.setIndustries()
 			this.setSteps()
 			this.setVendorsForOption()
+			this.setClientsForOption()
 		},
 		components: {
 			Header,

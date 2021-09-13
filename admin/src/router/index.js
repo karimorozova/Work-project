@@ -35,7 +35,6 @@ import OverallView from '@/components/dashboard/OverallView'
 import Activity from '@/components/dashboard/Activity'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
-import { store } from '../vuex/store'
 import TableClientApiSetting from "../components/Table/TableClientApiSetting"
 import Navbar from "../components/Navbar"
 import clearRouterView from "../components/clearRouterView"
@@ -69,11 +68,11 @@ import AddInvoicing from "../components/invoicingReports/AddInvoicing"
 import InvoicingPaidDetails from "../components/invoicingReports/InvoicingPaidDetails"
 
 
-import ReceivablesReportsList from "../components/receivables/ReceivablesReportsList"
-import ReceivablesPaidReportsList from "../components/receivables/ReceivablesPaidReportsList"
-import ReceivablesDetails from "../components/receivables/ReceivablesDetails"
-import ReceivablesAdd from "../components/receivables/ReceivablesAdd"
-import ReceivablesPaidDetails from "../components/receivables/ReceivablesPaidDetails"
+import ReceivablesReportsList from "../components/invoicingReceivables/ReceivablesReportsList"
+import ReceivablesPaidReportsList from "../components/invoicingReceivables/ReceivablesPaidReportsList"
+import ReceivablesDetails from "../components/invoicingReceivables/ReceivablesDetails"
+import ReceivablesAdd from "../components/invoicingReceivables/ReceivablesAdd"
+import ReceivablesPaidDetails from "../components/invoicingReceivables/ReceivablesPaidDetails"
 // =====================================================================================================
 
 
@@ -620,28 +619,28 @@ const router = new Router({
 							component: AddInvoicing
 						},
 						{
-							path: 'receivables/reports',
-							name: 'receivables',
+							path: 'invoicing-receivables/reports',
+							name: 'invoicing-receivables',
 							component: ReceivablesReportsList
 						},
 						{
-							path: 'receivables/paid-invoices',
-							name: 'receivables',
+							path: 'invoicing-receivables/paid-invoices',
+							name: 'invoicing-receivables',
 							component: ReceivablesPaidReportsList
 						},
 						{
-							path: 'receivables/paid-invoices/:id',
-							name: 'receivables',
+							path: 'invoicing-receivables/paid-invoices/:id',
+							name: 'invoicing-receivables',
 							component: ReceivablesPaidDetails
 						},
 						{
-							path: 'receivables/reports/:id',
-							name: 'receivables',
+							path: 'invoicing-receivables/reports/:id',
+							name: 'invoicing-receivables',
 							component: ReceivablesDetails
 						},
 						{
-							path: 'receivables/create-reports',
-							name: 'receivables',
+							path: 'invoicing-receivables/create-reports',
+							name: 'invoicing-receivables',
 							component: ReceivablesAdd
 						},
 

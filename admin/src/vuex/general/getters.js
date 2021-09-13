@@ -15,6 +15,7 @@ export const getAllIndustries= state => state.industries;
 export const getAllSteps = state => state.steps;
 export const getAllVendorsForProject = state => state.vendorsForProject
 export const getAllVendorsForOptions = state => state.vendorsForOptions
+export const getAllClientsForOptions = state => state.clientsForOptions
 export const getAllUnits = state => state.units
 export const getAllServices = state => state.services
 

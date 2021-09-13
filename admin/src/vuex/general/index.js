@@ -8,6 +8,7 @@ const state = {
     industries: [],
     vendorsForProject: [],
     vendorsForOptions: [],
+    clientsForOptions: [],
     services: [],
     units: [],
     customers: [],
