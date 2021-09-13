@@ -1,7 +1,7 @@
 <template lang="pug">
   .overallView
     div(v-if="isAdmin")
-      .row
+      .row(v-if="user.email === 'michal@pangea.global'")
         .col
           XtrfStatsToday( :xtrfStats="todayStats")
       .row
