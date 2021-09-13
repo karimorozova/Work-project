@@ -7,12 +7,12 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	invoiceId: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	clientId: {
+	// invoiceId: {
+	// 	type: String,
+	// 	default: '',
+	// 	trim: true
+	// },
+	client: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients'
 	},
@@ -33,38 +33,38 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	},
-	paymentDetails: {
-		paymentMethod: {
-			type: String,
-			default: ''
-		},
-		// file: {
-		// 	type: Object,
-		// 	default: () => ({})
-		// },
-		expectedPaymentDate: {
-			type: Date
-		},
-	},
-	paymentInformation: [{
-		paidAmount: {
-			type: Number,
-		},
-		unpaidAmount: {
-			type: Number
-		},
-		paymentMethod: {
-			type: String,
-		},
-		paymentDate: {
-			type: Date,
-			default: new Date()
-		},
-		notes: {
-			type: String,
-			default: ""
-		}
-	}],
+	// paymentDetails: {
+	// 	paymentMethod: {
+	// 		type: String,
+	// 		default: ''
+	// 	},
+	// 	// file: {
+	// 	// 	type: Object,
+	// 	// 	default: () => ({})
+	// 	// },
+	// 	expectedPaymentDate: {
+	// 		type: Date
+	// 	},
+	// },
+	// paymentInformation: [{
+	// 	paidAmount: {
+	// 		type: Number,
+	// 	},
+	// 	unpaidAmount: {
+	// 		type: Number
+	// 	},
+	// 	paymentMethod: {
+	// 		type: String,
+	// 	},
+	// 	paymentDate: {
+	// 		type: Date,
+	// 		default: new Date()
+	// 	},
+	// 	notes: {
+	// 		type: String,
+	// 		default: ""
+	// 	}
+	// }],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
