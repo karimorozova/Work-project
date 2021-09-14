@@ -98,6 +98,7 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 				'billingDate': 1,
 				'projectCurrency': 1,
 				'paymentProfile': 1,
+				'clientBillingInfo': 1,
 				'customer': { $arrayElemAt: [ "$customer", 0 ] }
 			}
 		},
