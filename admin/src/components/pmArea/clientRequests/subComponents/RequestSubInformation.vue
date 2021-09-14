@@ -15,14 +15,14 @@
       .row__data {{ project.status }}
     .sub-information__row
       .row__title Payment Profile:
-      .row__data(v-if="canUpdateRequest")
-        SelectSingle.drop(
-          placeholder="Select",
-          :selectedOption="project.paymentProfile",
-          :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
-          @chooseOption="setPayment"
-        )
-      .row__data(v-else) {{ project.paymentProfile }}
+      //.row__data(v-if="canUpdateRequest")
+      //  SelectSingle.drop(
+      //    placeholder="Select",
+      //    :selectedOption="project.paymentProfile",
+      //    :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
+      //    @chooseOption="setPayment"
+      //  )
+      .row__data {{ project.paymentProfile || 'Not assigned' }}
     .sub-information__row
       .row__title Urgent:
       .row__data
@@ -323,22 +323,22 @@
 			setClientContact({ option }) {
 				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option)
 			},
-			async setPayment({ option }) {
-				try {
-					await this.updateClientsRequestsProps({ projectId: this.project._id, value: { paymentProfile: option } })
-					this.alertToggle({
-						message: "Project payment profile updated",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Cannot update project payment profile",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
+			// async setPayment({ option }) {
+			// 	try {
+			// 		await this.updateClientsRequestsProps({ projectId: this.project._id, value: { paymentProfile: option } })
+			// 		this.alertToggle({
+			// 			message: "Project payment profile updated",
+			// 			isShow: true,
+			// 			type: "success"
+			// 		})
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Cannot update project payment profile",
+			// 			isShow: true,
+			// 			type: "error"
+			// 		})
+			// 	}
+			// },
 			async setUrgentStatus(event) {
 				if (!this.canUpdateRequest) return
 				try {

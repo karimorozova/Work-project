@@ -15,38 +15,36 @@
 </template>
 
 <script>
-import Request from "./subComponents/Request"
-import { mapGetters, mapActions } from "vuex"
-import RequestSubInformation from "./subComponents/RequestSubInformation"
-import RequestTasksAndSteps from "./RequestTasksAndSteps";
-import RequestAction from "./subComponents/RequestAction"
+	import Request from "./subComponents/Request"
+	import { mapGetters, mapActions } from "vuex"
+	import RequestSubInformation from "./subComponents/RequestSubInformation"
+	import RequestTasksAndSteps from "./RequestTasksAndSteps"
+	import RequestAction from "./subComponents/RequestAction"
 
-export default {
-  data(){
-    return {
-      clientRequest: {}
-    }
-  },
-	methods: {
-		showErrors() {
+	export default {
+		data() {
+			return {}
+		},
+		methods: {
+			showErrors() {
+
+			},
+			setDate() {
+
+			}
 
 		},
-		setDate(){
-
-    },
-
-	},
-  computed: {
-    ...mapGetters({
-      currentClientRequest: "getCurrentClientRequest",
-	    originallyLanguages: 'getAllLanguages',
-	    originallySteps: 'getAllSteps',
-	    originallyServices: "getAllServices",
-	    originallyUnits: "getAllUnits",
-    }),
-  },
-  components: { RequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
-}
+		computed: {
+			...mapGetters({
+				currentClientRequest: "getCurrentClientRequest",
+				originallyLanguages: 'getAllLanguages',
+				originallySteps: 'getAllSteps',
+				originallyServices: "getAllServices",
+				originallyUnits: "getAllUnits"
+			})
+		},
+		components: { RequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
+	}
 </script>
 
 <style scoped lang="scss">

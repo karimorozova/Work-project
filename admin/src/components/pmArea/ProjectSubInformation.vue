@@ -17,14 +17,14 @@
       .row__data {{ project.status }}
     .sub-information__row
       .row__title Payment Profile:
-      .row__data(v-if="!isProjectFinished")
-        SelectSingle.drop(
-          placeholder="Select",
-          :selectedOption="project.paymentProfile",
-          :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
-          @chooseOption="setPayment"
-        )
-      .row__data(v-else) {{ project.paymentProfile }}
+      //.row__data(v-if="!isProjectFinished")
+        //SelectSingle.drop(
+        //  placeholder="Select",
+        //  :selectedOption="project.paymentProfile",
+        //  :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
+        //  @chooseOption="setPayment"
+        //)
+      .row__data {{ project.paymentProfile || 'Not assigned' }}
     .sub-information__row
       .row__title Urgent:
       .row__data
@@ -311,26 +311,26 @@
 			setClientContact({ option }) {
 				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option)
 			},
-			async setPayment({ option }) {
-				try {
-					const result = await this.$http.post("/pm-manage/payment-profile", {
-						projectId: this.project._id,
-						paymentProfile: option
-					})
-					this.project.paymentProfile = result.data.paymentProfile
-					this.alertToggle({
-						message: "Project payment profile updated",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Cannot update project payment profile",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
+			// async setPayment({ option }) {
+			// 	try {
+			// 		const result = await this.$http.post("/pm-manage/payment-profile", {
+			// 			projectId: this.project._id,
+			// 			paymentProfile: option
+			// 		})
+			// 		this.project.paymentProfile = result.data.paymentProfile
+			// 		this.alertToggle({
+			// 			message: "Project payment profile updated",
+			// 			isShow: true,
+			// 			type: "success"
+			// 		})
+			// 	} catch (err) {
+			// 		this.alertToggle({
+			// 			message: "Cannot update project payment profile",
+			// 			isShow: true,
+			// 			type: "error"
+			// 		})
+			// 	}
+			// },
 			async setUrgentStatus(event) {
 				try {
 					const result = await this.$http.post("/pm-manage/urgent", {

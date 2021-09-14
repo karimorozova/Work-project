@@ -36,7 +36,7 @@
         @notApprove="doNotDelete"
       )
     .delete-button
-      Button(customClass="middle" color="#d15f45" :isDisabled="!!requestCounter" :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
+      Button(customClass="middle" color="#d15f45"  :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
 
 </template>
 

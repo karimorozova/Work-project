@@ -923,16 +923,16 @@ router.post('/urgent', async (req, res) => {
 	}
 })
 
-router.post('/payment-profile', async (req, res) => {
-	const { projectId, paymentProfile } = req.body
-	try {
-		const project = await getProjectAfterUpdate({ _id: projectId }, { paymentProfile })
-		res.send(project)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on updating payment profile')
-	}
-})
+// router.post('/payment-profile', async (req, res) => {
+// 	const { projectId, paymentProfile } = req.body
+// 	try {
+// 		const project = await getProjectAfterUpdate({ _id: projectId }, { paymentProfile })
+// 		res.send(project)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on updating payment profile')
+// 	}
+// })
 
 router.post('/client-contact', async (req, res) => {
 	const { projectId, contact, oldContact: { _id: oldContact } } = req.body

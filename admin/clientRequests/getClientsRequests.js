@@ -107,6 +107,11 @@ async function getClientRequestById(id) {
       ])
       .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
       .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+
+		requests._doc.clientBillingInfo = !!requests.clientBillingInfo
+				? requests.customer.billingInfo.find(({_id}) =>  `${requests.clientBillingInfo}` === `${_id}`)
+				: null
+
 		return requests
 	} catch(err) {
 		console.log(err);

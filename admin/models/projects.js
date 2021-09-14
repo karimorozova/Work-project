@@ -34,7 +34,7 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	requestId:{
+	requestId: {
 		type: Schema.Types.ObjectId, ref: 'ClientRequest',
 		default: null
 	},
@@ -54,8 +54,9 @@ const ProjectsSchema = new mongoose.Schema({
 		trim: true
 	},
 	clientBillingInfo: {
-		type:  Schema.Types.ObjectId,
+		type: Schema.Types.ObjectId,
 		ref: 'Clients.billingInfo',
+		default: null
 	},
 	startDate: {
 		type: Date,
@@ -94,197 +95,197 @@ const ProjectsSchema = new mongoose.Schema({
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
 	},
-  tasksDR1: [{
-    timestamp: {
-      type: Date,
-      default: ""
-    },
-    dr1Manager: {
-      type: Schema.Types.ObjectId,
-      ref: "User"
-    },
-    dr2Manager: {
-      type: Schema.Types.ObjectId,
-      ref: "User"
-    },
-    comment: {
-      type: String,
-      default: '',
-    },
-    // status: {
-    //   type: String,
-    //   default: "Started",
-    //   trim: true
-    // },
-    instructions: {
-      type: Array,
-      default: [],
-    },
-    taskId: {
-      type: String,
-      default: "",
-      trim: true
-    },
-    files: [
-      {
-        fileName: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        path: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        isFileApproved: {
-          type: Boolean,
-          default: false
-        },
-        isFilePushedDR2: {
-          type: Boolean,
-          default: false
-        }
-      }
-    ],
-  }],
-  tasksDR2: {
-    singleLang: [{
-	    deliveryInternalId:{
-		    type: String,
-		    default: '',
-		    trim: true
-	    },
-	    deliveryName: {
-		    type: String,
-		    trim: true,
-		    default: ''
-	    },
-      status: {
-        type: String,
-        default: '',
-      },
-      timestamp: {
-        type: Date,
-        default: '',
-      },
-      instructions: {
-        type: Array,
-        default: [],
-      },
-      comment: {
-        type: String,
-        default: '',
-      },
-      sourceLanguage: {
-        type: Schema.Types.ObjectId,
-        ref: 'Language'
-      },
-      targetLanguage: {
-        type: Schema.Types.ObjectId,
-        ref: 'Language'
-      },
-      files: [{
-        fileName: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        path: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        isFileApproved: {
-          type: Boolean,
-          default: false
-        },
-        taskId: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        dr1Manager: {
-          type: Schema.Types.ObjectId,
-          ref: "User"
-        },
-        dr2Manager: {
-          type: Schema.Types.ObjectId,
-          ref: "User"
-        },
-      }]
-    }],
-    multiLang: [{
-	    deliveryInternalId:{
-		    type: String,
-		    default: '',
-		    trim: true
-	    },
-	    deliveryName: {
-	    	type: String,
-		    trim: true,
-		    default: ''
-	    },
-      status: {
-        type: String,
-        default: '',
-      },
-      comment: {
-        type: String,
-        default: '',
-      },
-      tasks: [{type: String}],
-      instructions: {
-        type: Array,
-        default: [],
-      },
-      timestamp: {
-        type: Date,
-        default: ""
-      },
-      file: [{
-        fileName: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        path: {
-          type: String,
-          default: "",
-          trim: true
-        },
-        isFileApproved: {
-          type: Boolean,
-          default: false
-        },
-        dr1Manager: {
-          type: Schema.Types.ObjectId,
-          ref: "User"
-        },
-        dr2Manager: {
-          type: Schema.Types.ObjectId,
-          ref: "User"
-        },
-      }]
-    }],
-  },
-  tasksDeliverables: [{
-    deliverablesId: {
-      type: String,
-    },
-    path: {
-      type: String,
-      default: "",
-      trim: true
-    },
-    deliveredAt: {
-      type: Date,
-      default: new Date()
-    },
-    deliveredBy: {
-      type: Schema.Types.ObjectId, ref: 'User'
-    }
-  }],
+	tasksDR1: [ {
+		timestamp: {
+			type: Date,
+			default: ""
+		},
+		dr1Manager: {
+			type: Schema.Types.ObjectId,
+			ref: "User"
+		},
+		dr2Manager: {
+			type: Schema.Types.ObjectId,
+			ref: "User"
+		},
+		comment: {
+			type: String,
+			default: ''
+		},
+		// status: {
+		//   type: String,
+		//   default: "Started",
+		//   trim: true
+		// },
+		instructions: {
+			type: Array,
+			default: []
+		},
+		taskId: {
+			type: String,
+			default: "",
+			trim: true
+		},
+		files: [
+			{
+				fileName: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				path: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				isFileApproved: {
+					type: Boolean,
+					default: false
+				},
+				isFilePushedDR2: {
+					type: Boolean,
+					default: false
+				}
+			}
+		]
+	} ],
+	tasksDR2: {
+		singleLang: [ {
+			deliveryInternalId: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			deliveryName: {
+				type: String,
+				trim: true,
+				default: ''
+			},
+			status: {
+				type: String,
+				default: ''
+			},
+			timestamp: {
+				type: Date,
+				default: ''
+			},
+			instructions: {
+				type: Array,
+				default: []
+			},
+			comment: {
+				type: String,
+				default: ''
+			},
+			sourceLanguage: {
+				type: Schema.Types.ObjectId,
+				ref: 'Language'
+			},
+			targetLanguage: {
+				type: Schema.Types.ObjectId,
+				ref: 'Language'
+			},
+			files: [ {
+				fileName: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				path: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				isFileApproved: {
+					type: Boolean,
+					default: false
+				},
+				taskId: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				dr1Manager: {
+					type: Schema.Types.ObjectId,
+					ref: "User"
+				},
+				dr2Manager: {
+					type: Schema.Types.ObjectId,
+					ref: "User"
+				}
+			} ]
+		} ],
+		multiLang: [ {
+			deliveryInternalId: {
+				type: String,
+				default: '',
+				trim: true
+			},
+			deliveryName: {
+				type: String,
+				trim: true,
+				default: ''
+			},
+			status: {
+				type: String,
+				default: ''
+			},
+			comment: {
+				type: String,
+				default: ''
+			},
+			tasks: [ { type: String } ],
+			instructions: {
+				type: Array,
+				default: []
+			},
+			timestamp: {
+				type: Date,
+				default: ""
+			},
+			file: [ {
+				fileName: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				path: {
+					type: String,
+					default: "",
+					trim: true
+				},
+				isFileApproved: {
+					type: Boolean,
+					default: false
+				},
+				dr1Manager: {
+					type: Schema.Types.ObjectId,
+					ref: "User"
+				},
+				dr2Manager: {
+					type: Schema.Types.ObjectId,
+					ref: "User"
+				}
+			} ]
+		} ]
+	},
+	tasksDeliverables: [ {
+		deliverablesId: {
+			type: String
+		},
+		path: {
+			type: String,
+			default: "",
+			trim: true
+		},
+		deliveredAt: {
+			type: Date,
+			default: new Date()
+		},
+		deliveredBy: {
+			type: Schema.Types.ObjectId, ref: 'User'
+		}
+	} ],
 	tasks: {
 		type: Array,
 		default: []
@@ -337,8 +338,8 @@ const ProjectsSchema = new mongoose.Schema({
 		vendorsClickedOffer: Array,
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: "",
-		isInReport: {type: Boolean, default: false},
-		isPaid: {type: Boolean, default: false},
+		isInReport: { type: Boolean, default: false },
+		isPaid: { type: Boolean, default: false }
 	} ],
 	// TODO: refactoring
 	totalCost: {

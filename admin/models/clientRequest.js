@@ -12,6 +12,11 @@ const ClientRequestSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	clientBillingInfo: {
+		type: Schema.Types.ObjectId,
+		ref: 'Clients.billingInfo',
+		default: null
+	},
 	isUrgent: {
 		type: Boolean,
 		default: false
@@ -34,7 +39,7 @@ const ClientRequestSchema = new mongoose.Schema({
 		type: Date
 	},
 	createdBy: {
-		type: Object,
+		type: Object
 	},
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
@@ -164,123 +169,8 @@ const ClientRequestSchema = new mongoose.Schema({
 		isCheckComplianceTemplate: {
 			type: Boolean,
 			default: false
-		},
+		}
 	}
-
-	//  type: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  projectName: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  clientProjectNumber: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  startDate: {
-	//      type: Date,
-	//      default: Date.now
-	//  },
-	//  deadline: {
-	//      type: Date,
-	//      default: Date.now
-	//  },
-	//  isDeadlineApproved: {
-	//      type: Boolean,
-	//      default: false
-	//  },
-	//  industry: {
-	//      type: Schema.Types.ObjectId, ref: 'Industries'
-	//  },
-	//  service: {
-	//      type: Schema.Types.ObjectId, ref: 'Services'
-	//  },
-	//  status: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  isAssigned: {
-	//      type: Boolean,
-	//      default: false
-	//  },
-	//  accountManager: {
-	//      type: Schema.Types.ObjectId, ref: 'User'
-	//  },
-	//  projectManager: {
-	//      type: Schema.Types.ObjectId, ref: 'User'
-	//  },
-	//  salesManager: {
-	//      type: Schema.Types.ObjectId, ref: 'User'
-	//  },
-	//  customer: {
-	//      type: Schema.Types.ObjectId, ref: 'Clients'
-	//  },
-	//  sourceLanguage: {
-	//      type: Object,
-	//      default: null
-	//  },
-	//  targetLanguages: {
-	//      type: Array,
-	//      default: []
-	//  },
-	//  packageSize: {
-	//      type: Object,
-	//      default: null
-	//  },
-	//  brief: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  isBriefApproved: {
-	//      type: Boolean,
-	//      default: false
-	//  },
-	//  notes: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  tones: {
-	//      type: Array,
-	//      default: []
-	//  },
-	//  sourceFiles: {
-	//      type: Array,
-	//      default: []
-	//  },
-	//  refFiles: {
-	//      type: Array,
-	//      default: []
-	//  },
-	//  genBrief: {
-	//      type: Object,
-	//      default: null
-	//  },
-	//  structure: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  style: {
-	//      type: String,
-	//      default: '',
-	//      trim: true
-	//  },
-	//  designs: {
-	//      type: Array,
-	//      default: []
-	//  },
-	//  seo: {
-	//      type: Array,
-	//      default: []
-	//  }
 })
 
 const ClientRequest = mongoose.model('ClientRequest', ClientRequestSchema)

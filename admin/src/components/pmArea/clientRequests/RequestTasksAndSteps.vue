@@ -7,7 +7,6 @@
       .tasks-steps__closeAddTask(v-if="canUpdateRequest && isTaskData" @click="toggleTaskData")
         i.fas.fa-times-circle
 
-      //img.tasks-steps__arrow(v-if="canUpdateRequest" src="../../../assets/images/open-close-arrow-brown.png" @click="toggleTaskData" :class="{'tasks-steps_rotate': isTaskData }")
     div(v-if="canUpdateRequest")
       transition(name="slide-fade")
         RequestTasksData(
@@ -93,7 +92,7 @@
           template(slot="deadline" slot-scope="{ row, index }")
             .tasks__data {{ row.deadline }}
 
-    .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
+    .button(v-if="(!isTaskData && currentTasks.length && canUpdateRequest) && currentProject.clientBillingInfo")
       .button__convert
         Button(value="Convert into Project" :isDisabled="isButtonDisable" @clicked="convertIntoProject")
 
