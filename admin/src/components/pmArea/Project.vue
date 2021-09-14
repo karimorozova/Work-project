@@ -97,7 +97,7 @@
             )
         .project__number
           .input-title
-            .input-title__text Billing Info:
+            .input-title__text Billing Information:
             span.require *
           input.project__input-text( v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''" disabled)
           .project__drop-menu(v-else)
@@ -105,14 +105,8 @@
               :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''"
               :options="billingInfoList.map(({officialName}) => officialName)"
               @chooseOption="choseBillingInfo"
-              placeholder="Billing Info"
+              placeholder="Option"
             )
-
-        //.project__number
-        //  .input-title
-        //    .input-title__text Client Project Number:
-        //    span.require
-        //  input.project__input-text(type="text" :disabled="isProjectFinished" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
           label(for="test") Test
@@ -246,13 +240,6 @@
 							this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
 				}
 			},
-			async setClientNumber(e) {
-				const { value } = e.target
-				if (!this.project._id) {
-					return this.$emit('setValue', { prop: 'clientProjectNumber', option: value })
-				}
-				await this.setProjectProp({ prop: 'clientProjectNumber', value })
-			},
 			async setProjectProp({ prop, value }) {
 				try {
 					const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value })
@@ -268,28 +255,26 @@
 					this.selectedIndustry = ""
 				}
 			},
-      setCustomer({option}) {
-        if(option.billingInfo.length === 1) {
-          this.setBillingInfo(option.billingInfo[0])
-        } else {
-          this.setBillingInfo('')
-        }
-        this.$emit('setValue', {option, prop: 'customer'})
-      },
-      async choseBillingInfo({option}) {
-        const billingInfo = this.billingInfoList.find(({officialName}) => officialName === option)
-        if (!this.project._id) {
-          this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
-        }else {
-          await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
-        }
-
-      },
-
-      setBillingInfo(billingInfo) {
-
-        this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
-      },
+			setCustomer({ option }) {
+				if (option.billingInfo.length === 1) {
+					this.setBillingInfo(option.billingInfo[0])
+				} else {
+					this.setBillingInfo('')
+				}
+				this.$emit('setValue', { option, prop: 'customer' })
+			},
+			async choseBillingInfo({ option }) {
+				const billingInfo = this.billingInfoList.find(({ officialName }) => officialName === option)
+				if (!this.project._id) {
+					this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
+				} else {
+					await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
+					await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
+				}
+			},
+			setBillingInfo(billingInfo) {
+				this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
+			},
 			setIndustry({ option }) {
 				this.selectedIndustry = option
 			},
@@ -311,7 +296,7 @@
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
 				if (!this.project.customer.name) this.errors.push("Please, select a Client.")
 				if (!this.selectedIndustry) this.errors.push("Please, choose an industry.")
-				if (!this.project.clientBillingInfo || !this.project.clientBillingInfo.hasOwnProperty('_id')) this.errors.push("Please, choose an BillingInfo.")
+				if (!this.project.clientBillingInfo || !this.project.clientBillingInfo.hasOwnProperty('_id')) this.errors.push("Please, choose an Billing Information.")
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					return
@@ -375,7 +360,7 @@
 				const { id } = this.$route.params
 				if (id !== undefined) {
 					const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
-          await this.setCurrentProject(curProject.body)
+					await this.setCurrentProject(curProject.body)
 				}
 			},
 			isBillingDate() {
@@ -402,17 +387,17 @@
 				let res = []
 				if (this.project.customer.name) {
 					const { customer: { services } } = this.project
-          for (let industry of services.map(i => i.industries[0])){
-          	if(!res.length) res.push(industry)
-            if(!res.map(i => i.name).includes(industry.name)) res.push(industry)
-          }
+					for (let industry of services.map(i => i.industries[0])) {
+						if (!res.length) res.push(industry)
+						if (!res.map(i => i.name).includes(industry.name)) res.push(industry)
+					}
 					return res
 				}
 			},
-      billingInfoList() {
+			billingInfoList() {
 				if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
-					const  billingInfo  = this.project.customer.billingInfo
-					return billingInfo.map(({_id, officialName}) => ({_id, officialName}))
+					const billingInfo = this.project.customer.billingInfo
+					return billingInfo.map(({ _id, officialName, paymentType }) => ({ _id, officialName, paymentType }))
 				}
 				return []
 			},
@@ -452,11 +437,12 @@
     display: flex;
 
     &__text {
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .require {
-      color: red;
+      color: $red;
+      padding-left: 2px;
     }
   }
 

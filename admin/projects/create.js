@@ -25,8 +25,7 @@ async function createProject(project, user) {
 
   try {
     const { USD, GBP } = await CurrencyRatio.findOne();
-    //TODO: refactor | Client PaymentType
-    const { contacts, paymentType, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
+    const { contacts, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
     const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lte: todayEnd } });
 
     const currNumber = getNextProjectNumber(todayProjects)
@@ -36,7 +35,7 @@ async function createProject(project, user) {
     project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber;
     project.projectManager  = (role === 'Project Managers') ? roleId : projectManager._id
     project.accountManager = accountManager._id;
-    project.paymentProfile = paymentType;
+    project.paymentProfile = project.clientBillingInfo.paymentType;
     project.clientContacts = [contacts.find(({ leadContact }) => leadContact)];
     project.discounts = discounts;
     project.minimumCharge = { value: minPrice, toIgnore: false };
@@ -64,7 +63,7 @@ const createProjectFromRequest = async (requestId) => {
   todayEnd.setUTCHours(23, 59, 59, 0)
 
   const request = await getClientRequestById(requestId)
-  const { projectManager, accountManager, paymentProfile, clientContacts, projectName, isUrgent, brief, notes, startDate, deadline, billingDate, industry, customer, createdBy } = request
+  const { projectManager, accountManager, paymentProfile, clientContacts, projectName, clientBillingInfo, isUrgent, brief, notes, deadline, billingDate, industry, customer, createdBy } = request
   const { _id,  minPrice, currency } = customer
   const { discounts } = await Clients.findOne({ '_id': _id }).populate('discounts');
 
@@ -89,6 +88,7 @@ const createProjectFromRequest = async (requestId) => {
     projectId: "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber,
     projectManager,
     accountManager,
+    clientBillingInfo,
     paymentProfile,
     clientContacts,
     discounts,
