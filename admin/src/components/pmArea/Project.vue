@@ -275,10 +275,15 @@
         }
         this.$emit('setValue', {option, prop: 'customer'})
       },
-      choseBillingInfo({option}) {
+      async choseBillingInfo({option}) {
         const billingInfo = this.billingInfoList.find(({officialName}) => officialName === option)
-        this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
+        if (!this.project._id) {
+          this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
+        }
+        await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
+
       },
+
       setBillingInfo(billingInfo) {
 
         this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
