@@ -32,8 +32,8 @@
       template(slot="officialName" slot-scope="{ row, index }")
         .table__data {{ row.officialName }}
 
-      template(slot="paymentTerms" slot-scope="{ row, index }")
-        .table__data {{ (row.paymentTerms && row.paymentTerms.name) || '' }}
+      template(slot="paymentType" slot-scope="{ row, index }")
+        .table__data {{ row.paymentType || '' }}
 
       template(slot="country" slot-scope="{ row, index }")
         .table__data {{ row.address.country }}
@@ -87,9 +87,9 @@
 						style: { width: "24%" }
 					},
 					{
-						label: "Payment Terms",
-						headerKey: "headerPaymentTerms",
-						key: "paymentTerms",
+						label: "Payment Type",
+						headerKey: "headerPaymentType",
+						key: "paymentType",
 						style: { width: "24%" }
 					},
 					{

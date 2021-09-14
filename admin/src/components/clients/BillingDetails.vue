@@ -44,12 +44,26 @@
 
           .billing-info__field
             label Company name:
-            input(v-model="billingInfoCopy.officialName" placeholder="Value")
+              span.require *
+            input(v-model="billingInfoCopy.officialName" placeholder="Value" :class="{'error-shadow': !billingInfoCopy.officialName && isSaveClicked}")
 
           .billing-info__field
-            label Payment terms:
+            label Payment type:
+              span.require *
             .field__select-single
               SelectSingle(
+                :class="{'error-shadow': !billingInfoCopy.paymentType && isSaveClicked}"
+                :options="['PPP', 'Pre-Payment', 'Monthly', 'Custom']"
+                placeholder="Payment Type",
+                :selectedOption="billingInfoCopy.paymentType",
+                @chooseOption="setPaymentType"
+              )
+          .billing-info__field
+            label Payment terms:
+              span.require *
+            .field__select-single
+              SelectSingle(
+                :class="{'error-shadow': (!billingInfoCopy.paymentTerms || !billingInfoCopy.paymentTerms.name) && isSaveClicked}"
                 placeholder="Select"
                 :options="paymentTerms.map(({name}) => name)"
                 :selectedOption="(billingInfoCopy.paymentTerms && billingInfoCopy.paymentTerms.name) || ''"
@@ -188,6 +202,7 @@
 				editingIndex: -1,
 				isDeletingModal: false,
         errors: [],
+        isSaveClicked: false,
 			}
 		},
 		methods: {
@@ -279,7 +294,6 @@
 				this.$set(this.billingInfoCopy.address, 'state', option)
 			},
 			setPaymentTerms({ option }) {
-				console.log(this.paymentTerms.find(i => i.name === option))
 				this.$set(this.billingInfoCopy, 'paymentTerms', this.paymentTerms.find(i => i.name === option))
 			},
 			closeModal() {
@@ -289,12 +303,19 @@
 			checkErrors() {
 			  const allErrors = []
         this.errors = []
+        this.isSaveClicked = true
 			  if (!this.billingInfoCopy.hasOwnProperty('officialName') || !this.billingInfoCopy.officialName.trim().length) {
           allErrors.push('Official Name name cannot be empty.')
         }
+
+        if (!this.billingInfoCopy.hasOwnProperty('paymentType') || !this.billingInfoCopy.paymentType.trim().length) {
+          allErrors.push('Please select Payment Type.')
+        }
+
 			  if (!this.billingInfoCopy.hasOwnProperty('paymentTerms') || !this.billingInfoCopy.paymentTerms.hasOwnProperty('name')) {
           allErrors.push('Please select Payment Terms.')
         }
+
 			  this.errors.push(...allErrors)
 			  if (!this.errors.length) {
 				  this.createBillingInfo()
@@ -343,6 +364,12 @@
 
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
+
+  .require {
+    margin-left: 2px;
+    color: $red;
+    font-size: 14px;
+  }
 
   .contactModalAuto {
     padding: 25px;
@@ -591,7 +618,9 @@
       }
     }
   }
-
+  .error-shadow {
+    box-shadow: 0 0 5px $red;
+  }
   .items {
     display: flex;
     gap: 20px;

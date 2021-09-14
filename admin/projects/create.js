@@ -25,6 +25,7 @@ async function createProject(project, user) {
 
   try {
     const { USD, GBP } = await CurrencyRatio.findOne();
+    //TODO: refactor | Client PaymentType
     const { contacts, paymentType, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts');
     const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lte: todayEnd } });
 
