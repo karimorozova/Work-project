@@ -313,7 +313,7 @@
 					'nativeLanguage',
 					'timeZone',
 					'status',
-					'paymentType',
+					// 'paymentType',
 					'accountManager',
 					'salesManager',
 					'projectManager',
@@ -616,9 +616,9 @@
 				} ]
 
         // TODO: refacoring
-        clientForSave.paymentType = "PPP"
 				clientForSave.billingInfo = {
 					officialName: this.currentClientOverallData.name,
+          paymentType: "PPP",
           paymentTerms: '',
           address: {
             country: '',

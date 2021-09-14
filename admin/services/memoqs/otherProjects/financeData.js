@@ -192,6 +192,7 @@ const getUpdatedProjectData = async (project, allClients) => {
       projectManager: ObjectId(neededCustomer.projectManager._id),
       accountManager: ObjectId(neededCustomer.accountManager._id),
       industry: ObjectId(industry._id),
+      //TODO: refactor | Client PaymentType
       paymentProfile: neededCustomer.paymentType,
     };
   }

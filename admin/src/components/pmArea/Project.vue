@@ -99,7 +99,8 @@
           .input-title
             .input-title__text Billing Info:
             span.require *
-          .project__drop-menu
+          input.project__input-text( v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''" disabled)
+          .project__drop-menu(v-else)
             SelectSingle(
               :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''"
               :options="billingInfoList.map(({officialName}) => officialName)"

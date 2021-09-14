@@ -12,16 +12,16 @@
             :selectedOption="currentClientOverallData.status",
             @chooseOption="setStatus"
           )
-      .block-item
-        label.block-item__label Payment Type:
-          span.require *
-        .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.paymentType}")
-          SelectSingle(
-            :options="['PPP', 'Pre-Payment', 'Monthly', 'Custom']",
-            placeholder="Payment Type",
-            :selectedOption="currentClientOverallData.paymentType",
-            @chooseOption="setPaymentType"
-          )
+      //.block-item
+      //  label.block-item__label Payment Type:
+      //    span.require *
+      //  .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !currentClientOverallData.paymentType}")
+      //    SelectSingle(
+      //      :options="['PPP', 'Pre-Payment', 'Monthly', 'Custom']",
+      //      placeholder="Payment Type",
+      //      :selectedOption="currentClientOverallData.paymentType",
+      //      @chooseOption="setPaymentType"
+      //    )
       .block-item
         label.block-item__label Test:
         .block-item__check-item.checkbox
@@ -87,9 +87,9 @@
 					})
 				}
 			},
-      setPaymentType({option}) {
-        this.storeClientPropertyOverallData({prop: 'paymentType', value: option})
-      },
+      // setPaymentType({option}) {
+      //   this.storeClientPropertyOverallData({prop: 'paymentType', value: option})
+      // },
 			setStatus({ option }) {
 				this.storeClientPropertyOverallData({ prop: "status", value: option })
 			},

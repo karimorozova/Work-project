@@ -233,12 +233,12 @@
 					this.isLeadEmpty = true
 				}
 				if (!this.client.email || !emailValidRegex.test(this.client.email.toLowerCase())) this.errors.push('Please provide a valid email in General Information.')
+        //TODO: refactor | Client PaymentType
+				// if (this.clientType === "Individual") this.client.paymentType = 'PPP'
 
-				if (this.clientType === "Individual") this.client.paymentType = 'PPP'
-
-				if (this.clientType !== "Individual" && this.client.paymentType === '') {
-					this.errors.push('Please, add Payment type.')
-				}
+				// if (this.clientType !== "Individual" && this.client.paymentType === '') {
+				// 	this.errors.push('Please, add Payment type.')
+				// }
 				if (!this.client.accountManager || !this.client.projectManager) this.errors.push('All managers should be assigned.')
 
 				const isSameEmailsExists = await this.checkSameClientEmails(this.client.email)
@@ -294,9 +294,9 @@
 					notes: ""
 				} ]
 
-        this.client.paymentType = "PPP"
         this.client.billingInfo = {
           officialName: this.client.name,
+          paymentType: "PPP",
           paymentTerms: '',
           address: {
             country: '',
@@ -348,6 +348,7 @@
 				if (this.client.nativeLanguage === '') this.client.nativeLanguage = null
         this.client.billingInfo = {
           officialName: this.client.name,
+          paymentType: this.client.paymentType,
           paymentTerms: '',
           address: {
             country: '',
@@ -362,6 +363,7 @@
           reports: [],
           contacts: this.client.contacts,
         }
+				delete this.client.paymentType
 
 				sendData.append('client', JSON.stringify(this.client))
 				for (let i = 0; i < this.contactsPhotos.length; i++) sendData.append('photos', this.contactsPhotos[i])
