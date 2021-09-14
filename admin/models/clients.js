@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
+const Schema = mongoose.Schema
 
 const contacts = {
 	password: {
-		type: String,
+		type: String
 	},
 	photo: {
-		type: String,
+		type: String
 	},
 	firstName: {
 		type: String,
@@ -42,7 +42,7 @@ const contacts = {
 		default: ''
 	},
 	notes: {
-		type: String,
+		type: String
 	},
 	leadContact: {
 		type: Boolean,
@@ -51,7 +51,7 @@ const contacts = {
 }
 
 const billingContacts = {}
-for (let key in contacts) billingContacts[key] = contacts[key];
+for (let key in contacts) billingContacts[key] = contacts[key]
 
 delete billingContacts.password
 
@@ -80,19 +80,19 @@ const ClientSchema = new mongoose.Schema({
 	// 	default: []
 	// },
 	nativeLanguage: {
-		type: Schema.Types.ObjectId, ref: 'Language',
+		type: Schema.Types.ObjectId, ref: 'Language'
 	},
 	defaultPricelist: {
-		type: Schema.Types.ObjectId, ref: 'Pricelist',
+		type: Schema.Types.ObjectId, ref: 'Pricelist'
 	},
 	currency: {
 		type: String,
 		default: 'EUR',
-		trim: true,
+		trim: true
 	},
 	minPrice: {
 		type: Number,
-		default: 0,
+		default: 0
 	},
 	ignoreMinPrice: {
 		type: Boolean,
@@ -109,7 +109,7 @@ const ClientSchema = new mongoose.Schema({
 		trim: true
 	},
 	timeZone: {
-		type: Schema.Types.ObjectId, ref: 'Timezones',
+		type: Schema.Types.ObjectId, ref: 'Timezones'
 	},
 	documents: {
 		type: Array,
@@ -151,11 +151,11 @@ const ClientSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-	paymentType: {
-		type: String,
-		trim: true,
-	},
-	billingInfo: [{
+	billingInfo: [ {
+		paymentType: {
+			type: String,
+			trim: true
+		},
 		officialName: {
 			type: String,
 			trim: true
@@ -167,43 +167,43 @@ const ClientSchema = new mongoose.Schema({
 		address: {
 			country: {
 				type: String,
-				trim: true,
+				trim: true
 			},
 			street1: {
 				type: String,
-				trim: true,
+				trim: true
 			},
 			street2: {
 				type: String,
-				trim: true,
+				trim: true
 			},
 			city: {
 				type: String,
-				trim: true,
+				trim: true
 			},
 			state: {
 				type: String,
-				trim: true,
+				trim: true
 			},
 			zipCode: {
 				type: String,
-				trim: true,
+				trim: true
 			},
 			vat: {
 				type: String,
 				default: ''
-			},
+			}
 		},
 		notes: {
 			type: String,
-			trim: true,
+			trim: true
 		},
 		reports: {
 			type: Array,
 			default: []
 		},
-		contacts: [billingContacts]
-	}],
+		contacts: [ billingContacts ]
+	} ],
 	// sourceLanguages: [{
 	// 	type: Schema.Types.ObjectId, ref: 'Language'
 	// }],
@@ -213,39 +213,39 @@ const ClientSchema = new mongoose.Schema({
 	// industries: [
 	// 	{ type: Schema.Types.ObjectId, ref: 'Industries' }
 	// ],
-	services: [{
+	services: [ {
 		sourceLanguage: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		targetLanguages: [
-			{ type: Schema.Types.ObjectId, ref: 'Language', }
+			{ type: Schema.Types.ObjectId, ref: 'Language' }
 		],
 		services: [
-			{ type: Schema.Types.ObjectId, ref: 'Services', }
+			{ type: Schema.Types.ObjectId, ref: 'Services' }
 		],
 		industries: [
-			{ type: Schema.Types.ObjectId, ref: 'Industries', }
+			{ type: Schema.Types.ObjectId, ref: 'Industries' }
 		]
-	}],
+	} ],
 	rates: {
-		basicPricesTable: [{
+		basicPricesTable: [ {
 			type: {
 				type: String,
 				trim: true
 			},
 			sourceLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			targetLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			basicPrice: {
 				type: Number,
-				default: 1,
+				default: 1
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -254,22 +254,22 @@ const ClientSchema = new mongoose.Schema({
 			},
 			isActive: {
 				type: Boolean,
-				default: true,
+				default: true
 			}
-		}],
-		stepMultipliersTable: [{
+		} ],
+		stepMultipliersTable: [ {
 			step: {
-				type: Schema.Types.ObjectId, ref: 'Step',
+				type: Schema.Types.ObjectId, ref: 'Step'
 			},
 			unit: {
-				type: Schema.Types.ObjectId, ref: 'Units',
+				type: Schema.Types.ObjectId, ref: 'Units'
 			},
 			size: {
-				type: Number,
+				type: Number
 			},
 			multiplier: {
 				type: Number,
-				default: 100,
+				default: 100
 			},
 			defaultSize: {
 				type: Boolean,
@@ -277,7 +277,7 @@ const ClientSchema = new mongoose.Schema({
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -286,20 +286,20 @@ const ClientSchema = new mongoose.Schema({
 			},
 			isActive: {
 				type: Boolean,
-				default: true,
+				default: true
 			}
-		}],
-		industryMultipliersTable: [{
+		} ],
+		industryMultipliersTable: [ {
 			industry: {
-				type: Schema.Types.ObjectId, ref: 'Industries',
+				type: Schema.Types.ObjectId, ref: 'Industries'
 			},
 			multiplier: {
 				type: Number,
-				default: 100,
+				default: 100
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -308,27 +308,27 @@ const ClientSchema = new mongoose.Schema({
 			},
 			isActive: {
 				type: Boolean,
-				default: true,
+				default: true
 			}
-		}],
-		pricelistTable: [{
+		} ],
+		pricelistTable: [ {
 			sourceLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			targetLanguage: {
-				type: Schema.Types.ObjectId, ref: 'Language',
+				type: Schema.Types.ObjectId, ref: 'Language'
 			},
 			step: {
-				type: Schema.Types.ObjectId, ref: 'Step',
+				type: Schema.Types.ObjectId, ref: 'Step'
 			},
 			unit: {
-				type: Schema.Types.ObjectId, ref: 'Units',
+				type: Schema.Types.ObjectId, ref: 'Units'
 			},
 			size: {
-				type: Number,
+				type: Number
 			},
 			industry: {
-				type: Schema.Types.ObjectId, ref: 'Industries',
+				type: Schema.Types.ObjectId, ref: 'Industries'
 			},
 			price: {
 				type: Number,
@@ -336,7 +336,7 @@ const ClientSchema = new mongoose.Schema({
 			},
 			altered: {
 				type: Boolean,
-				default: false,
+				default: false
 			},
 			notification: {
 				type: String,
@@ -345,14 +345,14 @@ const ClientSchema = new mongoose.Schema({
 			},
 			isActive: {
 				type: Boolean,
-				default: true,
+				default: true
 			}
-		}]
+		} ]
 	},
-	contacts: [contacts],
-	discounts: [{
-		type: Schema.Types.ObjectId, ref: 'Discounts',
-	}],
+	contacts: [ contacts ],
+	discounts: [ {
+		type: Schema.Types.ObjectId, ref: 'Discounts'
+	} ],
 	matrix: {
 		type: Object,
 		default: {
@@ -434,7 +434,7 @@ const ClientSchema = new mongoose.Schema({
 			trim: true
 		}
 	},
-	notes: [{
+	notes: [ {
 		user: {},
 		createdAt: {
 			type: Date,
@@ -448,32 +448,32 @@ const ClientSchema = new mongoose.Schema({
 			type: String,
 			default: ''
 		}
-	}],
+	} ]
 
-}, { minimize: false });
+}, { minimize: false })
 
 ClientSchema.statics.authenticate = function (email, password, callback) {
 	Clients.findOne({ "contacts.email": email })
 			.exec((err, client) => {
-				if(err) {
-					return callback(err);
-				} else if(!client) {
-					const err = new Error('Client not found.');
-					err.status = 401;
-					return callback(err);
+				if (err) {
+					return callback(err)
+				} else if (!client) {
+					const err = new Error('Client not found.')
+					err.status = 401
+					return callback(err)
 				}
 
-				const contact = client.contacts.find((contact) => contact.email === email);
+				const contact = client.contacts.find((contact) => contact.email === email)
 				bcrypt.compare(password, contact.password, function (err, result) {
-					if(result === true || !contact.password) {
-						return callback(null, { client, contact });
+					if (result === true || !contact.password) {
+						return callback(null, { client, contact })
 					} else {
-						return callback();
+						return callback()
 					}
-				});
-			});
-};
+				})
+			})
+}
 
-const Clients = mongoose.model('Clients', ClientSchema);
+const Clients = mongoose.model('Clients', ClientSchema)
 
-module.exports = Clients;
+module.exports = Clients
