@@ -320,11 +320,11 @@
                 name: 'Receivables',
                 isOpen: false,
                 children: [
-                  // {
-                  //   type: 'link',
-                  //   path: '/pangea-finance/invoicing-receivables/reports',
-                  //   name: 'Invoices'
-                  // },
+                  {
+                    type: 'link',
+                    path: '/pangea-finance/invoicing-receivables/reports',
+                    name: 'Invoices'
+                  },
                   // {
                   //   type: 'link',
                   //   path: '/pangea-finance/invoicing-receivables/paid-invoices',

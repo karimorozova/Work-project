@@ -1,6 +1,56 @@
-const { Projects } = require("../models")
+const { Projects, InvoicingReceivables } = require("../models")
 const moment = require('moment')
 const { ObjectID: ObjectId } = require('mongodb')
+
+
+const reportsFiltersQuery = ({reportId,  vendors, to, from, status }) => {
+	const q = {}
+	// const reg = /[.*+?^${}()|[\]\\]/g
+	//
+	// if(reportId){
+	// 	const f = reportId.replace(reg, '\\$&')
+	// 	q['reportId'] = { "$regex": new RegExp(f, 'i') }
+	// }
+	// if (vendors) {
+	// 	q["vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	// }
+	// if(status) {
+	// 	q["status"] = status
+	// }
+	//
+	// if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
+	// if(!from) from = '1970-01-01'
+	//
+	// q['firstPaymentDate'] = {  $gte: new Date(`${ from }T00:00:00.000Z`) }
+	// q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
+
+	return q
+}
+
+const getAllReports = async (countToSkip, countToGet, query) => {
+	return (await InvoicingReceivables.find())
+	// const invoicingReprots = await InvoicingReports.aggregate([
+	// 			{
+	// 				$lookup: {
+	// 					from: "projects",
+	// 					let: { 'steps': '$steps' },
+	// 					pipeline: [
+	// 						{ "$unwind": "$steps" },
+	// 						{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+	// 						{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
+	// 					],
+	// 					as: "stepFinance"
+	// 				}
+	// 			},
+	// 			{ $match: {...query} },
+	// 			{ $sort : { reportId : -1 }},
+	// 			{ $skip: countToSkip },
+	// 			{ $limit: countToGet}
+	// 		]
+	// )
+	// return (await InvoicingReports.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
+}
+
 
 const tasksFiltersQuery = ({ clients, sourceLanguages, targetLanguages, to, from, service }, allLanguages) => {
 	const q = {}
@@ -47,6 +97,7 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 				'startDate': 1,
 				'billingDate': 1,
 				'projectCurrency': 1,
+				'paymentProfile': 1,
 				'customer': { $arrayElemAt: [ "$customer", 0 ] }
 			}
 		},
@@ -64,4 +115,9 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 	return (await Projects.aggregate(queryPipeline))
 }
 
-module.exports = { tasksFiltersQuery, getAllTasks }
+module.exports = {
+	reportsFiltersQuery,
+	tasksFiltersQuery,
+	getAllTasks,
+	getAllReports
+}

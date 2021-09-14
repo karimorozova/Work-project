@@ -1,6 +1,25 @@
 const router = require('express').Router()
 const { Languages } = require('../models')
-const { tasksFiltersQuery, getAllTasks } = require('../invoicingReceivables')
+
+const {
+	tasksFiltersQuery,
+	getAllTasks,
+	createReports,
+	reportsFiltersQuery,
+	getAllReports
+} = require('../invoicingReceivables')
+
+router.post("/reports", async (req, res) => {
+	try {
+		const {	countToSkip, countToGet, filters } = req.body
+		const query = reportsFiltersQuery(filters)
+		const reports = await getAllReports( countToSkip, countToGet, query )
+		res.send(reports);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
 
 router.post("/not-selected-tasks-list", async (req, res) => {
 	const { countToSkip, countToGet, filters } = req.body
@@ -12,6 +31,30 @@ router.post("/not-selected-tasks-list", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting Tasks!')
+	}
+})
+
+router.post("/not-selected-tasks-list", async (req, res) => {
+	const { countToSkip, countToGet, filters } = req.body
+	const allLanguages = await Languages.find()
+	try {
+		const query = tasksFiltersQuery(filters, allLanguages)
+		const tasks = await getAllTasks(countToSkip, countToGet, query)
+		res.send(tasks)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting Tasks!')
+	}
+})
+
+router.post('/create-report', async (req, res) => {
+	const { checkedProjects, createdBy } = req.body
+	try {
+		await createReports({ checkedProjects, createdBy })
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on /create-report!')
 	}
 })
 

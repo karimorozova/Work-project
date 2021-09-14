@@ -103,6 +103,9 @@
             .table__data
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
+          template(slot="project" slot-scope="{ row, index }")
+            .table__data(style="word-break: break-word; padding-right: 20px;") {{ row.projectName.length > 46 ? (row.projectName.substring(0, 45) + '...') : row.projectName }}
+
           template(slot="taskId" slot-scope="{ row, index }")
             .table__data {{ row.tasks.taskId }}
 
@@ -175,58 +178,64 @@
 						style: { width: "36px" }
 					},
 					{
+						label: "Project",
+						headerKey: "headerProject",
+						key: "project",
+						style: { width: "195px" }
+					},
+					{
 						label: "Task ID",
 						headerKey: "headerTaskId",
 						key: "taskId",
-						style: { width: "205px" }
+						style: { width: "180px" }
 					},
 					{
 						label: "Company name",
 						headerKey: "headerCompany",
 						key: "company",
-						style: { width: "220px" }
+						style: { width: "190px" }
 					},
 					{
 						label: "Start Date",
 						headerKey: "headerStartDate",
 						key: "startDate",
-						style: { width: "140px" }
+						style: { width: "110px" }
 					},
 					{
 						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
-						style: { width: "140px" }
+						style: { width: "110px" }
 					},
 					{
 						label: "Billing Date",
 						headerKey: "headerBillingDate",
 						key: "billingDate",
-						style: { width: "140px" }
+						style: { width: "110px" }
 					},
 					{
 						label: "Service",
 						headerKey: "headerService",
 						key: "service",
-						style: { width: "150px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Status",
 						headerKey: "headerJobStatus",
 						key: "jobStatus",
-						style: { width: "150px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Language Pair",
 						headerKey: "headerLangPair",
 						key: "langPair",
-						style: { width: "150px" }
+						style: { width: "140px" }
 					},
 					{
 						label: "Fee ",
 						headerKey: "headerPrice",
 						key: "price",
-						style: { width: "140px" }
+						style: { width: "120px" }
 					}
 				],
 
@@ -267,14 +276,15 @@
 			},
 			async sendTasks() {
 				alert("FOO BOO")
-				// const checkedProjects = this.steps.filter(step => step.isCheck)
-				// try {
-				// 	await this.$http.post('/invoicing-reports/create', { checkedProjects, createdBy: this.user._id })
-				// 	await this.getSteps()
-				// 	this.$emit('refreshReports')
-				// } catch (e) {
-				// 	console.log(e)
-				// }
+				const checkedProjects = this.tasks.filter(i => i.isCheck)
+				try {
+					await this.$http.post('/invoicing-receivables/create-report', { checkedProjects, createdBy: this.user._id })
+					await this.getTasks()
+					// TODO: ???? emit
+					// this.$emit('refreshReports')
+				} catch (e) {
+					console.log(e)
+				}
 			},
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY")
@@ -371,7 +381,7 @@
 		},
 		computed: {
 			...mapGetters({
-				// 	user: "getUser",
+				user: "getUser",
 				clientsList: "getAllClientsForOptions",
 				languages: "getAllLanguages",
 				settingServices: "getAllServices"

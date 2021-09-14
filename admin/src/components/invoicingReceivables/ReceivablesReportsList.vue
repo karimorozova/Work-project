@@ -12,85 +12,85 @@
             @close="closeApproveActionModal"
             @notApprove="closeApproveActionModal"
           )
-      .filter
-        .filter__item
-          label Report Id:
-          .filter__input
-            input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
-            .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
-              i.fas.fa-backspace
-        .filter__item
-          label Status:
-          .filter__input
-            SelectSingle(
-              :selectedOption="selectedStatus"
-              :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
-              placeholder="Option"
-              @chooseOption="setStatus"
-              :isRemoveOption="true"
-              @removeOption="removeStatus"
-            )
-        .filter__item
-          label Vendors:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedVendors"
-              :options="allVendors"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="setVendors"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeVendors"
-            )
-        .filter__item
-          label Date From:
-          .filter__input
-            DatepickerWithTime(
-              :value="fromDateValue"
-              @selected="setFromDate"
-              placeholder="Date"
-              :isTime="false"
-              :highlighted="highlighted"
-              :monday-first="true"
-              inputClass="datepicker-custom-filter"
-              calendarClass="calendar-custom"
-              :format="customFormatter"
-              :isClearIcon="true"
-              @removeSelectedDate="removeFromDate"
-            )
-        .filter__item
-          label Date To:
-          .filter__input
-            DatepickerWithTime(
-              :value="toDateValue"
-              @selected="setToDate"
-              placeholder="Date"
-              :isTime="false"
-              :highlighted="highlighted"
-              :monday-first="true"
-              inputClass="datepicker-custom-filter"
-              calendarClass="calendar-custom"
-              :format="customFormatter"
-              :isClearIcon="true"
-              @removeSelectedDate="removeToDate"
-            )
+      //   .filter
+      //     .filter__item
+      //       label Report Id:
+      //       .filter__input
+      //         input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
+      //         .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
+      //           i.fas.fa-backspace
+      //     .filter__item
+      //       label Status:
+      //       .filter__input
+      //         SelectSingle(
+      //           :selectedOption="selectedStatus"
+      //           :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
+      //           placeholder="Option"
+      //           @chooseOption="setStatus"
+      //           :isRemoveOption="true"
+      //           @removeOption="removeStatus"
+      //         )
+      //     .filter__item
+      //       label Vendors:
+      //       .filter__input
+      //         SelectMulti(
+      //           :selectedOptions="selectedVendors"
+      //           :options="allVendors"
+      //           :hasSearch="true"
+      //           placeholder="Options"
+      //           @chooseOptions="setVendors"
+      //           :isSelectedWithIcon="true"
+      //           :isRemoveOption="true"
+      //           @removeOption="removeVendors"
+      //         )
+      //     .filter__item
+      //       label Date From:
+      //       .filter__input
+      //         DatepickerWithTime(
+      //           :value="fromDateValue"
+      //           @selected="setFromDate"
+      //           placeholder="Date"
+      //           :isTime="false"
+      //           :highlighted="highlighted"
+      //           :monday-first="true"
+      //           inputClass="datepicker-custom-filter"
+      //           calendarClass="calendar-custom"
+      //           :format="customFormatter"
+      //           :isClearIcon="true"
+      //           @removeSelectedDate="removeFromDate"
+      //         )
+      //     .filter__item
+      //       label Date To:
+      //       .filter__input
+      //         DatepickerWithTime(
+      //           :value="toDateValue"
+      //           @selected="setToDate"
+      //           placeholder="Date"
+      //           :isTime="false"
+      //           :highlighted="highlighted"
+      //           :monday-first="true"
+      //           inputClass="datepicker-custom-filter"
+      //           calendarClass="calendar-custom"
+      //           :format="customFormatter"
+      //           :isClearIcon="true"
+      //           @removeSelectedDate="removeToDate"
+      //         )
 
-      .options
-        .options__item(v-if="ifSomeCheck")
-          label Reports Actions:
-          .options__input
-            SelectSingle(
-              :options="availableActionOptions",
-              placeholder="Action",
-              :selectedOption="selectedReportAction",
-              @chooseOption="openApproveActionModal"
-            )
-          .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
+      //   .options
+      //     .options__item(v-if="ifSomeCheck")
+      //       label Reports Actions:
+      //       .options__input
+      //         SelectSingle(
+      //           :options="availableActionOptions",
+      //           placeholder="Action",
+      //           :selectedOption="selectedReportAction",
+      //           @chooseOption="openApproveActionModal"
+      //         )
+      //       .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
-        .options__button(v-else)
-          router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/create-reports`}")
-            Button(value="Add Reports")
+      //     .options__button(v-else)
+      //       router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/create-reports`}")
+      //         Button(value="Add Reports")
 
       .reports__container
         .modal
@@ -104,56 +104,56 @@
               @close="closeDeleteRequestModal"
               @notApprove="closeDeleteRequestModal"
             )
-        //LayoutsTable(
-        //  :fields="fields"
-        //  :tableData="reports"
-        //  :customNumberOfFilterRows="2"
-        //  @bottomScrolled="bottomScrolled"
-        //)
-        //  template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        //    .table__header(v-if="field.headerKey === 'headerCheck'")
-        //      CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        //    .table__header(v-else) {{ field.label }}
-        //
-        //  template(slot="check" slot-scope="{ row, index }")
-        //    .table__data
-        //      CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
-        //
-        //  template(slot="reportId" slot-scope="{ row, index }" )
-        //    .table__data
-        //      router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/reports/${row._id}`}")
-        //        span {{ row.reportId }}
-        //
-        //  template(slot="dateRange" slot-scope="{ row, index }")
-        //    .table__data(v-html="dateRange(row)")
-        //
-        //  template(slot="vendorName" slot-scope="{ row, index }")
-        //    .table__data
-        //      router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
-        //        span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
-        //
-        //  template(slot="status" slot-scope="{ row, index }")
-        //    .table__data {{ row.status }}
-        //
-        //  template(slot="jobs" slot-scope="{ row, index }")
-        //    .table__data {{ row.steps.length }}
-        //
-        //  template(slot="amount" slot-scope="{ row, index }")
-        //    .table__data
-        //      span.currency(v-html="'&euro;'")
-        //      span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
-        //
-        //  template(slot="created" slot-scope="{ row, index }")
-        //    .table__data {{ getTime( row.createdAt) }}
-        //
-        //  template(slot="updated" slot-scope="{ row, index }")
-        //    .table__data {{ getTime( row.updatedAt) }}
-        //
-        //  template(slot="icon" slot-scope="{ row, index }")
-        //    .table__icon
-        //      i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
-        //
-        //.table__empty(v-if="!reports.length") Nothing found...
+        LayoutsTable(
+         :fields="fields"
+         :tableData="reports"
+         :customNumberOfFilterRows="2"
+         @bottomScrolled="bottomScrolled"
+        )
+         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+           .table__header(v-if="field.headerKey === 'headerCheck'")
+             CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+           .table__header(v-else) {{ field.label }}
+        
+         template(slot="check" slot-scope="{ row, index }")
+           .table__data
+             CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+        
+         template(slot="reportId" slot-scope="{ row, index }" )
+           .table__data
+             router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/reports/${row._id}`}")
+               span {{ row.reportId }}
+        
+         template(slot="dateRange" slot-scope="{ row, index }")
+           .table__data(v-html="dateRange(row)")
+        
+         template(slot="vendorName" slot-scope="{ row, index }")
+           .table__data
+             router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
+               span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
+        
+         template(slot="status" slot-scope="{ row, index }")
+           .table__data {{ row.status }}
+        
+         template(slot="jobs" slot-scope="{ row, index }")
+           .table__data {{ row.steps.length }}
+        
+         template(slot="amount" slot-scope="{ row, index }")
+           .table__data
+             span.currency(v-html="'&euro;'")
+             span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
+        
+         template(slot="created" slot-scope="{ row, index }")
+           .table__data {{ getTime( row.createdAt) }}
+        
+         template(slot="updated" slot-scope="{ row, index }")
+           .table__data {{ getTime( row.updatedAt) }}
+        
+         template(slot="icon" slot-scope="{ row, index }")
+           .table__icon
+             i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
+        
+        .table__empty(v-if="!reports.length") Nothing found...
 
 </template>
 
@@ -270,7 +270,7 @@
         }
 			},
       async deleteChecked() {
-        await this.$http.post('/invoicing-reports/delete-reports', {
+        await this.$http.post('/invoicing-receivables/delete-reports', {
           reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
         })
         this.closeApproveActionModal()
@@ -279,7 +279,7 @@
       async changeTaskStatus() {
 	      const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
 	      try {
-		      await this.$http.post('/invoicing-reports/manage-report-status', {
+		      await this.$http.post('/invoicing-receivables/manage-report-status', {
 			      reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
 			      nextStatus
 		      })
@@ -384,7 +384,7 @@
 				console.log(id)
 			},
 			async deleteRequest() {
-				await this.$http.get(`/invoicing-reports/report/${ this.deleteRequestId }/delete`)
+				await this.$http.get(`/invoicing-receivables/report/${ this.deleteRequestId }/delete`)
         await this.getReports()
 				this.closeDeleteRequestModal()
 			},
@@ -392,7 +392,7 @@
 				this.deleteRequestId = ''
 			},
 			async getReports() {
-				this.reports = (await this.$http.post('/invoicing-reports/reports', {
+				this.reports = (await this.$http.post('/invoicing-receivables/reports', {
 					countToSkip: 0,
 					countToGet: 100,
 					filters: this.allFilters
@@ -400,7 +400,7 @@
 			},
 			async bottomScrolled() {
 				if (this.isDataRemain) {
-					const result = await this.$http.post("/invoicing-reports/reports", {
+					const result = await this.$http.post("/invoicing-receivables/reports", {
 						filters: this.allFilters,
 						countToSkip: this.reports.length,
 						countToGet: 100
