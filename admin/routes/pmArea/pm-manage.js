@@ -128,7 +128,6 @@ router.get('/project', async (req, res) => {
 	const { id } = req.query
 	try {
 		const project = await getProject({ '_id': id })
-		console.log(project)
 		res.send(project)
 	} catch (err) {
 		console.log(err)

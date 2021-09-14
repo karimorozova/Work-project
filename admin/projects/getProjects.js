@@ -47,7 +47,7 @@ async function getProject(obj) {
 	project.customer = await Clients.findOne({ _id: project.customer })
 			.populate('sourceLanguages')
 			.populate('targetLanguages').lean()
-	project.clientBillingInfo =project.customer.billingInfo.find(({_id})=> project.clientBillingInfo.toString() === _id.toString())
+	project.clientBillingInfo = project.clientBillingInfo ? project.customer.billingInfo.find(({_id})=> project.clientBillingInfo.toString() === _id.toString()) : []
 	return project
 }
 
@@ -59,7 +59,7 @@ async function updateProject(query, update) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ]).lean()
-	project.clientBillingInfo = project.customer.billingInfo.find(({_id})=> project.clientBillingInfo.toString() === _id.toString())
+	project.clientBillingInfo = project.clientBillingInfo ? project.customer.billingInfo.find(({_id})=> project.clientBillingInfo.toString() === _id.toString()) : []
 	return project
 }
 

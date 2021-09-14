@@ -402,7 +402,7 @@
 				}
 			},
       billingInfoList() {
-				if (this.project.customer.billingInfo) {
+				if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
 					const  billingInfo  = this.project.customer.billingInfo
 					return billingInfo.map(({_id, officialName}) => ({_id, officialName}))
 				}
