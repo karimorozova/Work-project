@@ -110,7 +110,7 @@
             .table__data {{ row.tasks.taskId }}
 
           template(slot="company" slot-scope="{ row, index }")
-            .table__data foo boo
+            .table__data {{ getCompanyName(row) }}
 
           template(slot="startDate" slot-scope="{ row, index }")
             .table__data {{ formattedDate(row.startDate) }}
@@ -257,6 +257,12 @@
 			}
 		},
 		methods: {
+			getCompanyName({ customer, clientBillingInfo }) {
+				if (!clientBillingInfo) return '-'
+				if (!customer.billingInfo) return '-'
+				const { officialName } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
+				return officialName
+			},
 			replaceRoute(key, value) {
 				let query = this.$route.query
 				delete query[key]
