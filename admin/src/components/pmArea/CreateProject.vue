@@ -48,7 +48,7 @@
 
 <style lang="scss" scoped>
   .create-project {
-    width: 100%;
+    //width: 100%;
     margin: 50px;
   }
 </style>

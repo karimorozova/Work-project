@@ -98,7 +98,7 @@
         .project__number
           .input-title
             .input-title__text Billing Info:
-            span.require
+            span.require *
           .project__drop-menu
             SelectSingle(
               :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''"
@@ -279,8 +279,9 @@
         const billingInfo = this.billingInfoList.find(({officialName}) => officialName === option)
         if (!this.project._id) {
           this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
+        }else {
+          await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
         }
-        await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
 
       },
 
@@ -309,6 +310,7 @@
 				if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
 				if (!this.project.customer.name) this.errors.push("Please, select a Client.")
 				if (!this.selectedIndustry) this.errors.push("Please, choose an industry.")
+				if (!this.project.clientBillingInfo || !this.project.clientBillingInfo.hasOwnProperty('_id')) this.errors.push("Please, choose an BillingInfo.")
 				if (this.errors.length) {
 					this.areErrorsExist = true
 					return
