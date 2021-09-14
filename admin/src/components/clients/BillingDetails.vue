@@ -43,6 +43,11 @@
           .billing-info__title Billing Details
 
           .billing-info__field
+            label Billing name:
+              span.require *
+            input(v-model="billingInfoCopy.name" placeholder="Value" :class="{'error-shadow': !billingInfoCopy.name && isSaveClicked}")
+
+          .billing-info__field
             label Company name:
               span.require *
             input(v-model="billingInfoCopy.officialName" placeholder="Value" :class="{'error-shadow': !billingInfoCopy.officialName && isSaveClicked}")
@@ -91,6 +96,7 @@
             label Country / Region:
             .field__select-single
               SelectSingle(
+                :hasSearch="true"
                 placeholder="Option"
                 :options="countries"
                 :selectedOption="billingInfoCopy.address.country"
@@ -306,6 +312,10 @@
         this.isSaveClicked = true
 			  if (!this.billingInfoCopy.hasOwnProperty('officialName') || !this.billingInfoCopy.officialName.trim().length) {
           allErrors.push('Official Name name cannot be empty.')
+        }
+
+			  if (!this.billingInfoCopy.hasOwnProperty('name') || !this.billingInfoCopy.name.trim().length) {
+          allErrors.push('Name name cannot be empty.')
         }
 
         if (!this.billingInfoCopy.hasOwnProperty('paymentType') || !this.billingInfoCopy.paymentType.trim().length) {

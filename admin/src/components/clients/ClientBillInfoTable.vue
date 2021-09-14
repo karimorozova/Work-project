@@ -43,10 +43,13 @@
         .table__data(v-else)
           .images
             .image(v-for="(item, index) in row.contacts")
-              img.image__first(style="z-index: 100" v-if="item.photo && index === 0" :src="item.photo")
-              img.image__first(style="z-index: 100" v-if="!item.photo && index === 0" :src="require('../../assets/images/avatars/avatar-grey.png')")
-              img.image__next(:style="{'z-index': `${20 - index}`, 'margin-left': `${-10 * index + 'px'}` }" v-if="item.photo && index" :src="item.photo")
-              img.image__next(:style="{'z-index': `${20 - index}`, 'margin-left': `${-10 * index + 'px'}`  }" v-if="!item.photo && index" :src="require('../../assets/images/avatars/avatar-grey.png')")
+              .tooltip
+                span#myTooltip.tooltiptext(:style="{ 'right': `${30 + 10 * index + 'px'}` }") {{ item.firstName + ' ' + item.surname }}
+                .table__icons-info
+                  img.image__first(style="z-index: 100" v-if="item.photo && index === 0" :src="item.photo")
+                  img.image__first(style="z-index: 100" v-if="!item.photo && index === 0" :src="require(`../../assets/images/avatars/avatar-${index % 3}.png`)")
+                  img.image__next(:style="{'z-index': `${20 - index}`, 'left': `${-10 * index + 'px'}` }" v-if="item.photo && index" :src="item.photo")
+                  img.image__next(:style="{'z-index': `${20 - index}`, 'left': `${-10 * index + 'px'}`  }" v-if="!item.photo && index" :src="require(`../../assets/images/avatars/avatar-${index % 3}.png`)")
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
@@ -208,5 +211,47 @@
       cursor: pointer;
     }
   }
+  .tooltip {
+    position: relative;
+    display: flex;
 
+    .tooltiptext {
+      visibility: hidden;
+      font-size: 14px;
+      width: max-content;
+      background-color: white;
+      color: $text;
+      text-align: center;
+      border-radius: 4px;
+      //right: 28px;
+      bottom: -1px;
+      padding: 7px 12px;
+      position: absolute;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity .3s;
+      border: 1px solid $border;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 30%;
+        right: -12px;
+        transform: rotate(270deg);
+        border-width: 6px;
+        border-style: solid;
+        border-color: $border transparent transparent;
+      }
+    }
+
+    &:hover {
+      .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+      }
+      .image__next {
+        z-index: 101 !important;
+      }
+    }
+  }
 </style>

@@ -160,6 +160,10 @@ const ClientSchema = new mongoose.Schema({
 			type: String,
 			trim: true
 		},
+		name: {
+			type: String,
+			trim: true
+		},
 		paymentTerms: {
 			type: Object,
 			default: {}

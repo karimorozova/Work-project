@@ -17,7 +17,7 @@
 
         .table__dataImage(slot="name" slot-scope="{ row }")
           img.image(v-if="$route.params.id && row.photo" :src="row.photo")
-          img.image(v-else :src="require('../../assets/images/avatars/avatar-grey.png')")
+          img.image(v-else :src="require('../../assets/images/avatars/avatar-0.png')")
           span {{ getFullName(row) }}
         .table__data(slot="email" slot-scope="{ row, index }")  {{ row.email }}
         .table__data(slot="position" slot-scope="{ row, index }") {{ row.position }}

@@ -85,8 +85,8 @@
             span.require *
           .project__drop-menu
             SelectSingle(
-              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''"
-              :options="billingInfoList.map(({officialName}) => officialName)"
+              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
+              :options="billingInfoList.map(({name}) => name)"
               @chooseOption="choseBillingInfo"
               placeholder="Option"
             )
@@ -162,7 +162,7 @@
 				"updateClientsRequestsProps"
 			]),
 			async choseBillingInfo({ option }) {
-				const billingInfo = this.billingInfoList.find(({ officialName }) => officialName === option)
+				const billingInfo = this.billingInfoList.find(({ name }) => name === option)
 				await this.setRequestProp({ prop: 'clientBillingInfo', value: billingInfo })
 				await this.setRequestProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
 			},
@@ -309,7 +309,7 @@
 			billingInfoList() {
 				if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
 					const billingInfo = this.project.customer.billingInfo
-					return billingInfo.map(({ _id, officialName, paymentType }) => ({ _id, officialName, paymentType }))
+					return billingInfo.map(({ _id, officialName, paymentType, name }) => ({ _id, officialName, paymentType, name }))
 				}
 				return []
 			},

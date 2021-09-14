@@ -99,11 +99,11 @@
           .input-title
             .input-title__text Billing Information:
             span.require *
-          input.project__input-text( v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''" disabled)
+          input.project__input-text( v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo) || ''" disabled)
           .project__drop-menu(v-else)
             SelectSingle(
-              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''"
-              :options="billingInfoList.map(({officialName}) => officialName)"
+              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name ||   project.clientBillingInfo.officialName) || ''"
+              :options="billingInfoList.map(({name}) => name)"
               @chooseOption="choseBillingInfo"
               placeholder="Option"
             )
@@ -264,7 +264,7 @@
 				this.$emit('setValue', { option, prop: 'customer' })
 			},
 			async choseBillingInfo({ option }) {
-				const billingInfo = this.billingInfoList.find(({ officialName }) => officialName === option)
+				const billingInfo = this.billingInfoList.find(({ name }) => name === option)
 				if (!this.project._id) {
 					this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
 				} else {
@@ -397,7 +397,7 @@
 			billingInfoList() {
 				if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
 					const billingInfo = this.project.customer.billingInfo
-					return billingInfo.map(({ _id, officialName, paymentType }) => ({ _id, officialName, paymentType }))
+					return billingInfo.map(({ _id, officialName, paymentType, name }) => ({ _id, officialName, paymentType, name }))
 				}
 				return []
 			},
