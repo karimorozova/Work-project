@@ -346,7 +346,22 @@
 
 				if (this.client.timeZone === '') this.client.timeZone = null
 				if (this.client.nativeLanguage === '') this.client.nativeLanguage = null
-        this.client.billingInfo = []
+        this.client.billingInfo = {
+          officialName: this.client.name,
+          paymentTerms: '',
+          address: {
+            country: '',
+            street1: '',
+            street2: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            vat: '',
+          },
+          notes: '',
+          reports: [],
+          contacts: this.client.contacts,
+        }
 
 				sendData.append('client', JSON.stringify(this.client))
 				for (let i = 0; i < this.contactsPhotos.length; i++) sendData.append('photos', this.contactsPhotos[i])

@@ -81,7 +81,7 @@
               :options="clients"
               :hasSearch="isSearchClient"
               placeholder="Name"
-              @chooseOption="(e) => setValue(e, 'customer')"
+              @chooseOption="setCustomer"
             )
         .project__industry
           .input-title
@@ -97,9 +97,21 @@
             )
         .project__number
           .input-title
-            .input-title__text Client Project Number:
+            .input-title__text Billing Info:
             span.require
-          input.project__input-text(type="text" :disabled="isProjectFinished" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
+          .project__drop-menu
+            SelectSingle(
+              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.officialName) || ''"
+              :options="billingInfoList.map(({officialName}) => officialName)"
+              @chooseOption="choseBillingInfo"
+              placeholder="Billing Info"
+            )
+
+        //.project__number
+        //  .input-title
+        //    .input-title__text Client Project Number:
+        //    span.require
+        //  input.project__input-text(type="text" :disabled="isProjectFinished" :value="project.clientProjectNumber" placeholder="Project Number" @change="setClientNumber")
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
           label(for="test") Test
@@ -255,6 +267,22 @@
 					this.selectedIndustry = ""
 				}
 			},
+      setCustomer({option}) {
+        if(option.billingInfo.length === 1) {
+          this.setBillingInfo(option.billingInfo[0])
+        } else {
+          this.setBillingInfo('')
+        }
+        this.$emit('setValue', {option, prop: 'customer'})
+      },
+      choseBillingInfo({option}) {
+        const billingInfo = this.billingInfoList.find(({officialName}) => officialName === option)
+        this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
+      },
+      setBillingInfo(billingInfo) {
+
+        this.$emit('setValue', {option: billingInfo, prop: 'clientBillingInfo'})
+      },
 			setIndustry({ option }) {
 				this.selectedIndustry = option
 			},
@@ -339,7 +367,7 @@
 				const { id } = this.$route.params
 				if (id !== undefined) {
 					const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
-					await this.setCurrentProject(curProject.body)
+          await this.setCurrentProject(curProject.body)
 				}
 			},
 			isBillingDate() {
@@ -372,6 +400,13 @@
           }
 					return res
 				}
+			},
+      billingInfoList() {
+				if (this.project.customer.billingInfo) {
+					const  billingInfo  = this.project.customer.billingInfo
+					return billingInfo.map(({_id, officialName}) => ({_id, officialName}))
+				}
+				return []
 			},
 			nameOfProject() {
 				return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName

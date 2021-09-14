@@ -53,10 +53,9 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	clientProjectNumber: {
-		type: String,
-		default: '',
-		trim: true
+	clientBillingInfo: {
+		type:  Schema.Types.ObjectId,
+		ref: 'Clients.billingInfo',
 	},
 	startDate: {
 		type: Date,

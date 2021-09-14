@@ -175,7 +175,7 @@ const getClientRates = async (obj) => {
  */
 const getClientsForNewProject = () => {
 	return Clients
-			.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, services: 1 })
+			.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, services: 1, billingInfo: 1 })
 			.populate('services.industries')
 }
 
