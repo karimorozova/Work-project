@@ -53,7 +53,7 @@ const InvoicingReportsSchema = new mongoose.Schema({
 		},
 		paymentDate: {
 			type: Date,
-			default: new Date()
+			default: ''
 		},
 		notes: {
 			type: String,
@@ -68,11 +68,11 @@ const InvoicingReportsSchema = new mongoose.Schema({
 	},
 	createAt: {
 		type: Date,
-		default: new Date()
+		default: null
 	},
 	updatedAt: {
 		type: Date,
-		default: new Date()
+		default: null
 	}
 });
 

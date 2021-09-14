@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const InvoicingReceivablesSchema = new mongoose.Schema({
 	reportId: {
@@ -7,24 +7,30 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	// invoiceId: {
-	// 	type: String,
-	// 	default: '',
-	// 	trim: true
-	// },
 	client: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients'
+	},
+	clientBillingInfo: {
+		type: Schema.Types.ObjectId,
+		ref: 'Clients.billingInfo',
+		default: null
 	},
 	status: {
 		type: String,
 		default: '',
 		trim: true
 	},
-	tasks: [{
-		type: Schema.Types.ObjectId,
-		ref: 'Projects.tasks'
-	}],
+	tasks: [ {
+		taskId: {
+			type: String,
+			trim: true
+		},
+		projectId: {
+			type: String,
+			trim: true
+		}
+	} ],
 	firstPaymentDate: {
 		type: Date,
 		default: new Date()
@@ -33,38 +39,6 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	},
-	// paymentDetails: {
-	// 	paymentMethod: {
-	// 		type: String,
-	// 		default: ''
-	// 	},
-	// 	// file: {
-	// 	// 	type: Object,
-	// 	// 	default: () => ({})
-	// 	// },
-	// 	expectedPaymentDate: {
-	// 		type: Date
-	// 	},
-	// },
-	// paymentInformation: [{
-	// 	paidAmount: {
-	// 		type: Number,
-	// 	},
-	// 	unpaidAmount: {
-	// 		type: Number
-	// 	},
-	// 	paymentMethod: {
-	// 		type: String,
-	// 	},
-	// 	paymentDate: {
-	// 		type: Date,
-	// 		default: new Date()
-	// 	},
-	// 	notes: {
-	// 		type: String,
-	// 		default: ""
-	// 	}
-	// }],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
@@ -73,14 +47,14 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 	},
 	createAt: {
 		type: Date,
-		default: new Date()
+		default: null
 	},
 	updatedAt: {
 		type: Date,
-		default: new Date()
+		default: null
 	}
-});
+})
 
-const InvoicingReceivables = mongoose.model('InvoicingReceivables', InvoicingReceivablesSchema);
+const InvoicingReceivables = mongoose.model('InvoicingReceivables', InvoicingReceivablesSchema)
 
-module.exports = InvoicingReceivables;
+module.exports = InvoicingReceivables

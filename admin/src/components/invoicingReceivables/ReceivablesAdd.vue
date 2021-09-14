@@ -281,7 +281,6 @@
 				this.replaceRoute('to', moment(data).format('YYYY-MM-DD'))
 			},
 			async sendTasks() {
-				alert("FOO BOO")
 				const checkedProjects = this.tasks.filter(i => i.isCheck)
 				try {
 					await this.$http.post('/invoicing-receivables/create-report', { checkedProjects, createdBy: this.user._id })
