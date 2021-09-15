@@ -105,11 +105,14 @@
           template(slot="project" slot-scope="{ row, index }")
             .table__data(style="word-break: break-word; padding-right: 20px;") {{ row.projectName.length > 46 ? (row.projectName.substring(0, 45) + '...') : row.projectName }}
 
+          template(slot="client" slot-scope="{ row, index }")
+            .table__data {{ row.customer.name }}
+
+          template(slot="bn" slot-scope="{ row, index }")
+            .table__data {{ getCompanyName(row) }}
+
           template(slot="stepId" slot-scope="{ row, index }")
             .table__data {{ row.steps.stepId }}
-
-          template(slot="company" slot-scope="{ row, index }")
-            .table__data {{ getCompanyName(row) }}
 
           template(slot="startDate" slot-scope="{ row, index }")
             .table__data {{ formattedDate(row.startDate) }}
@@ -180,7 +183,19 @@
 						label: "Project",
 						headerKey: "headerProject",
 						key: "project",
-						style: { width: "195px" }
+						style: { width: "190px" }
+					},
+					{
+						label: "Client",
+						headerKey: "headerClient",
+						key: "client",
+						style: { width: "157px" }
+					},
+					{
+						label: "Billing name",
+						headerKey: "headerBN",
+						key: "bn",
+						style: { width: "158px" }
 					},
 					{
 						label: "Step ID",
@@ -189,52 +204,46 @@
 						style: { width: "190px" }
 					},
 					{
-						label: "Company name",
-						headerKey: "headerCompany",
-						key: "company",
-						style: { width: "200px" }
-					},
-					{
-						label: "Start Date",
-						headerKey: "headerStartDate",
-						key: "startDate",
-						style: { width: "110px" }
-					},
-					{
-						label: "Deadline",
-						headerKey: "headerDeadline",
-						key: "deadline",
-						style: { width: "110px" }
-					},
-					{
-						label: "Billing Date",
-						headerKey: "headerBillingDate",
-						key: "billingDate",
-						style: { width: "110px" }
-					},
-					{
 						label: "Step",
 						headerKey: "headerService",
 						key: "step",
-						style: { width: "130px" }
-					},
-					{
-						label: "Status",
-						headerKey: "headerJobStatus",
-						key: "jobStatus",
-						style: { width: "130px" }
+						style: { width: "120px" }
 					},
 					{
 						label: "Language Pair",
 						headerKey: "headerLangPair",
 						key: "langPair",
-						style: { width: "140px" }
+						style: { width: "120px" }
+					},
+					{
+						label: "Start Date",
+						headerKey: "headerStartDate",
+						key: "startDate",
+						style: { width: "100px" }
+					},
+					{
+						label: "Deadline",
+						headerKey: "headerDeadline",
+						key: "deadline",
+						style: { width: "100px" }
+					},
+					{
+						label: "Billing Date",
+						headerKey: "headerBillingDate",
+						key: "billingDate",
+						style: { width: "100px" }
+					},
+					{
+						label: "Status",
+						headerKey: "headerJobStatus",
+						key: "jobStatus",
+						style: { width: "100px" }
 					},
 					{
 						label: "Fee ",
 						headerKey: "headerPrice",
 						key: "price",
-						style: { width: "120px" }
+						style: { width: "100px" }
 					}
 				],
 
@@ -259,8 +268,8 @@
 			getCompanyName({ customer, clientBillingInfo }) {
 				if (!clientBillingInfo) return '-'
 				if (!customer.billingInfo) return '-'
-				const { officialName } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
-				return officialName
+				const { name } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
+				return name
 			},
 			replaceRoute(key, value) {
 				let query = this.$route.query

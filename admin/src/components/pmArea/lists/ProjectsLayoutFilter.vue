@@ -216,7 +216,7 @@
 			return {
 				booleanOptions: [ 'Yes', 'No' ],
 				allCurrency: [ 'EUR', 'USD', 'GBP' ],
-				allPaymentProfile: [ 'PPP', 'Pre-Payment', 'Monthly', '50%/50%' ],
+				allPaymentProfile: [ 'PPP', 'Pre-Payment', 'Monthly', 'Custom' ],
 				allTasksStatuses: ['Created', "Quote Sent", "Approved", "Rejected", "In progress", "Pending Approval [DR1]", "Completed", "Cancelled",  "Cancelled Halfway" ],
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
