@@ -19,7 +19,7 @@ async function updateProjectMetricsAndCreateSteps(projectId, tasks) {
 
 		filterExistingTasks();
 
-		await timeout(3500)
+		await timeout(4500)
 
 		for await (let task of tasks) {
 			const { stepsAndUnits } = task;
