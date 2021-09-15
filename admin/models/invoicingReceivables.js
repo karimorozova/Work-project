@@ -11,33 +11,33 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Clients'
 	},
-	clientBillingInfo: {
-		type: Schema.Types.ObjectId,
-		ref: 'Clients.billingInfo',
-		default: null
-	},
 	status: {
 		type: String,
 		default: '',
 		trim: true
 	},
-	tasks: [ {
-		taskId: {
-			type: String,
-			trim: true
+	clientBillingInfo: {
+		type: Schema.Types.ObjectId,
+		ref: 'Clients.billingInfo',
+		default: null
+	},
+	stepsAndProjects: [ {
+		project: {
+			type: Schema.Types.ObjectId,
+			ref: 'Projects'
 		},
-		projectId: {
-			type: String,
-			trim: true
+		step: {
+			type: Schema.Types.ObjectId,
+			ref: 'Projects.steps'
 		}
 	} ],
 	firstPaymentDate: {
 		type: Date,
-		default: new Date()
+		default: null
 	},
 	lastPaymentDate: {
 		type: Date,
-		default: new Date()
+		default: null
 	},
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'

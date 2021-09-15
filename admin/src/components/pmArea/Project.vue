@@ -99,10 +99,11 @@
           .input-title
             .input-title__text Billing Information:
             span.require *
-          input.project__input-text( v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo) || ''" disabled)
+          // TODO: delete false!
+          input.project__input-text(v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo.name) || ''" disabled)
           .project__drop-menu(v-else)
             SelectSingle(
-              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name ||   project.clientBillingInfo.officialName) || ''"
+              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
               :options="billingInfoList.map(({name}) => name)"
               @chooseOption="choseBillingInfo"
               placeholder="Option"
@@ -397,7 +398,7 @@
 			billingInfoList() {
 				if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
 					const billingInfo = this.project.customer.billingInfo
-					return billingInfo.map(({ _id, officialName, paymentType, name }) => ({ _id, officialName, paymentType, name }))
+					return billingInfo.map(({ _id, paymentType, name }) => ({ _id, paymentType, name }))
 				}
 				return []
 			},

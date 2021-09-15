@@ -2,38 +2,48 @@ const { InvoicingReceivables } = require('../models')
 const _ = require('lodash')
 
 
-const createReports = async ({ checkedProjects, createdBy }) => {
-	const reportsDB = await InvoicingReceivables.find({})
+const createReports = async ({ checkedSteps, createdBy }) => {
+	// console.log(checkedSteps)
 
-	const [ reportsPPP ] = [ checkedProjects.filter(({ paymentProfile }) => paymentProfile === 'PPP') ]
+	const reportsFromDB = await InvoicingReceivables.find({})
 
-	const { temp, updatedReportsDB } = await producePPP(reportsPPP, reportsDB)
+	const [ reportsPPP, reportsPrePayment] = [
+		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'PPP'),
+		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Pre-Payment')
+	]
 
-	await InvoicingReceivables.create(...temp, ...updatedReportsDB)
+	// const { temp, updatedReportsDB } = await produceReportPerProject(reportsPPP, reportsFromDB)
+	// const { temp: temp2, updatedReportsDB: updatedReportsDB2 } = await produceReportPerProject(reportsPrePayment, reportsFromDB)
 
-	// await InvoicingReceivables.create({
-	// 	clientBillingInfo
-	// })
+	console.log(
+			await produceReportPerProject(reportsPPP, reportsFromDB),
+			await produceReportPerProject(reportsPrePayment, reportsFromDB)
+	)
 
+	// console.log('TEMP', temp, updatedReportsDB)
+	// await InvoicingReceivables.create(...temp, ...updatedReportsDB)
+	// await InvoicingReceivables.create(reportsFromDB)
 	// console.log(checkedProjects)
 	// console.log( _.chain(checkedProjects).groupBy('clientBillingInfo').map((value, key) => ({ clientBillingInfo: key, rest: value })).value() )
 }
 
-const producePPP = (reportsPPP, reportsDB) => {
+const produceReportPerProject = (reportsPPP, reportsDB) => {
 	const temp = []
 	const updatedReportsDB = [ ...reportsDB ]
 
 	reportsPPP.forEach(element => {
-		const { taskId, projectId } = element.tasks
-		const _dbIndex = getIndex(updatedReportsDB, element)
+		const { steps: { _id: nativeStepId }, _id: nativeProjectId, clientBillingInfo } = element
 
+		const _dbIndex = getIndex(updatedReportsDB, clientBillingInfo, nativeProjectId)
 		if (_dbIndex === -1) {
-			const _tmpIndex = getIndex(temp, element)
+
+			const _tmpIndex = getIndex(temp, clientBillingInfo, nativeProjectId)
 			_tmpIndex === -1
-					? temp.push(getReportSaveStructureFromElement(element))
-					: temp[_tmpIndex].tasks.push({ taskId, projectId })
+					? temp.push(getFirstReportStructureFromElement(element))
+					: temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
+
 		} else {
-			updatedReportsDB[_dbIndex].tasks.push({ taskId, projectId })
+			updatedReportsDB[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
 		}
 	})
 
@@ -42,19 +52,21 @@ const producePPP = (reportsPPP, reportsDB) => {
 		updatedReportsDB
 	}
 
-	function getIndex(arr, item) {
-		return arr.findIndex(({ clientBillingInfo, tasks }) =>
-				`${ clientBillingInfo }` === `${ item.clientBillingInfo }` && tasks.map(({ projectId }) => projectId).includes(item.projectId))
+	function getIndex(arr, clientBillingInfo, nativeProjectId) {
+		return arr.findIndex(({ clientBillingInfo: _clientBillingInfo, stepsAndProjects }) =>
+				`${ clientBillingInfo }` === `${ _clientBillingInfo }` && stepsAndProjects.map(({ project }) => `${ project }`).includes(`${ nativeProjectId }`))
 	}
 }
 
-const getReportSaveStructureFromElement = ({ customer, clientBillingInfo, tasks, projectId }) => {
+const getFirstReportStructureFromElement = (element) => {
+	const { customer: client, clientBillingInfo, steps, _id } = element
+
 	return {
 		reportId: 'FOO',
-		client: customer,
+		client,
 		status: 'Created',
 		clientBillingInfo,
-		tasks: [ { taskId: tasks.taskId, projectId } ],
+		stepsAndProjects: [ { step: steps._id, project: _id } ],
 		firstPaymentDate: null,
 		lastPaymentDate: null,
 		createdBy: null,
