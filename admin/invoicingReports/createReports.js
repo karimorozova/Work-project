@@ -16,7 +16,7 @@ const reportAddSteps = async (reportId, stepsId) => {
 
 	await Projects.updateMany(
 			{ 'steps._id': { $in: stepsId } },
-			{ 'steps.$[i].isInReports': true },
+			{ 'steps.$[i].isInReportPayables': true },
 			{ arrayFilters: [ { 'i._id': { $in: stepsId } } ] })
 }
 
@@ -71,7 +71,7 @@ const addStepsToRequest = async (projects, createdBy) => {
 
 		await Projects.updateMany(
 				{ 'steps._id': { $in: allSteps } },
-				{ 'steps.$[i].isInReports': true },
+				{ 'steps.$[i].isInReportPayables': true },
 				{ arrayFilters: [ { 'i._id': { $in: allSteps } } ] })
 	}
 }

@@ -15,7 +15,7 @@ const reportDeleteStep = async (reportId, stepId) => {
 
 		await Projects.updateOne(
 				{ 'steps._id': stepId  },
-				{ 'steps.$[i].isInReports': false },
+				{ 'steps.$[i].isInReportPayables': false },
 				{ arrayFilters: [ { 'i._id': stepId } ] })
 
 	} catch (e) {
@@ -28,7 +28,7 @@ const reportDelete = async (reportId) => {
 	const steps = reporotInfo ? reporotInfo.steps : []
 	await Projects.updateMany(
 			{ 'steps._id': {$in: steps}  },
-			{ 'steps.$[i].isInReports': false },
+			{ 'steps.$[i].isInReportPayables': false },
 			{ arrayFilters: [ { 'i._id': {$in: steps} } ] })
 
 	await InvoicingReports.deleteOne({_id: reportId})

@@ -77,8 +77,8 @@ const tasksFiltersQuery = ({ clients, sourceLanguages, targetLanguages, to, from
 const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 	const queryPipeline = [
 		{ $match: { status: "Closed" } },
-		{ $unwind: "$tasks" },
-		{ $match: { $or: [ { "tasks.isInReports": false }, { "tasks.isInReports": { $exists: false } } ], "tasks.status": "Completed", ...queryForStep } },
+		{ $unwind: "$steps" },
+		{ $match: { $or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ], "steps.status": "Completed", ...queryForStep } },
 		{
 			$lookup:
 					{
@@ -90,7 +90,7 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 		},
 		{
 			$project: {
-				'tasks': 1,
+				'steps': 1,
 				"projectId": 1,
 				'projectName': 1,
 				'deadline': 1,

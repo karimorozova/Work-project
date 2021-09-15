@@ -338,8 +338,9 @@ const ProjectsSchema = new mongoose.Schema({
 		vendorsClickedOffer: Array,
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: "",
-		isInReport: { type: Boolean, default: false },
-		isPaid: { type: Boolean, default: false }
+		isInReportPayables: { type: Boolean, default: false },
+		isInReportReceivables: { type: Boolean, default: false },
+		// isPaid: { type: Boolean, default: false }
 	} ],
 	// TODO: refactoring
 	totalCost: {

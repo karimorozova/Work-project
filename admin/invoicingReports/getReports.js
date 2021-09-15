@@ -157,7 +157,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	const queryPipeline =  [
 		{ $match: { status: "Closed" } },
 		{ $unwind: "$steps" },
-		{ $match: { $or: [ { "steps.isInReports": false }, { "steps.isInReports": { $exists: false } } ], "steps.status": "Completed", ...queryForStep } },
+		{ $match: { $or: [ { "steps.isInReportPayables": false }, { "steps.isInReportPayables": { $exists: false } } ], "steps.status": "Completed", ...queryForStep } },
 		{
 			$lookup:
 					{
