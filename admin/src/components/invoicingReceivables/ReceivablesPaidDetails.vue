@@ -183,9 +183,9 @@
 			// 		// paymentDate: this.paymentDate,
 			// 		// notes: this.notes
 			// 	}
-			// 	const reuslt = (await (this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
+			// 	const reuslt = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
       //   if (reuslt === "Moved") {
-      //     await this.$router.push('/pangea-finance/invoicing-reports/reports')
+      //     await this.$router.push('/pangea-finance/invoicing-payables/reports')
       //   }else {
       //     await this.refreshReports()
       //   }
@@ -225,7 +225,7 @@
 			// async deleteStep() {
 			// 	const { reportId, stepId } = this.deleteInfo
 			// 	this.closeModalStep()
-			// 	await this.$http.post(`/invoicing-reports/report/${ reportId }/delete/${ stepId }`)
+			// 	await this.$http.post(`/invoicing-payables/report/${ reportId }/delete/${ stepId }`)
 			// 	await this.refreshReports()
       //
 			// },

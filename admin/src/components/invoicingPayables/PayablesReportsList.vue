@@ -89,7 +89,7 @@
           .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
         .options__button(v-else)
-          router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/create-reports`}")
+          router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-payables/create-reports`}")
             Button(value="Add Reports")
 
       .reports__container
@@ -121,7 +121,7 @@
 
           template(slot="reportId" slot-scope="{ row, index }" )
             .table__data
-              router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-reports/reports/${row._id}`}")
+              router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-payables/reports/${row._id}`}")
                 span {{ row.reportId }}
 
           template(slot="dateRange" slot-scope="{ row, index }")

@@ -245,7 +245,7 @@
 				}
 				const reuslt = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
         if (reuslt === "Moved") {
-          await this.$router.push('/pangea-finance/invoicing-reports/paid-invoices/' + this.reportDetailsInfo._id)
+          await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
         }else {
           await this.refreshReports()
         }

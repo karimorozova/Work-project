@@ -292,23 +292,23 @@
 							// },
               {
                 type: 'group',
-                path: 'invoicing-reports',
+                path: 'invoicing-payables',
                 name: 'Payables',
                 isOpen: false,
                 children: [
                   {
                     type: 'link',
-                    path: '/pangea-finance/invoicing-reports/reports',
+                    path: '/pangea-finance/invoicing-payables/reports',
                     name: 'Invoices'
                   },
                   {
                     type: 'link',
-                    path: '/pangea-finance/invoicing-reports/paid-invoices',
+                    path: '/pangea-finance/invoicing-payables/paid-invoices',
                     name: 'Paid Invoices'
                   },
                   {
                     type: 'link',
-                    path: '/pangea-finance/invoicing-reports/create-reports',
+                    path: '/pangea-finance/invoicing-payables/create-reports',
                     name: 'Add Invoices'
                   },
                 ]

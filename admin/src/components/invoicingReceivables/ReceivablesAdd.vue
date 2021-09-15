@@ -1,6 +1,6 @@
 <template lang="pug">
-  .invoicing-reports-add
-    .invoicing-reports-add__container
+  .invoicing-payables-add
+    .invoicing-payables-add__container
       .filter
         .filter__item
           label Clients:
@@ -85,7 +85,7 @@
               @removeOption="removeSettingStep"
             )
 
-      .invoicing-reports-add__table
+      .invoicing-payables-add__table
         LayoutsTable(
           :fields="fields",
           :tableData="steps",
@@ -514,7 +514,7 @@
     }
   }
 
-  .invoicing-reports-add {
+  .invoicing-payables-add {
     width: 1530px;
     margin: 50px 0 0 50px;
     background: #fff;

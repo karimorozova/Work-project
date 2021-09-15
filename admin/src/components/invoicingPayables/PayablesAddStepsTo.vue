@@ -1,6 +1,6 @@
 <template lang="pug">
-  .invoicing-reports-add
-    .invoicing-reports-add__table
+  .invoicing-payables-add
+    .invoicing-payables-add__table
       GeneralTable(
         :fields="fields",
         :tableData="steps",
@@ -201,7 +201,7 @@
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
 
-  .invoicing-reports-add {
+  .invoicing-payables-add {
     &__table {
       margin-top: 40px;
     }

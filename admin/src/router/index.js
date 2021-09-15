@@ -594,28 +594,28 @@ const router = new Router({
 							component: clearRouterView
 						},
 						{
-							path: 'invoicing-reports/reports',
-							name: 'invoicing-reports',
+							path: 'invoicing-payables/reports',
+							name: 'invoicing-payables',
 							component: PayablesReportsList
 						},
 						{
-							path: 'invoicing-reports/paid-invoices',
-							name: 'invoicing-reports',
+							path: 'invoicing-payables/paid-invoices',
+							name: 'invoicing-payables',
 							component: PayablesPaidReportsList
 						},
 						{
-							path: 'invoicing-reports/paid-invoices/:id',
-							name: 'invoicing-reports',
+							path: 'invoicing-payables/paid-invoices/:id',
+							name: 'invoicing-payables',
 							component: PayablesPaidDetails
 						},
 						{
-							path: 'invoicing-reports/reports/:id',
-							name: 'invoicing-reports',
+							path: 'invoicing-payables/reports/:id',
+							name: 'invoicing-payables',
 							component: PayablesDetails
 						},
 						{
-							path: 'invoicing-reports/create-reports',
-							name: 'invoicing-reports',
+							path: 'invoicing-payables/create-reports',
+							name: 'invoicing-payables',
 							component: PayablesAdd
 						},
 						{
