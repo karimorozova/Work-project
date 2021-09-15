@@ -13,14 +13,14 @@ const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
 const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
-const { getReportByVendorId, getReportPaidByVendorId, setReportsNextStatus, getPaidReport, getReport, clearReportsStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingReports')
+const { getPayableByVendorId, getPayablePaidByVendorId, setPayablesNextStatus, getPaidPayables, getPayable, clearPayablesStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingPayables')
 
 
 router.get("/reports", checkVendor, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getReportByVendorId(verificationResult.vendorId)
+		const reports = await getPayableByVendorId(verificationResult.vendorId)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -32,7 +32,7 @@ router.get("/paid-reports", checkVendor, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getReportPaidByVendorId(verificationResult.vendorId)
+		const reports = await getPayablePaidByVendorId(verificationResult.vendorId)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -43,8 +43,8 @@ router.get("/paid-reports", checkVendor, async (req, res) => {
 router.get("/get-report", checkVendor, async (req, res) => {
 	const { reportId } = req.query
 	try {
-		let reports = await getReport(reportId)
-		reports = await clearReportsStepsPrivateKeys(reports)
+		let reports = await getPayable(reportId)
+		reports = await clearPayablesStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -55,8 +55,8 @@ router.get("/get-report", checkVendor, async (req, res) => {
 router.get("/get-report-paid", checkVendor, async (req, res) => {
 	const { reportId } = req.query
 	try {
-		let reports = await getPaidReport(reportId)
-		reports = await clearReportsStepsPrivateKeys(reports)
+		let reports = await getPaidPayables(reportId)
+		reports = await clearPayablesStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -67,9 +67,9 @@ router.get("/get-report-paid", checkVendor, async (req, res) => {
 router.post("/approve-report", checkVendor, async (req, res) => {
 	try {
 		const { reportsIds, nextStatus } = req.body
-		await setReportsNextStatus(reportsIds, nextStatus)
-		let reports = await getReport(reportsIds[0])
-		reports = clearReportsStepsPrivateKeys(reports)
+		await setPayablesNextStatus(reportsIds, nextStatus)
+		let reports = await getPayable(reportsIds[0])
+		reports = clearPayablesStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)

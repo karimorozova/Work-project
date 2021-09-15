@@ -1,9 +1,9 @@
 const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
-const { InvoicingReports, Projects } = require("../models")
+const { InvoicingPayables, Projects } = require("../models")
 
 
-const getReportsDateRange = (steps) => {
+const getPayablesDateRange = (steps) => {
 	return steps.reduce((acc, { billingDate }) => {
 		acc.firstPaymentDate = moment.min(moment(billingDate.toString()), moment(acc.firstPaymentDate)).toISOString()
 		acc.lastPaymentDate = moment.max(moment(billingDate.toString()), moment(acc.lastPaymentDate)).toISOString()
@@ -33,7 +33,7 @@ const stepsFiltersQuery = ({ vendors, sourceLanguages, targetLanguages, to, from
 	return q
 }
 
-const reportsFiltersQuery = ({reportId,  vendors, to, from, status }) => {
+const payablesFiltersQuery = ({reportId,  vendors, to, from, status }) => {
 	const q = {}
 	const reg = /[.*+?^${}()|[\]\\]/g
 
@@ -58,8 +58,8 @@ const reportsFiltersQuery = ({reportId,  vendors, to, from, status }) => {
 }
 
 
-const getAllReports = async (countToSkip, countToGet, query) => {
-	const invoicingReprots = await InvoicingReports.aggregate([
+const getAllPayables = async (countToSkip, countToGet, query) => {
+	const invoicingReprots = await InvoicingPayables.aggregate([
 				{
 					$lookup: {
 						from: "projects",
@@ -78,11 +78,11 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 				{ $limit: countToGet}
 			]
 	)
-	return (await InvoicingReports.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
+	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
 }
 
-const getReport = async (id) => {
-	const invoicingReports = await InvoicingReports.aggregate([
+const getPayable = async (id) => {
+	const invoicingReports = await InvoicingPayables.aggregate([
 		{ $match: {"_id": ObjectId(id)}},
 		{
 			$lookup: {
@@ -99,11 +99,11 @@ const getReport = async (id) => {
 		}
 		]
 	)
-	return (await InvoicingReports.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
+	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
 }
 
-const getReportByVendorId = async (id) => {
-	return await InvoicingReports.aggregate([
+const getPayableByVendorId = async (id) => {
+	return await InvoicingPayables.aggregate([
 				{ $match: { "vendor": ObjectId(id), "status": { $ne: 'Created' }},},
 				{
 					$lookup: {
@@ -135,8 +135,8 @@ const getReportByVendorId = async (id) => {
 	)
 }
 
-const getReportProjectsAndSteps = async (id) => {
-	const invoicingReprots = await InvoicingReports.aggregate([
+const getPayablesProjectsAndSteps = async (id) => {
+	const invoicingReprots = await InvoicingPayables.aggregate([
 		{ $match: {"_id": ObjectId(id)}},
 		{
 			$lookup: {
@@ -150,7 +150,7 @@ const getReportProjectsAndSteps = async (id) => {
 			}
 		}]
 	)
-	return (await InvoicingReports.populate(invoicingReprots, ['vendor']))
+	return (await InvoicingPayables.populate(invoicingReprots, ['vendor']))
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
@@ -189,12 +189,12 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 }
 
 module.exports = {
-	getReportByVendorId,
+	getPayableByVendorId,
 	stepsFiltersQuery,
-	getAllReports,
-	getReport,
+	getAllPayables,
+	getPayable,
 	getAllSteps,
-	reportsFiltersQuery,
-	getReportsDateRange,
-	getReportProjectsAndSteps
+	payablesFiltersQuery,
+	getPayablesDateRange,
+	getPayablesProjectsAndSteps
 }

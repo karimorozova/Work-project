@@ -264,7 +264,7 @@
 			},
 			async bottomScrolled() {
 				if (this.isDataRemain) {
-					const result = await this.$http.post("/invoicing-reports/not-selected-steps-list", {
+					const result = await this.$http.post("/invoicing-payables/not-selected-steps-list", {
 						filters: this.allFilters,
 						countToSkip: this.steps.length,
 						countToGet: 100
@@ -285,7 +285,7 @@
 			async sendTasks() {
 				const checkedProjects = this.steps.filter(step => step.isCheck)
 				try {
-					await this.$http.post('/invoicing-reports/create', { checkedProjects, createdBy: this.user._id })
+					await this.$http.post('/invoicing-payables/create', { checkedProjects, createdBy: this.user._id })
 					await this.getSteps()
 					this.$emit('refreshReports')
 				} catch (e) {
@@ -294,7 +294,7 @@
 			},
 			async getSteps() {
 				this.steps = (
-						await this.$http.post('/invoicing-reports/not-selected-steps-list', {
+						await this.$http.post('/invoicing-payables/not-selected-steps-list', {
 							countToSkip: 0,
 							countToGet: 100,
 							filters: this.allFilters

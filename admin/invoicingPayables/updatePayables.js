@@ -1,10 +1,10 @@
-const { InvoicingReports, InvoicingReportsArchive } = require("../models")
+const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 const { moveProjectFile } = require('../utils/movingFile')
 const fs = require('fs')
 const ObjectId = require("mongodb").ObjectID
 
-const setReportsNextStatus = async (reportsIds, nextStatus) => {
-	await InvoicingReports.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus })
+const setPayablesNextStatus = async (reportsIds, nextStatus) => {
+	await InvoicingPayables.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus })
 }
 
 const invoiceReloadFile = async ({ reportId, paymentMethod, expectedPaymentDate, invoiceFile, oldPath }) => {
@@ -20,7 +20,7 @@ const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate,
 	await moveProjectFile(invoiceFile[0], `./dist${ newPath }`)
 
 
-	await InvoicingReports.updateOne({ _id: reportId }, {
+	await InvoicingPayables.updateOne({ _id: reportId }, {
 		status: 'Invoice Received',
 		paymentDetails: {
 			paymentMethod,
@@ -37,25 +37,25 @@ const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate,
 const paidOrAddPaymentInfo = async (reportId, data) => {
 	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 
-	await InvoicingReports.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: data } })
+	await InvoicingPayables.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: data } })
 
 	if ("Paid" === status) {
-		await InvoicingReports.aggregate([
+		await InvoicingPayables.aggregate([
 			{	"$match": {"_id" : ObjectId(reportId) } },
 			{
 				"$merge" : {
 					"into" : {
 						"db" : "pangea",
-						"coll" : "invoicingreportsarchives"
+						"coll" : "invoicingpayablesarchives"
 					}
 				}
 			}
 		])
-		await InvoicingReports.remove({_id: reportId})
+		await InvoicingPayables.remove({_id: reportId})
 		return "Moved"
 	}
 
 	return 'Success'
 
 }
-module.exports = { setReportsNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile }
+module.exports = { setPayablesNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile }

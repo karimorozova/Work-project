@@ -169,7 +169,7 @@
 			async sendTasks() {
 				const checkedProjects = this.steps.filter(step => step.isCheck)
 				try {
-					await this.$http.post(`/invoicing-reports/report/${ this.invoicingEditId }/steps/add`, {
+					await this.$http.post(`/invoicing-payables/report/${ this.invoicingEditId }/steps/add`, {
 						checkedProjects: checkedProjects.map(({ steps }) => steps._id),
 						createdBy: this.user._id
 					})

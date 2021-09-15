@@ -1,9 +1,9 @@
 const { ObjectID: ObjectId } = require("mongodb")
-const { InvoicingReports, InvoicingReportsArchive } = require("../models")
+const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 
 
-const getAllPaidReports = async (countToSkip, countToGet, query) => {
-	const invoicingReprots = await InvoicingReportsArchive.aggregate([
+const getAllPaidPayables = async (countToSkip, countToGet, query) => {
+	const invoicingReprots = await InvoicingPayablesArchive.aggregate([
 				{
 					$lookup: {
 						from: "projects",
@@ -22,11 +22,11 @@ const getAllPaidReports = async (countToSkip, countToGet, query) => {
 				{ $limit: countToGet}
 			]
 	)
-	return (await InvoicingReports.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
+	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
 }
 
 const getPaidReport = async (id) => {
-	const invoicingReports = await InvoicingReportsArchive.aggregate([
+	const invoicingReports = await InvoicingPayablesArchive.aggregate([
 		{ $match: {"_id": ObjectId(id)}},
 		{
 			$lookup: {
@@ -43,11 +43,11 @@ const getPaidReport = async (id) => {
 		}
 		]
 	)
-	return (await InvoicingReportsArchive.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
+	return (await InvoicingPayablesArchive.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
 }
 
 const getReportPaidByVendorId = async (id) => {
-	return await InvoicingReportsArchive.aggregate([
+	return await InvoicingPayablesArchive.aggregate([
 				{ $match: { "vendor": ObjectId(id)},},
 				{
 					$lookup: {
@@ -80,8 +80,8 @@ const getReportPaidByVendorId = async (id) => {
 }
 
 module.exports = {
-	getAllPaidReports,
+	getAllPaidPayables,
 	getPaidReport,
-	getReportPaidByVendorId,
+	getPayablePaidByVendorId: getReportPaidByVendorId,
 
 }

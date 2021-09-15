@@ -61,11 +61,11 @@ import ActiveVendors from '@/components/vendors/lists/ActiveVendors'
 import PotentialVendors from '@/components/vendors/lists/PotentialVendors'
 import InactiveVendors from '@/components/vendors/lists/InactiveVendors'
 
-import InvoicingReportsList from "../components/invoicingReports/InvoicingReportsList"
-import InvoicingPaidReportsList from "../components/invoicingReports/InvoicingPaidReportsList"
-import InvoicingDetails from "../components/invoicingReports/InvoicingDetails"
-import AddInvoicing from "../components/invoicingReports/AddInvoicing"
-import InvoicingPaidDetails from "../components/invoicingReports/InvoicingPaidDetails"
+import PayablesReportsList from "../components/invoicingPayables/PayablesReportsList"
+import PayablesPaidReportsList from "../components/invoicingPayables/PayablesPaidReportsList"
+import PayablesDetails from "../components/invoicingPayables/PayablesDetails"
+import PayablesAdd from "../components/invoicingPayables/PayablesAdd"
+import PayablesPaidDetails from "../components/invoicingPayables/PayablesPaidDetails"
 
 
 import ReceivablesReportsList from "../components/invoicingReceivables/ReceivablesReportsList"
@@ -596,27 +596,27 @@ const router = new Router({
 						{
 							path: 'invoicing-reports/reports',
 							name: 'invoicing-reports',
-							component: InvoicingReportsList
+							component: PayablesReportsList
 						},
 						{
 							path: 'invoicing-reports/paid-invoices',
 							name: 'invoicing-reports',
-							component: InvoicingPaidReportsList
+							component: PayablesPaidReportsList
 						},
 						{
 							path: 'invoicing-reports/paid-invoices/:id',
 							name: 'invoicing-reports',
-							component: InvoicingPaidDetails
+							component: PayablesPaidDetails
 						},
 						{
 							path: 'invoicing-reports/reports/:id',
 							name: 'invoicing-reports',
-							component: InvoicingDetails
+							component: PayablesDetails
 						},
 						{
 							path: 'invoicing-reports/create-reports',
 							name: 'invoicing-reports',
-							component: AddInvoicing
+							component: PayablesAdd
 						},
 						{
 							path: 'invoicing-receivables/reports',

@@ -234,10 +234,10 @@
 				this.isDeletingStep = false
 			},
 			async openDetails(id) {
-				this.reportDetailsInfo = (await this.$http.post('/invoicing-reports/paid-report/' + id)).data[0]
+				this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/paid-report/' + id)).data[0]
 			},
 			async getSteps() {
-				this.steps = (await this.$http.post('/invoicing-reports/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
+				this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
 				console.log('steps', this.steps)
 			}
 		},

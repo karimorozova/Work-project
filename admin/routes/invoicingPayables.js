@@ -2,20 +2,20 @@ const router = require('express').Router();
 
 const { Languages } = require('../models')
 const {
-	getAllReports,
-	getReport,
-	reportAddSteps,
-	reportDeleteStep,
+	getAllPayables,
+	getPayable,
+	payablesAddSteps,
+	payableDeleteStep,
 	getAllSteps,
-	addStepsToRequest,
+	addStepsToPayables,
 	stepsFiltersQuery,
-	reportsFiltersQuery,
-	setReportsNextStatus,
-	reportDelete,
+	payablesFiltersQuery,
+	setPayablesNextStatus,
+	payableDelete,
 	paidOrAddPaymentInfo,
-	getAllPaidReports,
-	getPaidReport,
-} = require('../invoicingReports')
+	getAllPaidPayables,
+	getPaidPayables,
+} = require('../invoicingPayables')
 
 const ObjectId = require("mongodb").ObjectID
 
@@ -26,7 +26,7 @@ router.post("/manage-report-status", async (req, res) => {
 		switch (nextStatus) {
 			case "Sent":
 				const { reportsIds } = req.body
-				await setReportsNextStatus(reportsIds, nextStatus)
+				await setPayablesNextStatus(reportsIds, nextStatus)
 				//TODO send nofitication
 				break;
 		}
@@ -65,8 +65,8 @@ router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 router.post("/reports", async (req, res) => {
 	try {
 		const {	countToSkip, countToGet, filters } = req.body
-		const query = reportsFiltersQuery(filters)
-		const reports = await getAllReports( countToSkip, countToGet, query )
+		const query = payablesFiltersQuery(filters)
+		const reports = await getAllPayables( countToSkip, countToGet, query )
 		res.send(reports);
 	} catch(err) {
 		console.log(err);
@@ -77,8 +77,8 @@ router.post("/reports", async (req, res) => {
 router.post("/paid-reports", async (req, res) => {
 	try {
 		const {	countToSkip, countToGet, filters } = req.body
-		const query = reportsFiltersQuery(filters)
-		const reports = await getAllPaidReports( countToSkip, countToGet, query )
+		const query = payablesFiltersQuery(filters)
+		const reports = await getAllPaidPayables( countToSkip, countToGet, query )
 		res.send(reports);
 	} catch(err) {
 		console.log(err);
@@ -92,7 +92,7 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 
 	try {
 		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
-		// const reports = await getAllReports( countToSkip, countToGet, query )
+		// const reports = await getAllPayables( countToSkip, countToGet, query )
 		res.send(result);
 	} catch(err) {
 		console.log(err);
@@ -103,7 +103,7 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 router.post("/report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
-		const report = await getReport(id)
+		const report = await getPayable(id)
 		res.send(report);
 	} catch(err) {
 		console.log(err);
@@ -114,7 +114,7 @@ router.post("/report/:id", async (req, res) => {
 router.post("/paid-report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
-		const report = await getPaidReport(id)
+		const report = await getPaidPayables(id)
 		res.send(report);
 	} catch(err) {
 		console.log(err);
@@ -125,7 +125,7 @@ router.post("/paid-report/:id", async (req, res) => {
 router.get("/report/:id/delete", async (req, res) => {
 	const { id } = req.params
 	try {
-		const report = await reportDelete(id)
+		const report = await payableDelete(id)
 		res.send(report);
 	} catch(err) {
 		console.log(err);
@@ -137,7 +137,7 @@ router.post("/delete-reports", async (req, res) => {
 	const { reportIds } = req.body
 	try {
 		for await (const reportId of reportIds) {
-			await reportDelete(reportId)
+			await payableDelete(reportId)
 		}
 
 		res.send("success");
@@ -150,7 +150,7 @@ router.post("/delete-reports", async (req, res) => {
 router.post("/report/:reportId/delete/:stepId", async (req, res) => {
 	const { reportId, stepId } = req.params
 	try {
-		const report = await reportDeleteStep(reportId, stepId)
+		const report = await payableDeleteStep(reportId, stepId)
 		res.send(report);
 	} catch(err) {
 		console.log(err);
@@ -163,7 +163,7 @@ router.post("/report/:reportId/steps/add", async (req, res) => {
 	const { reportId } = req.params
 	const { checkedProjects } = req.body
 	try {
-		const report = await reportAddSteps(reportId, checkedProjects)
+		const report = await payablesAddSteps(reportId, checkedProjects)
 		res.send(report);
 	} catch(err) {
 		console.log(err);
@@ -174,7 +174,7 @@ router.post("/report/:reportId/steps/add", async (req, res) => {
 router.post("/create", async (req, res) => {
 	const { checkedProjects, createdBy } = req.body;
 	try {
-		await addStepsToRequest(checkedProjects, createdBy )
+		await addStepsToPayables(checkedProjects, createdBy )
 		res.send("success");
 	} catch(err) {
 		console.log(err);

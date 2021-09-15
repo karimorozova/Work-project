@@ -243,7 +243,7 @@
 					paymentDate: this.paymentDate,
 					notes: this.notes
 				}
-				const reuslt = (await (this.$http.post(`/invoicing-reports/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
+				const reuslt = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
         if (reuslt === "Moved") {
           await this.$router.push('/pangea-finance/invoicing-reports/paid-invoices/' + this.reportDetailsInfo._id)
         }else {
@@ -285,7 +285,7 @@
 			async deleteStep() {
 				const { reportId, stepId } = this.deleteInfo
 				this.closeModalStep()
-				await this.$http.post(`/invoicing-reports/report/${ reportId }/delete/${ stepId }`)
+				await this.$http.post(`/invoicing-payables/report/${ reportId }/delete/${ stepId }`)
 				await this.refreshReports()
 
 			},
@@ -294,10 +294,10 @@
 				this.isDeletingStep = false
 			},
 			async openDetails(id) {
-				this.reportDetailsInfo = (await this.$http.post('/invoicing-reports/report/' + id)).data[0]
+				this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/report/' + id)).data[0]
 			},
 			async getSteps() {
-				this.steps = (await this.$http.post('/invoicing-reports/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
+				this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
 				console.log('steps', this.steps)
 			}
 		},

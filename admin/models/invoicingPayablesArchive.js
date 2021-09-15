@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const InvoicingReportsArchiveSchema = new mongoose.Schema({
+const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 	reportId: {
 		type: String,
 		default: '',
@@ -76,6 +76,6 @@ const InvoicingReportsArchiveSchema = new mongoose.Schema({
 	}
 });
 
-const InvoicingReportsArchive = mongoose.model('InvoicingReportsArchive', InvoicingReportsArchiveSchema);
+const InvoicingPayablesArchive = mongoose.model('InvoicingPayablesArchive', InvoicingPayablesArchiveSchema);
 
-module.exports = InvoicingReportsArchive;
+module.exports = InvoicingPayablesArchive;

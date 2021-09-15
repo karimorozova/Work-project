@@ -40,8 +40,8 @@ const IndustryTierInfo = require('./industryTier');
 const ClientsTasks = require('./clientsTasks')
 const ClientsNotes = require('./clientsNotes')
 const ClientsApiSetting = require('./clientsApiSetting')
-const InvoicingReports = require('./invoicingReports')
-const InvoicingReportsArchive = require('./invoicingReportsArchive')
+const InvoicingPayables = require('./invoicingPayables')
+const InvoicingPayablesArchive = require('./invoicingPayablesArchive')
 const PaymentTerms = require('./paymentTerms')
 const InvoicingReceivables = require('./invoicingReceivables')
 
@@ -89,8 +89,8 @@ const Models = {
   ClientsTasks,
   ClientsNotes,
   ClientsApiSetting,
-  InvoicingReports,
-  InvoicingReportsArchive,
+  InvoicingPayables,
+  InvoicingPayablesArchive,
   PaymentTerms,
 };
 

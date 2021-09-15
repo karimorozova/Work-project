@@ -1,4 +1,4 @@
-const clearReportsStepsPrivateKeys = async (reports) => {
+const clearPayablesStepsPrivateKeys = async (reports) => {
 	const privateKeys = [
 		'finance',
 		'nativeFinance.Price.receivables',
@@ -20,4 +20,4 @@ const clearReportsStepsPrivateKeys = async (reports) => {
 	})
 }
 
-module.exports = { clearReportsStepsPrivateKeys }
+module.exports = { clearPayablesStepsPrivateKeys }

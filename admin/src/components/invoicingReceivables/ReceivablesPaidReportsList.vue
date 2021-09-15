@@ -254,7 +254,7 @@
         }
 			},
       async deleteChecked() {
-        await this.$http.post('/invoicing-reports/delete-reports', {
+        await this.$http.post('/invoicing-payables/delete-reports', {
           reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
         })
         this.closeApproveActionModal()
@@ -263,7 +263,7 @@
       async changeTaskStatus() {
 	      const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
 	      try {
-		      await this.$http.post('/invoicing-reports/manage-report-status', {
+		      await this.$http.post('/invoicing-payables/manage-report-status', {
 			      reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
 			      nextStatus
 		      })
@@ -368,7 +368,7 @@
 				console.log(id)
 			},
 			async deleteRequest() {
-				await this.$http.get(`/invoicing-reports/report/${ this.deleteRequestId }/delete`)
+				await this.$http.get(`/invoicing-payables/report/${ this.deleteRequestId }/delete`)
         await this.getReports()
 				this.closeDeleteRequestModal()
 			},
@@ -376,7 +376,7 @@
 				this.deleteRequestId = ''
 			},
 			async getReports() {
-				this.reports = (await this.$http.post('/invoicing-reports/paid-reports', {
+				this.reports = (await this.$http.post('/invoicing-payables/paid-reports', {
 					countToSkip: 0,
 					countToGet: 100,
 					filters: this.allFilters
@@ -384,7 +384,7 @@
 			},
 			async bottomScrolled() {
 				if (this.isDataRemain) {
-					const result = await this.$http.post("/invoicing-reports/paid-reports", {
+					const result = await this.$http.post("/invoicing-payables/paid-reports", {
 						filters: this.allFilters,
 						countToSkip: this.reports.length,
 						countToGet: 100
