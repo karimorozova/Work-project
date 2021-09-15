@@ -5,16 +5,17 @@ const _ = require('lodash')
 const createReports = async ({ checkedSteps, createdBy }) => {
 	const reportsFromDB = await InvoicingReceivables.find({ status: 'Created' })
 
-	const [ jobsPPP, jobsPrePayment, jobsMonthly ] = [
+	const [ jobsPPP, jobsPrePayment, jobsMonthly, jobsCustom ] = [
 		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'PPP'),
 		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Pre-Payment'),
-		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Monthly')
+		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Monthly'),
+		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Custom')
 	]
 
 	const { temp: PPP, updatedReports: updatedReports1 } = await produceReportPerProject(jobsPPP, reportsFromDB)
 	const { temp: prePayment, updatedReports: updatedReports2 } = await produceReportPerProject(jobsPrePayment, updatedReports1)
 	const { temp: monthly, updatedReports: updatedReports3 } = await produceReportManyProjects(jobsMonthly, updatedReports2)
-	const { temp: custom, updatedReports: updatedReports4 } = await produceReportManyProjects(jobsMonthly, updatedReports3)
+	const { temp: custom, updatedReports: updatedReports4 } = await produceReportManyProjects(jobsCustom, updatedReports3)
 
 	await InvoicingReceivables.create(
 			...PPP,
