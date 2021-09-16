@@ -11,10 +11,13 @@ const getPayablesDateRange = (steps) => {
 	}, {firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20,'years')})
 }
 
-const stepsFiltersQuery = ({ vendors, sourceLanguages, targetLanguages, to, from, step }, allLanguages) => {
+const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, to, from, step }, allLanguages) => {
 	const q = {}
 	if (vendors) {
 		q["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	}
+		if (clients) {
+		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
 	if (sourceLanguages) {
 		q["steps.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }

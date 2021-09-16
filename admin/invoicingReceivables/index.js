@@ -1,5 +1,4 @@
 const {
-	tasksFiltersQuery,
 	getAllTasks,
 	reportsFiltersQuery,
 	getAllReports
@@ -14,5 +13,4 @@ module.exports = {
 	reportsFiltersQuery,
 	createReports,
 	getAllTasks,
-	tasksFiltersQuery
 }

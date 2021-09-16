@@ -56,29 +56,6 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 	)
 }
 
-
-const tasksFiltersQuery = ({ clients, sourceLanguages, targetLanguages, to, from, service }, allLanguages) => {
-	const q = {}
-	if (clients) {
-		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
-	}
-	if (sourceLanguages) {
-		q["tasks.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
-	}
-	if (targetLanguages) {
-		q["tasks.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
-	}
-	if (service) {
-		q["tasks.service.title"] = service
-	}
-	if (!to) to = moment().add(1, 'days').format('YYYY-MM-DD')
-	if (!from) from = '1970-01-01'
-
-	q["billingDate"] = { $gte: new Date(`${ from }T00:00:00.000Z`), $lt: new Date(`${ to }T24:00:00.000Z`) }
-
-	return q
-}
-
 const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 	const queryPipeline = [
 		{ $match: { status: "Closed" } },
@@ -123,7 +100,6 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 
 module.exports = {
 	reportsFiltersQuery,
-	tasksFiltersQuery,
 	getAllTasks,
 	getAllReports
 }

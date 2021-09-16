@@ -2,12 +2,15 @@ const router = require('express').Router()
 const { Languages } = require('../models')
 
 const {
-	tasksFiltersQuery,
 	getAllTasks,
 	createReports,
 	reportsFiltersQuery,
 	getAllReports
 } = require('../invoicingReceivables')
+
+const  {
+	stepsFiltersQuery
+} = require('../invoicingPayables')
 
 router.post("/reports", async (req, res) => {
 	try {
@@ -25,7 +28,7 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	const { countToSkip, countToGet, filters } = req.body
 	const allLanguages = await Languages.find()
 	try {
-		const query = tasksFiltersQuery(filters, allLanguages)
+		const query = stepsFiltersQuery(filters, allLanguages)
 		const tasks = await getAllTasks(countToSkip, countToGet, query)
 		res.send(tasks)
 	} catch (err) {
