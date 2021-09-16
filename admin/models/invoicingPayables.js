@@ -68,11 +68,11 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 	},
 	createAt: {
 		type: Date,
-		default: null
+		default: new Date()
 	},
 	updatedAt: {
 		type: Date,
-		default: null
+		default: new Date()
 	}
 });
 

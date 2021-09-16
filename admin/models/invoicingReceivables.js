@@ -33,11 +33,11 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 	} ],
 	firstPaymentDate: {
 		type: Date,
-		default: null
+		default: new Date()
 	},
 	lastPaymentDate: {
 		type: Date,
-		default: null
+		default: new Date()
 	},
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
@@ -47,11 +47,11 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 	},
 	createAt: {
 		type: Date,
-		default: null
+		default: new Date()
 	},
 	updatedAt: {
 		type: Date,
-		default: null
+		default: new Date()
 	}
 })
 
