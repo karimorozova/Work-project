@@ -94,7 +94,9 @@ const getPayable = async (id) => {
 				pipeline: [
 					{ "$unwind": "$steps" },
 					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ "$addFields": {"steps.billingDate": '$billingDate'}},
+					{ "$addFields": { "steps.projectNativeId": '$_id' } },
+					{ "$addFields": { "steps.projectName": '$projectName' } },
+					{ "$addFields": {" steps.billingDate": '$billingDate' }},
 					{ '$replaceRoot': { newRoot: '$steps' } },
 				],
 				as: "steps"
@@ -102,7 +104,7 @@ const getPayable = async (id) => {
 		}
 		]
 	)
-	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
+	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo' ] } ))
 }
 
 const getPayableByVendorId = async (id) => {

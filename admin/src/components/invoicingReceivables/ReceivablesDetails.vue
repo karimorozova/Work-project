@@ -3,9 +3,11 @@
     .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
       .invoicing-details__details
         .title
-          .title__text {{ reportDetailsInfo.client.name }}
-        //   .title__button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")')
-        //     Button(value="Add jobs" @clicked="changeToggleAddSteps")
+          .title__text
+            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
+              span {{ reportDetailsInfo.client.name }}
+          .title__button(v-if='!toggleAddSteps && reportDetailsInfo.status === "Created"')
+            Button(value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
           .invoicing-details__text
@@ -96,61 +98,65 @@
 
             //   Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
 
+          .invoicing-details__table
+            ApproveModal(
+              v-if="isDeletingStep"
+              class="absolute-middle"
+              text="Are you sure?"
+              approveValue="Yes"
+              notApproveValue="No"
+              @approve="deleteStep"
+              @close="closeModalStep"
+              @notApprove="closeModalStep"
+            )
+            GeneralTable(
+              :fields="fields",
+              :tableData="reportDetailsInfo.stepsWithProject",
+              :isFilterShow="false"
+              :isFilterAbsolute="false"
+            )
 
-          // .invoicing-details__table
-          //   ApproveModal(
-          //     v-if="isDeletingStep"
-          //     class="absolute-middle"
-          //     text="Are you sure?"
-          //     approveValue="Yes"
-          //     notApproveValue="No"
-          //     @approve="deleteStep"
-          //     @close="closeModalStep"
-          //     @notApprove="closeModalStep"
-          //   )
-          //   GeneralTable(
-          //     :fields="fields",
-          //     :tableData="reportDetailsInfo.stepsWithProject",
-          //     :isFilterShow="false"
-          //     :isFilterAbsolute="false"
-          //   )
+              template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+                .table__header {{ field.label }}
 
-          //     template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-          //       .table__header {{ field.label }}
+              template(slot="project" slot-scope="{ row, index }")
+                .table__data(style="word-break: break-word;")
+                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
+                    span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
 
-          //     template(slot="stepId" slot-scope="{ row, index }")
-          //       .table__data {{ row.stepId }}
+              template(slot="stepId" slot-scope="{ row, index }")
+                .table__data {{ row.stepId }}
 
-          //     template(slot="service" slot-scope="{ row, index }")
-          //       .table__data {{ row.name }}
+              template(slot="service" slot-scope="{ row, index }")
+                .table__data {{ row.name }}
 
-          //     template(slot="langPair" slot-scope="{ row, index }")
-          //       .table__data {{ row.sourceLanguage}}
-          //         span(style="font-size: 12px;color: #999999; margin: 0 4px;")
-          //           i(class="fas fa-angle-double-right")
-          //         | {{ row.targetLanguage }}
+              template(slot="langPair" slot-scope="{ row, index }")
+                .table__data {{ row.sourceLanguage}}
+                  span(style="font-size: 12px;color: #999999; margin: 0 4px;")
+                    i(class="fas fa-angle-double-right")
+                  | {{ row.targetLanguage }}
 
-          //     template(slot="billing" slot-scope="{ row, index }")
-          //       .table__data {{ formattedDate(row.billingDate) }}
+              template(slot="billing" slot-scope="{ row, index }")
+                .table__data {{ formattedDate(row.billingDate) }}
 
-          //     template(slot="payables" slot-scope="{ row, index }")
-          //       .table__data
-          //         span.currency(v-html="'&euro;'")
-          //         span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
+              template(slot="payables" slot-scope="{ row, index }")
+                .table__data
+                  span.currency(v-html="'&euro;'")
+                  span {{ 10 | roundTwoDigit}}
 
-          //     template(slot="icons", slot-scope="{ row, index }")
-          //       .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
-          //         i(class="fas fa-trash" @click="requestToDelete(row._id)")
+              template(slot="icons", slot-scope="{ row, index }")
+                .table__icons(v-if="(reportDetailsInfo.status === 'Created')")
+                  i(class="fas fa-trash" @click="requestToDelete(row._id)")
 
-      // .invoicing-details__add-steps
-      //   .add-steps__body
-      //     ReceivablesAddStepsTo.add-steps__table(
-      //       v-if="toggleAddSteps"
-      //       :steps="steps"
-      //       :invoicingEditId="reportDetailsInfo._id"
-      //       @refreshReports="refreshReports"
-      //       @closeTable="changeToggleAddSteps"
-      //     )
+      .invoicing-details__add-steps
+        .add-steps__body
+          ReceivablesAddStepsTo.add-steps__table(
+            v-if="toggleAddSteps"
+            :steps="steps"
+            :invoicingEditId="reportDetailsInfo._id"
+            @refreshReports="refreshReports"
+            @closeTable="changeToggleAddSteps"
+          )
 
     // .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
     //   .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
@@ -180,34 +186,40 @@
 				reportDetailsInfo: {},
 				fields: [
 					{
-						label: "Step Id",
+						label: "Project",
+						headerKey: "headerStepId",
+						key: "project",
+						style: { width: "22%" }
+					},
+					{
+						label: "Step ID",
 						headerKey: "headerStepId",
 						key: "stepId",
-						style: { width: "25%" }
+						style: { width: "19%" }
 					},
 					{
 						label: "Step",
 						headerKey: "headerService",
 						key: "service",
-						style: { width: "17%" }
+						style: { width: "14%" }
 					},
 					{
 						label: "Billing Date",
 						headerKey: "headerBilling",
 						key: "billing",
-						style: { width: "17%" }
+						style: { width: "14%" }
 					},
 					{
 						label: "Language Pair",
 						headerKey: "headerLangPair",
 						key: "langPair",
-						style: { width: "17%" }
+						style: { width: "14%" }
 					},
 					{
 						label: "Fee ",
 						headerKey: "headerPayables",
 						key: "payables",
-						style: { width: "17%" }
+						style: { width: "10%" }
 					},
 					{
 						label: "",
@@ -305,12 +317,10 @@
 			// 	await this.getReportDetails(this.$route.params.id)
 			// 	await this.getSteps()
 			// },
-			// changeToggleAddSteps() {
-			// 	this.toggleAddSteps = !this.toggleAddSteps
-			// 	if (this.toggleAddSteps) {
-			// 		this.getSteps()
-			// 	}
-			// },
+			changeToggleAddSteps() {
+				this.toggleAddSteps = !this.toggleAddSteps
+				if (this.toggleAddSteps) this.getSteps()
+			},
 			// requestToDelete(stepId) {
 			// 	this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
 			// 	this.isDeletingStep = true
@@ -475,23 +485,6 @@
       margin-bottom: 12px;
     }
 
-    /*&__block-title {*/
-    /*  font-size: 18px;*/
-    /*  font-family: Myriad600;*/
-    /*}*/
-
-    &__block {
-      /*margin: 10px 0;*/
-      /*width: 220px;*/
-    }
-
-    &__block-flex {
-      /*margin: 10px 0;*/
-      /*display: flex;*/
-      /*width: 220px;*/
-      /*justify-content: space-between;*/
-    }
-
     &__select {
       position: relative;
       height: 32px;
@@ -530,8 +523,18 @@
     height: 32px;
 
     &__text {
-      font-size: 21px;
+      font-size: 22px;
       font-family: 'Myriad600';
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: .2s ease-out;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 
@@ -553,7 +556,7 @@
 
     &__wrapper {
       border-radius: 4px;
-      padding: 20px;
+      padding: 25px;
       box-sizing: border-box;
       box-shadow: 0 1px 2px 0 rgba(99, 99, 99, .3), 0 1px 3px 1px rgba(99, 99, 99, .15);
       background: white;
@@ -580,6 +583,7 @@
 
   .text {
     &__block {
+      letter-spacing: 0.1px;
       margin: 10px 0;
       width: 310px;
       display: flex;
@@ -618,6 +622,16 @@
 
     &__data {
       width: 100%;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: .2s ease-out;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     &__icons {

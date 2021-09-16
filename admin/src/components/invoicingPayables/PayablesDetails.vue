@@ -3,13 +3,16 @@
     .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
       .invoicing-details__details
         .title
-          .title__text {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+          .title__text
+            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
+              span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+
           .title__button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")')
             Button(value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
           .invoicing-details__text
-            .text__address Office 333, Block B 55A, Mezhyhirska Street, 04000 Kyiv, Ukraine
+            .text__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address' }}
             .text__block
               .text__title Report Id:
               .text__value {{reportDetailsInfo.reportId}}
@@ -106,11 +109,16 @@
               template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
                 .table__header {{ field.label }}
 
+              template(slot="project" slot-scope="{ row, index }")
+                .table__data(style="word-break: break-word;")
+                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
+                    span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
+
               template(slot="stepId" slot-scope="{ row, index }")
                 .table__data {{ row.stepId }}
 
               template(slot="service" slot-scope="{ row, index }")
-                .table__data {{ row.service.title }}
+                .table__data {{ row.name }}
 
               template(slot="langPair" slot-scope="{ row, index }")
                 .table__data {{ row.sourceLanguage}}
@@ -168,34 +176,40 @@
 				reportDetailsInfo: {},
 				fields: [
 					{
-						label: "Step Id",
+						label: "Project",
+						headerKey: "headerStepId",
+						key: "project",
+						style: { width: "22%" }
+					},
+					{
+						label: "Step ID",
 						headerKey: "headerStepId",
 						key: "stepId",
-						style: { width: "25%" }
+						style: { width: "19%" }
 					},
 					{
 						label: "Step",
 						headerKey: "headerService",
 						key: "service",
-						style: { width: "17%" }
+						style: { width: "14%" }
 					},
 					{
 						label: "Billing Date",
 						headerKey: "headerBilling",
 						key: "billing",
-						style: { width: "17%" }
+						style: { width: "14%" }
 					},
 					{
 						label: "Language Pair",
 						headerKey: "headerLangPair",
 						key: "langPair",
-						style: { width: "17%" }
+						style: { width: "14%" }
 					},
 					{
 						label: "Fee ",
 						headerKey: "headerPayables",
 						key: "payables",
-						style: { width: "17%" }
+						style: { width: "10%" }
 					},
 					{
 						label: "",
@@ -246,11 +260,11 @@
 					notes: this.notes
 				}
 				const reuslt = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-        if (reuslt === "Moved") {
-          await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-        }else {
-          await this.refreshReports()
-        }
+				if (reuslt === "Moved") {
+					await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+				} else {
+					await this.refreshReports()
+				}
 				this.amount = 0
 			},
 			updatePaidAmount(event) {
@@ -296,9 +310,9 @@
 				this.isDeletingStep = false
 			},
 			async openDetails(id) {
-				try{
+				try {
 					this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/report/' + id)).data[0]
-				}catch (e) {
+				} catch (e) {
 					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}
 			},
@@ -323,7 +337,7 @@
 		},
 		async created() {
 			await this.openDetails(this.$route.params.id)
-      this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
+			this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
 		},
 		components: {
 			Button,
@@ -333,7 +347,7 @@
 			SelectSingle,
 			DatepickerWithTime,
 			CheckBox,
-      PayablesPaymentInformationCard
+			PayablesPaymentInformationCard
 		}
 	}
 </script>
@@ -443,23 +457,6 @@
       margin-bottom: 12px;
     }
 
-    /*&__block-title {*/
-    /*  font-size: 18px;*/
-    /*  font-family: Myriad600;*/
-    /*}*/
-
-    &__block {
-      /*margin: 10px 0;*/
-      /*width: 220px;*/
-    }
-
-    &__block-flex {
-      /*margin: 10px 0;*/
-      /*display: flex;*/
-      /*width: 220px;*/
-      /*justify-content: space-between;*/
-    }
-
     &__select {
       position: relative;
       height: 32px;
@@ -498,8 +495,18 @@
     height: 32px;
 
     &__text {
-      font-size: 21px;
+      font-size: 22px;
       font-family: 'Myriad600';
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: .2s ease-out;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 
@@ -521,7 +528,7 @@
 
     &__wrapper {
       border-radius: 4px;
-      padding: 20px;
+      padding: 25px;
       box-sizing: border-box;
       box-shadow: 0 1px 2px 0 rgba(99, 99, 99, .3), 0 1px 3px 1px rgba(99, 99, 99, .15);
       background: white;
@@ -548,6 +555,7 @@
 
   .text {
     &__block {
+      letter-spacing: 0.1px;
       margin: 10px 0;
       width: 310px;
       display: flex;
@@ -586,6 +594,16 @@
 
     &__data {
       width: 100%;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: .2s ease-out;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     &__icons {
