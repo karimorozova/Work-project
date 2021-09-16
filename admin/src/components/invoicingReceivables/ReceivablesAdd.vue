@@ -103,13 +103,16 @@
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
           template(slot="project" slot-scope="{ row, index }")
-            .table__data(style="word-break: break-word; padding-right: 20px;") {{ row.projectName.length > 46 ? (row.projectName.substring(0, 45) + '...') : row.projectName }}
+            .table__data(style="word-break: break-word; padding-right: 15px;") {{ row.projectName.length > 46 ? (row.projectName.substring(0, 40) + '...') : row.projectName }}
 
           template(slot="client" slot-scope="{ row, index }")
             .table__data {{ row.customer.name }}
 
           template(slot="bn" slot-scope="{ row, index }")
-            .table__data {{ getCompanyName(row) }}
+            .table__data {{ getCompanyNameAndPaymentType(row).getName() }}
+
+          template(slot="pt" slot-scope="{ row, index }")
+            .table__data {{ getCompanyNameAndPaymentType(row).getPaymentType() }}
 
           template(slot="stepId" slot-scope="{ row, index }")
             .table__data {{ row.steps.stepId }}
@@ -183,7 +186,7 @@
 						label: "Project",
 						headerKey: "headerProject",
 						key: "project",
-						style: { width: "190px" }
+						style: { width: "180px" }
 					},
 					{
 						label: "Client",
@@ -195,7 +198,13 @@
 						label: "Billing name",
 						headerKey: "headerBN",
 						key: "bn",
-						style: { width: "158px" }
+						style: { width: "128px" }
+					},
+					{
+						label: "Payment type",
+						headerKey: "headerPT",
+						key: "pt",
+						style: { width: "110px" }
 					},
 					{
 						label: "Step ID",
@@ -207,43 +216,43 @@
 						label: "Step",
 						headerKey: "headerService",
 						key: "step",
-						style: { width: "120px" }
+						style: { width: "110px" }
 					},
 					{
-						label: "Language Pair",
+						label: "Language pair",
 						headerKey: "headerLangPair",
 						key: "langPair",
 						style: { width: "120px" }
 					},
 					{
-						label: "Start Date",
+						label: "Start date",
 						headerKey: "headerStartDate",
 						key: "startDate",
-						style: { width: "100px" }
+						style: { width: "90px" }
 					},
 					{
 						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
-						style: { width: "100px" }
+						style: { width: "90px" }
 					},
 					{
-						label: "Billing Date",
+						label: "Billing date",
 						headerKey: "headerBillingDate",
 						key: "billingDate",
-						style: { width: "100px" }
+						style: { width: "90px" }
 					},
 					{
 						label: "Status",
 						headerKey: "headerJobStatus",
 						key: "jobStatus",
-						style: { width: "100px" }
+						style: { width: "90px" }
 					},
 					{
-						label: "Fee ",
+						label: "Fee",
 						headerKey: "headerPrice",
 						key: "price",
-						style: { width: "100px" }
+						style: { width: "80px" }
 					}
 				],
 
@@ -265,11 +274,19 @@
 			}
 		},
 		methods: {
-			getCompanyName({ customer, clientBillingInfo }) {
-				if (!clientBillingInfo) return '-'
-				if (!customer.billingInfo) return '-'
-				const { name } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
-				return name
+			getCompanyNameAndPaymentType({ customer, clientBillingInfo }) {
+				if (!clientBillingInfo) return buildReturn('-', '-')
+				if (!customer.billingInfo) return buildReturn('-', '-')
+
+				const { name, paymentType } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
+				return buildReturn(name, paymentType)
+
+				function buildReturn(name, paymentType) {
+					return {
+						getName: () => name,
+						getPaymentType: () => paymentType
+					}
+				}
 			},
 			replaceRoute(key, value) {
 				let query = this.$route.query
