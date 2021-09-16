@@ -54,8 +54,7 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 				})
 			} else {
 				changePaymentRange(temp[_tmpIndex], element)
-				temp[_tmpIndex].updatedBy = createdBy
-				temp[_tmpIndex].updatedAt = new Date()
+				refreshUpdatedInfo(temp[_tmpIndex], createdBy)
 
 				temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
 			}
@@ -63,8 +62,7 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 		} else {
 
 			changePaymentRange(updatedReports[_dbIndex], element)
-			updatedReports[_dbIndex].updatedBy = createdBy
-			updatedReports[_dbIndex].updatedAt = new Date()
+			refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
 
 			updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
 		}
@@ -96,16 +94,14 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 				})
 			} else {
 				changePaymentRange(temp[_tmpIndex], element)
-				updatedReports[_tmpIndex].updatedBy = createdBy
-				updatedReports[_tmpIndex].updatedAt = new Date()
+				refreshUpdatedInfo(temp[_tmpIndex], createdBy)
 
 				temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
 			}
 
 		} else {
 			changePaymentRange(updatedReports[_dbIndex], element)
-			updatedReports[_dbIndex].updatedBy = createdBy
-			updatedReports[_dbIndex].updatedAt = new Date()
+			refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
 
 			updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
 		}
@@ -145,6 +141,10 @@ const setUsedStatusToSteps = async (allStepsIds) => {
 function changePaymentRange(tempElement, element) {
 	tempElement.firstPaymentDate = moment.min(moment(element.startDate.toString()), moment(tempElement.firstPaymentDate)).toISOString()
 	tempElement.lastPaymentDate = moment.max(moment(element.deadline.toString()), moment(tempElement.lastPaymentDate)).toISOString()
+}
+function refreshUpdatedInfo(tempElement, createdBy) {
+	tempElement.updatedBy = createdBy
+	tempElement.updatedAt = new Date()
 }
 
 
