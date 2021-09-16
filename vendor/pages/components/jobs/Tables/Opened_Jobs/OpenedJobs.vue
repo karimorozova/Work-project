@@ -46,7 +46,7 @@
           span(v-html='returnIconCurrencyByStringCode("EUR")')
       template(slot="icons" slot-scope="{ row, index }")
         .jobs__icons(v-if="!isApproveReject(row)")
-          img.jobs__icon(v-if="isCompleteIcon(row)" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
+          //img.jobs__icon(v-if="isCompleteIcon(row)" src="../../../../../assets/images/complete-icon_small.png" @click.stop="showModal(index)")
           img.jobs__icon(v-if="isEnterIcon(row.status)" src="../../../../../assets/images/enter-icon.png")
         .jobs__icons(v-else)
           img.jobs__icon(v-for="(icon, key) in icons" :src="icon.icon" @click.stop="makeAction(index, key)" :title="key")

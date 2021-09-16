@@ -12,69 +12,69 @@
             @close="closeApproveActionModal"
             @notApprove="closeApproveActionModal"
           )
-      //   .filter
-      //     .filter__item
-      //       label Report Id:
-      //       .filter__input
-      //         input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
-      //         .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
-      //           i.fas.fa-backspace
-      //     .filter__item
-      //       label Status:
-      //       .filter__input
-      //         SelectSingle(
-      //           :selectedOption="selectedStatus"
-      //           :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
-      //           placeholder="Option"
-      //           @chooseOption="setStatus"
-      //           :isRemoveOption="true"
-      //           @removeOption="removeStatus"
-      //         )
-      //     .filter__item
-      //       label Vendors:
-      //       .filter__input
-      //         SelectMulti(
-      //           :selectedOptions="selectedVendors"
-      //           :options="allVendors"
-      //           :hasSearch="true"
-      //           placeholder="Options"
-      //           @chooseOptions="setVendors"
-      //           :isSelectedWithIcon="true"
-      //           :isRemoveOption="true"
-      //           @removeOption="removeVendors"
-      //         )
-      //     .filter__item
-      //       label Date From:
-      //       .filter__input
-      //         DatepickerWithTime(
-      //           :value="fromDateValue"
-      //           @selected="setFromDate"
-      //           placeholder="Date"
-      //           :isTime="false"
-      //           :highlighted="highlighted"
-      //           :monday-first="true"
-      //           inputClass="datepicker-custom-filter"
-      //           calendarClass="calendar-custom"
-      //           :format="customFormatter"
-      //           :isClearIcon="true"
-      //           @removeSelectedDate="removeFromDate"
-      //         )
-      //     .filter__item
-      //       label Date To:
-      //       .filter__input
-      //         DatepickerWithTime(
-      //           :value="toDateValue"
-      //           @selected="setToDate"
-      //           placeholder="Date"
-      //           :isTime="false"
-      //           :highlighted="highlighted"
-      //           :monday-first="true"
-      //           inputClass="datepicker-custom-filter"
-      //           calendarClass="calendar-custom"
-      //           :format="customFormatter"
-      //           :isClearIcon="true"
-      //           @removeSelectedDate="removeToDate"
-      //         )
+        .filter
+          .filter__item
+            label Report Id:
+            .filter__input
+              input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
+              .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
+                i.fas.fa-backspace
+          .filter__item
+            label Clients:
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedClients"
+                :options="allClients"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="setClient"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeClients"
+              )
+            //     .filter__item
+            //       label Status:
+            //       .filter__input
+            //         SelectSingle(
+            //           :selectedOption="selectedStatus"
+            //           :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
+            //           placeholder="Option"
+            //           @chooseOption="setStatus"
+            //           :isRemoveOption="true"
+            //           @removeOption="removeStatus"
+            //         )
+          .filter__item
+            label Date From:
+            .filter__input
+              DatepickerWithTime(
+                :value="fromDateValue"
+                @selected="setFromDate"
+                placeholder="Date"
+                :isTime="false"
+                :highlighted="highlighted"
+                :monday-first="true"
+                inputClass="datepicker-custom-filter"
+                calendarClass="calendar-custom"
+                :format="customFormatter"
+                :isClearIcon="true"
+                @removeSelectedDate="removeFromDate"
+              )
+          .filter__item
+            label Date To:
+            .filter__input
+              DatepickerWithTime(
+                :value="toDateValue"
+                @selected="setToDate"
+                placeholder="Date"
+                :isTime="false"
+                :highlighted="highlighted"
+                :monday-first="true"
+                inputClass="datepicker-custom-filter"
+                calendarClass="calendar-custom"
+                :format="customFormatter"
+                :isClearIcon="true"
+                @removeSelectedDate="removeToDate"
+              )
 
       //   .options
       //     .options__item(v-if="ifSomeCheck")
@@ -105,54 +105,61 @@
               @notApprove="closeDeleteRequestModal"
             )
         LayoutsTable(
-         :fields="fields"
-         :tableData="reports"
-         :customNumberOfFilterRows="2"
-         @bottomScrolled="bottomScrolled"
+          :fields="fields"
+          :tableData="reports"
+          :customNumberOfFilterRows="2"
+          @bottomScrolled="bottomScrolled"
         )
-         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-           .table__header(v-if="field.headerKey === 'headerCheck'")
-             CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-           .table__header(v-else) {{ field.label }}
-        
-         template(slot="check" slot-scope="{ row, index }")
-           .table__data
-             CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
-        
-         template(slot="reportId" slot-scope="{ row, index }" )
-           .table__data
-             router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/reports/${row._id}`}")
-               span {{ row.reportId }}
-        
-         template(slot="dateRange" slot-scope="{ row, index }")
-           .table__data(v-html="dateRange(row)")
-        
-         template(slot="vendorName" slot-scope="{ row, index }")
-           .table__data
-             router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
-               span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
-        
-         template(slot="status" slot-scope="{ row, index }")
-           .table__data {{ row.status }}
-        
-         template(slot="jobs" slot-scope="{ row, index }")
-           .table__data {{ row.steps.length }}
-        
-         template(slot="amount" slot-scope="{ row, index }")
-           .table__data
-             span.currency(v-html="'&euro;'")
-             span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
-        
-         template(slot="created" slot-scope="{ row, index }")
-           .table__data {{ getTime( row.createdAt) }}
-        
-         template(slot="updated" slot-scope="{ row, index }")
-           .table__data {{ getTime( row.updatedAt) }}
-        
-         template(slot="icon" slot-scope="{ row, index }")
-           .table__icon
-             i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
-        
+          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+            .table__header(v-if="field.headerKey === 'headerCheck'")
+              CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+            .table__header(v-else) {{ field.label }}
+
+          template(slot="check" slot-scope="{ row, index }")
+            .table__data
+              CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+
+          template(slot="reportId" slot-scope="{ row, index }" )
+            .table__data
+              //router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/reports/${row._id}`}")
+              span {{ row.reportId }}
+
+          template(slot="dateRange" slot-scope="{ row, index }")
+            .table__data(v-html="dateRange(row)")
+
+          template(slot="client" slot-scope="{ row, index }")
+            .table__data {{ row.client.name }}
+
+          template(slot="bn" slot-scope="{ row, index }")
+            .table__data {{ getCompanyNameAndPaymentType(row).getName() }}
+
+          template(slot="pt" slot-scope="{ row, index }")
+            .table__data {{ getCompanyNameAndPaymentType(row).getPaymentType() }}
+
+          template(slot="status" slot-scope="{ row, index }")
+            .table__data {{ row.status }}
+
+          template(slot="projects" slot-scope="{ row, index }")
+            .table__data {{ getReportProjectsCount(row) }}
+
+          template(slot="jobs" slot-scope="{ row, index }")
+            .table__data {{ row.stepsWithProject.length }}
+
+          template(slot="amount" slot-scope="{ row, index }")
+            .table__data
+              span.currency(v-html="'&euro;'")
+              span {{ getTotalAmount(row) | roundTwoDigit }}
+
+          template(slot="created" slot-scope="{ row, index }")
+            .table__data {{ getTime( row.createdAt) }}
+
+          template(slot="updated" slot-scope="{ row, index }")
+            .table__data {{ getTime( row.updatedAt) }}
+
+          template(slot="icon" slot-scope="{ row, index }")
+            .table__icon
+              i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
+
         .table__empty(v-if="!reports.length") Nothing found...
 
 </template>
@@ -179,79 +186,97 @@
 				highlighted: {
 					days: [ 6, 0 ]
 				},
-				// fields: [
-				// 	{
-				// 		label: "",
-				// 		headerKey: "headerCheck",
-				// 		key: "check",
-				// 		style: { width: "35px" }
-				// 	},
-				// 	{
-				// 		label: "Report Id",
-				// 		headerKey: "headerReportId",
-				// 		key: "reportId",
-				// 		style: { width: "150px" }
-				// 	},
-				// 	{
-				// 		label: "Vendor Name",
-				// 		headerKey: "headerVendorName",
-				// 		key: "vendorName",
-				// 		style: { width: "210px" }
-				// 	},
-				// 	{
-				// 		label: "Date Range",
-				// 		headerKey: "headerDateRange",
-				// 		key: "dateRange",
-				// 		style: { width: "210px" }
-				// 	},
-				// 	{
-				// 		label: "Status",
-				// 		headerKey: "headerStatus",
-				// 		key: "status",
-				// 		style: { width: "140px" }
-				// 	},
-				// 	{
-				// 		label: "Jobs",
-				// 		headerKey: "headerJobs",
-				// 		key: "jobs",
-				// 		style: { width: "140px" }
-				// 	},
-				// 	{
-				// 		label: "Amount",
-				// 		headerKey: "headerAmount",
-				// 		key: "amount",
-				// 		style: { width: "140px" }
-				// 	},
-				// 	{
-				// 		label: "Created On",
-				// 		headerKey: "headerCreated",
-				// 		key: "created",
-				// 		style: { width: "190px" }
-				// 	},
-				// 	{
-				// 		label: "Updated On",
-				// 		headerKey: "headerUpdated",
-				// 		key: "updated",
-				// 		style: { width: "190px" }
-				// 	},
-				// 	{
-				// 		label: "",
-				// 		headerKey: "headerIcon",
-				// 		key: "icon",
-				// 		style: { width: "57px" }
-				// 	}
-				// ],
+				fields: [
+					{
+						label: "",
+						headerKey: "headerCheck",
+						key: "check",
+						style: { width: "36px" }
+					},
+					{
+						label: "Report ID",
+						headerKey: "headerReportId",
+						key: "reportId",
+						style: { width: "120px" }
+					},
+					{
+						label: "Client",
+						headerKey: "headerClient",
+						key: "client",
+						style: { width: "157px" }
+					},
+					{
+						label: "Billing name",
+						headerKey: "headerBN",
+						key: "bn",
+						style: { width: "158px" }
+					},
+					{
+						label: "Payment type",
+						headerKey: "headerPT",
+						key: "pt",
+						style: { width: "120px" }
+					},
+					{
+						label: "Date Range",
+						headerKey: "headerDateRange",
+						key: "dateRange",
+						style: { width: "180px" }
+					},
+					{
+						label: "Status",
+						headerKey: "headerStatus",
+						key: "status",
+						style: { width: "120px" }
+					},
+					{
+						label: "Projects",
+						headerKey: "headerProjects",
+						key: "projects",
+						style: { width: "90px" }
+					},
+					{
+						label: "Jobs",
+						headerKey: "headerJobs",
+						key: "jobs",
+						style: { width: "90px" }
+					},
+					{
+						label: "Amount",
+						headerKey: "headerAmount",
+						key: "amount",
+						style: { width: "110px" }
+					},
+					{
+						label: "Created On",
+						headerKey: "headerCreated",
+						key: "created",
+						style: { width: "130px" }
+					},
+					{
+						label: "Updated On",
+						headerKey: "headerUpdated",
+						key: "updated",
+						style: { width: "130px" }
+					},
+					{
+						label: "",
+						headerKey: "headerIcon",
+						key: "icon",
+						style: { width: "47px" }
+					}
+				],
 				isDataRemain: true,
 
 				reportId: '',
-				vendors: '',
+				clients: '',
 				to: '',
 				from: '',
 				status: '',
 
 				dataVariables: [
 					'reportId',
-					'vendors',
+					'clients',
 					'to',
 					'from',
 					'status'
@@ -261,48 +286,66 @@
 			}
 		},
 		methods: {
-			...mapActions(['alertToggle']),
-			async manageReportActions() {
-        if (this.selectedReportAction === "Delete") {
-          await this.deleteChecked()
-        }else {
-          await this.changeTaskStatus()
-        }
+			getReportProjectsCount({ stepsAndProjects }) {
+				const { length } = [ ...new Set(stepsAndProjects.map(i => i.project)) ]
+				return length
 			},
-      async deleteChecked() {
-        await this.$http.post('/invoicing-receivables/delete-reports', {
-          reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
-        })
-        this.closeApproveActionModal()
-        await this.getReports()
-      },
-      async changeTaskStatus() {
-	      const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
-	      try {
-		      await this.$http.post('/invoicing-receivables/manage-report-status', {
-			      reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
-			      nextStatus
-		      })
-		      this.closeApproveActionModal()
-		      this.getReports()
-	      } catch (error) {
-		      this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
-	      }
-      },
-			openApproveActionModal({ option }) {
-				this.selectedReportAction = option
-				this.isActionModal = true
+			getCompanyNameAndPaymentType({ client, clientBillingInfo }) {
+				if (!clientBillingInfo) return buildReturn('-', '-')
+				if (!client.billingInfo) return buildReturn('-', '-')
+
+				const { name, paymentType } = client.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
+				return buildReturn(name, paymentType)
+
+				function buildReturn(name, paymentType) {
+					return {
+						getName: () => name,
+						getPaymentType: () => paymentType
+					}
+				}
 			},
-			closeApproveActionModal() {
-				this.selectedReportAction = ''
-				this.isActionModal = false
-			},
-			setStatus({ option }) {
-				this.replaceRoute('status', option)
-			},
-			removeStatus() {
-				this.replaceRoute('status', '')
-			},
+			...mapActions([ 'alertToggle' ]),
+			// async manageReportActions() {
+			//   if (this.selectedReportAction === "Delete") {
+			//     await this.deleteChecked()
+			//   }else {
+			//     await this.changeTaskStatus()
+			//   }
+			// },
+			// async deleteChecked() {
+			//   await this.$http.post('/invoicing-receivables/delete-reports', {
+			//     reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+			//   })
+			//   this.closeApproveActionModal()
+			//   await this.getReports()
+			// },
+			// async changeTaskStatus() {
+			//   const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
+			//   try {
+			//     await this.$http.post('/invoicing-receivables/manage-report-status', {
+			//       reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+			//       nextStatus
+			//     })
+			//     this.closeApproveActionModal()
+			//     this.getReports()
+			//   } catch (error) {
+			//     this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
+			//   }
+			// },
+			// openApproveActionModal({ option }) {
+			// 	this.selectedReportAction = option
+			// 	this.isActionModal = true
+			// },
+			// closeApproveActionModal() {
+			// 	this.selectedReportAction = ''
+			// 	this.isActionModal = false
+			// },
+			// setStatus({ option }) {
+			// 	this.replaceRoute('status', option)
+			// },
+			// removeStatus() {
+			// 	this.replaceRoute('status', '')
+			// },
 			getTime(time) {
 				return moment(time).format('DD-MM-YYYY, HH:mm')
 			},
@@ -328,50 +371,33 @@
 			setToDate(data) {
 				this.replaceRoute('to', moment(data).format('YYYY-MM-DD'))
 			},
-			getStepsPayables(stepFinance) {
-				return stepFinance.reduce((sum, finance) => {
-					sum += finance.payables || 0
+			getTotalAmount({ stepsWithProject }) {
+				return stepsWithProject.reduce((sum, i) => {
+					sum += i.finance.Price.receivables || 0
 					return sum
 				}, 0)
 			},
-			openDetails(id) {
-				this.$emit('openDetails', id)
-			},
+			// openDetails(id) {
+			// 	this.$emit('openDetails', id)
+			// },
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY")
 			},
 			toggleCheck(index, val) {
-				if(this.isActionModal) return
+				if (this.isActionModal) return
 				this.reports[index].isCheck = val
 			},
 			toggleAll(val) {
-				if(this.isActionModal) return
+				if (this.isActionModal) return
 				this.reports = this.reports.reduce((acc, cur) => {
 					acc.push({ ...cur, isCheck: val })
 					return acc
 				}, [])
 			},
-			getVendorsIdByFullName(option) {
-				const { _id } = this.vendorsList.find(({ firstName, surname }) => `${ firstName } ${ surname }` === option)
-				return _id
-			},
 			replaceRoute(key, value) {
 				let query = this.$route.query
 				delete query[key]
 				this.$router.replace({ path: this.$route.path, query: { ...query, [key]: value } })
-			},
-			removeVendors() {
-				this.replaceRoute('vendors', '')
-			},
-			setVendors({ option }) {
-				if (!this.$route.query.vendors) {
-					this.replaceRoute('vendors', this.getVendorsIdByFullName(option))
-					return
-				}
-				let _ids = this.$route.query.vendors.split(',')
-				if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
-				else _ids.push(this.getVendorsIdByFullName(option))
-				this.replaceRoute('vendors', _ids.join(','))
 			},
 			querySetter(vm, to) {
 				for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
@@ -380,16 +406,34 @@
 				for (let variable of this.dataVariables) this[variable] = ''
 			},
 			requestToDeleteRequest(id) {
-				this.deleteRequestId = id
-				console.log(id)
+				alert('DEL')
+				// this.deleteRequestId = id
+				// console.log(id)
 			},
-			async deleteRequest() {
-				await this.$http.get(`/invoicing-receivables/report/${ this.deleteRequestId }/delete`)
-        await this.getReports()
-				this.closeDeleteRequestModal()
+			// async deleteRequest() {
+			// 	await this.$http.get(`/invoicing-receivables/report/${ this.deleteRequestId }/delete`)
+			//   await this.getReports()
+			// 	this.closeDeleteRequestModal()
+			// },
+			// closeDeleteRequestModal() {
+			// 	this.deleteRequestId = ''
+			// },
+			setClient({ option }) {
+				if (!this.$route.query.clients) {
+					this.replaceRoute('clients', this.getClientsIdByName(option))
+					return
+				}
+				let _ids = this.$route.query.clients.split(',')
+				if (_ids.includes(this.getClientsIdByName(option))) _ids = _ids.filter(_id => _id !== this.getClientsIdByName(option))
+				else _ids.push(this.getClientsIdByName(option))
+				this.replaceRoute('clients', _ids.join(','))
 			},
-			closeDeleteRequestModal() {
-				this.deleteRequestId = ''
+			getClientsIdByName(option) {
+				const { _id } = this.clientsList.find(({ name }) => `${ name }` === option)
+				return _id
+			},
+			removeClients() {
+				this.replaceRoute('clients', '')
 			},
 			async getReports() {
 				this.reports = (await this.$http.post('/invoicing-receivables/reports', {
@@ -412,37 +456,37 @@
 		},
 		computed: {
 			...mapGetters({
-				vendorsList: "getAllVendorsForOptions"
+				clientsList: "getAllClientsForOptions"
 			}),
-			availableActionOptions() {
-				if (this.reports && this.reports.length) {
-					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
-						return [ 'Send Report', "Delete" ]
-					}
-				}
+			selectedClients() {
+				return this.$route.query.clients && this.clientsList.length
+						? this.$route.query.clients.split(',').map(_id => {
+							const client = this.clientsList.find(item => _id === item._id)
+							return client ? `${ client.name }` : ''
+						})
+						: []
 			},
+			allClients() {
+				return this.clientsList.map(({ name }) => `${ name }`)
+			},
+			// availableActionOptions() {
+			// 	if (this.reports && this.reports.length) {
+			// 		if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
+			// 			return [ 'Send Report', "Delete" ]
+			// 		}
+			// 	}
+			// },
 			allFilters() {
 				const filters = {}
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
 				return filters
 			},
-			ifSomeCheck() {
-				return this.reports.length && this.reports.some(item => item.isCheck)
-			},
-			selectedStatus() {
-				return this.$route.query.status || ''
-			},
-			selectedVendors() {
-				return this.$route.query.vendors && this.vendorsList.length
-						? this.$route.query.vendors.split(',').map(_id => {
-							const vendor = this.vendorsList.find(vendor => _id === vendor._id)
-							return vendor ? `${ vendor.firstName } ${ vendor.surname }` : ''
-						})
-						: []
-			},
-			allVendors() {
-				return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
-			},
+			// ifSomeCheck() {
+			// 	return this.reports.length && this.reports.some(item => item.isCheck)
+			// },
+			// selectedStatus() {
+			// 	return this.$route.query.status || ''
+			// },
 			fromDateValue() {
 				return this.$route.query.from || ''
 			},
@@ -456,13 +500,6 @@
 				return (this.reports && this.reports.length) && this.reports.every(i => i.isCheck)
 			}
 		},
-		beforeRouteEnter(to, from, next) {
-			next((vm) => {
-				vm.defaultSetter()
-				vm.querySetter(vm, to)
-				vm.getReports()
-			})
-		},
 		watch: {
 			$route(to, from) {
 				if (to.path === from.path) {
@@ -470,6 +507,13 @@
 					this.getReports()
 				}
 			}
+		},
+		beforeRouteEnter(to, from, next) {
+			next((vm) => {
+				vm.defaultSetter()
+				vm.querySetter(vm, to)
+				vm.getReports()
+			})
 		},
 		components: {
 			Button,

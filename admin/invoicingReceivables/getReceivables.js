@@ -3,52 +3,57 @@ const moment = require('moment')
 const { ObjectID: ObjectId } = require('mongodb')
 
 
-const reportsFiltersQuery = ({reportId,  vendors, to, from, status }) => {
+const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 	const q = {}
-	// const reg = /[.*+?^${}()|[\]\\]/g
-	//
-	// if(reportId){
-	// 	const f = reportId.replace(reg, '\\$&')
-	// 	q['reportId'] = { "$regex": new RegExp(f, 'i') }
-	// }
-	// if (vendors) {
-	// 	q["vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
-	// }
+	const reg = /[.*+?^${}()|[\]\\]/g
+
+	if(reportId){
+		const f = reportId.replace(reg, '\\$&')
+		q['reportId'] = { "$regex": new RegExp(f, 'i') }
+	}
+	if (clients) {
+		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
+	}
+
 	// if(status) {
 	// 	q["status"] = status
 	// }
-	//
-	// if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
-	// if(!from) from = '1970-01-01'
-	//
-	// q['firstPaymentDate'] = {  $gte: new Date(`${ from }T00:00:00.000Z`) }
-	// q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
+
+	if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
+	if(!from) from = '1970-01-01'
+
+	q['firstPaymentDate'] = {  $gte: new Date(`${ from }T00:00:00.000Z`) }
+	q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
 
 	return q
 }
 
 const getAllReports = async (countToSkip, countToGet, query) => {
-	return (await InvoicingReceivables.find())
-	// const invoicingReprots = await InvoicingReports.aggregate([
-	// 			{
-	// 				$lookup: {
-	// 					from: "projects",
-	// 					let: { 'steps': '$steps' },
-	// 					pipeline: [
-	// 						{ "$unwind": "$steps" },
-	// 						{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-	// 						{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
-	// 					],
-	// 					as: "stepFinance"
-	// 				}
-	// 			},
-	// 			{ $match: {...query} },
-	// 			{ $sort : { reportId : -1 }},
-	// 			{ $skip: countToSkip },
-	// 			{ $limit: countToGet}
-	// 		]
-	// )
-	// return (await InvoicingReports.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
+	const queryResult = await InvoicingReceivables.aggregate([
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'steps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ "$unwind": "$steps" },
+					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ "$addFields": { "steps.projectNativeId": '$_id' } },
+					{ "$addFields": { "steps.projectName": '$projectName' } },
+					{ '$replaceRoot': { newRoot: '$steps' } }
+				],
+				as: "stepsWithProject"
+			}
+		},
+		{ $match: { ...query } },
+		{ $sort: { reportId: -1 } },
+		{ $skip: countToSkip },
+		{ $limit: countToGet }
+	])
+
+	return await InvoicingReceivables.populate(queryResult, [
+				{ path: 'client', select: [ 'name', 'billingInfo' ] }
+			]
+	)
 }
 
 
