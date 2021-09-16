@@ -240,7 +240,7 @@
 					getName: () => name,
 					getPaymentTerms: () => paymentTerms,
 					getPaymentType: () => paymentType,
-					getAddress1: () => `${ street1 || '-' }, ${ city || '-' }, ${ country || '-' }`
+					getAddress1: () => `${ street1 || 'No street' }, ${ city || 'No city' }, ${ country || 'No country' }`
 				}
 			},
 			getReportProjectsCount({ stepsAndProjects }) {
