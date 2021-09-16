@@ -7,29 +7,50 @@ const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 	const q = {}
 	const reg = /[.*+?^${}()|[\]\\]/g
 
-	if(reportId){
+	if (reportId) {
 		const f = reportId.replace(reg, '\\$&')
 		q['reportId'] = { "$regex": new RegExp(f, 'i') }
 	}
 	if (clients) {
 		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
-	if(status) {
+	if (status) {
 		q["status"] = status
 	}
-	if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
-	if(!from) from = '1970-01-01'
+	if (!to) to = moment().add(1, 'days').format('YYYY-MM-DD')
+	if (!from) from = '1970-01-01'
 
-	q['firstPaymentDate'] = {  $gte: new Date(`${ from }T00:00:00.000Z`) }
+	q['firstPaymentDate'] = { $gte: new Date(`${ from }T00:00:00.000Z`) }
 	q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
 
 	return q
 }
 
 
-
 const getReportById = async (id) => {
+	const queryResult = await InvoicingReceivables.aggregate([
+		{ $match: { "_id": ObjectId(id) } },
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'steps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ "$unwind": "$steps" },
+					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ "$addFields": { "steps.projectNativeId": '$_id' } },
+					{ "$addFields": { "steps.projectName": '$projectName' } },
+					{ '$replaceRoot': { newRoot: '$steps' } }
+				],
+				as: "stepsWithProject"
+			}
+		}
 
+	])
+
+	return await InvoicingReceivables.populate(queryResult, [
+				{ path: 'client', select: [ 'name', 'billingInfo' ] }
+			]
+	)
 }
 
 const getAllReports = async (countToSkip, countToGet, query) => {
@@ -103,6 +124,7 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 }
 
 module.exports = {
+	getReportById,
 	reportsFiltersQuery,
 	getAllTasks,
 	getAllReports

@@ -159,6 +159,7 @@
 	import DatepickerWithTime from "../DatepickerWithTime"
 	import CheckBox from "../CheckBox"
 	import PayablesPaymentInformationCard from "./PayablesPaymentInformationCard"
+	import { mapActions } from "vuex"
 
 	export default {
 		name: "InvoicingDetails",
@@ -220,6 +221,7 @@
 			}
 		},
 		methods: {
+			...mapActions([ 'alertToggle' ]),
 			getStepsPayables(stepFinance) {
 				return stepFinance.reduce((sum, step) => {
 					sum += step.nativeFinance.Price.payables || 0
@@ -294,7 +296,11 @@
 				this.isDeletingStep = false
 			},
 			async openDetails(id) {
-				this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/report/' + id)).data[0]
+				try{
+					this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/report/' + id)).data[0]
+				}catch (e) {
+					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
+				}
 			},
 			async getSteps() {
 				this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))

@@ -9,20 +9,21 @@ const {
 	getReportById
 } = require('../invoicingReceivables')
 
-const  {
+const {
 	stepsFiltersQuery
 } = require('../invoicingPayables')
 
 router.post("/report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
-		const report = await getReportById(id)
-		res.send(report);
-	} catch(err) {
-		console.log(err);
-		res.status(500).send('Something wrong on getting steps');
+		const [ report ] = await getReportById(id)
+		console.log('ARARA-22', report)
+		res.send(report)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
-});
+})
 
 router.post("/reports", async (req, res) => {
 	try {

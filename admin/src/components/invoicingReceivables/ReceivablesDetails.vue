@@ -1,15 +1,15 @@
 <template lang="pug">
   .invoicing-details
-    .invoicing-details__wrapper(v-if="true")
+    .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
       .invoicing-details__details
-        // .title
-        //   .title__text {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+        .title
+          .title__text {{ reportDetailsInfo.client.name }}
         //   .title__button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")')
         //     Button(value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
           .invoicing-details__text
-            .text__address Office 333, Block B 55A, Mezhyhirska Street, 04000 Kyiv, Ukraine
+            .text__address {{ getBillingDetails(reportDetailsInfo).getAddress1() }}
             .text__block
               .text__title Report Id:
               .text__value {{reportDetailsInfo.reportId}}
@@ -23,14 +23,26 @@
               .text__title Date range:
               .text__value {{ formattedDate(reportDetailsInfo.firstPaymentDate) + ' / ' + formattedDate(reportDetailsInfo.lastPaymentDate)  }}
             .text__block
+              .text__title Billing name:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
+            .text__block
+              .text__title Payment type:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
+            .text__block
+              .text__title Payment terms:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
+            .text__block
+              .text__title Projects:
+              .text__value {{ getReportProjectsCount(reportDetailsInfo) }}
+            .text__block
               .text__title Jobs:
-              .text__value {{ reportDetailsInfo.steps.length }}
+              .text__value {{ reportDetailsInfo.stepsWithProject.length }}
             .text__block
               .text__title Total amount:
               .text__value
-                span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
+                span(style="margin-right: 4px;") {{ getTotalAmount(reportDetailsInfo) | roundTwoDigit }}
                 span(v-html="'&euro;'")
-            .text__block(v-if="true")
+            //.text__block(v-if="true")
               .text__title Invoice:
               .text__value
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
@@ -85,60 +97,60 @@
             //   Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
 
 
-          .invoicing-details__table
-            ApproveModal(
-              v-if="isDeletingStep"
-              class="absolute-middle"
-              text="Are you sure?"
-              approveValue="Yes"
-              notApproveValue="No"
-              @approve="deleteStep"
-              @close="closeModalStep"
-              @notApprove="closeModalStep"
-            )
-            GeneralTable(
-              :fields="fields",
-              :tableData="reportDetailsInfo.steps",
-              :isFilterShow="false"
-              :isFilterAbsolute="false"
-            )
+          // .invoicing-details__table
+          //   ApproveModal(
+          //     v-if="isDeletingStep"
+          //     class="absolute-middle"
+          //     text="Are you sure?"
+          //     approveValue="Yes"
+          //     notApproveValue="No"
+          //     @approve="deleteStep"
+          //     @close="closeModalStep"
+          //     @notApprove="closeModalStep"
+          //   )
+          //   GeneralTable(
+          //     :fields="fields",
+          //     :tableData="reportDetailsInfo.stepsWithProject",
+          //     :isFilterShow="false"
+          //     :isFilterAbsolute="false"
+          //   )
 
-              template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-                .table__header {{ field.label }}
+          //     template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+          //       .table__header {{ field.label }}
 
-              template(slot="stepId" slot-scope="{ row, index }")
-                .table__data {{ row.stepId }}
+          //     template(slot="stepId" slot-scope="{ row, index }")
+          //       .table__data {{ row.stepId }}
 
-              template(slot="service" slot-scope="{ row, index }")
-                .table__data {{ row.service.title }}
+          //     template(slot="service" slot-scope="{ row, index }")
+          //       .table__data {{ row.name }}
 
-              template(slot="langPair" slot-scope="{ row, index }")
-                .table__data {{ row.sourceLanguage}}
-                  span(style="font-size: 12px;color: #999999; margin: 0 4px;")
-                    i(class="fas fa-angle-double-right")
-                  | {{ row.targetLanguage }}
+          //     template(slot="langPair" slot-scope="{ row, index }")
+          //       .table__data {{ row.sourceLanguage}}
+          //         span(style="font-size: 12px;color: #999999; margin: 0 4px;")
+          //           i(class="fas fa-angle-double-right")
+          //         | {{ row.targetLanguage }}
 
-              template(slot="billing" slot-scope="{ row, index }")
-                .table__data {{ formattedDate(row.billingDate) }}
+          //     template(slot="billing" slot-scope="{ row, index }")
+          //       .table__data {{ formattedDate(row.billingDate) }}
 
-              template(slot="payables" slot-scope="{ row, index }")
-                .table__data
-                  span.currency(v-html="'&euro;'")
-                  span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
+          //     template(slot="payables" slot-scope="{ row, index }")
+          //       .table__data
+          //         span.currency(v-html="'&euro;'")
+          //         span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
 
-              template(slot="icons", slot-scope="{ row, index }")
-                .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
-                  i(class="fas fa-trash" @click="requestToDelete(row._id)")
+          //     template(slot="icons", slot-scope="{ row, index }")
+          //       .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
+          //         i(class="fas fa-trash" @click="requestToDelete(row._id)")
 
-      .invoicing-details__add-steps
-        .add-steps__body
-          ReceivablesAddStepsTo.add-steps__table(
-            v-if="toggleAddSteps"
-            :steps="steps"
-            :invoicingEditId="reportDetailsInfo._id"
-            @refreshReports="refreshReports"
-            @closeTable="changeToggleAddSteps"
-          )
+      // .invoicing-details__add-steps
+      //   .add-steps__body
+      //     ReceivablesAddStepsTo.add-steps__table(
+      //       v-if="toggleAddSteps"
+      //       :steps="steps"
+      //       :invoicingEditId="reportDetailsInfo._id"
+      //       @refreshReports="refreshReports"
+      //       @closeTable="changeToggleAddSteps"
+      //     )
 
     // .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
     //   .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
@@ -159,6 +171,7 @@
 	import DatepickerWithTime from "../DatepickerWithTime"
 	import CheckBox from "../CheckBox"
 	import ReceivablesPaymentInformationCard from "./ReceivablesPaymentInformationCard"
+	import { mapActions } from "vuex"
 
 	export default {
 		name: "InvoicingDetails",
@@ -220,12 +233,32 @@
 			}
 		},
 		methods: {
-			// getStepsPayables(stepFinance) {
-			// 	return stepFinance.reduce((sum, step) => {
-			// 		sum += step.nativeFinance.Price.payables || 0
-			// 		return sum
-			// 	}, 0)
-			// },
+			getBillingDetails({ client, clientBillingInfo }) {
+				const { billingInfo } = client
+				const { name, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+				return {
+					getName: () => name,
+					getPaymentTerms: () => paymentTerms,
+					getPaymentType: () => paymentType,
+					getAddress1: () => `${ street1 || '-' }, ${ city || '-' }, ${ country || '-' }`
+				}
+			},
+			getReportProjectsCount({ stepsAndProjects }) {
+				const { length } = [ ...new Set(stepsAndProjects.map(i => i.project)) ]
+				return length
+			},
+			getTotalAmount({ stepsWithProject }) {
+				return stepsWithProject.reduce((sum, i) => {
+					sum += i.finance.Price.receivables || 0
+					return sum
+				}, 0)
+			},
+			getStepsPayables(stepFinance) {
+				return stepFinance.reduce((sum, step) => {
+					sum += step.nativeFinance.Price.payables || 0
+					return sum
+				}, 0)
+			},
 			// setPaymentMethod({ option }) {
 			// 	this.paymentMethod = option
 			// },
@@ -244,11 +277,11 @@
 			// 		notes: this.notes
 			// 	}
 			// 	const reuslt = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-      //   if (reuslt === "Moved") {
-      //     await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-      //   }else {
-      //     await this.refreshReports()
-      //   }
+			//   if (reuslt === "Moved") {
+			//     await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+			//   }else {
+			//     await this.refreshReports()
+			//   }
 			// 	this.amount = 0
 			// },
 			// updatePaidAmount(event) {
@@ -265,9 +298,9 @@
 			// 		this.amount = this.getUnpaidAmount
 			// 	}
 			// },
-			// formattedDate(date) {
-			// 	return moment(date).format("DD-MM-YYYY ")
-			// },
+			formattedDate(date) {
+				return moment(date).format("DD-MM-YYYY ")
+			},
 			// async refreshReports() {
 			// 	await this.getReportDetails(this.$route.params.id)
 			// 	await this.getSteps()
@@ -287,7 +320,7 @@
 			// 	this.closeModalStep()
 			// 	await this.$http.post(`/invoicing-payables/report/${ reportId }/delete/${ stepId }`)
 			// 	await this.refreshReports()
-      //
+			//
 			// },
 			// closeModalStep() {
 			// 	this.deleteInfo = {}
@@ -299,12 +332,13 @@
 			// 	console.log('steps', this.steps)
 			// },
 			async getReportDetails(id) {
-				try{
-					this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/report/' + id)).data[0]
-				}catch (e) {
-					console.log(e)
+				try {
+					this.reportDetailsInfo = (await this.$http.post('/invoicing-receivables/report/' + id)).data
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}
-			}
+			},
+			...mapActions([ 'alertToggle' ])
 		},
 		computed: {
 			// getPaymentRemainder() {
@@ -321,17 +355,17 @@
 		},
 		async created() {
 			await this.getReportDetails(this.$route.params.id)
-      // this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
+			// this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
 		},
 		components: {
 			Button,
 			GeneralTable,
-      ReceivablesAddStepsTo,
+			ReceivablesAddStepsTo,
 			ApproveModal,
 			SelectSingle,
 			DatepickerWithTime,
 			CheckBox,
-      ReceivablesPaymentInformationCard
+			ReceivablesPaymentInformationCard
 		}
 	}
 </script>
