@@ -142,7 +142,7 @@
               template(slot="payables" slot-scope="{ row, index }")
                 .table__data
                   span.currency(v-html="'&euro;'")
-                  span {{ 10 | roundTwoDigit}}
+                  span {{ row.finance.Price.receivables | roundTwoDigit}}
 
               template(slot="icons", slot-scope="{ row, index }")
                 .table__icons(v-if="(reportDetailsInfo.status === 'Created')")
@@ -153,7 +153,6 @@
           ReceivablesAddStepsTo.add-steps__table(
             v-if="toggleAddSteps"
             :steps="steps"
-            :invoicingEditId="reportDetailsInfo._id"
             @refreshReports="refreshReports"
             @closeTable="changeToggleAddSteps"
           )
@@ -313,34 +312,55 @@
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY ")
 			},
-			// async refreshReports() {
-			// 	await this.getReportDetails(this.$route.params.id)
-			// 	await this.getSteps()
-			// },
+			async refreshReports() {
+				await this.getReportDetails(this.$route.params.id)
+				await this.callDesiredStepsMethod()
+			},
 			changeToggleAddSteps() {
 				this.toggleAddSteps = !this.toggleAddSteps
-				if (this.toggleAddSteps) this.getSteps()
+				if (this.toggleAddSteps) this.callDesiredStepsMethod()
 			},
-			// requestToDelete(stepId) {
-			// 	this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
-			// 	this.isDeletingStep = true
-			// },
-			// async deleteStep() {
-			// 	const { reportId, stepId } = this.deleteInfo
-			// 	this.closeModalStep()
-			// 	await this.$http.post(`/invoicing-payables/report/${ reportId }/delete/${ stepId }`)
-			// 	await this.refreshReports()
-			//
-			// },
-			// closeModalStep() {
-			// 	this.deleteInfo = {}
-			// 	this.isDeletingStep = false
-			// },
-
-			// async getSteps() {
-			// 	this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
-			// 	console.log('steps', this.steps)
-			// },
+			requestToDelete(stepId) {
+				this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
+				this.isDeletingStep = true
+			},
+			async deleteStep() {
+				const { reportId, stepId } = this.deleteInfo
+				this.closeModalStep()
+				await this.$http.post(`/invoicing-receivables/report/${ reportId }/delete/${ stepId }`)
+				await this.refreshReports()
+			},
+			closeModalStep() {
+				this.deleteInfo = {}
+				this.isDeletingStep = false
+			},
+			callDesiredStepsMethod() {
+				const PT = this.getBillingDetails(this.reportDetailsInfo).getPaymentType()
+				PT === 'PPP' || PT === 'Pre-Payment'
+						? this.getStepsMonoProject()
+						: this.getStepsMultiProject()
+			},
+			async getStepsMonoProject() {
+				const { stepsAndProjects, clientBillingInfo } = this.reportDetailsInfo
+				try {
+					this.steps = (await this.$http.post('/invoicing-receivables/not-selected-steps-list-mono-project/', {
+						projectId: stepsAndProjects[0].project,
+						clientBillingInfo
+					})).data.map(i => ({ ...i, isCheck: false }))
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
+				}
+			},
+			async getStepsMultiProject() {
+				const { clientBillingInfo } = this.reportDetailsInfo
+				try {
+					this.steps = (await this.$http.post('/invoicing-receivables/not-selected-steps-list-multi-project/', {
+						clientBillingInfo
+					})).data.map(i => ({ ...i, isCheck: false }))
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
+				}
+			},
 			async getReportDetails(id) {
 				try {
 					this.reportDetailsInfo = (await this.$http.post('/invoicing-receivables/report/' + id)).data

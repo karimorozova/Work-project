@@ -1,5 +1,5 @@
 const {
-	getAllTasks,
+	getAllSteps,
 	reportsFiltersQuery,
 	getAllReports,
 	getReportById
@@ -10,14 +10,16 @@ const {
 } = require('./createReceivables')
 
 const {
-	receivableDelete
+	receivableDelete,
+	deleteStepFromReport
 } = require('./deleteReceivables')
 
 module.exports = {
+	deleteStepFromReport,
 	getReportById,
 	getAllReports,
 	reportsFiltersQuery,
 	createReports,
-	getAllTasks,
+	getAllSteps,
 	receivableDelete,
 }

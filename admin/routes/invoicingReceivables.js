@@ -1,13 +1,15 @@
 const router = require('express').Router()
 const { Languages } = require('../models')
+const ObjectId = require("mongodb").ObjectID
 
 const {
-	getAllTasks,
+	getAllSteps,
 	createReports,
 	reportsFiltersQuery,
 	getAllReports,
 	getReportById,
-	receivableDelete
+	receivableDelete,
+	deleteStepFromReport
 } = require('../invoicingReceivables')
 
 const {
@@ -18,7 +20,6 @@ router.post("/report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
 		const [ report ] = await getReportById(id)
-		console.log('ARARA-22', report)
 		res.send(report)
 	} catch (err) {
 		console.log(err)
@@ -30,12 +31,12 @@ router.get("/report/:id/delete", async (req, res) => {
 	const { id } = req.params
 	try {
 		const report = await receivableDelete(id)
-		res.send(report);
-	} catch(err) {
-		console.log(err);
-		res.status(500).send('Something wrong on getting steps');
+		res.send(report)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
-});
+})
 
 router.post("/delete-reports", async (req, res) => {
 	const { receivableIds } = req.body
@@ -44,12 +45,12 @@ router.post("/delete-reports", async (req, res) => {
 			await receivableDelete(receivableId)
 		}
 
-		res.send("success");
-	} catch(err) {
-		console.log(err);
-		res.status(500).send('Something wrong on deleting reports');
+		res.send("success")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on deleting reports')
 	}
-});
+})
 
 router.post("/reports", async (req, res) => {
 	try {
@@ -68,11 +69,35 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	const allLanguages = await Languages.find()
 	try {
 		const query = stepsFiltersQuery(filters, allLanguages)
-		const tasks = await getAllTasks(countToSkip, countToGet, query)
-		res.send(tasks)
+		const steps = await getAllSteps(countToSkip, countToGet, query)
+		res.send(steps)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting Tasks!')
+	}
+})
+
+router.post("/not-selected-steps-list-mono-project", async (req, res) => {
+	const { projectId, clientBillingInfo } = req.body
+	try {
+		const query = { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo) }
+		const steps = await getAllSteps(0, 0, query)
+		res.send(steps)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
+	}
+})
+
+router.post("/not-selected-steps-list-multi-project/", async (req, res) => {
+	const { clientBillingInfo } = req.body
+	try {
+		const query = { "clientBillingInfo": ObjectId(clientBillingInfo) }
+		const steps = await getAllSteps(0, 0, query)
+		res.send(steps)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
 })
 
@@ -84,6 +109,17 @@ router.post('/create-report', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on /create-report!')
+	}
+})
+
+router.post("/report/:reportId/delete/:stepId", async (req, res) => {
+	const { reportId, stepId } = req.params
+	try {
+		await deleteStepFromReport(reportId, stepId)
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on deleting steps from report!')
 	}
 })
 

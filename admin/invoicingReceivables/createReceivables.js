@@ -1,15 +1,17 @@
-const { InvoicingReceivables, InvoicingPayables, Projects } = require('../models')
+const { InvoicingReceivables, Projects } = require('../models')
 const _ = require('lodash')
 const moment = require("moment")
 
-
-
 const createReports = async ({ checkedSteps, createdBy }) => {
 	const reportsFromDB = await InvoicingReceivables.find({ status: 'Created' })
-
 	const lastIndex = await InvoicingReceivables.findOne().sort({ 'reportId': -1 })
-	let lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 1
-	await setUsedStatusToSteps(checkedSteps.map(({steps})=> steps._id) )
+
+	let lastIntIndex = lastIndex != null
+			? parseInt(lastIndex.reportId.split('_').pop())
+			: 1
+
+	await setUsedStatusToSteps(checkedSteps.map(({ steps }) => steps._id))
+
 	const [ jobsPPP, jobsPrePayment, jobsMonthly, jobsCustom ] = [
 		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'PPP'),
 		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Pre-Payment'),
@@ -18,10 +20,9 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 	]
 
 	const { temp: PPP, updatedReports: updatedReports1, lastIntIndex: lastIntIndex1 } = produceReportPerProject(jobsPPP, reportsFromDB, lastIntIndex, createdBy)
-	const { temp: prePayment, updatedReports: updatedReports2, lastIntIndex: lastIntIndex2 } = produceReportPerProject(jobsPrePayment, updatedReports1,lastIntIndex1, createdBy)
-	const { temp: monthly, updatedReports: updatedReports3, lastIntIndex: lastIntIndex3 } = produceReportManyProjects(jobsMonthly, updatedReports2,lastIntIndex2, createdBy)
-	const { temp: custom, updatedReports: updatedReports4 } = produceReportManyProjects(jobsCustom, updatedReports3,lastIntIndex3, createdBy)
-
+	const { temp: prePayment, updatedReports: updatedReports2, lastIntIndex: lastIntIndex2 } = produceReportPerProject(jobsPrePayment, updatedReports1, lastIntIndex1, createdBy)
+	const { temp: monthly, updatedReports: updatedReports3, lastIntIndex: lastIntIndex3 } = produceReportManyProjects(jobsMonthly, updatedReports2, lastIntIndex2, createdBy)
+	const { temp: custom, updatedReports: updatedReports4 } = produceReportManyProjects(jobsCustom, updatedReports3, lastIntIndex3, createdBy)
 
 	await InvoicingReceivables.create(
 			...PPP,
@@ -31,7 +32,6 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 			...updatedReports4
 	)
 }
-
 
 const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => {
 	const temp = []
@@ -50,7 +50,7 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 					...getFirstReportStructureFromElement(element),
 					reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0"),
 					createdBy: createdBy,
-					updatedBy: createdBy,
+					updatedBy: createdBy
 				})
 			} else {
 				changePaymentRange(temp[_tmpIndex], element)
@@ -60,7 +60,6 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 			}
 
 		} else {
-
 			changePaymentRange(updatedReports[_dbIndex], element)
 			refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
 
@@ -70,7 +69,7 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 	return {
 		temp,
 		updatedReports,
-		lastIntIndex,
+		lastIntIndex
 	}
 }
 
@@ -90,7 +89,7 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 					...getFirstReportStructureFromElement(element),
 					reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0"),
 					createdBy: createdBy,
-					updatedBy: createdBy,
+					updatedBy: createdBy
 				})
 			} else {
 				changePaymentRange(temp[_tmpIndex], element)
@@ -107,11 +106,10 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 		}
 	})
 
-
 	return {
 		temp,
 		updatedReports,
-		lastIntIndex,
+		lastIntIndex
 	}
 
 	function getIndex(arr, clientBillingInfo, nativeProjectId) {
@@ -128,7 +126,7 @@ const getFirstReportStructureFromElement = (element) => {
 		clientBillingInfo,
 		stepsAndProjects: [ { step: steps._id, project: _id } ],
 		firstPaymentDate: startDate,
-		lastPaymentDate: deadline,
+		lastPaymentDate: deadline
 	}
 }
 const setUsedStatusToSteps = async (allStepsIds) => {
@@ -142,6 +140,7 @@ function changePaymentRange(tempElement, element) {
 	tempElement.firstPaymentDate = moment.min(moment(element.startDate.toString()), moment(tempElement.firstPaymentDate)).toISOString()
 	tempElement.lastPaymentDate = moment.max(moment(element.deadline.toString()), moment(tempElement.lastPaymentDate)).toISOString()
 }
+
 function refreshUpdatedInfo(tempElement, createdBy) {
 	tempElement.updatedBy = createdBy
 	tempElement.updatedAt = new Date()

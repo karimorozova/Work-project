@@ -81,7 +81,7 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 	)
 }
 
-const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
+const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	const queryPipeline = [
 		{ $match: { status: "Closed" } },
 		{ $unwind: "$steps" },
@@ -126,6 +126,6 @@ const getAllTasks = async (countToSkip, countToGet, queryForStep) => {
 module.exports = {
 	getReportById,
 	reportsFiltersQuery,
-	getAllTasks,
+	getAllSteps,
 	getAllReports
 }
