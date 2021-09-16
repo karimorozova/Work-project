@@ -6,7 +6,8 @@ const {
 	createReports,
 	reportsFiltersQuery,
 	getAllReports,
-	getReportById
+	getReportById,
+	receivableDelete
 } = require('../invoicingReceivables')
 
 const {
@@ -24,6 +25,31 @@ router.post("/report/:id", async (req, res) => {
 		res.status(500).send('Something wrong on getting steps')
 	}
 })
+
+router.get("/report/:id/delete", async (req, res) => {
+	const { id } = req.params
+	try {
+		const report = await receivableDelete(id)
+		res.send(report);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.post("/delete-reports", async (req, res) => {
+	const { receivableIds } = req.body
+	try {
+		for await (const receivableId of receivableIds) {
+			await receivableDelete(receivableId)
+		}
+
+		res.send("success");
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on deleting reports');
+	}
+});
 
 router.post("/reports", async (req, res) => {
 	try {

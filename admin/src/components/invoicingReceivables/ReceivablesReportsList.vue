@@ -17,7 +17,7 @@
             label Report Id:
             .filter__input
               input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
-              .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
+              .clear-icon(v-if="reportIdValue.length" @click="requestToDeleteReceivables('reportId')")
                 i.fas.fa-backspace
           .filter__item
             label Clients:
@@ -76,33 +76,33 @@
                 @removeSelectedDate="removeToDate"
               )
 
-      //   .options
-      //     .options__item(v-if="ifSomeCheck")
-      //       label Reports Actions:
-      //       .options__input
-      //         SelectSingle(
-      //           :options="availableActionOptions",
-      //           placeholder="Action",
-      //           :selectedOption="selectedReportAction",
-      //           @chooseOption="openApproveActionModal"
-      //         )
-      //       .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
+        .options
+          .options__item(v-if="ifSomeCheck")
+            label Reports Actions:
+            .options__input
+              SelectSingle(
+                :options="availableActionOptions",
+                placeholder="Action",
+                :selectedOption="selectedReportAction",
+                @chooseOption="openApproveActionModal"
+              )
+            .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
-      //     .options__button(v-else)
-      //       router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/create-reports`}")
-      //         Button(value="Add Reports")
+          .options__button(v-else)
+            router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/create-reports`}")
+              Button(value="Add Reports")
 
       .reports__container
         .modal
           .modal__block
             ApproveModal(
-              v-if="deleteRequestId !== ''"
+              v-if="deleteReceivablesId !== ''"
               text="Are you sure?"
               approveValue="Yes"
               notApproveValue="No"
-              @approve="deleteRequest"
-              @close="closeDeleteRequestModal"
-              @notApprove="closeDeleteRequestModal"
+              @approve="deleteReceivables"
+              @close="closeDeleteReceivablesModal"
+              @notApprove="closeDeleteReceivablesModal"
             )
         LayoutsTable(
           :fields="fields"
@@ -158,7 +158,7 @@
 
           template(slot="icon" slot-scope="{ row, index }")
             .table__icon
-              i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
+              i(class="fas fa-trash" @click="requestToDeleteReceivables(row._id)")
 
         .table__empty(v-if="!reports.length") Nothing found...
 
@@ -282,7 +282,7 @@
 					'status'
 				],
 
-				deleteRequestId: ''
+        deleteReceivablesId: ''
 			}
 		},
 		methods: {
@@ -305,20 +305,21 @@
 				}
 			},
 			...mapActions([ 'alertToggle' ]),
-			// async manageReportActions() {
-			//   if (this.selectedReportAction === "Delete") {
-			//     await this.deleteChecked()
-			//   }else {
-			//     await this.changeTaskStatus()
-			//   }
-			// },
-			// async deleteChecked() {
-			//   await this.$http.post('/invoicing-receivables/delete-reports', {
-			//     reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
-			//   })
-			//   this.closeApproveActionModal()
-			//   await this.getReports()
-			// },
+			async manageReportActions() {
+			  if (this.selectedReportAction === "Delete") {
+          await this.deleteChecked()
+        }
+			  // }else {
+			  //   await this.changeTaskStatus()
+			  // }
+			},
+			async deleteChecked() {
+			  await this.$http.post('/invoicing-receivables/delete-reports', {
+          receivableIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
+			  })
+			  this.closeApproveActionModal()
+			  await this.getReports()
+			},
 			// async changeTaskStatus() {
 			//   const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
 			//   try {
@@ -332,14 +333,14 @@
 			//     this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
 			//   }
 			// },
-			// openApproveActionModal({ option }) {
-			// 	this.selectedReportAction = option
-			// 	this.isActionModal = true
-			// },
-			// closeApproveActionModal() {
-			// 	this.selectedReportAction = ''
-			// 	this.isActionModal = false
-			// },
+			openApproveActionModal({ option }) {
+				this.selectedReportAction = option
+				this.isActionModal = true
+			},
+			closeApproveActionModal() {
+				this.selectedReportAction = ''
+				this.isActionModal = false
+			},
 			setStatus({ option }) {
 				this.replaceRoute('status', option)
 			},
@@ -405,19 +406,17 @@
 			defaultSetter() {
 				for (let variable of this.dataVariables) this[variable] = ''
 			},
-			requestToDeleteRequest(id) {
-				alert('DEL')
-				// this.deleteRequestId = id
-				// console.log(id)
+			requestToDeleteReceivables(id) {
+				this.deleteReceivablesId = id
 			},
-			// async deleteRequest() {
-			// 	await this.$http.get(`/invoicing-receivables/report/${ this.deleteRequestId }/delete`)
-			//   await this.getReports()
-			// 	this.closeDeleteRequestModal()
-			// },
-			// closeDeleteRequestModal() {
-			// 	this.deleteRequestId = ''
-			// },
+			async deleteReceivables() {
+				await this.$http.get(`/invoicing-receivables/report/${ this.deleteReceivablesId }/delete`)
+			  await this.getReports()
+				this.closeDeleteReceivablesModal()
+			},
+			closeDeleteReceivablesModal() {
+				this.deleteReceivablesId = ''
+			},
 			setClient({ option }) {
 				if (!this.$route.query.clients) {
 					this.replaceRoute('clients', this.getClientsIdByName(option))
@@ -469,21 +468,21 @@
 			allClients() {
 				return this.clientsList.map(({ name }) => `${ name }`)
 			},
-			// availableActionOptions() {
-			// 	if (this.reports && this.reports.length) {
-			// 		if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
-			// 			return [ 'Send Report', "Delete" ]
-			// 		}
-			// 	}
-			// },
+			availableActionOptions() {
+				if (this.reports && this.reports.length) {
+					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
+						return [  "Delete" ]
+					}
+				}
+			},
 			allFilters() {
 				const filters = {}
 				for (let variable of this.dataVariables) filters[variable] = this[variable]
 				return filters
 			},
-			// ifSomeCheck() {
-			// 	return this.reports.length && this.reports.some(item => item.isCheck)
-			// },
+			ifSomeCheck() {
+				return this.reports.length && this.reports.some(item => item.isCheck)
+			},
 			selectedStatus() {
 				return this.$route.query.status || ''
 			},
@@ -575,7 +574,7 @@
     display: flex;
     flex-wrap: wrap;
     position: absolute;
-    top: 20px;
+    top: 0px;
     right: 20px;
     align-items: center;
 
