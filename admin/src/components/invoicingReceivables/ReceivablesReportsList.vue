@@ -32,17 +32,17 @@
                 :isRemoveOption="true"
                 @removeOption="removeClients"
               )
-            //     .filter__item
-            //       label Status:
-            //       .filter__input
-            //         SelectSingle(
-            //           :selectedOption="selectedStatus"
-            //           :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
-            //           placeholder="Option"
-            //           @chooseOption="setStatus"
-            //           :isRemoveOption="true"
-            //           @removeOption="removeStatus"
-            //         )
+          .filter__item
+            label Status:
+            .filter__input
+              SelectSingle(
+                :selectedOption="selectedStatus"
+                :options="['Created', 'Sent']"
+                placeholder="Option"
+                @chooseOption="setStatus"
+                :isRemoveOption="true"
+                @removeOption="removeStatus"
+              )
           .filter__item
             label Date From:
             .filter__input
@@ -340,12 +340,12 @@
 			// 	this.selectedReportAction = ''
 			// 	this.isActionModal = false
 			// },
-			// setStatus({ option }) {
-			// 	this.replaceRoute('status', option)
-			// },
-			// removeStatus() {
-			// 	this.replaceRoute('status', '')
-			// },
+			setStatus({ option }) {
+				this.replaceRoute('status', option)
+			},
+			removeStatus() {
+				this.replaceRoute('status', '')
+			},
 			getTime(time) {
 				return moment(time).format('DD-MM-YYYY, HH:mm')
 			},
@@ -484,9 +484,9 @@
 			// ifSomeCheck() {
 			// 	return this.reports.length && this.reports.some(item => item.isCheck)
 			// },
-			// selectedStatus() {
-			// 	return this.$route.query.status || ''
-			// },
+			selectedStatus() {
+				return this.$route.query.status || ''
+			},
 			fromDateValue() {
 				return this.$route.query.from || ''
 			},

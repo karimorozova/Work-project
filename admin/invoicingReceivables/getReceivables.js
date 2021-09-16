@@ -14,11 +14,9 @@ const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 	if (clients) {
 		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
-
-	// if(status) {
-	// 	q["status"] = status
-	// }
-
+	if(status) {
+		q["status"] = status
+	}
 	if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
 	if(!from) from = '1970-01-01'
 
