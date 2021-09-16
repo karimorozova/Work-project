@@ -26,6 +26,12 @@ const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 	return q
 }
 
+
+
+const getReportById = async (id) => {
+
+}
+
 const getAllReports = async (countToSkip, countToGet, query) => {
 	const queryResult = await InvoicingReceivables.aggregate([
 		{

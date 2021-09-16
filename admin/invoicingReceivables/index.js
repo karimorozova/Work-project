@@ -1,7 +1,8 @@
 const {
 	getAllTasks,
 	reportsFiltersQuery,
-	getAllReports
+	getAllReports,
+	getReportById
 } = require('./getReceivables')
 
 const {
@@ -9,6 +10,7 @@ const {
 } = require('./createReceivables')
 
 module.exports = {
+	getReportById,
 	getAllReports,
 	reportsFiltersQuery,
 	createReports,
