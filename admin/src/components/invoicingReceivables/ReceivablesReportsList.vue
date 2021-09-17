@@ -203,7 +203,7 @@
 						label: "Client",
 						headerKey: "headerClient",
 						key: "client",
-						style: { width: "157px" }
+						style: { width: "150px" }
 					},
 					{
 						label: "Billing name",
@@ -233,13 +233,13 @@
 						label: "Projects",
 						headerKey: "headerProjects",
 						key: "projects",
-						style: { width: "90px" }
+						style: { width: "85px" }
 					},
 					{
 						label: "Jobs",
 						headerKey: "headerJobs",
 						key: "jobs",
-						style: { width: "90px" }
+						style: { width: "85px" }
 					},
 					{
 						label: "Amount",

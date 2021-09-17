@@ -58,6 +58,11 @@
               template(slot="stepId" slot-scope="{ row, index }")
                 .table__data {{ row.stepId }}
 
+              template(slot="project" slot-scope="{ row, index }")
+                .table__data(style="word-break: break-word;")
+                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
+                    span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
+
               template(slot="service" slot-scope="{ row, index }")
                 .table__data {{ row.service.title }}
 
@@ -112,6 +117,12 @@
 			return {
 				reportDetailsInfo: {},
 				fields: [
+          {
+            label: "Project Name",
+            headerKey: "headerProject",
+            key: "project",
+            style: { width: "19%" }
+          },
 					{
 						label: "Step Id",
 						headerKey: "headerStepId",
@@ -519,6 +530,14 @@
 
     &__data {
       width: 100%;
+      & a  {
+        color: inherit;
+        text-decoration: none;
+        transition: .2s ease-out;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
 
     &__icons {

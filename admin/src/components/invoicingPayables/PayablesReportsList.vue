@@ -138,6 +138,9 @@
           template(slot="jobs" slot-scope="{ row, index }")
             .table__data {{ row.steps.length }}
 
+          template(slot="project" slot-scope="{ row, index }")
+            .table__data {{ getProjectCount(row.stepFinance) }}
+
           template(slot="amount" slot-scope="{ row, index }")
             .table__data
               span.currency(v-html="'&euro;'")
@@ -196,7 +199,7 @@
 						label: "Vendor Name",
 						headerKey: "headerVendorName",
 						key: "vendorName",
-						style: { width: "210px" }
+						style: { width: "219px" }
 					},
 					{
 						label: "Date Range",
@@ -210,29 +213,35 @@
 						key: "status",
 						style: { width: "140px" }
 					},
+          {
+            label: "Projects",
+            headerKey: "headerProject",
+            key: "project",
+            style: { width: "90px" }
+          },
 					{
 						label: "Jobs",
 						headerKey: "headerJobs",
 						key: "jobs",
-						style: { width: "140px" }
+						style: { width: "90px" }
 					},
 					{
 						label: "Amount",
 						headerKey: "headerAmount",
 						key: "amount",
-						style: { width: "140px" }
+						style: { width: "120px" }
 					},
 					{
 						label: "Created On",
 						headerKey: "headerCreated",
 						key: "created",
-						style: { width: "190px" }
+						style: { width: "180px" }
 					},
 					{
 						label: "Updated On",
 						headerKey: "headerUpdated",
 						key: "updated",
-						style: { width: "190px" }
+						style: { width: "180px" }
 					},
 					{
 						label: "",
@@ -334,6 +343,9 @@
 					return sum
 				}, 0)
 			},
+      getProjectCount(stepFinance) {
+			  return [...new Set(stepFinance.map(({projectName}) => projectName ))].length
+      },
 			openDetails(id) {
 				this.$emit('openDetails', id)
 			},

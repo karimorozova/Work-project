@@ -70,6 +70,7 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$addFields": { "steps.nativeFinance.Price.projectName": '$projectName' } },
 							{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
 						],
 						as: "stepFinance"

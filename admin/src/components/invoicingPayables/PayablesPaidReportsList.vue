@@ -135,6 +135,9 @@
           template(slot="status" slot-scope="{ row, index }")
             .table__data {{ row.status }}
 
+          template(slot="project" slot-scope="{ row, index }")
+            .table__data {{getProjectCount(row.stepFinance) }}
+
           template(slot="jobs" slot-scope="{ row, index }")
             .table__data {{ row.steps.length }}
 
@@ -180,7 +183,7 @@
             label: "Report Id",
             headerKey: "headerReportId",
             key: "reportId",
-            style: { width: "197px" }
+            style: { width: "191px" }
           },
           {
             label: "Vendor Name",
@@ -198,19 +201,25 @@
             label: "Status",
             headerKey: "headerStatus",
             key: "status",
-            style: { width: "155px" }
+            style: { width: "130px" }
+          },
+          {
+            label: "Projects",
+            headerKey: "headerProject",
+            key: "project",
+            style: { width: "100px" }
           },
           {
             label: "Jobs",
             headerKey: "headerJobs",
             key: "jobs",
-            style: { width: "155px" }
+            style: { width: "100px" }
           },
           {
             label: "Amount",
             headerKey: "headerAmount",
             key: "amount",
-            style: { width: "155px" }
+            style: { width: "150px" }
           },
           {
             label: "Created On",
@@ -318,6 +327,9 @@
 					return sum
 				}, 0)
 			},
+      getProjectCount(stepFinance) {
+        return [...new Set(stepFinance.map(({projectNativeId}) => projectNativeId ))].length
+      },
 			openDetails(id) {
 				this.$emit('openDetails', id)
 			},

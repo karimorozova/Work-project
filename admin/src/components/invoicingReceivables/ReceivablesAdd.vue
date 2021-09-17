@@ -103,10 +103,14 @@
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
           template(slot="project" slot-scope="{ row, index }")
-            .table__data(style="word-break: break-word; padding-right: 15px;") {{ row.projectName.length > 46 ? (row.projectName.substring(0, 40) + '...') : row.projectName }}
+            .table__data(style="word-break: break-word; padding-right: 15px;")
+              router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+                span {{ row.projectName.length > 46 ? (row.projectName.substring(0, 40) + '...') : row.projectName }}
 
           template(slot="client" slot-scope="{ row, index }")
-            .table__data {{ row.customer.name }}
+            .table__data
+              router-link(class="link-to" target='_blank' :to="{path: `/pangea-clients/all/details/${row.customer._id}`}")
+                span {{ row.customer.name }}
 
           template(slot="bn" slot-scope="{ row, index }")
             .table__data {{ getCompanyNameAndPaymentType(row).getName() }}

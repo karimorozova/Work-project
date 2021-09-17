@@ -101,8 +101,12 @@
             .table__data
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
+          template(slot="project" slot-scope="{ row, index }")
+            .table__data(style="word-break: break-word; padding-right: 15px;")
+              router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+                span {{ row.projectName.length > 46 ? (row.projectName.substring(0, 40) + '...') : row.projectName }}
+
           template(slot="stepId" slot-scope="{ row, index }")
-          
             .table__data {{ row.steps.stepId }}
 
           template(slot="vendorName" slot-scope="{ row, index }")
@@ -167,53 +171,59 @@
 				isDataRemain: true,
 				steps: [],
 				fields: [
-					{
+          {
 						label: "",
 						headerKey: "headerCheck",
 						key: "check",
 						style: { width: "36px" }
 					},
+          {
+            label: "Projects",
+            headerKey: "headerProject",
+            key: "project",
+            style: { width: "185px" }
+          },
 					{
 						label: "Step Id",
 						headerKey: "headerStepId",
 						key: "stepId",
-						style: { width: "205px" }
+						style: { width: "200px" }
 					},
 					{
 						label: "Vendor",
 						headerKey: "headerVendorName",
 						key: "vendorName",
-						style: { width: "220px" }
+						style: { width: "190px" }
 					},
 					{
 						label: "Start Date",
 						headerKey: "headerStartDate",
 						key: "startDate",
-						style: { width: "140px" }
+						style: { width: "110px" }
 					},
 					{
 						label: "Deadline",
 						headerKey: "headerDeadline",
 						key: "deadline",
-						style: { width: "140px" }
+						style: { width: "110px" }
 					},
 					{
 						label: "Billing Date",
 						headerKey: "headerBillingDate",
 						key: "billingDate",
-						style: { width: "140px" }
+						style: { width: "110px" }
 					},
 					{
 						label: "Step",
 						headerKey: "headerService",
 						key: "service",
-						style: { width: "150px" }
+						style: { width: "120px" }
 					},
 					{
 						label: "Status",
 						headerKey: "headerJobStatus",
 						key: "jobStatus",
-						style: { width: "150px" }
+						style: { width: "120px" }
 					},
 					{
 						label: "Language Pair",

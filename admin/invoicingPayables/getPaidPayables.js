@@ -11,6 +11,7 @@ const getAllPaidPayables = async (countToSkip, countToGet, query) => {
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$addFields": { "steps.nativeFinance.Price.projectNativeId": '$_id' } },
 							{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
 						],
 						as: "stepFinance"
@@ -35,6 +36,8 @@ const getPaidReport = async (id) => {
 				pipeline: [
 					{ "$unwind": "$steps" },
 					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ "$addFields": { "steps.projectNativeId": '$_id' } },
+					{ "$addFields": { "steps.projectName": '$projectName' } },
 					{ "$addFields": {"steps.billingDate": '$billingDate'}},
 					{ '$replaceRoot': { newRoot: '$steps' } },
 				],
@@ -56,6 +59,7 @@ const getReportPaidByVendorId = async (id) => {
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$addFields": { "steps.projectName": '$projectName' } },
 							{ "$addFields": {"steps.billingDate": '$billingDate'}},
 							{ '$replaceRoot': { newRoot: '$steps' } },
 						],
