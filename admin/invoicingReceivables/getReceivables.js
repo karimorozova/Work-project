@@ -44,7 +44,6 @@ const getReportById = async (id) => {
 				as: "stepsWithProject"
 			}
 		}
-
 	])
 
 	return await InvoicingReceivables.populate(queryResult, [

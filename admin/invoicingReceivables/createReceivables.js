@@ -137,7 +137,7 @@ const setUsedStatusToSteps = async (allStepsIds) => {
 }
 
 function changePaymentRange(tempElement, element) {
-	tempElement.firstPaymentDate = moment.min(moment(element.startDate.toString()), moment(tempElement.firstPaymentDate)).toISOString()
+	tempElement.firstPaymentDate = moment.min(moment(element.deadline.toString()), moment(tempElement.firstPaymentDate)).toISOString()
 	tempElement.lastPaymentDate = moment.max(moment(element.deadline.toString()), moment(tempElement.lastPaymentDate)).toISOString()
 }
 
