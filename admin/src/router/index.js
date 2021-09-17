@@ -690,7 +690,7 @@ router.beforeEach((to, from, next) => {
 	const token = localStorage.getItem("token")
 
 	try {
-		if (to.path === '/login' || to.path === '/forgot') return next()
+		if (to.path === '/login' || to.path === 'pangea-zoho-code' || to.path === '/forgot') return next()
 		if (!!token) {
 			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
 			if (jwtObj) {
