@@ -18,7 +18,7 @@ const receivableDelete = async (reportId) => {
 
 const deleteStepFromReport = async (reportId, stepId) => {
 	try {
-		await InvoicingReceivables.updateOne({ _id: reportId }, { $pull: { 'stepsAndProjects.step': stepId } })
+		await InvoicingReceivables.updateOne({ _id: reportId }, { $pull: { 'stepsAndProjects': {"step":stepId} } })
 
 		const [ report ] = await getReportById(reportId)
 		let { stepsWithProject } = report
