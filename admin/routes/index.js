@@ -3,7 +3,7 @@ const { requiresLogin } = require("../middleware")
 
 // TODO: not used (refactoring soon...)
 // const zohoRouter = require('./zoho')
-// router.use('/zoho',  require('./zoho'))
+router.use('/zoho',  require('./zoho'))
 
 //--- TODO: перенести в общий роут с насройками
 router.use("/industry", require("./industry"))
