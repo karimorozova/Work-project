@@ -25,7 +25,7 @@ import ClientInfo from '@/components/clients/ClientInfo'
 import NewVendor from '@/components/vendors/NewVendor'
 import AccountInfo from '@/components/account/AccountInfo'
 import CreateProject from '@/components/pmArea/CreateProject'
-// import ZohoCode from '@/components/ZohoCode'
+import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
@@ -111,11 +111,11 @@ const router = new Router({
 			// 	}
 			// },
 			children: [
-				// {
-				//     path: '/zoho-code',
-				//     name: 'zoho',
-				//     component: ZohoCode
-				// },
+				{
+				    path: '/pangea-zoho-code',
+				    name: 'zoho',
+				    component: ZohoCode
+				},
 				{
 					path: 'pangea-account',
 					name: 'pangea-account',
@@ -690,7 +690,7 @@ router.beforeEach((to, from, next) => {
 	const token = localStorage.getItem("token")
 
 	try {
-		if (to.path === '/login' || to.path === '/forgot') return next()
+		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot') return next()
 		if (!!token) {
 			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
 			if (jwtObj) {

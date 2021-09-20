@@ -94,8 +94,8 @@ router.get("/crm-records", async (req, res) => {
     }
 })
 
-router.get('/creds', (req, res) => {
-    res.send(zohoCreds);
-})
+// router.get('/creds', (req, res) => {
+//     res.send(zohoCreds);
+// })
 
 module.exports = router;

@@ -101,17 +101,19 @@ async function getLeads(user) {
 
 async function getActivities(user) {
     const currentToken = await getCurrentToken();
-    const date = moment().hours(0);
-    const isoDate = date.toISOString().split(".")[0];
+    // const date = moment().hours(0);
+    // const isoDate = date.toISOString().split(".")[0];
     return new Promise((resolve,reject) => {
-        unirest.get(`${dataUrl}/Activities`)
-        .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
-        .header('If-Modified-Since', `${isoDate}+02:00`)
+        unirest.get(`https://books.zoho.com/api/v3/invoices?organization_id=630935724`)
+        .header('Authorization', `Bearer ${currentToken}`)
+        // .header('If-Modified-Since', `${isoDate}+02:00`)
         .end( (res) => {
             if(res.error) {
+
                 return reject(res.error)
             }
-            let result = res.body ? res.body.data.filter(item => item.Owner.name === user): "";
+            let result = res.body
+            console.log(result)
             resolve(result);
         })
     })
