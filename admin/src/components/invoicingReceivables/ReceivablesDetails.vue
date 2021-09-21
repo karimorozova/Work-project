@@ -312,7 +312,12 @@
 			// 	}
 			// },
       async generateInvoice() {
-        await this.$http.post('/invoicing-receivables/zoho/createInvoice', {test: this.reportDetailsInfo })
+				try {
+					const result = await this.$http.post('/invoicing-receivables/zoho/createInvoice', { _id: this.$route.params.id })
+          this.alertToggle()
+				}catch (e) {
+
+				}
       },
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY ")

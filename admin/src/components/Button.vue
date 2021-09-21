@@ -75,7 +75,7 @@
     }
   }
 
-/*  .action-button {
+  .action-button {
     &__button {
       min-width: 110px;
       padding: 0 24px 0 24px;
@@ -105,9 +105,9 @@
         margin: 5px;
       }
     }
-  }*/
+  }
 
-  .action-button {
+/*  .action-button {
     &__button {
       min-width: 110px;
       padding: 0 24px 0 24px;
@@ -123,7 +123,7 @@
       cursor: pointer;
 
       &:hover {
-        /*background: darken(#d15f45, 10%) !important;*/
+        !*background: darken(#d15f45, 10%) !important;*!
         transform: translate3d(0, -1px, 0);
         box-shadow:rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
       }
@@ -133,7 +133,7 @@
         transform: translate3d(0, 0px, 0);
       }
     }
-  }
+  }*/
 
   .disabled {
     opacity: 0.3;

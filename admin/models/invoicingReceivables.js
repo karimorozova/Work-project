@@ -52,6 +52,18 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 	updatedAt: {
 		type: Date,
 		default: new Date()
+	},
+	externalIntegration: {
+		_id: {
+			type: String,
+			trim: true,
+			default: ''
+		},
+		reportId: {
+			type: String,
+			trim: true,
+			default: ''
+		}
 	}
 })
 

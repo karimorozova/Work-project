@@ -43,6 +43,11 @@ const getReportById = async (id) => {
 				],
 				as: "stepsWithProject"
 			}
+		},
+		{
+			$addFields: {
+				total: { $sum: "$stepsWithProject.finance.Price.receivables" }
+			}
 		}
 	])
 

@@ -18,7 +18,13 @@ const {
 	createZohoInvoice
 } = require('./zoho')
 
+const {
+	updateInvoiceReceivablesStatus
+} = require('./updateReceivables')
+
+
 module.exports = {
+	updateInvoiceReceivablesStatus,
 	deleteStepFromReport,
 	getReportById,
 	getAllReports,
@@ -26,5 +32,5 @@ module.exports = {
 	createReports,
 	getAllSteps,
 	receivableDelete,
-	createZohoInvoice,
+	createZohoInvoice
 }

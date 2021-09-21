@@ -125,9 +125,9 @@ router.post("/report/:reportId/delete/:stepId", async (req, res) => {
 })
 
 router.post("/zoho/createInvoice", async (req, res) => {
-	const { test } = req.body
+	const { _id } = req.body
 	try {
-		await createZohoInvoice(test.client.name)
+		await createZohoInvoice(_id)
 		res.send('Done!')
 	} catch (err) {
 		console.log(err)
