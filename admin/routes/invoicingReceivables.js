@@ -9,7 +9,8 @@ const {
 	getAllReports,
 	getReportById,
 	receivableDelete,
-	deleteStepFromReport
+	deleteStepFromReport,
+	createZohoInvoice,
 } = require('../invoicingReceivables')
 
 const {
@@ -116,6 +117,17 @@ router.post("/report/:reportId/delete/:stepId", async (req, res) => {
 	const { reportId, stepId } = req.params
 	try {
 		await deleteStepFromReport(reportId, stepId)
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on deleting steps from report!')
+	}
+})
+
+router.post("/zoho/createInvoice", async (req, res) => {
+	const { test } = req.body
+	try {
+		await createZohoInvoice(test.client.name)
 		res.send('Done!')
 	} catch (err) {
 		console.log(err)

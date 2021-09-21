@@ -7,7 +7,9 @@
             router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
               span {{ reportDetailsInfo.client.name }}
           .title__button(v-if='!toggleAddSteps && reportDetailsInfo.status === "Created"')
-            Button(value="Add jobs" @clicked="changeToggleAddSteps")
+            .flex-wrapper
+              Button(value="Generate Invoice" @clicked="generateInvoice")
+              Button(value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
           .invoicing-details__text
@@ -309,6 +311,9 @@
 			// 		this.amount = this.getUnpaidAmount
 			// 	}
 			// },
+      async generateInvoice() {
+        await this.$http.post('/invoicing-receivables/zoho/createInvoice', {test: this.reportDetailsInfo })
+      },
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY ")
 			},
@@ -685,5 +690,8 @@
   .currency {
     margin-right: 4px;
     color: $dark-border;
+  }
+  .flex-wrapper {
+    display: flex;
   }
 </style>

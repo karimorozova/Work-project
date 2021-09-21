@@ -14,6 +14,10 @@ const {
 	deleteStepFromReport
 } = require('./deleteReceivables')
 
+const {
+	createZohoInvoice
+} = require('./zoho')
+
 module.exports = {
 	deleteStepFromReport,
 	getReportById,
@@ -22,4 +26,5 @@ module.exports = {
 	createReports,
 	getAllSteps,
 	receivableDelete,
+	createZohoInvoice,
 }
