@@ -36,9 +36,12 @@ const getCustomer = async (companyName) => {
 
 const createZohoInvoice = async (companyName) => {
 	const data  = {
-		customer_id: await getCustomer(companyName),
+		// customer_id: await getCustomer(companyName),
+		customer_id: "335260000005073023",
 		line_items: {
-			item_id: 658416846
+			item_id:  "335260000005073056",
+			rate: 3516.12,
+			quantity: 1
 		}
 	}
 	console.log( await getCustomer(companyName))
