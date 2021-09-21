@@ -221,8 +221,7 @@
       }
 
       &__item {
-        padding: 0 7px;
-        height: 31px;
+        padding: 7px;
         border-bottom: 1px solid $light-border;
         cursor: pointer;
         font-size: 14px;
