@@ -114,7 +114,7 @@ async function manageStatuses({ project, steps, jobId, status }) {
 
 		if(status === "Accepted") {
 			const updatedSteps =  await setAcceptedStepStatus({ project, steps, jobId })
-			await notifyStepDecisionMade({project, step, decision: 'accepted'});
+			await notifyStepDecisionMade({project, step, decision: 'accept'});
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
