@@ -197,7 +197,7 @@ function managerProjectAcceptedMessage(obj) {
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                     <h4 class="contact-name">Dear ${ obj.accManager }</h4>
                     <p>
-                        Client ${ obj.customer.name } has just accepted quote:  <a href="https://admin.pangea.global/pangea-projects/all-projects/All/details/${obj._id}" target="_blank">${ obj.projectId } - ${ obj.projectName }</a>
+                        Client <b>${ obj.customer.name }</b> has just accepted quote: <a href="https://admin.pangea.global/pangea-projects/all-projects/All/details/${obj._id}" target="_blank">${ obj.projectId } - ${ obj.projectName }</a>
                     </p>
                     <p>
                         You can proceed with the project.
@@ -218,7 +218,7 @@ function managerProjectRejectedMessage(obj) {
             <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                 <h4 class="contact-name">Dear ${ obj.manager }</h4>
                 <p>
-                    Client ${ obj.customer.name } has just rejected quote: <a href="https://admin.pangea.global/pangea-projects/all-projects/All/details/${obj._id}" target="_blank">${ obj.projectId } - ${ obj.projectName }</a>
+                    Client <b>${ obj.customer.name }</b> has just rejected quote: <a href="https://admin.pangea.global/pangea-projects/all-projects/All/details/${obj._id}" target="_blank">${ obj.projectId } - ${ obj.projectName }</a>
                 </p>
                 <p>
                     Please archive the project.
@@ -305,8 +305,19 @@ function stepDecisionMessage(obj, user) {
                 <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
                  		<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ user.firstName }</span></p>
                     <p style="font-weight: 400;">
-                        Vendor ${ obj.step.vendor.firstName } ${ vendorSurname } has ${ decision } the assigned step: ${ obj.step.stepId } from <a href="https://admin.pangea.global/pangea-projects/all-projects/All/details/${obj.project._id}" target="_blank">${ obj.project.projectId } - ${ obj.project.projectName }</a>
+                        Vendor <b>${ obj.step.vendor.firstName } ${ vendorSurname }</b> has <b> ${ decision }</b> the assigned step: ${ obj.step.stepId } 
                     </p>
+     								<ul>
+									     	<li>
+									     		${ obj.step.name }
+												</li>					
+												<li>
+													${ obj.step.sourceLanguage } >> ${ obj.step.targetLanguage }
+												</li>	
+										</ul>
+                    <p style="font-weight: 400;">
+                    	from project: <a href="https://admin.pangea.global/pangea-projects/all-projects/All/details/${obj.project._id}" target="_blank">${ obj.project.projectId } - ${ obj.project.projectName }</a>
+										</p>
                     <div style="font-weight: 400;">
                         ${ reason }
                     </div>

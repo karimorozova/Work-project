@@ -473,7 +473,7 @@ async function notifyManagerStepStarted(project, step) {
 async function notifyStepDecisionMade({ project, step, decision }) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
 	const messageId = decision === 'accept' ? 'I006.0' : 'I007.0'
-	const subject = `Vendor ${ decision === 'accept' ? 'approved' : 'rejected' } the job: ${ step.stepId } - ${ project.projectName } (ID ${ messageId })`
+	const subject = `Vendor: ${step.vendor.firstName} ${step.vendor.surname || ''} ${ decision === 'accept' ? 'approved' : 'rejected' } the job: ${ step.stepId } - ${ project.projectName } (ID ${ messageId })`
 	const messagePM = stepDecisionMessage({ project, step, decision }, projectManager)
 
 	// TODO (refactoring later, temporary hide notification for AM)
