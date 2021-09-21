@@ -16,7 +16,7 @@
 			async generateTokens() {
 				try {
 					const result = await this.$http.get(`/zoho/getTokens?code=${ this.code }`)
-					this.result = result
+					this.result = result.body.access_token
 				} catch (err) {
 					this.alertToggle({ message: err.data, isShow: true, type: "error" })
 				}
