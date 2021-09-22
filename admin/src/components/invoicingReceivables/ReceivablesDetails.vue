@@ -51,6 +51,11 @@
               .text__value
                 span(style="margin-right: 4px;") {{ getTotalAmount(reportDetailsInfo) | roundTwoDigit }}
                 span(v-html="'&euro;'")
+            .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
+              .text__title Invoice:
+              .text__value
+                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)")
+                  i(class="fas fa-download")
             //.text__block(v-if="true")
               .text__title Invoice:
               .text__value
@@ -254,6 +259,12 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			downloadFile(path) {
+				let link = document.createElement('a')
+				link.href = __WEBPACK__API_URL__ + '/dist/' + path
+				link.target = "_blank"
+				link.click()
+			},
 			getBillingDetails({ client, clientBillingInfo }) {
 				const { billingInfo } = client
 				const { name, officialName, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
@@ -458,7 +469,6 @@
       border: 1px solid $border-focus;
     }
   }
-
   .file-fake-button {
     height: 30px;
     width: 40px;
