@@ -6,6 +6,7 @@ const moment = require('moment')
 const { InvoicingReceivables } = require('../models')
 const { getTokens } = require('../services')
 const { returnMessageAndType } = require('./helper')
+const fs = require('fs')
 
 
 const baseUrl = 'https://books.zoho.com/api/v3/'
@@ -68,10 +69,13 @@ const createZohoInvoice = async (_reportId) => {
 
 	try {
 		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
+		const fileResult = (await zohoRequest(`invoices/${ _id }?organization_id=${ organizationId }&accept=pdf`))
+		fileResult.pipe( fs.createWriteStream("file.pdf"))
+		console.log(fileResult)
 		{
-			const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
 			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
-			await updateInvoiceReceivablesStatus(_reportId, 'Invoice Ready')
+			// await updateInvoiceReceivablesStatus(_reportId, 'Invoice Ready')
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
