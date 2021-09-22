@@ -4,7 +4,7 @@ const { getReportById } = require('./getReceivables')
 const { updateInvoiceReceivablesStatus, sendInvoiceToClientContacts } = require('./updateReceivables')
 const moment = require('moment')
 const { InvoicingReceivables } = require('../models')
-const { getTokens } = require('../services')
+const { getTokens, refreshToken } = require('../services')
 const { returnMessageAndType } = require('./helper')
 const fs = require('fs')
 
@@ -45,6 +45,19 @@ const getCustomer = async (companyName) => {
 	return customer.data.contacts[0].contact_id
 }
 
+const setNewTokenFromRefresh = async (attempt)=> {
+	if (attempt >= 5) return false
+	try {
+		const { _id, refresh_token } = await Zoho.findOne()
+		const {access_token = ''} = await refreshToken(refresh_token)
+		if (access_token === '') return returnMessageAndType("test", 'error')
+		await Zoho.updateOne({ _id: _id }, { access_token })
+		return true
+	}catch (e) {
+		return false
+	}
+}
+
 const createAndSendZohoInvoice = async (_reportId) => {
 	const data = await getZohoInvoiceCreationStructure(_reportId)
 	try {
@@ -63,7 +76,7 @@ const createAndSendZohoInvoice = async (_reportId) => {
 	}
 }
 
-const createZohoInvoice = async (_reportId) => {
+const createZohoInvoice = async (_reportId, attempt = 1) => {
 	const data = await getZohoInvoiceCreationStructure(_reportId)
 	try {
 		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
@@ -76,7 +89,12 @@ const createZohoInvoice = async (_reportId) => {
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
-		console.log(err)
+		if(err.response.data.code === 57) {
+			const isUpdated = await setNewTokenFromRefresh(attempt)
+			if (!isUpdated) return returnMessageAndType('Cann`t get access_token', 'error')
+			return await createZohoInvoice(_reportId, ++attempt)
+		}
+
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
 }

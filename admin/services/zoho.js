@@ -49,12 +49,29 @@ async function getTokens(code) {
     })
 }
 
-async function refreshToken() {
+// async function refreshToken() {
+//     return new Promise((resolve,reject) => {
+//         unirest.post(`${tokensUrl}/oauth/v2/token`)
+//         .header('Accept', 'application/json')
+//         .field('grant_type', 'refresh_token')
+//         .field('refresh_token', '1000.7963cfec29ec47370f975ee7e3033186.ba2acd9ed645dc106b3f10af0a69ceef')
+//         .field('client_id', zohoCreds.client_id)
+//         .field('client_secret', zohoCreds.client_secret)
+//         .end( (res) => {
+//             if(res.error) {
+//                 return reject(res.error)
+//             }
+//             resolve(res.body);
+//         })
+//     })
+// }
+
+async function refreshToken(refreshToken) {
     return new Promise((resolve,reject) => {
         unirest.post(`${tokensUrl}/oauth/v2/token`)
         .header('Accept', 'application/json')
         .field('grant_type', 'refresh_token')
-        .field('refresh_token', '1000.7963cfec29ec47370f975ee7e3033186.ba2acd9ed645dc106b3f10af0a69ceef')
+        .field('refresh_token', refreshToken)
         .field('client_id', zohoCreds.client_id)
         .field('client_secret', zohoCreds.client_secret)
         .end( (res) => {
