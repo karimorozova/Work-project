@@ -53,6 +53,18 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	},
+	invoice: {
+		filename: {
+			type: String,
+			default: '',
+			trim: true
+		},
+		path: {
+			type: String,
+			default: '',
+			trim: true
+		}
+	},
 	externalIntegration: {
 		_id: {
 			type: String,

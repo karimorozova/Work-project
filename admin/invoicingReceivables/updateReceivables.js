@@ -8,9 +8,8 @@ const updateInvoiceReceivablesStatus = async (reportId, status) => {
 }
 
 const sendInvoice = async (reportId) => {
-	console.log(reportId, 'SEND')
-
 	try {
+		await sendInvoiceToClientContacts(reportId)
 		await updateInvoiceReceivablesStatus(reportId, 'Sent')
 
 		return returnMessageAndType('Invoice sent', 'success')
@@ -22,25 +21,25 @@ const sendInvoice = async (reportId) => {
 const sendInvoiceToClientContacts = async (_reportId) => {
 	const attachments = []
 	const [ report ] = await getReportById(_reportId)
-	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
+	const { client, clientBillingInfo, total, reportId, lastPaymentDate, invoice } = report
 	const { officialName, contacts } = client.billingInfo.find(({ _id }) => `${ _id }` === `${ clientBillingInfo }`)
 	const subject = 'INVOICE READY PLS CHECK'
 
-	attachments.push({ filename: 'TEST.txt', path: `clientReportsFiles\614ae626b3f5ea304853429e\TEST.txt` })
-	const finalAttachments = attachments.map(item => ({ filename: item.filename, path: `./dist${ item.path }` }))
+	attachments.push({ filename: invoice.filename, path: invoice.path })
+	const finalAttachments = attachments.map(item => ({ filename: item.filename.split('-').pop(), path: `./dist/${ item.path }` }))
 
-	for await (let contact of contacts) {
+	//--------- TODO удалить н=>
+	for await (let contact of [ { email: 'maxyplmr@gmail.com' } ]) {
 		const message = 'INVOICE READY'
-
-		// const finalAttachments = attachmentsPaths.map(item => ({ filename: item.filename, path: `./dist${ item.path }` }))
-		//
-		// const message = projectDeliveryMessage({ comment, contact, accManager, projectId: updatedProject.projectId, projectName: updatedProject.projectName, id: updatedProject._id })
 		await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
 	}
+	//----------------------------------
 
-
-
-
+	// TODO: уже для работы реальных контатов!
+	// for await (let contact of contacts) {
+	// 	const message = 'INVOICE READY'
+	// 	await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
+	// }
 }
 
 

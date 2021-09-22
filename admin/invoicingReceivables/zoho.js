@@ -47,17 +47,16 @@ const getCustomer = async (companyName) => {
 
 const createAndSendZohoInvoice = async (_reportId) => {
 	const data = await getZohoInvoiceCreationStructure(_reportId)
-
 	try {
-		// const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
-		console.log('SAVE FILES + SEND')
+		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
+		await saveInvoiceFile(_reportId, _id)
+		console.log('done')
 		{
-		// 	const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
-		// 	await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
-		// 	await updateInvoiceReceivablesStatus(_reportId, 'Send')
+			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
+			await updateInvoiceReceivablesStatus(_reportId, 'Send')
 			await sendInvoiceToClientContacts(_reportId)
 		}
-
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
 		return returnMessageAndType(err.response.data.message, 'error')
@@ -66,19 +65,18 @@ const createAndSendZohoInvoice = async (_reportId) => {
 
 const createZohoInvoice = async (_reportId) => {
 	const data = await getZohoInvoiceCreationStructure(_reportId)
-
 	try {
 		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
 		const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
-		const fileResult = (await zohoRequest(`invoices/${ _id }?organization_id=${ organizationId }&accept=pdf`))
-		fileResult.pipe( fs.createWriteStream("file.pdf"))
-		console.log(fileResult)
+		await saveInvoiceFile(_reportId, _id)
+
 		{
 			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
-			// await updateInvoiceReceivablesStatus(_reportId, 'Invoice Ready')
+			await updateInvoiceReceivablesStatus(_reportId, 'Invoice Ready')
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
+		console.log(err)
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
 }
@@ -96,6 +94,26 @@ const getZohoInvoiceCreationStructure = async (_reportId) => {
 			"quantity": 1
 		} ]
 	}
+}
+
+const saveInvoiceFile = async (_reportId, _zohoId) => {
+	const fileResult = await zohoRequest(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`)
+
+	const fileName = `${ Math.floor(Math.random() * 1000000) }-invoice.pdf`
+
+	await writeFile(`dist/clientReportsFiles/${ _reportId }/${ fileName }`, fileResult.data)
+	await InvoicingReceivables.updateOne({ _id: _reportId }, { invoice: { filename: fileName, path: `clientReportsFiles/${ _reportId }/${ fileName }` } })
+}
+
+const writeFile = async (path, data) => {
+	return new Promise((resolve, reject) => {
+		fs.writeFile(path, data, 'utf8', (err) => {
+			if (err) reject(err)
+			else {
+				resolve()
+			}
+		})
+	})
 }
 
 
