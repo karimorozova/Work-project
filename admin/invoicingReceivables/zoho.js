@@ -23,8 +23,7 @@ async function getCurrentToken() {
 }
 
 
-const zohoRequest = async (link, data, method = "GET") => {
-	// try {
+const zohoRequest = async (link, data, method = "GET", additional = {}) => {
 	const token = await getCurrentToken()
 	return (await axios({
 		headers: {
@@ -33,11 +32,9 @@ const zohoRequest = async (link, data, method = "GET") => {
 		},
 		method,
 		url: baseUrl + link,
-		data
+		data,
+		...(additional)
 	}))
-	// } catch (e) {
-	// 	console.log(e)
-	// }
 }
 
 const getCustomer = async (companyName) => {
@@ -45,15 +42,15 @@ const getCustomer = async (companyName) => {
 	return customer.data.contacts[0].contact_id
 }
 
-const setNewTokenFromRefresh = async (attempt)=> {
+const setNewTokenFromRefresh = async (attempt) => {
 	if (attempt >= 5) return false
 	try {
 		const { _id, refresh_token } = await Zoho.findOne()
-		const {access_token = ''} = await refreshToken(refresh_token)
+		const { access_token = '' } = await refreshToken(refresh_token)
 		if (access_token === '') return returnMessageAndType("test", 'error')
 		await Zoho.updateOne({ _id: _id }, { access_token })
 		return true
-	}catch (e) {
+	} catch (e) {
 		return false
 	}
 }
@@ -64,7 +61,6 @@ const createAndSendZohoInvoice = async (_reportId) => {
 		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
 		const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
 		await saveInvoiceFile(_reportId, _id)
-		console.log('done')
 		{
 			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
 			await updateInvoiceReceivablesStatus(_reportId, 'Send')
@@ -89,7 +85,7 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
-		if(err.response.data.code === 57) {
+		if (err.response.data.code === 57) {
 			const isUpdated = await setNewTokenFromRefresh(attempt)
 			if (!isUpdated) return returnMessageAndType('Cann`t get access_token', 'error')
 			return await createZohoInvoice(_reportId, ++attempt)
@@ -115,25 +111,24 @@ const getZohoInvoiceCreationStructure = async (_reportId) => {
 }
 
 const saveInvoiceFile = async (_reportId, _zohoId) => {
-	const fileResult = await zohoRequest(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`)
-
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-invoice.pdf`
 
-	await writeFile(`dist/clientReportsFiles/${ _reportId }/${ fileName }`, fileResult.data)
+	const fileResult = await zohoRequest(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`, '', 'GET', { responseType: 'stream' })
+	fileResult.data.pipe(fs.createWriteStream(`dist/clientReportsFiles/${ _reportId }/${ fileName }`))
 	await InvoicingReceivables.updateOne({ _id: _reportId }, { invoice: { filename: fileName, path: `clientReportsFiles/${ _reportId }/${ fileName }` } })
+
 }
 
-const writeFile = async (path, data) => {
-	return new Promise((resolve, reject) => {
-		fs.writeFile(path, data, 'utf8', (err) => {
-			if (err) reject(err)
-			else {
-				resolve()
-			}
-		})
-	})
-}
-
+// const writeFile = async (path, data) => {
+// 	return new Promise((resolve, reject) => {
+// 		fs.writeFile(path, data, 'utf8', (err) => {
+// 			if (err) reject(err)
+// 			else {
+// 				resolve()
+// 			}
+// 		})
+// 	})
+// }
 
 module.exports = {
 	createZohoInvoice,
