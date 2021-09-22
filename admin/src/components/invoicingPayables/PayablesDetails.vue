@@ -238,7 +238,7 @@
 			...mapActions([ 'alertToggle' ]),
 			downloadFile(path) {
 				let link = document.createElement('a')
-				link.href = __WEBPACK__API_URL__ + '/dist/' + path
+				link.href = __WEBPACK__API_URL__ + '/' + path
 				link.target = "_blank"
 				link.click()
 			},
