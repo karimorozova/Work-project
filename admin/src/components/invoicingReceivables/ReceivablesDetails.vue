@@ -22,6 +22,9 @@
             .text__block
               .text__title Report Id:
               .text__value {{reportDetailsInfo.reportId}}
+            .text__block(v-if="reportDetailsInfo.externalIntegration.reportId")
+              .text__title External Report Id:
+              .text__value {{reportDetailsInfo.externalIntegration.reportId}}
             .text__block
               .text__title Status:
               .text__value {{reportDetailsInfo.status}}
@@ -671,7 +674,7 @@
     }
 
     &__title {
-      width: 100px;
+      width: 120px;
       font-family: Myriad600;
     }
 

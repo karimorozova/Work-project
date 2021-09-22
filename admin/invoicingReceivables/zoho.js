@@ -63,8 +63,9 @@ const createAndSendZohoInvoice = async (_reportId) => {
 		await saveInvoiceFile(_reportId, _id)
 		{
 			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
-			await updateInvoiceReceivablesStatus(_reportId, 'Send')
-			await sendInvoiceToClientContacts(_reportId)
+			// await updateInvoiceReceivablesStatus(_reportId, 'Sent')
+			await setInvoiceStatus(_id, 'sent')
+			// await sendInvoiceToClientContacts(_reportId)
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
@@ -117,6 +118,14 @@ const saveInvoiceFile = async (_reportId, _zohoId) => {
 	fileResult.data.pipe(fs.createWriteStream(`dist/clientReportsFiles/${ _reportId }/${ fileName }`))
 	await InvoicingReceivables.updateOne({ _id: _reportId }, { invoice: { filename: fileName, path: `clientReportsFiles/${ _reportId }/${ fileName }` } })
 
+}
+
+const setInvoiceStatus = async (_zohoId, status) => {
+	try {
+		await zohoRequest(`invoices/${ _zohoId }/status/${ status }?organization_id=${ organizationId }`, '', 'POST', )
+	} catch (err) {
+		return returnMessageAndType(err.response.data.message, 'error')
+	}
 }
 
 // const writeFile = async (path, data) => {
