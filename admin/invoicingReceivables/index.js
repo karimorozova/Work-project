@@ -15,15 +15,24 @@ const {
 } = require('./deleteReceivables')
 
 const {
-	createZohoInvoice
+	createZohoInvoice,
+	createAndSendZohoInvoice
 } = require('./zoho')
 
 const {
-	updateInvoiceReceivablesStatus
+	updateInvoiceReceivablesStatus,
+	sendInvoice,
 } = require('./updateReceivables')
+
+const {
+	returnMessageAndType
+} = require('./helper')
 
 
 module.exports = {
+	sendInvoice,
+	createAndSendZohoInvoice,
+	returnMessageAndType,
 	updateInvoiceReceivablesStatus,
 	deleteStepFromReport,
 	getReportById,

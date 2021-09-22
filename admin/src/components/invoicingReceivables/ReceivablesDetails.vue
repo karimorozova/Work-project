@@ -5,15 +5,20 @@
         .title
           .title__text
             router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
-              span {{ reportDetailsInfo.client.name }}
-          .title__button(v-if='!toggleAddSteps && reportDetailsInfo.status === "Created"')
+              span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
+          .title__button(v-if='!toggleAddSteps')
             .flex-wrapper
-              Button(value="Generate Invoice" @clicked="generateInvoice")
-              Button(value="Add jobs" @clicked="changeToggleAddSteps")
+              Button(v-if="reportDetailsInfo.status === 'Invoice Ready'" :outline="true" value="Send" @clicked="sendInvoice")
+              Button(v-if="reportDetailsInfo.status === 'Created'" :outline="true" value="Generate And Send" @clicked="generateAndSendInvoice")
+              Button(v-if="reportDetailsInfo.status === 'Created'" :outline="true" value="Generate Invoice" @clicked="generateInvoice")
+              Button(v-if="reportDetailsInfo.status === 'Created'" value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
           .invoicing-details__text
             .text__address {{ getBillingDetails(reportDetailsInfo).getAddress1() }}
+            .text__block
+              .text__title Customer:
+              .text__value {{reportDetailsInfo.client.name}}
             .text__block
               .text__title Report Id:
               .text__value {{reportDetailsInfo.reportId}}
@@ -246,10 +251,14 @@
 			}
 		},
 		methods: {
+			...mapActions({
+				alertToggle: "alertToggle"
+			}),
 			getBillingDetails({ client, clientBillingInfo }) {
 				const { billingInfo } = client
-				const { name, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+				const { name, officialName, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
 				return {
+					getOfficialName: () => officialName,
 					getName: () => name,
 					getPaymentTerms: () => paymentTerms,
 					getPaymentType: () => paymentType,
@@ -311,14 +320,36 @@
 			// 		this.amount = this.getUnpaidAmount
 			// 	}
 			// },
-      async generateInvoice() {
+      async sendInvoice(){
+	      try {
+		      const result = await this.$http.post('/invoicing-receivables/sendInvoice', { _id: this.$route.params.id })
+		      await this.getReportDetails(this.$route.params.id)
+		      const { type, message } = result.data
+		      this.alertToggle({ message, isShow: true, type })
+	      } catch (e) {
+		      console.log(e, 'generateInvoice()')
+	      }
+      },
+			async generateAndSendInvoice() {
+				try {
+					const result = await this.$http.post('/invoicing-receivables/zoho/createAndSendInvoice', { _id: this.$route.params.id })
+					await this.getReportDetails(this.$route.params.id)
+					const { type, message } = result.data
+					this.alertToggle({ message, isShow: true, type })
+				} catch (e) {
+					console.log(e, 'generateInvoice()')
+				}
+			},
+			async generateInvoice() {
 				try {
 					const result = await this.$http.post('/invoicing-receivables/zoho/createInvoice', { _id: this.$route.params.id })
-          this.alertToggle()
-				}catch (e) {
-
+					await this.getReportDetails(this.$route.params.id)
+					const { type, message } = result.data
+					this.alertToggle({ message, isShow: true, type })
+				} catch (e) {
+					console.log(e, 'generateInvoice()')
 				}
-      },
+			},
 			formattedDate(date) {
 				return moment(date).format("DD-MM-YYYY ")
 			},
@@ -696,6 +727,7 @@
     margin-right: 4px;
     color: $dark-border;
   }
+
   .flex-wrapper {
     display: flex;
   }
