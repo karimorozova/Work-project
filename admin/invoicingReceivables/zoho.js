@@ -1,11 +1,12 @@
 const axios = require("axios")
 const { Zoho } = require("../models")
 const { getReportById } = require('./getReceivables')
-const { updateInvoiceReceivablesStatus } = require('./updateReceivables')
+const { updateInvoiceReceivablesStatus, sendInvoiceToClientContacts } = require('./updateReceivables')
 const moment = require('moment')
 const { InvoicingReceivables } = require('../models')
 const { getTokens } = require('../services')
 const { returnMessageAndType } = require('./helper')
+
 
 const baseUrl = 'https://books.zoho.com/api/v3/'
 const organizationId = '630935724'
@@ -43,26 +44,34 @@ const getCustomer = async (companyName) => {
 	return customer.data.contacts[0].contact_id
 }
 
-const createAndSendZohoInvoice = async (internalReportId) => {
-	const [ report ] = await getReportById(internalReportId)
-	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
-	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
+const createAndSendZohoInvoice = async (_reportId) => {
+	const data = await getZohoInvoiceCreationStructure(_reportId)
 
-	const data = {
-		"customer_id": "335260000005073023",
-		"line_items": [ {
-			"item_id": "335260000005073056",
-			"rate": total,
-			"quantity": 1
-		} ]
-	}
 	try {
-		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		// const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
 		console.log('SAVE FILES + SEND')
 		{
+		// 	const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
+		// 	await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
+		// 	await updateInvoiceReceivablesStatus(_reportId, 'Send')
+			await sendInvoiceToClientContacts(_reportId)
+		}
+
+		return returnMessageAndType(result.data.message, 'success')
+	} catch (err) {
+		return returnMessageAndType(err.response.data.message, 'error')
+	}
+}
+
+const createZohoInvoice = async (_reportId) => {
+	const data = await getZohoInvoiceCreationStructure(_reportId)
+
+	try {
+		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		{
 			const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
-			await InvoicingReceivables.updateOne({ _id: internalReportId }, { externalIntegration: { _id, reportId } })
-			await updateInvoiceReceivablesStatus(internalReportId, 'Send')
+			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
+			await updateInvoiceReceivablesStatus(_reportId, 'Invoice Ready')
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
@@ -70,12 +79,12 @@ const createAndSendZohoInvoice = async (internalReportId) => {
 	}
 }
 
-const createZohoInvoice = async (internalReportId) => {
-	const [ report ] = await getReportById(internalReportId)
+const getZohoInvoiceCreationStructure = async (_reportId) => {
+	const [ report ] = await getReportById(_reportId)
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
 	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
 
-	const data = {
+	return {
 		"customer_id": "335260000005073023",
 		"line_items": [ {
 			"item_id": "335260000005073056",
@@ -83,19 +92,6 @@ const createZohoInvoice = async (internalReportId) => {
 			"quantity": 1
 		} ]
 	}
-
-	try {
-		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
-		{
-			const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
-			await InvoicingReceivables.updateOne({ _id: internalReportId }, { externalIntegration: { _id, reportId } })
-			await updateInvoiceReceivablesStatus(internalReportId, 'Invoice Ready')
-		}
-		return returnMessageAndType(result.data.message, 'success')
-	} catch (err) {
-		return returnMessageAndType(err.response.data.message, 'error')
-	}
-
 }
 
 

@@ -4,6 +4,7 @@ const { getReportById } = require('../invoicingReceivables/getReceivables')
 const moment = require('moment')
 
 const receivableDelete = async (reportId) => {
+	const DIR = './dist/vendorReportsFiles/'
 	const receivables = await InvoicingReceivables.findOne({ _id: reportId })
 	const steps = receivables ? receivables.stepsAndProjects.map(({ step }) => step) : []
 	await Projects.updateMany(
@@ -12,7 +13,7 @@ const receivableDelete = async (reportId) => {
 			{ arrayFilters: [ { 'i._id': { $in: steps } } ] })
 
 	await InvoicingReceivables.deleteOne({ _id: reportId })
-	await removeDir(reportId)
+	await removeDir(DIR, reportId)
 }
 
 

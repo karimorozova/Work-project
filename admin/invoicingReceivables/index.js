@@ -22,6 +22,7 @@ const {
 const {
 	updateInvoiceReceivablesStatus,
 	sendInvoice,
+	sendInvoiceToClientContacts,
 } = require('./updateReceivables')
 
 const {
@@ -30,6 +31,7 @@ const {
 
 
 module.exports = {
+	sendInvoiceToClientContacts,
 	sendInvoice,
 	createAndSendZohoInvoice,
 	returnMessageAndType,

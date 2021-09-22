@@ -24,6 +24,7 @@ const payableDeleteStep = async (reportId, stepId) => {
 }
 
 const payableDelete = async (reportId) => {
+	const DIR = './dist/vendorReportsFiles/'
 	const reporotInfo = await InvoicingPayables.findOne({ _id: reportId })
 	const steps = reporotInfo ? reporotInfo.steps : []
 	await Projects.updateMany(
@@ -32,7 +33,7 @@ const payableDelete = async (reportId) => {
 			{ arrayFilters: [ { 'i._id': {$in: steps} } ] })
 
 	await InvoicingPayables.deleteOne({_id: reportId})
-	await removeDir(reportId)
+	await removeDir(DIR, reportId)
 
 }
 module.exports = {  payableDeleteStep, payableDelete }

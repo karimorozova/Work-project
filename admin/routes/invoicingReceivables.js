@@ -1,6 +1,8 @@
 const router = require('express').Router()
 const { Languages } = require('../models')
 const ObjectId = require("mongodb").ObjectID
+const { createDir } = require('../invoicingPayables/PayablesFilesAndDirecrory')
+const DIR = './dist/clientReportsFiles/'
 
 const {
 	getAllSteps,
@@ -129,6 +131,7 @@ router.post("/report/:reportId/delete/:stepId", async (req, res) => {
 router.post("/zoho/createInvoice", async (req, res) => {
 	const { _id } = req.body
 	try {
+		await createDir(DIR, _id)
 		const messageAndType = await createZohoInvoice(_id)
 		res.send(messageAndType)
 	} catch (err) {
@@ -140,6 +143,7 @@ router.post("/zoho/createInvoice", async (req, res) => {
 router.post("/zoho/createAndSendInvoice", async (req, res) => {
 	const { _id } = req.body
 	try {
+		await createDir(DIR, _id)
 		const messageAndType = await createAndSendZohoInvoice(_id)
 		res.send(messageAndType)
 	} catch (err) {
