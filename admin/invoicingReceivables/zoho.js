@@ -97,7 +97,10 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 }
 
 const deleteZohoInvoice = async (invoiceId) => {
-	await zohoRequest(`invoices/${invoiceId}?organization_id=${organizationId}`, '', 'DELETE')
+	try {
+		await zohoRequest(`invoices/${invoiceId}?organization_id=${organizationId}`, '', 'DELETE')
+	} catch (e) {
+	}
 }
 
 const getZohoInvoiceCreationStructure = async (_reportId) => {

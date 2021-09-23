@@ -13,7 +13,7 @@ const receivableDelete = async (reportId) => {
 			{ 'steps.$[i].isInReportReceivables': false },
 			{ arrayFilters: [ { 'i._id': { $in: steps } } ] })
 
-	if (receivables.externalIntegration.hasOwnProperty('_id')) {
+	if (receivables.externalIntegration._id.length) {
 		await deleteZohoInvoice(receivables.externalIntegration._id)
 	}
 
