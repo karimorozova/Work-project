@@ -89,6 +89,7 @@
             .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
           .options__button(v-else)
+            Button(value="Zoho sync." :outline="true" @clicked="updateReportsStateFromZoho()" style="margin-right: 10px;")
             router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/create-reports`}")
               Button(value="Add Reports")
 
@@ -286,6 +287,7 @@
 			}
 		},
 		methods: {
+			...mapActions(['alertToggle']),
 			getReportProjectsCount({ stepsAndProjects }) {
 				const { length } = [ ...new Set(stepsAndProjects.map(i => i.project)) ]
 				return length
@@ -304,7 +306,6 @@
 					}
 				}
 			},
-			...mapActions([ 'alertToggle' ]),
 			async manageReportActions() {
 			  if (this.selectedReportAction === "Delete") {
           await this.deleteChecked()
@@ -320,6 +321,15 @@
 			  this.closeApproveActionModal()
 			  await this.getReports()
 			},
+			async updateReportsStateFromZoho(){
+				try{
+					await this.$http.get('/invoicing-receivables/update-reports-state-from-zoho')
+					const { type, message } = result.data
+					this.alertToggle({ message, isShow: true, type })
+				}catch (e) {
+					console.log(e)
+				}
+      },
 			// async changeTaskStatus() {
 			//   const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
 			//   try {

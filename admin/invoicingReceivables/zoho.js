@@ -1,13 +1,13 @@
 const axios = require("axios")
 const { Zoho } = require("../models")
 const { getReportById } = require('./getReceivables')
-const { updateInvoiceReceivablesStatus, sendInvoiceToClientContacts } = require('./updateReceivables')
+const { updateInvoiceReceivablesStatus } = require('./updateReceivables')
+const { sendInvoiceToClientContacts } = require('./notification')
 const moment = require('moment')
 const { InvoicingReceivables } = require('../models')
 const { getTokens, refreshToken } = require('../services')
 const { returnMessageAndType } = require('./helper')
 const fs = require('fs')
-
 
 const baseUrl = 'https://books.zoho.com/api/v3/'
 const organizationId = '630935724'
@@ -63,9 +63,9 @@ const createAndSendZohoInvoice = async (_reportId) => {
 		await saveInvoiceFile(_reportId, _id)
 		{
 			await InvoicingReceivables.updateOne({ _id: _reportId }, { externalIntegration: { _id, reportId } })
-			// await updateInvoiceReceivablesStatus(_reportId, 'Sent')
+			await updateInvoiceReceivablesStatus(_reportId, 'Sent')
 			await setInvoiceStatus(_id, 'sent')
-			// await sendInvoiceToClientContacts(_reportId)
+			await sendInvoiceToClientContacts(_reportId)
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
@@ -88,7 +88,7 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 	} catch (err) {
 		if (err.response.data.code === 57) {
 			const isUpdated = await setNewTokenFromRefresh(attempt)
-			if (!isUpdated) return returnMessageAndType('Cann`t get access_token', 'error')
+			if (!isUpdated) return returnMessageAndType('Can`t get access_token', 'error')
 			return await createZohoInvoice(_reportId, ++attempt)
 		}
 
@@ -98,7 +98,7 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 
 const deleteZohoInvoice = async (invoiceId) => {
 	try {
-		await zohoRequest(`invoices/${invoiceId}?organization_id=${organizationId}`, '', 'DELETE')
+		await zohoRequest(`invoices/${ invoiceId }?organization_id=${ organizationId }`, '', 'DELETE')
 	} catch (e) {
 	}
 }
@@ -129,7 +129,7 @@ const saveInvoiceFile = async (_reportId, _zohoId) => {
 
 const setInvoiceStatus = async (_zohoId, status) => {
 	try {
-		await zohoRequest(`invoices/${ _zohoId }/status/${ status }?organization_id=${ organizationId }`, '', 'POST', )
+		await zohoRequest(`invoices/${ _zohoId }/status/${ status }?organization_id=${ organizationId }`, '', 'POST')
 	} catch (err) {
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
@@ -146,8 +146,49 @@ const setInvoiceStatus = async (_zohoId, status) => {
 // 	})
 // }
 
+const updateReportsStateFromZoho = async () => {
+	try {
+		const reportsFromZoho = await zohoRequest(`invoices?organization_id=${ organizationId }`)
+		let reportsFromSystem = (await InvoicingReceivables.find({ $nor: [ { status: 'Created' }, { status: 'Invoice Ready' } ] })).filter(item => !!item.externalIntegration.reportId)
+		const { data: { invoices } } = reportsFromZoho
+
+		for await (let report of reportsFromSystem) {
+			const _invoiceIdx = invoices.findIndex(({ invoice_id }) => invoice_id === report.externalIntegration._id)
+
+			if (_invoiceIdx !== -1) {
+			 // TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
+				await InvoicingReceivables.updateOne({ _id: report._id }, { status: invoices[_invoiceIdx].status })
+			}
+		}
+		return returnMessageAndType('Information updated', 'success')
+	} catch (err) {
+		console.log(err)
+		return returnMessageAndType(err.response.data.message, 'error')
+	}
+}
+
+const updateReportStateFromZoho = async (_reportId) => {
+	try {
+		const [ report ] = await getReportById(_reportId)
+		const { externalIntegration } = report
+		if (externalIntegration._id) {
+			const reportFromZoho = await zohoRequest(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
+			const { data: { invoice } } = reportFromZoho
+			 // TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
+			await InvoicingReceivables.updateOne({ _id: report._id }, { status: invoice.status })
+		}
+
+	} catch (err) {
+		console.log(err)
+		return returnMessageAndType(err.response.data.message, 'error')
+	}
+}
+
 module.exports = {
+	updateReportStateFromZoho,
+	setInvoiceStatus,
+	updateReportsStateFromZoho,
 	createZohoInvoice,
 	createAndSendZohoInvoice,
-	deleteZohoInvoice,
+	deleteZohoInvoice
 }

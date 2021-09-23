@@ -14,7 +14,9 @@ const {
 	deleteStepFromReport,
 	createZohoInvoice,
 	createAndSendZohoInvoice,
-	sendInvoice
+	sendInvoice,
+	updateReportsStateFromZoho,
+	updateReportStateFromZoho
 } = require('../invoicingReceivables')
 
 const {
@@ -162,5 +164,27 @@ router.post("/sendInvoice", async (req, res) => {
 		res.status(500).send('Something wrong on /sendInvoice')
 	}
 })
+
+router.get("/update-reports-state-from-zoho", async (req, res) => {
+	try {
+		const messageAndType = await updateReportsStateFromZoho()
+		res.send(messageAndType)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on /sendInvoice')
+	}
+})
+
+router.get("/update-report-state-from-zoho/:id", async (req, res) => {
+	const { id } = req.params
+	try {
+		const messageAndType = await updateReportStateFromZoho(id)
+		res.send(messageAndType)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on /sendInvoice')
+	}
+})
+
 
 module.exports = router

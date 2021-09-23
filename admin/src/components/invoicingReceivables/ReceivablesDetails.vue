@@ -264,7 +264,7 @@
 			}),
 			downloadFile(path) {
 				let link = document.createElement('a')
-				link.href = __WEBPACK__API_URL__ + '/' +  path
+				link.href = __WEBPACK__API_URL__ + '/' + path
 				link.target = "_blank"
 				link.click()
 			},
@@ -334,16 +334,16 @@
 			// 		this.amount = this.getUnpaidAmount
 			// 	}
 			// },
-      async sendInvoice(){
-	      try {
-		      const result = await this.$http.post('/invoicing-receivables/sendInvoice', { _id: this.$route.params.id })
-		      await this.getReportDetails(this.$route.params.id)
-		      const { type, message } = result.data
-		      this.alertToggle({ message, isShow: true, type })
-	      } catch (e) {
-		      console.log(e, 'generateInvoice()')
-	      }
-      },
+			async sendInvoice() {
+				try {
+					const result = await this.$http.post('/invoicing-receivables/sendInvoice', { _id: this.$route.params.id })
+					await this.getReportDetails(this.$route.params.id)
+					const { type, message } = result.data
+					this.alertToggle({ message, isShow: true, type })
+				} catch (e) {
+					console.log(e, 'generateInvoice()')
+				}
+			},
 			async generateAndSendInvoice() {
 				try {
 					const result = await this.$http.post('/invoicing-receivables/zoho/createAndSendInvoice', { _id: this.$route.params.id })
@@ -423,6 +423,13 @@
 					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}
 			},
+			async updateReportsStateFromZoho(id) {
+				try {
+					await this.$http.get('/invoicing-receivables/update-report-state-from-zoho/' + id)
+				} catch (err) {
+					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
+				}
+			},
 			...mapActions([ 'alertToggle' ])
 		},
 		computed: {
@@ -439,6 +446,7 @@
 			// }
 		},
 		async created() {
+			await this.updateReportsStateFromZoho(this.$route.params.id)
 			await this.getReportDetails(this.$route.params.id)
 			// this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
 		},
@@ -472,6 +480,7 @@
       border: 1px solid $border-focus;
     }
   }
+
   .file-fake-button {
     height: 30px;
     width: 40px;

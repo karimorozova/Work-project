@@ -16,21 +16,33 @@ const {
 
 const {
 	createZohoInvoice,
-	createAndSendZohoInvoice
+	createAndSendZohoInvoice,
+	updateReportsStateFromZoho,
+	updateReportStateFromZoho,
+	setInvoiceStatus
 } = require('./zoho')
 
 const {
-	updateInvoiceReceivablesStatus,
-	sendInvoice,
-	sendInvoiceToClientContacts,
+	updateInvoiceReceivablesStatus
 } = require('./updateReceivables')
 
 const {
 	returnMessageAndType
 } = require('./helper')
 
+const {
+	sendInvoiceToClientContacts
+} = require('./notification')
+
+const {
+	sendInvoice
+} = require('./endpoint')
+
 
 module.exports = {
+	updateReportStateFromZoho,
+	setInvoiceStatus,
+	updateReportsStateFromZoho,
 	sendInvoiceToClientContacts,
 	sendInvoice,
 	createAndSendZohoInvoice,
