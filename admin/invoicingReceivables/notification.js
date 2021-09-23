@@ -13,7 +13,7 @@ const sendInvoiceToClientContacts = async (_reportId) => {
 	const finalAttachments = attachments.map(item => ({ filename: item.filename.split('-').pop(), path: `./dist/${ item.path }` }))
 
 	//--------- TODO удалить н=>
-	for await (let contact of [ { email: 'maxyplmr@gmail.com' } ]) {
+	for await (let contact of [ { email: 'maksym@pangea.global' } ]) {
 		const message = 'INVOICE READY'
 		await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
 	}
