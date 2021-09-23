@@ -96,6 +96,10 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 	}
 }
 
+const deleteZohoInvoice = async (invoiceId) => {
+	await zohoRequest(`invoices/${invoiceId}?organization_id=${organizationId}`, '', 'DELETE')
+}
+
 const getZohoInvoiceCreationStructure = async (_reportId) => {
 	const [ report ] = await getReportById(_reportId)
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
@@ -141,5 +145,6 @@ const setInvoiceStatus = async (_zohoId, status) => {
 
 module.exports = {
 	createZohoInvoice,
-	createAndSendZohoInvoice
+	createAndSendZohoInvoice,
+	deleteZohoInvoice,
 }
