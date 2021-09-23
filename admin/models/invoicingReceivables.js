@@ -65,6 +65,25 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 			trim: true
 		}
 	},
+	paymentInformation: [{
+		paidAmount: {
+			type: Number,
+		},
+		unpaidAmount: {
+			type: Number
+		},
+		// paymentMethod: {
+		// 	type: String,
+		// },
+		paymentDate: {
+			type: Date,
+			default: ''
+		},
+		notes: {
+			type: String,
+			default: ""
+		}
+	}],
 	externalIntegration: {
 		_id: {
 			type: String,
