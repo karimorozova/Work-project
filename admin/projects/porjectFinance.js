@@ -148,8 +148,8 @@ const recalculateProjectFinance = (finance, tasks, steps, discounts = [], paymen
 
   function sumReceivables(arr) {
     let value = 0;
-    for (let { finance: { Price: { receivables } } } of arr) {
-      value += +receivables;
+    for (let { finance: { Price }, status} of arr) {
+      value += status !== 'Cancelled Halfway' ? Price.receivables : Price.halfReceivables;
     }
     return value;
   }
