@@ -16,7 +16,9 @@ const {
 	createAndSendZohoInvoice,
 	sendInvoice,
 	updateReportsStateFromZoho,
-	updateReportStateFromZoho
+	updateReportStateFromZoho,
+	getAllPaidReceivables,
+	getPaidReceivables,
 } = require('../invoicingReceivables')
 
 const {
@@ -185,6 +187,30 @@ router.get("/update-report-state-from-zoho/:id", async (req, res) => {
 		res.status(500).send('Something wrong on /sendInvoice')
 	}
 })
+
+router.post("/paid-reports", async (req, res) => {
+	try {
+		const {	countToSkip, countToGet, filters } = req.body
+		const query = reportsFiltersQuery(filters)
+		// const query = {}
+		const reports = await getAllPaidReceivables( countToSkip, countToGet, query )
+		res.send(reports);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.post("/paid-report/:id", async (req, res) => {
+	const { id } = req.params
+	try {
+		const report = await getPaidReceivables(id)
+		res.send(report);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
 
 
 module.exports = router

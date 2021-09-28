@@ -27,6 +27,11 @@ const {
 } = require('./updateReceivables')
 
 const {
+	getAllPaidReceivables,
+	getPaidReceivables,
+} = require('./getPaidReceivables')
+
+const {
 	returnMessageAndType
 } = require('./helper')
 
@@ -55,5 +60,7 @@ module.exports = {
 	createReports,
 	getAllSteps,
 	receivableDelete,
-	createZohoInvoice
+	createZohoInvoice,
+	getAllPaidReceivables,
+	getPaidReceivables,
 }

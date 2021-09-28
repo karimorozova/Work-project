@@ -10,7 +10,7 @@ router.get("/getTokens", async (req, res) => {
         const zoho = await Zoho.find();
         if(zoho.length) {
             // console.log(code)
-             await Zoho.updateOne({"_id": zoho[0]._id, access_token: result.access_token});
+             await Zoho.updateOne({"_id": zoho[0]._id, access_token: result.access_token, refresh_token: result.refresh_token});
         } else {
             await Zoho.create(result);
         }

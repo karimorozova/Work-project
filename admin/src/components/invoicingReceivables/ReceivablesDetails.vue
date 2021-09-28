@@ -171,13 +171,12 @@
             @refreshReports="refreshReports"
             @closeTable="changeToggleAddSteps"
           )
-
-    // .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
-    //   .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
-    //     ReceivablesPaymentInformationCard(
-    //       :cardInfo="cardInfo"
-    //       :paymentDetails="reportDetailsInfo.paymentDetails"
-    //     )
+    .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.hasOwnProperty('paymentInformation') && reportDetailsInfo.paymentInformation.length")
+      .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
+        ReceivablesPaymentInformationCard(
+         :cardInfo="cardInfo"
+         :paymentDetails="{paymentDetails: {expectedPaymentDate: 0}}"
+        )
 
 </template>
 
@@ -425,7 +424,15 @@
 			},
 			async updateReportsStateFromZoho(id) {
 				try {
+          console.log('test1')
 					await this.$http.get('/invoicing-receivables/update-report-state-from-zoho/' + id)
+          const { type, message } = result.data
+          console.log(result.data)
+          console.log({ message })
+          this.alertToggle({ message, isShow: true, type })
+          if (message === 'Invoice paid') {
+            await this.$router.push('/')
+          }
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}

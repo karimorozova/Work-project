@@ -1,5 +1,5 @@
 const axios = require("axios")
-const { Zoho } = require("../models")
+const { Zoho, InvoicingPayables } = require("../models")
 const { getReportById } = require('./getReceivables')
 const { updateInvoiceReceivablesStatus } = require('./updateReceivables')
 const { sendInvoiceToClientContacts } = require('./notification')
@@ -8,6 +8,7 @@ const { InvoicingReceivables } = require('../models')
 const { getTokens, refreshToken } = require('../services')
 const { returnMessageAndType } = require('./helper')
 const fs = require('fs')
+const { ObjectID: ObjectId } = require("mongodb")
 
 const baseUrl = 'https://books.zoho.com/api/v3/'
 const organizationId = '630935724'
@@ -157,7 +158,38 @@ const updateReportsStateFromZoho = async () => {
 
 			if (_invoiceIdx !== -1) {
 			 // TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
-				await InvoicingReceivables.updateOne({ _id: report._id }, { status: invoices[_invoiceIdx].status })
+
+				// const isAllPaid = true
+				const isAllPaid = invoices[_invoiceIdx]["payment_made"] === invoices[_invoiceIdx].total
+				const paymentInfo = {
+					paymentDate: new Date(),
+					notes: "",
+					paidAmount: invoices[_invoiceIdx]["payment_made"],
+					unpaidAmount: invoices[_invoiceIdx].balance,
+					paymentMethod: ""
+				}
+
+				const dataToUpdate = {
+					status: invoices[_invoiceIdx].status,
+					paymentInformation : isAllPaid ? [paymentInfo] : []
+				}
+				await InvoicingReceivables.updateOne({ _id: report._id }, { ...dataToUpdate })
+
+				if (isAllPaid) {
+					await InvoicingReceivables.aggregate([
+						{	"$match": {"_id" : ObjectId(report._id) } },
+						{
+							"$merge" : {
+								"into" : {
+									"db" : "pangea",
+									"coll" : "invoicingreceivablesarchives"
+								}
+							}
+						}
+					])
+					await InvoicingReceivables.remove({_id: report._id})
+					// return returnMessageAndType('Inv', 'error')
+				}
 			}
 		}
 		return returnMessageAndType('Information updated', 'success')
@@ -174,8 +206,40 @@ const updateReportStateFromZoho = async (_reportId) => {
 		if (externalIntegration._id) {
 			const reportFromZoho = await zohoRequest(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
 			const { data: { invoice } } = reportFromZoho
-			 // TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
-			await InvoicingReceivables.updateOne({ _id: report._id }, { status: invoice.status })
+			const isAllPaid = true
+			// const isAllPaid = invoice["payment_made"] === invoice.total
+			// TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
+			const paymentInfo = {
+				paymentDate: new Date(),
+				notes: "",
+				paidAmount: invoice["payment_made"],
+				unpaidAmount: invoice.balance,
+				paymentMethod: ""
+			}
+
+			const dataToUpdate = {
+				status: invoice.status,
+				paymentInformation : isAllPaid ? [paymentInfo] : []
+			}
+
+			await InvoicingReceivables.updateOne({ _id: report._id }, { ...dataToUpdate })
+
+			if (isAllPaid) {
+				await InvoicingReceivables.aggregate([
+					{	"$match": {"_id" : ObjectId(_reportId) } },
+					{
+						"$merge" : {
+							"into" : {
+								"db" : "pangea",
+								"coll" : "invoicingreceivablesarchives"
+							}
+						}
+					}
+				])
+				await InvoicingReceivables.remove({_id: _reportId})
+				// admin/invoicingReceivables/zoho.js:430 hard code "invoice paid"
+				return returnMessageAndType('Invoice paid', 'success')
+			}
 		}
 
 	} catch (err) {
