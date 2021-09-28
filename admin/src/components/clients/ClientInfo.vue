@@ -200,7 +200,7 @@
             .block__data(v-if="isSalesInformation")
               ClientSalesInfo(:client="currentClientOverallData" @setLeadSource="setLeadSource")
 
-          .client-info__block(v-if="!isIndividual")
+          .client-info__block
             .block__header(@click="toggleBlock('isBillingInformation')" :class="{'block__header-grey': !isBillingInformation}")
               .title Billing Information
               .icon(v-if="!isBillingInformation")
