@@ -1,7 +1,7 @@
 const { Projects, Languages, Vendors } = require('../models')
 const htmlToPdf = require('html-pdf');
 let  apiUrl = require('../helpers/apiurl');
-!apiUrl && (apiUrl = 'https://testadmin.pangea.global')
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
 
 const { archiveMultipleFiles } = require('../utils/archiving');
 const { moveProjectFile, moveFile } = require('../utils/movingFile');

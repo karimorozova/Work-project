@@ -12,7 +12,7 @@
 
     .content
       Header
-      .content__body(v-if="unitsLength")
+      .content__body
         nuxt-child
 
     //.vendor-portal__top
@@ -131,9 +131,7 @@
 				],
 				isAccountMenu: false,
 				accountInfo: false,
-				domain: '',
-
-        unitsLength: 0
+				domain: ''
 			}
 		},
 		methods: {
@@ -152,7 +150,6 @@
 				try {
 					const result = await this.$axios.get("/api/units")
 					this.setOriginallyUnits(result.data)
-          this.unitsLength = result.data.length
 				} catch (err) {
 				}
 			},

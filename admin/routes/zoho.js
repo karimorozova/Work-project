@@ -9,8 +9,7 @@ router.get("/getTokens", async (req, res) => {
         const result = await getTokens(code);
         const zoho = await Zoho.find();
         if(zoho.length) {
-            // console.log(code)
-             await Zoho.updateOne({"_id": zoho[0]._id, access_token: result.access_token, refresh_token: result.refresh_token});
+            await Zoho.updateOne({"_id": zoho[0]._id, access_token: result.access_token});
         } else {
             await Zoho.create(result);
         }
@@ -95,8 +94,8 @@ router.get("/crm-records", async (req, res) => {
     }
 })
 
-// router.get('/creds', (req, res) => {
-//     res.send(zohoCreds);
-// })
+router.get('/creds', (req, res) => {
+    res.send(zohoCreds);
+})
 
 module.exports = router;

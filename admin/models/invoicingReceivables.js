@@ -52,47 +52,6 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 	updatedAt: {
 		type: Date,
 		default: new Date()
-	},
-	invoice: {
-		filename: {
-			type: String,
-			default: '',
-			trim: true
-		},
-		path: {
-			type: String,
-			default: '',
-			trim: true
-		}
-	},
-	paymentInformation: [{
-		paidAmount: {
-			type: Number,
-		},
-		unpaidAmount: {
-			type: Number
-		},
-		// paymentMethod: {
-		// 	type: String,
-		// },
-		paymentDate: {
-			type: Date,
-		},
-		notes: {
-			type: String,
-		}
-	}],
-	externalIntegration: {
-		_id: {
-			type: String,
-			trim: true,
-			default: ''
-		},
-		reportId: {
-			type: String,
-			trim: true,
-			default: ''
-		}
 	}
 })
 

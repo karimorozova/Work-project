@@ -1,9 +1,8 @@
 <template lang="pug">
   .details(v-if="job._id")
     .title Project Details
-    //Button(:value="'Update progress'" @clicked="updateData")
     //.btn(v-if="!isForbidden.status")
-      //Button(:value="'Update'" )
+      //Button(:value="'Update'" @clicked="updateData")
     .details__data
       .details__info
         .details__main
@@ -62,20 +61,23 @@
 				this.isApproveModal = false
 			},
 			// async updateData() {
-			// try {
-			// 	await this.getProjectById(this.$route.params.project)
-			// 	if (this.project) {
-			// 		await this.getStepFromProject(this.$route.params.id)
-			// 		await this.getTaskFromProject(this.currentStep.taskId)
-			// 	}
-			// } catch (err) {
-			// } finally {
-			// 	this.refreshProgress()
-			// }
+				// try {
+				// 	await this.getProjectById(this.$route.params.project)
+				// 	if (this.project) {
+				// 		await this.getStepFromProject(this.$route.params.id)
+				// 		await this.getTaskFromProject(this.currentStep.taskId)
+				// 	}
+				// } catch (err) {
+				// } finally {
+				// 	this.refreshProgress()
+				// }
 			// },
 			async getProjectById(id) {
 				try {
-					const result = await this.$axios.post(`vendor/project`, { id, token: this.getToken })
+					const result = await this.$axios.post(`vendor/project`, {
+						id,
+						token: this.getToken
+					})
 					this.project = JSON.parse(window.atob(result.data))
 				} catch (e) {
 				}
@@ -90,7 +92,7 @@
 			setDeliverables({ files }) {
 				this.targetFiles = files
 			},
-			// #Complete
+      // #Complete
 			async completeJob() {
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
 				this.closeModal()
@@ -98,9 +100,9 @@
 					if (type === 'CAT Wordcount') {
 						await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
 						await this.$axios.post('/vendor/set-workFlowStatus', { token: this.getToken, stepId: this.job.stepId, stepAction: 'Finish' })
-					} else if (this.job.serviceStep.title === "Compliance") {
+					}else if(this.job.serviceStep.title === "Compliance"){
 						await this.setJobComplianceStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles })
-					} else {
+					}else{
 						await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
 					}
 					this.setCurrentJob()
@@ -113,9 +115,8 @@
 					if (!this.job._id) {
 						await this.getJobInfo()
 					}
-					// if (this.job.status !== "Started") return
+					if (this.job.status !== "Started") return
 					const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
-					console.log(type)
 					const isCatTool = type === 'CAT Wordcount'
 					await this.$axios.post('/vendor/update-progress', { token: this.getToken, projectId: this.job.project_Id, isCatTool })
 					await this.getJobs()
@@ -123,6 +124,7 @@
 					this.alertToggle({ message: "Progress updated", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: err.response.data, isShow: true, type: "error" })
+
 				}
 			},
 			async getJobInfo() {
@@ -144,12 +146,13 @@
 			}
 		},
 		computed: {
-			...mapGetters({
-				job: "getSelectedJob",
-				allJobs: "getAllJobs",
-				originallyUnits: "getOriginallyUnits",
-				getToken: "getToken"
-			}),
+			...
+					mapGetters({
+						job: "getSelectedJob",
+						allJobs: "getAllJobs",
+						originallyUnits: "getOriginallyUnits",
+						getToken: "getToken"
+					}),
 			buttonValue() {
 				return "Start"
 			},

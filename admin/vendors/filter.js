@@ -50,7 +50,7 @@ function getFilteringQueryPotential(filters) {
 		]
 	}
 	if (industries) {
-		query["pendingCompetencies.industry"] = ObjectId(industries)
+		query.industries = ObjectId(industries)
 	}
 	if (nameFilter) {
 		query["firstName"] = { "$regex": new RegExp(`${ nameFilter }`, 'i') }

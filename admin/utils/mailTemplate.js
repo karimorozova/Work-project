@@ -45,11 +45,11 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 			to: `${ obj.to }`, // pm@pangea.global list of receivers
 			subject: `${ obj.subject }`, // Subject line
 			text: "", // plain text body
-			html: msg // html body
+			html: "<b>" + msg + "</b>" // html body
 		}
 		mailOptions.attachments = obj.attachments || []
 		if (!withoutImage) {
-			if (!mailOptions.attachments.map(item => item.filename).includes('logo.png')) {
+			if(!mailOptions.attachments.map(item => item.filename).includes('logo.png')){
 				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
 			}
 		}
@@ -60,7 +60,7 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 				rej(error)
 			}
 			if (info) {
-				console.log('sendEmail() ', 'id' + info.messageId, 'Message sent to:' + obj.to)
+				// console.log('sendEmail', 'Message sent: %s', info.messageId)
 				res(info.messageId)
 				mailOptions = {}
 			} else {
@@ -82,7 +82,7 @@ const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 		}
 		mailOptions.attachments = mailSettings.attachments || []
 		if (!withoutImage) {
-			if (!mailOptions.attachments.map(item => item.filename).includes('logo.png')) {
+			if(!mailOptions.attachments.map(item => item.filename).includes('logo.png')){
 				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
 			}
 		}
@@ -115,7 +115,7 @@ const sendEmailCandidates = function (obj, msg, withoutImage = false) {
 		}
 		mailOptions.attachments = obj.attachments || []
 		if (!withoutImage) {
-			if (!mailOptions.attachments.map(item => item.filename).includes('logo.png')) {
+			if(!mailOptions.attachments.map(item => item.filename).includes('logo.png')){
 				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
 			}
 		}

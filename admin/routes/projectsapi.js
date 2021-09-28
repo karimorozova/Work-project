@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { Projects } = require('../models')
-const { getProject, updateProjectStatus, updateWithApprovedTasks, notifyStepDecisionMade } = require('../projects')
+const { getProject, updateProjectStatus, updateWithApprovedTasks } = require('../projects')
 const { emitter } = require('../events')
 const { getProjectManageToken } = require("../middleware")
 const { notifyManagerProjectStarts, sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
@@ -173,8 +173,7 @@ router.get('/step-decision', getProjectManageToken, async (req, res) => {
 			if (steps[index].vendorsClickedOffer.indexOf(vendorId) !== -1) {
 				return res.send(generateTemplateForDefaultMessage('Sorry. You\'ve already made your decision.'))
 			}
-			await emitter.emit('stepAcceptAction', { project, index, vendorId, decision })
-			await notifyStepDecisionMade({project, step: steps[index], decision});
+			emitter.emit('stepAcceptAction', { project, index, vendorId, decision })
 			res.send(generateTemplateForAlertTasksAcceptOrRejectVendor(currentProject, stepId, decision))
 		}
 	} catch (err) {

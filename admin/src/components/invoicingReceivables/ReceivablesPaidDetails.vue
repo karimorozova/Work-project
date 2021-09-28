@@ -1,9 +1,9 @@
 <template lang="pug">
   .invoicing-details
-    .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('client')")
+    .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
       .invoicing-details__details
         .title
-          .title__text {{reportDetailsInfo.client.officialCompanyName}}
+          .title__text {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
 
         .invoicing-details__body
           .invoicing-details__text
@@ -90,7 +90,7 @@
       .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
         ReceivablesPaymentInformationCard(
           :cardInfo="cardInfo"
-          :paymentDetails="{paymentDetails: {expectedPaymentDate: 0}}"
+          :paymentDetails="reportDetailsInfo.paymentDetails"
         )
 
 </template>
@@ -234,8 +234,7 @@
 				this.isDeletingStep = false
 			},
 			async openDetails(id) {
-				this.reportDetailsInfo = (await this.$http.post('/invoicing-receivables/paid-report/' + id)).data[0]
-        console.log((await this.$http.post('/invoicing-receivables/paid-report/' + id)).data[0])
+				this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/paid-report/' + id)).data[0]
 			},
 			async getSteps() {
 				this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
@@ -245,7 +244,6 @@
 		computed: {
 			//Todo: show status "Invoice Received" and "Partially Paid"1
 			getPaymentRemainder() {
-			  return 10
 				const { paymentInformation = [] } = this.reportDetailsInfo
 				return paymentInformation.reduce((sum, item) => {
 					sum += item.paidAmount

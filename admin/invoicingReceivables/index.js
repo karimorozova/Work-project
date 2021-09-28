@@ -14,45 +14,7 @@ const {
 	deleteStepFromReport
 } = require('./deleteReceivables')
 
-const {
-	createZohoInvoice,
-	createAndSendZohoInvoice,
-	updateReportsStateFromZoho,
-	updateReportStateFromZoho,
-	setInvoiceStatus
-} = require('./zoho')
-
-const {
-	updateInvoiceReceivablesStatus
-} = require('./updateReceivables')
-
-const {
-	getAllPaidReceivables,
-	getPaidReceivables,
-} = require('./getPaidReceivables')
-
-const {
-	returnMessageAndType
-} = require('./helper')
-
-const {
-	sendInvoiceToClientContacts
-} = require('./notification')
-
-const {
-	sendInvoice
-} = require('./endpoint')
-
-
 module.exports = {
-	updateReportStateFromZoho,
-	setInvoiceStatus,
-	updateReportsStateFromZoho,
-	sendInvoiceToClientContacts,
-	sendInvoice,
-	createAndSendZohoInvoice,
-	returnMessageAndType,
-	updateInvoiceReceivablesStatus,
 	deleteStepFromReport,
 	getReportById,
 	getAllReports,
@@ -60,7 +22,4 @@ module.exports = {
 	createReports,
 	getAllSteps,
 	receivableDelete,
-	createZohoInvoice,
-	getAllPaidReceivables,
-	getPaidReceivables,
 }

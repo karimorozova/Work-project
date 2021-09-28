@@ -125,7 +125,7 @@ async function stepVendorsRequestSending(project, checkedSteps) {
 	try {
 		let steps = [...project.steps];
 		const assignedStepsCheck = checkedSteps.map(item => item.stepId.toString());
-		for await (let step of steps) {
+		for (let step of steps) {
 			if(assignedStepsCheck.indexOf(step.stepId.toString()) !== -1 && step.status === 'Created' ) {
 				await sendRequestToVendor(project, step);
 				step.status = "Request Sent"

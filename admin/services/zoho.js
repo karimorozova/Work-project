@@ -49,29 +49,12 @@ async function getTokens(code) {
     })
 }
 
-// async function refreshToken() {
-//     return new Promise((resolve,reject) => {
-//         unirest.post(`${tokensUrl}/oauth/v2/token`)
-//         .header('Accept', 'application/json')
-//         .field('grant_type', 'refresh_token')
-//         .field('refresh_token', '1000.7963cfec29ec47370f975ee7e3033186.ba2acd9ed645dc106b3f10af0a69ceef')
-//         .field('client_id', zohoCreds.client_id)
-//         .field('client_secret', zohoCreds.client_secret)
-//         .end( (res) => {
-//             if(res.error) {
-//                 return reject(res.error)
-//             }
-//             resolve(res.body);
-//         })
-//     })
-// }
-
-async function refreshToken(refreshToken) {
+async function refreshToken() {
     return new Promise((resolve,reject) => {
         unirest.post(`${tokensUrl}/oauth/v2/token`)
         .header('Accept', 'application/json')
         .field('grant_type', 'refresh_token')
-        .field('refresh_token', refreshToken)
+        .field('refresh_token', '1000.7963cfec29ec47370f975ee7e3033186.ba2acd9ed645dc106b3f10af0a69ceef')
         .field('client_id', zohoCreds.client_id)
         .field('client_secret', zohoCreds.client_secret)
         .end( (res) => {
@@ -118,19 +101,17 @@ async function getLeads(user) {
 
 async function getActivities(user) {
     const currentToken = await getCurrentToken();
-    // const date = moment().hours(0);
-    // const isoDate = date.toISOString().split(".")[0];
+    const date = moment().hours(0);
+    const isoDate = date.toISOString().split(".")[0];
     return new Promise((resolve,reject) => {
-        unirest.get(`https://books.zoho.com/api/v3/invoices?organization_id=630935724`)
-        .header('Authorization', `Bearer ${currentToken}`)
-        // .header('If-Modified-Since', `${isoDate}+02:00`)
+        unirest.get(`${dataUrl}/Activities`)
+        .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
+        .header('If-Modified-Since', `${isoDate}+02:00`)
         .end( (res) => {
             if(res.error) {
-
                 return reject(res.error)
             }
-            let result = res.body
-            console.log(result)
+            let result = res.body ? res.body.data.filter(item => item.Owner.name === user): "";
             resolve(result);
         })
     })

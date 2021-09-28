@@ -234,7 +234,8 @@
       z-index: 10;
 
       &__item {
-        padding: 7px;
+        padding: 0 7px;
+        height: 31px;
         border-bottom: 1px solid $light-border;
         cursor: pointer;
         font-size: 14px;

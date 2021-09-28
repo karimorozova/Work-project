@@ -76,7 +76,6 @@ export default {
       return tasksDeliverables.map(item => {
       	const allDR2 = [...singleLang, ...multiLang ]
 	        const currentDelivery = allDR2.find(({_id}) => `${_id}` === `${item.deliverablesId}`)
-          if(!currentDelivery) return false
           const languagePair = currentDelivery.hasOwnProperty('sourceLanguage') ?
               `${this.allLanguages.find(({_id}) => `${_id}` === `${currentDelivery.sourceLanguage}`).symbol} >> ${this.allLanguages.find(({_id}) => `${_id}` === `${currentDelivery.targetLanguage}`).symbol}` :
               'Multilingual'
@@ -89,7 +88,7 @@ export default {
 		        languagePair,
 		        filesLength
           }
-      }).filter(Boolean)
+      })
 		}
 	},
 	components: {

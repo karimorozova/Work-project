@@ -19,10 +19,10 @@ function getTasksWithFinanceUpdated (step, project) {
  */
 function getTasksFinancePrice (steps) {
   const receivables = +(steps.reduce((prev, cur) => {
-    return prev + (cur.status !== 'Cancelled Halfway' ? cur.finance.Price.receivables : cur.finance.Price.halfReceivables);
+    return prev + cur.finance.Price.receivables;
   }, 0).toFixed(2));
   const payables = +(steps.reduce((prev, cur) => {
-    return prev + (cur.status !== 'Cancelled Halfway' ? cur.finance.Price.payables : cur.finance.Price.halfPayables);
+    return prev + cur.finance.Price.payables;
   }, 0).toFixed(2));
   return { receivables, payables };
 }

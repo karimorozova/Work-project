@@ -43,6 +43,7 @@ emitter.on('stepAcceptAction', async (obj) => {
         //     await updateMemoqProjectUsers(steps);
         // }
         await Projects.updateOne({"_id": project.id}, { steps });
+        await notifyStepDecisionMade({project, step: steps[index], decision});
     } catch(err) {
         console.log("Error from emitter stepAcceptAction");
         console.log(err);

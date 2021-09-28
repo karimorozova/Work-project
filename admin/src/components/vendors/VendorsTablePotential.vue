@@ -42,7 +42,7 @@
         //    @chosenLang="setNative"
         //    @scrollDrop="scrollDrop"
         //  )
-        .vendors-table__no-drop.vendors-table__native {{ (row.native && row.native.lang) || '-' }}
+        .vendors-table__no-drop.vendors-table__native {{ row.native.lang }}
       template(slot="industry" slot-scope="{ row, index }")
         //.vendors-table__drop-menu(v-if="currentEditingIndex === index")
         //  MultiVendorIndustrySelect(

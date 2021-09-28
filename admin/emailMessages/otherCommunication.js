@@ -180,7 +180,7 @@ function generateTemplateForRejectQuote(obj, link) {
 
 function generateTemplateForAlertAcceptQuote(obj) {
 	const { total, languagesPairs, servicesList } = returnAdditionalInformationFUllQuote(obj)
-	const linkPortal = `<div style="margin-top: 15px; font-weight: bold"><a href="https://testportal.pangea.global/dashboard/details/${ obj._id }" style="color: #4BA5A5;">Enter the project page for more information</a></div>`
+	const linkPortal = `<div style="margin-top: 15px; font-weight: bold"><a href="https://portal.pangea.global/dashboard/details/${ obj._id }" style="color: #4BA5A5;">Enter the project page for more information</a></div>`
 	return `
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <div class="card" style="color: #66563E; font-family:'Roboto'; width: 600px;margin: 0 auto;margin-top: 50px;margin-bottom: 50px;-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1);font-size: 16px;">
@@ -404,7 +404,7 @@ function generateTemplateForTasksAcceptOrRejectQuote(obj, tasks, prop, link) {
 function generateTemplateForAlertForTasksAcceptOrRejectQuote(obj, tasks, prop) {
 	const { total, languagesPairs, servicesList } = returnAdditionalInformationTasksQuote(obj, tasks)
 	const linkToPortal = prop === 'Approved' ?
-			`<div style="margin-top: 15px; font-weight: bold"><a href="https://testportal.pangea.global/dashboard/details/${ obj._id }" style="color: #4BA5A5;">Enter the project page for more information</a></div>` :
+			`<div style="margin-top: 15px; font-weight: bold"><a href="https://portal.pangea.global/dashboard/details/${ obj._id }" style="color: #4BA5A5;">Enter the project page for more information</a></div>` :
 			`<span></span>`
 	const alert = prop === 'Approved' ?
 			`<p style="display: flex; align-items: center;">
@@ -565,7 +565,7 @@ function generateTemplateForAlertTasksAcceptOrRejectVendor(obj, step, prop) {
 					<span style="font-size: 20px; margin-left: 10px; font-weight: bold;">The quote has been rejected</span>
 				</p>`
 	const linkToPortal = prop === 'accept' ?
-			`<div style="margin-top: 15px; font-weight: bold"><a href="https://testvendor.pangea.global/dashboard/project-details/${ obj._id }/${ currentStep._id }" style="color: #4BA5A5;">Enter the step page for more information</a></div>` :
+			`<div style="margin-top: 15px; font-weight: bold"><a href="https://vendor.pangea.global/dashboard/project-details/${ obj._id }/${ currentStep._id }" style="color: #4BA5A5;">Enter the step page for more information</a></div>` :
 			`<span></span>`
 	return `
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">

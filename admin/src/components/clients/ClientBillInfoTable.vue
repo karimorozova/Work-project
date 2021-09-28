@@ -19,6 +19,7 @@
           @notApprove="closeDeleteModal"
         )
 
+
     GeneralTable(
       :fields="fields",
       :tableData="client.billingInfo",
@@ -27,9 +28,6 @@
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header {{ field.label }}
-
-      template(slot="name" slot-scope="{ row, index }")
-        .table__data {{ row.name }}
 
       template(slot="officialName" slot-scope="{ row, index }")
         .table__data {{ row.officialName }}
@@ -46,11 +44,12 @@
           .images
             .image(v-for="(item, index) in row.contacts")
               .tooltip
-                .tooltiptext(:style="{ 'right': `${40 + 10 * index + 'px'}` }") {{ item.firstName + ' ' + item.surname }}
-                img.image__first(style="z-index: 20" v-if="item.photo && index === 0" :src="item.photo")
-                img.image__first(style="z-index: 20" v-if="!item.photo && index === 0" :src="require(`../../assets/images/avatars/avatar-${index % 3}.png`)")
-                img.image__next(:style="{'z-index': `${20 - index}`, 'margin-left': `-9px` }" v-if="item.photo && index" :src="item.photo")
-                img.image__next(:style="{'z-index': `${20 - index}`, 'margin-left': `-9px`  }" v-if="!item.photo && index" :src="require(`../../assets/images/avatars/avatar-${index % 3}.png`)")
+                span#myTooltip.tooltiptext(:style="{ 'right': `${30 + 10 * index + 'px'}` }") {{ item.firstName + ' ' + item.surname }}
+                .table__icons-info
+                  img.image__first(style="z-index: 100" v-if="item.photo && index === 0" :src="item.photo")
+                  img.image__first(style="z-index: 100" v-if="!item.photo && index === 0" :src="require(`../../assets/images/avatars/avatar-${index % 3}.png`)")
+                  img.image__next(:style="{'z-index': `${20 - index}`, 'left': `${-10 * index + 'px'}` }" v-if="item.photo && index" :src="item.photo")
+                  img.image__next(:style="{'z-index': `${20 - index}`, 'left': `${-10 * index + 'px'}`  }" v-if="!item.photo && index" :src="require(`../../assets/images/avatars/avatar-${index % 3}.png`)")
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
@@ -85,40 +84,34 @@
 				},
 				fields: [
 					{
-						label: "Name",
-						headerKey: "headerBillingName",
-						key: "name",
-						style: { width: "18%" }
-					},
-					{
 						label: "Official Name",
 						headerKey: "headerOfficalName",
 						key: "officialName",
-						style: { width: "18%" }
+						style: { width: "24%" }
 					},
 					{
 						label: "Payment Type",
 						headerKey: "headerPaymentType",
 						key: "paymentType",
-						style: { width: "18%" }
+						style: { width: "24%" }
 					},
 					{
 						label: "Country",
 						headerKey: "headerCountry",
 						key: "country",
-						style: { width: "18%" }
+						style: { width: "24%" }
 					},
 					{
 						label: "Billing Contacts",
 						headerKey: "headerContacts",
 						key: "contacts",
-						style: { width: "18%" }
+						style: { width: "17%" }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						style: { width: "10%" }
+						style: { width: "11%" }
 					}
 				]
 			}
@@ -179,17 +172,15 @@
   }
 
   .image {
+    height: 24px;
+    width: 24px;
+
     &__first,
     &__next {
       height: 24px;
       width: 24px;
       border-radius: 24px;
       object-fit: cover;
-      transition: transform .2s;
-
-      &:hover {
-        transform: scale(1.2);
-      }
     }
   }
 
@@ -220,7 +211,6 @@
       cursor: pointer;
     }
   }
-
   .tooltip {
     position: relative;
     display: flex;
@@ -259,7 +249,6 @@
         visibility: visible;
         opacity: 1;
       }
-
       .image__next {
         z-index: 101 !important;
       }

@@ -28,7 +28,7 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 	if(step){
 		q["steps.serviceStep.title"] = step
 	}
-	if(!to) to = moment().add( 2, 'years').format('YYYY-MM-DD');
+	if(!to) to = moment().add( 1, 'days').format('YYYY-MM-DD');
 	if(!from) from = '1970-01-01'
 
 	q["billingDate"] = { $gte: new Date(`${ from }T00:00:00.000Z`), $lt: new Date(`${ to }T24:00:00.000Z`) }
