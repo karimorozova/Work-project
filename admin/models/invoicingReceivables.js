@@ -77,11 +77,9 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		// },
 		paymentDate: {
 			type: Date,
-			default: ''
 		},
 		notes: {
 			type: String,
-			default: ""
 		}
 	}],
 	externalIntegration: {

@@ -1,7 +1,7 @@
 export default {
     data() {
         return {
-            domain: "https://admin.pangea.global"
+            domain: "https://testadmin.pangea.global"
         }
     },
     mounted() {
