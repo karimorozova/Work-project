@@ -235,43 +235,98 @@
 				complianceTemplates: [
 					{
 						title: '[1] POI (Proof of Identity Documents)',
-						description: '<li>Full name</li><li>DOB</li><li>Issue date</li><li>Expiry date if there is any</li>'
+						description:
+								'<li>Full name</li>' +
+								'<li>DOB</li>' +
+								'<li>Issue date</li>' +
+								'<li>Expiry date if there is any</li>'
 					},
 					{
 						title: '[2] POA (Proof of Address Documents)',
-						description: '<li>Full name</li><li>Address</li><li>Issue date</li><li>Who Issued</li>'
+						description:
+								'<li>Full name</li>' +
+								'<li>Address</li>' +
+								'<li>Issue date</li>' +
+								'<li>Who Issued</li>'
 					},
 					{
 						title: '[3] Tax declarations',
-						description: '<li>Name</li><li>Net annual declared income</li><li>Year of declaration</li><li>Issue date</li><li>Currency</li>'
+						description:
+								'<li>Name of taxpayer</li>' +
+								'<li>Net annual declared income</li>' +
+								'<li>Dividend’s amount (from which company)</li>' +
+								'<li>Salaries amount</li>' +
+								'<li>Other income amount (specify the source of income in rent, insurances, royalties, sale of property)</li>' +
+						    '<li>Net annual declared income</li>' +
+								'<li>Year of declaration</li>' +
+								'<li>Issue date</li>' +
+								"<li>Employer's details</li>" +
+								'<li>Currency</li>'
 					},
 					{
 						title: '[4] Salary certificates / letters of employment',
-						description: '<li>Name</li><li>Net salary</li><li>Employer</li><li>Issue date</li><li>Currency</li>'
+						description:
+								'<li>Name</li>' +
+								'<li>Net salary</li>' +
+								'<li>Employer</li>' +
+								'<li>Issue date</li>' +
+								'<li>Currency</li>'
 					},
 					{
 						title: '[5] Sales / purchase agreements',
-						description: '<li>Name of seller</li><li>Name of buyer if any</li><li>Amount of the sale</li><li>Date of agreement</li><li>Issuing authority</li><li>Currency</li>'
+						description:
+								'<li>Name of seller</li>' +
+								'<li>Name of buyer if any</li>' +
+								'<li>Amount of the sale</li>' +
+								'<li>Date of agreement</li>' +
+								'<li>Issuing authority</li>' +
+								'<li>Currency</li>'
 					},
 					{
 						title: '[6] Cancellation letters of bank accounts / CCs',
-						description: '<li>Account holder name</li><li>Account number</li><li>Issuing credit institution</li><li>CC digits</li><li>Issue date</li>'
+						description:
+								'<li>Account holder name</li>' +
+								'<li>Account number</li>' +
+								'<li>Issuing credit institution</li>' +
+								'<li>CC digits</li>' +
+								'<li>Issue date</li>'
 					},
 					{
 						title: '[7] Specific transactions on bank statements',
-						description: '<li>Brief description of specific transaction</li>'
+						description:
+								'<li>Brief description of specific transaction</li>'
 					},
 					{
 						title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
-						description: '<li>Type of doc</li><li>Names involved</li><li>Relation</li>'
+						description:
+								'<li>Type of doc</li>' +
+								'<li>Names involved</li>' +
+								'<li>Relation</li>'
 					},
 					{
-						title: '[9] Corporate: Company Info',
-						description: '<li>Registered name</li><li>Incorporation date</li><li>Directors and Authorised Signatories</li><li>Shareholders/ Beneficial Owners</li><li>Registered AND Business address (if available)</li><li>Share capital</li><li>Any information on Directors and Shareholders</li>'
+						title: '[9] Corporate Documents',
+						description:
+								'<li>Registered name</li>' +
+								'<li>Incorporation date</li>' +
+								'<li>Directors and Authorised Signatories</li>' +
+								'<li>Shareholders / Beneficial owners</li>' +
+								'<li>Registered and Business address (if available)</li>' +
+								'<li>Share capital</li>' +
+								'<li>Any information on Directors and Shareholders</li>'+
+								'<li>Form of the legal entity (limited company/partnership/sole proprietorship etc)</li>' +
+								'<li>Nature of business of the company</li>' +
+								'<li>Any other important points</li>'
 					},
 					{
-						title: '[10] Corporate: Financial statements',
-						description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
+						title: '[10] Financial statements',
+						description:
+								'<li>Company name and year of FSs</li>' +
+								'<li>Declared gross and net profit/loss for the year (amount and currency)</li>' +
+								'<li>Declared accumulated reserves (amount and currency)</li>' +
+								'<li>Any information regarding payments to and from shareholders and/or directors</li>' +
+								'<li>Any company obligations/loans to/from capital owners and management</li>' +
+								'<li>Taxes due from company</li>' +
+								'<li>References to distributions of dividends or profits to shareholders</li>'
 					},
 					{
 						title: 'N/A - no template',

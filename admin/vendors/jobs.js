@@ -4,7 +4,8 @@ const {
 	taskCompleteNotifyPM,
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
-	nextVendorCanStartWorkNotification
+	nextVendorCanStartWorkNotification,
+	notifyStepDecisionMade
 } = require('../projects')
 
 const { Projects, Delivery, Languages } = require('../models')
@@ -113,11 +114,13 @@ async function manageStatuses({ project, steps, jobId, status }) {
 
 		if(status === "Accepted") {
 			const updatedSteps =  await setAcceptedStepStatus({ project, steps, jobId })
+			await notifyStepDecisionMade({project, step, decision: 'accept'});
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
 		if (status === "Rejected") {
 			const updatedSteps = setRejectedStatus({ steps, jobId })
+			await notifyStepDecisionMade({project, step, decision: 'rejected'});
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 

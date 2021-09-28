@@ -5,7 +5,7 @@ const {
 	generateNewPricelistCombinations
 } = require('../clients')
 const { getRateInfoFromStepFinance, manageMonoPairRates, manageDuoPairRates } = require("../pricelist/ratesmanage")
-const { getVendor, getVendorAfterUpdate } = require("./index")
+const { getVendor, getVendorAfterUpdate } = require("./getVendors")
 const { createRateCombinations } = require('./createVendorRates')
 const { tableKeys } = require('../enums')
 const { getCompetenciesForCheck } = require('./helpers')

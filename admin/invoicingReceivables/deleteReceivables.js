@@ -1,9 +1,11 @@
 const { InvoicingReceivables, Projects } = require("../models")
 const { removeDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")
 const { getReportById } = require('../invoicingReceivables/getReceivables')
+const { deleteZohoInvoice } = require('../invoicingReceivables/zoho')
 const moment = require('moment')
 
 const receivableDelete = async (reportId) => {
+	const DIR = './dist/clientReportsFiles/'
 	const receivables = await InvoicingReceivables.findOne({ _id: reportId })
 	const steps = receivables ? receivables.stepsAndProjects.map(({ step }) => step) : []
 	await Projects.updateMany(
@@ -11,8 +13,13 @@ const receivableDelete = async (reportId) => {
 			{ 'steps.$[i].isInReportReceivables': false },
 			{ arrayFilters: [ { 'i._id': { $in: steps } } ] })
 
+	if ( receivables.externalIntegration._id.length) {
+		await deleteZohoInvoice(receivables.externalIntegration._id)
+	}
+
 	await InvoicingReceivables.deleteOne({ _id: reportId })
-	await removeDir(reportId)
+
+	await removeDir(DIR, reportId)
 }
 
 

@@ -236,6 +236,12 @@
 		},
 		methods: {
 			...mapActions([ 'alertToggle' ]),
+			downloadFile(path) {
+				let link = document.createElement('a')
+				link.href = __WEBPACK__API_URL__ + '/' + path
+				link.target = "_blank"
+				link.click()
+			},
 			getStepsPayables(stepFinance) {
 				return stepFinance.reduce((sum, step) => {
 					sum += step.nativeFinance.Price.payables || 0

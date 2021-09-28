@@ -12,7 +12,7 @@ const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 		q['reportId'] = { "$regex": new RegExp(f, 'i') }
 	}
 	if (clients) {
-		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
+		q["client"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
 	if (status) {
 		q["status"] = status
@@ -42,6 +42,11 @@ const getReportById = async (id) => {
 					{ '$replaceRoot': { newRoot: '$steps' } }
 				],
 				as: "stepsWithProject"
+			}
+		},
+		{
+			$addFields: {
+				total: { $sum: "$stepsWithProject.finance.Price.receivables" }
 			}
 		}
 	])
@@ -81,10 +86,18 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
+	console.log({ queryForStep })
 	const queryPipeline = [
 		{ $match: { status: "Closed" } },
 		{ $unwind: "$steps" },
-		{ $match: { $or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ], "steps.status": "Completed", ...queryForStep } },
+		{
+			$match: {
+				clientBillingInfo: { $exists: true, $ne: null },
+				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
+				"steps.status": "Completed",
+				...queryForStep
+			}
+		},
 		{
 			$lookup:
 					{
