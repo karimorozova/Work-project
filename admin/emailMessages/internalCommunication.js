@@ -203,7 +203,7 @@ function managersAndClientAcceptedMessage(obj) {
                     	This email is to confirm that quote <b>${ obj.projectId } - ${ obj.projectName }</b> has been accepted.
 										</p>
 										<p>
-                    	Pls click <a href="https://portal.pangea.global/dashboard/details/${ obj._id }" target="_blank">here</a> to enter the project in <b>αlfα by Pangea</b> portal
+                    	Pls click <a href="https://portal.pangea.global/dashboard/details/${ obj.nativeProjectId }" target="_blank">here</a> to enter the project in <b>αlfα by Pangea</b> portal
 										</p>
                 </div>
                 <footer>

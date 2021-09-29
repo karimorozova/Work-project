@@ -13,14 +13,14 @@ async function notifyManagerProjectRejected(project) {
 
 		for await (let contact of contacts) {
 			const message = managersAndClientRejectedMessage({ ...project._doc, ...contact })
-			await managerNotifyMail(projectManager, message, `Quote ${ project.projectId } - ${ project.projectName } has been rejected (C003.1)`)
+			await managerNotifyMail(projectManager, message, `Quote rejected: ${ project.projectId } - ${ project.projectName } (C003.1)`)
 		}
 
 		const messagePM = managersAndClientRejectedMessage({ ...project._doc, ...projectManager })
-		await managerNotifyMail(projectManager, messagePM, `Quote ${ project.projectId } - ${ project.projectName } has been rejected (C003.1)`)
+		await managerNotifyMail(projectManager, messagePM, `Quote rejected: ${ project.projectId } - ${ project.projectName } (C003.1)`)
 
 		const messageAM = managersAndClientRejectedMessage({ ...project._doc, ...accountManager })
-		await managerNotifyMail(accountManager, messageAM, `Quote ${ project.projectId } - ${ project.projectName } has been rejected (C003.1)`)
+		await managerNotifyMail(accountManager, messageAM, `Quote rejected: ${ project.projectId } - ${ project.projectName } (C003.1)`)
 
 	} catch (err) {
 		console.log(err)
@@ -35,20 +35,20 @@ async function notifyManagerProjectStarts(project) {
 		const accountManager = await User.findOne({ "_id": project.accountManager._id }).lean()
 		const contacts = project.clientContacts
 
-		const messageToAM = managersAndClientAcceptedMessage({ ...project._doc, ...accountManager })
-		await managerNotifyMail(accountManager, messageToAM, `Quote ${ project.projectId } - ${ project.projectName } has been accepted (C002.1)`)
+		const messageToAM = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...accountManager })
+		await managerNotifyMail(accountManager, messageToAM, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 
 		for await (let contact of contacts) {
-			const message = managersAndClientAcceptedMessage({ ...project._doc, ...contact })
-			await managerNotifyMail(contact, message, `Quote ${ project.projectId } - ${ project.projectName } has been accepted (C002.1)`)
+			const message = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...contact })
+			await managerNotifyMail(contact, message, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 		}
 
 		if (notAssignedStep) {
 			const pmMessage = managerAssignmentNotifyingMessage({ ...project._doc, ...projectManager })
-			await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName }, missing Vendors (I001.0)`)
+			await managerNotifyMail(projectManager, pmMessage, `Quote accepted: ${ project.projectId } - ${ project.projectName }, missing Vendors (I001.0)`)
 		} else {
-			const messageToPM = managersAndClientAcceptedMessage({ ...project._doc, ...projectManager })
-			await managerNotifyMail(projectManager, messageToPM, `Quote ${ project.projectId } - ${ project.projectName } has been accepted (C002.1)`)
+			const messageToPM = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...projectManager })
+			await managerNotifyMail(projectManager, messageToPM, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 		}
 
 	} catch (err) {

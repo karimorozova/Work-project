@@ -118,7 +118,7 @@ const sendCostQuoteMessage = async (project, message, arrayOfEmails) => {
 
 const sendQuoteMessage = async (project, message, arrayOfEmails, tasksIds = []) => {
 	const { allUnits, allSettingsSteps } = await allUnitsAndSteps()
-	let subject = project.isUrgent ? 'URGENT! Decide on a Quote' : 'Decide on a Quote'
+	let subject = project.isUrgent ? 'URGENT! Decide on a Quote:' : 'Decide on a Quote:'
 	let messageId = 'C001.0'
 	if (project.isPriceUpdated) {
 		messageId = 'C001.1'

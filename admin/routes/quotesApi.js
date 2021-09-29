@@ -28,7 +28,7 @@ router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 
 	const { status, steps, tasks: allTasks } = project
 	const neededSteps = steps.filter(item => tasksIds.includes(item.taskId))
-	const neededTasks = tasks.filter(item => tasksIds.includes(item.taskId))
+	const neededTasks = allTasks.filter(item => tasksIds.includes(item.taskId))
 
 	if (!neededTasks.length || !neededTasks.every(item => item.status === 'Quote sent')) {
 		res.send({ code: 8 })
