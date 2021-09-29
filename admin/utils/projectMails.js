@@ -1,156 +1,147 @@
-const { User, Projects, Services, Units } = require('../models');
-const { managerNotifyMail, sendEmail, clientQuoteEmail, clientQuoteToEmails, sendEmailFromUser } = require('./mailTemplate');
-const { managerAssignmentNotifyingMessage, managerProjectAcceptedMessage, managerProjectRejectedMessage } = require('../emailMessages/internalCommunication');
-const { emailMessageForContact } = require("../emailMessages/clientCommunication");
-const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication");
+const { User, Projects, Services, Units } = require('../models')
+const { managerNotifyMail, sendEmail, clientQuoteEmail, clientQuoteToEmails, sendEmailFromUser } = require('./mailTemplate')
+const { managerAssignmentNotifyingMessage, managersAndClientAcceptedMessage, managersAndClientRejectedMessage } = require('../emailMessages/internalCommunication')
+const { requestMessageForVendor, vendorReassignmentMessage, vendorMiddleReassignmentMessage, vendorMiddleAssignmentMessage } = require("../emailMessages/vendorCommunication")
 const { generatePOFile } = require('../projects/files')
 const fs = require('fs')
 
 async function notifyManagerProjectRejected(project) {
 	try {
-		const accManager = await User.findOne({ "_id": project.accountManager.id });
-		const projectManager = await User.findOne({ "_id": project.projectManager._id });
-		const messagePM = managerProjectRejectedMessage({ ...project._doc, manager: projectManager.firstName });
-		const messageAM = managerProjectRejectedMessage({ ...project._doc, manager: accManager.firstName });
-		await managerNotifyMail(accManager, messageAM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (C003.0)`);
-		await managerNotifyMail(projectManager, messagePM, `Quote Rejected ${ project.projectId } - ${ project.projectName } (C003.0)`);
+		const accountManager = await User.findOne({ "_id": project.accountManager.id }).lean()
+		const projectManager = await User.findOne({ "_id": project.projectManager._id }).lean()
+		const contacts = project.clientContacts
+
+		for await (let contact of contacts) {
+			const message = managersAndClientRejectedMessage({ ...project._doc, ...contact })
+			await managerNotifyMail(projectManager, message, `Quote ${ project.projectId } - ${ project.projectName } has been rejected (C003.1)`)
+		}
+
+		const messagePM = managersAndClientRejectedMessage({ ...project._doc, ...projectManager })
+		await managerNotifyMail(projectManager, messagePM, `Quote ${ project.projectId } - ${ project.projectName } has been rejected (C003.1)`)
+
+		const messageAM = managersAndClientRejectedMessage({ ...project._doc, ...accountManager })
+		await managerNotifyMail(accountManager, messageAM, `Quote ${ project.projectId } - ${ project.projectName } has been rejected (C003.1)`)
+
 	} catch (err) {
-		console.log(err);
-		console.log("Error in notifyManagerProjectRejected");
+		console.log(err)
+		console.log("Error in notifyManagerProjectRejected")
 	}
 }
 
 async function notifyManagerProjectStarts(project) {
 	try {
-		const projectManager = await User.findOne({ "_id": project.projectManager._id });
-		const accountManager = await User.findOne({ "_id": project.accountManager._id });
+		const notAssignedStep = project.steps.find(item => !item.vendor)
+		const projectManager = await User.findOne({ "_id": project.projectManager._id }).lean()
+		const accountManager = await User.findOne({ "_id": project.accountManager._id }).lean()
+		const contacts = project.clientContacts
 
-		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project);
+		const messageToAM = managersAndClientAcceptedMessage({ ...project._doc, ...accountManager })
+		await managerNotifyMail(accountManager, messageToAM, `Quote ${ project.projectId } - ${ project.projectName } has been accepted (C002.1)`)
 
-		await Projects.updateOne({ "_id": project._id }, { steps });
-		const notAssignedStep = steps.find(item => !item.vendor);
-		if(notAssignedStep) {
-			await managerEmailsSend({ project, projectManager, accountManager });
-		} else {
-			await notifyMangerProjectAppoved({ project, projectManager, accountManager })
+		for await (let contact of contacts) {
+			const message = managersAndClientAcceptedMessage({ ...project._doc, ...contact })
+			await managerNotifyMail(contact, message, `Quote ${ project.projectId } - ${ project.projectName } has been accepted (C002.1)`)
 		}
-	} catch (err) {
-		console.log(err);
-		console.log("Error in notifyManagerProjectStarts");
-	}
-}
 
-async function notifyMangerProjectAppoved({ project, projectManager, accountManager }) {
-	try {
-		const messageAM = managerProjectAcceptedMessage({ ...project._doc, accManager: accountManager.firstName });
-		const messagePM = managerProjectAcceptedMessage({ ...project._doc, accManager: projectManager.firstName });
-		await managerNotifyMail(accountManager, messageAM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (C002.0)`);
-		await managerNotifyMail(projectManager, messagePM, `Quote Accepted ${ project.projectId } - ${ project.projectName } (C002.0)`);
+		if (notAssignedStep) {
+			const pmMessage = managerAssignmentNotifyingMessage({ ...project._doc, ...projectManager })
+			await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName }, missing Vendors (I001.0)`)
+		} else {
+			const messageToPM = managersAndClientAcceptedMessage({ ...project._doc, ...projectManager })
+			await managerNotifyMail(projectManager, messageToPM, `Quote ${ project.projectId } - ${ project.projectName } has been accepted (C002.1)`)
+		}
+
 	} catch (err) {
-		console.log(err);
-		console.log("Error in notifyMangerProjectAppoved");
+		console.log(err)
+		console.log("Error in notifyManagerProjectStarts")
 	}
 }
 
 async function sendQuoteToVendorsAfterProjectAccepted(projectSteps, project) {
-	let steps = [];
+	let steps = []
 	try {
 		for (let step of projectSteps) {
-			if(!!step.vendor && step.status === 'Created') {
+			if (!!step.vendor && step.status === 'Created') {
 				step.status = "Request Sent"
-				await sendRequestToVendor(project, step);
-				const index = step.vendorsClickedOffer.indexOf(step.vendor._id);
-				if(index !== -1) step.vendorsClickedOffer.splice(index, 1);
+				await sendRequestToVendor(project, step)
+				const index = step.vendorsClickedOffer.indexOf(step.vendor._id)
+				if (index !== -1) step.vendorsClickedOffer.splice(index, 1)
 			}
-			steps.push(step);
+			steps.push(step)
 		}
-		return steps;
+		return steps
 	} catch (err) {
-		console.log(err);
-		console.log("Error in sendQuoteToVendorsAfterProjectAccepted");
-	}
-}
-
-async function managerEmailsSend({ project, projectManager, accountManager }) {
-	try {
-		const pmMessageObj = { ...project._doc, user: { ...projectManager._doc, id: projectManager.id } };
-		const smMessageObj = { ...project._doc, user: { ...accountManager._doc, id: accountManager.id } };
-		const pmMessage = managerAssignmentNotifyingMessage(pmMessageObj);
-		const smMessage = managerAssignmentNotifyingMessage(smMessageObj);
-		await managerNotifyMail(projectManager, pmMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (I001.0)`);
-		await managerNotifyMail(accountManager, smMessage, `Quote Accepted: ${ project.projectId } - ${ project.projectName } (I001.0)`);
-	} catch (err) {
-		console.log(err);
-		console.log("Error in managerEmailsSend");
+		console.log(err)
+		console.log("Error in sendQuoteToVendorsAfterProjectAccepted")
 	}
 }
 
 async function stepReassignedNotification(step, reason) {
 	try {
 		const { vendor, status, stepId } = step
-		if(status === 'Created') return
+		if (status === 'Created') return
 
-		const message = vendorReassignmentMessage(step, reason);
-		await sendEmail({ to: vendor.email, subject: `Step ${ stepId } has been reassigned (ID V001.1)` }, message);
+		const message = vendorReassignmentMessage(step, reason)
+		await sendEmail({ to: vendor.email, subject: `Step ${ stepId } has been reassigned (ID V001.1)` }, message)
 	} catch (err) {
-		console.log(err);
+		console.log(err)
 		console.log("Error in stepReassignedNotification")
 	}
 }
 
 async function stepMiddleReassignedNotification(step, reason, isPay) {
 	try {
-		const allUnits = await Units.find();
-		const message = vendorMiddleReassignmentMessage(allUnits, step, reason, isPay);
-		const subject = `Step ${ step.stepId } has been reassigned to another vendor (ID V002.0)`;
-		await sendEmail({ to: step.vendor.email, subject }, message);
+		const allUnits = await Units.find()
+		const message = vendorMiddleReassignmentMessage(allUnits, step, reason, isPay)
+		const subject = `Step ${ step.stepId } has been reassigned to another vendor (ID V002.0)`
+		await sendEmail({ to: step.vendor.email, subject }, message)
 	} catch (err) {
-		console.log(err);
-		console.log("Error in stepMiddleReassignedNotification");
+		console.log(err)
+		console.log("Error in stepMiddleReassignedNotification")
 	}
 }
 
 async function stepMiddleAssignNotification(step, isStart) {
 	try {
-		const message = vendorMiddleAssignmentMessage({ step, isStart });
-		const subject = `Step ${ step.stepId } has been reassigned to you (ID V002.1)`;
-		await sendEmail({ to: step.vendor.email, subject }, message);
+		const message = vendorMiddleAssignmentMessage({ step, isStart })
+		const subject = `Step ${ step.stepId } has been reassigned to you (ID V002.1)`
+		await sendEmail({ to: step.vendor.email, subject }, message)
 	} catch (err) {
-		console.log(err);
-		console.log("Error in stepMiddleAssignNotification");
+		console.log(err)
+		console.log("Error in stepMiddleAssignNotification")
 	}
 }
 
 async function stepVendorsRequestSending(project, checkedSteps) {
 	try {
-		let steps = [...project.steps];
-		const assignedStepsCheck = checkedSteps.map(item => item.stepId.toString());
+		let steps = [ ...project.steps ]
+		const assignedStepsCheck = checkedSteps.map(item => item.stepId.toString())
 		for await (let step of steps) {
-			if(assignedStepsCheck.indexOf(step.stepId.toString()) !== -1 && step.status === 'Created' ) {
-				await sendRequestToVendor(project, step);
+			if (assignedStepsCheck.indexOf(step.stepId.toString()) !== -1 && step.status === 'Created') {
+				await sendRequestToVendor(project, step)
 				step.status = "Request Sent"
 			}
 		}
-		return steps;
+		return steps
 	} catch (err) {
-		console.log(err);
+		console.log(err)
 		console.log("Error in stepVendorsRequestSending")
 	}
 }
 
 async function stepEmailToVendor(project, step) {
 	try {
-		let steps = [...project.steps];
-		await sendRequestToVendor(project, step);
+		let steps = [ ...project.steps ]
+		await sendRequestToVendor(project, step)
 		return steps.map(item => {
-			if(step.taskId === item.taskId && step.name === item.name) {
-				item.status = "Request Sent";
-				return item;
+			if (step.taskId === item.taskId && step.name === item.name) {
+				item.status = "Request Sent"
+				return item
 			}
-			return item;
-		});
+			return item
+		})
 	} catch (err) {
-		console.log(err);
+		console.log(err)
 		console.log("Error in stepEmailToVendor")
 	}
 }
@@ -162,83 +153,72 @@ async function sendRequestToVendor(project, step) {
 		requestInfo.projectName = project.projectName
 		requestInfo.industry = project.industry.name
 		requestInfo.brief = project.brief
-		const message = requestMessageForVendor(requestInfo, project._id, )
+		const message = requestMessageForVendor(requestInfo, project._id)
 
 		const pdf = await generatePOFile(requestInfo, project)
 		const attachments = [ { content: fs.createReadStream(pdf), filename: 'PO.pdf' } ]
 
-		await sendEmailFromUser(project.projectManager,{ to: step.vendor.email, attachments, subject: `Availability approval for a Step ${ step.stepId } (${ step.serviceStep.title }) (ID V001.0)` }, message)
+		await sendEmailFromUser(project.projectManager, {
+			to: step.vendor.email,
+			attachments,
+			subject: `Availability approval for a Step ${ step.stepId } (${ step.serviceStep.title }) (ID V001.0)`
+		}, message)
 		fs.unlink(pdf, (err) => {
 			if (err) console.log(err)
 		})
 	} catch (err) {
-		console.log(err);
-		console.log('Error in sendRequestToVendor');
-	}
-}
-
-async function sendEmailToContact(project, contact) {
-	try {
-		let projectInfo = { ...project._doc };
-		projectInfo.firstName = contact.firstName;
-		projectInfo.surname = contact.surname;
-		const service = await Services.findOne({ "_id": project.tasks[0].service });
-		projectInfo.service = service.title;
-		const message = emailMessageForContact(projectInfo);
-		await clientQuoteEmail({ contact, subject: `Project information (ID C006, ${ project.projectId } - ${ project.projectName })` }, message);
-	} catch (err) {
-		console.log(err);
-		console.log('Error in sendEmailToContact');
+		console.log(err)
+		console.log('Error in sendRequestToVendor')
 	}
 }
 
 function getAccManagerAndContact(project) {
-	const accManager = project.accountManager;
-	const contact = project.customer.contacts.find(item => item.leadContact);
-	return { accManager, contact };
+	const accManager = project.accountManager
+	const contact = project.customer.contacts.find(item => item.leadContact)
+	return { accManager, contact }
 }
 
 async function notifyClientProjectCancelled(project, template) {
 	try {
-		const message = template;
-		const messageId = project.status === "Cancelled" ? "C005.0" : "C008.0";
-		const subject = project.status === "Cancelled" ? "Project cancelled" : "Project has been cancelled in the middle of the work";
+		const message = template
+		const messageId = project.status === "Cancelled" ? "C005.0" : "C008.0"
+		const subject = project.status === "Cancelled" ? "Project cancelled" : "Project has been cancelled in the middle of the work"
 
 		for (let contactEmail of project.clientContacts.map(item => item.email)) {
-			await clientQuoteToEmails(project.accountManager,{
+			await clientQuoteToEmails(project.accountManager, {
 				email: contactEmail,
 				subject: `${ subject } ${ project.projectId } - ${ project.projectName } (ID ${ messageId })`
-			}, dynamicClientName(message, contactEmail, project));
+			}, dynamicClientName(message, contactEmail, project))
 		}
 	} catch (err) {
-		console.log(err);
-		console.log('Error in notifyClientProjectCancelled');
+		console.log(err)
+		console.log('Error in notifyClientProjectCancelled')
 	}
 }
 
 function dynamicClientName(message, contactEmail, project) {
-	const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail);
-	if(currentContactIndex !== -1) {
-		const { firstName, surname } = project.clientContacts[currentContactIndex];
-		const clientName = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`;
+	const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail)
+	if (currentContactIndex !== -1) {
+		const { firstName, surname } = project.clientContacts[currentContactIndex]
+		const clientName = `<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`
 		return message.replace(`<div id="client-name-row">&nbsp;</div>`, clientName)
 	} else {
-		return message;
+		return message
 	}
 }
 
 async function notifyClientTasksCancelled(project, template) {
 	try {
 		// const { contact } = getAccManagerAndContact(project);
-		const message = template;
-		const subject = `Task(s) has been cancelled in the middle of the work (ID C008.1)`;
+		const message = template
+		const subject = `Task(s) has been cancelled in the middle of the work (ID C008.1)`
 
 		for (let contactEmail of project.clientContacts.map(item => item.email)) {
 			await sendEmail({ to: contactEmail, subject }, dynamicClientName(message, contactEmail, project))
 		}
 	} catch (err) {
-		console.log(err);
-		console.log('Error in notifyClientTasksCancelled');
+		console.log(err)
+		console.log('Error in notifyClientTasksCancelled')
 	}
 }
 
@@ -247,11 +227,10 @@ module.exports = {
 	notifyManagerProjectRejected,
 	stepVendorsRequestSending,
 	stepEmailToVendor,
-	sendEmailToContact,
 	stepReassignedNotification,
 	notifyClientProjectCancelled,
 	notifyClientTasksCancelled,
 	stepMiddleReassignedNotification,
 	stepMiddleAssignNotification,
 	sendQuoteToVendorsAfterProjectAccepted
-};
+}

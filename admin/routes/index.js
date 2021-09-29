@@ -30,7 +30,7 @@ router.use("/invoicing-receivables", requiresLogin, require("./invoicingReceivab
 
 //Open API ==========================================================================
 router.use("/open-pangea", require("./OpenPangea"))
-router.use("/projectsapi", require("./projectsapi"))
+router.use("/quotesApi", require("./quotesApi"))
 // TODO: refactoring routes in api route. (hide half of them)
 router.use("/api", require("./api"))
 // TODO: refactoring routes in admin route. (not protected)

@@ -44,7 +44,7 @@
 				isTableDropMenu: true,
 				currentTemplate: "",
 				editorData: this.message.includes('cid:logo@pan') ?
-						this.message.replace('cid:logo@pan', '../../../static/email-logo.png') :
+						this.message.replace('cid:logo@pan', '/static/email-logo2.png') :
 						this.message,
 				editorConfig: {
 					allowedContent: true,
@@ -59,8 +59,8 @@
 			},
 			send() {
 				this.$emit("send",
-						this.editorData.includes('static/email-logo.png') ?
-								this.editorData.replace('../../../static/email-logo.png', 'cid:logo@pan') :
+						this.editorData.includes('static/email-logo2.png') ?
+								this.editorData.replace('/static/email-logo2.png', 'cid:logo@pan') :
 								this.editorData
 				);
 			},

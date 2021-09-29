@@ -1,11 +1,11 @@
 <template lang="pug">
   .buttons
     .button(v-if="outline")
-      .action-buttonOutline(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
-        input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'color': color, 'border': `2px solid ${color}`}")
+      .action-buttonOutline(:class="[customClass, {fullWidthButton: isFullWidth}]")
+        input.action-buttonOutline__button(:class="[{disabled: isDisabled}]" type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'color': color, 'border': `2px solid ${color}`}")
     .button(v-else)
       .action-button(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
-        input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
+        input.action-button__button(:class="[{disabled: isDisabled}]" type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
 </template>
 
 <script>
@@ -45,6 +45,7 @@
   @import "../assets/scss/colors.scss";
 
   .action-buttonOutline {
+
     &__button {
       transition: .2s ease-out;
       text-align: center;
@@ -56,9 +57,9 @@
       background-color: white;
       outline: none;
       letter-spacing: 0.2px;
+      cursor: pointer;
 
       &:hover {
-        cursor: pointer;
         box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       }
 
@@ -76,6 +77,7 @@
   }
 
   .action-button {
+
     &__button {
       min-width: 110px;
       padding: 0 24px 0 24px;
@@ -88,9 +90,9 @@
       transition: .2s ease-out;
       outline: none;
       letter-spacing: 0.2px;
+      cursor: pointer;
 
       &:hover {
-        cursor: pointer;
         box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       }
 
@@ -107,36 +109,36 @@
     }
   }
 
-/*  .action-button {
-    &__button {
-      min-width: 110px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      border-radius: 2px;
-      color: $white;
-      transition: background .2s, transform .2s, box-shadow .2s;
-      will-change: transform;
-      font-size: 14px;
-      border: none;
-      outline: none;
-      letter-spacing: 0.2px;
-      cursor: pointer;
+  /*  .action-button {
+      &__button {
+        min-width: 110px;
+        padding: 0 24px 0 24px;
+        height: 32px;
+        border-radius: 2px;
+        color: $white;
+        transition: background .2s, transform .2s, box-shadow .2s;
+        will-change: transform;
+        font-size: 14px;
+        border: none;
+        outline: none;
+        letter-spacing: 0.2px;
+        cursor: pointer;
 
-      &:hover {
-        !*background: darken(#d15f45, 10%) !important;*!
-        transform: translate3d(0, -1px, 0);
-        box-shadow:rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-      }
+        &:hover {
+          !*background: darken(#d15f45, 10%) !important;*!
+          transform: translate3d(0, -1px, 0);
+          box-shadow:rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+        }
 
-      &:active {
-        box-shadow: none;
-        transform: translate3d(0, 0px, 0);
+        &:active {
+          box-shadow: none;
+          transform: translate3d(0, 0px, 0);
+        }
       }
-    }
-  }*/
+    }*/
 
   .disabled {
-    opacity: 0.3;
+    opacity: 0.5;
     cursor: default;
   }
 

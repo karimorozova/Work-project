@@ -153,7 +153,7 @@ async function manageDeliveryFile({fileData, file}) {
 
 async function getPdf(allUnits, allSettingsSteps, project, tasksIds = []) {
     try {
-        const html = await getPdfOfQuote(allUnits, allSettingsSteps, project, tasksIds);
+        const html = await getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps);
         var options = { width: '820', height: '900', orientation: "landscape", base: apiUrl };
         return new Promise((resolve, reject) => {
             htmlToPdf.create(html, options).toFile('./dist/uploads/htmlpdf.pdf', function(err, res) {

@@ -15,7 +15,6 @@ const {
 
 const {
 	messageForClientSendQuote,
-	emailMessageForContact,
 	getDeliveryMessage,
 	getNotifyDeliveryMessage,
 	messageForClientSendCostQuote,
@@ -77,29 +76,23 @@ const allUnitsAndSteps = async () => {
 
 async function getCostMessage(projectId) {
 	const { allUnits, allSettingsSteps } = await allUnitsAndSteps()
+	let project = await getProject({ "_id": projectId })
 	try {
-		let quote = await getQuoteInfo(projectId, [])
-		return messageForClientSendCostQuote(quote, allUnits, allSettingsSteps)
+		return await messageForClientSendCostQuote(project, allUnits, allSettingsSteps)
 	} catch (err) {
 		console.log(err)
-		console.log('Error in getMessage')
+		console.log('Error in getCostMessage')
 	}
 }
 
-async function getMessage(projectId, messageTarget, taskIds = []) {
+async function getQuoteMessage(projectId, tasksIds) {
 	const { allUnits, allSettingsSteps } = await allUnitsAndSteps()
+	let project = await getProject({ "_id": projectId })
 	try {
-		let quote = await getQuoteInfo(projectId, taskIds)
-		switch (messageTarget) {
-			case 'quote':
-			case 'task':
-				return messageForClientSendQuote(quote, allUnits, allSettingsSteps)
-			default:
-				return emailMessageForContact(quote)
-		}
+		return await messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps)
 	} catch (err) {
 		console.log(err)
-		console.log('Error in getMessage')
+		console.log('Error in getQuoteMessage')
 	}
 }
 
@@ -152,26 +145,26 @@ function dynamicClientName(message, contactEmail, project) {
 	const currentContactIndex = project.clientContacts.findIndex(item => item.email === contactEmail)
 	if (currentContactIndex !== -1) {
 		const { firstName, surname } = project.clientContacts[currentContactIndex]
-		const clientName = `<p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`
+		const clientName = `<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ firstName } ${ surname || "" }</span></p>`
 		return message.replace(`<div id="client-name-row">&nbsp;</div>`, clientName)
 	} else {
 		return message
 	}
 }
 
-async function getQuoteInfo(projectId, tasksIds) {
-	try {
-		const project = await getProject({ '_id': projectId })
-		const service = await getService({ '_id': project.tasks[0].service })
-		let quote = { ...project._doc, id: project.id }
-		quote.selectedTasks = tasksIds.length ? project.tasks.filter(task => tasksIds.includes(task.taskId)) : []
-		quote.service = service.title
-		return quote
-	} catch (err) {
-		console.log(err)
-		console.log("Error in getQuoteInfo")
-	}
-}
+// async function getQuoteInfo(projectId, tasksIds) {
+// 	try {
+// 		const project = await getProject({ '_id': projectId })
+// 		const service = await getService({ '_id': project.tasks[0].service })
+// 		let quote = { ...project._doc, id: project.id }
+// 		quote.selectedTasks = tasksIds.length ? project.tasks.filter(task => tasksIds.includes(task.taskId)) : []
+// 		quote.service = service.title
+// 		return quote
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error in getQuoteInfo")
+// 	}
+// }
 
 async function stepCompletedNotifyPM(project, step) {
 	const { projectManager, accManager } = await getAMPMbyProject(project)
@@ -453,17 +446,11 @@ async function sendClientDeliveries({ projectId, type, entityId, user, contacts,
 
 
 async function notifyManagerStepStarted(project, step) {
-	const { projectManager, accManager } = await getAMPMbyProject(project)
+	const { projectManager } = await getAMPMbyProject(project)
 	const subject = `Step started: ${ step.stepId } - ${ project.projectName } (I002.0)`
 	const messagePM = stepStartedMessage({ ...project._doc, step }, projectManager)
-
-	// TODO (refactoring later, temporary hide notification for AM)
-	// const messageAM = stepStartedMessage({ ...project._doc, step }, accManager)
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, messagePM)
-
-		// TODO (refactoring later, temporary hide notification for AM)
-		// await sendEmail({ to: project.accountManager.email, subject }, messageAM)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in notifyManagerStepStarted")
@@ -471,21 +458,15 @@ async function notifyManagerStepStarted(project, step) {
 }
 
 async function notifyStepDecisionMade({ project, step, decision }) {
-	const { projectManager, accManager } = await getAMPMbyProject(project)
+	const { projectManager } = await getAMPMbyProject(project)
 	const messageId = decision === 'accept' ? 'I006.0' : 'I007.0'
-	const subject = `Vendor: ${step.vendor.firstName} ${step.vendor.surname || ''} ${ decision === 'accept' ? 'approved' : 'rejected' } the job: ${ step.stepId } - ${ project.projectName } (ID ${ messageId })`
+	const subject = `Vendor: ${ step.vendor.firstName } ${ step.vendor.surname || '' } ${ decision === 'accept' ? 'approved' : 'rejected' } the job: ${ step.stepId } - ${ project.projectName } (ID ${ messageId })`
 	const messagePM = stepDecisionMessage({ project, step, decision }, projectManager)
-
-	// TODO (refactoring later, temporary hide notification for AM)
-	// const messageAM = stepDecisionMessage({ project, step, decision }, accManager)
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, messagePM)
-
-		// TODO (refactoring later, temporary hide notification for AM)
-		// await sendEmail({ to: project.accountManager.email, subject }, messageAM)
 	} catch (err) {
 		console.log(err)
-		console.log("Error in notifyManagerStepStarted")
+		console.log("Error in notifyStepDecisionMade")
 	}
 }
 
@@ -560,7 +541,6 @@ const nextVendorCanStartWorkNotification = async ({ task, steps, jobId }) => {
 module.exports = {
 	nextVendorCanStartWorkNotification,
 	stepCancelNotifyVendor,
-	getMessage,
 	taskCompleteNotifyPM,
 	notifyClientDeliverablesReady,
 	sendClientDeliveries,
@@ -568,7 +548,7 @@ module.exports = {
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,
-	// notifyReadyForDr2,
+	getQuoteMessage,
 	notifyStepReopened,
 	notifyVendorStepStart,
 	sendQuoteMessage,

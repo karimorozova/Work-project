@@ -62,7 +62,7 @@ const {
 } = require('../../projects')
 
 const {
-	getMessage,
+	getQuoteMessage,
 	getCostMessage
 } = require('../../projects/emails')
 
@@ -447,36 +447,10 @@ router.put('/project-date', async (req, res) => {
 	}
 })
 
-router.get('/projects/all/details', async (req, res) => {
-	const { projectId } = req.query
-	try {
-		const message = await getMessage(projectId, 'details')
-		res.send({ message })
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on getting project details')
-	}
-})
-
-router.post('/projects/all/details', async (req, res) => {
-	const { id, message } = req.body
-	try {
-		const project = await getProject({ '_id': id })
-		await clientQuoteEmail({
-			...project.customer._doc,
-			subject: `Project details (C006, ${ project.projectId } - ${ project.projectName })`
-		}, message)
-		res.send('Project details sent')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on sending project details')
-	}
-})
-
 router.get('/quote-message', async (req, res) => {
 	const { projectId } = req.query
 	try {
-		const message = await getMessage(projectId, 'quote')
+		const message = await getQuoteMessage(projectId, [])
 		res.send({ message })
 	} catch (err) {
 		console.log(err)
@@ -496,9 +470,9 @@ router.get('/quote-cost-message', async (req, res) => {
 })
 
 router.post('/task-quote-message', async (req, res) => {
-	const { projectId, tasks } = req.body
+	const { projectId, tasksIds } = req.body
 	try {
-		const message = await getMessage(projectId, 'task', tasks)
+		const message = await getQuoteMessage(projectId, tasksIds)
 		res.send({ message })
 	} catch (err) {
 		console.log(err)
@@ -552,18 +526,6 @@ router.post('/send-task-quote', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on sending the Quote')
-	}
-})
-
-router.post('/contact-mailing', async (req, res) => {
-	const { projectId, contact } = req.body
-	try {
-		const project = await getProject({ '_id': projectId })
-		await sendEmailToContact(project, contact)
-		res.send('Email has been sent')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on contact-mailing')
 	}
 })
 

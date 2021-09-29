@@ -39,6 +39,7 @@ import TableClientApiSetting from "../components/Table/TableClientApiSetting"
 import Navbar from "../components/Navbar"
 import clearRouterView from "../components/clearRouterView"
 import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
+import QuoteDecision from '../components/pmArea/QuoteDecision'
 
 
 // LIST ================================================================================================
@@ -95,6 +96,11 @@ const router = new Router({
 			path: '/forgot',
 			name: 'forgot',
 			component: PasswordRestore
+		},
+		{
+			path: '/quote-decision',
+			name: 'quote-decision',
+			component: QuoteDecision
 		},
 		{
 			path: '/',
@@ -688,9 +694,8 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
 	const date = Date.now()
 	const token = localStorage.getItem("token")
-
 	try {
-		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot') return next()
+		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot' || to.name === 'quote-decision') return next()
 		if (!!token) {
 			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
 			if (jwtObj) {

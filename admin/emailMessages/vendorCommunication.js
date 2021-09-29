@@ -26,11 +26,11 @@ function applicationMessage(obj, infoForMail) {
 		}, "")
 	}
 
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span style="color:#333;">Hello Recruitment Team,</span></p>
                     <p style="font-size: 14px; font-weight: 400;"><span id="client-name-row" style="color:#333;">A new applicant has submitted a form.</span></p>
                     <p style="font-size: 14px; font-weight: 400;"><span id="client-name-row" style="color:#333;">Here is the initial information:</span></p>
@@ -48,18 +48,18 @@ function applicationMessage(obj, infoForMail) {
                     <p style="font-weight: 400; color:#66563e;"><b style="margin-right: 6px;"> Software experience: </b> <span>${ obj.softwares }</span> </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function vendorRegistration(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                 		<p style="color: #333; background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.firstName },</span></p>
 										<p style="font-weight: 400;color:#333;">
                       Thank you for your interest in working with Pangea.
@@ -85,107 +85,91 @@ function vendorRegistration(obj) {
                     <p style="font-weight: 400;color:#333;">Pangea HR team</p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function requestMessageForVendor(obj) {
-
-	console.log(obj)
 	const date = Date.now()
-	const langPair = obj.sourceLanguage ? `${ obj.sourceLanguage } >> ${ obj.targetLanguage }; ` : `${ obj.targetLanguage } / ${ obj.packageSize }; `
 	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '24h' })
-	const stepId = obj.stepId.replace(/ /g, '%20')
-	const acceptQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=accept&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" >I accept - ${ obj.name }, ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
-	const declineQuote = '<a href=' + `${ apiUrl }/projectsapi/pangea-re-survey-page-step-decision?decision=decline&vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ stepId }&to=${ date }&t=${ token }` + ` target="_blank" >I reject - ${ obj.name }, ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	const langPair = obj.sourceLanguage === obj.targetLanguage ? obj.targetLanguage : obj.sourceLanguage + ' >> ' + obj.targetLanguage
+
+	const acceptHref = `${ apiUrl }/quote-decision?vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ obj._id }&from=${ date }&t=${ token }&type=vendor&prop=accept`
+	const declineHref = `${ apiUrl }/quote-decision?vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ obj._id }&from=${ date }&t=${ token }&type=vendor&prop=reject`
+
+	let acceptQuote = `<a href="${ acceptHref }" style="background: #47A6A6;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">I accept ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	let declineQuote = `<a href="${ declineHref }" style="background: #d15f45;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">I reject ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
 
 	const start = moment(obj.start).format('DD-MM-YYYY, HH:mm')
 	const deadline = moment(obj.deadline).format('DD-MM-YYYY, HH:mm')
 
-	console.log(start, deadline)
-
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<style type="text/css">.im {color: #333 !important;}</style>
+					<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
-                    <p>
-                        Step ${ obj.stepId } ${ obj.serviceStep.title } has been assigned to you.
-                    </p>
-                    <p style="font-weight: 400;">
-                        Here are the needed details:
-                    </p>
-                    <div class="details" style="width:95%;margin-top:0;margin-bottom:0;margin-right:auto;margin-left:auto;" >
-                        <table class="details__table" style="color:#333;border-width:1px;border-style:solid;border-color:#999;border-collapse:collapse;" >
-                            <tr>
-                                <td class="main_weight600" style="background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >ID:</td>
-                                <td style="font-weight: 400;background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ obj.stepId }</td>
-                            </tr>
-                            <tr>
-                                <td class="main_weight600" style="padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Work type:</td>
-                                <td style="font-weight: 400;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ obj.serviceStep.title }</td>
-                            </tr>
-                            <tr>
-                                <td class="main_weight600" style="background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Language:</td>
-                                <td style="font-weight: 400;background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ langPair }</td>
-                            </tr>
-                            <tr>
-                                <td class="main_weight600" style="padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Industry:</td>
-                                <td style="font-weight: 400;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ obj.industry }</td>
-                            </tr>
-                            <tr>
-                                <td class="main_weight600" style="background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Wordcount:</td>
-                                <td style="font-weight: 400;background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ obj.nativeFinance.Wordcount.payables || '-' }</td>
-                            </tr>
-                           <tr>
-                                <td class="main_weight600" style="padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Approx. start date:</td>
-                                <td style="font-weight: 400;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ start }</td>
-                            </tr>
-                            <tr>
-                                <td class="main_weight600" style="background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Deadline:</td>
-                                <td style="font-weight: 400;background:#f7f7f7;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ deadline }</td>
-                            </tr>
-                            <tr>
-                             <td class="main_weight600" style="padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;font-weight:600;" >Cost:</td>
-                             <td style="font-weight: 400;padding-top:7px;padding-bottom:7px;padding-right:7px;padding-left:7px;min-width:180px;" >${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <p class="main_weight600 main_line15" style="font-weight:600;line-height:1.5;" >
-                        By clicking on one of the links below, you can accept or reject the job.
-                    </p>
-                    <p style="font-weight: 400;">
-                        You can accept the quote by clicking the link below:
-                    </p>
+                <div class="main" style="padding:25px;" >
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName } ${ obj.vendor.surname || '' }</span></p>
 
-                    <span style="font-weight: 400;">I accept - ${ acceptQuote }</span>
-                    <p style="font-weight: 400;">or</p>
-                    <span style="font-weight: 400;">I reject - ${ declineQuote }</span>
-
+                    <p> Job ${ obj.name } has been assigned to you.</p>
+    
+								    <div class="block" style="border: 1px solid #bfbfbf; width: max-content;">
+											  <div style="border-bottom: 1px solid #ededed;">
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">ID:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ obj.stepId }</div>
+											  </div>
+								        <div style="border-bottom: 1px solid #ededed;">
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Work type:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ obj.name }</div>
+											  </div>
+											  <div style="border-bottom: 1px solid #ededed;">
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Language:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ langPair }</div>
+											  </div>
+											  <div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Industry:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ obj.industry }</div>
+											  </div>
+								        <div style="border-bottom: 1px solid #ededed;">
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Approx. start date:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ start }</div>
+											  </div>
+											  <div style="border-bottom: 1px solid #ededed;">
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Deadline:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ deadline }</div>
+											  </div>
+											  <div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Cost:</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</div>
+											  </div>
+										</div>
+	                  <p style="margin-top: 35px;">You can accept the quote by clicking the link below:<br>
+                    <span> ${ acceptQuote }</span>
+                    <span> ${ declineQuote }</span>
+                    </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function stepCancelledMessage(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                         We would like to information you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled.
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
@@ -193,11 +177,11 @@ function stepCancelledMessage(obj) {
 
 function stepMiddleCancelledMessage(obj) {
 	const fee = obj.status === "Completed" ? obj.nativeFinance.Price.payables : obj.nativeFinance.Price.halfPayables
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                         We would like to inform you that step: ${ obj.stepId } ${ obj.serviceStep.title } has been cancelled in the middle.
@@ -207,36 +191,36 @@ function stepMiddleCancelledMessage(obj) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function vendorReassignmentMessage(obj, reason) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                         We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor.
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function vendorCanStartStartedSecondStep(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName } ${ obj.vendor.surname || '' }</span></p>
                     <p style="font-weight: 400;">
                     	Step <b>${ obj.step.stepId }: ${ obj.step.name }</b> is now ready to start.
@@ -249,7 +233,7 @@ function vendorCanStartStartedSecondStep(obj) {
 										</p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
@@ -265,11 +249,11 @@ function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
 			`<p style="font-weight: 400;">You will be paid according to your partial completion of the step.</p>
         <p style="font-weight: 400;">You have completed ${ progress } % of the task and your fee for this step is: ${ fee } ${ returnIconCurrencyByStringCode('EUR') }</p>`
 			: ""
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Step ${ obj.stepId } (${ obj.serviceStep.title }) has been reassigned to another vendor.
@@ -280,7 +264,7 @@ function vendorMiddleReassignmentMessage(allUnits, obj, reason, isPay) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
@@ -290,11 +274,11 @@ function vendorMiddleAssignmentMessage(obj) {
 	const mainMessage = obj.isStart ?
 			"Although someone else has worked on this step, you shall start the task from the beginning."
 			: "You should continue your work from the place it has been stopped."
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.step.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Step: ${ obj.step.stepId } has been reassigned to you.
@@ -305,7 +289,7 @@ function vendorMiddleAssignmentMessage(obj) {
                     <p style="font-weight: 400;">An availability email with all the details of the project will be sent to you shortly.</p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
@@ -313,11 +297,11 @@ function vendorMiddleAssignmentMessage(obj) {
 
 function stepReopenedMessage(obj) {
 	const reason = obj.reason ? `<p style="font-weight: 400;">Reason: ${ obj.reason }</p>` : ""
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                          Step: ${ obj.stepId } ${ obj.serviceStep.title } has been reopened.
@@ -325,18 +309,18 @@ function stepReopenedMessage(obj) {
                     ${ reason }
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function stepReadyToStartMessage(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.step.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Step ${ obj.step.stepId }: ${ obj.project.projectName } is now ready to start.
@@ -349,18 +333,18 @@ function stepReadyToStartMessage(obj) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`
 }
 
 function sendMemoqCredentials(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#333;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
+                <div class="main" style="padding:25px;" >
                 		<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
 										<p style="font-weight: 400;">Your account on Memoq has been created.</p>
 										<p style="font-weight: 400;">
@@ -370,7 +354,7 @@ function sendMemoqCredentials(obj) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
+                    <hr size="10" style="border:none;" color="#efefef">
                     <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`

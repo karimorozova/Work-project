@@ -3,12 +3,12 @@ function testSentMessage(obj) {
 	date.setDate(date.getDate() + 5);
 	const sourceLang = obj.source ? obj.source.lang : "NA";
 	const industriesList = obj.industries.reduce((acc, curr) => acc + `<li>${ curr.name };</li>`, '');
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.firstName }</span></p>
+                <div class="main" style="padding:25px;" >
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.firstName }</span></p>
                     <p style="font-weight: 400;">
                         As part of our initial process, please find attached our sample text in: ${ sourceLang }. <br>
                         The sample translation focuses on terminology(s): <br>
@@ -30,19 +30,19 @@ function testSentMessage(obj) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`;
 }
 
 function testNotPassedMessage(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
+                <div class="main" style="padding:25px;" >
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
                     <p style="font-weight: 400;" >
                         Thank you again for applying for the ${ obj.target.lang }-Translator@Pangea position. <br>
                         Your test and qualifications have been reviewed carefully and although your talent is valued, we have decided to pursue other candidates at this stage.
@@ -55,19 +55,19 @@ function testNotPassedMessage(obj) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`;
 }
 
 function testPassedMessage(obj) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
+                <div class="main" style="padding:25px;" >
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
                     <p style="font-weight: 400;">
                         Your test was evaluated and received positive feedback <br>
                         Please review the test results attached. <br>
@@ -78,19 +78,19 @@ function testPassedMessage(obj) {
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`;
 }
 
 function rejectedPendingCompetenceTemplate({vendorName, sourceLanguage, targetLanguage, industry, step}) {
-	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:rgb(129, 129, 129);font-family:'Roboto', sans-serif;color:#66563E;box-sizing:border-box;" >
-                <header style="background-color:#66563E;text-align:center;" >
-                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin-top:20px;margin-bottom:20px;margin-right:0;margin-left:0;" >
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
-                <div class="main" style="padding-top:20px;padding-bottom:20px;padding-right:20px;padding-left:20px;" >
-                    <p style="background: #F4F0EE; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ vendorName },</span></p>
+                <div class="main" style="padding:25px;" >
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ vendorName },</span></p>
                     <p style="font-weight: 400;" >
                       We appreciate the time and effort you invested in completing this form.
                       Unfortunately, your profile does not match our requirements. Here are the details:
@@ -111,8 +111,8 @@ function rejectedPendingCompetenceTemplate({vendorName, sourceLanguage, targetLa
                     </p>
                 </div>
                 <footer>
-                    <hr size="15" color="#66563E">
-                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#66563E;" >www.pangea.global</a>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
                 </footer>
             </div>`;
 }

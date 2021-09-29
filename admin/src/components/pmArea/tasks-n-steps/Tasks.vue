@@ -400,7 +400,7 @@
 					const template = await this.$http.post(
 							`/pm-manage/task-quote-message`, {
 								projectId: this.currentProject._id,
-								tasks: this.allTasks.filter(item => item.isChecked && item.status === "Created").map(item => item.taskId)
+								tasksIds: this.allTasks.filter(item => item.isChecked && item.status === "Created").map(item => item.taskId)
 							}
 					)
 					this.previewMessageQuote = template.body.message

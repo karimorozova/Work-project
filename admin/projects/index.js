@@ -39,7 +39,6 @@ const {
 
 const {
 	stepCancelNotifyVendor,
-	getMessage,
 	taskCompleteNotifyPM,
 	notifyManagerStepStarted,
 	notifyStepDecisionMade,
@@ -146,7 +145,6 @@ module.exports = {
 	setStepsStatus,
 	createProject,
 	createTasks,
-	getMessage,
 	taskCompleteNotifyPM,
 	getProjectWithUpdatedFinance,
 	updateProjectProgress,

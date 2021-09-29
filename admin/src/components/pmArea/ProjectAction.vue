@@ -51,14 +51,6 @@
       .project-action__confirm
         Button(:value="'Edit & Send'" @clicked="getSendCostQuoteMessage")
 
-    //.project-action__setting(v-if="isAction('Deliver')")
-      .project-action__confirm
-        Button(:value="'Edit & Send'" @clicked="getDeliveryMessage")
-
-    //.project-action__setting(v-if="isAction('Send Project Details')")
-    //  .project-action__confirm
-    //    Button(:value="'Edit & Send'" @clicked="getProjectDetailsMessage")
-
     .project-action__setting(v-if="isAction('Cancel')")
       .project-action__drop-menu
         SelectSingle(
@@ -149,7 +141,6 @@
 				previewMessage: '',
 				selectedAction: '',
 				selectedReason: '',
-				// moreInformation: '',
 				reasons: [],
 				managers: [],
 				actions: [ 'Cancel' ],
@@ -251,15 +242,6 @@
 					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
 			},
-			// async getProjectDetailsMessage() {
-			// 	try {
-			// 		const template = await this.$http.get(`/pm-manage/project-details?projectId=${ this.project._id }`);
-			// 		this.previewMessage = template.data.message;
-			// 		this.openPreview();
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: err.message, isShow: true, type: "error" });
-			// 	}
-			// },
 			async sendMessageCostQuotes({ message, arrayOfEmails }) {
 				try {
 					await this.sendClientCostQuote({ message, arrayOfEmails })
@@ -496,7 +478,6 @@
 					"Draft",
 					"Cost Quote",
 					"Quote sent",
-					//"Requested",
 					"Cancelled"
 				]
 

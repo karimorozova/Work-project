@@ -19,7 +19,7 @@ const sendEmailFromUser = async function (from, obj, msg) {
 		}
 
 		mailOptions.attachments = obj.attachments || []
-		mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
+		mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo2.png', cid: 'logo@pan' })
 
 		mailTransporter.sendMail(mailOptions, (error, info) => {
 			mailTransporter.close()
@@ -50,7 +50,7 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 		mailOptions.attachments = obj.attachments || []
 		if (!withoutImage) {
 			if (!mailOptions.attachments.map(item => item.filename).includes('logo.png')) {
-				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
+				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo2.png', cid: 'logo@pan' })
 			}
 		}
 		mailTransporter.sendMail(mailOptions, (error, info) => {
@@ -83,7 +83,7 @@ const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 		mailOptions.attachments = mailSettings.attachments || []
 		if (!withoutImage) {
 			if (!mailOptions.attachments.map(item => item.filename).includes('logo.png')) {
-				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
+				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo2.png', cid: 'logo@pan' })
 			}
 		}
 		mailTransporter.sendMail(mailOptions, (error, info) => {
@@ -116,7 +116,7 @@ const sendEmailCandidates = function (obj, msg, withoutImage = false) {
 		mailOptions.attachments = obj.attachments || []
 		if (!withoutImage) {
 			if (!mailOptions.attachments.map(item => item.filename).includes('logo.png')) {
-				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo.png', cid: 'logo@pan' })
+				mailOptions.attachments.push({ filename: 'logo.png', path: './static/email-logo2.png', cid: 'logo@pan' })
 			}
 		}
 		mailTransporter.sendMail(mailOptions, (error, info) => {
@@ -150,7 +150,7 @@ const clientQuoteToEmails = async function (from, obj, message) {
 		mailOptions.attachments = obj.attachments || []
 		mailOptions.attachments.push({
 			filename: 'logo.png',
-			path: './static/email-logo.png',
+			path: './static/email-logo2.png',
 			cid: 'logo@pan'
 		})
 		mailTransporter.sendMail(mailOptions, (error, info) => {
@@ -179,7 +179,7 @@ const clientQuoteEmail = function (obj, msg) {
 		mailOptions.attachments = obj.attachments || []
 		mailOptions.attachments.push({
 			filename: 'logo.png',
-			path: './static/email-logo.png',
+			path: './static/email-logo2.png',
 			cid: 'logo@pan' //same cid value as in the html img src
 		})
 		mailTransporter.sendMail(mailOptions, (error, info) => {
@@ -207,7 +207,7 @@ const managerNotifyMail = function (obj, msg, subject) {
 		mailOptions.attachments = obj.attachments || []
 		mailOptions.attachments.push({
 			filename: 'logo.png',
-			path: './static/email-logo.png',
+			path: './static/email-logo2.png',
 			cid: 'logo@pan' //same cid value as in the html img src
 		})
 		mailTransporter.sendMail(mailOptions, (error, info) => {
