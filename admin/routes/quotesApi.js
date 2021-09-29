@@ -26,7 +26,7 @@ router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 		return
 	}
 
-	const { status, steps, tasks } = project
+	const { status, steps, tasks: allTasks } = project
 	const neededSteps = steps.filter(item => tasksIds.includes(item.taskId))
 	const neededTasks = tasks.filter(item => tasksIds.includes(item.taskId))
 
@@ -48,7 +48,7 @@ router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 		await Projects.updateOne({ _id }, { $set: { tasks, steps } })
 	}
 	if (prop === 'reject') {
-		const tasks = tasks.map(task => {
+		const tasks = allTasks.map(task => {
 			if (task.status === 'Quote sent') task.status = 'Rejected'
 			return task
 		})
