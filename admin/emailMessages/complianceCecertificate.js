@@ -11,7 +11,7 @@ const stamp = apiUrl + '/static/certificate-images/stamp.png'
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 
 	return `
-		<img src="../src/assets/images/logo.png">
+		<div><img src="../src/assets/images/logo.png"></div>
 	`
 
 	const dateNow = new Date()
