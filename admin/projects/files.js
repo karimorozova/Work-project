@@ -197,6 +197,7 @@ const generatePOFile = async (requestInfo, project) => {
 const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
 	const allLanguages = await Languages.find()
 	const template = getCertificateTemplate({ project, allLanguages, tasks, deliveryData })
+	console.log(template)
 	return new Promise((resolve, reject) => {
 		htmlToPdf.create(
 				template,
