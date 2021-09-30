@@ -21,6 +21,7 @@ const {
 	getPaidReceivables,
 	paidOrAddPaymentInfo,
 	setInvoiceStatus,
+	createCustomerPayment,
 } = require('../invoicingReceivables')
 
 const {
@@ -220,9 +221,7 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 
 	try {
 		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
-		if (result.status === 'Moved') {
-			await setInvoiceStatus(result.zohoId, 'sent')
-		}
+		await createCustomerPayment(reportId, paidAmount)
 		res.send(result.status);
 	} catch(err) {
 		console.log(err);
