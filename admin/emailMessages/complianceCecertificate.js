@@ -7,9 +7,8 @@ const moment = require('moment')
 // const logo = '/static/certificate-images/logo.png'\
 const logo = 'https://hdwallpapers.cat/thumbnail_small/blue-eye-dsfsadfasd-sdfsad-sdfsdf-abstract-7qik.jpg'
 
-
-const background ='/static/certificate-images/watermark.png'
-const stamp = '/static/certificate-images/stamp.png'
+// const background ='/static/certificate-images/watermark.png'
+// const stamp = '/static/certificate-images/stamp.png'
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()
