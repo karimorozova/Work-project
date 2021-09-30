@@ -4,20 +4,19 @@ const moment = require('moment')
 !apiUrl && (apiUrl = 'https://admin.pangea.global')
 // apiUrl = 'http://localhost:3001'
 
-const logo = apiUrl + '/dist/static/certificate-images/logo.png'
-const background = apiUrl + '/dist/static/certificate-images/watermark.png'
-const stamp = apiUrl + '/dist/static/certificate-images/stamp.png'
+const logo = apiUrl + '/static/certificate-images/logo.png'
+const background = apiUrl + '/static/certificate-images/watermark.png'
+const stamp = apiUrl + '/static/certificate-images/stamp.png'
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
-	return `<img src="${logo}"/>`
-	// const dateNow = new Date()
-	// const projectTasks = project.tasks.filter(item => tasks.includes(item.taskId))
-	// const languages = [ ...new Set(projectTasks.map(item => `${ getLang(item.sourceLanguage) } >> ${ getLang(item.targetLanguage) }`)) ]
-	//
-	// function getLang(arg) {
-	// 	const { lang } = allLanguages.find(({ symbol }) => symbol === arg)
-	// 	return lang
-	// }
+	const dateNow = new Date()
+	const projectTasks = project.tasks.filter(item => tasks.includes(item.taskId))
+	const languages = [ ...new Set(projectTasks.map(item => `${ getLang(item.sourceLanguage) } >> ${ getLang(item.targetLanguage) }`)) ]
+
+	function getLang(arg) {
+		const { lang } = allLanguages.find(({ symbol }) => symbol === arg)
+		return lang
+	}
 
 	return `<style>* { margin: 0; padding: 0; }</style>
 	<div class="layout" style="background-image: url(${ background });color: #333;height: 1054px;width: 814px;background-size: 65%;background-repeat: no-repeat;background-position: center;font-family: Arial, sans-serif;">
