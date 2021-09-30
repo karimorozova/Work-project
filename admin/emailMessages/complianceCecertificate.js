@@ -4,9 +4,9 @@ const moment = require('moment')
 // !apiUrl && (apiUrl = 'https://admin.pangea.global')
 // // apiUrl = 'http://localhost:3001'
 
-const logo = 'https://admin.pangea.global/static/certificate-images/logo.png'
-const background ='https://admin.pangea.global/static/certificate-images/watermark.png'
-const stamp = 'https://admin.pangea.global/static/certificate-images/stamp.png'
+const logo = '/static/certificate-images/logo.png'
+const background ='/static/certificate-images/watermark.png'
+const stamp = '/static/certificate-images/stamp.png'
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()
