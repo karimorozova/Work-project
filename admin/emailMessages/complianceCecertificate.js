@@ -9,6 +9,9 @@ const logo = 'https://hdwallpapers.cat/thumbnail_small/blue-eye-dsfsadfasd-sdfsa
 
 // const background ='/static/certificate-images/watermark.png'
 // const stamp = '/static/certificate-images/stamp.png'
+let background = ''
+const stamp = ''
+
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()
