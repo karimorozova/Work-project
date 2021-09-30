@@ -109,7 +109,8 @@ const getZohoInvoiceCreationStructure = async (_reportId) => {
 	const [ report ] = await getReportById(_reportId)
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
 	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
-	const customerId = await getCustomer(getOfficialCompanyName(clientBillingInfo))
+	// const customerId = await getCustomer(getOfficialCompanyName(clientBillingInfo))
+	const customerId =  "335260000005073023"
 	return {
 		"customer_id": customerId,
 		"line_items": [ {
