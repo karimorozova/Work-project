@@ -1,17 +1,12 @@
-// let apiUrl = require('../helpers/apiurl')
+let apiUrl = require('../helpers/apiurl')
 const moment = require('moment')
 
-// !apiUrl && (apiUrl = 'https://admin.pangea.global')
-// // apiUrl = 'http://localhost:3001'
+!apiUrl && (apiUrl = 'https://admin.pangea.global')
+// apiUrl = 'http://localhost:3001'
 
-// const logo = '/static/certificate-images/logo.png'\
-const logo = 'https://hdwallpapers.cat/thumbnail_small/blue-eye-dsfsadfasd-sdfsad-sdfsdf-abstract-7qik.jpg'
-
-// const background ='/static/certificate-images/watermark.png'
-// const stamp = '/static/certificate-images/stamp.png'
-let background = ''
-const stamp = ''
-
+const logo = apiUrl + '/static/certificate-images/logo.png'
+const background = apiUrl + '/static/certificate-images/watermark.png'
+const stamp = apiUrl + '/static/certificate-images/stamp.png'
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()

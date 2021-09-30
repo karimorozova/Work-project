@@ -197,12 +197,16 @@ const generatePOFile = async (requestInfo, project) => {
 const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
 	const allLanguages = await Languages.find()
 	const template = getCertificateTemplate({ project, allLanguages, tasks, deliveryData })
-	console.log(template)
 	return new Promise((resolve, reject) => {
 		htmlToPdf.create(
 				template,
 				{
-					...pdfConfig
+						type: 'pdf',
+						width: '814',
+						height: '1054',
+						orientation: "landscape",
+						base: apiUrl,
+						border: 0
 				})
 				.toFile('./dist/uploads/certificatePdf.pdf', function (err, res) {
 					if (err) {
