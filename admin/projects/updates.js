@@ -25,8 +25,8 @@ const {
 
 const { downloadMemoqFile } = require('../services/memoqs/files')
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users')
-
 const { notifyManagerProjectStarts } = require('../utils')
+const { sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
 
 
 const cancelProjectInMemoq = async (project) => {
@@ -402,30 +402,15 @@ async function getApprovedProject(project, status) {
 	const taskIds = project.tasks.map(item => item.taskId)
 	const { tasks, steps } = updateWithApprovedTasks({ taskIds, project })
 	project.isStartAccepted = true
-	// const stepsStatuses = ["Ready to Start", "Waiting to Start"];
-	// const wordsUnitSteps = [];
-	// for (let step of steps) {
-	//   const { serviceStep, status } = step;
-	//   const { unit: unitId } = serviceStep;
-	//   const { type } = await Units.findOne({ _id: unitId });
-	//   if (type === 'CAT Wordcount' && stepsStatuses.indexOf(status) !== -1) wordsUnitSteps.push(step);
-	// }
-	// const splittedByIdSteps = wordsUnitSteps.reduce((acc, cur) => {
-	//   acc[cur.memoqProjectId] = acc[cur.memoqProjectId] ? [...acc[cur.memoqProjectId], cur] : [cur];
-	//   return acc;
-	// }, {});
-
 	try {
-		// if (wordsUnitSteps.length) {
-		//   for (let id in splittedByIdSteps) {
-		//     await setMemoqTranlsators(id, splittedByIdSteps[id]);
-		//   }
-		// }
 		if (project.isStartAccepted) {
-			await notifyManagerProjectStarts(project)
+			await notifyManagerProjectStarts(project, false)
 		}
 		await notifyVendorStepStart([], steps, project)
-		return await updateProject({ "_id": project.id }, { status, isStartAccepted: true, tasks, steps, isPriceUpdated: false })
+		const updatedProject = await updateProject({ "_id": project.id }, { status, isStartAccepted: true, tasks, steps, isPriceUpdated: false })
+
+		const updatedSteps = await sendQuoteToVendorsAfterProjectAccepted(updatedProject.steps, updatedProject)
+		return await updateProject({ "_id": project.id }, { steps: updatedSteps })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in getApprovedProject")

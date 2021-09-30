@@ -28,7 +28,7 @@ async function notifyManagerProjectRejected(project) {
 	}
 }
 
-async function notifyManagerProjectStarts(project) {
+async function notifyManagerProjectStarts(project, isNotifyClientContacts = true) {
 	try {
 		const notAssignedStep = project.steps.find(item => !item.vendor)
 		const projectManager = await User.findOne({ "_id": project.projectManager._id }).lean()
@@ -38,7 +38,7 @@ async function notifyManagerProjectStarts(project) {
 		const messageToAM = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...accountManager })
 		await managerNotifyMail(accountManager, messageToAM, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 
-		for await (let contact of contacts) {
+		if(isNotifyClientContacts) for await (let contact of contacts) {
 			const message = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...contact })
 			await managerNotifyMail(contact, message, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 		}
