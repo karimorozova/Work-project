@@ -66,52 +66,52 @@
                   i(class="fas fa-download")
 
 
-            // .payment-info(v-if="true")
+            .payment-info(v-if="true")
 
-            //   .payment-info__doublePay
-            //     .payment-info__payBlock
-            //       .amount__title Paid Amount:
-            //       input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
-            //     .check-box
-            //       CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
-            //       span(class="check-box__text") Paid full
+              .payment-info__doublePay
+                .payment-info__payBlock
+                  .amount__title Paid Amount:
+                  input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
+                .check-box
+                  CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
+                  span(class="check-box__text") Paid full
 
-            //   .payment-info__amountAndFile
-            //     .payment-info__amount
-            //       .amount__title Unpaid Amount:
-            //       .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
+              .payment-info__amountAndFile
+                .payment-info__amount
+                  .amount__title Unpaid Amount:
+                  .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
 
-            //   .payment-info__double
-            //     .payment-info__block
-            //       .payment-info__title Payment Method:
-            //       .payment-info__select
-            //         SelectSingle(
-            //           :selectedOption="paymentMethod"
-            //           :options="['test1', 'test2', 'test3' ]"
-            //           placeholder="Option"
-            //           @chooseOption="setPaymentMethod"
-            //         )
-            //     .payment-info__block
-            //       .payment-info__title Payment Date:
-            //       DatepickerWithTime(
-            //         :value="paymentDate"
-            //         @selected="setFromDate"
-            //         placeholder="Date"
-            //         :isTime="true"
-            //         :highlighted="highlighted"
-            //         :monday-first="true"
-            //         inputClass="datepicker-custom-filter-185"
-            //         calendarClass="calendar-custom"
-            //         :format="customFormatter"
-            //         :disabled="disabled"
-            //       )
+              .payment-info__double
+                .payment-info__block
+                  .payment-info__title Payment Method:
+                  .payment-info__select
+                    SelectSingle(
+                      :selectedOption="paymentMethod"
+                      :options="['test1', 'test2', 'test3' ]"
+                      placeholder="Option"
+                      @chooseOption="setPaymentMethod"
+                    )
+                .payment-info__block
+                  .payment-info__title Payment Date:
+                  DatepickerWithTime(
+                    :value="paymentDate"
+                    @selected="setFromDate"
+                    placeholder="Date"
+                    :isTime="true"
+                    :highlighted="highlighted"
+                    :monday-first="true"
+                    inputClass="datepicker-custom-filter-185"
+                    calendarClass="calendar-custom"
+                    :format="customFormatter"
+                    :disabled="disabled"
+                  )
 
 
-            //   .payment-info__notes
-            //     .payment-info__title Notes:
-            //     textarea(type="text" rows="3" v-model="notes")
+              .payment-info__notes
+                .payment-info__title Notes:
+                textarea(type="text" rows="3" v-model="notes")
 
-            //   Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
+              Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
 
           .invoicing-details__table
             ApproveModal(
@@ -290,49 +290,48 @@
 			},
 			getStepsPayables(stepFinance) {
 				return stepFinance.reduce((sum, step) => {
-					sum += step.nativeFinance.Price.payables || 0
+					sum += step.finance.Price.receivables || 0
 					return sum
 				}, 0)
 			},
-			// setPaymentMethod({ option }) {
-			// 	this.paymentMethod = option
-			// },
-			// setFromDate(e) {
-			// 	this.paymentDate = e
-			// },
-			// customFormatter(date) {
-			// 	return moment(date).format('DD-MM-YYYY, HH:mm')
-			// },
-			// async reportToPayment() {
-			// 	const data = {
-			// 		paidAmount: this.amount,
-			// 		unpaidAmount: (this.getUnpaidAmount - +this.amount).toFixed(2),
-			// 		paymentMethod: this.paymentMethod,
-			// 		paymentDate: this.paymentDate,
-			// 		notes: this.notes
-			// 	}
-			// 	const reuslt = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-			//   if (reuslt === "Moved") {
-			//     await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-			//   }else {
-			//     await this.refreshReports()
-			//   }
-			// 	this.amount = 0
-			// },
-			// updatePaidAmount(event) {
-			// 	const value = event.target.value
-			// 	console.log(value, this.amount)
-			// 	if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
-			// 		this.amount = (parseFloat(value)).toFixed(2)
-			// 	}
-			// 	this.$forceUpdate()
-			// },
-			// togglePaidFull(val) {
-			// 	this.isFull = val
-			// 	if (val) {
-			// 		this.amount = this.getUnpaidAmount
-			// 	}
-			// },
+			setPaymentMethod({ option }) {
+				this.paymentMethod = option
+			},
+			setFromDate(e) {
+				this.paymentDate = e
+			},
+			customFormatter(date) {
+				return moment(date).format('DD-MM-YYYY, HH:mm')
+			},
+			async reportToPayment() {
+				const data = {
+					paidAmount: this.amount,
+					unpaidAmount: (this.getUnpaidAmount - +this.amount).toFixed(2),
+					paymentMethod: this.paymentMethod,
+					paymentDate: this.paymentDate,
+					notes: this.notes
+				}
+				const reuslt = (await (this.$http.post(`/invoicing-receivables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
+			  if (reuslt === "Moved") {
+			    await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+			  }else {
+			    await this.refreshReports()
+			  }
+				this.amount = 0
+			},
+			updatePaidAmount(event) {
+				const value = event.target.value
+				if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
+					this.amount = (parseFloat(value)).toFixed(2)
+				}
+        this.$forceUpdate()
+			},
+			togglePaidFull(val) {
+				this.isFull = val
+				if (val) {
+					this.amount = this.getUnpaidAmount
+				}
+			},
 			async sendInvoice() {
 				try {
 					const result = await this.$http.post('/invoicing-receivables/sendInvoice', { _id: this.$route.params.id })
@@ -424,11 +423,8 @@
 			},
 			async updateReportsStateFromZoho(id) {
 				try {
-          console.log('test1')
 					await this.$http.get('/invoicing-receivables/update-report-state-from-zoho/' + id)
           const { type, message } = result.data
-          console.log(result.data)
-          console.log({ message })
           this.alertToggle({ message, isShow: true, type })
           if (message === 'Invoice paid') {
             await this.$router.push('/')
@@ -440,22 +436,22 @@
 			...mapActions([ 'alertToggle' ])
 		},
 		computed: {
-			// getPaymentRemainder() {
-			// 	const { paymentInformation = [] } = this.reportDetailsInfo
-			// 	return paymentInformation.reduce((sum, item) => {
-			// 		sum += item.paidAmount
-			// 		return sum
-			// 	}, 0)
-			// },
-			// getUnpaidAmount() {
-			// 	const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder)
-			// 	return +(parseFloat(rawUnpaidAmount)).toFixed(2)
-			// }
+			getPaymentRemainder() {
+				const { paymentInformation = [] } = this.reportDetailsInfo
+				return paymentInformation.reduce((sum, item) => {
+					sum += item.paidAmount
+					return sum
+				}, 0)
+			},
+			getUnpaidAmount() {
+				const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.stepsWithProject) - (+this.getPaymentRemainder)
+				return +(parseFloat(rawUnpaidAmount)).toFixed(2)
+			}
 		},
 		async created() {
 			await this.updateReportsStateFromZoho(this.$route.params.id)
 			await this.getReportDetails(this.$route.params.id)
-			// this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
+      // this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
 		},
 		components: {
 			Button,

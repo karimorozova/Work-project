@@ -19,6 +19,8 @@ const {
 	updateReportStateFromZoho,
 	getAllPaidReceivables,
 	getPaidReceivables,
+	paidOrAddPaymentInfo,
+	setInvoiceStatus,
 } = require('../invoicingReceivables')
 
 const {
@@ -206,6 +208,22 @@ router.post("/paid-report/:id", async (req, res) => {
 	try {
 		const report = await getPaidReceivables(id)
 		res.send(report);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.post("/report-final-status/:reportId", async (req, res) => {
+	const {reportId} = req.params
+	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body
+
+	try {
+		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
+		if (result.status === 'Moved') {
+			await setInvoiceStatus(result.zohoId, 'sent')
+		}
+		res.send(result.status);
 	} catch(err) {
 		console.log(err);
 		res.status(500).send('Something wrong on getting steps');

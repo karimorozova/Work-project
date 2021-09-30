@@ -23,7 +23,8 @@ const {
 } = require('./zoho')
 
 const {
-	updateInvoiceReceivablesStatus
+	updateInvoiceReceivablesStatus,
+	paidOrAddPaymentInfo
 } = require('./updateReceivables')
 
 const {
@@ -53,6 +54,7 @@ module.exports = {
 	createAndSendZohoInvoice,
 	returnMessageAndType,
 	updateInvoiceReceivablesStatus,
+	paidOrAddPaymentInfo,
 	deleteStepFromReport,
 	getReportById,
 	getAllReports,

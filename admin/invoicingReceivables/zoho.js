@@ -159,7 +159,7 @@ const updateReportsStateFromZoho = async () => {
 			if (_invoiceIdx !== -1) {
 			 // TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
 
-				// const isAllPaid = true
+				// const isAllPaid = false
 				const isAllPaid = invoices[_invoiceIdx]["payment_made"] === invoices[_invoiceIdx].total
 				const paymentInfo = {
 					paymentDate: new Date(),
@@ -206,8 +206,8 @@ const updateReportStateFromZoho = async (_reportId) => {
 		if (externalIntegration._id) {
 			const reportFromZoho = await zohoRequest(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
 			const { data: { invoice } } = reportFromZoho
-			const isAllPaid = true
-			// const isAllPaid = invoice["payment_made"] === invoice.total
+			// const isAllPaid = false
+			const isAllPaid = invoice["payment_made"] === invoice.total
 			// TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
 			const paymentInfo = {
 				paymentDate: new Date(),
