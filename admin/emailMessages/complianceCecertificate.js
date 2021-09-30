@@ -9,6 +9,11 @@ const background = apiUrl + '/static/certificate-images/watermark.png'
 const stamp = apiUrl + '/static/certificate-images/stamp.png'
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
+
+	return `
+		<img src="../src/assets/images/logo.png">
+	`
+
 	const dateNow = new Date()
 	const projectTasks = project.tasks.filter(item => tasks.includes(item.taskId))
 	const languages = [ ...new Set(projectTasks.map(item => `${ getLang(item.sourceLanguage) } >> ${ getLang(item.targetLanguage) }`)) ]
