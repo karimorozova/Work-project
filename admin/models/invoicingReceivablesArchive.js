@@ -65,6 +65,18 @@ const InvoicingReceivablesArchiveSchema = new mongoose.Schema({
 			trim: true
 		}
 	},
+	reportFiles: [ {
+		filename: {
+			type: String,
+			default: '',
+			trim: true
+		},
+		path: {
+			type: String,
+			default: '',
+			trim: true
+		}
+	} ],
 	paymentInformation: [{
 		paidAmount: {
 			type: Number,

@@ -65,9 +65,21 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 			trim: true
 		}
 	},
-	paymentInformation: [{
+	reportFiles: [ {
+		filename: {
+			type: String,
+			default: '',
+			trim: true
+		},
+		path: {
+			type: String,
+			default: '',
+			trim: true
+		}
+	} ],
+	paymentInformation: [ {
 		paidAmount: {
-			type: Number,
+			type: Number
 		},
 		unpaidAmount: {
 			type: Number
@@ -83,7 +95,7 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 			type: String,
 			default: ""
 		}
-	}],
+	} ],
 	externalIntegration: {
 		_id: {
 			type: String,
