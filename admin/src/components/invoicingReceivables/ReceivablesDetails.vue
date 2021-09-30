@@ -423,13 +423,14 @@
 			},
 			async updateReportsStateFromZoho(id) {
 				try {
-					await this.$http.get('/invoicing-receivables/update-report-state-from-zoho/' + id)
+					const result = await this.$http.get('/invoicing-receivables/update-report-state-from-zoho/' + id)
           const { type, message } = result.data
           this.alertToggle({ message, isShow: true, type })
           if (message === 'Invoice paid') {
             await this.$router.push('/')
           }
 				} catch (err) {
+          console.log(err)
 					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}
 			},

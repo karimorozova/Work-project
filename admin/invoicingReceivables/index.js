@@ -19,7 +19,8 @@ const {
 	createAndSendZohoInvoice,
 	updateReportsStateFromZoho,
 	updateReportStateFromZoho,
-	setInvoiceStatus
+	setInvoiceStatus,
+	createCustomerPayment
 } = require('./zoho')
 
 const {
@@ -65,4 +66,5 @@ module.exports = {
 	createZohoInvoice,
 	getAllPaidReceivables,
 	getPaidReceivables,
+	createCustomerPayment,
 }

@@ -15,9 +15,6 @@ const sendInvoiceToClientContacts = async (_reportId) => {
 	console.log(reportFiles)
 	if(reportFiles.length) for(let file of reportFiles) attachments.push({ ...file })
 	attachments.push({ filename: invoice.filename, path: invoice.path })
-
-	console.log(attachments)
-
 	const finalAttachments = attachments.map(item => ({ filename: item.filename.split('-').pop(), path: `./dist/${ item.path }` }))
 
 	//--------- TODO удалить н=>

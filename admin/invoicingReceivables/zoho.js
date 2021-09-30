@@ -39,8 +39,8 @@ const zohoRequest = async (link, data, method = "GET", additional = {}) => {
 }
 
 const getCustomer = async (companyName) => {
-	const customer = await zohoRequest(`contacts?organization_id=${ organizationId }&contact_name=${ companyName }`)
-	return customer.data.contacts[0].contact_id
+	const customer = await zohoRequest(`contacts?organization_id=${ organizationId }&company_name=${ companyName }`)
+	return customer.data.contacts.length > 0 ? customer.data.contacts[0].contact_id : "335260000005073023"
 }
 
 const setNewTokenFromRefresh = async (attempt) => {
@@ -70,6 +70,7 @@ const createAndSendZohoInvoice = async (_reportId) => {
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
+		console.log(err)
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
 }
@@ -108,9 +109,9 @@ const getZohoInvoiceCreationStructure = async (_reportId) => {
 	const [ report ] = await getReportById(_reportId)
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
 	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
-
+	const customerId = await getCustomer(getOfficialCompanyName(clientBillingInfo))
 	return {
-		"customer_id": "335260000005073023",
+		"customer_id": customerId,
 		"line_items": [ {
 			"item_id": "335260000005073056",
 			"rate": total,
@@ -118,6 +119,25 @@ const getZohoInvoiceCreationStructure = async (_reportId) => {
 		} ]
 	}
 }
+
+const getZohoClientPaymentCreationStructure = async (_reportId, amount) => {
+	const [ report ] = await getReportById(_reportId)
+	const { client, clientBillingInfo, externalIntegration } = report
+	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
+	console.log(getOfficialCompanyName(clientBillingInfo))
+	const customerId = "335260000005073023"
+	return  {
+		"customer_id": customerId,
+		"invoices": [
+			{
+				"invoice_id": externalIntegration. _id.toString(),
+				"amount_applied": amount
+			}
+		],
+		"payment_mode": "cash",
+		"date": moment().format('YYYY-MM-DD'),
+		"amount": amount
+	}}
 
 const saveInvoiceFile = async (_reportId, _zohoId) => {
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-invoice.pdf`
@@ -132,6 +152,16 @@ const setInvoiceStatus = async (_zohoId, status) => {
 	try {
 		await zohoRequest(`invoices/${ _zohoId }/status/${ status }?organization_id=${ organizationId }`, '', 'POST')
 	} catch (err) {
+		return returnMessageAndType(err.response.data.message, 'error')
+	}
+}
+
+const createCustomerPayment = async (_reportId, amount) => {
+	try {
+		const data = await getZohoClientPaymentCreationStructure(_reportId, amount)
+		await zohoRequest(`customerpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+	} catch (err) {
+		console.log(err)
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
 }
@@ -202,8 +232,9 @@ const updateReportsStateFromZoho = async () => {
 const updateReportStateFromZoho = async (_reportId) => {
 	try {
 		const [ report ] = await getReportById(_reportId)
-		const { externalIntegration } = report
-		if (externalIntegration._id) {
+		const { externalIntegration, status } = report
+		if(status === 'Created' || status === 'Invoice Ready' || status === "Partly Paid" ) return returnMessageAndType('Updated', 'success')
+		if (externalIntegration._id ) {
 			const reportFromZoho = await zohoRequest(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
 			const { data: { invoice } } = reportFromZoho
 			// const isAllPaid = false
@@ -241,9 +272,7 @@ const updateReportStateFromZoho = async (_reportId) => {
 				return returnMessageAndType('Invoice paid', 'success')
 			}
 		}
-
 	} catch (err) {
-		console.log(err)
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
 }
@@ -254,5 +283,6 @@ module.exports = {
 	updateReportsStateFromZoho,
 	createZohoInvoice,
 	createAndSendZohoInvoice,
-	deleteZohoInvoice
+	deleteZohoInvoice,
+	createCustomerPayment,
 }
