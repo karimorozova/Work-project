@@ -4,7 +4,10 @@ const moment = require('moment')
 // !apiUrl && (apiUrl = 'https://admin.pangea.global')
 // // apiUrl = 'http://localhost:3001'
 
-const logo = '/static/certificate-images/logo.png'
+// const logo = '/static/certificate-images/logo.png'\
+const logo = 'https://hdwallpapers.cat/thumbnail_small/blue-eye-dsfsadfasd-sdfsad-sdfsdf-abstract-7qik.jpg'
+
+
 const background ='/static/certificate-images/watermark.png'
 const stamp = '/static/certificate-images/stamp.png'
 
