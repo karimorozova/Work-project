@@ -201,11 +201,12 @@ const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
 		htmlToPdf.create(
 				template,
 				{
+						// base: 'file://' + path.resolve('./public') + '/'
 						type: 'pdf',
 						width: '814',
 						height: '1054',
 						orientation: "landscape",
-						base: apiUrl,
+						base: 'https://admin.pangea.global',
 						border: 0
 				})
 				.toFile('./dist/uploads/certificatePdf.pdf', function (err, res) {
