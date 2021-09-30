@@ -218,26 +218,26 @@ const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
 	})
 }
 
-const generateReceivablesReportsByTemplate = async (_reportId, filename, template) => {
-	const conf = { ...pdfConfig }
-	conf.width = '882'
-	conf.height = '1130'
-
-	return new Promise((resolve, reject) => {
-		htmlToPdf.create(
-				template,
-				{
-					...conf
-				})
-				.toFile(`./dist/clientReportsFiles/${ _reportId }/${ filename }.pdf`, function (err, res) {
-					if (err) {
-						console.log(err)
-						reject(err)
-					}
-					resolve(`./dist/clientReportsFiles/${ _reportId }/${ filename }.pdf`)
-				})
-	})
-}
+// const generateReceivablesReportsByTemplate = async (_reportId, filename, template) => {
+// 	const conf = { ...pdfConfig }
+// 	conf.width = '882'
+// 	conf.height = '1130'
+//
+// 	return new Promise((resolve, reject) => {
+// 		htmlToPdf.create(
+// 				template,
+// 				{
+// 					...conf
+// 				})
+// 				.toFile(`./dist/clientReportsFiles/${ _reportId }/${ filename }.pdf`, function (err, res) {
+// 					if (err) {
+// 						console.log(err)
+// 						reject(err)
+// 					}
+// 					resolve(`./dist/clientReportsFiles/${ _reportId }/${ filename }.pdf`)
+// 				})
+// 	})
+// }
 
 const copyProjectFiles = (project, originalFile) => {
 	const copiedName = originalFile.path.split("/").pop()
@@ -252,7 +252,7 @@ const copyProjectFiles = (project, originalFile) => {
 }
 
 module.exports = {
-	generateReceivablesReportsByTemplate,
+	// generateReceivablesReportsByTemplate,
 	generatePOFile,
 	storeFiles,
 	createArchiveForDeliverableItem,

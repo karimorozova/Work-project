@@ -15,7 +15,7 @@ const {
 	generateAndSaveCertificate,
 	copyProjectFiles,
 	generatePOFile,
-	generateReceivablesReportsByTemplate
+	// generateReceivablesReportsByTemplate
 } = require('./files')
 
 const {
@@ -105,7 +105,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
-	generateReceivablesReportsByTemplate,
+	// generateReceivablesReportsByTemplate,
 	generatePOFile,
 	nextVendorCanStartWorkNotification,
 	cancelProjectInMemoq,
