@@ -12,10 +12,12 @@ console.log(apiUrl + '/static/certificate-images/stamp.png')
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	return `
-		<img src="/static/logo.png">
+		<img src="file:///static/logo.png">
 
-		<img src="/static/error.svg">
-		<img src="../static/certificate-images/stamp.png">
+		<img src="\static\error.svg">
+		<img src="\\static\\error.svg">
+		
+		<img src="http://157.90.235.134/static/certificate-images/stamp.png">
 		<img src="./../static/certificate-images/stamp.png">
 		
 		
