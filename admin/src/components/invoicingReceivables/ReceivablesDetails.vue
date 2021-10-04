@@ -27,7 +27,7 @@
               .text__value {{reportDetailsInfo.externalIntegration.reportId}}
             .text__block
               .text__title Status:
-              .text__value {{reportDetailsInfo.status}}
+              .text__value {{firstBigLatter(reportDetailsInfo.status)}}
             .text__block
               .text__title Created At:
               .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
@@ -57,8 +57,13 @@
             .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
               .text__title Invoice:
               .text__value
-                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)")
-                  i(class="fas fa-download")
+                .download-file(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)") {{reportDetailsInfo.invoice.filename}}
+            .text__block(v-if="this.reportDetailsInfo.status !== 'Created' && reportDetailsInfo.reportFiles.length > 0")
+              .text__title Reports:
+              .text__value
+                .download-file(v-for="reportFile in reportDetailsInfo.reportFiles" style="cursor: pointer"  @click="downloadFile(reportFile.path)") {{reportFile.filename}}
+                //.file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)")
+                //  i(class="fas fa-download")
             //.text__block(v-if="true")
               .text__title Invoice:
               .text__value
@@ -267,6 +272,9 @@
 				link.target = "_blank"
 				link.click()
 			},
+      firstBigLatter(string) {
+        return string[0].toUpperCase() + string.slice(1).toLowerCase()
+      },
 			getBillingDetails({ client, clientBillingInfo }) {
 				const { billingInfo } = client
 				const { name, officialName, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
@@ -484,6 +492,14 @@
       border: 1px solid $border-focus;
     }
   }
+
+  .download-file {
+    color: $red;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
 
   .file-fake-button {
     height: 30px;

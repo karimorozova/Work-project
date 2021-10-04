@@ -7,13 +7,19 @@
 
         .invoicing-details__body
           .invoicing-details__text
-            .text__address Office 333, Block B 55A, Mezhyhirska Street, 04000 Kyiv, Ukraine
+            .text__address {{ getBillingDetails(reportDetailsInfo).getAddress1() }}
+            .text__block
+              .text__title Customer:
+              .text__value {{reportDetailsInfo.client.name}}
             .text__block
               .text__title Report Id:
               .text__value {{reportDetailsInfo.reportId}}
+            .text__block(v-if="reportDetailsInfo.externalIntegration.reportId")
+              .text__title External Report Id:
+              .text__value {{reportDetailsInfo.externalIntegration.reportId}}
             .text__block
               .text__title Status:
-              .text__value {{reportDetailsInfo.status}}
+              .text__value {{firstBigLatter(reportDetailsInfo.status)}}
             .text__block
               .text__title Created At:
               .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
@@ -21,14 +27,37 @@
               .text__title Date range:
               .text__value {{ formattedDate(reportDetailsInfo.firstPaymentDate) + ' / ' + formattedDate(reportDetailsInfo.lastPaymentDate)  }}
             .text__block
+              .text__title Billing name:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
+            .text__block
+              .text__title Payment type:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
+            .text__block
+              .text__title Payment terms:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
+            .text__block
+              .text__title Projects:
+              .text__value {{ getReportProjectsCount(reportDetailsInfo) }}
+            .text__block
               .text__title Jobs:
-              .text__value {{ reportDetailsInfo.steps.length }}
+              .text__value {{ reportDetailsInfo.stepsAndProjects.length }}
             .text__block
               .text__title Total amount:
               .text__value
-                span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
+                span(style="margin-right: 4px;") {{ getTotalAmount(reportDetailsInfo) | roundTwoDigit }}
                 span(v-html="'&euro;'")
-            .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
+            .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
+              .text__title Invoice:
+              .text__value
+                .download-file(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)") {{reportDetailsInfo.invoice.filename}}
+                //.file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)")
+                //  i(class="fas fa-download")
+
+            .text__block(v-if="this.reportDetailsInfo.status !== 'Created' && reportDetailsInfo.hasOwnProperty('reportFiles') && reportDetailsInfo.reportFiles.length > 0")
+              .text__title Reports:
+              .text__value
+                .download-file(v-for="reportFile in reportDetailsInfo.reportFiles" style="cursor: pointer"  @click="downloadFile(reportFile.path)") {{reportFile.filename}}
+            //.text__block(v-if="true")
               .text__title Invoice:
               .text__value
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
@@ -166,6 +195,36 @@
 					return sum
 				}, 0)
 			},
+      downloadFile(path) {
+        let link = document.createElement('a')
+        link.href = __WEBPACK__API_URL__ + '/' + path
+        link.target = "_blank"
+        link.click()
+      },
+      firstBigLatter(string) {
+			  return string[0].toUpperCase() + string.slice(1).toLowerCase()
+      },
+      getReportProjectsCount({ stepsAndProjects }) {
+        const { length } = [ ...new Set(stepsAndProjects.map(i => i.project)) ]
+        return length
+      },
+      getTotalAmount({ steps }) {
+        return steps.reduce((sum, i) => {
+          sum += i.finance.Price.receivables || 0
+          return sum
+        }, 0)
+      },
+      getBillingDetails({ client, clientBillingInfo }) {
+        const { billingInfo } = client
+        const { name, officialName, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+        return {
+          getOfficialName: () => officialName,
+          getName: () => name,
+          getPaymentTerms: () => paymentTerms,
+          getPaymentType: () => paymentType,
+          getAddress1: () => `${ street1 || 'No street' }, ${ city || 'No city' }, ${ country || 'No country' }`
+        }
+      },
 			// setPaymentMethod({ option }) {
 			// 	this.paymentMethod = option
 			// },
@@ -235,7 +294,6 @@
 			},
 			async openDetails(id) {
 				this.reportDetailsInfo = (await this.$http.post('/invoicing-receivables/paid-report/' + id)).data[0]
-        console.log((await this.$http.post('/invoicing-receivables/paid-report/' + id)).data[0])
 			},
 			async getSteps() {
 				this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
@@ -288,6 +346,13 @@
 
     &:focus {
       border: 1px solid $border-focus;
+    }
+  }
+
+  .download-file {
+    color: $red;
+    &:hover {
+      text-decoration: underline;
     }
   }
 
@@ -499,7 +564,7 @@
     }
 
     &__title {
-      width: 100px;
+      width: 120px;
       font-family: Myriad600;
     }
 
