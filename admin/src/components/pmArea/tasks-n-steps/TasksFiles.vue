@@ -50,7 +50,7 @@
               @deleteFile="(e) => deleteFile(e, 'refFiles')"
             )
       .tasks-files__tooltip
-        div Source: total size must be <= 10Mb, each file can be <= 2Mb
+        div Source: total size must be <= 10Mb, each file can be <= 3Mb
         div Reference: each file can be <= 50Mb
 
     ValidationErrors(
@@ -146,7 +146,7 @@
 				const filteredFiles = Array.from(files).filter(item => {
 					const { size, name } = item
 					const extension = name.split('.').pop()
-					return size / 1000000 <= 2 && this.forbiddenExtensions.indexOf(extension) === -1
+					return size / 1000000 <= 3 && this.forbiddenExtensions.indexOf(extension) === -1
 				})
 				if (filteredFiles.length && this.checkFilesSource(filteredFiles)) {
 					for (let file of filteredFiles) {
