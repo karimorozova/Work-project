@@ -81,7 +81,7 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	const allLanguages = await Languages.find()
 	try {
 		const query = stepsFiltersQuery(filters, allLanguages)
-		const steps = await getAllSteps(countToSkip, countToGet, query)
+		const steps = await getAllSteps(countToSkip, countToGet, {...query, "steps.status": "Completed", status: "Closed" })
 		res.send(steps)
 	} catch (err) {
 		console.log(err)
@@ -92,7 +92,7 @@ router.post("/not-selected-steps-list", async (req, res) => {
 router.post("/not-selected-steps-list-mono-project", async (req, res) => {
 	const { projectId, clientBillingInfo } = req.body
 	try {
-		const query = { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo) }
+		const query = { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo), "steps.status": "Completed", status: "Closed" }
 		const steps = await getAllSteps(0, 0, query)
 		res.send(steps)
 	} catch (err) {
@@ -104,7 +104,7 @@ router.post("/not-selected-steps-list-mono-project", async (req, res) => {
 router.post("/not-selected-steps-list-multi-project/", async (req, res) => {
 	const { clientBillingInfo } = req.body
 	try {
-		const query = { "clientBillingInfo": ObjectId(clientBillingInfo) }
+		const query = { "clientBillingInfo": ObjectId(clientBillingInfo), "steps.status": "Completed", status: "Closed" }
 		const steps = await getAllSteps(0, 0, query)
 		res.send(steps)
 	} catch (err) {
@@ -220,8 +220,8 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body
 
 	try {
-		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
 		await createCustomerPayment(reportId, paidAmount)
+		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
 		res.send(result.status);
 	} catch(err) {
 		console.log(err);

@@ -86,15 +86,12 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
-	console.log({ queryForStep })
 	const queryPipeline = [
-		{ $match: { status: "Closed" } },
 		{ $unwind: "$steps" },
 		{
 			$match: {
 				clientBillingInfo: { $exists: true, $ne: null },
 				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
-				"steps.status": "Completed",
 				...queryForStep
 			}
 		},

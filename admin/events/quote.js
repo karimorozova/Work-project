@@ -1,8 +1,12 @@
 const EventEmitter = require('events')
 const emitter = new EventEmitter()
-const { Projects } = require('../models')
+const { Projects, InvoicingReceivables } = require('../models')
 const { setStepsStatus, notifyStepDecisionMade } = require('../projects')
 const { notifyManagerProjectStarts, sendQuoteToVendorsAfterProjectAccepted, notifyManagerProjectRejected } = require('../utils')
+const { getAllSteps, createReports, createAndSendZohoInvoice } = require("../invoicingReceivables")
+const { createDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")
+
+const DIR = './dist/clientReportsFiles/'
 
 
 emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
@@ -32,6 +36,14 @@ emitter.on('client-decide', async (project, prop) => {
 	}
 	if (prop === 'reject') {
 		await notifyManagerProjectRejected(project)
+	}
+
+	if(project.paymentProfile === 'PPP' && !project.isTest) {
+		const steps = await getAllSteps(0, 0, { _id: project._id })
+		await createReports({checkedSteps: steps, createdBy: null})
+		const report = await InvoicingReceivables.findOne({"stepsAndProjects.step": {"$in": steps.map(({steps}) => steps._id.toString())}  })
+		await createDir(DIR, report._id.toString())
+		await createAndSendZohoInvoice(report._id.toString())
 	}
 })
 

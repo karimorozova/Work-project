@@ -125,7 +125,6 @@ const getZohoClientPaymentCreationStructure = async (_reportId, amount) => {
 	const [ report ] = await getReportById(_reportId)
 	const { client, clientBillingInfo, externalIntegration } = report
 	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
-	console.log(getOfficialCompanyName(clientBillingInfo))
 	const customerId = "335260000005073023"
 	return  {
 		"customer_id": customerId,
