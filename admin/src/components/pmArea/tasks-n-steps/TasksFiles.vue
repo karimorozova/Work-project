@@ -139,7 +139,7 @@
 				return sizesSum / 1000000 <= 10
 			},
 			uploadSourceFiles({ files }) {
-				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 2)
+				const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 3)
 				if (filesBiggerThan2MB.length) {
 					this.showFileSizeWarning = true
 				}
