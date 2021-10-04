@@ -23,7 +23,7 @@ const sendInvoiceToClientContacts = async (_reportId = "614c67225a835d39a356670f
 	//--------- TODO удалить н=>
 	for await (let contact of [ { email: 'maksym@pangea.global' }, { email: 'dmitrii@pangea.global' } ]) {
 		const message = invoicingMessage(contact, report, currency)
-		await sendEmail({ to: contact.email, attachments: finalAttachments, subject: '' }, message)
+		await sendEmail({ to: contact.email, attachments: finalAttachments, subject}, message)
 	}
 	//----------------------------------
 
