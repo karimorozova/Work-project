@@ -14,22 +14,22 @@ async function getProjects(obj) {
 async function getProjectsForPortal(obj) {
 	return (await Projects.find(
 			obj,
-				{
-					projectId:1,
-					projectName:1,
-					status: 1,
-					clientContacts: 1,
-					tasks: 1,
-					steps:1,
-					startDate: 1,
-					deadline: 1,
-					finance: 1,
-					createdBy: 1,
-					tasksDeliverables: 1,
-					tasksDR2: 1,
-					projectCurrency: 1,
-				}
-			)
+			{
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				clientContacts: 1,
+				tasks: 1,
+				steps: 1,
+				startDate: 1,
+				deadline: 1,
+				finance: 1,
+				createdBy: 1,
+				tasksDeliverables: 1,
+				tasksDR2: 1,
+				projectCurrency: 1
+			}
+	)
 			.populate('industry')
 			.populate('service')
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
@@ -47,7 +47,7 @@ async function getProject(obj) {
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
-			? project.customer.billingInfo.find(({_id}) =>  `${project.clientBillingInfo}` === `${_id}`)
+			? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
 			: null
 
 	return project
@@ -63,20 +63,26 @@ async function updateProject(query, update) {
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
-			? project.customer.billingInfo.find(({_id}) =>  `${project.clientBillingInfo}` === `${_id}`)
+			? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
 			: null
 
 	return project
 }
 
 async function getProjectAfterUpdate(query, update) {
-	return await Projects.findOneAndUpdate(query, update, { new: true })
+	const project = await Projects.findOneAndUpdate(query, update, { new: true })
 			.populate('industry')
 			.populate('customer')
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+
+	project._doc.clientBillingInfo = !!project.clientBillingInfo
+			? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
+			: null
+
+	return project
 }
 
 async function getFilteredProjects(filters) {
