@@ -3,7 +3,7 @@ const { getReportById } = require('./getReceivables')
 const { generateReportPPP } = require('./statisticReportsGeneration')
 const { invoicingMessage } = require('../emailMessages/clientCommunication')
 
-const sendInvoiceToClientContacts = async (_reportId = "614c67225a835d39a356670f") => {
+const sendInvoiceToClientContacts = async (_reportId) => {
 	const attachments = []
 	const reportFiles = []
 	const [ report ] = await getReportById(_reportId)
