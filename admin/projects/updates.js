@@ -142,7 +142,8 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
 				task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status
 				if (task.status === "Cancelled Halfway") {
 					task.finance = getTaskNewFinance(changedSteps, task)
-					task.targetFiles = await getTaskTargetFiles({ task, projectId, stepName: 'halfway' })
+					// TODO: Cancelled Halfway memoq file downloading issue
+					// task.targetFiles = await getTaskTargetFiles({ task, projectId })
 				} else {
 					task.finance = {
 						Wordcount: {
@@ -165,21 +166,31 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
 	}
 }
 
-async function getTaskTargetFiles({ task, projectId, stepName }) {
+async function getTaskTargetFiles({ task, projectId, step }) {
+	let { memoqDocs, memoqProjectId, targetLanguage, targetFilesStage1, targetFilesStage2 } = task
+	let { stepId } = step
+
 	let targetFiles = []
-	const { memoqDocs, memoqProjectId } = task
+	if(!targetFilesStage1) targetFilesStage1 = []
+	if(!targetFilesStage2) targetFilesStage2 = []
+
 	try {
 		for (let doc of memoqDocs) {
-			// const exportPath = doc.ExportPath.slice(1);
-			// const pathParts = exportPath.split(".");
-			// const fileName = pathParts.slice(0, -1).join();
-			const fileName = `${ Math.floor(Math.random() * 1000000) }}-${ doc.ImportPath }`
+			const stepCounter = stepId[stepId.length - 1]
+			const fileName = `${ targetLanguage }-${ stepCounter }-${ Math.floor(Math.random() * 1000000) }-${ doc.ImportPath }`
 			const path = `/projectFiles/${ projectId }/${ fileName }`
 			await downloadMemoqFile({ memoqProjectId, docId: doc.DocumentGuid, path: `./dist${ path }` })
-			// targetFiles.push({ fileName: doc.DocumentName, path });
 			targetFiles.push({ fileName, path })
+			eval('targetFilesStage' + stepCounter).push({ fileName, path })
 		}
-		return targetFiles
+
+		return {
+			...task,
+			targetFiles,
+			targetFilesStage1,
+			targetFilesStage2
+		}
+
 	} catch (err) {
 		console.log(err)
 		console.log("Error in getTaskTargetFiles")
@@ -191,12 +202,14 @@ async function downloadCompletedFiles(stepId) {
 	try {
 		let { id, steps, tasks } = await getProject({ "steps._id": stepId })
 		const step = steps.find(item => item.id === stepId)
-		const taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
-		tasks[taskIndex].targetFiles = await getTaskTargetFiles({
-			task: tasks[taskIndex],
+		const _taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
+
+		tasks[_taskIndex] = await getTaskTargetFiles({
+			task: tasks[_taskIndex],
 			projectId: id,
-			stepName: step.name
+			step
 		})
+
 		await Projects.updateOne({ "_id": id }, { tasks })
 	} catch (err) {
 		console.log(err)

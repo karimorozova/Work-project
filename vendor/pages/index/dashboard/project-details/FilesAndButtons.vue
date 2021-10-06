@@ -74,6 +74,7 @@
 				})
 			},
 			async startJob() {
+				if(!this.job.isVendorRead) alert('Please don\'t forget to confirm that you have read and downloaded all the reference files, by ticking the box')
 				if (!this.job.isVendorRead) return
 				const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit)
 				try {

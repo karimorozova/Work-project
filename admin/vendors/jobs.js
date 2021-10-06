@@ -169,7 +169,7 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 const pushTasksToDR1 = async (project, task, step) =>{
   const {_id, projectManager, accountManager} = project
 	const instructions = step.serviceStep.title === 'Compliance' ? drInstructionsCompliance : dr1Instructions
-  const files = getTaskTargetFiles(project,task)
+  const files = getTaskTargetFilesWithCopy(project,task)
   project.tasksDR1.push({
     dr1Manager: projectManager,
     dr2Manager: accountManager,
@@ -180,7 +180,7 @@ const pushTasksToDR1 = async (project, task, step) =>{
   return await Projects.updateOne({_id: _id}, {tasksDR1: project.tasksDR1})
 }
 
-function getTaskTargetFiles(project,task) {
+function getTaskTargetFilesWithCopy(project,task) {
   return task.targetFiles.reduce((acc, cur) => {
     const originalName = cur.path.split("/").pop()
     const dr1FileName = `${Math.floor(Math.random() * 1000000)}-${originalName}`

@@ -1,5 +1,11 @@
 <template lang="pug">
   .tasks
+    .tasks__fileDetails(v-if="isFilesDetailsModal && fileDetailsIndex !== null")
+      Files(
+        @close="hideFileDetails"
+        :task="allTasks[fileDetailsIndex]"
+      )
+
     .tasks__preview(v-if="isEditAndSend")
       Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessage")
 
@@ -96,6 +102,9 @@
         template(slot="headerCheck" slot-scope="{ field }")
           .table__header
             CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="(e)=>toggleAll(e, true)" @uncheck="(e)=>toggleAll(e, false)" customClass="tasks-n-steps")
+
+        template(slot="headerFilesIcon" slot-scope="{ field }")
+          .table__header {{ field.label }}
         template(slot="headerTaskId" slot-scope="{ field }")
           .table__header {{ field.label }}
         template(slot="headerService" slot-scope="{ field }")
@@ -122,6 +131,9 @@
         template(slot="check" slot-scope="{ row, index }")
           .table__data
             CheckBox(:isChecked="row.isChecked" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
+        template(slot="fileDetails" slot-scope="{row, index}")
+          .table__data(style="cursor: pointer;" @click="showFileDetails(index)")
+            img(src="../../../assets/images/latest-version/files.png")
         template(slot="taskId" slot-scope="{ row }")
           .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
         template(slot="service" slot-scope="{ row }")
@@ -216,6 +228,7 @@
 	import reviewManagers from "@/mixins/reviewManagers"
 	import GeneralTable from "../../GeneralTable"
 	import DeliveryOneMulti from "./DeliveryOneMulti"
+	import Files from "../stepinfo/Files"
 
 	export default {
 		mixins: [ currencyIconDetected, reviewManagers ],
@@ -237,10 +250,11 @@
 			return {
 				fields: [
 					{ label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-					{ label: "Id", headerKey: "headerTaskId", key: "taskId", style: { "width": "4%" } },
-					{ label: "Service", headerKey: "headerService", key: "service", style: { "width": "11%" } },
-					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
-					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "12%" } },
+					{ label: "", headerKey: "headerFilesIcon", key: "fileDetails", style: { "width": "3%", "border-left": "none" } },
+					{ label: "", headerKey: "headerTaskId", key: "taskId", style: { "width": "4%" } },
+					{ label: "Service", headerKey: "headerService", key: "service", style: { "width": "10%" } },
+					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "10%" } },
 					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
@@ -273,11 +287,20 @@
 				managers: [],
 				selectedManager: null,
 				reviewTasksMulti: [],
-				isDeliveryReviewMulti: false
-
+				isDeliveryReviewMulti: false,
+				isFilesDetailsModal: false,
+        fileDetailsIndex: null,
 			}
 		},
 		methods: {
+			showFileDetails(index) {
+				this.fileDetailsIndex = index
+				this.isFilesDetailsModal = true
+			},
+			hideFileDetails() {
+				this.fileDetailsIndex = null
+				this.isFilesDetailsModal = false
+			},
 			closeManageApprovalModal() {
 				this.manageApprovalModal = false
 			},
@@ -461,14 +484,14 @@
 			async approveCancelAction() {
 				const checkedTasks = this.allTasks.filter(item => item.isChecked)
 				if (!checkedTasks.length) return this.closeApproveModal()
-        try {
-	        await this.cancelTasks(checkedTasks)
-	        this.alertToggle({ message: "Cancelled", isShow: true, type: "success" })
-	        this.closeApproveModal()
-	        this.unCheckAllTasks()
-        }catch (e) {
-	        this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
-        }
+				try {
+					await this.cancelTasks(checkedTasks)
+					this.alertToggle({ message: "Cancelled", isShow: true, type: "success" })
+					this.closeApproveModal()
+					this.unCheckAllTasks()
+				} catch (e) {
+					this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
+				}
 			},
 			notApproveAction() {
 				this.closeApproveModal()
@@ -591,7 +614,7 @@
 						.map(({ title }) => title)
 
 				let taskSteps = this.currentProject.steps
-            .filter(item => item.taskId === task.taskId)
+						.filter(item => item.taskId === task.taskId)
 
 				taskSteps = taskSteps.filter(item => !item.stepId.includes('Cancelled'))
 
@@ -645,7 +668,7 @@
 				this.isDeliveryReviewMulti = false
 				this.selectedAction = ""
 				this.setShowTasksAndDeliverables(true)
-        this.toggleAll(e, false)
+				this.toggleAll(e, false)
 			},
 			isEvery(taskStatus) {
 				return this.currentProject.tasks
@@ -728,6 +751,7 @@
 			this.getManagers()
 		},
 		components: {
+			Files,
 			DeliveryOneMulti,
 			GeneralTable,
 			DeliveryOne,
@@ -857,7 +881,7 @@
       padding: 20px 40px;
       background: white;
       position: absolute;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -972,21 +996,32 @@
       padding: 3px;
       border-radius: 4px;
       margin-left: 22px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       opacity: 0;
       z-index: -2;
       transition: all 0.2s;
     }
 
     &__modal {
-      padding: 20px;
+      padding: 25px;
       background: white;
       position: absolute;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 500;
+    }
+
+    &__fileDetails {
+      padding: 25px;
+      background: white;
+      position: absolute;
+      box-shadow: $box-shadow;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 501;
     }
 
     &__titleModal {

@@ -17,13 +17,13 @@
         :originallyUnits="originallyUnits"
         :projectCurrency="projectCurrency"
       )
-    .step-info__block
-      Files(
-        :stepFiles="stepFiles"
-        :step="step"
-        :projectId="task.projectId"
-        :originallyUnits="originallyUnits"
-      )
+    //.step-info__block
+    //  Files(
+    //    :stepFiles="stepFiles"
+    //    :step="step"
+    //    :projectId="task.projectId"
+    //    :originallyUnits="originallyUnits"
+    //  )
 </template>
 
 <script>
@@ -64,16 +64,16 @@
 			}
 		},
 		methods: {
-			stepFilesFiller(arr, category) {
-				let files = []
-				for (let file of arr) {
-					const nameArr = file.split("/")
-					const filePath = file.includes('dist') ? __WEBPACK__API_URL__ + file.split("./dist")[1] : __WEBPACK__API_URL__ + file
-					const fileName = nameArr[nameArr.length - 1]
-					files.push({ fileName: fileName, category: category, link: filePath })
-				}
-				return files
-			},
+			// stepFilesFiller(arr, category) {
+			// 	let files = []
+			// 	for (let file of arr) {
+			// 		const nameArr = file.split("/")
+			// 		const filePath = file.includes('dist') ? __WEBPACK__API_URL__ + file.split("./dist")[1] : __WEBPACK__API_URL__ + file
+			// 		const fileName = nameArr[nameArr.length - 1]
+			// 		files.push({ fileName: fileName, category: category, link: filePath })
+			// 	}
+			// 	return files
+			// },
 			refreshFinance({ costs }) {
 				// console.log("refresh finance", costs);
 			},
@@ -105,17 +105,17 @@
 			...mapGetters({
 				currentProject: "getCurrentProject"
 			}),
-			stepFiles() {
-				let result = []
-				if (this.task.sourceFiles) result.push(...this.stepFilesFiller(this.task.sourceFiles, "Source"))
-				if (this.task.refFiles) result.push(...this.stepFilesFiller(this.task.refFiles, "Reference"))
-				if (this.task.status !== 'Pending Approval [DR1]' && this.task.status !== 'Pending Approval [DR2]' && this.task.status !== 'Ready for Delivery') {
-					if (this.task.targetFiles) result.push(...this.stepFilesFiller(this.task.targetFiles.map(i => i.path), "Target"))
-				} else {
-					if (this.delivery) result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
-				}
-				return result
-			}
+			// stepFiles() {
+			// 	let result = []
+			// 	if (this.task.sourceFiles) result.push(...this.stepFilesFiller(this.task.sourceFiles, "Source"))
+			// 	if (this.task.refFiles) result.push(...this.stepFilesFiller(this.task.refFiles, "Reference"))
+			// 	if (this.task.status !== 'Pending Approval [DR1]' && this.task.status !== 'Pending Approval [DR2]' && this.task.status !== 'Ready for Delivery') {
+			// 		if (this.task.targetFiles) result.push(...this.stepFilesFiller(this.task.targetFiles.map(i => i.path), "Target"))
+			// 	} else {
+			// 		if (this.delivery) result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
+			// 	}
+			// 	return result
+			// }
 		},
 		components: {
 			Vendor,
