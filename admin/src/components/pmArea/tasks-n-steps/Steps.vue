@@ -134,18 +134,18 @@
               span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
               span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
-        template(slot="margin" slot-scope="{ row }")
-          .table__finance
+        template(slot="margin" slot-scope="{ row, index }")
+          .table__finance(:id="'margin'+index")
             span(v-if="marginCalc(row)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="marginCalc(row)") {{ marginCalc(row) }}
+            sup(:class="{'red-color': +marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
       transition(name="fade")
         .steps__info(v-if="isStepInfo")
           StepInfo(
             :step="allSteps[infoIndex]"
             :index="infoIndex"
-            :vendors="vendors"
             :task="getTask(infoIndex)"
             @closeStepInfo="closeStepInfo"
             :originallyLanguages="originallyLanguages"
@@ -182,7 +182,6 @@
         @scrollDrop="scrollDrop"
       )
 
-
     ValidationErrors(
       v-if="areErrorsExist"
       :errors="errors"
@@ -209,7 +208,6 @@
 	import scrollDrop from "@/mixins/scrollDrop"
 	import stepVendor from "@/mixins/stepVendor"
 	import currencyIconDetected from "../../../mixins/currencyIconDetected"
-
 	import { mapGetters, mapActions } from 'vuex'
 	import ProgressLineStep from "../../ProgressLineStep"
 	import GeneralTable from "../../GeneralTable"
@@ -247,13 +245,13 @@
 					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "10%" } },
 					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
 					{ label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "18%" } },
-					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "12%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
 					// { label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "8%" } },
 					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
 					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "7%" } },
 					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "7%" } },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "7%" } }
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } }
 				],
 				selectedVendors: [],
 				modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
@@ -293,15 +291,6 @@
 				const { stepId, vendor } = step
 				if (vendor) this.currentStepIdForRemoveVendor = stepId
 			},
-			// getTotalReceivables(step) {
-			//     console.log(step.finance.Price.receivables)
-			//
-			//     const { finance, clientDiscount } = step;
-			//     // if(clientDiscount) {
-			//     //     return (finance.Price.receivables - finance.Price.receivables*clientDiscount/100).toFixed(2);
-			//     // }
-			//     return finance.Price.receivables;
-			// },
 			progress(prog) {
 				return prog.hasOwnProperty('totalWordCount') ? +((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : +prog
 			},
@@ -349,10 +338,17 @@
 			},
 			marginCalc(step) {
 				const { Price } = step.finance
-				if (Price.halfReceivables >= 0) {
-					return (Price.halfReceivables - Price.halfPayables).toFixed(2)
-				}
-				return (+Price.receivables - +Price.payables).toFixed(2)
+				let margin = 0
+				if (Price.halfReceivables >= 0) margin = +Price.halfReceivables - +Price.halfPayables
+        else margin = +Price.receivables - +Price.payables
+				return margin.toFixed(2)
+			},
+			marginCalcPercent(step) {
+				const { Price } = step.finance
+				let percent = NaN
+				if (Price.halfReceivables >= 0) percent = 100 - (+Price.halfPayables / +Price.halfReceivables) * 100
+				percent = 100 - (Price.payables / Price.receivables) * 100
+				return Number.isNaN(percent) ? 0 : percent.toFixed(0)
 			},
 			getTask(index) {
 				return this.tasks.find(item => {
@@ -379,16 +375,10 @@
 			setVendor({ person }, index) {
 				const { stepId, taskId } = this.allSteps[index]
 				const doesHaveAccess = this.userGroup.name === "Administrators" || this.userGroup.name === "Developers" || this.userGroup.name === "Project Managers"
-				const relatedStep = this.allSteps.find(item => item.stepId !== stepId && item.taskId === taskId)
 				if (doesHaveAccess) {
 					this.$emit("setVendor", { vendor: person, index })
-				}
-				//else if (!relatedStep.vendor || relatedStep.vendor.toString() !== person._id.toString()) {
-					// this.$emit("setVendor", { vendor: person, index })
-				//}
-				else {
+				} else {
 					this.alertToggle({ message: "Error can't assign Vendor to Step", isShow: true, type: 'error' })
-					// this.showErrors([ 'This vendor has already been assigned to a related step' ])
 				}
 			},
 			async setAction({ option }) {
@@ -583,34 +573,6 @@
 					} else if (indexesForAvailableStatuses.length && !indexesForAvailableStatuses.includes(-1)) {
 						return [ "Change Deadline" ]
 					}
-
-					// const startAvailableOption = [ "Mark as accept/reject", "Request confirmation" ]
-					// const startAvailableStatuses = [ "Created", 'Rejected', 'Approved' ]
-
-					// if (checkedSteps.length) {
-					//
-					//   if(checkedSteps.every(({status}) => status === 'Created' || status === 'Rejected' )){
-					//     return ["Mark as accept/reject", "Request confirmation"]
-					//   }else if(checkedSteps.every(({status}) => status === 'Completed' )){
-					//     return ["ReOpen"]
-					//   }
-					// }
-
-					// let result = [ "Mark as accept/reject", "Request confirmation" ]
-					// const requestedStep = this.allSteps.find(item => item.status === "Request Sent" || item.status === "Created")
-					// const completedStep = this.allSteps.find(item => item.status === "Completed")
-					// if (!requestedStep && result.indexOf("Mark as accept/reject") !== -1) {
-					// 	result = []
-					// }
-					// if (completedStep && result.indexOf("ReOpen") === -1) {
-					// 	result.push("ReOpen")
-					// }
-					// if (!result.length) {
-					// 	result = [ "No action available" ]
-					// }
-					// return result
-
-					// return []
 				}
 			},
 			isAllSelected() {
@@ -653,7 +615,8 @@
       padding: 0 6px;
       word-break: break-word;
     }
-    &__statusAndProgress{
+
+    &__statusAndProgress {
       width: 100%;
       padding: 0 6px;
     }
@@ -715,13 +678,15 @@
 
     &__info {
       position: absolute;
-      top: -150px;
-      left: 10%;
-      width: 80%;
-      z-index: 50;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      z-index: 500;
+      padding: 25px;
       background-color: $white;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      margin-bottom: 120px;
+      box-shadow: $box-shadow;
+      margin-bottom: 140px;
     }
 
     &__info-icon {
@@ -863,6 +828,9 @@
   .overHidden {
     overflow-y: hidden;
     overflow-x: hidden;
+  }
+  .red-color{
+    color: $red;
   }
 
 </style>

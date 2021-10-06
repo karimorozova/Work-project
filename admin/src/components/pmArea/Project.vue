@@ -100,7 +100,7 @@
             .input-title__text Billing Information:
             span.require *
           // TODO: delete false!
-          input.project__input-text(v-if="false && isProjectFinished"  type="text" :value="(project.clientBillingInfo.name) || ''" disabled)
+          input.project__input-text(v-if="isProjectFinished || project._id" type="text" :value="(project.clientBillingInfo.name) || ''" disabled)
           .project__drop-menu(v-else)
             SelectSingle(
               :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"

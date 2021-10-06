@@ -102,6 +102,12 @@
     cursor: pointer;
   }
 
+  sup {
+    margin-left: 4px;
+    font-size: 11px;
+    color: $border-focus;
+  }
+
   .b-log-in,
   .b-log-out {
     padding: 6px;

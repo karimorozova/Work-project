@@ -164,11 +164,12 @@
             span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
             span(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
-        template(slot="margin" slot-scope="{ row }")
+        template(slot="margin" slot-scope="{ row, index }")
           .table__finance
-            span(v-if="marginCalc(row.finance.Price)")
+            span(v-if="marginCalc(row)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-            span(v-if="marginCalc(row.finance.Price)") {{ marginCalc(row.finance.Price) }}
+            span(v-if="marginCalc(row)") {{ marginCalc(row) }}
+            sup(:class="{'red-color': +marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
         template(slot="delivery" slot-scope="{ row }")
           .table__data
@@ -255,12 +256,12 @@
 					{ label: "Service", headerKey: "headerService", key: "service", style: { "width": "10%" } },
 					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
 					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
-					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "10%" } },
+					{ label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "9%" } },
 					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
 					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
 					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "8%" } },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } },
 					{ label: "", headerKey: "headerDelivery", key: "delivery", style: { "width": "4%" } }
 				],
 				selectedAction: "",
@@ -289,7 +290,7 @@
 				reviewTasksMulti: [],
 				isDeliveryReviewMulti: false,
 				isFilesDetailsModal: false,
-        fileDetailsIndex: null,
+				fileDetailsIndex: null
 			}
 		},
 		methods: {
@@ -600,11 +601,31 @@
 
 				return dates
 			},
-			marginCalc(finance) {
-				if (finance.halfReceivables >= 0) {
-					return (finance.halfReceivables - finance.halfPayables).toFixed(2)
+			getPrice(status, taskId) {
+				const { steps } = this.currentProject
+				const neededSteps = steps.filter(item => item.taskId === taskId)
+				let receivables = 0
+				let payables = 0
+
+				if (status === 'Cancelled Halfway') {
+					receivables = neededSteps.reduce((a, c) => a + +c.finance.Price.halfReceivables, 0)
+					payables = neededSteps.reduce((a, c) => a + +c.finance.Price.halfPayables, 0)
+				} else {
+					receivables = neededSteps.reduce((a, c) => a + +c.finance.Price.receivables, 0)
+					payables = neededSteps.reduce((a, c) => a + +c.finance.Price.payables, 0)
 				}
-				return (finance.receivables - finance.payables).toFixed(2)
+
+				return { receivables, payables }
+			},
+			marginCalc({ status, taskId }) {
+				const { receivables, payables } = this.getPrice(status, taskId)
+				return (receivables - payables).toFixed(2)
+			},
+			marginCalcPercent({ status, taskId }) {
+				const { receivables, payables } = this.getPrice(status, taskId)
+				let percent = NaN
+				percent = 100 - (payables / receivables) * 100
+				return Number.isNaN(percent) ? 0 : percent.toFixed(0)
 			},
 			progress(task) {
 				let progress = 0
@@ -1067,6 +1088,9 @@
       height: 32px;
       width: 220px;
     }
+  }
 
+  .red-color{
+    color: $red;
   }
 </style>

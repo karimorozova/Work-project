@@ -1,43 +1,32 @@
 <template lang="pug">
   .step-info
-    span.step-info__close(@click="closeInfo") +
-    .step-info__block.size Step Id: {{ step.stepId }}
+    .step-info__title {{ step.stepId }}
+    .step-info__close(@click.stop="closeInfo") &#215;
+
     .step-info__block
-      Vendor(
-        :index="index"
-        :step="step"
-        :vendors="vendors"
+      StepDetails(
         :vendor="step.vendor"
-        :originallyLanguages="originallyLanguages"
+        :step="step"
+        :task="task"
       )
-    .step-info__block
+    .step-info__finance
       Finance(
         :step="step"
         @refreshFinance="refreshFinance"
         :originallyUnits="originallyUnits"
         :projectCurrency="projectCurrency"
       )
-    //.step-info__block
-    //  Files(
-    //    :stepFiles="stepFiles"
-    //    :step="step"
-    //    :projectId="task.projectId"
-    //    :originallyUnits="originallyUnits"
-    //  )
 </template>
 
 <script>
-	import Vendor from "../stepinfo/Vendor"
 	import Finance from "../stepinfo/finance/Finance"
 	import Matrix from "../stepinfo/Matrix"
 	import Files from "../stepinfo/Files"
 	import { mapGetters, mapActions } from "vuex"
+	import StepDetails from "../stepinfo/StepDetails"
 
 	export default {
 		props: {
-			vendors: {
-				type: Array
-			},
 			step: {
 				type: Object
 			},
@@ -64,29 +53,9 @@
 			}
 		},
 		methods: {
-			// stepFilesFiller(arr, category) {
-			// 	let files = []
-			// 	for (let file of arr) {
-			// 		const nameArr = file.split("/")
-			// 		const filePath = file.includes('dist') ? __WEBPACK__API_URL__ + file.split("./dist")[1] : __WEBPACK__API_URL__ + file
-			// 		const fileName = nameArr[nameArr.length - 1]
-			// 		files.push({ fileName: fileName, category: category, link: filePath })
-			// 	}
-			// 	return files
-			// },
 			refreshFinance({ costs }) {
 				// console.log("refresh finance", costs);
 			},
-			// async getDeliveryFiles() {
-			// 	try {
-			// 		const result = await this.$http.post("/pm-manage/delivery-data", {
-			// 			projectId: this.currentProject._id,
-			// 			taskId: this.task.taskId
-			// 		})
-			// 		this.delivery = result.data
-			// 	} catch (err) {
-			// 	}
-			// },
 			closeInfo() {
 				this.$emit("closeStepInfo")
 			},
@@ -96,29 +65,15 @@
 			})
 		},
 		mounted() {
-			// const { status } = this.task
-			// if (status === 'Pending Approval [DR1]' || status === 'Pending Approval [DR2]' || status === 'Ready for Delivery') {
-			// 	this.getDeliveryFiles()
-			// }
+
 		},
 		computed: {
 			...mapGetters({
 				currentProject: "getCurrentProject"
-			}),
-			// stepFiles() {
-			// 	let result = []
-			// 	if (this.task.sourceFiles) result.push(...this.stepFilesFiller(this.task.sourceFiles, "Source"))
-			// 	if (this.task.refFiles) result.push(...this.stepFilesFiller(this.task.refFiles, "Reference"))
-			// 	if (this.task.status !== 'Pending Approval [DR1]' && this.task.status !== 'Pending Approval [DR2]' && this.task.status !== 'Ready for Delivery') {
-			// 		if (this.task.targetFiles) result.push(...this.stepFilesFiller(this.task.targetFiles.map(i => i.path), "Target"))
-			// 	} else {
-			// 		if (this.delivery) result.push(...this.stepFilesFiller(this.delivery.files.map(i => i.path), "Target"))
-			// 	}
-			// 	return result
-			// }
+			})
 		},
 		components: {
-			Vendor,
+			StepDetails,
 			Finance,
 			Matrix,
 			Files
@@ -128,27 +83,37 @@
 </script>
 
 <style lang="scss" scoped>
-  .step-info {
-    padding: 21px;
-    position: relative;
+  @import "../../../assets/scss/colors";
 
-    &__block {
-      margin-bottom: 20px;
+  .step-info {
+    &__title {
+      font-size: 18px;
+      font-family: Myriad600;
+      margin-bottom: 10px;
+    }
+
+    &__finance {
+      margin-top: 20px;
     }
 
     &__close {
       position: absolute;
-      top: 3px;
-      right: 8px;
-      transform: rotate(45deg);
-      font-size: 24px;
-      font-weight: 600;
+      top: 10px;
+      right: 10px;
+      font-size: 22px;
       cursor: pointer;
-    }
-  }
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
 
-  .size {
-    font-size: 21px;
-    font-family: 'Myriad600';
+      &:hover {
+        opacity: 1
+      }
+    }
   }
 </style>
