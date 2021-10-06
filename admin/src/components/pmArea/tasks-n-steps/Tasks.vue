@@ -169,7 +169,7 @@
             span(v-if="marginCalc(row)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="marginCalc(row)") {{ marginCalc(row) }}
-            sup(:class="{'red-color': +marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
+            sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
         template(slot="delivery" slot-scope="{ row }")
           .table__data
