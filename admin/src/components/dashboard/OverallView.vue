@@ -144,7 +144,7 @@
 			},
 			dueToday() {
 				if (this.filteredForPmAmOrAdmin.length) {
-					const today = this.filteredForPmAmOrAdmin.filter((project) => moment(0, "HH").isSame(project.deadline, 'days'))
+					const today = [ ...this.filteredForPmAmOrAdmin.filter((project) => moment(0, "HH").isSame(project.deadline, 'days'))]
 					return today.map(item => {
 						item.class = moment(item.deadline).diff(moment()) <= 0 ? 'red-row' : ''
 						return item
