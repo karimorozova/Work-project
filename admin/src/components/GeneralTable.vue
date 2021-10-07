@@ -376,7 +376,7 @@
   }
 
   .red-row{
-    background-color: #F4CCCC;
+    background-color: $light-red;
   }
 
   .shortBody {

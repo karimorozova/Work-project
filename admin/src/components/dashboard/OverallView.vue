@@ -143,11 +143,13 @@
 					})
 			},
 			dueToday() {
-				return this.filteredForPmAmOrAdmin.length
-						? this.filteredForPmAmOrAdmin.filter((project) => {
-							return moment(0, "HH").isSame(project.deadline, 'days')
-						})
-						: []
+				if (this.filteredForPmAmOrAdmin.length) {
+					const today = this.filteredForPmAmOrAdmin.filter((project) => moment(0, "HH").isSame(project.deadline, 'days'))
+					return today.map(item => {
+						item.class = moment(item.deadline).diff(moment()) <= 0 ? 'red-row' : ''
+						return item
+					})
+				}
 			},
 			startedToday() {
 				return this.filteredForPmAmOrAdmin.length
@@ -167,17 +169,17 @@
 						})
 						: []
 			},
-      myQuotes() {
-        const STATUSES = [ 'Draft', 'Cost Quote', 'Quote sent' ]
-        if (this.isAdmin)
-          return this.quotes.filter(({accountManager, projectManager})=> (accountManager._id === this.user._id || projectManager._id === this.user._id))
+			myQuotes() {
+				const STATUSES = [ 'Draft', 'Cost Quote', 'Quote sent' ]
+				if (this.isAdmin)
+					return this.quotes.filter(({ accountManager, projectManager }) => (accountManager._id === this.user._id || projectManager._id === this.user._id))
 
-        return this.filteredForPmAmOrAdmin.length
-            ? this.filteredForPmAmOrAdmin.filter((project) => {
-              return STATUSES.includes(project.status)
-            })
-            : []
-      },
+				return this.filteredForPmAmOrAdmin.length
+						? this.filteredForPmAmOrAdmin.filter((project) => {
+							return STATUSES.includes(project.status)
+						})
+						: []
+			},
 			isAdmin() {
 				if (!this.user.hasOwnProperty('group')) return false
 				const userGroup = this.user.group.name
@@ -204,7 +206,7 @@
 			XtrfStatsToday,
 			StartedToday,
 			Quotes,
-      MyQuotes,
+			MyQuotes,
 			IncomingRequests,
 			AcceptedRequest,
 			ProjectFinanceStats,
