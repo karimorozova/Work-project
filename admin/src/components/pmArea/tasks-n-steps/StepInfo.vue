@@ -8,6 +8,7 @@
         :vendor="step.vendor"
         :step="step"
         :task="task"
+        :originallyUnits="originallyUnits"
       )
     .step-info__finance
       Finance(

@@ -5,6 +5,8 @@
       span(v-if="!!vendor")  &ensp;/&ensp;
       span {{ step.name }}
       span &ensp;/&ensp;
+      span {{ getUnitType(step.serviceStep.unit) }}
+      span &ensp;/&ensp;
       span(v-html="stepLanguages(step)")
 
     .details__links
@@ -39,9 +41,15 @@
 			},
 			task: {
 				type: Object
+			},
+			originallyUnits: {
+				type: Array
 			}
 		},
 		methods: {
+			getUnitType(id) {
+				return this.originallyUnits.find(item => item._id.toString() === id.toString()).type || ''
+			},
 			goToMemoq(item) {
 				const { WebTransUrl } = item
 				const domainUrl = WebTransUrl.replace('116.203.204.212', 'memoq.pangea.global')
@@ -91,7 +99,7 @@
     }
 
     &__title1 {
-      font-size: 19px;
+      font-size: 18px;
       margin-top: 20px;
       font-family: 'MYRIAD300';
     }

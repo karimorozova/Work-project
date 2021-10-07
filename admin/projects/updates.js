@@ -171,8 +171,8 @@ async function getTaskTargetFiles({ task, projectId, step }) {
 	let { stepId } = step
 
 	let targetFiles = []
-	if(!targetFilesStage1) targetFilesStage1 = []
-	if(!targetFilesStage2) targetFilesStage2 = []
+	if (!targetFilesStage1) targetFilesStage1 = []
+	if (!targetFilesStage2) targetFilesStage2 = []
 
 	try {
 		for (let doc of memoqDocs) {
@@ -259,7 +259,6 @@ function getTaskStatusAfterCancel(steps, taskId) {
 		return "Cancelled Halfway"
 	}
 }
-
 
 function getStepNewFinance(step) {
 	const { progress, finance } = step
@@ -410,7 +409,6 @@ async function setNewProjectDetails(project, status, reason) {
 	}
 }
 
-
 async function getApprovedProject(project, status) {
 	const taskIds = project.tasks.map(item => item.taskId)
 	const { tasks, steps } = updateWithApprovedTasks({ taskIds, project })
@@ -455,7 +453,6 @@ function getApprovedStepStatus(stepTask, step) {
 	return 'Waiting to Start'
 }
 
-
 function updateStepsProgress(task, steps) {
 	return steps.map(item => {
 		if (task.taskId === item.taskId) {
@@ -464,7 +461,6 @@ function updateStepsProgress(task, steps) {
 		return item
 	})
 }
-
 
 function updateWordcountStepsProgress({ steps, task }) {
 	const { memoqDocs: docs } = task
@@ -475,7 +471,6 @@ function updateWordcountStepsProgress({ steps, task }) {
 		return item
 	})
 }
-
 
 function setStepsProgress(title, docs) {
 	const prop = title === 'Translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
@@ -495,23 +490,31 @@ function setStepsProgress(title, docs) {
 	return { ...stepProgress, ...totalProgress }
 }
 
-
 async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) {
 	const steps = project.steps.map(item => {
 		if (item.id === jobId) {
 			item.status = 'Completed'
 			item.progress = 100
-			item.targetFile = path
+			// item.targetFile = path
 		}
 		return item
 	})
-	const taskStep = steps.find(item => item.id === jobId)
+
+	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
+	const stepCounter = neededStep.stepId[neededStep.stepId.length - 1]
+
 	const tasks = project.tasks.map(item => {
-		let targetFiles = item.targetFiles || []
-		if (taskStep.taskId === item.taskId) {
-			// targetFiles.push({ fileName, path, isFileApproved: false });
-			targetFiles.push({ fileName, path })
+		if (neededStep.taskId === item.taskId) {
+			let targetFiles = []
+			let targetFilesStage1 = item.targetFilesStage1 || []
+			let targetFilesStage2 = item.targetFilesStage2 || []
+
+			targetFiles.push({ fileName, path: path.split('./dist').pop() })
+			eval('targetFilesStage' + stepCounter).push({ fileName, path: path.split('./dist').pop() })
+
 			item.targetFiles = targetFiles
+			item.targetFilesStage1 = targetFilesStage1
+			item.targetFilesStage2 = targetFilesStage2
 		}
 		return item
 	})
@@ -525,28 +528,36 @@ async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) 
 }
 
 async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
-
 	const steps = project.steps.map(item => {
 		if (item.id === jobId) {
 			item.status = 'Completed'
 			item.progress = 100
-			item.targetFile = paths
+			// item.targetFile = paths
 		}
 		return item
 	})
 
-	const taskStep = steps.find(item => item.id === jobId)
+	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
+	const stepCounter = neededStep.stepId[neededStep.stepId.length - 1]
 
 	const tasks = project.tasks.map(item => {
-		let targetFiles = item.targetFiles || []
-		if (taskStep.taskId === item.taskId) {
+		if (neededStep.taskId === item.taskId) {
+			let targetFiles = []
+			let targetFilesStage1 = item.targetFilesStage1 || []
+			let targetFilesStage2 = item.targetFilesStage2 || []
+
 			for (let path of paths) {
-				targetFiles.push({ fileName: path.split("/").pop(), path })
+				targetFiles.push({ fileName: path.split("/").pop(), path: path.split('./dist').pop() })
+				eval('targetFilesStage' + stepCounter).push({ fileName: path.split("/").pop(), path: path.split('./dist').pop() })
 			}
+
 			item.targetFiles = targetFiles
+			item.targetFilesStage1 = targetFilesStage1
+			item.targetFilesStage2 = targetFilesStage2
 		}
 		return item
 	})
+
 	try {
 		return await updateProject({ "_id": project.id }, { steps, tasks })
 	} catch (err) {
@@ -555,7 +566,6 @@ async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
 		throw new Error(err.message)
 	}
 }
-
 
 async function getAfterReopenSteps(steps, project) {
 	try {
@@ -586,11 +596,9 @@ function getTasksAfterReopen({ steps, tasks }) {
 	return updatedTasks
 }
 
-
 async function updateOtherProject(query, update) {
 	return await MemoqProject.findOneAndUpdate(query, update, { new: false })
 }
-
 
 const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	const vendor = await Vendors.findOne({ _id: vendorId })
@@ -629,7 +637,6 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 		projectUsers.push({ id: UserGuid, isPm })
 	}
 }
-
 
 const assignProjectManagers = async ({ manager, memoqProjectId }) => {
 	const users = await getMemoqUsers()

@@ -329,7 +329,7 @@ const ProjectsSchema = new mongoose.Schema({
 		progress: "",
 		status: "",
 		clientRate: {},
-		targetFile: "",
+		// targetFile: "",
 		finance: stepFinance,
 		nativeFinance: stepFinance,
 		defaultStepPrice: 0,

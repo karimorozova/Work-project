@@ -824,22 +824,23 @@ router.post('/project-value', async (req, res) => {
 })
 
 router.post('/step-target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
-	const { jobId } = req.body
-	try {
-		const project = await getProject({ 'steps._id': jobId })
-		const { targetFile } = req.files
-		const paths = await storeFiles(targetFile, project.id)
-		const updatedProject = await updateNonWordsTaskTargetFiles({
-			project,
-			path: paths[0],
-			jobId,
-			fileName: targetFile[0].filename
-		})
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error / Cannot add Target file to the Steps array of Project')
-	}
+	// TODO not used! refactoring
+	// const { jobId } = req.body
+	// try {
+	// 	const project = await getProject({ 'steps._id': jobId })
+	// 	const { targetFile } = req.files
+	// 	const paths = await storeFiles(targetFile, project.id)
+	// 	const updatedProject = await updateNonWordsTaskTargetFiles({
+	// 		project,
+	// 		path: paths[0],
+	// 		jobId,
+	// 		fileName: targetFile[0].filename
+	// 	})
+	// 	res.send(updatedProject)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send('Error / Cannot add Target file to the Steps array of Project')
+	// }
 })
 
 function getAccManagerAndContact(project) {
