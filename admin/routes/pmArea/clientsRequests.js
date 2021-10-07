@@ -20,6 +20,23 @@ const { upload } = require('../../utils')
 
 const { ClientRequest } = require('../../models')
 
+
+router.post('/manage-request-languages', async (req, res) => {
+	console.log('tytss')
+	const { projectId, type, data } = req.body
+	try {
+		if(type === 'sourceLanguage') await ClientRequest.updateOne({ "_id": projectId}, { $set: { 'requestForm.sourceLanguage': data, 'requestForm.targetLanguages': [] } })
+		else await ClientRequest.updateOne({ "_id": projectId}, { $set: { 'requestForm.targetLanguages': data } })
+
+		const updatedProject = await getClientRequestById({ "_id": projectId })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on /manage-request-languages')
+	}
+})
+
+
 router.post('/manage-client-contact', async (req, res) => {
 	const { contact, action, projectId } = req.body
 	try {

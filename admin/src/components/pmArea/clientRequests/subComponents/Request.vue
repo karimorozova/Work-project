@@ -392,7 +392,7 @@
       font-family: Myriad600;
       align-items: center;
       cursor: default;
-      font-size: 21px;
+      font-size: 19px;
       height: 38px;
       width: 459px;
       color: #68573e;

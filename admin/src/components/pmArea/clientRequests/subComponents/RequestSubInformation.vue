@@ -469,7 +469,7 @@
       align-items: center;
 
       &-title {
-        font-size: 21px;
+        font-size: 19px;
         font-family: 'Myriad600';
       }
 

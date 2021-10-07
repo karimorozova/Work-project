@@ -199,7 +199,7 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       font-family: Myriad600;
       border-bottom: 1px solid $border;
       margin-bottom: 20px;

@@ -303,7 +303,7 @@
 			}
 		},
 		created() {
-			console.log('start vsego - pr', this.currentProject)
+			console.log('setDefaultService - start')
 			this.setDefaultService()
 		},
 		computed: {

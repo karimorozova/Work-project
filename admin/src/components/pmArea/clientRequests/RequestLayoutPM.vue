@@ -12,6 +12,35 @@
       RequestSubInformation(:project="currentClientRequest")
       RequestAction(:project="currentClientRequest")
 
+      .side(v-if="!currentClientRequest.tasksAndSteps.length")
+        .side__info
+          .form__project
+            .form__project-title Languages control
+
+          .order__row
+            .order__subTitle Source:
+            .order__value
+              .drop
+                SelectSingle(
+                  :hasSearch="true"
+                  placeholder="Option"
+                  :options="getSourceLanguages.map(i => i.lang)"
+                  :selectedOption="currentClientRequest.requestForm.sourceLanguage.lang"
+                  @chooseOption="setSourceLanguage"
+                )
+
+          .order__row
+            .order__subTitle Targets:
+            .order__value
+              .drop
+                SelectMulti(
+                  :hasSearch="true"
+                  placeholder="Options"
+                  :options="getTargetLanguages.map(i => i.lang)"
+                  :selectedOptions="currentClientRequest.requestForm.targetLanguages.length ? currentClientRequest.requestForm.targetLanguages.map(i => i.lang) : []"
+                  @chooseOptions="setTargetLanguages"
+                )
+
 </template>
 
 <script>
@@ -20,19 +49,54 @@
 	import RequestSubInformation from "./subComponents/RequestSubInformation"
 	import RequestTasksAndSteps from "./RequestTasksAndSteps"
 	import RequestAction from "./subComponents/RequestAction"
+	import SelectMulti from "../../SelectMulti"
+	import SelectSingle from "../../SelectSingle"
 
 	export default {
 		data() {
-			return {}
+			return {
+				mainSourceLanguageId: null
+			}
 		},
 		methods: {
-			showErrors() {
+			...mapActions([ 'alertToggle', 'setCurrentClientRequest' ]),
+			async setSourceLanguage({ option }) {
+				this.$children[1].closeTaskDataAndClearTasksRequest()
+				const neededLanguageObject = this.originallyLanguages.find(item => item.lang === option)
+				if (neededLanguageObject._id.toString() === this.mainSourceLanguageId.toString()) return
+				this.mainSourceLanguageId = neededLanguageObject._id
 
+				try {
+					const updatedProject = await this.$http.post('/clients-requests/manage-request-languages', {
+						projectId: this.currentClientRequest._id,
+						type: 'sourceLanguage',
+						data: neededLanguageObject
+					})
+					this.setCurrentClientRequest(updatedProject.data)
+				} catch (err) {
+					this.alertToggle({ message: "Error in setting source language!", isShow: true, type: "error" })
+				}
 			},
-			setDate() {
+			async setTargetLanguages({ option }) {
+				this.$children[1].closeTaskDataAndClearTasksRequest()
+				let data = [ ...this.currentClientRequest.requestForm.targetLanguages ]
+				const neededLanguageObject = this.originallyLanguages.find(item => item.lang === option)
 
+				const position = data.findIndex(item => item.lang === option)
+				if (position !== -1) data.splice(position, 1)
+				else data.push(neededLanguageObject)
+
+				try {
+					const updatedProject = await this.$http.post('/clients-requests/manage-request-languages', {
+						projectId: this.currentClientRequest._id,
+						type: 'targetLanguages',
+						data
+					})
+					this.setCurrentClientRequest(updatedProject.data)
+				} catch (err) {
+					this.alertToggle({ message: "Error in setting target language!", isShow: true, type: "error" })
+				}
 			}
-
 		},
 		computed: {
 			...mapGetters({
@@ -41,13 +105,52 @@
 				originallySteps: 'getAllSteps',
 				originallyServices: "getAllServices",
 				originallyUnits: "getAllUnits"
-			})
+			}),
+			getSourceLanguages() {
+				if (this.originallyLanguages.length) {
+					const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
+					const neededServices = [ ...new Set(services
+							.filter(item => item.industries[0].toString() === industry._id.toString() && item.services[0].toString() === service._id.toString())
+							.map(item => item.sourceLanguage)) ]
+					return neededServices.map(item => this.originallyLanguages.find(item2 => item2._id.toString() === item))
+				}
+			},
+			getTargetLanguages() {
+				if (this.originallyLanguages.length && this.mainSourceLanguageId) {
+					const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
+					const neededServices = [ ...new Set(services
+							.filter(item => item.industries[0].toString() === industry._id.toString()
+									&& item.services[0].toString() === service._id.toString()
+									&& item.sourceLanguage.toString() === this.mainSourceLanguageId.toString())
+							.map(item => item.targetLanguages[0])) ]
+					return neededServices.map(item => this.originallyLanguages.find(item2 => item2._id.toString() === item))
+				}
+			}
 		},
-		components: { RequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
+		mounted() {
+			this.mainSourceLanguageId = this.currentClientRequest.requestForm.sourceLanguage._id.toString()
+		},
+		components: { SelectSingle, SelectMulti, RequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
 	}
 </script>
 
 <style scoped lang="scss">
+  @import "../../../assets/scss/colors";
+
+  .side {
+    &__info {
+      position: relative;
+      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      padding: 20px;
+      width: 400px;
+      box-sizing: border-box;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      border-radius: 4px;
+      background: white;
+    }
+  }
+
   .client-req {
     &__layout {
       margin: 50px;
@@ -55,12 +158,65 @@
     }
   }
 
-  .main-wrapper {
-  }
-
   .sub-wrapper {
     margin-left: 40px;
     padding-right: 40px;
   }
 
+
+  .form {
+    position: relative;
+    padding: 20px;
+    min-width: 1000px;
+    max-width: 1000px;
+    box-sizing: border-box;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    border-radius: 4px;
+    background: white;
+
+    &__project {
+      margin-bottom: 20px;
+      border-bottom: 1px solid $border;
+      width: 100%;
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      &-title {
+        font-size: 19px;
+        font-family: 'Myriad600';
+      }
+    }
+  }
+
+  .order {
+    &__buttons {
+      padding-top: 25px;
+      margin-top: 5px;
+      border-top: 1px solid $light-border;
+    }
+
+    &__subTitle {
+      width: 110px;
+    }
+
+    &__value {
+      font-family: 'Myriad400';
+    }
+
+    &__row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 40px;
+    }
+
+  }
+
+  .drop {
+    height: 32px;
+    position: relative;
+    width: 220px;
+  }
 </style>

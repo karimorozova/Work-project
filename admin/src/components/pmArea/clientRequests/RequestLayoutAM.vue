@@ -184,7 +184,7 @@
           textarea(type="text" rows="9" v-model="currentClientRequest.notes" @change="changeNotes(currentClientRequest.notes)")
 
       .form__button
-        Button(@clicked="approveRequest" :isDisabled="!isAllChecked" value="Approve")
+        Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
 
     .side
       .side__info
@@ -214,20 +214,52 @@
           .order__subTitle Status:
           .order__value {{ currentClientRequest.status }}
         .order__row
+          .order__subTitle Client:
+          .order__value {{ currentClientRequest.customer.name }}
+        .order__row
           .order__subTitle Service:
           .order__value {{ currentClientRequest.requestForm.service.title }}
+        .order__row
+          .order__subTitle Industry:
+          .order__value {{ currentClientRequest.industry.name }}
         .order__row
           .order__subTitle Source:
           .order__value {{ currentClientRequest.requestForm.sourceLanguage.lang }}
         .order__row
-          .order__subTitle Target:
-          .order__value {{ currentClientRequest.requestForm.targetLanguages[0].lang }}
+          .order__subTitle Targets:
+          .order__value {{ getTargets(currentClientRequest) }}
 
         .order__buttons
           Button(v-if="(isAdmin || isAm()) && !isAmSet()" customClass="middle"  class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
           Button(v-if="isAdmin || isAm()" customClass="middle" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
 
 
+      .side__info
+        .form__wrapper(v-if="!canUpdateRequest()")
+        .form__project
+          .form__project-title Languages control
+        .order__row
+          .order__subTitle Source:
+          .order__value
+            .drop
+              SelectSingle(
+                :hasSearch="true"
+                placeholder="Option"
+                :options="getSourceLanguages.map(i => i.lang)"
+                :selectedOption="currentClientRequest.requestForm.sourceLanguage.lang"
+                @chooseOption="setSourceLanguage"
+              )
+        .order__row
+          .order__subTitle Targets:
+          .order__value
+            .drop
+              SelectMulti(
+                :hasSearch="true"
+                placeholder="Options"
+                :options="getTargetLanguages.map(i => i.lang)"
+                :selectedOptions="currentClientRequest.requestForm.targetLanguages.length ? currentClientRequest.requestForm.targetLanguages.map(i => i.lang) : []"
+                @chooseOptions="setTargetLanguages"
+              )
       //.side__contacts
       //  .form__contacts
       //    DataTable(
@@ -269,6 +301,7 @@
 	import Button from "../../Button"
 	import ApproveModal from "../../ApproveModal"
 	import GeneralTable from "../../GeneralTable"
+	import SelectMulti from "../../SelectMulti"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -354,7 +387,8 @@
 				refFiles: [],
 				currentTemplate: '',
 				selected: '',
-				deleteCurrentRequest: false
+				deleteCurrentRequest: false,
+				mainSourceLanguageId: null
 			}
 		},
 		methods: {
@@ -363,17 +397,53 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
+			getTargets({ requestForm }) {
+				if (!requestForm.targetLanguages.length) return '-'
+				return requestForm.targetLanguages.length > 1 ? requestForm.targetLanguages.map(i => i.lang).join(', ') : requestForm.targetLanguages[0].lang
+			},
+			async setSourceLanguage({ option }) {
+				const neededLanguageObject = this.languages.find(item => item.lang === option)
+				if (neededLanguageObject._id.toString() === this.mainSourceLanguageId.toString()) return
+				this.mainSourceLanguageId = neededLanguageObject._id
+
+				try {
+					const updatedProject = await this.$http.post('/clients-requests/manage-request-languages', {
+						projectId: this.currentClientRequest._id,
+						type: 'sourceLanguage',
+						data: neededLanguageObject
+					})
+					this.setCurrentClientRequest(updatedProject.data)
+				} catch (err) {
+					this.alertToggle({ message: "Error in setting source language!", isShow: true, type: "error" })
+				}
+			},
+			async setTargetLanguages({ option }) {
+				let data = [ ...this.currentClientRequest.requestForm.targetLanguages ]
+				const neededLanguageObject = this.languages.find(item => item.lang === option)
+
+				const position = data.findIndex(item => item.lang === option)
+				if (position !== -1) data.splice(position, 1)
+				else data.push(neededLanguageObject)
+
+				try {
+					const updatedProject = await this.$http.post('/clients-requests/manage-request-languages', {
+						projectId: this.currentClientRequest._id,
+						type: 'targetLanguages',
+						data
+					})
+					this.setCurrentClientRequest(updatedProject.data)
+				} catch (err) {
+					this.alertToggle({ message: "Error in setting target language!", isShow: true, type: "error" })
+				}
+			},
 			isDeleteRequest() {
 				this.deleteCurrentRequest = true
 			},
 			async deleteRequest() {
 				const { id } = this.$route.params
 				await this.$http.post(`/clients-requests/${ id }/delete`)
-				if (window.history.length > 2) {
-					this.$router.go(-1)
-				} else {
-					this.$router.push('/pangea-dashboard/overall-view')
-				}
+				if (window.history.length > 2) this.$router.go(-1)
+				else this.$router.push('/pangea-dashboard/overall-view')
 			},
 			doNotDelete() {
 				this.deleteCurrentRequest = false
@@ -384,17 +454,9 @@
 				navigator.clipboard.writeText(elementText)
 				try {
 					document.execCommand('copy')
-					this.alertToggle({
-						message: "Text copied successfully",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Text copied successfully", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Text not copied",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Text not copied", isShow: true, type: "error" })
 				}
 			},
 			setCurrentAm() {
@@ -458,11 +520,8 @@
 			},
 			changeProjectName(key, value) {
 				if (!this.canUpdateRequest()) return
-				// const regex = /^([^\d\W]|[A-z])[\w \.]*$/
-				// if (!regex.test(value) || !value) {
 				if (!value) {
 					this.alertToggle({ message: "Project name not saved!", isShow: true, type: "error" })
-					// this.currentClientRequest.projectName = value.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
 					return
 				}
 				try {
@@ -776,13 +835,35 @@
 		},
 		mounted() {
 			this.restructuredFiles(this.currentClientRequest)
+			this.mainSourceLanguageId = this.currentClientRequest.requestForm.sourceLanguage._id.toString()
 		},
 		computed: {
 			...mapGetters({
 				user: "getUser",
 				users: "getUsers",
+				languages: "getAllLanguages",
 				currentClientRequest: "getCurrentClientRequest"
 			}),
+			getSourceLanguages() {
+				if (this.languages.length) {
+					const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
+					const neededServices = [ ...new Set(services
+							.filter(item => item.industries[0].toString() === industry._id.toString() && item.services[0].toString() === service._id.toString())
+							.map(item => item.sourceLanguage)) ]
+					return neededServices.map(item => this.languages.find(item2 => item2._id.toString() === item))
+				}
+			},
+			getTargetLanguages() {
+				if (this.languages.length && this.mainSourceLanguageId) {
+					const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
+					const neededServices = [ ...new Set(services
+							.filter(item => item.industries[0].toString() === industry._id.toString()
+									&& item.services[0].toString() === service._id.toString()
+									&& item.sourceLanguage.toString() === this.mainSourceLanguageId.toString())
+							.map(item => item.targetLanguages[0])) ]
+					return neededServices.map(item => this.languages.find(item2 => item2._id.toString() === item))
+				}
+			},
 			isAdmin() {
 				const { group: { name } } = this.user
 				return name === "Administrators" || name === "Developers"
@@ -823,6 +904,7 @@
 		},
 
 		components: {
+			SelectMulti,
 			GeneralTable,
 			ApproveModal,
 			Button,
@@ -839,6 +921,12 @@
 <style scoped lang="scss">
   @import "../../../assets/styles/settingsTable";
   @import "../../../assets/scss/colors";
+
+  .drop {
+    height: 32px;
+    position: relative;
+    width: 220px;
+  }
 
   input[type="text"]:disabled {
     background: white;
@@ -915,7 +1003,7 @@
   }
 
   .formLayout {
-    padding: 40px;
+    padding: 50px;
     display: flex;
   }
 
@@ -1096,7 +1184,7 @@
       align-items: center;
 
       &-title {
-        font-size: 21px;
+        font-size: 19px;
         font-family: 'Myriad600';
       }
 
@@ -1230,11 +1318,11 @@
     }
 
     &__subTitle {
-      width: 170px;
+      width: 110px;
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       font-family: Myriad600;
     }
 
@@ -1243,7 +1331,8 @@
     }
 
     &__row {
-      display: -webkit-box;
+      display: flex;
+      align-items: center;
       width: 100%;
       height: 40px;
     }

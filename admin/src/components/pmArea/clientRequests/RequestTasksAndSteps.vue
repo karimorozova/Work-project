@@ -162,6 +162,10 @@
 				"setCurrentClientRequest",
 				"setTasksDataValueRequest"
 			]),
+      closeTaskDataAndClearTasksRequest(){
+	      this.isTaskData = false
+	      this.clearTasksDataRequest()
+      },
 			checkTranslationSourceFiles(title, tasksAndSteps) {
 				if (title === 'Translation') {
 					if (tasksAndSteps.length) {
@@ -451,7 +455,7 @@
     }
 
     &__tasks-title {
-      font-size: 21px;
+      font-size: 19px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
