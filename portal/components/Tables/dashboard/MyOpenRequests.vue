@@ -53,10 +53,12 @@
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
             .tooltip.user
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              i(class="fas fa-user")
+              img.image(v-if="client.contacts.find(item => item.email === row.createdBy.email).photo" :src="domain+client.contacts.find(item => item.email === row.createdBy.email).photo")
+              i(v-else class="fas fa-user")
 
-
-
+        template(slot="icon", slot-scope="{ row, index }")
+          .table__icons(v-if="row.status === 'Client Request'" @click="deleteAction(row._id)")
+            i(class="fas trash fa-trash")
 
 </template>
 
@@ -65,69 +67,79 @@
 	import moment from "moment"
 	import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 	import ApproveModal from "../../ApproveModal"
+	import { mapActions } from "vuex"
 
 	export default {
 		mixins: [ tableSortAndFilter ],
 		props: {
-      myRequests: {
+			myRequests: {
 				type: Array,
 				require: true
+			},
+			client: {
+				type: Object
 			}
 		},
 		data() {
 			return {
+				domain: '',
+				fields: [
+					{
+						label: "Project ID",
+						headerKey: "headerProjectId",
+						key: "projectId",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "19%" }
+					},
+					{
+						label: "Project Name",
+						headerKey: "headerProjectName",
+						key: "projectName",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "20%" }
 
-        fields: [
-          {
-            label: "Project ID",
-            headerKey: "headerProjectId",
-            key: "projectId",
-            sortInfo: { isSort: true, order: 'default' },
-            filterInfo: { isFilter: true },
-            style: { width: "19%" }
-          },
-          {
-            label: "Project Name",
-            headerKey: "headerProjectName",
-            key: "projectName",
-            sortInfo: { isSort: true, order: 'default' },
-            filterInfo: { isFilter: true },
-            style: { width: "20%" }
-
-          },
-          {
-            label: "Status",
-            headerKey: "headerStatus",
-            key: "status",
-            sortInfo: { isSort: true, order: 'default' },
-            filterInfo: { isFilter: true },
-            style: { width: "17%" }
-          },
-          {
-            label: "Request On",
-            headerKey: "headerRequestDate",
-            key: "startDate",
-            sortInfo: { isSort: true, order: 'default' },
-            filterInfo: { isFilter: false },
-            style: { width: "18%" }
-          },
-          {
-            label: "Deadline",
-            headerKey: "headerDeadline",
-            key: "deadline",
-            sortInfo: { isSort: true, order: 'default' },
-            filterInfo: { isFilter: false },
-            style: { width: "17%" }
-          },
-          {
-            label: "Creator",
-            headerKey: "headerCreatedBy",
-            key: "createdBy",
-            style: { width: "9%" }
-          },
-        ],
-        isDeleting: false,
-        currentDelete: '',
+					},
+					{
+						label: "Status",
+						headerKey: "headerStatus",
+						key: "status",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: true },
+						style: { width: "17%" }
+					},
+					{
+						label: "Request On",
+						headerKey: "headerRequestDate",
+						key: "startDate",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: false },
+						style: { width: "15%" }
+					},
+					{
+						label: "Deadline",
+						headerKey: "headerDeadline",
+						key: "deadline",
+						sortInfo: { isSort: true, order: 'default' },
+						filterInfo: { isFilter: false },
+						style: { width: "15%" }
+					},
+					{
+						label: "Creator",
+						headerKey: "headerCreatedBy",
+						key: "createdBy",
+						style: { width: "9%" }
+					},
+					{
+						label: "",
+						headerKey: "headerIcon",
+						key: "icon",
+						style: { width: "5%" }
+					}
+				],
+				isDeleting: false,
+				currentDelete: ''
 			}
 		},
 		computed: {
@@ -136,37 +148,57 @@
 			}
 		},
 		methods: {
+			...mapActions([ 'alertToggle' ]),
 			customFormatter(date) {
 				return moment(date).format('MMM D, HH:mm')
 			},
-      deleteAction(id) {
-			  this.currentDelete = id
-        this.isDeleting = true
-      },
-      closeDeleteModal() {
-        this.currentDelete = ''
-        this.isDeleting = false
-      },
-      async approveDelete() {
-        this.$emit('deleteActivityTask', { id: this.currentDelete })
-        this.closeDeleteModal()
-      },
-      getCreatedBy(createdBy) {
-        return {
-          isCreatedBy: !!(createdBy && createdBy.hasOwnProperty('firstName')),
-          createdBy: createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
-        }
-      },
+			deleteAction(id) {
+				this.currentDelete = id
+				this.isDeleting = true
+			},
+			closeDeleteModal() {
+				this.currentDelete = ''
+				this.isDeleting = false
+			},
+			async approveDelete() {
+				try {
+					await this.$axios.post('/portal/delete-service-request', { requestId: this.currentDelete })
+					this.myRequests = this.myRequests.filter(item => item._id.toString() !== this.currentDelete.toString())
+					this.closeDeleteModal()
+					this.alertToggle({ message: "Request deleted!", isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: "Error on Request deleting!", isShow: true, type: "error" })
+				}
+			},
+			getCreatedBy(createdBy) {
+				return {
+					isCreatedBy: !!(createdBy && createdBy.hasOwnProperty('firstName')),
+					createdBy: createdBy && createdBy.hasOwnProperty('firstName') ? createdBy.firstName : '-'
+				}
+			}
+		},
+		created() {
+			this.domain = process.env.domain
 		},
 		components: {
 			GeneralTable,
-      ApproveModal
+			ApproveModal
 		}
 	}
 </script>
 
 <style scoped lang="scss">
   @import "../../../assets/scss/colors";
+
+  .image {
+    height: 28px;
+    width: 28px;
+    border-radius: 50%;
+  }
+
+  .trash {
+    cursor: pointer;
+  }
 
   .component {
     &__title {
@@ -175,6 +207,7 @@
       font-size: 18px;
       font-family: 'Myriad600';
     }
+
     &__modal-wrapper {
       position: absolute;
       top: 50%;
@@ -206,6 +239,7 @@
       justify-content: space-between;
       box-sizing: border-box;
     }
+
     &__icons {
       display: flex;
       justify-content: center;
@@ -213,17 +247,20 @@
       gap: 10px;
       //font-size: 16px;
     }
+
     &__actions {
       justify-content: center;
     }
   }
+
   .short {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     max-width: 90%;
   }
-  .icon-button{
+
+  .icon-button {
     transition: .2s ease-out;
     color: $dark-border;
     cursor: pointer;
@@ -232,6 +269,7 @@
       color: $text;
     }
   }
+
   .tooltip {
     position: relative;
     display: flex;
@@ -239,9 +277,9 @@
     color: $dark-border;
 
 
-    &.user{
-      height: 32px;
-      width: 32px;
+    &.user {
+      height: 28px;
+      width: 28px;
       background: $light-border;
       border-radius: 50%;
       justify-content: center;
@@ -249,7 +287,7 @@
       color: $dark-border;
     }
 
-    &-data{
+    &-data {
       visibility: hidden;
       font-size: 14px;
       width: max-content;
@@ -264,7 +302,8 @@
       transition: opacity .3s;
       border: 1px solid $text;
       color: $text;
-      &.user{
+
+      &.user {
         right: 40px;
         top: 1px;
         color: $text;

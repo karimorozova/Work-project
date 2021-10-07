@@ -46,37 +46,37 @@
     opacity: 0;
   }
 
-  ::-webkit-scrollbar {
-    width: 14px;
-    height: 14px;
-  }
-  ::-webkit-scrollbar-track {
-    background: rgba(103, 87, 62, 0.1);
-  }
-  ::-webkit-scrollbar-thumb:vertical {
-    background-color: rgba(103, 87, 62, 0.3);
-    border-left: 3px solid transparent;
-    border-right: 3px solid transparent;
-    background-clip: content-box;
-    border-radius: 4px;
-    min-height: 25px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(103, 87, 62, 0.6);
-    background-clip: content-box;
-  }
+  /*::-webkit-scrollbar {*/
+  /*  width: 14px;*/
+  /*  height: 14px;*/
+  /*}*/
+  /*::-webkit-scrollbar-track {*/
+  /*  background: rgba(103, 87, 62, 0.1);*/
+  /*}*/
+  /*::-webkit-scrollbar-thumb:vertical {*/
+  /*  background-color: rgba(103, 87, 62, 0.3);*/
+  /*  border-left: 3px solid transparent;*/
+  /*  border-right: 3px solid transparent;*/
+  /*  background-clip: content-box;*/
+  /*  border-radius: 4px;*/
+  /*  min-height: 25px;*/
+  /*}*/
+  /*::-webkit-scrollbar-thumb:hover {*/
+  /*  background-color: rgba(103, 87, 62, 0.6);*/
+  /*  background-clip: content-box;*/
+  /*}*/
 
-  ::-webkit-scrollbar-thumb:horizontal {
-    background-color: rgba(103, 87, 62, 0.3);
-    border-top: 3px solid transparent;
-    border-bottom: 3px solid transparent;
-    background-clip: content-box;
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(103, 87, 62, 0.6);
-    background-clip: content-box;
-  }
+  /*::-webkit-scrollbar-thumb:horizontal {*/
+  /*  background-color: rgba(103, 87, 62, 0.3);*/
+  /*  border-top: 3px solid transparent;*/
+  /*  border-bottom: 3px solid transparent;*/
+  /*  background-clip: content-box;*/
+  /*  border-radius: 4px;*/
+  /*}*/
+  /*::-webkit-scrollbar-thumb:hover {*/
+  /*  background-color: rgba(103, 87, 62, 0.6);*/
+  /*  background-clip: content-box;*/
+  /*}*/
 
   @font-face {
     font-family: 'Myriad300';

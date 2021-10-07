@@ -1,10 +1,10 @@
 <template lang="pug">
-  .dashboard
+  .dashboard(v-if="Object.keys(client).length")
     .row
       .col
-        AllOpenRequests( :allRequests="filteredRequest")
+        AllOpenRequests(:client="client" :allRequests="filteredRequest")
       .col
-        MyOpenRequests( :myRequests="myFilteredRequest")
+        MyOpenRequests(:client="client" :myRequests="myFilteredRequest")
     .row
       .col
         AllOpenQuotes( :allQuotes="filteredQuotes" @changeQuoteStatus="makeQuoteAction")
@@ -97,6 +97,7 @@
 		  ...mapGetters({
         user: "getUserInfo",
         clientRequests: "getClientRequests",
+			  client: "getClientInfo"
       }),
 			filteredProjects() {
 				let statuses = [ 'Started', 'Approved', 'In progress', 'Ready for Delivery' ]

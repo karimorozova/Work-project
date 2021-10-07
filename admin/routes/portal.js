@@ -4,29 +4,34 @@ const jwt = require("jsonwebtoken")
 const { checkClientContact } = require('../middleware')
 const { getClient } = require('../clients')
 const { getService } = require('../services')
+
 const {
-	getProject, getProjects, getProjectsForPortal, updateProjectStatusForClientPortalProject
-	// getDeliverablesLink
+	getProject,
+	getProjects,
+	getProjectsForPortal,
+	updateProjectStatusForClientPortalProject
 } = require("../projects/")
+
 const { getProjectDeliverables } = require('../projects/files')
 
 const {
-	// createRequest,
-	// storeRequestFiles,
-	getClientsRequests,
 	getClientsRequestsForPortal,
-	// updateClientRequest,
-	// clientRequestNotification,
-	// notifyRequestCancelled,
 	complianceServiceRequest,
 	createRequestFiles,
 	notifyAMsRequestCreated,
-	translationServiceRequest
+	translationServiceRequest,
+	removeClientRequestById
 } = require('../clientRequests')
 
 const { getAfterTaskStatusUpdate } = require('../clients')
 const { getMemoqProjectsForClientPortal } = require('../services/memoqs/otherProjects')
-const { Clients, Projects, Languages } = require('../models')
+
+const {
+	Clients,
+	Projects,
+	Languages
+} = require('../models')
+
 const { secretKey } = require('../configs')
 const { upload } = require('../utils/')
 const { setClientsContactNewPassword, updateAccountDetails } = require('../users')
@@ -53,6 +58,17 @@ router.post('/compliance-service-request', checkClientContact, upload.fields([ {
 		const request = await complianceServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
 		notifyAMsRequestCreated(request)
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Server Error on incoming request")
+	}
+})
+
+router.post('/delete-service-request', checkClientContact, async (req, res) => {
+	const { requestId } = req.body
+	try {
+		await removeClientRequestById(requestId)
 		res.send('Done')
 	} catch (err) {
 		console.log(err)

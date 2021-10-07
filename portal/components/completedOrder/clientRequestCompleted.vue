@@ -38,7 +38,8 @@
             .form__col
               .form__select
                 .form__input-title Target Language:
-                .width-220 {{ values.currentTargetLang[0].lang}}
+                .width-220 {{ Array.isArray( values.currentTargetLang) ?  values.currentTargetLang[0].lang : values.currentTargetLang.lang}}
+
         .form__title Files
         .form__part
           .form__row
