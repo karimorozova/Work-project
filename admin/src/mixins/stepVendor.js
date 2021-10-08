@@ -27,7 +27,7 @@ export default {
 				if(isCurrentStep !== null) {
 					const currentSteps = allSteps.filter(item => item.taskId === allSteps[index].taskId);
 					const currentStep = neededStepIndex === 'last' ? currentSteps[currentSteps.length - 1] : currentSteps[0];
-					vendors = vendors.filter(item => currentStep.vendor !== null ? item._id.toString() !== currentStep.vendor._id.toString() : item);
+					vendors = vendors.filter(item => currentStep.vendor !== null && currentStep.vendor.surname !== 'Agency' ? item._id.toString() !== currentStep.vendor._id.toString() : item);
 				}
 			}
 		},
