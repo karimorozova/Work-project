@@ -5,7 +5,7 @@
         .personal__item
             LabelInput(name="Surname" :value="accountInfo.surname" @input="(e) => setInputValue(e, 'surname')")
         .personal__item
-            LabelInput(name="Email" :value="accountInfo.email" @input="(e) => setInputValue(e, 'email')")
+            LabelInput(name="Email (read only)" :value="accountInfo.email" :isReadonly="true" is-readonly="true" @input="(e) => setInputValue(e, 'email')")
         .personal__item
             LabelInput(name="Phone" :value="accountInfo.phone" @input="(e) => setInputValue(e, 'phone')")
         .personal__item
