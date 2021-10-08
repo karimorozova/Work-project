@@ -92,7 +92,7 @@ router.get('/vendor-decide', getProjectManageToken, async (req, res) => {
 	}
 
 	quoteEmitter.emit('vendor-decide', prop, project, vendorId, stepId)
-	prop === 'accept' ? res.send({ code: -1 }) : res.send({ code: -2 })
+	prop === 'accept' ? res.send({ code: -3 }) : res.send({ code: -2 })
 })
 
 router.get('/client-decide', getProjectManageToken, async (req, res) => {
@@ -126,7 +126,7 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 	if (prop === 'accept') {
 		let { tasks, steps } = updateWithApprovedTasks({ taskIds: allProjectTasks.map(i => i.taskId), project })
 		const newDeadline = +lengthThinkingTime + new Date(deadline).getTime()
-		steps = steps.map( item => {
+		steps = steps.map(item => {
 			const newDeadline = +lengthThinkingTime + new Date(item.deadline).getTime()
 			item.deadline = new Date(newDeadline).toISOString()
 			return item
@@ -149,6 +149,7 @@ router.get('/get-success-message', async (req, res) => {
 	let { code } = req.query
 	let message = ''
 	let title = ''
+	let footer = ''
 	code = code.toString()
 
 	try {
@@ -156,17 +157,23 @@ router.get('/get-success-message', async (req, res) => {
 			case '-1':
 				title = 'Thank you'
 				message = 'for accepting the quote'
+				footer = 'Go to <a style="margin-left: 3px;" href="https://portal.pangea.global/dashboard"> portal.pangea</a>'
 				break
 			case '-2':
 				title = 'Quote rejected'
 				message = ''
+				break
+			case '-3':
+				title = 'Thank you'
+				message = ''
+				footer = 'Go to <a style="margin-left: 3px;" href="https://vendor.pangea.global/dashboard"> vendor.pangea</a>'
 				break
 			default:
 				title = 'ERROR CODE 0'
 				message = 'System error, contact the system administrator.'
 		}
 
-		res.send(getSuccessTemplate(title, message))
+		res.send(getSuccessTemplate(title, message, footer))
 	} catch (err) {
 		console.log(err, 'at get-success-message')
 	}
