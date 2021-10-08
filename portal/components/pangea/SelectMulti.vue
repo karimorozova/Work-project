@@ -415,7 +415,7 @@
     .tooltipData {
       visibility: hidden;
       font-size: 14px;
-      width: max-content;
+      width: 240px;
       background: white;
       border-radius: 4px;
       right: 25px;
