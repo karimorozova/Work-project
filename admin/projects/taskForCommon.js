@@ -16,8 +16,8 @@ async function createTasksAndStepsForCustomUnits(allInfo, iterator = 0) {
 		let tasksWithoutFinance = JSON.parse(JSON.stringify(tasksWithoutFinanceOriginal))
 
 		stepsAndUnits.length === 2
-				? steps = await getStepsForDuoUnits({ ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts })
-				: steps = await getStepsForMonoUnits({ ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts })
+				? steps = await getStepsForUnits('Duo', { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts })
+				: steps = await getStepsForUnits('Mono', { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts })
 
 		steps = checkIsSameVendor(steps)
 
@@ -53,11 +53,6 @@ async function getTasksForCustomUnits(tasksInfo, iterator) {
 			projectId,
 			start: stepsDates[0].start,
 			deadline: stepsDates[stepsDates.length - 1].deadline,
-			//#FIN53
-			// finance: {
-			//   Wordcount: { receivables: '', payables: '' },
-			//   Price: { receivables: '', payables: '' }
-			// },
 			status: 'Created'
 		})
 		tasksLength++
@@ -66,17 +61,23 @@ async function getTasksForCustomUnits(tasksInfo, iterator) {
 }
 
 
-async function getStepsForDuoUnits(allInfo) {
+async function getStepsForUnits(type, allInfo) {
 	const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts, projectId } = allInfo
 	const steps = []
 
 	for (let i = 0; i < tasks.length; i++) {
 		const task = tasks.length > 1 ? tasks[i] : tasks[0]
+
 		const firstStepId = `${ task.taskId } ${ i + 1 < 10 ? `S0${ i + 1 }` : `S${ i + 1 }` }`
-		const secondStepId = `${ task.taskId } ${ i + 2 < 10 ? `S0${ i + 2 }` : `S${ i + 2 }` }`
 		const firstStep = await createStepForTask(stepsAndUnits[0], task, firstStepId)
-		const secondStep = await createStepForTask(stepsAndUnits[1], task, secondStepId)
-		steps.push(firstStep, secondStep)
+
+		if (type === 'Duo') {
+			const secondStepId = `${ task.taskId } ${ i + 2 < 10 ? `S0${ i + 2 }` : `S${ i + 2 }` }`
+			const secondStep = await createStepForTask(stepsAndUnits[1], task, secondStepId)
+			steps.push(firstStep, secondStep)
+		} else {
+			steps.push(firstStep)
+		}
 	}
 
 	return steps
@@ -110,8 +111,6 @@ async function getStepsForDuoUnits(allInfo) {
 			name: stepName,
 			start: stepsDates[0].start,
 			deadline: stepsDates[0].deadline,
-			//#FIN53
-			// [key]: quantity,
 			size: serviceStep.size || 1,
 			vendor: ObjectId(vendor),
 			vendorRate,
@@ -127,53 +126,4 @@ async function getStepsForDuoUnits(allInfo) {
 	}
 }
 
-
-async function getStepsForMonoUnits(allInfo, common = false) {
-	let { tasks, stepsDates, industry, customer, discounts, projectId } = allInfo
-	const steps = []
-	for (let i = 0; i < tasks.length; i++) {
-		const task = tasks[i]
-		let { stepsAndUnits, sourceLanguage, targetLanguage } = task
-		!stepsAndUnits.hasOwnProperty('hours') || (stepsAndUnits[0].hours = 1)
-		let serviceStep = stepsAndUnits.find(item => item.hours)
-		serviceStep = await gatherServiceStepInfo(serviceStep)
-		const { step, hours, size, title } = serviceStep
-		const stepName = title
-		const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry })
-		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
-			customer,
-			industry,
-			serviceStep,
-			task,
-			vendorId,
-			quantity: hours,
-			discounts,
-			projectId
-		})
-
-		steps.push({
-			...task,
-			start: common ? stepsDates[1].start : stepsDates[0].start,
-			deadline: common ? stepsDates[1].deadline : stepsDates[0].deadline,
-			stepId: `${ tasks[i].taskId } S01`,
-			serviceStep,
-			name: stepName,
-			vendor: ObjectId(vendor),
-			vendorRate,
-			clientRate,
-			// hours,
-			size: size || 1,
-			finance,
-			defaultStepPrice,
-			progress: 0,
-			vendorsClickedOffer: [],
-			isVendorRead: false,
-			nativeFinance,
-			nativeVendorRate
-		})
-	}
-	return steps
-}
-
-
-module.exports = { createTasksAndStepsForCustomUnits, getStepsForDuoUnits, getTasksForCustomUnits }
+module.exports = { createTasksAndStepsForCustomUnits,  getTasksForCustomUnits }

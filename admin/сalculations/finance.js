@@ -33,7 +33,7 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 	let clientPrice = getPriceFromPersonRates(rates.pricelistTable, dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
 	let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) : 0
 
-  vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
+	vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
 
 	const clientRate = {
 		value: clientPrice,
@@ -69,22 +69,17 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 
 	function stepFinance(isNative) {
 		return {
+			Quantity: {
+				receivables: quantity,
+				payables: quantity
+			},
 			Wordcount: {
-				receivables: forWords ?
-						title === 'Translation' ?
-								getRelativeQuantity(metrics, 'client') :
-								+quantity : 0,
-				payables: forWords ?
-						title === 'Translation' ?
-								getRelativeQuantity(metrics, 'vendor') :
-								+quantity : 0
+				receivables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity : 0,
+				payables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity : 0
 			},
 			Price: {
-				receivables: +clientRate.value *
-						+(title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
-				payables: vendor ?
-						(isNative ? +nativeVendorRate.value : +vendorRate.value) * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) :
-						0
+				receivables: +clientRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
+				payables: vendor ? (isNative ? +nativeVendorRate.value : +vendorRate.value) * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) : 0
 			}
 		}
 	}

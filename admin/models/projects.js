@@ -13,19 +13,18 @@ const GBP = {
 	type: Number,
 	default: 0
 }
+
+const financeExtract = {
+	receivables: "",
+	payables: "",
+	halfReceivables: "",
+	halfPayables: ""
+}
+
 const stepFinance = {
-	'Wordcount': {
-		receivables: "",
-		payables: "",
-		halfReceivables: "",
-		halfPayables: ""
-	},
-	'Price': {
-		receivables: "",
-		payables: "",
-		halfReceivables: "",
-		halfPayables: ""
-	}
+	'Quantity' : financeExtract,
+	'Wordcount': financeExtract,
+	'Price': financeExtract
 }
 
 const ProjectsSchema = new mongoose.Schema({
@@ -339,7 +338,7 @@ const ProjectsSchema = new mongoose.Schema({
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: "",
 		isInReportPayables: { type: Boolean, default: false },
-		isInReportReceivables: { type: Boolean, default: false },
+		isInReportReceivables: { type: Boolean, default: false }
 		// isPaid: { type: Boolean, default: false }
 	} ],
 	// TODO: refactoring
