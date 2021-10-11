@@ -9,7 +9,7 @@ async function getProjects(obj) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
-			// .populate('requestId', [ 'projectId' ])
+			.populate('requestId')
 
 }
 
