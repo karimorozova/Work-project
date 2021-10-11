@@ -1,5 +1,5 @@
 const {
-	getProjects,
+	getProjectsForVendorPortal,
 	getProject,
 	taskCompleteNotifyPM,
 	notifyManagerStepStarted,
@@ -17,7 +17,7 @@ async function getJobs(id) {
 	const allLanguages = await Languages.find()
 	try {
 		let jobs = []
-		const projects = await getProjects({ 'steps.vendor': id })
+		const projects = await getProjectsForVendorPortal({ 'steps.vendor': id })
 		for (let project of projects) {
 			const steps = getSteps(project, id, allLanguages)
 			jobs.push(...steps)
