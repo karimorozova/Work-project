@@ -47,13 +47,13 @@
 
         template(slot="client", slot-scope="{ row, index }")
           .client-table__data(v-if="currentActive !== index")
-            span(v-if="row.firstName") {{ row.firstName }}
+            span(v-if="row.firstName") {{ row.firstName }} {{ row.surname || '' }}
           .client-table__drop(v-else)
             SelectSingle(
               placeholder="Select",
               :isTableDropMenu="isTableDropMenu",
               :hasSearch="true",
-              :selectedOption="currentClientContact.firstName",
+              :selectedOption="Object.keys(currentClientContact).length ? `${currentClientContact.firstName} ${currentClientContact.surname || ''}` : '' ",
               :options="clientData",
               @chooseOption="setClientContact"
             )
@@ -254,7 +254,7 @@
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
-				if (this.projectClientContacts.find((item) => item.firstName === this.currentClientContact.firstName)) {
+				if (this.projectClientContacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === `${ this.currentClientContact.firstName } ${ this.currentClientContact.surname || '' }`)) {
 					this.errors.push("Such contact exists")
 				}
 				if (!this.currentClientContact.hasOwnProperty("firstName")) {
@@ -310,9 +310,7 @@
 				if (this.currentActive !== -1) {
 					return this.isEditing()
 				}
-				this.projectClientContacts.push({
-					projectClientContact: ""
-				})
+				this.projectClientContacts.push({})
 				this.setEditingData(this.projectClientContacts.length - 1)
 			},
 			setEditingData(index) {
@@ -321,7 +319,7 @@
 				this.oldClientContact = this.currentClientContact
 			},
 			setClientContact({ option }) {
-				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option)
+				this.currentClientContact = this.project.customer.contacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === option)
 			},
 			// async setPayment({ option }) {
 			// 	try {
@@ -366,7 +364,7 @@
 			}),
 			clientData() {
 				if (this.project) {
-					return this.project.customer.contacts.map((i) => i.firstName)
+					return this.project.customer.contacts.map((i) => `${ i.firstName } ${ i.surname || '' }`)
 				}
 			},
 			isProjectFinished() {

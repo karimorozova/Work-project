@@ -44,6 +44,7 @@
               .input__title Assign to Project Manager:
               .drop-white
                 SelectSingle(
+                  :hasSearch="true"
                   :options="managers",
                   placeholder="Option",
                   :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
@@ -54,6 +55,7 @@
               .input__title Assign to Account Manager:
               .drop-white
                 SelectSingle(
+                  :hasSearch="true"
                   :options="accountManagers",
                   placeholder="Option",
                   :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
@@ -72,6 +74,7 @@
                 .table__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
                 .table__dataDrop(v-else)
                   SelectSingle(
+                    :hasSearch="true"
                     :isTableDropMenu="true"
                     :options="availableContacts"
                     @chooseOption="setContact"

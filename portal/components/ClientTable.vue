@@ -15,6 +15,7 @@
         .table__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
         .table__dataDrop(v-else)
           SelectSingle(
+            :hasSearch="true"
             :isTableDropMenu="true"
             :options="availableContacts"
             @chooseOption="(e) => $emit('setContact', index, e)"
@@ -67,11 +68,11 @@
 		computed: {
 			availableContacts() {
 				return this.clientInfo.contacts
-						.map(item => `${ item.firstName } ${ item.surname }`)
+						.map(item => `${ item.firstName } ${ item.surname || '' }`)
 						.filter(
 								name =>
 										!this.currentContacts
-												.map(item => `${ item.firstName } ${ item.surname }`)
+												.map(item => `${ item.firstName } ${ item.surname || '' }`)
 												.includes(name)
 						)
 			}

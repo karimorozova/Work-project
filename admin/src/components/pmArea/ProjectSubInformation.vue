@@ -34,7 +34,11 @@
 
     .sub-information__row(v-if="project.requestId")
       .row__title Request:
-      .row__data {{ project.requestId.projectId }}
+      .row__data
+        .link
+          router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${project.requestId._id}`}")
+            span {{ project.requestId.projectId }}
+
 
     .client-table
       GeneralTable(
@@ -52,13 +56,13 @@
           .client-table__header {{ field.label }}
 
         template(slot="client", slot-scope="{ row, index }")
-          .client-table__data(v-if="currentActive !== index") {{ row.firstName }}
+          .client-table__data(v-if="currentActive !== index") {{ row.firstName }} {{ row.surname || '' }}
           .client-table__drop(v-else)
             SelectSingle(
               placeholder="Select",
               :isTableDropMenu="isTableDropMenu",
               :hasSearch="true",
-              :selectedOption="currentClientContact.firstName",
+              :selectedOption="Object.keys(currentClientContact).length ? `${currentClientContact.firstName} ${currentClientContact.surname || ''}` : '' ",
               :options="clientData",
               @chooseOption="setClientContact"
             )
@@ -254,7 +258,7 @@
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
-				if (this.projectClientContacts.find((item) => item.firstName === this.currentClientContact.firstName)) {
+				if (this.projectClientContacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === `${ this.currentClientContact.firstName } ${ this.currentClientContact.surname || '' }`)) {
 					this.errors.push("Such contact exists")
 				}
 				if (!this.currentClientContact.hasOwnProperty("firstName")) {
@@ -302,9 +306,7 @@
 				if (this.currentActive !== -1) {
 					return this.isEditing()
 				}
-				this.projectClientContacts.push({
-					projectClientContact: ""
-				})
+				this.projectClientContacts.push({})
 				this.setEditingData(this.projectClientContacts.length - 1)
 			},
 			setEditingData(index) {
@@ -313,7 +315,7 @@
 				this.oldClientContact = this.currentClientContact
 			},
 			setClientContact({ option }) {
-				this.currentClientContact = this.project.customer.contacts.find((item) => item.firstName === option)
+				this.currentClientContact = this.project.customer.contacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === option)
 			},
 			// async setPayment({ option }) {
 			// 	try {
@@ -361,7 +363,7 @@
 		computed: {
 			clientData() {
 				if (this.project) {
-					return this.project.customer.contacts.map((i) => i.firstName)
+					return this.project.customer.contacts.map((i) => `${ i.firstName } ${ i.surname || '' }`)
 				}
 			},
 			isProjectFinished() {
@@ -602,5 +604,17 @@
     transition: .2s ease;
     align-items: flex-end;
     cursor: pointer;
+  }
+
+  .link {
+    a {
+      color: $text;
+      text-decoration: none;
+      transition: .2s ease-out;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 </style>
