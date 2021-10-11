@@ -14,6 +14,7 @@ const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs');
 
 async function getJobs(id) {
+	console.log(id)
 	const allLanguages = await Languages.find()
 	try {
 		let jobs = []
