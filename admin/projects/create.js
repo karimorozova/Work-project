@@ -226,15 +226,16 @@ async function createTasks ({ tasksInfo, refFiles }) {
       project
     };
 
-    if (stepsAndUnits.length === 2) {
-      const onlyPackages = stepsAndUnits.every(({ unit }) => unit === "Packages");
-      if (!onlyPackages) await createTasksAndStepsForCustomUnits(allInfo);
-       else await createTasksWithPackagesUnit(allInfo);
-    } else {
-      const [{ unit }] = stepsAndUnits;
-      if (unit !== "Packages") await createTasksAndStepsForCustomUnits(allInfo);
-      else await createTasksWithPackagesUnit(allInfo);
-    }
+
+    // if (stepsAndUnits.length === 2) {
+    //   const onlyPackages = stepsAndUnits.every(({ unit }) => unit === "Packages");
+    //   if (!onlyPackages) await createTasksAndStepsForCustomUnits(allInfo);
+    //    else await createTasksWithPackagesUnit(allInfo);
+    // } else {
+    //   const [{ unit }] = stepsAndUnits;
+    //   if (unit !== "Packages") await createTasksAndStepsForCustomUnits(allInfo);
+    //   else await createTasksWithPackagesUnit(allInfo);
+    // }
 
     return await getProject({ _id: tasksInfo.projectId });
   } catch (err) {

@@ -1,9 +1,4 @@
-/**
- *
- * @param {Object }step
- * @param {Object }project
- * @returns {Array} - returns an array of tasks
- */
+
 function getTasksWithFinanceUpdated (step, project) {
   let { tasks, steps } = project;
   const taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
@@ -12,11 +7,6 @@ function getTasksWithFinanceUpdated (step, project) {
   return tasks;
 }
 
-/**
- *
- * @param {Array} steps
- * @returns {{receivables: {Number}, payables: {Number}}}
- */
 function getTasksFinancePrice (steps) {
   const receivables = +(steps.reduce((prev, cur) => {
     return prev + (cur.status !== 'Cancelled Halfway' ? cur.finance.Price.receivables : cur.finance.Price.halfReceivables);

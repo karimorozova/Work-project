@@ -45,9 +45,7 @@ async function getAfterWordcountPayablesUpdated({ project, step }) {
 		})
 		const quantity = tasks[taskIndex].metrics.totalWords
 		const { serviceStep, vendor } = step
-		const { finance, vendorRate, nativeFinance, nativeVendorRate } = await getStepFinanceData({
-			customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId
-		}, true)
+		const { finance, vendorRate, nativeFinance, nativeVendorRate } = await getStepFinanceData({ customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId }, true)
 
 		steps[stepIndex].finance = finance
 		steps[stepIndex].vendorRate = vendorRate
