@@ -21,7 +21,7 @@
         template(slot="projectName" slot-scope="{ row, index }")
           .table__data
             router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              span {{row.projectName}}
+              span {{ getProjectName( row.projectName ) }}
 
         template(slot="clientName" slot-scope="{ row, index }")
           .table__data {{row.customer.name}}
@@ -112,6 +112,12 @@
         template(slot="tasksStatuses" slot-scope="{ row, index }")
           .table__data {{ tasksToString(row.tasks) }}
 
+        template(slot="requestId" slot-scope="{ row, index }")
+          .table__data(v-if="!!row.requestId")
+            router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${row.requestId._id}`}")
+              span {{row.requestId.projectId}}
+          .table__data(v-else) -
+
 
 </template>
 
@@ -133,7 +139,7 @@
 			return {
 				fields: [
 					{
-						label: "Project Id",
+						label: "Project ID",
 						headerKey: "headerID",
 						key: "projectId",
 						style: { "width": "140px" }
@@ -154,7 +160,7 @@
 						label: "Languages",
 						headerKey: "headerLanguages",
 						key: "languages",
-						style: { "width": "150px" }
+						style: { "width": "160px" }
 					},
 					{
 						label: "Start Date",
@@ -282,11 +288,23 @@
 						headerKey: "tasksStatusesHeader",
 						key: "tasksStatuses",
 						style: { "width": "160px" }
+					},
+					{
+						label: "Request ID",
+						headerKey: "headerRequestID",
+						key: "requestId",
+						style: { "width": "140px" }
 					}
 				]
 			}
 		},
 		methods: {
+			getProjectName(str) {
+				if (!str.substr(0, 32).includes(' ') && str.length > 32) {
+					return str.substr(0, 32) + '...'
+				}
+				return str
+			},
 			discounts(discounts) {
 				if (!discounts.length) return '-'
 				return discounts.reduce((acc, curr) => {
@@ -345,9 +363,9 @@
 					// if (isSendToXtrf && xtrfLinks && xtrfLinks.length ) return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
 					// else return 'Not transferred yet'
 
-          if(isSendToXtrf && xtrfLink) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
-          else if (isSendToXtrf && xtrfLinks && xtrfLinks.length)  return xtrfLinks.map(({link}) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
-          else return 'Not transferred yet'
+					if (isSendToXtrf && xtrfLink) return `<a style="color: #9c9c9c;" href="${ xtrfLink }" target="_blank"><i class="fas fa-link"></i></a>`
+					else if (isSendToXtrf && xtrfLinks && xtrfLinks.length) return xtrfLinks.map(({ link }) => (`<a style="color: #9c9c9c;" href="${ link }" target="_blank"><i class="fas fa-link"></i></a>`)).join('&nbsp;')
+					else return 'Not transferred yet'
 				}
 
 				if (tasks.length && tasks.every(({ service }) => service.title === 'Translation')) {

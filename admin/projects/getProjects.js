@@ -1,4 +1,4 @@
-const { Projects, Clients, Languages, Services } = require('../models/')
+const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
 const { getFilterdProjectsQuery } = require('./filter')
 
 async function getProjects(obj) {
@@ -9,6 +9,8 @@ async function getProjects(obj) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('requestId', [ 'projectId' ])
+
 }
 
 async function getProjectsForPortal(obj) {
@@ -45,6 +47,7 @@ async function getProject(obj) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('requestId', [ 'projectId' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
 			? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
@@ -61,6 +64,7 @@ async function updateProject(query, update) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('requestId', [ 'projectId' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
 			? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
@@ -77,6 +81,7 @@ async function getProjectAfterUpdate(query, update) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('requestId', [ 'projectId' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
 			? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
@@ -88,7 +93,8 @@ async function getProjectAfterUpdate(query, update) {
 async function getFilteredProjects(filters) {
 	const allLanguages = await Languages.find()
 	const allServices = await Services.find()
-	const query = getFilterdProjectsQuery(filters, allLanguages, allServices)
+	const allRequests = await ClientRequest.find()
+	const query = getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests)
 
 	const projects = await Projects.aggregate([
 		{
@@ -173,8 +179,8 @@ async function getFilteredProjects(filters) {
 			'service',
 			{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'accountManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
-			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email' ] }
-
+			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email' ] },
+			{ path: 'requestId', select: [ 'projectId' ] }
 		])
 	} catch (err) {
 		console.log(err)

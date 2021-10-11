@@ -58,10 +58,6 @@
 				// this.refreshProjects()
 			},
 			selectProject({ project }) {
-				if (project.status === 'Closed') {
-					alert('Closed requests don\'t have a layout yet.')
-					return
-				}
 				this.$router.push(`${ this.$route.path }/details/${ project._id }`)
 				// this.$router.push(`/pangea-projects/requests/details/${ project._id }`)
 			},

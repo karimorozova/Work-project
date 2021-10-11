@@ -32,6 +32,10 @@
           input#urgent(type="checkbox", :disabled="isProjectFinished" :checked="project.isUrgent", @change="setUrgentStatus")
           label(for="urgent")
 
+    .sub-information__row(v-if="project.requestId")
+      .row__title Request:
+      .row__data {{ project.requestId.projectId }}
+
     .client-table
       GeneralTable(
         :fields="fields",

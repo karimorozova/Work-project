@@ -1,6 +1,6 @@
 const ObjectId = require('mongodb').ObjectID
 
-function getFilterdProjectsQuery(filters, allLanguages, allServices) {
+function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests) {
 
 	const reg = /[.*+?^${}()|[\]\\]/g
 	let query = {}
@@ -23,7 +23,8 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 		projectCurrency,
 		paymentProfile,
 		vendors,
-		tasksStatuses
+		tasksStatuses,
+		requestId
 	} = filters
 
 
@@ -85,7 +86,7 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 
 	if (tasksStatuses) {
 		const tasksStatusesArr = tasksStatuses.split(',')
-		if(tasksStatusesArr.includes('In progress') && !tasksStatusesArr.includes('Started')) tasksStatusesArr.push('Started')
+		if (tasksStatusesArr.includes('In progress') && !tasksStatusesArr.includes('Started')) tasksStatusesArr.push('Started')
 		console.log(tasksStatusesArr)
 		query["tasks.status"] = { $in: tasksStatusesArr }
 	}
@@ -101,6 +102,12 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices) {
 	if (paymentProfile) {
 		query["paymentProfile"] = paymentProfile
 	}
+
+	if (requestId) {
+		const request = allRequests.find(({ projectId }) => projectId === requestId)
+		if(request) query['requestId'] = ObjectId(request._id)
+	}
+
 	return query
 }
 

@@ -4,12 +4,16 @@
       RequestLayoutAM
     .content(v-if="currentClientRequest.status === 'Request Approved'")
       RequestLayoutPM
+    .content(v-if="currentClientRequest.status === 'Closed'")
+      RequestLayoutClosed
+
 </template>
 
 <script>
 	import { mapGetters, mapActions } from "vuex"
 	import RequestLayoutAM from "./RequestLayoutAM"
 	import RequestLayoutPM from "./RequestLayoutPM"
+	import RequestLayoutClosed from "./RequestLayoutClosed"
 
 	export default {
 		data() {
@@ -33,7 +37,7 @@
 				currentClientRequest: "getCurrentClientRequest"
 			})
 		},
-		components: { RequestLayoutAM, RequestLayoutPM },
+		components: { RequestLayoutClosed, RequestLayoutAM, RequestLayoutPM },
 		created() {
 			this.getClientRequest()
 		},

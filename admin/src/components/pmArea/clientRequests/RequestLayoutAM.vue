@@ -229,6 +229,10 @@
           .order__subTitle Targets:
           .order__value {{ getTargets(currentClientRequest) }}
 
+        .order__row(v-if="currentClientRequest.hasOwnProperty('createdBy')")
+          .order__subTitle Created By:
+          .order__value {{ currentClientRequest.createdBy.firstName }} {{ currentClientRequest.createdBy.surname || '' }}
+
         .order__buttons
           Button(v-if="(isAdmin || isAm()) && !isAmSet()" customClass="middle"  class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
           Button(v-if="isAdmin || isAm()" customClass="middle" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
@@ -1142,10 +1146,9 @@
 
     &__inputsGroup {
       flex-grow: 1;
-      background-color: $table-list;
       position: relative;
       padding: 20px 30px;
-      border: 1px solid $light-border;
+      border: 2px solid $light-border;
       border-radius: 4px;
       height: fit-content;
     }

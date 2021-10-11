@@ -200,6 +200,14 @@
             :isRemoveOption="true"
             @removeOption="removePaymentProfile"
           )
+
+      .filter__item(v-if="filter === 'requestId'")
+        label Request Id:
+        .filter__input
+          input(type="text" placeholder="Value" :value="requestIdValue" @change="requestIdSetFilter" @keyup.13="requestIdSetFilter")
+          .clear-icon(v-if="requestIdValue.length" @click="removeSelectedInputs('requestId')")
+            i.fas.fa-backspace
+
 </template>
 
 <script>
@@ -288,6 +296,10 @@
 				let query = this.$route.query
 				delete query[key]
 				this.$router.replace({ path: this.$route.path, query: { ...query, [key]: value } })
+			},
+			requestIdSetFilter(e) {
+				const { value } = e.target
+				this.replaceRoute('requestId', value)
 			},
 			projectIdSetFilter(e) {
 				const { value } = e.target
@@ -390,6 +402,9 @@
 			}),
 			mappedLanguages() {
 				return this.languages.map(({ lang }) => lang)
+			},
+			requestIdValue() {
+				return this.$route.query.requestId || ''
 			},
 			projectIdValue() {
 				return this.$route.query.projectId || ''
