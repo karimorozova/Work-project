@@ -1,6 +1,18 @@
 const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
 const { getFilterdProjectsQuery } = require('./filter')
 
+
+async function getProjectsForVendorPortal(obj) {
+	return await Projects.find(obj)
+			.populate('industry')
+			.populate('customer')
+			.populate('service')
+			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+
+}
+
 async function getProjects(obj) {
 	return await Projects.find(obj)
 			.populate('industry')
@@ -188,4 +200,4 @@ async function getFilteredProjects(filters) {
 	}
 }
 
-module.exports = { getProject, getProjects, getProjectsForPortal, updateProject, getFilteredProjects, getProjectAfterUpdate }
+module.exports = { getProject, getProjects, getProjectsForPortal, updateProject, getFilteredProjects, getProjectAfterUpdate, getProjectsForVendorPortal }
