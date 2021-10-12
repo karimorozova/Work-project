@@ -18,7 +18,12 @@
           .table__data
             CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-        template(slot="project" slot-scope="{ row, index }")
+        template(slot="projectId" slot-scope="{ row, index }")
+          .table__data(style="word-break: break-word;")
+            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+              span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectId }}
+
+        template(slot="projectName" slot-scope="{ row, index }")
           .table__data(style="word-break: break-word;")
             router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
               span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
@@ -85,9 +90,15 @@
 						style: { width: "2.2%" }
 					},
 					{
-						label: "Project",
+						label: "Project ID",
 						headerKey: "headerProject",
-						key: "project",
+						key: "projectId",
+						style: { width: "10%" }
+					},
+					{
+						label: "Project Name",
+						headerKey: "headerProject",
+						key: "projectName",
 						style: { width: "14%" }
 					},
 					{

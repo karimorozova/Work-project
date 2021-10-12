@@ -149,7 +149,7 @@
           template(slot="amount" slot-scope="{ row, index }")
             .table__data
               span.currency(v-html="'&euro;'")
-              span {{ getTotalAmount(row) | roundTwoDigit }}
+              span {{ row.total | roundTwoDigit }}
 
           template(slot="created" slot-scope="{ row, index }")
             .table__data {{ getTime( row.createdAt) }}

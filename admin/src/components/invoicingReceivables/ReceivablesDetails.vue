@@ -52,7 +52,7 @@
             .text__block
               .text__title Total amount:
               .text__value
-                span(style="margin-right: 4px;") {{ getTotalAmount(reportDetailsInfo) | roundTwoDigit }}
+                span(style="margin-right: 4px;") {{ reportDetailsInfo.total | roundTwoDigit }}
                 span(v-html="'&euro;'")
             .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
               .text__title Invoice:
@@ -129,44 +129,79 @@
               @close="closeModalStep"
               @notApprove="closeModalStep"
             )
-            GeneralTable(
-              :fields="fields",
-              :tableData="reportDetailsInfo.stepsWithProject",
-              :isFilterShow="false"
-              :isFilterAbsolute="false"
-            )
+            .invoicing-details__project-group(v-for="[project, stepsWithProject] in Object.entries(groupByProject)")
+              .title-project
+                span {{project}}
+                span Total: {{getProjectTotalOrMinimumCharge(stepsWithProject) + sumPaymentAdditions(stepsWithProject[0].paymentAdditions)}}
 
-              template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-                .table__header {{ field.label }}
+              GeneralTable(
+                :fields="fields",
+                :tableData="stepsWithProject",
+                :isFilterShow="false"
+                :isFilterAbsolute="false"
+                :isBodyShort="true"
+              )
 
-              template(slot="project" slot-scope="{ row, index }")
-                .table__data(style="word-break: break-word;")
-                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
-                    span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
+                template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+                  .table__header {{ field.label }}
 
-              template(slot="stepId" slot-scope="{ row, index }")
-                .table__data {{ row.stepId }}
+                template(slot="projectName" slot-scope="{ row, index }")
+                  .table__data(style="word-break: break-word;")
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
+                      span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
 
-              template(slot="service" slot-scope="{ row, index }")
-                .table__data {{ row.name }}
+                template(slot="stepId" slot-scope="{ row, index }")
+                  .table__data {{ row.stepId }}
 
-              template(slot="langPair" slot-scope="{ row, index }")
-                .table__data {{ row.sourceLanguage}}
-                  span(style="font-size: 12px;color: #999999; margin: 0 4px;")
-                    i(class="fas fa-angle-double-right")
-                  | {{ row.targetLanguage }}
+                template(slot="service" slot-scope="{ row, index }")
+                  .table__data {{ row.name }}
 
-              template(slot="billing" slot-scope="{ row, index }")
-                .table__data {{ formattedDate(row.billingDate) }}
+                template(slot="langPair" slot-scope="{ row, index }")
+                  .table__data {{ row.sourceLanguage}}
+                    span(style="font-size: 12px;color: #999999; margin: 0 4px;")
+                      i(class="fas fa-angle-double-right")
+                    | {{ row.targetLanguage }}
 
-              template(slot="payables" slot-scope="{ row, index }")
-                .table__data
-                  span.currency(v-html="'&euro;'")
-                  span {{ row.finance.Price.receivables | roundTwoDigit}}
+                template(slot="billing" slot-scope="{ row, index }")
+                  .table__data {{ formattedDate(row.billingDate) }}
 
-              template(slot="icons", slot-scope="{ row, index }")
-                .table__icons(v-if="(reportDetailsInfo.status === 'Created')")
-                  i(class="fas fa-trash" @click="requestToDelete(row._id)")
+                template(slot="payables" slot-scope="{ row, index }")
+                  .table__data
+                    span.currency(v-if="!isProjectMinimumCharge(stepsWithProject)" v-html="getProjectCurrencySymbol(stepsWithProject[0].projectCurrency)")
+                    span(v-if="!isProjectMinimumCharge(stepsWithProject)") {{ row.finance.Price.receivables | roundTwoDigit}}
+                    span(v-else) -
+
+                template(slot="icons", slot-scope="{ row, index }")
+                  .table__icons(v-if="(reportDetailsInfo.status === 'Created')")
+                    i(class="fas fa-trash" @click="requestToDelete(row._id)")
+
+              .payment-additions__sub-totoal {{isProjectMinimumCharge(stepsWithProject) ? 'Minimum Charge' : 'Sub-Total' }}: {{getProjectTotalOrMinimumCharge(stepsWithProject)}}
+
+              .payment-additions(v-if="stepsWithProject[0].paymentAdditions.length > 0")
+                GeneralTable(
+                  :fields="fieldsAdditionalPaid"
+                  :tableData="stepsWithProject[0].paymentAdditions"
+                  :isFilterShow="false"
+                  :isFilterAbsolute="false"
+                  :isBodyShort="true"
+                )
+
+                  template(v-for="field in fieldsAdditionalPaid" :slot="field.headerKey" slot-scope="{ field }")
+                    .table__header {{ field.label }}
+
+                  //template(slot="projectId" slot-scope="{ row, index }")
+                  //  .table__data {{ row.projectId }}
+
+                  template(slot="name" slot-scope="{ row, index }")
+                    .table__data {{ row.name }}
+
+                  template(slot="value" slot-scope="{ row, index }")
+                    .table__data
+                      span.currency(v-html="getProjectCurrencySymbol(stepsWithProject[0].projectCurrency)")
+                      span {{ row.value }}
+
+                .payment-additions__sub-totoal Sub-Total(2): {{sumPaymentAdditions(stepsWithProject[0].paymentAdditions)}}
+
 
       .invoicing-details__add-steps
         .add-steps__body
@@ -196,6 +231,7 @@
 	import CheckBox from "../CheckBox"
 	import ReceivablesPaymentInformationCard from "./ReceivablesPaymentInformationCard"
 	import { mapActions } from "vuex"
+	import _ from "lodash"
 
 	export default {
 		name: "InvoicingDetails",
@@ -204,9 +240,9 @@
 				reportDetailsInfo: {},
 				fields: [
 					{
-						label: "Project",
+						label: "Project Name",
 						headerKey: "headerStepId",
-						key: "project",
+						key: "projectName",
 						style: { width: "22%" }
 					},
 					{
@@ -245,6 +281,20 @@
 						key: "icons",
 						style: { width: "7%" }
 					}
+				],
+				fieldsAdditionalPaid: [
+					{
+						label: "Additions title",
+						headerKey: "headerName",
+						key: "name",
+						style: { width: "60%" }
+					},
+					{
+						label: "Amount",
+						headerKey: "headerValue",
+						key: "value",
+						style: { width: "40%" }
+					},
 				],
 				toggleAddSteps: false,
 				deleteInfo: {},
@@ -442,6 +492,27 @@
 					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}
 			},
+
+      isProjectMinimumCharge(stepsWithProject) {
+        const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
+        const minimumCharge = stepsWithProject[0].minimumCharge
+        return !minimumCharge.isIgnore && receivablesAmount < minimumCharge.value
+      },
+      getProjectTotalOrMinimumCharge(stepsWithProject){
+        const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
+        const minimumCharge = stepsWithProject[0].minimumCharge
+        return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : receivablesAmount
+      },
+      getProjectCurrencySymbol (projectCurrency) {
+			  const currencies = {
+          'EUR': '€',
+          'USD': '$',
+        }
+        return currencies[projectCurrency]
+      },
+      sumPaymentAdditions (paymentAdditions) {
+			  return paymentAdditions.reduce((acc, {value}) => acc += value, 0)
+      },
 			...mapActions([ 'alertToggle' ])
 		},
 		computed: {
@@ -453,9 +524,17 @@
 				}, 0)
 			},
 			getUnpaidAmount() {
-				const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.stepsWithProject) - (+this.getPaymentRemainder)
+				const rawUnpaidAmount = this.reportDetailsInfo.total - (+this.getPaymentRemainder)
 				return +(parseFloat(rawUnpaidAmount)).toFixed(2)
-			}
+			},
+      groupByProject() {
+			  const groupedByProject = _.groupBy(this.reportDetailsInfo.stepsWithProject, (item) => {
+			    return item.projectId
+        })
+        console.log(groupedByProject)
+        return groupedByProject
+      }
+
 		},
 		async created() {
 			await this.updateReportsStateFromZoho(this.$route.params.id)
@@ -492,12 +571,30 @@
       border: 1px solid $border-focus;
     }
   }
+  .payment-additions {
+    width: 450px;
+    margin: 20px 0;
+    margin-left: auto;
 
+    &__sub-totoal {
+      text-align: right;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+  }
   .download-file {
     color: $red;
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  .title-project{
+    font-size: 18px;
+    font-family: Myriad600;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
   }
 
 
@@ -646,6 +743,9 @@
     width: 1530px;
     margin: 50px;
 
+    &__project-group {
+      margin-bottom: 40px;
+    }
 
     &__cards {
       display: flex;
@@ -666,8 +766,14 @@
     }
 
     &__table {
-      width: 70%;
+      width: 65%;
       position: relative;
+      max-height: 600px;
+      overflow: auto;
+      padding: 25px;
+      border-radius: 4px;
+      border: 2px solid #bfbfbf;
+
     }
 
     &__text {
