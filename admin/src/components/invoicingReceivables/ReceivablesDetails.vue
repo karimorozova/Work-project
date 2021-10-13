@@ -132,7 +132,7 @@
             .invoicing-details__project-group(v-for="[project, stepsWithProject] in Object.entries(groupByProject)")
               .title-project
                 span {{project}}
-                span Total: {{getProjectTotalOrMinimumCharge(stepsWithProject) + sumPaymentAdditions(stepsWithProject[0].paymentAdditions)}}
+                span Total: {{ (getProjectTotalOrMinimumCharge(stepsWithProject) + sumPaymentAdditions(stepsWithProject[0].paymentAdditions).toFixed(2)) }}
 
               GeneralTable(
                 :fields="fields",
@@ -214,8 +214,8 @@
     .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.hasOwnProperty('paymentInformation') && reportDetailsInfo.paymentInformation.length")
       .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
         ReceivablesPaymentInformationCard(
-         :cardInfo="cardInfo"
-         :paymentDetails="{paymentDetails: {expectedPaymentDate: 0}}"
+          :cardInfo="cardInfo"
+          :paymentDetails="{paymentDetails: {expectedPaymentDate: 0}}"
         )
 
 </template>
@@ -294,7 +294,7 @@
 						headerKey: "headerValue",
 						key: "value",
 						style: { width: "40%" }
-					},
+					}
 				],
 				toggleAddSteps: false,
 				deleteInfo: {},
@@ -322,9 +322,9 @@
 				link.target = "_blank"
 				link.click()
 			},
-      firstBigLatter(string) {
-        return string[0].toUpperCase() + string.slice(1).toLowerCase()
-      },
+			firstBigLatter(string) {
+				return string[0].toUpperCase() + string.slice(1).toLowerCase()
+			},
 			getBillingDetails({ client, clientBillingInfo }) {
 				const { billingInfo } = client
 				const { name, officialName, paymentType, paymentTerms: { name: paymentTerms }, address: { street1, street2, country, city } } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
@@ -370,11 +370,11 @@
 					notes: this.notes
 				}
 				const reuslt = (await (this.$http.post(`/invoicing-receivables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-			  if (reuslt === "Moved") {
-			    await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-			  }else {
-			    await this.refreshReports()
-			  }
+				if (reuslt === "Moved") {
+					await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+				} else {
+					await this.refreshReports()
+				}
 				this.amount = 0
 			},
 			updatePaidAmount(event) {
@@ -382,7 +382,7 @@
 				if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
 					this.amount = (parseFloat(value)).toFixed(2)
 				}
-        this.$forceUpdate()
+				this.$forceUpdate()
 			},
 			togglePaidFull(val) {
 				this.isFull = val
@@ -482,37 +482,37 @@
 			async updateReportsStateFromZoho(id) {
 				try {
 					const result = await this.$http.get('/invoicing-receivables/update-report-state-from-zoho/' + id)
-          const { type, message } = result.data
-          this.alertToggle({ message, isShow: true, type })
-          if (message === 'Invoice paid') {
-            await this.$router.push('/')
-          }
+					const { type, message } = result.data
+					this.alertToggle({ message, isShow: true, type })
+					if (message === 'Invoice paid') {
+						await this.$router.push('/')
+					}
 				} catch (err) {
-          console.log(err)
+					console.log(err)
 					this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
 				}
 			},
 
-      isProjectMinimumCharge(stepsWithProject) {
-        const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
-        const minimumCharge = stepsWithProject[0].minimumCharge
-        return !minimumCharge.isIgnore && +receivablesAmount < minimumCharge.value
-      },
-      getProjectTotalOrMinimumCharge(stepsWithProject){
-        const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
-        const minimumCharge = stepsWithProject[0].minimumCharge
-        return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : +receivablesAmount
-      },
-      getProjectCurrencySymbol (projectCurrency) {
-			  const currencies = {
-          'EUR': '€',
-          'USD': '$',
-        }
-        return currencies[projectCurrency]
-      },
-      sumPaymentAdditions (paymentAdditions) {
-			  return paymentAdditions.reduce((acc, {value}) => acc += value, 0)
-      },
+			isProjectMinimumCharge(stepsWithProject) {
+				const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
+				const minimumCharge = stepsWithProject[0].minimumCharge
+				return !minimumCharge.isIgnore && +receivablesAmount < minimumCharge.value
+			},
+			getProjectTotalOrMinimumCharge(stepsWithProject) {
+				const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
+				const minimumCharge = stepsWithProject[0].minimumCharge
+				return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : +receivablesAmount
+			},
+			getProjectCurrencySymbol(projectCurrency) {
+				const currencies = {
+					'EUR': '€',
+					'USD': '$'
+				}
+				return currencies[projectCurrency]
+			},
+			sumPaymentAdditions(paymentAdditions) {
+				return paymentAdditions.reduce((acc, { value }) => acc += value, 0)
+			},
 			...mapActions([ 'alertToggle' ])
 		},
 		computed: {
@@ -527,19 +527,19 @@
 				const rawUnpaidAmount = this.reportDetailsInfo.total - (+this.getPaymentRemainder)
 				return +(parseFloat(rawUnpaidAmount)).toFixed(2)
 			},
-      groupByProject() {
-			  const groupedByProject = _.groupBy(this.reportDetailsInfo.stepsWithProject, (item) => {
-			    return item.projectId
-        })
-        console.log(groupedByProject)
-        return groupedByProject
-      }
+			groupByProject() {
+				const groupedByProject = _.groupBy(this.reportDetailsInfo.stepsWithProject, (item) => {
+					return item.projectId
+				})
+				console.log(groupedByProject)
+				return groupedByProject
+			}
 
 		},
 		async created() {
 			await this.updateReportsStateFromZoho(this.$route.params.id)
 			await this.getReportDetails(this.$route.params.id)
-      // this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
+			// this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
 		},
 		components: {
 			Button,
@@ -571,6 +571,7 @@
       border: 1px solid $border-focus;
     }
   }
+
   .payment-additions {
     width: 450px;
     margin: 20px 0;
@@ -582,14 +583,16 @@
       margin-top: 5px;
     }
   }
+
   .download-file {
     color: $red;
+
     &:hover {
       text-decoration: underline;
     }
   }
 
-  .title-project{
+  .title-project {
     font-size: 18px;
     font-family: Myriad600;
     display: flex;
