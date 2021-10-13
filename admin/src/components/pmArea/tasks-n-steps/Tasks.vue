@@ -151,21 +151,21 @@
           .table__data {{ row.status | stepsAndTasksStatusFilter }}
 
         template(slot="receivables" slot-scope="{ row }")
-          .table__finance
+          //.table__finance
             span(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
             span(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
         template(slot="payables" slot-scope="{ row }")
-          .table__finance
+          //.table__finance
             span(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
             span(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
         template(slot="margin" slot-scope="{ row, index }")
-          .table__finance
+          //.table__finance
             span(v-if="marginCalc(row)")
               span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="marginCalc(row)") {{ marginCalc(row) }}
@@ -401,10 +401,10 @@
 			isAppearCheckBox() {
 				return this.selectedAction === 'Cancel'
 			},
-			getTaskPrice(row, prop) {
-				const value = row.finance.Price[prop]
-				return value === 0 ? value : value.toFixed(2)
-			},
+			// getTaskPrice(row, prop) {
+			// 	const value = row.finance.Price[prop]
+			// 	return value === 0 ? value : value.toFixed(2)
+			// },
 			closePreview() {
 				this.isEditAndSend = false
 				this.isEditAndSendQuote = false

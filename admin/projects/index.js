@@ -67,9 +67,9 @@ const {
 	createTasksForWordcount
 } = require('./taskForWordcount')
 
-const {
-	getProjectWithUpdatedFinance
-} = require('./metrics')
+// const {
+// 	getProjectWithUpdatedFinance
+// } = require('./metrics')
 
 const {
 	getProjectAfterFinanceUpdated,
@@ -150,7 +150,7 @@ module.exports = {
 	createProject,
 	createTasks,
 	taskCompleteNotifyPM,
-	getProjectWithUpdatedFinance,
+	// getProjectWithUpdatedFinance,
 	updateProjectProgress,
 	updateWithApprovedTasks,
 	getAfterReopenSteps,

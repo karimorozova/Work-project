@@ -66,7 +66,10 @@ export const addProjectWordsTasks = async ({ dispatch }, payload) => {
 		await Vue.http.post('/memoqapi/metrics', { projectId: tasksInfo.projectId, tasks: tasks.data });
 
 		dispatch('setMemoqProjectMessage', 'dbFinance');
-		const updatedProject = await Vue.http.get(`/pm-manage/costs?projectId=${ tasksInfo.projectId }`);
+		// const updatedProject = await Vue.http.get(`/pm-manage/costs?projectId=${ tasksInfo.projectId }`);
+		// await dispatch('setCurrentProject', updatedProject.data);
+
+		const updatedProject = await Vue.http.get(`/pm-manage/project?id=${ tasksInfo.projectId }`);
 		await dispatch('setCurrentProject', updatedProject.data);
 
 		dispatch('alertToggle', { message: "Tasks were added", isShow: true })

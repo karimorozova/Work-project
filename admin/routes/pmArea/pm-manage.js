@@ -566,17 +566,17 @@ router.post('/reassign-vendor', async (req, res) => {
 	}
 })
 
-router.get('/costs', async (req, res) => {
-	const { projectId } = req.query
-	try {
-		let project = await getProject({ _id: projectId })
-		const updatedProject = await updateProjectCosts(project)
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on getting costs')
-	}
-})
+// router.get('/costs', async (req, res) => {
+// 	const { projectId } = req.query
+// 	try {
+// 		let project = await getProject({ _id: projectId })
+// 		const updatedProject = await updateProjectCosts(project)
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on getting costs')
+// 	}
+// })
 
 router.post('/step-payables', async (req, res) => {
 	let { projectId, step, index } = req.body
@@ -1118,8 +1118,12 @@ router.post('/remove-vendor-from-step', async (req, res) => {
 		const project = await getProject({ '_id': projectId })
 		const steps = await getStepsWithFinanceUpdated(step, project)
 		const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
-		const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
+		const updatedProject = await updateProject({ '_id': projectId }, { steps, tasks })
 		res.send(updatedProject)
+
+		//FIN53
+		// const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
+		// res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on remove-vendor-from-step!')

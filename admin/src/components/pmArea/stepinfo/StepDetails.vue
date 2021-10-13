@@ -10,12 +10,12 @@
       span(v-html="stepLanguages(step)")
 
     .details__links
-      .details__vendorLinks
-        .link(v-if="!!vendor")
+      .details__vendorLinks(v-if="!!vendor")
+        .link
           .link__title Vendor Portal:
           .link__icon(@click="goToVendor")
             i.fas.fa-external-link-alt
-        .link(v-if="!!vendor")
+        .link
           .link__title Vendor Page:
           .link__icon(@click="gotToVendorInfo")
             i.fas.fa-external-link-alt

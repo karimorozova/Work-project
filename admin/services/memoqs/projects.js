@@ -366,11 +366,11 @@ async function getProjectAnalysis(projectId) {
 			sanitize: true,
 			trim: true
 		})["s:Envelope"]["s:Body"].RunAnalysisResponse;
-		return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? null : result.RunAnalysisResult.ResultsForTargetLangs;
+		return !result || result.RunAnalysisResult.ResultStatus !== 'Success' ? undefined : result.RunAnalysisResult.ResultsForTargetLangs;
 	} catch (err) {
 		console.log("Error in getProjectAnalysis");
 		console.log(err);
-		throw new Error(err.message);
+		return undefined
 	}
 }
 

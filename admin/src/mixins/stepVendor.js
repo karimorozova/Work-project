@@ -11,6 +11,8 @@ export default {
 			const stepId = step.serviceStep.step;
 			let vendors = this.vendors;
 
+			return vendors
+
 			filterVendorByNearStep(/(\sS01)/.exec(allSteps[index].stepId), 'last');
 			filterVendorByNearStep(/(\sS02)/.exec(allSteps[index].stepId), 'first');
 

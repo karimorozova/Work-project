@@ -22,7 +22,7 @@ const financeExtract = {
 }
 
 const stepFinance = {
-	'Quantity' : financeExtract,
+	'Quantity': financeExtract,
 	'Wordcount': financeExtract,
 	'Price': financeExtract
 }
@@ -338,7 +338,8 @@ const ProjectsSchema = new mongoose.Schema({
 		isVendorRead: { type: Boolean, default: false },
 		previousStatus: "",
 		isInReportPayables: { type: Boolean, default: false },
-		isInReportReceivables: { type: Boolean, default: false }
+		isInReportReceivables: { type: Boolean, default: false },
+		stepsAndUnits: []
 		// isPaid: { type: Boolean, default: false }
 	} ],
 	// TODO: refactoring
@@ -431,8 +432,10 @@ const ProjectsSchema = new mongoose.Schema({
 	finance: {
 		type: Object,
 		default: {
-			'Wordcount': {},
-			'Price': {}
+			'Price': {
+				'receivables': 0,
+				'payables': 0
+			}
 		}
 	},
 	minimumCharge: {

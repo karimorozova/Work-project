@@ -124,8 +124,8 @@
 				}
 				if (ifNeedRefreshMetrics) {
 					await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id })
-					const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
-					await this.setCurrentProject(updatedProject.body)
+					// const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
+					// await this.setCurrentProject(updatedProject.body)
 				}
 			},
 			getDataForTasks(dataForTasks) {

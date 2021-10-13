@@ -16,36 +16,19 @@ function setTaskMetrics({ metrics, matrix, prop }) {
 	return taskMetrics
 }
 
-async function receivablesCalc({ task, project, step }) {
-	// try {
-	// 	if (step.serviceStep.symbol !== "translation") {
-	// 		const { cost, rate } = await calcProofingStep({ step, task, project, words: task.metrics.totalWords });
-	// 		return { cost, rate };
-	// 	}
-	// 	const metrics = task.metrics;
-	// 	const rate = await getCustomerRate({ step, industryId: project.industry.id, customerId: project.customer.id, task });
-	// 	;
-	// 	const cost = calcCost(metrics, 'client', rate).toFixed(2);
-	// 	return { cost: +cost, rate };
-	// } catch (err) {
-	// 	console.log(err);
-	// 	console.log("Error in receivablesCalc");
-	// }
-}
-
 async function getAfterWordcountPayablesUpdated({ project, step }) {
 	try {
-		let { tasks, steps, customer, industry, discounts, _id: projectId, paymentAdditions  } = project
+		let { tasks, steps, customer, industry, discounts, _id: projectId } = project
 		const taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
 		const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId)
-		tasks[taskIndex].metrics = setTaskMetrics({
-			metrics: tasks[taskIndex].metrics,
-			matrix: step.vendor.matrix,
-			prop: 'vendor'
-		})
-		const quantity = tasks[taskIndex].metrics.totalWords
+
+		tasks[taskIndex].metrics = setTaskMetrics({ metrics: tasks[taskIndex].metrics, matrix: step.vendor.matrix, prop: 'vendor' })
 		const { serviceStep, vendor } = step
-		const { finance, vendorRate, nativeFinance, nativeVendorRate } = await getStepFinanceData({ customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId }, true)
+
+		const quantity = { receivables: tasks[taskIndex].metrics.totalWords, payables: tasks[taskIndex].metrics.totalWords }
+
+		const { finance, vendorRate, nativeFinance, nativeVendorRate } =
+				await getStepFinanceData({ customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId }, true)
 
 		steps[stepIndex].finance = finance
 		steps[stepIndex].vendorRate = vendorRate
@@ -53,12 +36,7 @@ async function getAfterWordcountPayablesUpdated({ project, step }) {
 		steps[stepIndex].nativeFinance = nativeFinance
 		steps[stepIndex].nativeVendorRate = nativeVendorRate
 
-		const taskSteps = steps.filter(step => step.taskId === tasks[taskIndex].taskId)
-		tasks[taskIndex].finance = {
-			Wordcount: setTaskFinance(taskSteps, 'Wordcount'),
-			Price: setTaskFinance(taskSteps, 'Price')
-		}
-		return await updateProjectCosts({ ...project._doc, id: project._id, tasks, steps })
+		return await updateProject({ '_id': project.id }, { tasks, steps })
 	} catch (err) {
 		console.log(err)
 		console.log('Error in getAfterWordcountPayablesUpdated')
@@ -130,26 +108,6 @@ function getStepPayables({ rate, metrics, step }, nativeVendorRate) {
 	return { ...step, finance, vendorRate: rate, nativeVendorRate }
 }
 
-
-function calculatePayableWords(metrics) {
-	// const payables = Object.keys(metrics).filter(item => item !== "totalWords")
-	// 		.reduce((acc, cur) => {
-	// 			return acc + metrics[cur].value * metrics[cur].vendor
-	// 		}, 0)
-	// return Math.round(payables)
-}
-
-function getRate({ step, project }) {
-	// try {
-	// 	const comb = getCombination({ combs: step.vendor.wordsRates, step, industryId: project.industry.id });
-	// 	const rate = comb ? comb.rates[step.serviceStep._id] : "";
-	// 	return rate || "";
-	// } catch (err) {
-	// 	console.log(err);
-	// 	console.log("Error in getRate");
-	// }
-}
-
 function calcCost(metrics, field, rate) {
 	let cost = 0
 	let wordsSum = 0
@@ -167,165 +125,47 @@ function calcCost(metrics, field, rate) {
 	return cost
 }
 
-async function getCustomerRate({ step, industryId, customerId }) {
-	//MM
-	// try {
-	// 	const customer = await getClient({ "_id": customerId });
-	// 	const comb = getCombination({ combs: customer.wordsRates, step, industryId });
-	// 	const rate = comb ? comb.rates[step.serviceStep._id] : "";
-	// 	return rate || "";
-	// } catch (err) {
-	// 	console.log(err);
-	// 	console.log("Error in getCustomerRate");
-	// }
-}
-
-function getCombination({ combs, step, industryId }) {
-	//MM
-	// const filtered = combs.filter(item => {
-	// 	if (step.serviceStep.calcualtionUnit !== 'Packages') {
-	// 		return item.source.symbol === step.sourceLanguage &&
-	// 				item.target.symbol === step.targetLanguage
-	// 	}
-	// 	return item.target.symbol === step.targetLanguage &&
-	// 			item.packageSize === step.packageSize
-	// })
-	// return filtered.find(item => {
-	// 	const index = item.industries.findIndex(indus => indus.id === industryId || indus._id === industryId);
-	// 	return index !== -1;
-	// })
-}
-
-async function calcProofingStep({ step, task, project, words }) {
-	// try {
-	// 	const rate = await getCustomerRate({ task, step, industryId: project.industry.id, customerId: project.customer.id });
-	// 	let cost = 0;
-	// 	if(rate) {
-	// 		const value = +(words * rate.value).toFixed(2);
-	// 		cost = rate.min && value < rate.min ? rate.min : value;
-	// 	}
-	// 	return { cost, rate }
-	// } catch (err) {
-	// 	console.log(err);
-	// 	console.log('Error in calcProofingStep');
-	// }
-}
-
-async function setDefaultStepVendors(project, memoqUsers) {
-	// try {
-	//MM
-	//NOT USED??
-	// let { steps, tasks } = project;
-	// const activeVendors = await getVendors({ status: 'Active' });
-	// for (let i = 0; i < steps.length; i++) {
-	// 	let step = JSON.parse(JSON.stringify(steps[i]))
-	// 	if (step.serviceStep.unit === 'CAT Wordcount' && !step.vendor) {
-	// 		let taskIndex = tasks.findIndex(item => item.taskId === step.taskId);
-	// 		let matchedVendors = getMatchedVendors({ activeVendors, steps, index: i, project, memoqUsers });
-	// 		if (matchedVendors.length === 1) {
-	// 			step.vendor = matchedVendors[0];
-	// 			tasks[taskIndex].metrics = step.serviceStep.symbol !== "translation" ? tasks[taskIndex].metrics
-	// 					: setTaskMetrics({ metrics: tasks[taskIndex].metrics, matrix: matchedVendors[0].matrix, prop: 'vendor' });
-	// 			step = payablesCalc({ metrics: tasks[taskIndex].metrics, project, step });
-	// 			tasks[taskIndex].finance.Price.payables = +(tasks[taskIndex].finance.Price.payables + step.finance.Price.payables).toFixed(2);
-	// 			const taskSteps = steps.filter(item => item.taskId === tasks[taskIndex].taskId && item.finance.Wordcount.payables);
-	// 			tasks[taskIndex].finance.Wordcount.payables = taskSteps.reduce((acc, cur) => acc + +cur.finance.Wordcount.payables, 0);
-	// 		}
-	// 	}
-	// 	steps[i] = step
-	// }
-	// return { steps, tasks };
-	// } catch (err) {
-	// 	console.log(err);
-	// 	console.log("Error in setDefaultStepVendors");
-	// }
-}
-
-function getMatchedVendors({ activeVendors, steps, index, project, memoqUsers }) {
-	// const step = steps[index];
-	// const memoqEmails = memoqUsers.map(item => item.email);
-	// let availableVendors = activeVendors.filter(item => memoqEmails.indexOf(item.email) !== -1);
-	// let temporaryVendors = []
-	//
-	// for (const vendor of availableVendors) {
-	// 	temporaryVendors.push(getVendorsWordRates({ vendor, step }))
-	// }
-	//
-	// //MM
-	// return [temporaryVendors.filter(item => item)[0]];
-	//
-	// if(!availableVendors.length) return [];
-	// if(index > 0 && step.taskId === steps[index - 1].taskId) {
-	// 	availableVendors = availableVendors.filter(item => {
-	// 		if(steps[index - 1].vendor) {
-	// 			return item.id !== steps[index - 1].vendor.id;
-	// 		}
-	// 		return item;
-	// 	})
-	// }
-	// let matchedVendors = [];
-	// for (let vendor of availableVendors) {
-	// 	const isMatching = checkForLanguages({ vendor, step, project });
-	// 	if(isMatching) {
-	// 		matchedVendors.push(vendor);
-	// 	}
-	// }
-	// return matchedVendors;
-}
-
-function getVendorsWordRates({ vendor, step, project }) {
-	return vendor.wordsRates.length !== 0 ? vendor : false
-}
-
-function checkForLanguages({ vendor, step, project }) {
-	return vendor.wordsRates.find(item => {
-		if (item.source && item.source.symbol === step.sourceLanguage &&
-				item.target && item.target.symbol === step.targetLanguage) {
-			return hasActiveRateValue({
-				step,
-				rate: item,
-				stepIndustry: project.industry.id
-			})
-		}
-	})
-}
-
 async function updateProjectCosts(project) {
-	let finance = {
-		Wordcount: getProjectFinanceData(project, 'Wordcount'),
-		Price: getProjectFinanceData(project, 'Price')
-	}
-	const { receivables, payables } = finance.Price
-	const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0
-	try {
-		const checkStatuses = [ 'Quote sent', 'Approved' ]
-		const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1
-		return await updateProject({ '_id': project.id }, {
-			tasks: project.tasks,
-			steps: project.steps,
-			finance,
-			isPriceUpdated,
-			roi
-		})
-	} catch (err) {
-		console.log(err)
-		console.log('Error in updateProjectCosts')
-	}
+	console.log('updateProjectCosts77')
+	// let finance = {
+	// 	Wordcount: getProjectFinanceData(project, 'Wordcount'),
+	// 	Price: getProjectFinanceData(project, 'Price')
+	// }
+	// const { receivables, payables } = finance.Price
+	// const roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0
+	// try {
+	// 	const checkStatuses = [ 'Quote sent', 'Approved' ]
+	// 	const isPriceUpdated = checkStatuses.indexOf(project.status) !== -1
+	// 	return await updateProject({ '_id': project.id }, {
+	// 		tasks: project.tasks,
+	// 		steps: project.steps,
+	// 		finance,
+	// 		isPriceUpdated,
+	// 		roi
+	// 	})
+	// } catch (err) {
+	// 	console.log(err)
+	// 	console.log('Error in updateProjectCosts')
+	// }
 }
 
 function getProjectFinanceData(project, prop) {
-	const activeTasks = project.tasks.filter(item => item.status !== "Cancelled")
-	return activeTasks.reduce((acc, cur) => {
-		const receivables = +cur.finance[prop].halfReceivables || +cur.finance[prop].receivables
-		const payables = +cur.finance[prop].halfPayables || +cur.finance[prop].payables
-		acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables
-		acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables
-		return acc
-	}, {receivables: +project.paymentAdditions.reduce((acc, {value}) => acc += +value, 0)})
+	//FIN53
+	// const activeTasks = project.tasks.filter(item => item.status !== "Cancelled")
+	// return activeTasks.reduce((acc, cur) => {
+	// 	const receivables = +cur.finance[prop].halfReceivables || +cur.finance[prop].receivables
+	// 	const payables = +cur.finance[prop].halfPayables || +cur.finance[prop].payables
+	// 	acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables
+	// 	acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables
+	// 	return acc
+	// }, {receivables: +project.paymentAdditions.reduce((acc, {value}) => acc += +value, 0)})
 }
 
 module.exports = {
-	receivablesCalc, payablesCalc, setDefaultStepVendors,
-	updateProjectCosts, calcCost, setTaskMetrics, getAfterWordcountPayablesUpdated,
+	payablesCalc,
+	updateProjectCosts,
+	calcCost,
+	setTaskMetrics,
+	getAfterWordcountPayablesUpdated,
 	returnVendorRate
 }

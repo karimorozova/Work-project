@@ -1,4 +1,4 @@
-const { CurrencyRatio, Clients, Pricelist, Languages, Vendors, Projects } = require('../models')
+const { CurrencyRatio, Clients, Pricelist, Languages, Vendors, Projects, Units } = require('../models')
 
 const { multiplyPrices } = require('../multipliers')
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
@@ -8,19 +8,19 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 	const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData
 	const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
 	const { metrics, sourceLanguage, targetLanguage } = task
-
-	let vendor
-	if (vendorId) {
-		vendor = await Vendors.findOne({ _id: vendorId })
-	}
 	const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
 	const client = await Clients.findOne({ _id: customer })
-	const currencyRatio = await CurrencyRatio.findOne()
 	const { rates, defaultPricelist, currency } = client
+	const currencyRatio = await CurrencyRatio.findOne()
 	const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
 	const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
 	const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
 	const { step, unit, size, title } = serviceStep
+	const fullUnit = await Units.findOne({ _id: unit })
+
+	let vendor
+	if (vendorId) vendor = await Vendors.findOne({ _id: vendorId })
+
 	const dataForComparison = {
 		sourceLanguage: sourceId,
 		targetLanguage: targetId,
@@ -70,17 +70,38 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 	function stepFinance(isNative) {
 		return {
 			Quantity: {
-				receivables: quantity,
-				payables: quantity
+				receivables: quantity.receivables,
+				payables: quantity.payables
 			},
 			Wordcount: {
-				receivables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity : 0,
-				payables: forWords ? title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity : 0
+				receivables: getRelativeWordCountByEntity('client', quantity.receivables),
+				payables: getRelativeWordCountByEntity('vendor', quantity.payables)
 			},
 			Price: {
-				receivables: +clientRate.value * +(title === 'Translation' ? getRelativeQuantity(metrics, 'client') : +quantity),
-				payables: vendor ? (isNative ? +nativeVendorRate.value : +vendorRate.value) * +(title === 'Translation' ? getRelativeQuantity(metrics, 'vendor') : +quantity) : 0
+				receivables: getTotalStepPriceClient(),
+				payables: getTotalStepPriceVendor()
 			}
+		}
+
+		function getTotalStepPriceClient() {
+			return +clientRate.value * getRelativeWordCountByEntity('client', quantity.receivables)
+		}
+
+		function getTotalStepPriceVendor() {
+			if (vendor) {
+				const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
+				return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
+			}
+			return 0
+		}
+
+		function getRelativeWordCountByEntity(entity, quantity) {
+			quantity = quantity || 0
+			if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
+					? +getRelativeQuantity(metrics, entity)
+					: +quantity
+
+			return +quantity
 		}
 	}
 
@@ -133,7 +154,6 @@ const getRelativeQuantity = (metrics, key) => {
 	}
 	return counter
 }
-
 
 const getCorrectBasicPrice = (basicPriceRow, currency) => {
 	if (currency === 'USD') return basicPriceRow.usdBasicPrice

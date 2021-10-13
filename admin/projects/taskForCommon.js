@@ -1,33 +1,25 @@
 const { updateProject } = require("./getProjects")
 const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor')
 const { getStepFinanceData } = require('../сalculations/finance')
-const { gatherServiceStepInfo, getFinanceForCustomUnits, getProjectFinance } = require('./helpers')
+const { gatherServiceStepInfo } = require('./helpers')
 const ObjectId = require('mongodb').ObjectID
 
 
 async function createTasksAndStepsForCustomUnits(allInfo, iterator = 0) {
 	const { project, stepsAndUnits } = allInfo
-
 	try {
-		const { customer: { _id: customer }, _id, industry, discounts, finance, projectId, minimumCharge } = project
-		let steps = []
-		let tasksWithoutFinanceOriginal = await getTasksForCustomUnits({ ...allInfo, projectId }, iterator)
+		const { customer: { _id: customer }, _id, industry, discounts, projectId } = project
 
-		let tasksWithoutFinance = JSON.parse(JSON.stringify(tasksWithoutFinanceOriginal))
+		let steps = []
+		let tasks = await getTasksForCustomUnits({ ...allInfo, projectId }, iterator)
+		tasks = JSON.parse(JSON.stringify(tasks))
 
 		stepsAndUnits.length === 2
-				? steps = await getStepsForUnits('Duo', { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts })
-				: steps = await getStepsForUnits('Mono', { ...allInfo, customer, industry, tasks: tasksWithoutFinance, discounts })
+				? steps = await getStepsForUnits('Duo', { ...allInfo, customer, industry, tasks, discounts })
+				: steps = await getStepsForUnits('Mono', { ...allInfo, customer, industry, tasks, discounts })
 
 		steps = checkIsSameVendor(steps)
-
-		const tasks = tasksWithoutFinanceOriginal.map(item => getFinanceForCustomUnits(item, steps))
-
-		const { projectFinance, roi } = getProjectFinance(tasks, finance, minimumCharge)
-
-		return await updateProject(
-				{ _id }, { finance: projectFinance, roi, $push: { tasks, steps } }
-		)
+		return await updateProject({ _id }, { $push: { tasks, steps } })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in createTasksWithHoursUnit")
@@ -60,7 +52,6 @@ async function getTasksForCustomUnits(tasksInfo, iterator) {
 	return tasks
 }
 
-
 async function getStepsForUnits(type, allInfo) {
 	const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts, projectId } = allInfo
 	const steps = []
@@ -69,11 +60,11 @@ async function getStepsForUnits(type, allInfo) {
 		const task = tasks.length > 1 ? tasks[i] : tasks[0]
 
 		const firstStepId = `${ task.taskId } ${ i + 1 < 10 ? `S0${ i + 1 }` : `S${ i + 1 }` }`
-		const firstStep = await createStepForTask(stepsAndUnits[0], task, firstStepId)
+		const firstStep = await generateStepForCustomTasks(stepsAndUnits[0], task, firstStepId)
 
 		if (type === 'Duo') {
 			const secondStepId = `${ task.taskId } ${ i + 2 < 10 ? `S0${ i + 2 }` : `S${ i + 2 }` }`
-			const secondStep = await createStepForTask(stepsAndUnits[1], task, secondStepId)
+			const secondStep = await generateStepForCustomTasks(stepsAndUnits[1], task, secondStepId)
 			steps.push(firstStep, secondStep)
 		} else {
 			steps.push(firstStep)
@@ -82,27 +73,18 @@ async function getStepsForUnits(type, allInfo) {
 
 	return steps
 
-	async function createStepForTask(serviceStep, task, stepId) {
+	async function generateStepForCustomTasks(serviceStep, task, stepId) {
 		serviceStep = await gatherServiceStepInfo(serviceStep)
 		const { title, step } = serviceStep
 		const { sourceLanguage, targetLanguage } = task
 		const stepName = title
-
-		const key = serviceStep.hasOwnProperty('quantity') ? 'quantity' : 'hours'
-
-		const quantity = serviceStep[key]
 		const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry })
 
-		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } = await getStepFinanceData({
-			customer,
-			industry,
-			serviceStep,
-			task,
-			vendorId,
-			quantity,
-			discounts,
-			projectId
-		})
+		const key = serviceStep.hasOwnProperty('quantity') ? 'quantity' : 'hours'
+		const quantity = { receivables: serviceStep[key], payables: serviceStep[key] }
+
+		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } =
+				await getStepFinanceData({ customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId })
 
 		return {
 			...task,
@@ -121,9 +103,10 @@ async function getStepsForUnits(type, allInfo) {
 			vendorsClickedOffer: [],
 			isVendorRead: false,
 			nativeFinance,
-			nativeVendorRate
+			nativeVendorRate,
+			stepsAndUnits
 		}
 	}
 }
 
-module.exports = { createTasksAndStepsForCustomUnits,  getTasksForCustomUnits }
+module.exports = { createTasksAndStepsForCustomUnits }
