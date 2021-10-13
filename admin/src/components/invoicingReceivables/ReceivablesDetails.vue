@@ -132,7 +132,7 @@
             .invoicing-details__project-group(v-for="[project, stepsWithProject] in Object.entries(groupByProject)")
               .title-project
                 span {{project}}
-                span Total: {{ (getProjectTotalOrMinimumCharge(stepsWithProject) + sumPaymentAdditions(stepsWithProject[0].paymentAdditions).toFixed(2)) }}
+                span Total: {{ getCurrentProjectTotal(stepsWithProject) }}
 
               GeneralTable(
                 :fields="fields",
@@ -316,6 +316,11 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
+			getCurrentProjectTotal(stepsWithProject) {
+				const total = this.getProjectTotalOrMinimumCharge(stepsWithProject)
+				const additions = this.sumPaymentAdditions(stepsWithProject[0].paymentAdditions)
+				return (+total + +additions).toFixed(2)
+			},
 			downloadFile(path) {
 				let link = document.createElement('a')
 				link.href = __WEBPACK__API_URL__ + '/' + path
@@ -501,7 +506,7 @@
 			getProjectTotalOrMinimumCharge(stepsWithProject) {
 				const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
 				const minimumCharge = stepsWithProject[0].minimumCharge
-				return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : +receivablesAmount
+				return +this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : +receivablesAmount
 			},
 			getProjectCurrencySymbol(projectCurrency) {
 				const currencies = {
