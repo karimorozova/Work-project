@@ -10,7 +10,7 @@ const sendInvoiceToClientContacts = async (_reportId) => {
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate, invoice, externalIntegration } = report
 	const BI = client.billingInfo.find(({ _id }) => `${ _id }` === `${ clientBillingInfo }`)
 	const { officialName, contacts, paymentType, currency } = BI
-	const subject = `Invoice ${ externalIntegration._id || '' } is ready (C007.0)`
+	const subject = `Invoice ${ externalIntegration.reportId || '' } is ready (C007.0)`
 
 	if (paymentType === 'PPP') {
 		reportFiles.push(await generateReportPPP(_reportId, report, BI))

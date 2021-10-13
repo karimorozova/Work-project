@@ -27,7 +27,7 @@ const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 }
 
 
-const getReportById = async (id) => {
+const getReportByIdFromDb = async (id) => {
 	const queryResult = await InvoicingReceivables.aggregate([
 		{ $match: { "_id": ObjectId(id) } },
 		{
@@ -38,7 +38,11 @@ const getReportById = async (id) => {
 					{ "$unwind": "$steps" },
 					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 					{ "$addFields": { "steps.projectNativeId": '$_id' } },
+					{ "$addFields": { "steps.projectId": '$projectId' } },
 					{ "$addFields": { "steps.projectName": '$projectName' } },
+					{ "$addFields": { "steps.projectCurrency": '$projectCurrency' } },
+					{ "$addFields": { "steps.paymentAdditions": '$paymentAdditions' } },
+					{ "$addFields": { "steps.minimumCharge": '$minimumCharge' } },
 					{ '$replaceRoot': { newRoot: '$steps' } }
 				],
 				as: "stepsWithProject"
@@ -57,7 +61,62 @@ const getReportById = async (id) => {
 	)
 }
 
+const getReportById = async (id) => {
+	const report = await getReportByIdFromDb(id)
+	const { result, sumPaymentAdditions,  uniquePaymentAdditions} = getReceivableTotal(report[0])
+	report[0].total = result + sumPaymentAdditions
+	return report
+}
+
 const getAllReports = async (countToSkip, countToGet, query) => {
+	const reports = await getAllReportsFromDb(countToSkip, countToGet, query)
+	for (const report of reports) {
+		const { result, sumPaymentAdditions} = getReceivableTotal(report)
+		report.total = result + sumPaymentAdditions
+	}
+	return reports
+}
+
+
+const getReceivableTotal = (report) => {
+	const uniquePaymentAdditions = getUniquePaymentAdditions(report)
+	const test = getProjectMinimumChargeAndSumReceivables(report)
+	const result =  Object.values(test).reduce((acc, {receivables, minimumCharge}) => acc += minimumCharge > receivables ? minimumCharge : receivables  , 0)
+	return { result, sumPaymentAdditions:  uniquePaymentAdditions.reduce((acc, {value}) => acc += value, 0),  uniquePaymentAdditions}
+}
+
+const getUniquePaymentAdditions = (report) => {
+	let uniquePaymentAdditions = []
+	let countedProjectIds = []
+	if(!report) return []
+	for (const { projectNativeId, projectId ,paymentAdditions = [] } of report.stepsWithProject) {
+
+		if (!countedProjectIds.includes(projectNativeId.toString())) {
+			const paymentAdditionsWithProjId = paymentAdditions.map(item => {
+				item.projectId = projectId
+				return item
+			})
+			uniquePaymentAdditions.push(...paymentAdditions)
+			countedProjectIds.push(projectNativeId.toString())
+		}
+	}
+	return uniquePaymentAdditions
+}
+
+const getProjectMinimumChargeAndSumReceivables = (report) => {
+	let groupedReports = {}
+	if(!report) return {}
+ 	for (const { projectNativeId, finance, minimumCharge = {toIgnore: true} } of report.stepsWithProject) {
+		if (Boolean(groupedReports[projectNativeId])) {
+			groupedReports[projectNativeId].receivables += finance.Price.receivables
+		} else {
+			groupedReports[projectNativeId] = { receivables: finance.Price.receivables, minimumCharge: !minimumCharge.toIgnore ? minimumCharge.value : 0 }
+		}
+	}
+	return groupedReports
+}
+
+const getAllReportsFromDb = async (countToSkip, countToGet, query) => {
 	const queryResult = await InvoicingReceivables.aggregate([
 		{
 			$lookup: {
@@ -68,6 +127,8 @@ const getAllReports = async (countToSkip, countToGet, query) => {
 					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 					{ "$addFields": { "steps.projectNativeId": '$_id' } },
 					{ "$addFields": { "steps.projectName": '$projectName' } },
+					{ "$addFields": { "steps.paymentAdditions": '$paymentAdditions' } },
+					{ "$addFields": { "steps.minimumCharge": '$minimumCharge' } },
 					{ '$replaceRoot': { newRoot: '$steps' } }
 				],
 				as: "stepsWithProject"
@@ -136,5 +197,6 @@ module.exports = {
 	getReportById,
 	reportsFiltersQuery,
 	getAllSteps,
-	getAllReports
+	getAllReports,
+	getReceivableTotal,
 }

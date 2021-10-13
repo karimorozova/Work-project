@@ -44,7 +44,7 @@
             .text__block
               .text__title Total amount:
               .text__value
-                span(style="margin-right: 4px;") {{ getTotalAmount(reportDetailsInfo) | roundTwoDigit }}
+                span(style="margin-right: 4px;") {{ reportDetailsInfo.total | roundTwoDigit }}
                 span(v-html="'&euro;'")
             .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
               .text__title Invoice:
@@ -74,35 +74,80 @@
               @close="closeModalStep"
               @notApprove="closeModalStep"
             )
-            GeneralTable(
-              :fields="fields",
-              :tableData="reportDetailsInfo.steps",
-              :isFilterShow="false"
-              :isFilterAbsolute="false"
-            )
 
-              template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-                .table__header {{ field.label }}
+            .invoicing-details__project-group(v-for="[project, stepsWithProject] in Object.entries(groupByProject)")
+              .title-project
+                span {{project}}
+                span Total: {{getProjectTotalOrMinimumCharge(stepsWithProject) + sumPaymentAdditions(stepsWithProject[0].paymentAdditions)}}
 
-              template(slot="stepId" slot-scope="{ row, index }")
-                .table__data {{ row.stepId }}
+              GeneralTable(
+                :fields="fields",
+                :tableData="stepsWithProject",
+                :isFilterShow="false"
+                :isFilterAbsolute="false"
+                :isBodyShort="true"
+              )
 
-              template(slot="service" slot-scope="{ row, index }")
-                .table__data {{ row.service.title }}
+                template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+                  .table__header {{ field.label }}
 
-              template(slot="langPair" slot-scope="{ row, index }")
-                .table__data {{ row.sourceLanguage}}
-                  span(style="font-size: 12px;color: #999999; margin: 0 4px;")
-                    i(class="fas fa-angle-double-right")
-                  | {{ row.targetLanguage }}
+                template(slot="projectName" slot-scope="{ row, index }")
+                  .table__data(style="word-break: break-word;")
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
+                      span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
 
-              template(slot="billing" slot-scope="{ row, index }")
-                .table__data {{ formattedDate(row.billingDate) }}
+                template(slot="stepId" slot-scope="{ row, index }")
+                  .table__data {{ row.stepId }}
 
-              template(slot="payables" slot-scope="{ row, index }")
-                .table__data
-                  span.currency(v-html="'&euro;'")
-                  span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
+                template(slot="service" slot-scope="{ row, index }")
+                  .table__data {{ row.name }}
+
+                template(slot="langPair" slot-scope="{ row, index }")
+                  .table__data {{ row.sourceLanguage}}
+                    span(style="font-size: 12px;color: #999999; margin: 0 4px;")
+                      i(class="fas fa-angle-double-right")
+                    | {{ row.targetLanguage }}
+
+                template(slot="billing" slot-scope="{ row, index }")
+                  .table__data {{ formattedDate(row.billingDate) }}
+
+                template(slot="payables" slot-scope="{ row, index }")
+                  .table__data
+                    span.currency(v-if="!isProjectMinimumCharge(stepsWithProject)" v-html="getProjectCurrencySymbol(stepsWithProject[0].projectCurrency)")
+                    span(v-if="!isProjectMinimumCharge(stepsWithProject)") {{ row.finance.Price.receivables | roundTwoDigit}}
+                    span(v-else) -
+
+                template(slot="icons", slot-scope="{ row, index }")
+                  .table__icons(v-if="(reportDetailsInfo.status === 'Created')")
+                    i(class="fas fa-trash" @click="requestToDelete(row._id)")
+
+              .payment-additions__sub-totoal {{isProjectMinimumCharge(stepsWithProject) ? 'Minimum Charge' : 'Sub-Total' }}: {{getProjectTotalOrMinimumCharge(stepsWithProject)}}
+
+              .payment-additions(v-if="stepsWithProject[0].paymentAdditions.length > 0")
+                GeneralTable(
+                  :fields="fieldsAdditionalPaid"
+                  :tableData="stepsWithProject[0].paymentAdditions"
+                  :isFilterShow="false"
+                  :isFilterAbsolute="false"
+                  :isBodyShort="true"
+                )
+
+                  template(v-for="field in fieldsAdditionalPaid" :slot="field.headerKey" slot-scope="{ field }")
+                    .table__header {{ field.label }}
+
+                  //template(slot="projectId" slot-scope="{ row, index }")
+                  //  .table__data {{ row.projectId }}
+
+                  template(slot="name" slot-scope="{ row, index }")
+                    .table__data {{ row.name }}
+
+                  template(slot="value" slot-scope="{ row, index }")
+                    .table__data
+                      span.currency(v-html="getProjectCurrencySymbol(stepsWithProject[0].projectCurrency)")
+                      span {{ row.value }}
+
+                .payment-additions__sub-totoal Sub-Total(2): {{sumPaymentAdditions(stepsWithProject[0].paymentAdditions)}}
+
 
 
       //.invoicing-details__add-steps
@@ -134,6 +179,7 @@
 	import DatepickerWithTime from "../DatepickerWithTime"
 	import CheckBox from "../CheckBox"
 	import ReceivablesPaymentInformationCard from "./ReceivablesPaymentInformationCard"
+  import _ from "lodash"
 
 	export default {
 		name: "InvoicingDetails",
@@ -141,6 +187,12 @@
 			return {
 				reportDetailsInfo: {},
 				fields: [
+          {
+            label: "Project Name",
+            headerKey: "headerProjectName",
+            key: "projectName",
+            style: { width: "22%" }
+          },
 					{
 						label: "Step Id",
 						headerKey: "headerStepId",
@@ -172,6 +224,20 @@
 						style: { width: "18%" }
 					},
 				],
+        fieldsAdditionalPaid: [
+          {
+            label: "Title",
+            headerKey: "headerName",
+            key: "name",
+            style: { width: "60%" }
+          },
+          {
+            label: "Amount",
+            headerKey: "headerValue",
+            key: "value",
+            style: { width: "40%" }
+          },
+        ],
 				// toggleAddSteps: false,
 				deleteInfo: {},
 				isDeletingStep: false,
@@ -208,8 +274,8 @@
         const { length } = [ ...new Set(stepsAndProjects.map(i => i.project)) ]
         return length
       },
-      getTotalAmount({ steps }) {
-        return steps.reduce((sum, i) => {
+      getTotalAmount({ stepsWithProject }) {
+        return stepsWithProject.reduce((sum, i) => {
           sum += i.finance.Price.receivables || 0
           return sum
         }, 0)
@@ -298,7 +364,28 @@
 			async getSteps() {
 				this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
 				console.log('steps', this.steps)
-			}
+			},
+
+      isProjectMinimumCharge(stepsWithProject) {
+        const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
+        const minimumCharge = stepsWithProject[0].minimumCharge
+        return !minimumCharge.isIgnore && receivablesAmount < minimumCharge.value
+      },
+      getProjectTotalOrMinimumCharge(stepsWithProject){
+        const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
+        const minimumCharge = stepsWithProject[0].minimumCharge
+        return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : receivablesAmount
+      },
+      getProjectCurrencySymbol (projectCurrency) {
+        const currencies = {
+          'EUR': '€',
+          'USD': '$',
+        }
+        return currencies[projectCurrency]
+      },
+      sumPaymentAdditions (paymentAdditions) {
+        return paymentAdditions.reduce((acc, {value}) => acc += value, 0)
+      },
 		},
 		computed: {
 			//Todo: show status "Invoice Received" and "Partially Paid"1
@@ -311,9 +398,16 @@
 				}, 0)
 			},
 			getUnpaidAmount() {
-				const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder)
+				const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.stepsWithProject) - (+this.getPaymentRemainder)
 				return +(parseFloat(rawUnpaidAmount)).toFixed(2)
-			}
+			},
+      groupByProject() {
+        const groupedByProject = _.groupBy(this.reportDetailsInfo.stepsWithProject, (item) => {
+          return item.projectId
+        })
+        console.log(groupedByProject)
+        return groupedByProject
+      }
 		},
 		created() {
 			this.openDetails(this.$route.params.id)
@@ -349,11 +443,46 @@
     }
   }
 
+  .payment-additions {
+    width: 450px;
+    margin: 20px 0;
+    margin-left: auto;
+
+    &__sub-totoal {
+      text-align: right;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+  }
   .download-file {
     color: $red;
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  .title-project{
+    font-size: 18px;
+    font-family: Myriad600;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+
+
+  .download-file {
+    color: $red;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .title-project{
+    font-size: 18px;
+    font-family: Myriad600;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
   }
 
   .file-fake-button {
@@ -392,6 +521,18 @@
       width: 100px;
       box-sizing: border-box;
       color: $red;
+    }
+  }
+
+  .payment-additions {
+    width: 470px;
+    margin: 20px 0;
+    margin-left: auto;
+
+
+    & span {
+      //float: right;
+
     }
   }
 
@@ -509,6 +650,10 @@
     margin: 50px;
 
 
+    &__project-group {
+      margin-bottom: 40px;
+    }
+
     &__cards {
       display: flex;
       flex-wrap: wrap;
@@ -528,8 +673,13 @@
     }
 
     &__table {
-      width: 70%;
+      width: 65%;
       position: relative;
+      max-height: 600px;
+      overflow: auto;
+      padding: 25px;
+      border-radius: 4px;
+      border: 2px solid #bfbfbf;
     }
 
     &__text {
@@ -619,5 +769,13 @@
   .currency {
     margin-right: 4px;
     color: $dark-border;
+  }
+  .link-to {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 </style>
