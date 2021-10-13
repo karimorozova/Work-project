@@ -496,12 +496,12 @@
       isProjectMinimumCharge(stepsWithProject) {
         const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
         const minimumCharge = stepsWithProject[0].minimumCharge
-        return !minimumCharge.isIgnore && receivablesAmount < minimumCharge.value
+        return !minimumCharge.isIgnore && +receivablesAmount < minimumCharge.value
       },
       getProjectTotalOrMinimumCharge(stepsWithProject){
         const receivablesAmount = stepsWithProject.reduce((acc, { finance }) => acc += finance.Price.receivables, 0).toFixed(2)
         const minimumCharge = stepsWithProject[0].minimumCharge
-        return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : receivablesAmount
+        return this.isProjectMinimumCharge(stepsWithProject) ? minimumCharge.value : +receivablesAmount
       },
       getProjectCurrencySymbol (projectCurrency) {
 			  const currencies = {
