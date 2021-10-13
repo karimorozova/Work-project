@@ -238,7 +238,7 @@ function fillNonEmptyDuoRates({allAvailablePairs, stepsIds, industries, duoRates
 
 async function getRateInfoFromStepFinance({project, step, rate}) {
     const stepId = step.serviceStep._id;
-    const prop = getCorrectRateProp(step.serviceStep);
+    // const prop = getCorrectRateProp(step.serviceStep);
     const industries = [{...project.industry._doc, _id: project.industry.id}];
     try {
         const defaultRates = await getDefaultRates(step.serviceStep.calculationUnit);
@@ -265,15 +265,15 @@ async function getPairInfoForUpdate({prop, step}) {
     }
 }
 
-function getCorrectRateProp(serviceStep) {
-    if(serviceStep.calculationUnit === 'Words') {
-        return 'wordsRates';
-    }
-    if(serviceStep.calculationUnit === 'Hours') {
-        return 'hoursRates'
-    }
-    return 'monoRates';
-}
+// function getCorrectRateProp(serviceStep) {
+//     if(serviceStep.calculationUnit === 'Words') {
+//         return 'wordsRates';
+//     }
+//     if(serviceStep.calculationUnit === 'Hours') {
+//         return 'hoursRates'
+//     }
+//     return 'monoRates';
+// }
 
 function getRatesForUpdate({defaultRates, rate, stepId}) {
     return Object.keys(defaultRates).reduce((acc, cur) => {

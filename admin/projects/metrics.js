@@ -24,7 +24,7 @@ async function updateProjectMetricsAndCreateSteps(projectId, tasks) {
 			const isIncludesWordCount = stepsAndUnits.find(item => item.unit === 'CAT Wordcount')
 
 			if (!!isIncludesWordCount && task.status === "Created") {
-				const analysis = await tryToGetMemoqMetrics(task.memoqProjectId)
+				const analysis = await tryToGetMemoqMetrics(task.memoqProjectId, undefined)
 
 				if (analysis) {
 					const taskMetrics = getTaskMetrics({ task, matrix: project.customer.matrix, analysis })
@@ -59,13 +59,17 @@ async function updateProjectMetricsAndCreateSteps(projectId, tasks) {
 	}
 }
 
-async function tryToGetMemoqMetrics(memoqProjectId) {
-	const analysis = await getProjectAnalysis(memoqProjectId)
-	if (typeof analysis === 'object') return analysis
-
-	setTimeout(() => {
-		return tryToGetMemoqMetrics(memoqProjectId)
-	}, 500)
+async function tryToGetMemoqMetrics(memoqProjectId, analysis) {
+	return new Promise(async (resolve, reject) => {
+		if (analysis) {
+			resolve(analysis)
+		} else {
+			analysis = await getProjectAnalysis(memoqProjectId)
+			setTimeout(async () => {
+				resolve (await tryToGetMemoqMetrics(memoqProjectId, analysis))
+			}, 400)
+		}
+	})
 }
 
 
@@ -178,7 +182,7 @@ async function generateStepsForCATTasks(task, industry, customer, discounts, pro
 			finance,
 			defaultStepPrice,
 			vendorRate,
-			totalWords: quantity,
+			totalWords: metrics.totalWords,
 			vendorsClickedOffer: [],
 			isVendorRead: false,
 			service,

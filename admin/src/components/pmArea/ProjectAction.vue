@@ -485,7 +485,9 @@
 					result = [ "Cancel" ]
 				}
 
-				if (this.project.finance.Price.receivables && nonStartedStatuses.indexOf(this.project.status) !== -1) {
+				if (
+						// this.project.finance.Price.receivables &&
+            nonStartedStatuses.indexOf(this.project.status) !== -1) {
 					result = [ "Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel" ]
 				}
 

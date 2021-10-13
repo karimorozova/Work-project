@@ -316,8 +316,8 @@ const ProjectsSchema = new mongoose.Schema({
 		memoqTarget: "",
 		memoqDocIds: [],
 		packageSize: "",
-		hours: "",
-		quantity: "",
+		// hours: "",
+		// quantity: "",
 		size: {
 			type: Number,
 			default: 1

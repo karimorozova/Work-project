@@ -31,21 +31,19 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 		if (type === 'CAT Wordcount') {
 			quantity = +curr.totalWords
 			cost += +curr.totalWords * +curr.clientRate.value
-		} else if (type === 'Packages') {
-			quantity = +curr.quantity
-			cost += +curr.quantity * +curr.clientRate.value
 		} else {
-			quantity = +curr.hours
-			cost += +curr.hours * +curr.clientRate.value
+			quantity = +curr.finance.Quantity.receivables
+			cost += +curr.finance.Quantity.receivables * +curr.clientRate.value
 		}
+
 
 		acc = acc + `<div style="border-bottom: 1px solid #ededed;">
 			        <div style="display: inline-block; padding: 8px; width: 130px;">${ name }</div>
 			        <div style="display: inline-block; padding: 8px; width: 135px;">${ curr.sourceLanguage === curr.targetLanguage ? curr.targetLanguage : curr.sourceLanguage + ' >> ' + curr.targetLanguage } </div>
 			        <div style="display: inline-block; padding: 8px; width: 140px;">${ type } </div>
 			        <div style="display: inline-block; padding: 8px; width: 70px;">${ +quantity.toFixed(2) }</div>
-			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + curr.clientRate.value.toFixed(2) } </div>
-			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + cost.toFixed(2) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + +curr.clientRate.value.toFixed(3) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + +cost.toFixed(2) } </div>
 				    </div>`
 		return acc
 	}, '')
@@ -93,12 +91,11 @@ function getStepsSubTotal(tasksIds, steps, allUnits) {
 
 	for (let curStep of allSteps) {
 		const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString())
+
 		if (type === 'CAT Wordcount') {
 			subTotal += +curStep.totalWords * +curStep.clientRate.value
-		} else if (type === 'Packages') {
-			subTotal += +curStep.quantity * +curStep.clientRate.value
 		} else {
-			subTotal += +curStep.hours * +curStep.clientRate.value
+			subTotal += +curStep.finance.Quantity.receivables * +curStep.clientRate.value
 		}
 	}
 	return +subTotal.toFixed(2)
@@ -113,10 +110,8 @@ function getStepsTotal(tasksIds, steps, allUnits) {
 		const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString())
 		if (type === 'CAT Wordcount') {
 			total += +curStep.finance.Wordcount.receivables * +curStep.clientRate.value
-		} else if (type === 'Packages') {
-			total += +curStep.quantity * +curStep.clientRate.value
 		} else {
-			total += +curStep.hours * +curStep.clientRate.value
+			total += +curStep.finance.Quantity.receivables * +curStep.clientRate.value
 		}
 	}
 	return +total.toFixed(2)

@@ -93,6 +93,7 @@ const deletePaymentAddition = async (_id, { _id: paymentAdditionId, value }) => 
 
 
 const recalculateProjectFinance = (finance, tasks, steps, discounts = [], paymentAdditions) => {
+	//FIN53
 	steps = steps.filter(({ status }) => status !== 'Cancelled')
 	for (let step of steps) {
 		let { finance: { Price: { receivables } }, clientRate: { value } } = step
@@ -125,6 +126,7 @@ const recalculateProjectFinance = (finance, tasks, steps, discounts = [], paymen
 }
 
 const findStepMultiplier = (step) => {
+	//FIN53
 	if (step.finance.Wordcount.receivables === 0) {
 		if (step._doc.hasOwnProperty('quantity')) {
 			return +step.quantity

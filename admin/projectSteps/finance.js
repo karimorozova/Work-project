@@ -46,6 +46,7 @@ function getCommonUnitPricesAndRates(step, unitType, { crossRate, projectCurrenc
 		nativePaybles = detectedUnitType(unitType, nativeRate)
 	}
 
+	//FIN53
 	function detectedUnitType(unitType, value) {
 		return unitType === 'Packages' ? sumValues(step.quantity, value) : sumValues(step.hours, value)
 	}

@@ -155,6 +155,7 @@ async function getStepPayablesAssigment({ task, step, project, allUnits }) {
 		const rate = {
 			value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +nativeVendorRate.value, crossRate)
 		}
+		//FIN53
 		step.finance.Price.payables = +(type === 'Hours' ? step.hours : step.quantity) * +rate.value
 		step.nativeFinance.Price.payables = +(type === 'Hours' ? step.hours : step.quantity) * +nativeVendorRate.value
 		return {

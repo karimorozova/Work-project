@@ -363,7 +363,7 @@ function sendMemoqCredentials(obj) {
 async function generatePO(requestInfo, fullVendor, project) {
 	const { firstName, surname } = fullVendor
 	let { stepId, start, deadline, name, sourceLanguage, targetLanguage, industry, nativeFinance, serviceStep, totalWords, taskId, nativeVendorRate: { value: rate } } = requestInfo
-	const { Wordcount, Price } = nativeFinance
+	const { Wordcount, Price, Quantity } = nativeFinance
 	const { unit: unitId } = serviceStep
 	const { type } = await Units.findOne({ "_id": unitId })
 	const isTranslationJob = name === 'Translation'
@@ -372,16 +372,13 @@ async function generatePO(requestInfo, fullVendor, project) {
 	let col1 = ''
 	let col2 = ''
 
-	if (type === 'Packages') {
-		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Quantity:</div><div class="value">${ requestInfo.quantity }</div>`
-		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Unit:</div><div class="value">Packages</div>`
-	} else if (type === 'CAT Wordcount' && isTranslationJob) {
+	if (type === 'CAT Wordcount' && isTranslationJob) {
 		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Total Wordcount:</div><div class="value">${ totalWords }</div>`
 		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Weighted Wordcount:</div><div class="value">${ Wordcount.payables }</div>`
 	} else if (type === 'CAT Wordcount' && !isTranslationJob) {
 		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Total Wordcount:</div><div class="value">${ totalWords }</div>`
 	} else {
-		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Quantity:</div><div class="value">${ requestInfo.hours }</div>`
+		col1 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Quantity:</div><div class="value">${ Quantity.payables }</div>`
 		col2 = `<div class="key" style="font-weight: 600;margin-right: 10px;">Unit:</div><div class="value">${ type }</div>`
 	}
 
