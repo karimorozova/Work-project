@@ -1,7 +1,7 @@
 <template lang="pug">
   .units
-    .units__table
-      SettingsTable(
+    .table
+      GeneralTable(
         :fields="fields"
         :tableData="units"
         :errors="errors"
@@ -13,24 +13,24 @@
         @notApprove="cancel"
       )
         template(slot="headerUnit" slot-scope="{ field }")
-          .units__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerSteps" slot-scope="{ field }")
-          .units__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerSizes" slot-scope="{ field }")
-          .units__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerActive" slot-scope="{ field }")
-          .units__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerIcons" slot-scope="{ field }")
-          .units__header {{ field.label }}
+          .table__header {{ field.label }}
 
         template(slot="unit" slot-scope="{ row, index }")
-          .units__data(v-if="currentActive !== index") {{ row.type }}
-          .units__editing-data(v-else)
-            input.units__input(type="text" v-model="currentUnit")
+          .table__data(v-if="currentActive !== index") {{ row.type }}
+          .table__input(v-else)
+            input(type="text" v-model="currentUnit")
 
         template(slot="steps" slot-scope="{ row, index }")
-          .units__data(v-if="currentActive !== index") {{ presentServices(row.steps) }}
-          .units__drop-menu(v-else)
+          .table__data(style="max-height: 40px; overflow-y: auto;" v-if="currentActive !== index") {{ presentServices(row.steps) }}
+          .table__drop(v-else)
             SelectMulti(
               :isTableDropMenu="isTableDropMenu"
               placeholder="Select"
@@ -41,24 +41,25 @@
               :allOptionsButtons="true"
             )
 
-        template(slot="sizes" slot-scope="{ row, index }")
-          .units__data-chips(v-if="currentActive !== index" v-html="formatSizes(row.sizes)")
-          .units__editing-chips(v-else)
-            Chips(
-              :chips="currentSizes"
-              @setChips="setChips"
-              @deleteChips="deleteChips"
-              :placeholder="'Add size...'"
-            )
+        //template(slot="sizes" slot-scope="{ row, index }")
+        //  .table__data-chips(v-if="currentActive !== index" v-html="formatSizes(row.sizes)")
+        //  .table__editing-chips(v-else)
+        //    Chips(
+        //      :chips="currentSizes"
+        //      @setChips="setChips"
+        //      @deleteChips="deleteChips"
+        //      :placeholder="'Add size...'"
+        //    )
 
         template(slot="active" slot-scope="{ row, index }")
-          .units__data.units_centered(:class="{'units_active': currentActive === index}")
-            img.units__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'units_opacity': currentActive === index}")
-            img.units__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'units_opacity': currentActive === index}")
+          .table__data(style="width: 100%; text-align: center;" :class="{'filter__opacity': currentActive !== index}")
+            img.table__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+            img.table__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
 
         template(slot="icons" slot-scope="{ row, index }")
-          .units__icons
-            img.units__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'units_opacity': isActive(key, index)}")
+          .table__icons
+            img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
+
     Add(@add="addUnit")
 </template>
 
@@ -66,9 +67,10 @@
 	import SettingsTable from "./SettingsTable"
 	import Chips from "../Chips"
 	import Add from "../Add"
-	import { mapGetters, mapActions } from "vuex"
+	import { mapActions } from "vuex"
 	import crudIcons from "@/mixins/crudIcons"
 	import SelectMulti from "../SelectMulti"
+	import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -79,41 +81,29 @@
 						label: "Unit",
 						headerKey: "headerUnit",
 						key: "unit",
-						width: "14%",
-						padding: "0"
+						style: { width: "25%" }
 					},
 					{
 						label: "Steps",
 						headerKey: "headerSteps",
 						key: "steps",
-						width: "32%",
-						padding: "0"
-					},
-					{
-						label: "Sizes",
-						headerKey: "headerSizes",
-						key: "sizes",
-						width: "32%",
-						padding: "0"
+						style: { width: "49%" }
 					},
 					{
 						label: "Active",
 						headerKey: "headerActive",
 						key: "active",
-						width: "8%",
-						padding: "0"
+						style: { width: "9%" }
 					},
 					{
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						width: "14%",
-						padding: "0"
+						style: { width: "17%" }
 					}
 				],
 				steps: [],
 				currentServices: [],
-				currentSizes: [],
 				units: [],
 				oldUnits: [],
 				currentUnit: "",
@@ -129,22 +119,9 @@
 			...mapActions({
 				alertToggle: "alertToggle"
 			}),
-			setChips({ data }) {
-				this.currentSizes.push(data)
-			},
-			deleteChips({ index }) {
-				this.currentSizes.splice(index, 1)
-			},
-			formatSizes(array) {
-				let sizes = ""
-				array.forEach((element) => {
-					sizes += `<span style="display:inline-flex;padding:0 10px;height:20px;font-size:14px;line-height:20px;border-radius:8px;margin-right:5px;border:1px solid #66563d" class="test">${ element }</span>`
-				})
-				return sizes
-			},
 			presentServices(services) {
 				if (!services.length) return ""
-				return services.reduce((acc, cur) => acc + `${ cur.title }; `, "")
+				return services.reduce((acc, cur) => acc + `${ cur.title }, `, "")
 			},
 			setServices({ option }) {
 				const position = this.selectedServices.indexOf(option)
@@ -160,11 +137,7 @@
 					const result = await this.$http.get("/api/steps")
 					this.steps = result.body
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Services",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Services", isShow: true, type: "error" })
 				}
 			},
 			async getUnits() {
@@ -172,11 +145,7 @@
 					const result = await this.$http.get("/api/units")
 					this.units = result.body
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Units",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Units", isShow: true, type: "error" })
 				}
 			},
 			toggleActive(index) {
@@ -184,10 +153,9 @@
 				this.units[index].active = !this.units[index].active
 			},
 			addUnit() {
-				if (this.currentActive !== -1) {
-					return this.isEditing()
-				}
+				if (this.currentActive !== -1) return this.isEditing()
 				this.currentServices = []
+
 				this.units.push({
 					active: true,
 					type: "",
@@ -233,44 +201,28 @@
 				this.errors = []
 				const id = this.units[index]._id
 				let oldUnit = this.oldUnits[index]
+
 				try {
 					const result = await this.$http.post("/api/units", {
 						unit: {
 							_id: id,
 							type: this.units[index].type,
 							active: true,
-							steps: this.currentServices,
-							sizes: this.currentSizes
+							steps: this.currentServices
+							// sizes: this.currentSizes
 						}
 					})
-					this.alertToggle({
-						message: "Saved only Steps",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Saved only Steps", isShow: true, type: "success" })
 					this.getUnits()
+
 					if (result.data !== "Updated") {
-						await this.$http.post("/pricelists/add-new-multiplier", {
-							key: "Unit",
-							id: result.data
-						})
+						await this.$http.post("/pricelists/add-new-multiplier", { key: "Unit", id: result.data })
 					} else {
-						await this.$http.post("/pricelists/update-multiplier", {
-							key: "Unit",
-							oldMultiplier: oldUnit
-						})
-						// await this.$http.post("/clientsapi/rates", {
-						//   key: "Unit",
-						//   oldMultiplier: oldUnit,
-						// });
+						await this.$http.post("/pricelists/update-multiplier", { key: "Unit", oldMultiplier: oldUnit })
 						this.getOldData()
 					}
 				} catch (error) {
-					this.alertToggle({
-						message: "Error on saving Unit Steps info",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Unit Steps info", isShow: true, type: "error" })
 				}
 			},
 			async saveChanges(index) {
@@ -283,34 +235,20 @@
 							_id: id,
 							type: this.currentUnit,
 							active: this.units[index].active,
-							steps: this.currentServices,
-							sizes: this.currentSizes
+							steps: this.currentServices
+							// sizes: this.currentSizes
 						}
 					})
 					this.alertToggle({ message: "Saved", isShow: true, type: "success" })
 					this.getUnits()
 					if (result.data !== "Updated") {
-						await this.$http.post("/pricelists/add-new-multiplier", {
-							key: "Unit",
-							id: result.data
-						})
+						await this.$http.post("/pricelists/add-new-multiplier", { key: "Unit", id: result.data })
 					} else {
-						await this.$http.post("/pricelists/update-multiplier", {
-							key: "Unit",
-							oldMultiplier: oldUnit
-						})
-						// await this.$http.post("/clientsapi/rates", {
-						//   key: "Unit",
-						//   oldMultiplier: oldUnit,
-						// });
+						await this.$http.post("/pricelists/update-multiplier", { key: "Unit", oldMultiplier: oldUnit })
 						this.getOldData()
 					}
 				} catch (error) {
-					this.alertToggle({
-						message: "Error on saving Unit info",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on saving Unit info", isShow: true, type: "error" })
 				}
 			},
 			cancel() {
@@ -321,21 +259,8 @@
 				if (this.currentActive === -1) return
 				const editable = this.units[index].editable
 				this.errors = []
-				if (index === 0 && this.currentSizes.length)
-					this.errors.push("This unit should not have any sizes")
-				if (!this.currentUnit || !this.isUnique(index))
-					this.errors.push("Unit should not be empty and be unique!")
-				if (this.currentSizes.map((item) => Math.sign(item)).includes(NaN))
-					this.errors.push("Size should be number!")
-				if (this.currentSizes.map((item) => item === "").includes(true))
-					this.errors.push("Size cannot be empty!")
-				if (
-						this.currentSizes.filter(
-								(item, index, array) =>
-										index !== array.indexOf(item) || index !== array.lastIndexOf(item)
-						).length
-				)
-					this.errors.push("Size should be unique!")
+				if (!this.currentUnit || !this.isUnique(index)) this.errors.push("Unit should not be empty and be unique!")
+
 				if (this.errors.length) {
 					this.areErrors = true
 					return
@@ -352,26 +277,14 @@
 				const id = this.units[index]._id
 				const editable = this.units[index].editable
 				if (!editable) {
-					this.alertToggle({
-						message: "This Unit cannot be deleted.",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "This Unit cannot be deleted.", isShow: true, type: "error" })
 					return
 				}
 				try {
 					await this.$http.delete(`/api/units/${ id }`)
-					this.alertToggle({
-						message: "Unit removed",
-						isShow: true,
-						type: "success"
-					})
+					this.alertToggle({ message: "Unit removed", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on removing Unit",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on removing Unit", isShow: true, type: "error" })
 				}
 				this.cancel()
 				this.getUnits()
@@ -381,19 +294,12 @@
 					const result = await this.$http.get("/api/units")
 					this.oldUnits = result.body
 				} catch (err) {
-					this.alertToggle({
-						message: "Error on getting Units",
-						isShow: true,
-						type: "error"
-					})
+					this.alertToggle({ message: "Error on getting Units", isShow: true, type: "error" })
 				}
 			},
 			isUnique(index) {
 				const duplicateIndex = this.units.findIndex((item, ind) => {
-					if (
-							index !== ind &&
-							item.type.toLowerCase() === this.currentUnit.toLowerCase().trim()
-					) {
+					if (index !== ind && item.type.toLowerCase() === this.currentUnit.toLowerCase().trim()) {
 						return item
 					}
 				})
@@ -411,6 +317,7 @@
 			}
 		},
 		components: {
+			GeneralTable,
 			SettingsTable,
 			Add,
 			SelectMulti,
@@ -428,131 +335,81 @@
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
-  @import "../../assets/styles/settingsTable";
 
   .units {
-    @extend %setting-table;
-    width: 1000px;
+    width: 850px;
     border-radius: 4px;
     margin: 50px;
+    background-color: white;
+    box-shadow: $box-shadow;
+    padding: 25px;
+  }
 
+
+  .table {
+    width: 100%;
 
     &__data {
-      @extend %table-data;
-      overflow-x: hidden;
+      padding: 0 7px;
     }
 
-    &__editing-data {
-      @extend %table-data;
-      box-shadow: inset 0 0 7px $brown-shadow;
+    &__header {
+      padding: 0 7px;
     }
 
-    &__data-chips {
-      @extend %table-data;
-      overflow-y: hidden;
-    }
-
-    &__editing-chips {
-      @extend %table-data;
-      box-shadow: inset 0 0 7px $brown-shadow;
-      overflow-y: hidden;
-    }
-
-    &__input {
-      @extend %table-text-input;
+    &__drop {
+      position: relative;
+      height: 32px;
+      max-width: 220px;
+      margin: 0 7px;
+      width: 100%;
+      background: white;
+      border-radius: 4px;
     }
 
     &__icons {
-      @extend %table-icons;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
     }
 
     &__icon {
-      @extend %table-icon;
-    }
-
-    &__checkbox {
-      width: 22px;
-      height: 22px;
       cursor: pointer;
       opacity: 0.5;
     }
 
-    &_centered {
-      justify-content: center;
-    }
-
-    &_flex {
-      display: flex;
-      justify-content: space-around;
-    }
-
-    &__main-icon,
-    &__file-preview {
-      width: 22px;
-      height: 22px;
-    }
-
-    &__link {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 22px;
-    }
-
-    &__drop-menu {
-      position: relative;
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
-    &__download {
-      cursor: pointer;
-      width: 40%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    &_opacity {
+    &__opacity {
       opacity: 1;
     }
 
-    &__upload {
-      position: relative;
-      background: url("../../assets/images/Other/upload-icon.png");
-      background-position-x: center;
-      background-repeat: no-repeat;
-      width: 40%;
-      height: 22px;
-      overflow: hidden;
-    }
-
-    &__load-file {
+    &__input {
       width: 100%;
-      height: 22px;
-      border: none;
-      outline: none;
-      opacity: 0;
-      z-index: 2;
-      position: absolute;
-      left: 6px;
-      cursor: pointer;
-      font-size: 0;
+      padding: 0 7px;
     }
+  }
 
-    &__no-file {
-      opacity: 0.5;
+  input {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 100%;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
     }
+  }
 
-    &_no-back {
-      background: none;
-    }
-
-    &__file-preview {
-      margin-left: 10px;
-    }
-
-    &_active {
-      box-shadow: inset 0 0 8px $brown-shadow;
+  .filter {
+    &__opacity {
+      filter: opacity(0.5);
     }
   }
 </style>

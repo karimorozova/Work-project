@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const PricelistSchema = new mongoose.Schema({
 	name: {
@@ -12,36 +12,36 @@ const PricelistSchema = new mongoose.Schema({
 	isActive: {
 		type: Boolean
 	},
-	newLangPairs: [{
+	newLangPairs: [ {
 		source: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		target: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		}
-	}],
-	basicPricesTable: [{
+	} ],
+	basicPricesTable: [ {
 		type: {
 			type: String,
 			trim: true
 		},
 		sourceLanguage: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		targetLanguage: {
-			type: Schema.Types.ObjectId, ref: 'Language',
+			type: Schema.Types.ObjectId, ref: 'Language'
 		},
 		euroBasicPrice: {
 			type: Number,
-			default: 0,
+			default: 0
 		},
 		usdBasicPrice: {
 			type: Number,
-			default: 0,
+			default: 0
 		},
 		gbpBasicPrice: {
 			type: Number,
-			default: 0,
+			default: 0
 		},
 		altered: {
 			type: Boolean,
@@ -51,36 +51,29 @@ const PricelistSchema = new mongoose.Schema({
 			type: Boolean,
 			default: true
 		}
-	}],
-	stepMultipliersTable: [{
+	} ],
+	stepMultipliersTable: [ {
 		step: {
-			type: Schema.Types.ObjectId, ref: 'Step',
+			type: Schema.Types.ObjectId, ref: 'Step'
 		},
 		unit: {
-			type: Schema.Types.ObjectId, ref: 'Units',
-		},
-		size: {
-			type: Number,
+			type: Schema.Types.ObjectId, ref: 'Units'
 		},
 		multiplier: {
 			type: Number,
-			default: 100,
+			default: 100
 		},
 		euroMinPrice: {
 			type: Number,
-			default: 0,
+			default: 0
 		},
 		usdMinPrice: {
 			type: Number,
-			default: 0,
+			default: 0
 		},
 		gbpMinPrice: {
 			type: Number,
-			default: 0,
-		},
-		defaultSize: {
-			type: Boolean,
-			default: false
+			default: 0
 		},
 		altered: {
 			type: Boolean,
@@ -90,14 +83,14 @@ const PricelistSchema = new mongoose.Schema({
 			type: Boolean,
 			default: true
 		}
-	}],
-	industryMultipliersTable: [{
+	} ],
+	industryMultipliersTable: [ {
 		industry: {
-			type: Schema.Types.ObjectId, ref: 'Industries',
+			type: Schema.Types.ObjectId, ref: 'Industries'
 		},
 		multiplier: {
 			type: Number,
-			default: 100,
+			default: 100
 		},
 		altered: {
 			type: Boolean,
@@ -107,7 +100,7 @@ const PricelistSchema = new mongoose.Schema({
 			type: Boolean,
 			default: true
 		}
-	}],
+	} ],
 	discountChart: {
 		type: Object,
 		default: {
@@ -122,8 +115,8 @@ const PricelistSchema = new mongoose.Schema({
 			noMatch: { text: "No match", rate: 100 }
 		}
 	}
-}, { minimize: false });
+}, { minimize: false })
 
-const Pricelist = mongoose.model('Pricelist', PricelistSchema);
+const Pricelist = mongoose.model('Pricelist', PricelistSchema)
 
-module.exports = Pricelist;
+module.exports = Pricelist

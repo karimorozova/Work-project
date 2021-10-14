@@ -374,16 +374,9 @@ const VendorSchema = new mongoose.Schema({
 			unit: {
 				type: Schema.Types.ObjectId, ref: 'Units'
 			},
-			size: {
-				type: Number
-			},
 			multiplier: {
 				type: Number,
 				default: 100
-			},
-			defaultSize: {
-				type: Boolean,
-				default: false
 			},
 			altered: {
 				type: Boolean,
@@ -433,9 +426,6 @@ const VendorSchema = new mongoose.Schema({
 			},
 			unit: {
 				type: Schema.Types.ObjectId, ref: 'Units'
-			},
-			size: {
-				type: Number
 			},
 			industry: {
 				type: Schema.Types.ObjectId, ref: 'Industries'

@@ -11,7 +11,6 @@ const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunicatio
 const { assignMemoqTranslator, getProject, updateProjectProgress, regainWorkFlowStatusByStepId } = require('../../projects')
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
-const { pangeaEncoder, projectDecodeFinancePart } = require('../../helpers/pangeaCrypt')
 const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
 const { getPayableByVendorId, getPayablePaidByVendorId, setPayablesNextStatus, getPaidPayables, getPayable, clearPayablesStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingPayables')
 

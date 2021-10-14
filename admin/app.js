@@ -12,14 +12,11 @@ const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
-require('./helpers/dbSetDefault');
+const { checkCollections } = require('./helpers/dbSetDefault');
 require('./schedule');
 
-// SOCKET.IO SERVER
-
-// end SOCKET.IO se
-
-// const { getMemoqUsers, deleteMemoqUser } = require('./services/memoqs/users');
+//NEW DB
+checkCollections()
 
 
 const allowedOrigins = [

@@ -10,9 +10,7 @@ const getDefaultBasicPrices = async () => {
 	const EnglishBritain = allLanguages.find(({ lang }) => lang === 'English (United Kingdom)')
 
 
-	allLanguages.forEach(language => {
-		addedDefaultBasicPrices(EnglishBritain, language)
-	})
+	allLanguages.forEach(language => addedDefaultBasicPrices(EnglishBritain, language))
 	allLanguages.filter(({ lang }) => lang !== 'English (United Kingdom)').forEach(language => {
 		addedDefaultBasicPrices(language, EnglishBritain)
 	})
@@ -45,33 +43,16 @@ const getDefaultStepMultipliers = async () => {
 	const allSteps = await Step.find()
 	const units = await Units.find()
 	const defaultStepMultipliers = []
-	for (let { _id, sizes, steps } of units) {
-		if (sizes.length) {
-			sizes.forEach(size => {
-				steps.forEach(step => {
-					defaultStepMultipliers.push({
-						multiplier: getStepMultiplier(allSteps, step),
-						step: ObjectId(step._id),
-						unit: _id,
-						size: +size,
-						euroMinPrice: 0,
-						usdMinPrice: 0,
-						gbpMinPrice: 0
-					})
-				})
-			})
-		} else {
-			steps.forEach(step => defaultStepMultipliers.push({
-				multiplier: getStepMultiplier(allSteps, step),
-				step: step._id,
-				unit: _id,
-				size: 1,
-				euroMinPrice: 0,
-				usdMinPrice: 0,
-				gbpMinPrice: 0,
-				isActive: true
-			}))
-		}
+	for (let { _id, steps } of units) {
+		steps.forEach(step => defaultStepMultipliers.push({
+			multiplier: getStepMultiplier(allSteps, step),
+			step: step._id,
+			unit: _id,
+			euroMinPrice: 0,
+			usdMinPrice: 0,
+			gbpMinPrice: 0,
+			isActive: true
+		}))
 	}
 	return defaultStepMultipliers
 }

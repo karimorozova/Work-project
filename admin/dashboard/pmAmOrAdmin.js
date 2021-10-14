@@ -38,7 +38,6 @@ async function getProjects(filters) {
 				"customer.leadSource",
 				"customer.leadGeneration",
 				"customer.salesStage",
-				"customer.salesComission",
 				"customer.isTest",
 				"customer.sourceLanguages",
 				"customer.industries",
