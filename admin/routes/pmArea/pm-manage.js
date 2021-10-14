@@ -1176,6 +1176,19 @@ router.post('/update-filters-and-fields/:userId', async (req, res) => {
 	}
 })
 
+router.post('/step-finance-edit/:projectId', async (req, res) => {
+	const { projectId } = req.params
+	const data  = req.body
+	try {
+		console.log({projectId, data})
+		res.send("done!")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on update project filters')
+	}
+})
+
+
 
 // XTRF API ==================================================================
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")

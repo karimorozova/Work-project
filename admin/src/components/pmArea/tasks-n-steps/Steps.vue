@@ -1,5 +1,7 @@
 <template lang="pug">
   .steps
+
+
     .steps__action(v-if="!isProjectFinished")
       .steps__title Step Action:
       .steps__drop-menu
@@ -52,9 +54,7 @@
         template(slot="check" slot-scope="{ row, index }")
           .table__data
             CheckBox(:isChecked="row.check" @check="(e)=>toggleCheck(e, index, true)" @uncheck="(e)=>toggleCheck(e, index, false)" customClass="tasks-n-steps")
-        template(slot="info" slot-scope="{row, index}")
-          .table__data(style="cursor: pointer;" @click="showStepDetails(index)")
-            img(src="../../../assets/images/latest-version/view-details.png")
+
         //template(slot="id" slot-scope="{ row }")
           .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
         template(slot="name" slot-scope="{ row }")
@@ -141,6 +141,11 @@
             span(v-if="marginCalc(row)") {{ marginCalc(row) }}
             sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
+        template(slot="info" slot-scope="{row, index}")
+          .table__space-between
+            img(src="../../../assets/images/latest-version/view-details.png" style="cursor: pointer;" @click="showStepDetails(index)")
+            img(src="../../../assets/images/latest-version/view-details.png" style="cursor: pointer;" @click="showFinanceEditing(index)")
+
       transition(name="fade")
         .steps__info(v-if="isStepInfo")
           StepInfo(
@@ -151,6 +156,14 @@
             :originallyLanguages="originallyLanguages"
             :originallyUnits="originallyUnits"
             :projectCurrency="currentProject.projectCurrency"
+          )
+
+      transition(name="fade")
+        .steps__info(v-if="isFinanceEdit")
+          ProjectFinanceModal(
+            :step="allSteps[infoIndex]"
+            :projectCurrency="currentProject.projectCurrency"
+            @closeFinanceEditing="closeFinanceEditing"
           )
     .steps__reassignment(v-if="isReassignment")
       Reassignment(
@@ -196,6 +209,7 @@
 	import CheckBox from "@/components/CheckBox"
 	import Tabs from "../../Tabs"
 	import PersonSelect from "../PersonSelect"
+	import ProjectFinanceModal from "../ProjectFinanceModal"
 
 	const ApproveModal = () => import("../../ApproveModal")
 	const StepInfo = () => import("./StepInfo")
@@ -240,18 +254,19 @@
 				tabs: [ 'Tasks', 'Steps' ],
 				fields: [
 					{ label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-					{ label: "", headerKey: "headerInfo", key: "info", style: { "width": "3%", "border-left": "none" } },
+
 					// { label: "Id", headerKey: "headerId", key: "id", style: { "width": "4%" } },
 					{ label: "Step", headerKey: "headerName", key: "name", style: { "width": "10%" } },
-					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
+					{ label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "10%" } },
 					{ label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "18%" } },
-					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
+					{ label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "10%" } },
 					// { label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "8%" } },
 					{ label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
 					{ label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
-					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "7%" } },
-					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "7%" } },
-					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } }
+					{ label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
+					{ label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
+					{ label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "11%" } },
+          { label: "", headerKey: "headerInfo", key: "info", style: { "width": "6%" } },
 				],
 				selectedVendors: [],
 				modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
@@ -262,6 +277,7 @@
 				chosenStep: {},
 				infoIndex: -1,
 				isStepInfo: false,
+        isFinanceEdit: false,
 				isReassignment: false,
 				reassignStep: {},
 				areErrorsExist: false,
@@ -359,6 +375,10 @@
 				this.infoIndex = index
 				this.isStepInfo = true
 			},
+      showFinanceEditing(index) {
+				this.infoIndex = index
+				this.isFinanceEdit = true
+			},
 			showReassignment(index) {
 				this.infoIndex = index
 				this.reassignStep = { ...this.allSteps[index] }
@@ -368,6 +388,10 @@
 				this.isStepInfo = false
 				this.infoIndex = -1
 			},
+      closeFinanceEditing() {
+        this.infoIndex = -1
+        this.isFinanceEdit = false
+      },
 			closeReassignment() {
 				this.isReassignment = false
 				this.infoIndex = -1
@@ -602,7 +626,8 @@
 			StepInfo,
 			Reassignment,
 			ApproveModal,
-			Tabs
+			Tabs,
+      ProjectFinanceModal,
 		}
 	}
 </script>
@@ -611,6 +636,15 @@
   @import "../../../assets/scss/colors.scss";
 
   .table {
+
+    &__space-between {
+      padding: 0 6px;
+      word-break: break-word;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+
     &__data {
       padding: 0 6px;
       word-break: break-word;
