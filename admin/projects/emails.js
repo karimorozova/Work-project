@@ -276,6 +276,70 @@ async function notifyClientDeliverablesReady({ project, contacts, type, entityId
 	}
 }
 
+async function reSendClientManyDeliveries({ projectId, multi, single, contacts, comment, user }) {
+	let project = await getProject({ "_id": projectId })
+	const { projectId: srtProjectId, tasksDeliverables, accountManager, tasksDR2, tasks, projectName } = project
+
+	const allLanguages = await Languages.find()
+	const accManager = await User.findOne({ "_id": accountManager.id })
+
+	let attachmentsPaths = []
+
+	if (multi.length) {
+		for await (let item of multi) {
+			let slug = ''
+			const deliverableObj = tasksDR2.multiLang.find(({ _id }) => `${ _id }` === `${ item._id }`)
+			const { tasks: personalTasks } = deliverableObj
+			const projectTasks = tasks.filter(item => personalTasks.includes(item.taskId))
+
+			slug = projectTasks.reduce((acc, curr) => {
+				const { lang: source } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.sourceLanguage }`)
+				const { lang: target } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.targetLanguage }`)
+				const languages = source === target ? target : `${ source } to ${ target }`
+				acc = acc + `"${ languages } - ${ curr.service.title }", `
+				return acc
+			}, '')
+
+			const { path, _id: deliverablesId } = tasksDeliverables.find(({ deliverablesId }) => `${ deliverablesId }` === `${ item._id }`)
+			const filename = `${ slug }deliverables.zip`
+			attachmentsPaths.push({ filename, path })
+
+			await Projects.updateOne({ "_id": projectId, "tasksDeliverables._id": deliverablesId }, { $set: { "tasksDeliverables.$.deliveredAt": new Date() } })
+		}
+	}
+
+	if (single.length) {
+		for await (let item of single) {
+			let slug = ''
+			const { sourceLanguage, targetLanguage, files } = tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ item._id }`)
+			const personalTasks = [ ...new Set(files.map(item => item.taskId)) ]
+			const projectTasks = tasks.filter(item => personalTasks.includes(item.taskId))
+			const { lang: source } = allLanguages.find(({ _id }) => `${ _id }` === `${ sourceLanguage }`)
+			const { lang: target } = allLanguages.find(({ _id }) => `${ _id }` === `${ targetLanguage }`)
+			const languages = source === target ? target : `${ source } to ${ target }`
+			slug = projectTasks.reduce((acc, curr) => {
+				acc = acc + `"${ languages } - ${ curr.service.title }", `
+				return acc
+			}, '')
+
+			const { path, _id: deliverablesId } = tasksDeliverables.find(({ deliverablesId }) => `${ deliverablesId }` === `${ item._id }`)
+			const filename = `${ slug }deliverables.zip`
+			attachmentsPaths.push({ filename, path })
+
+			await Projects.updateOne({ "_id": projectId, "tasksDeliverables._id": deliverablesId }, { $set: { "tasksDeliverables.$.deliveredAt": new Date() } })
+		}
+	}
+
+	contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
+	const subject = `DELIVERY: ${ srtProjectId } - ${ projectName } (C006.0)`
+	for await (let contact of contacts) {
+		const finalAttachments = attachmentsPaths.map(item => ({ filename: item.filename, path: `./dist${ item.path }` }))
+
+		const message = projectDeliveryMessage({ comment, contact, accManager, projectId: srtProjectId, projectName: projectName, id: projectId })
+		await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
+	}
+}
+
 async function sendClientManyDeliveries({ projectId, entitiesForDeliver, user, contacts, comment }) {
 	contacts.push({ email: 'am@pangea.global', firstName: 'Account Managers' })
 	let updatedProject = await getProject({ "_id": projectId })
@@ -554,5 +618,6 @@ module.exports = {
 	sendQuoteMessage,
 	getCostMessage,
 	sendCostQuoteMessage,
-	sendClientManyDeliveries
+	sendClientManyDeliveries,
+	reSendClientManyDeliveries
 }

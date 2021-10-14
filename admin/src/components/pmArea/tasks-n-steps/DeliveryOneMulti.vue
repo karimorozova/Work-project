@@ -708,7 +708,8 @@
   }
 
   .icon-start-line {
-    margin-right: 6px;
+    margin-right: 10px;
+    color: #666;
   }
 
   .marginTop {

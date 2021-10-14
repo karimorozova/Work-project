@@ -269,7 +269,7 @@
 
     &__check-icon {
       font-size: 16px;
-      color: $light-brown;
+      color: $border;
       cursor: pointer;
       transition: ease 0.1s;
       margin-right: 10px;

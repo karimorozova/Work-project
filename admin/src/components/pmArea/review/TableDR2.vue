@@ -117,7 +117,7 @@
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
 					upload: { src: require("../../../assets/images/latest-version/upload-file.png") },
-					delete: { src: require("../../../assets/images/latest-version/delete-icon.png") },
+					delete: { src: require("../../../assets/images/latest-version/i-delete.png") },
 					lock: { src: require("../../../assets/images/latest-version/lock.png") }
 				},
 				selectedAction: "",
@@ -287,7 +287,7 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-
+    margin-top: 20px;
 
     &__approveModal {
       z-index: 6000;
@@ -351,7 +351,7 @@
 
     &__check-icon {
       font-size: 16px;
-      color: $light-brown;
+      color: $border;
       cursor: pointer;
       transition: ease 0.1s;
       margin-right: 10px;
