@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const fs = require('fs')
 const {
-	User,
+	User
 } = require('../../models')
 
 const {
@@ -25,8 +25,12 @@ const {
 	approveInstructionDR2,
 	approveFilesDR2,
 	changeManagersDR1,
-	changeNameLang,
+	changeNameLang
 } = require("../../projects")
+
+const {
+	reSendClientManyDeliveries
+} = require('../../projects/emails')
 
 const {
 	Projects
@@ -71,7 +75,7 @@ router.post('/target-dr2', upload.fields([ { name: 'targetFile' } ]), async (req
 })
 
 router.post('/remove-dr2-file', async (req, res) => {
-	const {  type, taskId, projectId, path, entityId } = req.body
+	const { type, taskId, projectId, path, entityId } = req.body
 	try {
 		if (type === 'single') {
 			if (taskId !== 'Loaded in DR2') {
@@ -87,7 +91,7 @@ router.post('/remove-dr2-file', async (req, res) => {
 					{ arrayFilters: [ { 'i._id': entityId } ] }
 			)
 
-		}else{
+		} else {
 			await Projects.updateOne(
 					{ "_id": projectId, 'tasksDR2.multiLang._id': entityId, "tasksDR2.multiLang.file.path": path },
 					{ $pull: { "tasksDR2.multiLang.$[i].file": { path } } },
@@ -96,7 +100,7 @@ router.post('/remove-dr2-file', async (req, res) => {
 
 		}
 
-		if(await fs.existsSync(`./dist${path}`)) {
+		if (await fs.existsSync(`./dist${ path }`)) {
 			fs.unlink(`./dist${ path }`, (err) => {
 				if (err) throw(err)
 			})
@@ -196,7 +200,7 @@ router.post('/remove-dr-file', async (req, res) => {
 	const { taskId, path, projectId } = req.body
 	try {
 		await Projects.updateOne({ "_id": projectId, 'tasksDR1.files.path': path }, { $pull: { 'tasksDR1.$[i].files': { path } } }, { arrayFilters: [ { 'i.taskId': taskId } ] })
-		if(await fs.existsSync(`./dist${path}`)) {
+		if (await fs.existsSync(`./dist${ path }`)) {
 			fs.unlink(`./dist${ path }`, (err) => {
 				if (err) throw(err)
 			})
@@ -393,6 +397,41 @@ router.post('/change-managers', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on adding tasks ref files')
+	}
+})
+router.post('/re-send', async (req, res) => {
+	try {
+		const { projectId, multi, single, contacts, comment, user } = req.body
+		await reSendClientManyDeliveries({ projectId, multi, single, contacts, comment, user })
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on resend deliverables')
+	}
+})
+
+router.post('/re-open', async (req, res) => {
+	try {
+		const { projectId, multi, single } = req.body
+
+		if (single.length) {
+			for await (let item of single) await updateProject(
+					{ "_id": projectId, 'tasksDR2.singleLang._id': item._id },
+					{ $set: { "tasksDR2.singleLang.$.status": "Pending Approval [DR2]" } }
+			)
+		}
+		if (multi.length) {
+			for await (let item of multi) await updateProject(
+					{ "_id": projectId, 'tasksDR2.multiLang._id': item._id },
+					{ $set: { "tasksDR2.multiLang.$.status": "Pending Approval [DR2]" } }
+			)
+		}
+
+		let updatedProject = await getProject({ '_id': projectId })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on reopen deliverables')
 	}
 })
 

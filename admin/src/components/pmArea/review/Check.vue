@@ -48,7 +48,7 @@
     &__icon {
       color: $border;
       font-size: 16px;
-      transition: ease 0.1s;
+      transition: linear 0.1s;
     }
 
     &_green {

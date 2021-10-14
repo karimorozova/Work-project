@@ -116,7 +116,8 @@
 
       .deliverables__header(v-if="isShowTasksAndDeliverables")
         .deliverables__title Deliverables
-        .deliverablesActions(v-if="!isProjectFinished")
+        //.deliverablesActions(v-if="!isProjectFinished")
+        .deliverablesActions()
           .deliverablesActions__title Deliverables Action:
           .deliverablesActions__drop-menu
             SelectSingle(
@@ -149,11 +150,11 @@
           .table__data(slot="file" slot-scope="{ row }") {{ row.files.length }}
           .table__data(slot="task" slot-scope="{ row }") {{ getTasksId(row) }}
           .table__dataStatus(slot="status" slot-scope="{ row }")
-              .tooltip(v-if="row.status === 'Delivered'")
-                span#myTooltip2.tooltiptext-left(v-html="getDeliveryTimeAndPerson(row)")
-                i.far.fa-clock
+            .tooltip(v-if="row.status === 'Delivered'")
+              span#myTooltip2.tooltiptext-left(v-html="getDeliveryTimeAndPerson(row)")
+              i.far.fa-clock
 
-              span {{ row.status }}
+            span {{ row.status }}
 
           .table__data(slot="action" slot-scope="{ row, index }")
 
@@ -285,13 +286,20 @@
 			},
 			async deliverForMany() {
 				const entitiesForDeliver = this.deliverables.filter(item => !!item.isChecked).map(item => ({ entityId: item._id, type: item.type }))
-				await this.approveDeliverMany({
-					projectId: this.currentProject._id,
-					entitiesForDeliver,
-					user: this.user,
-					contacts: this.listOfContactsForDeliver(),
-					comment: this.comment
-				})
+
+				if (this.selectedAction === 'Deliver') {
+					await this.approveDeliverMany({
+						projectId: this.currentProject._id,
+						entitiesForDeliver,
+						user: this.user,
+						contacts: this.listOfContactsForDeliver(),
+						comment: this.comment
+					})
+				}
+				if (this.selectedAction === 'ReSend') {
+					this.reSendDeliverables()
+				}
+
 				this.closeContactsModal()
 				this.setDefaultContact()
 				this.selectedAction = ''
@@ -338,6 +346,41 @@
 				this.selectedAction = option
 				if (option === 'Deliver') {
 					this.openContactsModalMany()
+				} else if (option === 'ReOpen') {
+					this.reOpenDeliverables()
+				} else if (option === 'ReSend') {
+					this.openContactsModalMany()
+				}
+			},
+			async reSendDeliverables() {
+				try {
+					await this.$http.post('/delivery/re-send', {
+						projectId: this.currentProject._id,
+						multi: this.currentProject.tasksDR2.multiLang.filter(i => i.isChecked),
+						single: this.currentProject.tasksDR2.singleLang.filter(i => i.isChecked),
+						contacts: this.listOfContactsForDeliver(),
+						comment: this.comment,
+						user: this.user
+					})
+					this.alertToggle({ message: 'Successfully resent!', isShow: true, type: "success" })
+				} catch (err) {
+					this.alertToggle({ message: 'Error in reSend deliverables!', isShow: true, type: "error" })
+				} finally {
+					this.selectedAction = ''
+				}
+			},
+			async reOpenDeliverables() {
+				try {
+					const result = await this.$http.post('/delivery/re-open', {
+						projectId: this.currentProject._id,
+						multi: this.currentProject.tasksDR2.multiLang.filter(i => i.isChecked),
+						single: this.currentProject.tasksDR2.singleLang.filter(i => i.isChecked)
+					})
+					this.storeProject(result.data)
+				} catch (err) {
+					this.alertToggle({ message: 'Error in reOpen deliverables!', isShow: true, type: "error" })
+				} finally {
+					this.selectedAction = ''
 				}
 			},
 			closeDeleteModal() {
@@ -368,7 +411,7 @@
 				}
 				if (type === 'multi' && this.canUpdateDr2) {
 					icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
-					icons.delete = { src: require("../../assets/images/latest-version/delete-icon.png") }
+					icons.delete = { src: require("../../assets/images/latest-version/i-delete.png") }
 				} else if (type === 'single' && !files.length && (this.isAdmin || `${ AMId }` === `${ this.user._id }` || `${ PMId }` === `${ this.user._id }`)
 				) {
 					icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
@@ -543,8 +586,13 @@
 			availableActionsOptions() {
 				const getArrayOfChecked = this.deliverables.filter(item => !!item.isChecked)
 
-				if (getArrayOfChecked.length) if (getArrayOfChecked.every(({ status }) => status === 'Ready for Delivery')) {
-					return [ 'Deliver' ]
+				if (getArrayOfChecked.length) {
+					if (getArrayOfChecked.every(({ status }) => status === 'Ready for Delivery')) {
+						return [ 'Deliver', 'ReOpen' ]
+					}
+					if (getArrayOfChecked.every(({ status }) => status === 'Delivered')) {
+						return [ 'ReOpen', 'ReSend' ]
+					}
 				}
 			},
 			canUpdateDr2() {
@@ -565,7 +613,7 @@
 						this.currentProject.tasksDR2.singleLang.map(item => {
 							return {
 								_id: item._id,
-                deliveryName: item.deliveryName || this.currentProject.projectName,
+								deliveryName: item.deliveryName || this.currentProject.projectName,
 								deliveryInternalId: item.deliveryInternalId,
 								type: 'single',
 								status: item.status,
@@ -580,7 +628,7 @@
 						this.currentProject.tasksDR2.multiLang.map(item => {
 							return {
 								_id: item._id,
-                deliveryName: item.deliveryName || this.currentProject.projectName,
+								deliveryName: item.deliveryName || this.currentProject.projectName,
 								deliveryInternalId: item.deliveryInternalId,
 								type: 'multi',
 								status: item.status,
@@ -724,13 +772,13 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       font-family: "Myriad600";
       margin-bottom: 10px;
     }
 
     &__title2 {
-      font-size: 21px;
+      font-size: 19px;
       font-family: "Myriad600";
       margin-bottom: 15px;
     }
@@ -906,14 +954,14 @@
     }
 
     &__titleModal {
-      font-size: 21px;
+      font-size: 19px;
       margin-bottom: 20px;
       text-align: center;
       font-family: Myriad600;
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       display: flex;
       justify-content: space-between;
       font-family: Myriad600;
@@ -1025,7 +1073,7 @@
     }
 
     &__modal {
-      padding: 20px;
+      padding: 25px;
       background: white;
       position: absolute;
       box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
@@ -1065,9 +1113,10 @@
       font-size: 14px;
       justify-content: center;
       margin-bottom: 10px;
+      align-items: center;
 
       & span {
-        padding-left: 5px;
+        padding-left: 6px;
 
       }
 

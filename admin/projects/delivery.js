@@ -220,16 +220,15 @@ const sendNotificationToDR2 = async (projectId, taskIds, accountManager) => {
 	await managerNotifyMail(allUsers.find(({ _id }) => `${ _id }` === `${ accountManager }`), messageToNew, `The DR2 has been assigned to you: ${ project.projectId } (I009.1)`)
 }
 
-const changeNameLang = async ({projectId, deliveryId, deliveryName, type}) => {
-	const deliveryType = type === 'single' ? 'singleLang': 'multiLang'
+const changeNameLang = async ({ projectId, deliveryId, deliveryName, type }) => {
+	const deliveryType = type === 'single' ? 'singleLang' : 'multiLang'
 	await Projects.updateOne(
-			{ "_id": projectId, [`tasksDR2.${deliveryType}._id`]: deliveryId },
-			{ [`tasksDR2.${deliveryType}.$[i].deliveryName`]: deliveryName },
+			{ "_id": projectId, [`tasksDR2.${ deliveryType }._id`]: deliveryId },
+			{ [`tasksDR2.${ deliveryType }.$[i].deliveryName`]: deliveryName },
 			{ arrayFilters: [ { 'i._id': deliveryId } ] }
 	)
 	return await getProject({ _id: projectId })
 }
-
 
 
 function returnNewDeliveryId(projectId, singleLang, multiLang) {
@@ -291,7 +290,9 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault })
 
 	if (filesFromVault.length) {
 		for (let file of filesFromVault) {
-			const path = copyProjectFiles({ _id: projectId }, file)
+			let path = copyProjectFiles({ _id: projectId }, file)
+			if (path.includes('dist')) path = path.replace('./dist', '')
+
 			files.push({
 				fileName: path.split('/').pop(),
 				path,
@@ -331,15 +332,18 @@ async function addMultiLangDR2({ projectId, taskIds, refFiles, filesFromVault })
 }
 
 async function removeMultiDR2({ projectId, type, dr2Id }) {
+
 	const qProject = { "_id": projectId }
 	const { tasksDR2: { multiLang, singleLang } } = await Projects.findOne(qProject)
 
 	if (type === 'multi') {
 		const newMultiLang = multiLang.filter(({ _id }) => `${ _id }` !== `${ dr2Id }`)
 		const removedMultiLang = multiLang.filter(({ _id }) => `${ _id }` === `${ dr2Id }`)[0]
-		await fs.unlink(`./dist/${ removedMultiLang.file.path }`, (err) => {
-			if (err) console.log(err)
-		})
+		for await (let item of removedMultiLang.file) {
+			await fs.unlink(`${ './dist' + item.path }`, (err) => {
+				if (err) console.log(err)
+			})
+		}
 
 		return await getProjectAfterUpdate(qProject, { "tasksDR2.multiLang": newMultiLang })
 	} else {
@@ -666,5 +670,5 @@ module.exports = {
 	changeManager,
 	rollbackReview,
 	targetFileDR2,
-	changeNameLang,
+	changeNameLang
 }

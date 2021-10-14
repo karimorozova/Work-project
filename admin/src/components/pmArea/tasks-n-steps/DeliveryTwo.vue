@@ -8,7 +8,7 @@
     .review__title
       span Delivery Review 2:
       .review__delivery-name
-        input.field__name(type="text" placeholder="Delivery Name" v-model="deliveryName" :disabled="isCertificateExist")
+        input.field__name(type="text" placeholder="Delivery Name" :class="{'border-active': deliveryName !== deliveryData.deliveryName}" v-model="deliveryName" :disabled="isCertificateExist")
         .review__action-icon(v-if="deliveryName !== deliveryData.deliveryName")
           i(class="fas fa-save" @click="setDeliveryName")
           i(class="fas fa-times-circle" @click="setDefaultDeliveryName")
@@ -49,7 +49,7 @@
             i.fa.fa-paper-plane(aria-hidden='true')
     .relative__wrapper(v-if="isServiceForCertificate")
       .review__certificate
-        Button( value="Generate Certificate" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
+        Button( value="Generate Certificate" :outline="true" @clicked="generateCertificate" :isDisabled="isCertificateExist ")
 
     .review__table
       TableDR2(
@@ -136,7 +136,7 @@
 				selectedContacts: [],
 				comment: "",
 				isComment: false,
-        deliveryName: ''
+				deliveryName: ''
 			}
 		},
 		beforeDestroy() {
@@ -404,9 +404,9 @@
 				await this.setCurrentProject(updatedProject.data)
 
 			},
-      setDefaultDeliveryName() {
-			  this.deliveryName = this.deliveryData.deliveryName
-      }
+			setDefaultDeliveryName() {
+				this.deliveryName = this.deliveryData.deliveryName
+			}
 		},
 		computed: {
 			...mapGetters({
@@ -439,11 +439,11 @@
 				const { tasksDR2 } = this.project
 				if (this.type === 'single') {
 					const deliveryData = tasksDR2.singleLang.find(item => `${ item._id }` === `${ this.id }`)
-          this.deliveryName = deliveryData.deliveryName
+					this.deliveryName = deliveryData.deliveryName
 					return deliveryData
 				} else {
 					const deliveryData = tasksDR2.multiLang.find(item => `${ item._id }` === `${ this.id }`)
-          this.deliveryName = deliveryData.deliveryName
+					this.deliveryName = deliveryData.deliveryName
 					return deliveryData
 				}
 			},
@@ -489,16 +489,24 @@
   @import "../../../assets/scss/colors.scss";
 
   .field__name {
-    font-size: 14px;
-    color: #3d3d3d;
-    border: 1px solid #bfbfbf;
+    border: none;
     border-radius: 4px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
-    width: 220px;
+    width: 592px;
     height: 32px;
     transition: .1s ease-out;
+    font-size: 19px;
+    color: $text;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .border-active {
+    border: 1px solid $border-focus;
   }
 
   .dr1Comment {
@@ -541,22 +549,23 @@
     width: 1000px;
     border-radius: 4px;
 
-    &__delivery-name{
+    &__delivery-name {
       display: flex;
       align-items: center;
       gap: 5px;
     }
-    &__action-icon{
+
+    &__action-icon {
       display: flex;
-      justify-content: flex-end;
       align-items: center;
-      gap: 5px;
-      font-size: 18px;
+      gap: 8px;
+      margin-left: 10px;
+      font-size: 16px;
+
       i {
         transition: .2s ease-out;
         color: $dark-border;
         cursor: pointer;
-
 
         &:hover {
           color: $text;
@@ -577,13 +586,12 @@
     }
 
     &__certificate {
-      padding: 15px 0;
-
-      input {
-        margin-right: 15px;
-      }
+      position: absolute;
+      margin-top: 20px;
+      z-index: 10;
     }
-    .inputs{
+
+    .inputs {
       &__group {
         display: flex;
         margin-bottom: 10px;
@@ -769,7 +777,8 @@
   }
 
   .icon-start-line {
-    margin-right: 6px;
+    margin-right: 10px;
+    color: #666;
   }
 
   .marginTop {
