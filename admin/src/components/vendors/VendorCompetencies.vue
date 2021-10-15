@@ -5,7 +5,7 @@
         v-if="isDeleting"
         text="Are you sure?"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="deleteCompetencies"
         @close="closeModal"
         @notApprove="closeModal"

@@ -124,7 +124,7 @@
               class="absolute-middle"
               text="Are you sure?"
               approveValue="Yes"
-              notApproveValue="No"
+              notApproveValue="Cancel"
               @approve="deleteStep"
               @close="closeModalStep"
               @notApprove="closeModalStep"

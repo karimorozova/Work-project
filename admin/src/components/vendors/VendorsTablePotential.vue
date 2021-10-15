@@ -17,7 +17,7 @@
       template(slot="status" slot-scope="{ row, index }")
         //.vendors-table__drop-menu(v-if="currentEditingIndex === index")
         //  VendorStatusSelect(
-        //    isAllExist="no"
+        //    isAllExist="Cancel"
         //    :selectedStatus="selectedStatus"
         //    :parentInd="index"
         //    @chosenStatus="setStatus"

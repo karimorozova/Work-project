@@ -19,7 +19,7 @@
       ApproveModal(
         text="Are you sure you want to change Project Manager?"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="setPM"
         @close="closeModal"
         @notApprove="closeModal"
@@ -30,7 +30,7 @@
         v-if="deleteCurrentRequest"
         text="Are you sure you want to change Project Manager?"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="deleteRequest"
         @close="doNotDelete"
         @notApprove="doNotDelete"

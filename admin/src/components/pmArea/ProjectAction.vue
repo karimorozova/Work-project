@@ -101,7 +101,7 @@
       ApproveModal(
         text="Are you sure you want to re-open the project?"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="approveModal"
         @close="closeModal"
         @notApprove="closeModal"
@@ -111,7 +111,7 @@
       ApproveModal(
         text="Are you sure you want to re-open the project?"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="approveModalToDraft"
         @close="closeModal"
         @notApprove="closeModal"

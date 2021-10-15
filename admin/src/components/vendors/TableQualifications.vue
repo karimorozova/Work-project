@@ -9,7 +9,7 @@
         text="Do you want to notify the vendor by email with the attached Passed Test?"
         :optionWithoutClosing="true"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="sendMessageVendorPassed"
         @notApprove="notSendMessageVendorPassed"
       )
@@ -20,7 +20,7 @@
         text="Do you want to notify the vendor by email with the attached Not Passed Test?"
         :optionWithoutClosing="true"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="sendMessageVendorNotPassed"
         @notApprove="notSendMessageVendorNotPassed"
       )

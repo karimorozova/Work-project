@@ -13,7 +13,7 @@
         ApproveModal(
           text="Are you sure?"
           approveValue="Yes"
-          notApproveValue="No"
+          notApproveValue="Cancel"
           @approve="deleteBillingInfo"
           @close="closeDeleteModal"
           @notApprove="closeDeleteModal"

@@ -47,7 +47,7 @@
       ApproveModal(
         text="Are you sure?"
         approveValue="Yes"
-        notApproveValue="No"
+        notApproveValue="Cancel"
         @approve="removeRefFile"
         @close="closeManageApprovalModal"
         @notApprove="closeManageApprovalModal"

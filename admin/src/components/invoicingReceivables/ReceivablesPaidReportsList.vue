@@ -7,7 +7,7 @@
             v-if="isActionModal"
             :text='`Confirm action: "${selectedReportAction}"`'
             approveValue="Yes"
-            notApproveValue="No"
+            notApproveValue="Cancel"
             @approve="manageReportActions"
             @close="closeApproveActionModal"
             @notApprove="closeApproveActionModal"
@@ -99,7 +99,7 @@
               v-if="deleteReceivablesId !== ''"
               text="Are you sure?"
               approveValue="Yes"
-              notApproveValue="No"
+              notApproveValue="Cancel"
               @approve="deleteRequest"
               @close="closeDeleteRequestModal"
               @notApprove="closeDeleteRequestModal"

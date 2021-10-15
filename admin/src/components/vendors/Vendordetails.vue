@@ -204,7 +204,7 @@
         ApproveModal(
           text="Are you sure?"
           approveValue="Yes"
-          notApproveValue="No"
+          notApproveValue="Cancel"
           @approve="approveModal"
           @close="approveMemoqVendorAction = false"
           @notApprove="approveMemoqVendorAction = false"
