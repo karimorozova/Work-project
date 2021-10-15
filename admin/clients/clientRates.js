@@ -27,10 +27,10 @@ const updateClientRatesFromSettings = async (clientId) => {
 	let allCombinationsSteps = []
 	for (let step of newSteps) allCombinationsSteps.push(...await getStepMultipliersCombinations(step, boundPricelist))
 
-	allCombinationsSteps = _.uniqBy(allCombinationsSteps, item => (item.step.toString() + item.unit.toString() + item.size))
+	allCombinationsSteps = _.uniqBy(allCombinationsSteps, item => (item.step.toString() + item.unit.toString()))
 
 	for (let elem of stepMultipliersTable) {
-		const idx = allCombinationsSteps.findIndex(item => `${ item.step }-${ item.unit }-${ item.size }` === `${ elem.step }-${ elem.unit }-${ elem.size }`)
+		const idx = allCombinationsSteps.findIndex(item => `${ item.step }-${ item.unit }` === `${ elem.step }-${ elem.unit }`)
 		if (idx !== -1) {
 			delete elem._id
 			allCombinationsSteps[idx] = elem
@@ -40,8 +40,8 @@ const updateClientRatesFromSettings = async (clientId) => {
 	const allCombinations = await filteredCombinationsResultRatesTable(generateNewPricelistCombinations(basicPricesTable, allCombinationsSteps, industryMultipliersTable), clientId)
 
 	for (let elem of pricelistTable) {
-		const idx = allCombinations.findIndex(item => `${ item.sourceLanguage }-${ item.targetLanguage }-${ item.step }-${ item.unit }-${ item.size }-${ item.industry }` ===
-				`${ elem.sourceLanguage }-${ elem.targetLanguage }-${ elem.step }-${ elem.unit }-${ elem.size }-${ elem.industry }`)
+		const idx = allCombinations.findIndex(item => `${ item.sourceLanguage }-${ item.targetLanguage }-${ item.step }-${ item.unit }-${ item.industry }` ===
+				`${ elem.sourceLanguage }-${ elem.targetLanguage }-${ elem.step }-${ elem.unit }-${ elem.industry }`)
 		delete elem._id
 		allCombinations[idx] = elem
 	}
@@ -165,8 +165,8 @@ const replaceOldItem = (arr, replacementItem, boundPricelist, key, personKey) =>
 			altered = neededLangPair ? neededLangPair.altered : false
 			break
 		case tableKeys.stepMultipliersTable:
-			const { step, unit, size } = replacementItem
-			const neededStepRow = getNeededStepRow(stepMultipliersTable, step, unit, size)
+			const { step, unit } = replacementItem
+			const neededStepRow = getNeededStepRow(stepMultipliersTable, step, unit)
 			altered = neededStepRow ? neededStepRow.altered : false
 			break
 		case tableKeys.industryMultipliersTable:
@@ -199,9 +199,9 @@ const changePricelistTable = (pricelistTable, updatedItem, key, oldMultiplier) =
 			})
 			break
 		case tableKeys.stepMultipliersTable:
-			const { step, unit, size, multiplier: stepMultiplier } = updatedItem
+			const { step, unit, multiplier: stepMultiplier } = updatedItem
 			updatedPricelistTable = pricelistTable.map(item => {
-				if (!item.altered && `${ item.step } ${ item.unit } ${ item.size }` === `${ step._id } ${ unit._id } ${ size }`) {
+				if (!item.altered && `${ item.step } ${ item.unit }` === `${ step._id } ${ unit._id }`) {
 					item.price /= oldMultiplier
 					item.price *= Number(stepMultiplier)
 					item.price = item.price.toFixed(4)
@@ -291,7 +291,7 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
 	}
 
 	for (let elem of stepMultipliersTable) {
-		const idx = newStepMultiplierCombinations.findIndex(item => `${ item.step }-${ item.unit }-${ item.size }` === `${ elem.step }-${ elem.unit }-${ elem.size }`)
+		const idx = newStepMultiplierCombinations.findIndex(item => `${ item.step }-${ item.unit }` === `${ elem.step }-${ elem.unit }`)
 		if (idx !== -1) newStepMultiplierCombinations[idx].multiplier = elem.multiplier
 	}
 
@@ -303,7 +303,7 @@ const addNewRateComponents = async (clientId, newServicesArr) => {
 	pricelistTable = [ ...pricelistTable, ...generateNewPricelistCombinations(freshBasicPriceRows, newStepMultiplierCombinations, newIndustryMultiplierCombinations) ]
 
 	basicPricesTable = _.uniqBy(basicPricesTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString()))
-	pricelistTable = _.uniqBy(pricelistTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString() + item.step.toString() + item.unit.toString() + item.size + item.industry.toString()))
+	pricelistTable = _.uniqBy(pricelistTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString() + item.step.toString() + item.unit.toString() + item.industry.toString()))
 
 	const newRates = {
 		basicPricesTable,
@@ -338,7 +338,7 @@ const getNeededCurrency = (basicPriceObj, clientCurrency) => {
 
 const getNeededLangPair = (arr, sourceLangId, targetLangId) => (arr.find(item => (item.sourceLanguage.toString() === sourceLangId.toString() && item.targetLanguage.toString() === targetLangId.toString())))
 
-const getNeededStepRow = (arr, step, unit, size) => (arr.find(item => (`${ item.step } ${ item.unit } ${ item.size }` === `${ step._id } ${ unit._id } ${ size }`)))
+const getNeededStepRow = (arr, step, unit) => (arr.find(item => (`${ item.step } ${ item.unit }` === `${ step._id } ${ unit._id }`)))
 
 const getUniqueServiceItems = (newService, rates, allSteps) => {
 	const { services: newServices, industries: newIndustries } = newService
@@ -387,34 +387,13 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
 	} else {
 		for (let item of calculationUnit) {
 			const { _id: unitId } = item
-			const sizes = item.sizes !== null ? item.sizes : []
-
-			if (sizes.length) {
-				sizes.forEach(size => {
-					const neededStepRow = stepMultipliersTable.find(item => (
-							`${ item.step } ${ item.unit } ${ item.size }` === `${ _id } ${ unitId } ${ size }`
-					))
-					const multiplier = !!neededStepRow ? neededStepRow.multiplier : 100
-					stepUnitSizeCombinations.push({
-						step: _id,
-						unit: unitId,
-						size,
-						multiplier
-					})
-				})
-			} else {
-				const neededStepRow = stepMultipliersTable.find(({ step, unit }) => (
-						`${ step } ${ unit }` === `${ _id } ${ unitId }`
-				))
-				const multiplier = !!neededStepRow ? neededStepRow.multiplier : 100
-				stepUnitSizeCombinations.push({
-					step: _id,
-					unit: unitId,
-					size: 1,
-					defaultSize: true,
-					multiplier
-				})
-			}
+			const neededStepRow = stepMultipliersTable.find(({ step, unit }) => `${ step } ${ unit }` === `${ _id } ${ unitId }`)
+			const multiplier = !!neededStepRow ? neededStepRow.multiplier : 100
+			stepUnitSizeCombinations.push({
+				step: _id,
+				unit: unitId,
+				multiplier
+			})
 		}
 	}
 	return stepUnitSizeCombinations
@@ -422,7 +401,7 @@ const getStepMultipliersCombinations = async ({ _id }, { stepMultipliersTable })
 
 const generateNewPricelistCombinations = (newBasicPriceRows, newStepMultiplierRows, newIndustryMultiplierRows) => {
 	const newPricelistCombinations = []
-	for (let { step, unit, size, multiplier: stepMultiplierValue } of newStepMultiplierRows) {
+	for (let { step, unit, multiplier: stepMultiplierValue } of newStepMultiplierRows) {
 		for (let { sourceLanguage, targetLanguage, basicPrice } of newBasicPriceRows) {
 			for (let { industry, multiplier: industryMultiplierValue } of newIndustryMultiplierRows) {
 				newPricelistCombinations.push({
@@ -430,9 +409,8 @@ const generateNewPricelistCombinations = (newBasicPriceRows, newStepMultiplierRo
 					targetLanguage,
 					step,
 					unit,
-					size,
 					industry,
-					price: multiplyPrices(basicPrice, stepMultiplierValue, size, industryMultiplierValue)
+					price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue)
 				})
 			}
 		}
@@ -442,7 +420,7 @@ const generateNewPricelistCombinations = (newBasicPriceRows, newStepMultiplierRo
 
 const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable, fromDelete = false) => {
 	const newPricelistCombinations = []
-	for (let { step, unit, size, multiplier: stepMultiplierValue } of stepMultipliersTable) {
+	for (let { step, unit, multiplier: stepMultiplierValue } of stepMultipliersTable) {
 		for (let { sourceLanguage, targetLanguage, basicPrice } of basicPricesTable) {
 			for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
 				newPricelistCombinations.push({
@@ -450,28 +428,20 @@ const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, indust
 					targetLanguage,
 					step,
 					unit,
-					size,
 					industry,
-					price: multiplyPrices(basicPrice, stepMultiplierValue, size, industryMultiplierValue)
+					price: multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue)
 				})
 			}
 		}
 	}
-	const newPricelistComboIds = newPricelistCombinations.map(item => (
-			`${ item.sourceLanguage } ${ item.targetLanguage } ${ item.step } ${ item.unit } ${ item.unit } ${ item.size } ${ item.industry }`
-	))
+	const newPricelistComboIds = newPricelistCombinations.map(item => `${ item.sourceLanguage } ${ item.targetLanguage } ${ item.step } ${ item.unit } ${ item.unit } ${ item.industry }`)
 	newPricelistCombinations.push(...oldPricelistTable)
-	const unique = oldPricelistTable.filter(item => (
-			newPricelistComboIds.includes(
-					`${ item.sourceLanguage } ${ item.targetLanguage } ${ item.step } ${ item.unit } ${ item.unit } ${ item.size } ${ item.industry }`
-			)
-	))
+	const unique = oldPricelistTable.filter(item => newPricelistComboIds.includes(`${ item.sourceLanguage } ${ item.targetLanguage } ${ item.step } ${ item.unit } ${ item.unit } ${ item.industry }`))
 	return fromDelete ? unique : _.uniqBy(newPricelistCombinations, (item) => (
 			item.sourceLanguage.toString() +
 			item.targetLanguage.toString() +
 			item.step.toString() +
 			item.unit.toString() +
-			item.size +
 			item.industry.toString()
 	))
 }
@@ -502,7 +472,7 @@ const updateClientRatesFromServices = async (client, updatedService, oldService)
 	}
 
 	updatedPricelistTable = getPricelistCombinations(updatedBasicPricesTable, updatedStepMultipliersTable, updatedIndustryMultipliersTable, updatedPricelistTable)
-	updatedPricelistTable = _.uniqBy(updatedPricelistTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString() + item.step.toString() + item.unit.toString() + item.size + item.industry.toString()))
+	updatedPricelistTable = _.uniqBy(updatedPricelistTable, item => (item.sourceLanguage.toString() + item.targetLanguage.toString() + item.step.toString() + item.unit.toString() + item.industry.toString()))
 
 	await Clients.updateOne({ _id }, {
 		rates: {

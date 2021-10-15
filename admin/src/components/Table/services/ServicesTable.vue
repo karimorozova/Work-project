@@ -45,7 +45,7 @@
               @scrollDrop="scrollDrop"
             )
         template(slot="active" slot-scope="{ row, index }")
-          .table__icons( :class="{'table_active': currentActive === index}")
+          .table__icons( :class="{'filter__opacity': currentActive !== index}")
             img.table__checkbox(v-if="row.active" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
             img.table__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
         template(slot="icons" slot-scope="{ row, index }")
@@ -232,10 +232,7 @@
 			async getAllServices() {
 				try {
 					const services = await this.$http.get("/api/services")
-					this.services = services.body.sort((x, y) => {
-						if (x.title > y.title) return 1
-						if (x.title < y.title) return -1
-					})
+					this.services = services.body
 					await this.servicesGetting(this.services)
 				} catch (err) {
 					this.alertToggle({ message: "Erorr on getting Services", isShow: true, type: "error" })
@@ -325,6 +322,12 @@
 
     &:focus {
       border: 1px solid $border-focus;
+    }
+  }
+
+  .filter {
+    &__opacity {
+      filter: opacity(0.5);
     }
   }
 

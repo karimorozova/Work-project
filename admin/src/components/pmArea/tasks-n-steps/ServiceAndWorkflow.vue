@@ -246,7 +246,6 @@
 		},
 		computed: {
 			...mapGetters({
-				services: "getVuexServices",
 				tasksData: "getTasksData",
 				currentProject: "getCurrentProject"
 			}),

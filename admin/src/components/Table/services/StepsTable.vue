@@ -33,7 +33,7 @@
               @chooseOptions="setUnits"
               :allOptionsButtons="true"
             )
-        .table__icons.table_centered( slot="active" slot-scope="{ row, index }" :class="{'table_active': currentActive === index}")
+        .table__icons.table_centered( slot="active" slot-scope="{ row, index }" :class="{'filter__opacity': currentActive !== index}")
           img.table__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index, 'isActive')" :class="{'table__opacity': currentActive === index}")
           img.table__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index, 'isActive')" :class="{'table__opacity': currentActive === index}")
 
@@ -281,6 +281,11 @@
 
     &:focus {
       border: 1px solid $border-focus;
+    }
+  }
+  .filter {
+    &__opacity {
+      filter: opacity(0.5);
     }
   }
 

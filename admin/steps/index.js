@@ -62,10 +62,6 @@ async function changeStepsInUnits(stepToUpdate) {
             _id,
             calculationUnit: step.calculationUnit,
             title: step.title,
-            // symbol: step.symbol,
-            // isStage1: step.isStage1,
-            // isStage2: step.isStage2,
-            // isEditor: step.isEditor,
             isActive: step.isActive,
           });
         }

@@ -41,10 +41,10 @@
               :allOptionsButtons="true"
             )
 
-        template(slot="active" slot-scope="{ row, index }")
-          .table__data(style="width: 100%; text-align: center;" :class="{'filter__opacity': currentActive !== index}")
-            img.table__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
-            img.table__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+        //template(slot="active" slot-scope="{ row, index }")
+        //  .table__data(style="width: 100%; text-align: center;" :class="{'filter__opacity': currentActive !== index}")
+        //    img.table__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+        //    img.table__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
 
         template(slot="icons" slot-scope="{ row, index }")
           .table__icons
@@ -68,7 +68,7 @@
 			return {
 				fields: [
 					{
-						label: "Unit",
+						label: "Calculation Unit",
 						headerKey: "headerUnit",
 						key: "unit",
 						style: { width: "25%" }
@@ -77,14 +77,14 @@
 						label: "Steps",
 						headerKey: "headerSteps",
 						key: "steps",
-						style: { width: "51%" }
+						style: { width: "60%" }
 					},
-					{
-						label: "Active",
-						headerKey: "headerActive",
-						key: "active",
-						style: { width: "9%" }
-					},
+					// {
+					// 	label: "Active",
+					// 	headerKey: "headerActive",
+					// 	key: "active",
+					// 	style: { width: "9%" }
+					// },
 					{
 						label: "",
 						headerKey: "headerIcons",

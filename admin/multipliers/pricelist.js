@@ -4,8 +4,8 @@ const { getFilteredStepMultiplier } = require('./stepMultipiers')
 const lodash = require('lodash')
 
 const getPercentage = (number, percentage) => number * (percentage / 100)
-const multiplyPrices = (basicPrice, firstPercentMultiplier, size, secondPercentMultiplier) =>
-		+(getPercentage(basicPrice, firstPercentMultiplier) * Number(size) * (secondPercentMultiplier / 100)).toFixed(4)
+const multiplyPrices = (basicPrice, firstPercentMultiplier, secondPercentMultiplier) =>
+		+(getPercentage(basicPrice, firstPercentMultiplier) * (secondPercentMultiplier / 100)).toFixed(4)
 
 const { differenceOperationType } = require('../enums/differenceOperationType')
 const { getVendor } = require('../vendors/getVendors')
