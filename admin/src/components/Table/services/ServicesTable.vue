@@ -44,26 +44,10 @@
               @chooseOptions="(e) => setStep(e)"
               @scrollDrop="scrollDrop"
             )
-        //template(slot="step2" slot-scope="{ row, index }")
-        //  .table__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage2') }}
-        //  .table__drop-menu(v-else)
-        //    SelectSingle(
-        //      :selectedOption="currentStep2"
-        //      :options="secondStageSteps"
-        //      @chooseOption="(e) => setStep(e, 'currentStep2')"
-        //      @scrollDrop="scrollDrop"
-        //      :isRemoveOption="true"
-        //      @removeOption="removeOptionStep2"
-        //    )
-        //template(slot="isRequestQuote" slot-scope="{ row, index }")
-          .table__data(:class="{'table_active': currentActive === index}")
-            img.table__checkbox(v-if="row.isRequestQuote" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActiveRequestQuote(index)" :class="{'table_opacity': currentActive === index}")
-            img.table__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActiveRequestQuote(index)" :class="{'table_opacity': currentActive === index}")
-
         template(slot="active" slot-scope="{ row, index }")
-          .table__icons(:class="{'table_active': currentActive === index}")
-            img.table__icon(v-if="row.active" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
-            img.table__icon(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+          .table__icons( :class="{'table_active': currentActive === index}")
+            img.table__checkbox(v-if="row.active" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+            img.table__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
         template(slot="icons" slot-scope="{ row, index }")
           .table__icons
             img.table__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")

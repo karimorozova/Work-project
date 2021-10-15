@@ -33,9 +33,10 @@
               @chooseOptions="setUnits"
               :allOptionsButtons="true"
             )
-        .table__icons.table_centered(slot="active" slot-scope="{ row, index }" :class="{'table_active': currentActive === index}")
-          img.table__icon(v-if="isSelected('isActive', index)" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index, 'isActive')" :class="{'table__opacity': currentActive === index}")
-          img.table__icon(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index, 'isActive')" :class="{'table__opacity': currentActive === index}")
+        .table__icons.table_centered( slot="active" slot-scope="{ row, index }" :class="{'table_active': currentActive === index}")
+          img.table__checkbox(v-if="isSelected('isActive', index)" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index, 'isActive')" :class="{'table__opacity': currentActive === index}")
+          img.table__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index, 'isActive')" :class="{'table__opacity': currentActive === index}")
+
         .table__icons(slot="icons" slot-scope="{ row, index }")
           img.table__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
     Add(@add="addStep")
