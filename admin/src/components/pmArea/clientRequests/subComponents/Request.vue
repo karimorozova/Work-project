@@ -385,7 +385,7 @@
   .project {
     display: flex;
     flex-direction: column;
-    width: 1000px;
+    width: 1040px;
 
     &__nameDisabled {
       display: flex;
@@ -422,7 +422,7 @@
 
     &__all-info {
       padding: 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       position: relative;
       background: white;
       border-radius: 4px;

@@ -965,7 +965,7 @@
     position: absolute;
     z-index: 100;
     background: #fff;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     border-radius: 4px;
   }
 
@@ -1330,7 +1330,7 @@
   .calendar-custom {
     width: 260px;
     right: 0;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
   }
 
   .calendar-custom .cell,

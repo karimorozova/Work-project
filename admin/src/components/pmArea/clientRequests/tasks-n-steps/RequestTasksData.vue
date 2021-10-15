@@ -270,7 +270,6 @@
 			// JobSettings,
 			// SelectSingle,
 			RequestServiceAndWorkflow
-			// BigToggler
 		},
 		async created() {
 			await this.getMemoqTemplates()

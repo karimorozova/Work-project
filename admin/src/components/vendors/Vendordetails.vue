@@ -799,7 +799,7 @@
     &__general {
       padding: 20px;
       width: 350px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       margin-left: 40px;
       border-radius: 4px;
       background-color: white;
@@ -810,7 +810,7 @@
       border-radius: 4px;
       width: 390px;
       margin-left: 40px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       background-color: white;
     }
   }
@@ -849,13 +849,13 @@
 
   .vendor-info {
     position: relative;
-    width: 1000px;
-    min-width: 1000px;
+    width: 1040px;
+    min-width: 1040px;
 
     &__block {
       box-sizing: border-box;
       margin-bottom: 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       position: relative;
       border-radius: 4px;
       background-color: white;
@@ -919,7 +919,7 @@
     }
 
     &_error-shadow {
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       border-radius: 4px;
     }
   }
@@ -1011,7 +1011,7 @@
 
     &:hover {
       cursor: pointer;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
     }
 
     &:active {
@@ -1102,7 +1102,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     background-color: #fff;
     z-index: 20;
 

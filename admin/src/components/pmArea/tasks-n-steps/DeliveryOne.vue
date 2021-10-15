@@ -364,10 +364,10 @@
     flex-direction: column;
     padding: 20px;
     box-sizing: border-box;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     background-color: $white;
     position: relative;
-    width: 1000px;
+    width: 1040px;
     border-radius: 4px;
 
 

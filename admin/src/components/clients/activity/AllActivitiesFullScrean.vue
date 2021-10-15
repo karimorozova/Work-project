@@ -73,7 +73,7 @@
 
   .all-activities {
     background-color: white;
-    min-width: 1000px;
+    min-width: 1040px;
 
     &__actions {
       display: flex;

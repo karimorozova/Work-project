@@ -432,8 +432,8 @@
   .side {
     &__contacts,
     &__pm {
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       padding: 20px;
+      box-shadow: $box-shadow;
       width: 240px;
       height: fit-content;
       margin-left: 40px;
@@ -442,8 +442,8 @@
 
     &__info {
       position: relative;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
       padding: 20px;
+      box-shadow: $box-shadow;
       width: 400px;
       box-sizing: border-box;
       margin-left: 40px;
@@ -456,10 +456,10 @@
   .form {
     position: relative;
     padding: 20px;
-    min-width: 1000px;
-    max-width: 1000px;
+    min-width: 1040px;
+    max-width: 1040px;
     box-sizing: border-box;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     border-radius: 4px;
     background: white;
 
@@ -644,7 +644,7 @@
 
     &__main {
       padding: 30px 20px 20px 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       position: absolute;
       z-index: 9999;
       background: white;

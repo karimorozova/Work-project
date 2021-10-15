@@ -89,7 +89,7 @@
     box-shadow: $box-shadow;
     position: relative;
 
-    width: 1000px;
+    width: 1040px;
     box-sizing: border-box;
     border-radius: 4px;
     margin: 50px;

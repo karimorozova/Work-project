@@ -32,8 +32,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  @import "../assets/scss/colors";
+
   .pop-up-window {
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     background-color: white;
     position: fixed;
     bottom: 0;

@@ -84,7 +84,6 @@
 	import SelectSingle from "../../SelectSingle"
 	import ServiceAndWorkflow from "./ServiceAndWorkflow"
 	import Button from "../../Button"
-	import BigToggler from "@/components/BigToggler"
 	import { mapGetters, mapActions } from "vuex"
 	import DataTable from "../../DataTable"
 
@@ -361,7 +360,6 @@
 			SelectSingle,
 			Button,
 			ServiceAndWorkflow,
-			BigToggler
 		},
 		async created() {
 			await this.getMemoqTemplates()

@@ -83,6 +83,7 @@
 	}
 </script>
 <style lang="scss" scoped>
+  @import "../../assets/scss/colors";
   .activity {
     width: 1530px;
     margin: 50px;
@@ -96,7 +97,7 @@
     .col {
       width: 750px;
       padding: 10px 20px 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       box-sizing: border-box;
       background-color: white;
       border-radius: 4px;

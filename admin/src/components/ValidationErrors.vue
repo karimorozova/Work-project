@@ -48,7 +48,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
-        box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+        box-shadow: $box-shadow;
         background-color: white;
         border-radius: 4px;
         border-left: 4px solid $red;
@@ -104,7 +104,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
-        box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+        box-shadow: $box-shadow;
         background-color: white;
         border-radius: 4px;
         border-left: 4px solid $red;

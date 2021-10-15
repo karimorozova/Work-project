@@ -385,7 +385,7 @@
 
   .client-api {
     @extend %setting-table;
-    width: 1000px;
+    width: 1040px;
     border-radius: 4px;
     margin: 50px;
 

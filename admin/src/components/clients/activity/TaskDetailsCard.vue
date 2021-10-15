@@ -192,7 +192,7 @@
   }
   .task {
     border: 1px solid #e8e8e8;
-    padding: 20px;
+    padding: 25px;
     background: #fff;
     height: fit-content;
     margin-bottom: 20px;

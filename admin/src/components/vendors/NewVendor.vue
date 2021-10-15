@@ -370,7 +370,7 @@
       padding: 20px;
       margin-top: 50px;
       width: 350px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
       margin-left: 40px;
       background: white;
       border-radius: 4px;
@@ -424,22 +424,22 @@
 
   .vendor-info {
     box-sizing: border-box;
-    width: 1000px;
+    width: 1040px;
     margin: 50px 0 50px 50px;
   }
 
   .title {
     font-size: 21px;
     padding: 30px 0 10px;
-    width: 1000px;
+    width: 1040px;
   }
 
   .gen-info,
   .rates {
     box-sizing: border-box;
     padding: 20px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-    width: 1000px;
+    box-shadow: $box-shadow;
+    width: 1040px;
     border-radius: 4px;
     background-color: white;
   }
@@ -599,7 +599,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1000px;
+    width: 1040px;
     margin-top: 30px;
   }
 
@@ -619,7 +619,7 @@
 
     &:hover {
       cursor: pointer;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
     }
 
     &:active {
@@ -704,7 +704,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     background-color: #fff;
     z-index: 20;
 
