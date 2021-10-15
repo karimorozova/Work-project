@@ -83,7 +83,7 @@
           .client-table__icons(v-else)
             img(src="../../assets/images/latest-version/lock.png")
 
-    Add(@add="addData" v-if="!isProjectFinished")
+    Add(@add="addData" v-if="true")
 </template>
 
 <script>
