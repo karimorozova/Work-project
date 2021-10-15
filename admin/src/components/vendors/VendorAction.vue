@@ -54,7 +54,7 @@
       height: 28px;
 
       i {
-        font-size: 18px;
+        font-size: 19px;
         cursor: pointer;
       }
 

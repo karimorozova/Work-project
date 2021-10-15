@@ -147,7 +147,7 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       width: 100%;
       text-align: center;
       margin-bottom: 20px;
@@ -179,7 +179,7 @@
       position: absolute;
       top: 5px;
       right: 7px;
-      font-size: 21px;
+      font-size: 19px;
       cursor: pointer;
       height: 22px;
       width: 22px;

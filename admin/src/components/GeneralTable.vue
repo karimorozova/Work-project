@@ -241,7 +241,7 @@
 
   .fa-caret-up,
   .fa-caret-down {
-    font-size: 18px;
+    font-size: 19px;
     @extend %iconsStyle;
   }
 

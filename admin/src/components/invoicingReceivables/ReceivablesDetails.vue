@@ -598,7 +598,7 @@
   }
 
   .title-project {
-    font-size: 18px;
+    font-size: 19px;
     font-family: Myriad600;
     display: flex;
     justify-content: space-between;
@@ -789,7 +789,7 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;

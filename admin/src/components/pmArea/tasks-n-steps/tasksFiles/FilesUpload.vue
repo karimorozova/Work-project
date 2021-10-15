@@ -74,7 +74,7 @@
     &__delete-file {
       transform: rotate(45deg);
       cursor: pointer;
-      font-size: 18px;
+      font-size: 19px;
       font-weight: bold;
       margin-right: 5px;
     }

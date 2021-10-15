@@ -259,7 +259,7 @@
     }
 
     &__pair {
-      font-size: 18px;
+      font-size: 19px;
     }
 
     &__data {

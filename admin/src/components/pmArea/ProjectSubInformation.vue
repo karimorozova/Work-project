@@ -461,7 +461,7 @@
       align-items: center;
 
       &-title {
-        font-size: 21px;
+        font-size: 19px;
         font-family: 'Myriad600';
       }
 
@@ -526,7 +526,7 @@
 
   .fa-info-circle,
   .fa-envelope {
-    font-size: 18px;
+    font-size: 19px;
   }
 
   .drop {

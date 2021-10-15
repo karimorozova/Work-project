@@ -279,7 +279,7 @@
       position: absolute;
       right: 38px;
       bottom: 5px;
-      font-size: 18px;
+      font-size: 19px;
     }
   }
 </style>

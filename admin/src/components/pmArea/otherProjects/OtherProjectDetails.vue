@@ -340,7 +340,7 @@
   }
 
   .fa {
-    font-size: 20px;
+    font-size: 19px;
     transition: ease 0.2s;
     cursor: pointer;
   }

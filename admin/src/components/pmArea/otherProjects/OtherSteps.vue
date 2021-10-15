@@ -247,7 +247,7 @@
 
     &__title {
       margin-bottom: 5px;
-      font-size: 18px;
+      font-size: 19px;
     }
 
     &__drop-menu {

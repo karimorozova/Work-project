@@ -111,7 +111,7 @@
     &__title {
       position: absolute;
       top: 17px;
-      font-size: 18px;
+      font-size: 19px;
       font-family: 'Myriad600';
     }
   }

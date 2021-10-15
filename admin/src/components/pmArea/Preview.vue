@@ -78,7 +78,7 @@ export default {
         overflow-y: auto;
     }
     &__title {
-        font-size: 20px;
+        font-size: 19px;
         margin-bottom: 10px;
     }
     &__message {

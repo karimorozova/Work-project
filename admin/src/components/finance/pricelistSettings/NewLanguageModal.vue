@@ -68,7 +68,7 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       font-family: Myriad600;
       margin-bottom: 20px;
     }

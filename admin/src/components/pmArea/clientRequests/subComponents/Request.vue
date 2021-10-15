@@ -447,7 +447,7 @@
     }
 
     &__name {
-      font-size: 20px;
+      font-size: 19px;
       padding: 0 5px;
       height: 42px;
       width: 488px;
@@ -551,7 +551,7 @@
       right: 5px;
       width: 18px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 19px;
     }
 
     &__button {

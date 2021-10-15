@@ -531,7 +531,7 @@
 
     &__name {
       text-align: center;
-      font-size: 20px;
+      font-size: 19px;
       font-family: Myriad900;
       border-top: 1px solid $border;
       padding-top: 22px;

@@ -1405,7 +1405,7 @@
     position: absolute;
     right: 30px;
     bottom: 4px;
-    font-size: 18px;
+    font-size: 19px;
   }
 
   #checkBrief {

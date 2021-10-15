@@ -131,7 +131,7 @@
       position: absolute;
       top: 10px;
       right: 15px;
-      font-size: 21px;
+      font-size: 19px;
       cursor: pointer;
       height: 22px;
       width: 22px;
@@ -152,7 +152,7 @@
     }
 
     /*&__title {*/
-    /*  font-size: 21px;*/
+    /*  font-size: 19px;*/
     /*  text-align: center;*/
     /*  padding-top: 5px;*/
     /*}*/

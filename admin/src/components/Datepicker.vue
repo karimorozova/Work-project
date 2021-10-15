@@ -981,7 +981,7 @@ input:disabled {
 
 .vdp-datepicker__calendar header .up {
   color: #D15F45;
-  font-size: 18px;
+  font-size: 19px;
 }
 
 .vdp-datepicker__calendar header .prev:after,

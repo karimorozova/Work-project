@@ -151,6 +151,6 @@
   }
 
   .size {
-    font-size: 20px;
+    font-size: 19px;
   }
 </style>

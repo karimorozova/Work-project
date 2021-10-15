@@ -155,7 +155,7 @@
   @import '../assets/scss/colors.scss';
 
   i {
-    font-size: 20px;
+    font-size: 19px;
     color: $border;
   }
   .content {

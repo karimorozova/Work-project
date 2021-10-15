@@ -462,7 +462,7 @@
   }
 
   .title-project{
-    font-size: 18px;
+    font-size: 19px;
     font-family: Myriad600;
     display: flex;
     justify-content: space-between;
@@ -478,7 +478,7 @@
   }
 
   .title-project{
-    font-size: 18px;
+    font-size: 19px;
     font-family: Myriad600;
     display: flex;
     justify-content: space-between;
@@ -585,7 +585,7 @@
     }
 
     /*&__block-title {*/
-    /*  font-size: 18px;*/
+    /*  font-size: 19px;*/
     /*  font-family: Myriad600;*/
     /*}*/
 
@@ -639,7 +639,7 @@
     height: 32px;
 
     &__text {
-      font-size: 21px;
+      font-size: 19px;
       font-family: 'Myriad600';
     }
   }
@@ -687,7 +687,7 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;

@@ -86,7 +86,7 @@
     }
 
     &__comment {
-      font-size: 18px;
+      font-size: 19px;
       color: $main-color;
 
     }
@@ -94,7 +94,7 @@
     &__email {
       height: 40px;
       width: 100%;
-      font-size: 18px;
+      font-size: 19px;
       color: $main-color;
       padding: 0 10px;
       box-sizing: border-box;
@@ -124,7 +124,7 @@
       width: 165px;
       height: 36px;
       border-radius: 4px;
-      font-size: 18px;
+      font-size: 19px;
       background-color: #4BA5A5;
       color: #fff;
       border: none;
@@ -162,7 +162,7 @@
     }
 
     &__message {
-      font-size: 18px;
+      font-size: 19px;
       margin-bottom: 20px;
     }
 

@@ -286,7 +286,7 @@
           height: 40px;
           display: flex;
           align-items: center;
-          font-size: 18px;
+          font-size: 19px;
           justify-content: space-around;
 
           .trash {

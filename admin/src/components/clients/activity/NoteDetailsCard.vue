@@ -171,7 +171,7 @@
     padding-bottom: 10px;
 
     &__title {
-      font-size: 20px;
+      font-size: 19px;
       margin-left: 10px;
     }
 
@@ -180,7 +180,7 @@
       min-width: 40px;
       width: 40px;
       background: #daeded;
-      font-size: 20px;
+      font-size: 19px;
       border-radius: 40px;
       color: #4ba5a5;
       display: flex;
@@ -206,7 +206,7 @@
 
     &__check {
       height: 22px;
-      font-size: 21px;
+      font-size: 19px;
       width: 22px;
       margin-right: 10px;
       color: rgba(0, 0, 0, .6);
@@ -220,7 +220,7 @@
     }
     &__checkDone {
       height: 22px;
-      font-size: 21px;
+      font-size: 19px;
       width: 22px;
       margin-right: 10px;
       color: #4ba5a5;
@@ -228,7 +228,7 @@
     }
 
     &__title {
-      font-size: 21px;
+      font-size: 19px;
     }
 
     &__date {

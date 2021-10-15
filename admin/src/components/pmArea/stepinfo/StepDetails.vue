@@ -99,7 +99,7 @@
     }
 
     &__title1 {
-      font-size: 18px;
+      font-size: 19px;
       margin-top: 20px;
       font-family: 'MYRIAD300';
     }

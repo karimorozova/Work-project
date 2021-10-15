@@ -128,7 +128,7 @@
         padding: 10px;
         display: flex;
         border: 1px solid $border;
-        font-size: 18px;
+        font-size: 19px;
         justify-content: center;
         font-family: 'Myriad600';
         transition: ease 0.2s;
@@ -171,7 +171,7 @@
       min-width: 40px;
       width: 40px;
       background: $table-list-hover;
-      font-size: 18px;
+      font-size: 19px;
       border-radius: 40px;
       color: $border-focus;
       display: flex;

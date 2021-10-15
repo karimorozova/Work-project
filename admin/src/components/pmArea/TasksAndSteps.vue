@@ -312,7 +312,7 @@
     }
 
     &__tasks-title {
-      font-size: 21px;
+      font-size: 19px;
       display: flex;
       justify-content: space-between;
       align-items: center;

@@ -473,7 +473,7 @@
 
   .fa-info-circle,
   .fa-envelope {
-    font-size: 18px;
+    font-size: 19px;
   }
 
 
@@ -550,7 +550,7 @@
 
   .click-copy {
     margin-left: 15px;
-    font-size: 18px;
+    font-size: 19px;
     cursor: pointer;
     transition: ease 0.2s;
     opacity: 0.8;

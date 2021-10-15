@@ -181,7 +181,7 @@
       &-span {
         vertical-align: sub;
         display: inline-block;
-        font-size: 18px;
+        font-size: 19px;
       }
     }
 

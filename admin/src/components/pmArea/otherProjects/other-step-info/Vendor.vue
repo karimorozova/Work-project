@@ -83,7 +83,7 @@
 
     &__title {
       margin-bottom: 15px;
-      font-size: 18px;
+      font-size: 19px;
     }
 
     &__info {

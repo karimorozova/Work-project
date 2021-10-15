@@ -269,7 +269,7 @@
       position: relative;
       max-width: 100%;
       text-align: center;
-      font-size: 18px;
+      font-size: 19px;
       margin-bottom: 15px;
     }
 

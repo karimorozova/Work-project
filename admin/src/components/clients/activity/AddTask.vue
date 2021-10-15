@@ -220,7 +220,7 @@
 
       .fa-calendar-alt {
         color: #938676;
-        font-size: 20px;
+        font-size: 19px;
       }
 
       input {
@@ -248,7 +248,7 @@
       position: absolute;
       top: 5px;
       right: 7px;
-      font-size: 21px;
+      font-size: 19px;
       cursor: pointer;
       height: 22px;
       width: 22px;
@@ -288,7 +288,7 @@
       }
 
       input {
-        font-size: 18px;
+        font-size: 19px;
         padding: 10px 0px 10px 0px;
         display: block;
         width: 100%;
@@ -302,7 +302,7 @@
       }
 
       label {
-        font-size: 18px;
+        font-size: 19px;
         font-weight: normal;
         position: absolute;
         pointer-events: none;

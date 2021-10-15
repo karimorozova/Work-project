@@ -136,7 +136,7 @@
 
     &__title {
       padding: 20px 0 0 40px;
-      font-size: 20px;
+      font-size: 19px;
     }
 
     &__all-info {

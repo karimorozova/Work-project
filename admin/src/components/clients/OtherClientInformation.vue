@@ -95,7 +95,7 @@
     }
 
     .icon {
-      font-size: 18px;
+      font-size: 19px;
       position: absolute;
       right: 5px;
       top: 6px;

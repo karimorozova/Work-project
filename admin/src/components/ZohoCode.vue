@@ -35,7 +35,7 @@
     padding: 40px;
 
     &__message {
-      font-size: 20px;
+      font-size: 19px;
     }
   }
 

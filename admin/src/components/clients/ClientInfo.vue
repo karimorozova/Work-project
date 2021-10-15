@@ -994,7 +994,7 @@
   }
 
   .title-with-action {
-    font-size: 21px;
+    font-size: 19px;
     padding: 30px 0 10px;
     display: flex;
     justify-content: space-between;
@@ -1027,7 +1027,7 @@
     z-index: 20;
 
     p {
-      font-size: 21px;
+      font-size: 19px;
       width: 50%;
       text-align: center;
     }

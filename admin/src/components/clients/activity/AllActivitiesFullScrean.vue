@@ -97,7 +97,7 @@
     }
 
     &__modal-actions {
-      font-size: 21px;
+      font-size: 19px;
       display: flex;
       justify-content: flex-end;
       margin: 4px 8px;
@@ -112,7 +112,7 @@
     }
 
     &__close {
-      font-size: 21px;
+      font-size: 19px;
       cursor: pointer;
       font-family: Myriad900;
       opacity: 0.8;

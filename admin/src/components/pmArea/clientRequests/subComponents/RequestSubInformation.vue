@@ -532,7 +532,7 @@
 
   .fa-info-circle,
   .fa-envelope {
-    font-size: 18px;
+    font-size: 19px;
   }
 
   .drop {

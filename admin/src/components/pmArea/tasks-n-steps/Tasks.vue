@@ -1046,7 +1046,7 @@
     }
 
     &__titleModal {
-      font-size: 21px;
+      font-size: 19px;
       margin-bottom: 20px;
       text-align: center;
       font-family: Myriad600;

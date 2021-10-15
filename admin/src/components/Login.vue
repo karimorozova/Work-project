@@ -226,7 +226,7 @@
       box-sizing: border-box;
       height: 40px;
       width: 100%;
-      font-size: 18px;
+      font-size: 19px;
       color: $text;
       padding-left: 10px;
       padding-right: 10px;
@@ -268,7 +268,7 @@
       width: 165px;
       height: 36px;
       border-radius: 4px;
-      font-size: 18px;
+      font-size: 19px;
       background-color: $green;
       color: $white;
       opacity: 0.5;

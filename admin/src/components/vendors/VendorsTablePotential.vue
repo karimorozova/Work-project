@@ -455,7 +455,7 @@ export default {
     z-index: 20;
 
     p {
-      font-size: 21px;
+      font-size: 19px;
       width: 50%;
       text-align: center;
     }

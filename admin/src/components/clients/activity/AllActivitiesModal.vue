@@ -98,7 +98,7 @@
     }
 
     &__close {
-      font-size: 21px;
+      font-size: 19px;
       cursor: pointer;
       font-family: Myriad900;
       opacity: .8;

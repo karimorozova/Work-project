@@ -429,7 +429,7 @@
   }
 
   .title {
-    font-size: 21px;
+    font-size: 19px;
     padding: 30px 0 10px;
     width: 1040px;
   }
@@ -669,7 +669,7 @@
     height: 100%;
 
     &__message {
-      font-size: 18px;
+      font-size: 19px;
       opacity: 0.5;
       width: 50%;
       text-align: center;
@@ -709,7 +709,7 @@
     z-index: 20;
 
     p {
-      font-size: 21px;
+      font-size: 19px;
       width: 50%;
       text-align: center;
     }

@@ -291,13 +291,13 @@
     }
 
     &__title {
-      font-size: 20px;
+      font-size: 19px;
       margin-left: 15px;
       font-family: 'Myriad300';
     }
 
     &__icon {
-      font-size: 18px;
+      font-size: 19px;
       color: white;
       display: flex;
       justify-content: center;

@@ -301,7 +301,7 @@
     border-radius: 4px;
 
     &__titleFinance {
-      font-size: 21px;
+      font-size: 19px;
       font-family: Myriad600;
     }
 
@@ -341,7 +341,7 @@
 
     &__title {
       padding: 20px;
-      font-size: 21px;
+      font-size: 19px;
       display: flex;
       font-family: Myriad600;
       align-items: center;

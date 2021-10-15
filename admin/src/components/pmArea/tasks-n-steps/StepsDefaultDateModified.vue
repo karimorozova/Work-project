@@ -267,7 +267,7 @@
       position: relative;
       max-width: 100%;
       text-align: center;
-      font-size: 18px;
+      font-size: 19px;
       margin-bottom: 15px;
     }
 
@@ -292,7 +292,7 @@
       top: 9px;
       right: 5px;
       width: 18px;
-      font-size: 18px;
+      font-size: 19px;
       cursor: pointer;
     }
   }

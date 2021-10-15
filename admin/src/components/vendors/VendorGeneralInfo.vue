@@ -389,7 +389,7 @@
     height: 100%;
 
     &__message {
-      font-size: 18px;
+      font-size: 19px;
       opacity: 0.5;
       width: 50%;
       text-align: center;

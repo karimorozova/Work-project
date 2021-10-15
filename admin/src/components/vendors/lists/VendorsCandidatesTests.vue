@@ -729,7 +729,7 @@
   }
 
   .fa-times {
-    font-size: 18px;
+    font-size: 19px;
     padding: 5px;
     cursor: pointer;
   }

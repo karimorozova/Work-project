@@ -170,7 +170,7 @@ export default {
   z-index: 501;
 
   &__title {
-    font-size: 18px;
+    font-size: 19px;
     font-family: Myriad600;
     margin-bottom: 10px;
   }

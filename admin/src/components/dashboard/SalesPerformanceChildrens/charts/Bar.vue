@@ -71,14 +71,14 @@ export default {
     }
   }
   &__current-value {
-    font-size: 18px;
+    font-size: 19px;
     position: absolute;
     top: -25px;
     left: 20px;
     color: $orange;
   }
   &__total-value {
-    font-size: 18px;
+    font-size: 19px;
     position: absolute;
     right: -35px;
     top: -2px;

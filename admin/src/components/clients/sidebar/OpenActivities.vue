@@ -158,7 +158,7 @@
       height: 40px;
       min-width: 40px;
       width: 40px;
-      font-size: 18px;
+      font-size: 19px;
       border-radius: 40px;
       display: flex;
       justify-content: center;

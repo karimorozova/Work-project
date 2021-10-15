@@ -203,7 +203,7 @@
     }
 
     &__title {
-      font-size: 18px;
+      font-size: 19px;
     }
 
     input {
