@@ -27,9 +27,9 @@
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
+        .price__header(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        .price-title(v-else) {{ field.label }}
+        .price__header(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
         .price__data(v-if="isEdit")
@@ -40,9 +40,6 @@
 
       template(slot="unit" slot-scope="{ row, index }")
         .price__data {{ row.unit.type }}
-
-      template(slot="size" slot-scope="{ row, index }")
-        .price__data {{ row.size }}
 
       template(slot="multiplier" slot-scope="{ row, index }")
         .price__data(v-if="!isEdit")
@@ -135,34 +132,28 @@
 						style: { "width": "23%" }
 					},
 					{
-						label: "Size",
-						headerKey: "headerSize",
-						key: "size",
-						style: { "width": "10%" }
-					},
-					{
 						label: "Multiplier %",
 						headerKey: "headerMultiplier",
 						key: "multiplier",
-						style: { "width": "10%" }
+						style: { "width": "12.5%" }
 					},
 					{
 						label: "Fix EUR",
 						headerKey: "headerMinPriceEUR",
 						key: "eur",
-						style: { "width": "10%" }
+						style: { "width": "12.5%" }
 					},
 					{
 						label: "Fix USD",
 						headerKey: "headerMinPriceUSD",
 						key: "usd",
-						style: { "width": "10%" }
+						style: { "width": "12.5%" }
 					},
 					{
 						label: "Fix GBP",
 						headerKey: "headerMinPriceGBP",
 						key: "gbp",
-						style: { "width": "10%" }
+						style: { "width": "12.5%" }
 					}
 				],
 				dataArray: [],
@@ -353,6 +344,14 @@
 
   .price {
     background-color: #fff;
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
 
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {

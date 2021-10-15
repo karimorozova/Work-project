@@ -11,16 +11,17 @@
         bodyCellClass="matrix-table"
       )
         template(slot="headerText", slot-scope="{ field }")
-          span.pricelistDiscountChart__text {{ field.label }}
+          span.pricelistDiscountChart__header {{ field.label }}
         template(slot="headerRate", slot-scope="{ field }")
-          span.pricelistDiscountChart__text {{ field.label }}
+          span.pricelistDiscountChart__header {{ field.label }}
         template(slot="text", slot-scope="{ row }")
-          span.pricelistDiscountChart__text {{ row.text }}
+          span.pricelistDiscountChart__header {{ row.text }}
+
         template(slot="rate", slot-scope="{ row }")
-          .table__data(v-if="!isEdit")
+          .pricelistDiscountChart__data(v-if="!isEdit")
             span {{ row.rate }}
             span.pricelistDiscountChart__percent %
-          .table__dataEdit(v-else)
+          .pricelistDiscountChart__data(v-else)
             input.pricelistDiscountChart__rate(type="number", min="0", max="100", :value="row.rate | maxRateCount", @change="(e) => setMatrixData(e, row.key)")
 
 </template>
@@ -99,6 +100,15 @@
   @import "../../../assets/scss/generalTable";
 
   .pricelistDiscountChart {
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
+
     &__rate {
       @extend %editing-input;
     }

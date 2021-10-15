@@ -14,7 +14,6 @@ import TableGroups from '@/components/Table/TableGroups'
 import TableLanguages from '@/components/Table/TableLanguagesNew'
 import TableServices from '@/components/Table/TableServices'
 import TableIndustries from '@/components/Table/TableIndustries'
-import TableUnits from '@/components/Table/TableUnits'
 import TablePaymentTerms from "@/components/Table/TablePaymentTerms"
 import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
@@ -225,11 +224,6 @@ const router = new Router({
 							path: 'users',
 							name: 'users',
 							component: Users
-						},
-						{
-							path: 'units',
-							name: 'units',
-							component: TableUnits
 						},
 						{
 							path: 'payment-terms',

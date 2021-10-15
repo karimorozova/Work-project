@@ -21,7 +21,7 @@
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title {{ field.label }}
+        .price__header {{ field.label }}
 
       template(slot="sourceLang" slot-scope="{ row, index }")
         .price__data {{ row.sourceLanguage.lang }}
@@ -30,7 +30,7 @@
       template(slot="step" slot-scope="{ row, index }")
         .price__data {{ row.step.title }}
       template(slot="unit" slot-scope="{ row, index }")
-        .price__data {{ row.unit.type }} / {{row.size}}
+        .price__data {{ row.unit.type }}
       template(slot="industry" slot-scope="{ row, index }")
         .price__data {{ row.industry }}
 
@@ -221,6 +221,14 @@
   .price {
     background-color: #fff;
     box-shadow: none;
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
 
     input {
       &::-webkit-inner-spin-button,

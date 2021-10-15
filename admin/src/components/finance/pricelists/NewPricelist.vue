@@ -5,6 +5,7 @@
       .new-price__item
         LabelVal(text="Name" customClass="new-chart-label" :isRequired="true")
           input.new-price__text(type="text" v-model="pricelistName")
+
       .new-price__item
         LabelVal(text="Copy from" customClass="new-chart-label")
           .new-price__drop-menu
@@ -14,12 +15,14 @@
               @chooseOption="setPricelistForCopy"
               placeholder="Select"
             )
+
     .new-price__row-checkbox
       .new-price__item2
-        LabelVal(text="Default Vendor" customClass="new-chart-label")
+        LabelVal(text="Default Vendor" style="margin-bottom: 15px;" customClass="new-chart-label")
           CheckBox(:isChecked="isVendorDefault" @check="(e) => toggleProp(e, 'isVendorDefault')" @uncheck="(e) => toggleProp(e, 'isVendorDefault')")
         LabelVal(text="Active" customClass="new-chart-label")
           CheckBox(:isChecked="isActive" @check="(e) => toggleProp(e, 'isActive')" @uncheck="(e) => toggleProp(e, 'isActive')")
+
       .new-price__item2
         input.button__update-btn(v-if="selectedPricelist" type="submit" value="Clear Copy Input" @click="clearCopyForm()")
 
@@ -27,21 +30,25 @@
       .new-price__button
         Button(value="Save" @clicked="checkForErrors")
       .new-price__button
-        Button(value="Cancel" @clicked="cancel")
-    ValidationErrors(v-if="isErrorExist"
+        Button(value="Cancel" :outline="true" @clicked="cancel")
+
+    ValidationErrors(
+      v-if="isErrorExist"
       :errors="errors"
       :isAbsolute="isAbsolute"
-      @closeErrors="closeErrors")
+      @closeErrors="closeErrors"
+    )
+
 </template>
 
 <script>
-	import LabelVal from "@/components/LabelVal";
-	import Toggler from "@/components/Toggler";
-	import CheckBox from "@/components/CheckBox";
-	import SelectSingle from "@/components/SelectSingle";
-	import ValidationErrors from "@/components/ValidationErrors";
-	import Button from "@/components/Button";
-	import { mapActions } from "vuex";
+	import LabelVal from "@/components/LabelVal"
+	import Toggler from "@/components/Toggler"
+	import CheckBox from "@/components/CheckBox"
+	import SelectSingle from "@/components/SelectSingle"
+	import ValidationErrors from "@/components/ValidationErrors"
+	import Button from "@/components/Button"
+	import { mapActions } from "vuex"
 
 	export default {
 		props: {
@@ -63,26 +70,26 @@
 		},
 		methods: {
 			clearCopyForm() {
-				this.selectedPricelist = "";
+				this.selectedPricelist = ""
 			},
 			toggleProp(e, prop) {
-				this[prop] = !this[prop];
+				this[prop] = !this[prop]
 			},
 			isNotUnique() {
 				return this.pricelists.find(item => {
-					return (item.name.toLowerCase() === this.pricelistName.toLowerCase().trim());
-				});
+					return (item.name.toLowerCase() === this.pricelistName.toLowerCase().trim())
+				})
 			},
 			closeErrors() {
-				this.isErrorExist = false;
+				this.isErrorExist = false
 			},
 			async checkForErrors() {
-				this.errors = [];
-				if(!this.pricelistName || this.isNotUnique()) this.errors.push("The name should be unique and not empty.");
-				if(this.errors.length) {
-					return this.isErrorExist = true;
+				this.errors = []
+				if (!this.pricelistName || this.isNotUnique()) this.errors.push("The name should be unique and not empty.")
+				if (this.errors.length) {
+					return this.isErrorExist = true
 				}
-				await this.savePricelist();
+				await this.savePricelist()
 			},
 			async savePricelist() {
 				const pricelist = {
@@ -91,37 +98,37 @@
 					isClientDefault: this.isClientDefault,
 					isVendorDefault: this.isVendorDefault,
 					isActive: this.isActive
-				};
+				}
 				try {
-					await this.$http.post("/prices/new-pricelist", { pricelist });
-					await this.updateDefaultPricelists();
-					this.$emit('saved');
-					this.alertToggle({ message: "Pricelist saved", isShow: true, type: "success" });
+					await this.$http.post("/prices/new-pricelist", { pricelist })
+					await this.updateDefaultPricelists()
+					this.$emit('saved')
+					this.alertToggle({ message: "Pricelist saved", isShow: true, type: "success" })
 				} catch (err) {
-					this.alertToggle({ message: "Error: Cannot save pricelist", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error: Cannot save pricelist", isShow: true, type: "error" })
 				}
 			},
 			async updateDefaultPricelists() {
 				try {
-					if(this.isClientDefault) {
-						let defaultClientPrice = this.pricelists.find(item => item.isClientDefault);
-						defaultClientPrice.isClientDefault = false;
-						await this.$http.post('/prices/pricelist', { pricelist: { ...defaultClientPrice } });
+					if (this.isClientDefault) {
+						let defaultClientPrice = this.pricelists.find(item => item.isClientDefault)
+						defaultClientPrice.isClientDefault = false
+						await this.$http.post('/prices/pricelist', { pricelist: { ...defaultClientPrice } })
 					}
-					if(this.isVendorDefault) {
-						let defaultVendorPrice = this.pricelists.find(item => item.isVendorDefault);
-						defaultVendorPrice.isVendorDefault = false;
-						await this.$http.post('/prices/pricelist', { pricelist: { ...defaultVendorPrice } });
+					if (this.isVendorDefault) {
+						let defaultVendorPrice = this.pricelists.find(item => item.isVendorDefault)
+						defaultVendorPrice.isVendorDefault = false
+						await this.$http.post('/prices/pricelist', { pricelist: { ...defaultVendorPrice } })
 					}
 				} catch (err) {
-					this.alertToggle({ message: "Error on updating Pircelist", isShow: true, type: "error" });
+					this.alertToggle({ message: "Error on updating Pircelist", isShow: true, type: "error" })
 				}
 			},
 			cancel() {
-				this.$emit('cancel');
+				this.$emit('cancel')
 			},
 			setPricelistForCopy({ option }) {
-				this.selectedPricelist = option;
+				this.selectedPricelist = option
 			},
 			...mapActions({
 				alertToggle: "alertToggle",
@@ -130,7 +137,7 @@
 		},
 		computed: {
 			pricesNames() {
-				return this.pricelists.map(item => item.name);
+				return this.pricelists.map(item => item.name)
 			}
 		},
 		components: {
@@ -171,7 +178,7 @@
   }
 
   .new-price {
-    width: 600px;
+    width: 350px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -185,12 +192,13 @@
 
     &__title {
       margin-bottom: 25px;
-      font-size: 22px;
+      font-size: 19px;
+      font-family: Myriad600;
     }
 
     &__row {
-      display: flex;
-      justify-content: space-between;
+      /*display: flex;*/
+      /*justify-content: space-between;*/
     }
 
     &__row-checkbox {

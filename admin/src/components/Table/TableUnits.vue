@@ -41,16 +41,6 @@
               :allOptionsButtons="true"
             )
 
-        //template(slot="sizes" slot-scope="{ row, index }")
-        //  .table__data-chips(v-if="currentActive !== index" v-html="formatSizes(row.sizes)")
-        //  .table__editing-chips(v-else)
-        //    Chips(
-        //      :chips="currentSizes"
-        //      @setChips="setChips"
-        //      @deleteChips="deleteChips"
-        //      :placeholder="'Add size...'"
-        //    )
-
         template(slot="active" slot-scope="{ row, index }")
           .table__data(style="width: 100%; text-align: center;" :class="{'filter__opacity': currentActive !== index}")
             img.table__checkbox(v-if="row.active" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
@@ -87,7 +77,7 @@
 						label: "Steps",
 						headerKey: "headerSteps",
 						key: "steps",
-						style: { width: "49%" }
+						style: { width: "51%" }
 					},
 					{
 						label: "Active",
@@ -99,7 +89,7 @@
 						label: "",
 						headerKey: "headerIcons",
 						key: "icons",
-						style: { width: "17%" }
+						style: { width: "15%" }
 					}
 				],
 				steps: [],
@@ -209,7 +199,6 @@
 							type: this.units[index].type,
 							active: true,
 							steps: this.currentServices
-							// sizes: this.currentSizes
 						}
 					})
 					this.alertToggle({ message: "Saved only Steps", isShow: true, type: "success" })
@@ -236,7 +225,6 @@
 							type: this.currentUnit,
 							active: this.units[index].active,
 							steps: this.currentServices
-							// sizes: this.currentSizes
 						}
 					})
 					this.alertToggle({ message: "Saved", isShow: true, type: "success" })
@@ -335,16 +323,6 @@
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
-
-  .units {
-    width: 850px;
-    border-radius: 4px;
-    margin: 50px;
-    background-color: white;
-    box-shadow: $box-shadow;
-    padding: 25px;
-  }
-
 
   .table {
     width: 100%;

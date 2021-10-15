@@ -2,13 +2,8 @@
   .services-wrapper
     .tabs
       Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTab")
+
     .table(v-if="isServices")
-      //ServicesTable(
-      //  :allSteps="steps"
-      //  :firstStageSteps="firstStageSteps"
-      //  :secondStageSteps="secondStageSteps"
-      //  @setUnitFilter="setUnitFilter"
-      //)
       ServicesTable(
         :allSteps="steps"
         @setUnitFilter="setUnitFilter"
@@ -17,7 +12,11 @@
       StepsTable(
         :steps="steps"
         @setStepsWithId="setStepsWithId"
-        @updateSteps="updateSteps")
+        @updateSteps="updateSteps"
+      )
+    .table(v-if="isUnits")
+      TableUnits
+
 </template>
 
 <script>
@@ -25,13 +24,15 @@
 	import StepsTable from "./services/StepsTable"
 	import Tabs from "@/components/Tabs"
 	import { mapActions } from "vuex"
+	import TableUnits from "./TableUnits"
 
 	export default {
 		data() {
 			return {
 				isServices: true,
 				isSteps: false,
-				tabs: [ "Services", "Steps" ],
+				isUnits: false,
+				tabs: [ "Services", "Steps", "Units" ],
 				selectedTab: "Services",
 				steps: [],
 				unitFilter: ""
@@ -44,7 +45,8 @@
 			}),
 			setTab({ index }) {
 				this.isServices = index === 0
-				this.isSteps = !this.isServices
+				this.isSteps = index === 1
+				this.isUnits = index === 2
 				this.selectedTab = this.tabs[index]
 			},
 			setUnitFilter({ unit }) {
@@ -63,27 +65,10 @@
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting Steps from DB", isShow: true, type: "error" })
 				}
-			},
-			// getFilteredStageSteps(stageProp) {
-			// 	if (this.steps.length) {
-			// 		return this.steps.filter(item => {
-			// 			return this.unitFilter ? item[stageProp] && item.calculationUnit === this.unitFilter : item[stageProp]
-			// 		})
-			// 	}
-			// 	return []
-			// }
-		},
-		computed: {
-			// firstStageSteps() {
-			// 	const result = this.getFilteredStageSteps('isStage1')
-			// 	return result.length ? result.map(item => item.title) : []
-			// },
-			// secondStageSteps() {
-			// 	const result = this.getFilteredStageSteps('isStage2')
-			// 	return result.length ? result.map(item => item.title) : []
-			// }
+			}
 		},
 		components: {
+			TableUnits,
 			ServicesTable,
 			StepsTable,
 			Tabs
@@ -101,7 +86,7 @@
   .services-wrapper {
     background-color: $white;
     padding: 25px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     position: relative;
 
     width: 1000px;

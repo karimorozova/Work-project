@@ -82,18 +82,15 @@
 	export default {
 		mixins: [ scrollDrop, crudIcons ],
 		props: {
-			allSteps: { type: Array },
-			// firstStageSteps: { type: Array },
-			// secondStageSteps: { type: Array }
+			allSteps: { type: Array }
 		},
 		data() {
 			return {
 				fields: [
-					{ label: "Title", headerKey: "headerTitle", key: "title", style: { width: "50%" }},
-					{ label: "Language Form", headerKey: "headerLangForm", key: "languageForm", style: { width: "25%" } },
-					{ label: "Steps", headerKey: "headerSteps", key: "steps", style: { width: "25%" } },
-					// { label: "Request Quote", headerKey: "headerIsRequestQuote", key: "isRequestQuote", style: { width: "25%" } },
-					{ label: "Active", headerKey: "headerActive", key: "active", style: { width: "10%" } },
+					{ label: "Title", headerKey: "headerTitle", key: "title", style: { width: "25%" } },
+					{ label: "Language Form", headerKey: "headerLangForm", key: "languageForm", style: { width: "16%" } },
+					{ label: "Steps", headerKey: "headerSteps", key: "steps", style: { width: "35%" } },
+					{ label: "Active", headerKey: "headerActive", key: "active", style: { width: "9%" } },
 					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "15%" } }
 				],
 				services: [],
@@ -102,7 +99,6 @@
 				currentTitle: "",
 				currentLangForm: "",
 				currentStep: "",
-				// iconFile: [],
 				imageData: "",
 				steps: [],
 				areErrors: false,
@@ -111,9 +107,6 @@
 			}
 		},
 		methods: {
-			// removeOptionStep2(){
-			// 	this.currentStep = ""
-      // },
 			isScrollDrop(drop, elem) {
 				return drop && this.services.length >= 20
 			},
@@ -124,17 +117,6 @@
 				}
 				return ""
 			},
-			// uploadIcon(event) {
-			// 	this.iconFile.push(event.target.files[0])
-			// 	const input = event.target
-			// 	if (input.files && input.files[0]) {
-			// 		let reader = new FileReader()
-			// 		reader.onload = (e) => {
-			// 			this.imageData = e.target.result
-			// 		}
-			// 		reader.readAsDataURL(input.files[0])
-			// 	}
-			// },
 			toggleActive(index) {
 				if (this.currentActive !== index) return
 				this.services[index].active = !this.services[index].active
@@ -164,7 +146,6 @@
 				this.errors = []
 				if (!this.currentTitle || this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!")
 				if (!this.currentLangForm) this.errors.push("Please, select language form.")
-				// if (!this.currentStep1) this.errors.push("Please, select Step 1.")
 				if (this.errors.length) {
 					this.areErrors = true
 					return
@@ -210,26 +191,14 @@
 				}
 			},
 			collectData(index) {
-				const steps = this.allSteps.filter(({ title }) => this.currentStep.includes(title)).map(({ _id }) => ({step: _id}))
+				const steps = this.allSteps.filter(({ title }) => this.currentStep.includes(title)).map(({ _id }) => ({ step: _id }))
 				const newData = new FormData()
 				newData.append("title", this.currentTitle)
 				newData.append("active", this.services[index].active)
 				newData.append("steps", JSON.stringify(steps))
-				// newData.append("isRequestQuote", this.services[index].isRequestQuote)
-				// newData.append("icon", this.iconFile[0])
 				newData.append("languageForm", this.currentLangForm)
-				// newData.append("symbol", symbol)
-				// newData.append("projectType", this.services[index].projectType)
-				// newData.append("sortIndex", this.services[index].sortIndex)
 				return newData
 			},
-			// getStepsInfo() {
-			// 	let steps = []
-			// 	const step = this.allSteps.find(item => item.title === this.currentStep)
-      //   console.log(step)
-			// 	steps.push({ step: step._id })
-			// 	return steps
-			// },
 			setEditionData(index) {
 				this.currentActive = index
 				this.currentTitle = this.services[index].title
@@ -239,7 +208,7 @@
 			setCurrentEditableSteps(index) {
 				const { steps } = this.services[index]
 				if (steps && steps.length) {
-					this.currentStep = steps.map(({step}) => step.title)
+					this.currentStep = steps.map(({ step }) => step.title)
 				} else {
 					this.currentStep = []
 				}
@@ -250,20 +219,19 @@
 				this.currentLangForm = ""
 				this.currentStep = []
 				this.imageData = ""
-				// this.iconFile = []
 				this.$emit("setUnitFilter", { unit: "" })
 			},
 			setLangForm({ option }) {
 				this.currentLangForm = option
 			},
 			setStep({ option }) {
-        const position = this.currentStep.indexOf(option)
-        if (position !== -1) {
-          this.currentStep.splice(position, 1)
-        } else {
-          const { title } = this.allSteps.find((item) => item.title === option)
-          this.currentStep.push(title)
-        }
+				const position = this.currentStep.indexOf(option)
+				if (position !== -1) {
+					this.currentStep.splice(position, 1)
+				} else {
+					const { title } = this.allSteps.find((item) => item.title === option)
+					this.currentStep.push(title)
+				}
 			},
 
 			addService() {
@@ -273,7 +241,7 @@
 				this.services.push({
 					title: "",
 					languageForm: "",
-					calculationUnit: "",
+					calculationUnit: ""
 				})
 				this.setEditionData(this.services.length - 1)
 			},
@@ -301,8 +269,8 @@
 			}
 		},
 		components: {
-      GeneralTable,
-      SelectMulti,
+			GeneralTable,
+			SelectMulti,
 			SelectSingle,
 			Add
 		},
@@ -314,119 +282,11 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  //@import "../../../assets/styles/settingsTable";
-  //
-  //.services {
-  //  width: 920;
-  //
-  //  &__data {
-  //    @extend %table-data;
-  //  }
-  //
-  //  &__editing-data {
-  //    @extend %table-data;
-  //    box-shadow: inset 0 0 7px $brown-shadow;
-  //  }
-  //
-  //  &__input {
-  //    @extend %table-text-input;
-  //  }
-  //
-  //  &__icons {
-  //    @extend %table-icons;
-  //  }
-  //
-  //  &__icon {
-  //    @extend %table-icon;
-  //  }
-  //
-  //  &__drop-menu {
-  //    position: relative;
-  //  }
-  //
-  //  &__checkbox {
-  //    cursor: pointer;
-  //    opacity: 0.5;
-  //  }
-  //
-  //  &_centered {
-  //    justify-content: center;
-  //  }
-  //
-  //  &_flex {
-  //    display: flex;
-  //    justify-content: space-around;
-  //  }
-  //
-  //  &__main-icon, &__file-preview {
-  //    width: 22px;
-  //    height: 22px;
-  //  }
-  //
-  //  &__link {
-  //    display: flex;
-  //    justify-content: center;
-  //    align-items: center;
-  //    width: 22px;
-  //  }
-  //
-  //  &__download {
-  //    cursor: pointer;
-  //    width: 40%;
-  //    display: flex;
-  //    justify-content: center;
-  //    align-items: center;
-  //  }
-  //
-  //  &_opacity {
-  //    opacity: 1;
-  //  }
-  //
-  //  &__upload {
-  //    position: relative;
-  //    background: url("../../../assets/images/Other/upload-icon.png");
-  //    background-position-x: center;
-  //    background-repeat: no-repeat;
-  //    width: 40%;
-  //    height: 22px;
-  //    overflow: hidden;
-  //  }
-  //
-  //  &__load-file {
-  //    width: 100%;
-  //    height: 22px;
-  //    border: none;
-  //    outline: none;
-  //    opacity: 0;
-  //    z-index: 2;
-  //    position: absolute;
-  //    left: 6px;
-  //    cursor: pointer;
-  //    font-size: 0;
-  //  }
-  //
-  //  &__no-file {
-  //    opacity: 0.5;
-  //  }
-  //
-  //  &_no-back {
-  //    background: none;
-  //  }
-  //
-  //  &__file-preview {
-  //    margin-left: 10px;
-  //  }
-  //
-  //  &_active {
-  //    box-shadow: inset 0 0 8px $brown-shadow;
-  //  }
-  //}
 
   .table {
     width: 100%;
 
     &__data {
-      width: 100%;
       padding: 0 7px;
     }
 
@@ -437,8 +297,11 @@
     &__drop {
       position: relative;
       height: 32px;
-      width: 100%;
+      max-width: 220px;
       margin: 0 7px;
+      width: 100%;
+      background: white;
+      border-radius: 4px;
     }
 
     &__icons {
@@ -456,6 +319,11 @@
 
     &__opacity {
       opacity: 1;
+    }
+
+    &__input {
+      width: 100%;
+      padding: 0 7px;
     }
   }
 

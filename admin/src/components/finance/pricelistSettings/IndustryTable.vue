@@ -17,9 +17,9 @@
     )
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .price-title(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
+        .price__header(v-if="field.headerKey === 'headerCheck' && isEdit && dataArray.length")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        .price-title(v-else) {{ field.label }}
+        .price__header(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
         .price__data(v-if="isEdit")
@@ -203,6 +203,14 @@
   .price {
     background-color: #fff;
     box-shadow: none;
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
 
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {

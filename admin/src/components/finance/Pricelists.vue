@@ -10,39 +10,52 @@
           @notApprove="setDefaults",
           @close="setDefaults"
         )
-      SettingsTable(
-        :fields="fields"
-        :tableData="vuexPricelists"
-      )
-        template(slot="headerName" slot-scope="{ field }")
-          .pricelists__head-title {{ field.label }}
-        template(slot="headerVendorDefault" slot-scope="{ field }")
-          .pricelists__head-title {{ field.label }}
-        template(slot="headerActive" slot-scope="{ field }")
-          .pricelists__head-title {{ field.label }}
-        template(slot="headerIcons" slot-scope="{ field }")
-          .pricelists__head-title {{ field.label }}
-        template(slot="name" slot-scope="{ row, index }")
-          .pricelists__data.pricelists_pointer(v-if="currentActive !== index" @click="showPriceSettings(row._id)")
-            .pricelists__rates-link {{ row.name }}
-          .pricelists__editing-data(v-else)
-            input.pricelists__text(type="text" v-model="currentName")
-        template(slot="vendorDefault" slot-scope="{ row, index }")
-          .pricelists__data.pricelists_centered
-            CheckBox(:isChecked="row.isVendorDefault"
-              @check="(e) => setDefaultPricelist(e, index, 'isVendorDefault')"
-              @uncheck="(e) => setDefaultPricelist(e, index, 'isVendorDefault')")
-        template(slot="active" slot-scope="{ row, index }")
-          .pricelists__data.pricelists_centered
-            Toggler(:isDisabled="false" :isActive="row.isActive" @toggle="toggleActive(index)")
-        template(slot="icons" slot-scope="{ row, index }")
-          .pricelists__icons
-            img.pricelists__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'pricelists_opacity': isActive(key, index)}")
+
+      .table
+        GeneralTable(
+          :fields="fields"
+          :tableData="vuexPricelists"
+        )
+          template(slot="headerName" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerVendorDefault" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerActive" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerIcons" slot-scope="{ field }")
+            .table__header {{ field.label }}
+
+          template(slot="name" slot-scope="{ row, index }")
+            .table__data.pricelists_pointer(v-if="currentActive !== index" @click="showPriceSettings(row._id)")
+              .pricelists__rates-link {{ row.name }}
+            .table__input(v-else)
+              input(type="text" v-model="currentName" placeholder="Pricelist name")
+
+          template(slot="vendorDefault" slot-scope="{ row, index }")
+            .table__data.pricelists_centered(style="width: 100%; text-align: center;" :class="{'filter__opacity': currentActive !== index}")
+              CheckBox(
+                :isChecked="row.isVendorDefault"
+                @check="(e) => setDefaultPricelist(e, index, 'isVendorDefault')"
+                @uncheck="(e) => setDefaultPricelist(e, index, 'isVendorDefault')"
+              )
+
+          template(slot="active" slot-scope="{ row, index }")
+            .table__data.pricelists_centered(style="width: 100%;")
+              Toggler(:isDisabled="false" :isActive="row.isActive" @toggle="toggleActive(index)")
+
+          template(slot="icons" slot-scope="{ row, index }")
+            .table__icons
+              img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
+
       Add(@add="addPricelist")
-      ValidationErrors(v-if="isErrorExist"
+
+      ValidationErrors(
+        v-if="isErrorExist"
         :errors="errors"
         :isAbsolute="isErrorExist"
-        @closeErrors="closeErrors")
+        @closeErrors="closeErrors"
+      )
+
     .pricelists__new(v-if="isNewPricelist")
       NewPricelist(:pricelists="pricelists" @cancel="cancelNewPricelist" @saved="refreshPricelists")
 </template>
@@ -57,6 +70,7 @@
 	import NewPricelist from "./pricelists/NewPricelist"
 	import { mapGetters, mapActions } from "vuex"
 	import crudIcons from "@/mixins/crudIcons"
+	import GeneralTable from "../GeneralTable"
 
 	export default {
 		mixins: [ crudIcons ],
@@ -64,18 +78,20 @@
 			return {
 				pricelists: [],
 				fields: [
-					{ label: "Name", headerKey: "headerName", key: "name", width: "35%", padding: "0" },
-					{ label: "Default Vendor", headerKey: "headerVendorDefault", key: "vendorDefault", width: "25%", padding: "0" },
-					{ label: "Active", headerKey: "headerActive", key: "active", width: "15%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "25%", padding: "0" }
+					{ label: "Name", headerKey: "headerName", key: "name", style: { width: "50%" } },
+					{ label: "Default Vendor", headerKey: "headerVendorDefault", key: "vendorDefault", style: { width: "15%" } },
+					{ label: "Active", headerKey: "headerActive", key: "active", style: { width: "15%" } },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "20%" } }
 				],
+
 				icons: {
-					save: { icon: require("../../assets/images/Other/save-icon-qa-form.png") },
-					edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
-					copy: { icon: require("../../assets/images/duplicate.jpg") },
-					cancel: { icon: require("../../assets/images/cancel_icon.jpg") },
-					delete: { icon: require("../../assets/images/Other/delete-icon-qa-form.png") }
+					save: { icon: require("../../assets/images/latest-version/i-save.png") },
+					edit: { icon: require("../../assets/images/latest-version/i-edit.png") },
+					cancel: { icon: require("../../assets/images/latest-version/i-cancel.png") },
+					delete: { icon: require("../../assets/images/latest-version/i-delete.png") },
+					copy: { icon: require("../../assets/images/duplicate.jpg") }
 				},
+
 				isNewPricelist: false,
 				currentActive: -1,
 				currentName: "",
@@ -271,6 +287,7 @@
 			})
 		},
 		components: {
+			GeneralTable,
 			SettingsTable,
 			Add,
 			Toggler,
@@ -288,6 +305,72 @@
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
   @import "../../assets/styles/settingsTable.scss";
+
+  .table {
+    width: 100%;
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
+
+    &__drop {
+      position: relative;
+      height: 32px;
+      width: 100%;
+      margin: 0 7px;
+      background: white;
+      border-radius: 4px;
+    }
+
+    &__icons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
+    }
+
+    &__icon {
+      cursor: pointer;
+      opacity: 0.5;
+    }
+
+    &__opacity {
+      opacity: 1;
+    }
+
+    &__input {
+      width: 100%;
+      padding: 0 7px;
+    }
+  }
+
+  input {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 100%;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .filter {
+    &__opacity {
+      filter: opacity(0.5);
+    }
+  }
 
   .pricelists {
     position: relative;
@@ -310,11 +393,11 @@
 
     &_pointer {
       cursor: pointer;
+      transition: all 0.1s;
 
       &:hover {
         .pricelists__rates-link {
-          transition: all 0.3s;
-          text-shadow: 0 0 5px $brown-shadow;
+          text-decoration: underline;
         }
       }
     }

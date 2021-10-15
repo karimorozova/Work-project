@@ -394,13 +394,8 @@
 							},
 							{
 								type: 'link',
-								name: 'Services / Steps',
+								name: 'Services / Steps / Units',
 								path: '/pangea-settings/services'
-							},
-							{
-								type: 'link',
-								name: 'Units',
-								path: '/pangea-settings/units'
 							},
 							{
 								type: 'link',
