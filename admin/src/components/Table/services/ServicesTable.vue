@@ -12,9 +12,7 @@
           .table__header {{ field.label }}
         template(slot="headerLangForm" slot-scope="{ field }")
           .table__header {{ field.label }}
-        template(slot="headerStep1" slot-scope="{ field }")
-          .table__header {{ field.label }}
-        template(slot="headerStep2" slot-scope="{ field }")
+        template(slot="headerSteps" slot-scope="{ field }")
           .table__header {{ field.label }}
         template(slot="headerIsRequestQuote" slot-scope="{ field }")
           .table__header {{ field.label }}
@@ -37,15 +35,15 @@
               @scrollDrop="scrollDrop"
             )
 
-        //template(slot="step1" slot-scope="{ row, index }") test
-        //  .table__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage1') }}
-        //  .table__drop-menu(v-else)
-        //    SelectSingle(
-        //      :selectedOption="currentStep1"
-        //      :options="firstStageSteps"
-        //      @chooseOption="(e) => setStep(e, 'currentStep1')"
-        //      @scrollDrop="scrollDrop"
-        //    )
+        template(slot="steps" slot-scope="{ row, index }")
+          .table__data(v-if="currentActive !== index") {{ row.steps.map(({step}) => step.title).join("; ")}}
+          .table__drop(v-else)
+            SelectMulti(
+              :selectedOptions="currentStep"
+              :options="allSteps.map(({title}) => title)"
+              @chooseOptions="(e) => setStep(e)"
+              @scrollDrop="scrollDrop"
+            )
         //template(slot="step2" slot-scope="{ row, index }")
         //  .table__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage2') }}
         //  .table__drop-menu(v-else)
@@ -74,7 +72,8 @@
 
 <script>
 	import GeneralTable from "../../GeneralTable"
-	import SelectSingle from "@/components/SelectSingle"
+	import SelectMulti from "../../SelectMulti"
+	import SelectSingle from "../../SelectSingle"
 	import Add from "@/components/Add"
 	import scrollDrop from "@/mixins/scrollDrop"
 	import { mapActions } from "vuex"
@@ -92,6 +91,7 @@
 				fields: [
 					{ label: "Title", headerKey: "headerTitle", key: "title", style: { width: "50%" }},
 					{ label: "Language Form", headerKey: "headerLangForm", key: "languageForm", style: { width: "25%" } },
+					{ label: "Steps", headerKey: "headerSteps", key: "steps", style: { width: "25%" } },
 					// { label: "Request Quote", headerKey: "headerIsRequestQuote", key: "isRequestQuote", style: { width: "25%" } },
 					{ label: "Active", headerKey: "headerActive", key: "active", style: { width: "10%" } },
 					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "15%" } }
@@ -101,8 +101,7 @@
 				currentActive: -1,
 				currentTitle: "",
 				currentLangForm: "",
-				currentStep1: "",
-				currentStep2: "",
+				currentStep: "",
 				// iconFile: [],
 				imageData: "",
 				steps: [],
@@ -112,9 +111,9 @@
 			}
 		},
 		methods: {
-			removeOptionStep2(){
-				this.currentStep2 = ""
-      },
+			// removeOptionStep2(){
+			// 	this.currentStep = ""
+      // },
 			isScrollDrop(drop, elem) {
 				return drop && this.services.length >= 20
 			},
@@ -211,8 +210,7 @@
 				}
 			},
 			collectData(index) {
-				const symbol = this.services[index]._id ? this.services[index].symbol : this.currentTitle.slice(0, 3).toLowerCase()
-				const steps = this.getStepsInfo()
+				const steps = this.allSteps.filter(({ title }) => this.currentStep.includes(title)).map(({ _id }) => ({step: _id}))
 				const newData = new FormData()
 				newData.append("title", this.currentTitle)
 				newData.append("active", this.services[index].active)
@@ -225,14 +223,13 @@
 				// newData.append("sortIndex", this.services[index].sortIndex)
 				return newData
 			},
-			getStepsInfo() {
-				let steps = []
-				const stage1 = this.allSteps.find(item => item.title === this.currentStep1)
-				const stage2 = this.allSteps.find(item => item.title === this.currentStep2)
-				if (stage1) steps.push({ stage: 'stage1', step: stage1._id })
-				if (stage2) steps.push({ stage: 'stage2', step: stage2._id })
-				return steps
-			},
+			// getStepsInfo() {
+			// 	let steps = []
+			// 	const step = this.allSteps.find(item => item.title === this.currentStep)
+      //   console.log(step)
+			// 	steps.push({ step: step._id })
+			// 	return steps
+			// },
 			setEditionData(index) {
 				this.currentActive = index
 				this.currentTitle = this.services[index].title
@@ -242,21 +239,16 @@
 			setCurrentEditableSteps(index) {
 				const { steps } = this.services[index]
 				if (steps && steps.length) {
-					const stage1 = steps.find(item => item.stage === 'stage1')
-					const stage2 = steps.find(item => item.stage === 'stage2')
-					this.currentStep1 = stage1 ? stage1.step.title : ""
-					this.currentStep2 = stage2 ? stage2.step.title : ""
+					this.currentStep = steps.map(({step}) => step.title)
 				} else {
-					this.currentStep1 = ""
-					this.currentStep2 = ""
+					this.currentStep = []
 				}
 			},
 			cancel() {
 				this.currentActive = -1
 				this.currentTitle = ""
 				this.currentLangForm = ""
-				this.currentStep1 = ""
-				this.currentStep2 = ""
+				this.currentStep = []
 				this.imageData = ""
 				// this.iconFile = []
 				this.$emit("setUnitFilter", { unit: "" })
@@ -264,23 +256,24 @@
 			setLangForm({ option }) {
 				this.currentLangForm = option
 			},
-			setStep({ option }, prop) {
-				this[prop] = option
+			setStep({ option }) {
+        const position = this.currentStep.indexOf(option)
+        if (position !== -1) {
+          this.currentStep.splice(position, 1)
+        } else {
+          const { title } = this.allSteps.find((item) => item.title === option)
+          this.currentStep.push(title)
+        }
 			},
+
 			addService() {
 				if (this.currentActive !== -1) {
 					return this.isEditing()
 				}
 				this.services.push({
-					icon: "",
 					title: "",
 					languageForm: "",
 					calculationUnit: "",
-					active: false,
-					isRequestQuote: false,
-					sortIndex: this.services.length + 1,
-					symbol: "",
-					projectType: "regular"
 				})
 				this.setEditionData(this.services.length - 1)
 			},
@@ -309,6 +302,7 @@
 		},
 		components: {
       GeneralTable,
+      SelectMulti,
 			SelectSingle,
 			Add
 		},
