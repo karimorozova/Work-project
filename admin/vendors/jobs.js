@@ -11,7 +11,7 @@ const {
 const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions, drInstructionsCompliance } = require('../enums')
-const fs = require('fs');
+const fs = require('fs')
 
 async function getJobs(id) {
 	const allLanguages = await Languages.find()
@@ -89,7 +89,7 @@ async function updateStepProp({ jobId, prop, value }) {
 		const steps = project.steps.map(item => {
 			if (item.id === jobId) {
 				item[prop] = value
-				if(prop === "status" || value === "Accepted" || value === "Rejected" ) item.vendorsClickedOffer = [item.vendor]
+				if (prop === "status" || value === "Accepted" || value === "Rejected") item.vendorsClickedOffer = [ item.vendor ]
 			}
 			return item
 		})
@@ -112,15 +112,15 @@ async function manageStatuses({ project, steps, jobId, status }) {
 			return await manageCompletedStatus({ project, jobId, steps, task })
 		}
 
-		if(status === "Accepted") {
-			const updatedSteps =  await setAcceptedStepStatus({ project, steps, jobId })
-			await notifyStepDecisionMade({project, step, decision: 'accept'});
+		if (status === "Accepted") {
+			const updatedSteps = await setAcceptedStepStatus({ project, steps, jobId })
+			await notifyStepDecisionMade({ project, step, decision: 'accept' })
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
 		if (status === "Rejected") {
 			const updatedSteps = setRejectedStatus({ steps, jobId })
-			await notifyStepDecisionMade({project, step, decision: 'rejected'});
+			await notifyStepDecisionMade({ project, step, decision: 'rejected' })
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
@@ -149,7 +149,7 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 
 		if (isAllStepsCompleted({ steps, task })) {
 			await setTaskStatusAndSave({ project, jobId, steps, status: "Pending Approval [DR1]" })
-      await pushTasksToDR1(project, task, step)
+			await pushTasksToDR1(project, task, step)
 			return await taskCompleteNotifyPM(project, task)
 		}
 
@@ -166,63 +166,38 @@ async function manageCompletedStatus({ project, jobId, steps, task }) {
 	}
 }
 
-const pushTasksToDR1 = async (project, task, step) =>{
-  const {_id, projectManager, accountManager} = project
+const pushTasksToDR1 = async (project, task, step) => {
+	const { _id, projectManager, accountManager } = project
 	const instructions = step.serviceStep.title === 'Compliance' ? drInstructionsCompliance : dr1Instructions
-  const files = getTaskTargetFilesWithCopy(project,task)
-  project.tasksDR1.push({
-    dr1Manager: projectManager,
-    dr2Manager: accountManager,
-    instructions,
-    taskId: task.taskId,
-    files
-  })
-  return await Projects.updateOne({_id: _id}, {tasksDR1: project.tasksDR1})
+	const files = getTaskTargetFilesWithCopy(project, task)
+	project.tasksDR1.push({
+		dr1Manager: projectManager,
+		dr2Manager: accountManager,
+		instructions,
+		taskId: task.taskId,
+		files
+	})
+	return await Projects.updateOne({ _id: _id }, { tasksDR1: project.tasksDR1 })
 }
 
-function getTaskTargetFilesWithCopy(project,task) {
-  return task.targetFiles.reduce((acc, cur) => {
-    const originalName = cur.path.split("/").pop()
-    const dr1FileName = `${Math.floor(Math.random() * 1000000)}-${originalName}`
+function getTaskTargetFilesWithCopy(project, task) {
+	return task.targetFiles.reduce((acc, cur) => {
+		const originalName = cur.path.split("/").pop()
+		const dr1FileName = `${ Math.floor(Math.random() * 1000000) }-${ originalName }`
 
-    fs.copyFile(`./dist/projectFiles/${project._id}/${originalName}`, `./dist/projectFiles/${project._id}/${dr1FileName}`, (err) => {
-      if (err) throw err;
-    });
+		fs.copyFile(`./dist/projectFiles/${ project._id }/${ originalName }`, `./dist/projectFiles/${ project._id }/${ dr1FileName }`, (err) => {
+			if (err) throw err
+		})
 
-    acc.push({
-      fileName: dr1FileName,
-      path: `/projectFiles/${project._id}/${dr1FileName}`,
-      isFileApproved: false,
-    })
+		acc.push({
+			fileName: dr1FileName,
+			path: `/projectFiles/${ project._id }/${ dr1FileName }`,
+			isFileApproved: false
+		})
 
-    return acc
-  }, [])
+		return acc
+	}, [])
 }
-
-
-// async function addToDelivery(project, task) {
-// 	const files = getTaskTargetFiles(task)
-// 	const pair = task.sourceLanguage ? `${ task.sourceLanguage } >> ${ task.targetLanguage }` : `${ task.targetLanguage } / ${ task.packageSize }`
-// 	try {
-// 		await Delivery.updateOne({ projectId: project.id }, {
-// 			$push: {
-// 				tasks: {
-// 					dr1Manager: project.projectManager,
-// 					dr2Manager: project.accountManager,
-// 					status: task.deliveryStatus,
-// 					pair,
-// 					taskId: task.taskId,
-// 					instructions: dr1Instructions,
-// 					files
-// 				}
-// 			}
-// 		}, { upsert: true })
-// 	} catch (err) {
-// 		console.log(err)
-// 		console.log("Error in the addToDelivery")
-// 	}
-// }
-
 
 function getWithReadyToStartSteps({ task, steps }) {
 	const stage2step = task.service.steps.find(item => item.stage === 'stage2')
@@ -243,19 +218,19 @@ async function setAcceptedStepStatus({ project, steps, jobId }) {
 		const task = project.tasks.find(item => item.taskId === step.taskId)
 		const taskSteps = steps.filter(item => item.taskId === task.taskId)
 
-		if(taskSteps.length === 1){
+		if (taskSteps.length === 1) {
 			status = isProjectApproved ? 'Ready to Start' : 'Waiting to Start'
-		}else{
-			const _jobIndex = taskSteps.findIndex(({_id}) => `${_id}` === `${jobId}`)
-			if(!_jobIndex){
+		} else {
+			const _jobIndex = taskSteps.findIndex(({ _id }) => `${ _id }` === `${ jobId }`)
+			if (!_jobIndex) {
 				status = isProjectApproved ? 'Ready to Start' : 'Waiting to Start'
-			}else{
+			} else {
 				status = isProjectApproved && taskSteps[0].status === 'Completed' ? 'Ready to Start' : 'Waiting to Start'
 			}
 		}
 
-		return  steps.map(item => {
-			item.status = `${item.id}` === `${jobId}` && item.status !== 'Rejected' ? status : item.status
+		return steps.map(item => {
+			item.status = `${ item.id }` === `${ jobId }` && item.status !== 'Rejected' ? status : item.status
 			return item
 		})
 
@@ -279,8 +254,8 @@ async function setTaskStatusAndSave({ project, jobId, steps, status }) {
 	const { tasks } = project
 	const { taskId } = steps.find(item => item._id.toString() === jobId)
 	const currSteps = steps
-				.filter(item => item.taskId === taskId)
-				.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+			.filter(item => item.taskId === taskId)
+			.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
 	const updatedTasks = tasks.map(item => {
 		if (item.taskId === taskId) {
@@ -316,7 +291,7 @@ function getProjectStatus({ project, status, updatedTasks }) {
 function isAllStepsCompleted({ steps, task }) {
 	const taskSteps = steps
 			.filter(item => item.taskId === task.taskId)
-			.filter(({status}) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+			.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
 	return !taskSteps.length ? false : taskSteps.every(item => item.status === 'Completed')
 }

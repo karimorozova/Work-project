@@ -50,15 +50,10 @@ const recalculateFromNewPrice = (row, syncedPrice, rates) => {
 	const { sourceLanguage, targetLanguage } = row
 	let { stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates
 	pricelistTable = pricelistTable.map(item => {
-		if (!item.altered && item.sourceLanguage.toString() === sourceLanguage._id.toString() &&
-				item.targetLanguage.toString() === targetLanguage._id.toString()) {
-			const { multiplier: stepMultiplier, size } = stepMultipliersTable.find(row => (
-					`${ row.step } ${ row.unit } ${ row.size }` === `${ item.step } ${ item.unit } ${ item.size }`
-			))
-			const { multiplier: industryMultiplier } = industryMultipliersTable.find(row => (
-					row.industry.toString() === item.industry.toString()
-			))
-			item.price = multiplyPrices(syncedPrice, stepMultiplier, size, industryMultiplier)
+		if (!item.altered && item.sourceLanguage.toString() === sourceLanguage._id.toString() && item.targetLanguage.toString() === targetLanguage._id.toString()) {
+			const { multiplier: stepMultiplier } = stepMultipliersTable.find(row => `${ row.step } ${ row.unit }` === `${ item.step } ${ item.unit }`)
+			const { multiplier: industryMultiplier } = industryMultipliersTable.find(row => row.industry.toString() === item.industry.toString())
+			item.price = multiplyPrices(syncedPrice, stepMultiplier, industryMultiplier)
 		}
 		return item
 	})
@@ -67,9 +62,9 @@ const recalculateFromNewPrice = (row, syncedPrice, rates) => {
 
 
 const synchronizeStepMultiplier = async (row, stepMultipliersTable, rates, subjectId, fromVendor = false) => {
-	const { _id, step, unit, size, multiplier } = row
+	const { _id, step, unit, multiplier } = row
 	const neededSubject = fromVendor ? Vendors : Clients
-	const neededStepMultiplierRow = getNeededStepRow(stepMultipliersTable, step, unit, size)
+	const neededStepMultiplierRow = getNeededStepRow(stepMultipliersTable, step, unit)
 	const neededRowIndex = rates.stepMultipliersTable.findIndex(item => item._id.toString() === _id.toString())
 	const syncedMultiplier = !!neededStepMultiplierRow ? neededStepMultiplierRow.multiplier : multiplier
 	rates.stepMultipliersTable[neededRowIndex].multiplier = syncedMultiplier
@@ -94,15 +89,15 @@ const synchronizeIndustryMultiplier = async (row, industryMultipliersTable, rate
 }
 
 const synchronizePricelistTable = async (row, rates, subjectId, fromVendor = false) => {
-	const { _id, sourceLanguage, targetLanguage, step, unit, size, industry } = row
+	const { _id, sourceLanguage, targetLanguage, step, unit, industry } = row
 	const neededSubject = fromVendor ? Vendors : Clients
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates
 	const { basicPrice } = getNeededLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id)
-	const { multiplier: stepMultiplierValue } = getNeededStepRow(stepMultipliersTable, step, unit, size)
+	const { multiplier: stepMultiplierValue } = getNeededStepRow(stepMultipliersTable, step, unit)
 	const { multiplier: industryMultiplierValue } = industryMultipliersTable.find(item => (
 			item.industry.toString() === industry._id.toString()
 	))
-	const recalculatedPrice = multiplyPrices(basicPrice, stepMultiplierValue, size, industryMultiplierValue)
+	const recalculatedPrice = multiplyPrices(basicPrice, stepMultiplierValue, industryMultiplierValue)
 	const neededPricelistRowIndex = pricelistTable.findIndex(item => item._id.toString() === _id.toString())
 	rates.pricelistTable[neededPricelistRowIndex].price = recalculatedPrice
 	rates.pricelistTable[neededPricelistRowIndex].altered = false
@@ -119,15 +114,10 @@ const recalculateFromNewMultiplier = (row, syncedMultiplier, rates, key) => {
 				if (
 						!item.altered &&
 						item.step.toString() === row.step._id.toString() &&
-						item.unit.toString() === row.unit._id.toString() &&
-						item.size === Number(row.size)) {
-					const { basicPrice } = basicPricesTable.find(row => (
-							`${ row.sourceLanguage } ${ row.targetLanguage }` === `${ item.sourceLanguage } ${ item.targetLanguage }`
-					))
-					const { multiplier: industryMultiplier } = industryMultipliersTable.find(row => (
-							row.industry.toString() === item.industry.toString()
-					))
-					item.price = multiplyPrices(basicPrice, syncedMultiplier, row.size, industryMultiplier)
+						item.unit.toString() === row.unit._id.toString() ) {
+					const { basicPrice } = basicPricesTable.find(row => `${ row.sourceLanguage } ${ row.targetLanguage }` === `${ item.sourceLanguage } ${ item.targetLanguage }`)
+					const { multiplier: industryMultiplier } = industryMultipliersTable.find(row => row.industry.toString() === item.industry.toString())
+					item.price = multiplyPrices(basicPrice, syncedMultiplier, industryMultiplier)
 				}
 				return item
 			})
@@ -139,7 +129,7 @@ const recalculateFromNewMultiplier = (row, syncedMultiplier, rates, key) => {
 							`${ row.sourceLanguage } ${ row.targetLanguage }` === `${ item.sourceLanguage } ${ item.targetLanguage }`
 					))
 					const { multiplier: stepMultiplier, size } = stepMultipliersTable.find(row => (
-							`${ row.step } ${ row.unit } ${ row.size }` === `${ item.step } ${ item.unit } ${ item.size }`
+							`${ row.step } ${ row.unit }` === `${ item.step } ${ item.unit }`
 					))
 					item.price = multiplyPrices(basicPrice, stepMultiplier, size, syncedMultiplier)
 				}

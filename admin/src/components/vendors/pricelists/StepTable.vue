@@ -40,9 +40,6 @@
         template(slot="unit", slot-scope="{ row, index }")
           .table__data(:class="{'opacity-05': !row.isActive}") {{ row.unit.type }}
 
-        template(slot="size", slot-scope="{ row, index }")
-          .table__data(:class="{'opacity-05': !row.isActive}") {{ row.size }}
-
         template(slot="multiplier", slot-scope="{ row, index }")
           .table__data(v-if="isEdit && row.isActive")
             input(type="number" @change="setRowValue(row)" v-model="finalData[index].multiplier")
@@ -85,7 +82,7 @@
 	import Button from "../../Button"
 	import Toggler from "../../Toggler"
 	import GeneralTable from "../../GeneralTable"
-  import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
+	import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 
 	export default {
 		mixins: [ tableSortAndFilter ],
@@ -123,7 +120,7 @@
 						dataKey: "title",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "30%" }
+						style: { width: "36%" }
 					},
 					{
 						label: "Unit",
@@ -132,15 +129,7 @@
 						dataKey: "type",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "30%" }
-					},
-					{
-						label: "Size",
-						headerKey: "headerSize",
-						key: "size",
-						sortInfo: { isSort: true, order: 'default' },
-						filterInfo: { isFilter: true },
-						style: { width: "12%" }
+						style: { width: "36%" }
 					},
 					{
 						label: "%",

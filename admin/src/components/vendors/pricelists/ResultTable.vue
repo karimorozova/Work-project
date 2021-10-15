@@ -45,9 +45,6 @@
         template(slot="unit", slot-scope="{ row, index }")
           .table__data {{ row.unit.type }}
 
-        template(slot="size", slot-scope="{ row, index }")
-          .table__data {{ row.size }}
-
         template(slot="industry", slot-scope="{ row, index }")
           .table__data {{ row.industry.name }}
 
@@ -137,7 +134,7 @@
 						dataKey: "lang",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "14%" }
+						style: { width: "16.5%" }
 					},
 					{
 						label: "Target",
@@ -146,7 +143,7 @@
 						dataKey: "lang",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "14%" }
+						style: { width: "16.5%" }
 					},
 					{
 						label: "Step",
@@ -155,7 +152,7 @@
 						dataKey: "title",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "12%" }
+						style: { width: "13%" }
 					},
 					{
 						label: "Unit",
@@ -164,15 +161,7 @@
 						dataKey: "type",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "12%" }
-					},
-					{
-						label: "Size",
-						headerKey: "headerSize",
-						key: "size",
-						sortInfo: { isSort: true, order: 'default' },
-						filterInfo: { isFilter: true },
-						style: { width: "8%" }
+						style: { width: "13%" }
 					},
 					{
 						label: "Industry",
@@ -181,7 +170,7 @@
 						dataKey: "name",
 						sortInfo: { isSort: true, order: 'default' },
 						filterInfo: { isFilter: true },
-						style: { width: "12%" }
+						style: { width: "13%" }
 					},
 					{
 						label: "Price",

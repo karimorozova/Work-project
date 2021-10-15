@@ -1,5 +1,4 @@
-const { Step, Services, Units } = require('../models')
-const { multiplyPrices } = require('../multipliers')
+const { Step, Services } = require('../models')
 const _ = require('lodash')
 
 
@@ -40,9 +39,7 @@ const updateClientLangPairs = async (operationObj) => {
 	}
 
 	function pushNewLangPair(newSourceLanguage, newTargetLanguage, toReturn = false) {
-		const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => (
-				`${ row.sourceLanguage } ${ row.targetLanguage }` === `${ newSourceLanguage } ${ newTargetLanguage }`
-		))
+		const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => `${ row.sourceLanguage } ${ row.targetLanguage }` === `${ newSourceLanguage } ${ newTargetLanguage }`)
 		let basicPrice = 0.100
 		if (sameDefaultPair) {
 			switch (currency) {
@@ -92,86 +89,6 @@ const updateClientLangPairs = async (operationObj) => {
 			}
 		})
 	}
-
-	// async function pushNewLangCombination(newService) {
-	// 	const { sourceLanguage, targetLanguages, services, industries } = newService
-	// 	const langPairCombinations = pushNewLangPair(sourceLanguage, targetLanguages[0], true)
-	// 	const stepMultiplierCombinations = await getStepMultipliers(services[0])
-	// 	const industryMultiplierCombinations = getIndustryMultipliers(industries[0])
-	// 	langPairCombinations.forEach(langRow => {
-	// 		stepMultiplierCombinations.forEach(stepRow => {
-	// 			industryMultiplierCombinations.forEach(industryRow => {
-	// 				updatedPricelist.push({
-	// 					sourceLanguage: langRow.sourceLanguage,
-	// 					targetLanguage: langRow.targetLanguage,
-	// 					step: stepRow.step,
-	// 					unit: stepRow.unit,
-	// 					size: stepRow.size,
-	// 					industry: industryRow.industry,
-	// 					price: multiplyPrices(langRow.basicPrice, stepRow.multiplier, stepRow.size, industryRow.multiplier)
-	// 				})
-	// 			})
-	// 		})
-	// 	})
-	// }
-	// async function getStepMultipliers(serviceId) {
-	// 	const stepMultipliers = []
-	// 	const { steps } = await Services.findOne({ _id: serviceId })
-	// 	for (let i = 0; i < steps.length; i++) {
-	// 		const { step: stepId } = steps[i]
-	// 		const { calculationUnit } = await Step.findOne({ _id: stepId }).populate('calculationUnit')
-	// 		for (let { _id: unitId } of calculationUnit) {
-	// 			const { sizes } = await Units.findOne({ _id: unitId })
-	// 			if (sizes.length) {
-	// 				for (let size of sizes) {
-	// 					const row = defaultPricelist.stepMultipliersTable.find(row => (
-	// 							`${ row.step } ${ row.unit } ${ row.size }` === `${ stepId } ${ unitId } ${ size }`
-	// 					))
-	// 					stepMultipliers.push({
-	// 						step: stepId,
-	// 						unit: unitId,
-	// 						size,
-	// 						multiplier: row ? row.multiplier : 100
-	// 					})
-	// 				}
-	// 			} else {
-	// 				const row = defaultPricelist.stepMultipliersTable.find(row => (
-	// 						`${ row.step } ${ row.unit } ${ row.size }` === `${ stepId } ${ unitId } ${ 1 }`
-	// 				))
-	// 				stepMultipliers.push({
-	// 					step: stepId,
-	// 					unit: unitId,
-	// 					size: 1,
-	// 					multiplier: row ? row.multiplier : 100
-	// 				})
-	// 			}
-	// 		}
-	// 	}
-	// 	return stepMultipliers
-	// }
-	//
-	// function getIndustryMultipliers(industryId) {
-	// 	const industryMultipliers = []
-	// 	const sameDefaultIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
-	// 			industry.toString() === industryId.toString()
-	// 	))
-	// 	industryMultipliers.push({
-	// 		industry: industryId,
-	// 		multiplier: sameDefaultIndustryRow ? sameDefaultIndustryRow.multiplier : 100
-	// 	})
-	// 	return industryMultipliers
-	// }
-
-	// function replaceOldLanguage(table, newLanguage, key, needNewLangCompare = false) {
-	// 	return table.map(row => {
-	// 		const { sourceLanguage, targetLanguage } = row
-	// 		if (`${ sourceLanguage } ${ targetLanguage }` === `${ needNewLangCompare ? updatedService.sourceLanguage : oldService.sourceLanguage._id } ${ oldService.targetLanguages[0]._id }`) {
-	// 			row[key] = newLanguage
-	// 		}
-	// 		console.log()
-	// 		return row
-	// 	})
-	// }
 }
 
 const updateClientStepMultipliers = async (operationObj) => {
@@ -212,22 +129,18 @@ const updateClientStepMultipliers = async (operationObj) => {
 
 	function pushNewSteps(newStepsArr, toReturn = false) {
 		let arrToReturn = []
-		for (let { stepId, unitId, size } of newStepsArr) {
-			const row = defaultPricelist.stepMultipliersTable.find(row => (
-					`${ row.step } ${ row.unit } ${ row.size }` === `${ stepId } ${ unitId } ${ size }`
-			))
+		for (let { stepId, unitId } of newStepsArr) {
+			const row = defaultPricelist.stepMultipliersTable.find(row => `${ row.step } ${ row.unit }` === `${ stepId } ${ unitId }`)
 			if (toReturn) {
 				arrToReturn.push({
 					step: stepId,
 					unit: unitId,
-					size,
 					multiplier: row ? row.multiplier : 100
 				})
 			} else {
 				stepMultipliersTable.push({
 					step: stepId,
 					unit: unitId,
-					size,
 					multiplier: row ? row.multiplier : 100
 				})
 			}
@@ -239,38 +152,20 @@ const updateClientStepMultipliers = async (operationObj) => {
 		const stepCombinationRows = []
 		for (let step of stepsArr) {
 			const { calculationUnit } = await Step.findOne({ _id: step }).populate('calculationUnit')
-			for (let { _id: unitId, sizes } of calculationUnit) {
-				if (sizes.length) {
-					for (let size of sizes) {
-						stepCombinationRows.push(`${ step } ${ unitId } ${ size }`)
-					}
-				} else {
-					stepCombinationRows.push(`${ step } ${ unitId } ${ 1 }`)
-				}
-			}
+			for (let { _id: unitId } of calculationUnit) stepCombinationRows.push(`${ step } ${ unitId }`)
 		}
-		return table.filter(row => (
-				!stepCombinationRows.includes(`${ row.step } ${ row.unit } ${ row.size }`)
-		))
+		return table.filter(row => !stepCombinationRows.includes(`${ row.step } ${ row.unit }`))
 	}
 
 	async function findStepRows(serviceId) {
 		let uniqueStepRows = []
 		const { steps } = await Services.findOne({ _id: serviceId })
 		const allSteps = await Step.find().populate('calculationUnit')
-		const allUnits = await Units.find()
 
 		for (let i = 0; i < steps.length; i++) {
 			const { step: stepId } = steps[i]
 			const { calculationUnit } = allSteps.find(item => item._id.toString() === stepId.toString())
-			for (let { _id: unitId } of calculationUnit) {
-				const { sizes } = allUnits.find(item => item._id.toString() === unitId.toString())
-				if (sizes.length) {
-					for (let size of sizes) uniqueStepRows.push({ stepId, unitId, size })
-				} else {
-					uniqueStepRows.push({ stepId, unitId, size: 1 })
-				}
-			}
+			for (let { _id: unitId } of calculationUnit) uniqueStepRows.push({ stepId, unitId })
 		}
 		return uniqueStepRows
 	}
@@ -279,30 +174,20 @@ const updateClientStepMultipliers = async (operationObj) => {
 		let uniqueStepRows = []
 		const { steps } = await Services.findOne({ _id: serviceId })
 		const allSteps = await Step.find().populate('calculationUnit')
-		const allUnits = await Units.find()
+
 		for (let i = 0; i < steps.length; i++) {
 			const { step: stepId } = steps[i]
 			const { calculationUnit } = allSteps.find(item => item._id.toString() === stepId.toString())
 			for (let { _id: unitId } of calculationUnit) {
-				const { sizes } = allUnits.find(item => item._id.toString() === unitId.toString())
-				if (sizes.length) {
-					for (let size of sizes) {
-						const uniqueRow = findUniqueStepTableRow(stepId, unitId)
-						uniqueRow && uniqueStepRows.push({ stepId, unitId, size })
-					}
-				} else {
-					const uniqueRow = findUniqueStepTableRow(stepId, unitId)
-					uniqueRow && uniqueStepRows.push({ stepId, unitId, size: 1 })
-				}
+				const uniqueRow = findUniqueStepTableRow(stepId, unitId)
+				uniqueRow && uniqueStepRows.push({ stepId, unitId })
 			}
 		}
 		return uniqueStepRows
 
 		function findUniqueStepTableRow(stepId, unitId) {
 			return stepMultipliersTable.every(row => {
-				if (row.step.toString() !== stepId.toString() || row.unit.toString() !== unitId.toString()) {
-					return row
-				}
+				if (row.step.toString() !== stepId.toString() || row.unit.toString() !== unitId.toString()) return row
 			})
 		}
 	}
@@ -315,105 +200,6 @@ const updateClientStepMultipliers = async (operationObj) => {
 			}
 		})
 	}
-
-	// function pushNewStepCombination(newService) {
-	// 	const { sourceLanguage, targetLanguages, industries } = newService
-	// 	const langPairCombinations = getLangPairsObjs(sourceLanguage, targetLanguages[0])
-	// 	const stepMultiplierCombinations = pushNewSteps(newUniqueStepRows, true)
-	// 	const industryMultiplierCombinations = getIndustryMultipliers(industries[0])
-	// 	langPairCombinations.forEach(langRow => {
-	// 		stepMultiplierCombinations.forEach(stepRow => {
-	// 			industryMultiplierCombinations.forEach(industryRow => {
-	// 				updatedPricelist.push({
-	// 					sourceLanguage: langRow.sourceLanguage,
-	// 					targetLanguage: langRow.targetLanguage,
-	// 					step: stepRow.step,
-	// 					unit: stepRow.unit,
-	// 					size: stepRow.size,
-	// 					industry: industryRow.industry,
-	// 					price: multiplyPrices(langRow.basicPrice, stepRow.multiplier, stepRow.size, industryRow.multiplier)
-	// 				})
-	// 			})
-	// 		})
-	// 	})
-	// }
-	// function getLangPairsObjs(sourceLanguage, targetLanguage) {
-	// 	const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => (
-	// 			`${ row.sourceLanguage } ${ row.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`
-	// 	))
-	// 	let basicPrice = 1
-	// 	if (sameDefaultPair) {
-	// 		switch (currency) {
-	// 			case 'USD':
-	// 				basicPrice = sameDefaultPair.usdBasicPrice
-	// 				break
-	// 			case 'GBP':
-	// 				basicPrice = sameDefaultPair.gbpBasicPrice
-	// 				break
-	// 			default:
-	// 				basicPrice = sameDefaultPair.euroBasicPrice
-	// 		}
-	// 		return [ {
-	// 			sourceLanguage,
-	// 			targetLanguage,
-	// 			basicPrice
-	// 		} ]
-	// 	} else {
-	// 		return [ {
-	// 			sourceLanguage,
-	// 			targetLanguage,
-	// 			basicPrice: 0.100
-	// 		} ]
-	// 	}
-	// }
-	//
-	// function getIndustryMultipliers(industryId) {
-	// 	const industryMultipliers = []
-	// 	const sameDefaultIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
-	// 			industry.toString() === industryId.toString()
-	// 	))
-	// 	industryMultipliers.push({
-	// 		industry: industryId,
-	// 		multiplier: sameDefaultIndustryRow ? sameDefaultIndustryRow.multiplier : 100
-	// 	})
-	// 	return industryMultipliers
-	// }
-	// function deleteOldUniqueStepCombinations(indexesArr) {
-	// 	for (let index of indexesArr) {
-	// 		updatedPricelist.splice(indexesArr, 1)
-	// 	}
-	// }
-	// async function findUniqueOldSteps(serviceId) {
-	// 	let uniqueStepRows = []
-	// 	const otherServiceSteps = []
-	// 	const clientServicesFromServicesArr = otherServices.map(({ services }) => services)
-	// 	for (let service of clientServicesFromServicesArr) {
-	// 		const { steps } = await Services.findOne({ _id: service })
-	// 		steps.forEach(({ step }) => otherServiceSteps.push(step.toString()))
-	// 	}
-	// 	const { steps } = await Services.findOne({ _id: serviceId })
-	// 	for (let { step } of steps) {
-	// 		if (!otherServiceSteps.includes(step.toString())) {
-	// 			uniqueStepRows.push(step)
-	// 		}
-	// 	}
-	// 	return uniqueStepRows
-	// }
-	// async function findUniqOldStepCombinationIndexes(serviceId, compareOldSource, compareOldTarget) {
-	// 	const uniqueOldStepCombinationIndexes = []
-	// 	const { steps } = await Services.findOne({ _id: serviceId })
-	// 	for (let { step: serviceStep } of steps) {
-	// 		for (let i = 0; i < updatedPricelist.length; i++) {
-	// 			const { sourceLanguage, targetLanguage, step } = updatedPricelist[i]
-	// 			if (!compareOldSource ? oldService.sourceLanguage._id.toString() : updatedService.sourceLanguage.toString() === sourceLanguage.toString()
-	// 			&& !compareOldTarget ? oldService.targetLanguages[0]._id.toString() : updatedService.targetLanguages[0].toString() === targetLanguage.toString()
-	// 					&& serviceStep.toString() === step.toString()) {
-	// 				uniqueOldStepCombinationIndexes.push(i)
-	// 			}
-	// 		}
-	// 	}
-	// 	return uniqueOldStepCombinationIndexes
-	// }
 }
 
 const updateClientIndustryMultipliers = async (operationObj) => {
@@ -452,117 +238,6 @@ const updateClientIndustryMultipliers = async (operationObj) => {
 			}
 		})
 	}
-
-	// async function pushNewLangCombination(newService) {
-	// 	const { sourceLanguage, targetLanguages, services } = newService
-	// 	const langPairCombinations = getLangPairsObjs(sourceLanguage, targetLanguages[0])
-	// 	const stepMultiplierCombinations = await getStepMultipliers(services[0])
-	// 	const industryMultiplierCombinations = pushNewIndustry(true)
-	// 	langPairCombinations.forEach(langRow => {
-	// 		stepMultiplierCombinations.forEach(stepRow => {
-	// 			industryMultiplierCombinations.forEach(industryRow => {
-	// 				updatedPricelist.push({
-	// 					sourceLanguage: langRow.sourceLanguage,
-	// 					targetLanguage: langRow.targetLanguage,
-	// 					step: stepRow.step,
-	// 					unit: stepRow.unit,
-	// 					size: stepRow.size,
-	// 					industry: industryRow.industry,
-	// 					price: multiplyPrices(langRow.basicPrice, stepRow.multiplier, stepRow.size, industryRow.multiplier)
-	// 				})
-	// 			})
-	// 		})
-	// 	})
-	// }
-
-	// async function getStepMultipliers(serviceId) {
-	// 	const stepMultipliers = []
-	// 	const { steps } = await Services.findOne({ _id: serviceId })
-	// 	for (let i = 0; i < steps.length; i++) {
-	// 		const { step: stepId } = steps[i]
-	// 		const { calculationUnit } = await Step.findOne({ _id: stepId }).populate('calculationUnit')
-	// 		for (let { _id: unitId } of calculationUnit) {
-	// 			const { sizes } = await Units.findOne({ _id: unitId })
-	// 			console.log(sizes)
-	// 			if (sizes.length) {
-	// 				for (let size of sizes) {
-	// 					const row = defaultPricelist.stepMultipliersTable.find(row => (
-	// 							`${ row.step } ${ row.unit } ${ row.size }` === `${ stepId } ${ unitId } ${ size }`
-	// 					))
-	// 					stepMultipliers.push({
-	// 						step: stepId,
-	// 						unit: unitId,
-	// 						size,
-	// 						multiplier: row ? row.multiplier : 100
-	// 					})
-	// 				}
-	// 			} else {
-	// 				const row = defaultPricelist.stepMultipliersTable.find(row => (
-	// 						`${ row.step } ${ row.unit } ${ row.size }` === `${ stepId } ${ unitId } ${ 1 }`
-	// 				))
-	// 				stepMultipliers.push({
-	// 					step: stepId,
-	// 					unit: unitId,
-	// 					size: row.size,
-	// 					multiplier: row ? row.multiplier : 100
-	// 				})
-	// 			}
-	// 		}
-	// 	}
-	// 	return stepMultipliers
-	// }
-
-	// function getLangPairsObjs(sourceLanguage, targetLanguage) {
-	// 	const sameDefaultPair = defaultPricelist.basicPricesTable.find(row => (
-	// 			`${ row.sourceLanguage } ${ row.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`
-	// 	))
-	// 	let basicPrice = 1
-	// 	if (sameDefaultPair) {
-	// 		switch (currency) {
-	// 			case 'USD':
-	// 				basicPrice = sameDefaultPair.usdBasicPrice
-	// 				break
-	// 			case 'GBP':
-	// 				basicPrice = sameDefaultPair.gbpBasicPrice
-	// 				break
-	// 			default:
-	// 				basicPrice = sameDefaultPair.euroBasicPrice
-	// 		}
-	// 		return [ {
-	// 			sourceLanguage,
-	// 			targetLanguage,
-	// 			basicPrice
-	// 		} ]
-	// 	}
-	// }
-
-	// function pushNewIndustry(toReturn = false) {
-	// 	const arrToReturn = []
-	// 	const sameDefaultIndustryRow = defaultPricelist.industryMultipliersTable.find(({ industry }) => (
-	// 			industry.toString() === newIndustry.toString()
-	// 	))
-	// 	if (toReturn) {
-	// 		arrToReturn.push({
-	// 			industry: newIndustry,
-	// 			multiplier: sameDefaultIndustryRow ? sameDefaultIndustryRow.multiplier : 100
-	// 		})
-	// 	}
-	// 	industryMultipliersTable.push({
-	// 		industry: newIndustry,
-	// 		multiplier: sameDefaultIndustryRow ? sameDefaultIndustryRow.multiplier : 100
-	// 	})
-	// 	return arrToReturn
-	// }
-
-	// function replaceOldIndustry(table, newIndustry, oldIndustry) {
-	// 	return table.map(row => {
-	// 		const { industry } = row
-	// 		if (industry.toString() === oldIndustry.toString()) {
-	// 			row.industry = newIndustry
-	// 		}
-	// 		return row
-	// 	})
-	// }
 }
 
 module.exports = {

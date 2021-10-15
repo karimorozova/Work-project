@@ -368,7 +368,7 @@ const checkUnitDifference = async (stepDifferences, oldUnit) => {
 				const neededUnit = calculationUnit.find(unit => unit.toString() === oldUnit._id.toString())
 				let sameCombination
 				for (let { stepMultipliersTable } of pricelists) {
-					sameCombination = stepMultipliersTable.find(item => `${ item.step } ${ item.unit } ${ item.size }` === `${ _id } ${ oldUnit._id } ${ 1 }`)
+					sameCombination = stepMultipliersTable.find(item => `${ item.step } ${ item.unit }` === `${ _id } ${ oldUnit._id }`)
 				}
 				if (!sameCombination) {
 					newMultiplierCombinations.push({
