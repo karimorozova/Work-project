@@ -199,10 +199,10 @@
 						key: 'Industry',
 						oldMultiplier: oldIndustry
 					})
-					await this.$http.post('/clientsapi/rates', {
-						key: 'Industry',
-						oldMultiplier: oldIndustry
-					})
+					// await this.$http.post('/clientsapi/rates', {
+					// 	key: 'Industry',
+					// 	oldMultiplier: oldIndustry
+					// })
 				} catch (err) {
 					this.alertToggle({ message: "Error on saving Industry info", isShow: true, type: "error" })
 				}
