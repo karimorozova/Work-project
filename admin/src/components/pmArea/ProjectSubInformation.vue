@@ -68,7 +68,7 @@
             )
 
         template(slot="icons", slot-scope="{ row, index }")
-          .client-table__icons(v-if="!isProjectFinished")
+          .client-table__icons(v-if="true")
             i.client-table__icon.fa.fa-envelope(
               @click="openWYSIWYG(index)",
               :class="{ 'client-table_opacity': true }",
@@ -83,7 +83,7 @@
           .client-table__icons(v-else)
             img(src="../../assets/images/latest-version/lock.png")
 
-    Add(@add="addData" v-if="!isProjectFinished")
+    Add(@add="addData" v-if="true")
 </template>
 
 <script>
