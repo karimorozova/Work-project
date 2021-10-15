@@ -3,10 +3,14 @@
     .tabs
       Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTab")
     .table(v-if="isServices")
+      //ServicesTable(
+      //  :allSteps="steps"
+      //  :firstStageSteps="firstStageSteps"
+      //  :secondStageSteps="secondStageSteps"
+      //  @setUnitFilter="setUnitFilter"
+      //)
       ServicesTable(
         :allSteps="steps"
-        :firstStageSteps="firstStageSteps"
-        :secondStageSteps="secondStageSteps"
         @setUnitFilter="setUnitFilter"
       )
     .table(v-if="isSteps")
@@ -60,24 +64,24 @@
 					this.alertToggle({ message: "Error on getting Steps from DB", isShow: true, type: "error" })
 				}
 			},
-			getFilteredStageSteps(stageProp) {
-				if (this.steps.length) {
-					return this.steps.filter(item => {
-						return this.unitFilter ? item[stageProp] && item.calculationUnit === this.unitFilter : item[stageProp]
-					})
-				}
-				return []
-			}
+			// getFilteredStageSteps(stageProp) {
+			// 	if (this.steps.length) {
+			// 		return this.steps.filter(item => {
+			// 			return this.unitFilter ? item[stageProp] && item.calculationUnit === this.unitFilter : item[stageProp]
+			// 		})
+			// 	}
+			// 	return []
+			// }
 		},
 		computed: {
-			firstStageSteps() {
-				const result = this.getFilteredStageSteps('isStage1')
-				return result.length ? result.map(item => item.title) : []
-			},
-			secondStageSteps() {
-				const result = this.getFilteredStageSteps('isStage2')
-				return result.length ? result.map(item => item.title) : []
-			}
+			// firstStageSteps() {
+			// 	const result = this.getFilteredStageSteps('isStage1')
+			// 	return result.length ? result.map(item => item.title) : []
+			// },
+			// secondStageSteps() {
+			// 	const result = this.getFilteredStageSteps('isStage2')
+			// 	return result.length ? result.map(item => item.title) : []
+			// }
 		},
 		components: {
 			ServicesTable,
@@ -95,7 +99,11 @@
   @import "../../assets/styles/settingsTable";
 
   .services-wrapper {
-    @extend %setting-table;
+    background-color: $white;
+    padding: 25px;
+    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    position: relative;
+
     width: 1000px;
     box-sizing: border-box;
     border-radius: 4px;

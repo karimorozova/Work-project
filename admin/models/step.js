@@ -10,24 +10,10 @@ const StepSchema = new mongoose.Schema({
   calculationUnit: [{
     type: Schema.Types.ObjectId, ref: "Units"
   }],
-  isStage1: {
-    type: Boolean
-  },
-  isStage2: {
-    type: Boolean
-  },
-  isEditor: {
-    type: Boolean
-  },
   isActive: {
     type: Boolean,
     default: true
   },
-  symbol: {
-    type: String,
-    default: '',
-    trim: true
-  }
 });
 
 const Step = mongoose.model('Step', StepSchema);

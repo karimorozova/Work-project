@@ -62,6 +62,7 @@ function getWordcountAndClients({projects, lang, industries}) {
       clients.push(cur.customer);
     }
     const steps = cur.steps.filter(step => {
+      //TODO: refactoring Services/Step
       return step.serviceStep.symbol === 'translation' && step.sourceLanguage === 'EN-GB' && step.targetLanguage === lang.symbol
     }).map(item => item.progress.wordsDone);
     acc += steps.reduce((a, b) => a + b, 0);

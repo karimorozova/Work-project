@@ -161,7 +161,7 @@ async function generateStepsForCATTasks(task, industry, customer, discounts, pro
 
 		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } =
 				await getStepFinanceData({ customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId }, true)
-
+		//TODO: refactoring Services/Step
 		const step = {
 			stepId: `${ task.taskId } ${ stepsIdCounter }`,
 			taskId: task.taskId,
@@ -198,6 +198,7 @@ async function generateStepsForCATTasks(task, industry, customer, discounts, pro
 
 
 function setStepsProgress(symbol, docs) {
+	//TODO: refactoring Services/Step  stepTitle+unit
 	const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
 	const totalProgress = docs.reduce((acc, cur) => {
 		acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop]

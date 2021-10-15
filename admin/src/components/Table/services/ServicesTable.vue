@@ -1,43 +1,35 @@
 <template lang="pug">
   .services
-    .services__table
-      SettingsTable(
+    .table
+      GeneralTable(
         :fields="fields"
         :tableData="services"
         :errors="errors"
         :areErrors="areErrors"
         @closeErrors="closeErrors"
       )
-        template(slot="headerIcon" slot-scope="{ field }")
-          .services__header {{ field.label }}
         template(slot="headerTitle" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerLangForm" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerStep1" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerStep2" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerIsRequestQuote" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerActive" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerIcons" slot-scope="{ field }")
-          .services__header {{ field.label }}
+          .table__header {{ field.label }}
 
-        template(slot="icon" slot-scope="{ row, index }")
-          .services__data.services_centered(:class="activeClasses(index)")
-            img.services__main-icon(v-if="row.icon" :src="row.icon")
-            .services__upload(v-if="currentActive === index" :class="{'services_no-back': imageData}")
-              input.services__load-file(type="file" @change="uploadIcon")
-              img.services__file-preview(v-if="imageData" :src="imageData")
         template(slot="title" slot-scope="{ row, index }")
-          .services__data(v-if="currentActive !== index") {{ row.title }}
-          .services__editing-data(v-else)
-            input.services__input(type="text" v-model="currentTitle")
+          .table__data(v-if="currentActive !== index") {{ row.title }}
+          .table__data(v-else)
+            input.table__input(type="text" v-model="currentTitle")
         template(slot="languageForm" slot-scope="{ row, index }")
-          .services__data(v-if="currentActive !== index") {{ row.languageForm }}
-          .services__drop-menu(v-else)
+          .table__data(v-if="currentActive !== index") {{ row.languageForm }}
+          .table__drop(v-else)
             SelectSingle(
               :selectedOption="currentLangForm"
               :options="langForms"
@@ -45,43 +37,43 @@
               @scrollDrop="scrollDrop"
             )
 
-        template(slot="step1" slot-scope="{ row, index }")
-          .services__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage1') }}
-          .services__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="currentStep1"
-              :options="firstStageSteps"
-              @chooseOption="(e) => setStep(e, 'currentStep1')"
-              @scrollDrop="scrollDrop"
-            )
-        template(slot="step2" slot-scope="{ row, index }")
-          .services__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage2') }}
-          .services__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="currentStep2"
-              :options="secondStageSteps"
-              @chooseOption="(e) => setStep(e, 'currentStep2')"
-              @scrollDrop="scrollDrop"
-              :isRemoveOption="true"
-              @removeOption="removeOptionStep2"
-            )
-        template(slot="isRequestQuote" slot-scope="{ row, index }")
-          .services__data.services_centered(:class="{'services_active': currentActive === index}")
-            img.services__checkbox(v-if="row.isRequestQuote" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
-            img.services__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActiveRequestQuote(index)" :class="{'services_opacity': currentActive === index}")
+        //template(slot="step1" slot-scope="{ row, index }") test
+        //  .table__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage1') }}
+        //  .table__drop-menu(v-else)
+        //    SelectSingle(
+        //      :selectedOption="currentStep1"
+        //      :options="firstStageSteps"
+        //      @chooseOption="(e) => setStep(e, 'currentStep1')"
+        //      @scrollDrop="scrollDrop"
+        //    )
+        //template(slot="step2" slot-scope="{ row, index }")
+        //  .table__data(v-if="currentActive !== index") {{ presentStep(row.steps, 'stage2') }}
+        //  .table__drop-menu(v-else)
+        //    SelectSingle(
+        //      :selectedOption="currentStep2"
+        //      :options="secondStageSteps"
+        //      @chooseOption="(e) => setStep(e, 'currentStep2')"
+        //      @scrollDrop="scrollDrop"
+        //      :isRemoveOption="true"
+        //      @removeOption="removeOptionStep2"
+        //    )
+        //template(slot="isRequestQuote" slot-scope="{ row, index }")
+          .table__data(:class="{'table_active': currentActive === index}")
+            img.table__checkbox(v-if="row.isRequestQuote" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActiveRequestQuote(index)" :class="{'table_opacity': currentActive === index}")
+            img.table__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActiveRequestQuote(index)" :class="{'table_opacity': currentActive === index}")
 
         template(slot="active" slot-scope="{ row, index }")
-          .services__data.services_centered(:class="{'services_active': currentActive === index}")
-            img.services__checkbox(v-if="row.active" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
-            img.services__checkbox(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'services_opacity': currentActive === index}")
+          .table__icons(:class="{'table_active': currentActive === index}")
+            img.table__icon(v-if="row.active" src="../../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+            img.table__icon(v-else src="../../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
         template(slot="icons" slot-scope="{ row, index }")
-          .services__icons
-            img.services__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'services_opacity': isActive(key, index)}")
+          .table__icons
+            img.table__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
     Add(@add="addService")
 </template>
 
 <script>
-	import SettingsTable from "../SettingsTable"
+	import GeneralTable from "../../GeneralTable"
 	import SelectSingle from "@/components/SelectSingle"
 	import Add from "@/components/Add"
 	import scrollDrop from "@/mixins/scrollDrop"
@@ -92,20 +84,17 @@
 		mixins: [ scrollDrop, crudIcons ],
 		props: {
 			allSteps: { type: Array },
-			firstStageSteps: { type: Array },
-			secondStageSteps: { type: Array }
+			// firstStageSteps: { type: Array },
+			// secondStageSteps: { type: Array }
 		},
 		data() {
 			return {
 				fields: [
-					{ label: "Icon", headerKey: "headerIcon", key: "icon", width: "9%", padding: "0" },
-					{ label: "Title", headerKey: "headerTitle", key: "title", width: "16%", padding: "0" },
-					{ label: "Language Form", headerKey: "headerLangForm", key: "languageForm", width: "12%", padding: "0" },
-					{ label: "Step 1", headerKey: "headerStep1", key: "step1", width: "16%", padding: "0" },
-					{ label: "Step 2", headerKey: "headerStep2", key: "step2", width: "16%", padding: "0" },
-					{ label: "Request Quote", headerKey: "headerIsRequestQuote", key: "isRequestQuote", width: "11%", padding: "0" },
-					{ label: "Active", headerKey: "headerActive", key: "active", width: "8%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0" }
+					{ label: "Title", headerKey: "headerTitle", key: "title", style: { width: "50%" }},
+					{ label: "Language Form", headerKey: "headerLangForm", key: "languageForm", style: { width: "25%" } },
+					// { label: "Request Quote", headerKey: "headerIsRequestQuote", key: "isRequestQuote", style: { width: "25%" } },
+					{ label: "Active", headerKey: "headerActive", key: "active", style: { width: "10%" } },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "15%" } }
 				],
 				services: [],
 				langForms: [ "Mono", "Duo" ],
@@ -114,7 +103,7 @@
 				currentLangForm: "",
 				currentStep1: "",
 				currentStep2: "",
-				iconFile: [],
+				// iconFile: [],
 				imageData: "",
 				steps: [],
 				areErrors: false,
@@ -136,17 +125,17 @@
 				}
 				return ""
 			},
-			uploadIcon(event) {
-				this.iconFile.push(event.target.files[0])
-				const input = event.target
-				if (input.files && input.files[0]) {
-					let reader = new FileReader()
-					reader.onload = (e) => {
-						this.imageData = e.target.result
-					}
-					reader.readAsDataURL(input.files[0])
-				}
-			},
+			// uploadIcon(event) {
+			// 	this.iconFile.push(event.target.files[0])
+			// 	const input = event.target
+			// 	if (input.files && input.files[0]) {
+			// 		let reader = new FileReader()
+			// 		reader.onload = (e) => {
+			// 			this.imageData = e.target.result
+			// 		}
+			// 		reader.readAsDataURL(input.files[0])
+			// 	}
+			// },
 			toggleActive(index) {
 				if (this.currentActive !== index) return
 				this.services[index].active = !this.services[index].active
@@ -176,7 +165,7 @@
 				this.errors = []
 				if (!this.currentTitle || this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!")
 				if (!this.currentLangForm) this.errors.push("Please, select language form.")
-				if (!this.currentStep1) this.errors.push("Please, select Step 1.")
+				// if (!this.currentStep1) this.errors.push("Please, select Step 1.")
 				if (this.errors.length) {
 					this.areErrors = true
 					return
@@ -227,13 +216,13 @@
 				const newData = new FormData()
 				newData.append("title", this.currentTitle)
 				newData.append("active", this.services[index].active)
-				newData.append("isRequestQuote", this.services[index].isRequestQuote)
-				newData.append("icon", this.iconFile[0])
-				newData.append("languageForm", this.currentLangForm)
 				newData.append("steps", JSON.stringify(steps))
-				newData.append("symbol", symbol)
-				newData.append("projectType", this.services[index].projectType)
-				newData.append("sortIndex", this.services[index].sortIndex)
+				// newData.append("isRequestQuote", this.services[index].isRequestQuote)
+				// newData.append("icon", this.iconFile[0])
+				newData.append("languageForm", this.currentLangForm)
+				// newData.append("symbol", symbol)
+				// newData.append("projectType", this.services[index].projectType)
+				// newData.append("sortIndex", this.services[index].sortIndex)
 				return newData
 			},
 			getStepsInfo() {
@@ -269,7 +258,7 @@
 				this.currentStep1 = ""
 				this.currentStep2 = ""
 				this.imageData = ""
-				this.iconFile = []
+				// this.iconFile = []
 				this.$emit("setUnitFilter", { unit: "" })
 			},
 			setLangForm({ option }) {
@@ -319,7 +308,7 @@
 			}
 		},
 		components: {
-			SettingsTable,
+      GeneralTable,
 			SelectSingle,
 			Add
 		},
@@ -331,112 +320,167 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
+  //@import "../../../assets/styles/settingsTable";
+  //
+  //.services {
+  //  width: 920;
+  //
+  //  &__data {
+  //    @extend %table-data;
+  //  }
+  //
+  //  &__editing-data {
+  //    @extend %table-data;
+  //    box-shadow: inset 0 0 7px $brown-shadow;
+  //  }
+  //
+  //  &__input {
+  //    @extend %table-text-input;
+  //  }
+  //
+  //  &__icons {
+  //    @extend %table-icons;
+  //  }
+  //
+  //  &__icon {
+  //    @extend %table-icon;
+  //  }
+  //
+  //  &__drop-menu {
+  //    position: relative;
+  //  }
+  //
+  //  &__checkbox {
+  //    cursor: pointer;
+  //    opacity: 0.5;
+  //  }
+  //
+  //  &_centered {
+  //    justify-content: center;
+  //  }
+  //
+  //  &_flex {
+  //    display: flex;
+  //    justify-content: space-around;
+  //  }
+  //
+  //  &__main-icon, &__file-preview {
+  //    width: 22px;
+  //    height: 22px;
+  //  }
+  //
+  //  &__link {
+  //    display: flex;
+  //    justify-content: center;
+  //    align-items: center;
+  //    width: 22px;
+  //  }
+  //
+  //  &__download {
+  //    cursor: pointer;
+  //    width: 40%;
+  //    display: flex;
+  //    justify-content: center;
+  //    align-items: center;
+  //  }
+  //
+  //  &_opacity {
+  //    opacity: 1;
+  //  }
+  //
+  //  &__upload {
+  //    position: relative;
+  //    background: url("../../../assets/images/Other/upload-icon.png");
+  //    background-position-x: center;
+  //    background-repeat: no-repeat;
+  //    width: 40%;
+  //    height: 22px;
+  //    overflow: hidden;
+  //  }
+  //
+  //  &__load-file {
+  //    width: 100%;
+  //    height: 22px;
+  //    border: none;
+  //    outline: none;
+  //    opacity: 0;
+  //    z-index: 2;
+  //    position: absolute;
+  //    left: 6px;
+  //    cursor: pointer;
+  //    font-size: 0;
+  //  }
+  //
+  //  &__no-file {
+  //    opacity: 0.5;
+  //  }
+  //
+  //  &_no-back {
+  //    background: none;
+  //  }
+  //
+  //  &__file-preview {
+  //    margin-left: 10px;
+  //  }
+  //
+  //  &_active {
+  //    box-shadow: inset 0 0 8px $brown-shadow;
+  //  }
+  //}
 
-  .services {
-    width: 920;
+  .table {
+    width: 100%;
 
     &__data {
-      @extend %table-data;
+      width: 100%;
+      padding: 0 7px;
     }
 
-    &__editing-data {
-      @extend %table-data;
-      box-shadow: inset 0 0 7px $brown-shadow;
+    &__header {
+      padding: 0 7px;
     }
 
-    &__input {
-      @extend %table-text-input;
+    &__drop {
+      position: relative;
+      height: 32px;
+      width: 100%;
+      margin: 0 7px;
     }
 
     &__icons {
-      @extend %table-icons;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
     }
 
     &__icon {
-      @extend %table-icon;
-    }
-
-    &__drop-menu {
-      position: relative;
-    }
-
-    &__checkbox {
       cursor: pointer;
       opacity: 0.5;
     }
 
-    &_centered {
-      justify-content: center;
-    }
-
-    &_flex {
-      display: flex;
-      justify-content: space-around;
-    }
-
-    &__main-icon, &__file-preview {
-      width: 22px;
-      height: 22px;
-    }
-
-    &__link {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 22px;
-    }
-
-    &__download {
-      cursor: pointer;
-      width: 40%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    &_opacity {
+    &__opacity {
       opacity: 1;
     }
+  }
 
-    &__upload {
-      position: relative;
-      background: url("../../../assets/images/Other/upload-icon.png");
-      background-position-x: center;
-      background-repeat: no-repeat;
-      width: 40%;
-      height: 22px;
-      overflow: hidden;
-    }
+  input {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 100%;
+    height: 32px;
+    transition: .1s ease-out;
 
-    &__load-file {
-      width: 100%;
-      height: 22px;
-      border: none;
-      outline: none;
-      opacity: 0;
-      z-index: 2;
-      position: absolute;
-      left: 6px;
-      cursor: pointer;
-      font-size: 0;
-    }
-
-    &__no-file {
-      opacity: 0.5;
-    }
-
-    &_no-back {
-      background: none;
-    }
-
-    &__file-preview {
-      margin-left: 10px;
-    }
-
-    &_active {
-      box-shadow: inset 0 0 8px $brown-shadow;
+    &:focus {
+      border: 1px solid $border-focus;
     }
   }
+
 
 </style>
