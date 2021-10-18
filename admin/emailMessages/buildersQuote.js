@@ -43,9 +43,9 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 			        <div style="display: inline-block; padding: 8px; width: 127px;">${ name }</div>
 			        <div style="display: inline-block; padding: 8px; width: 132px;">${ curr.sourceLanguage === curr.targetLanguage ? curr.targetLanguage : curr.sourceLanguage + ' >> ' + curr.targetLanguage } </div>
 			        <div style="display: inline-block; padding: 8px; width: 137px;">${ type } </div>
-			        <div style="display: inline-block; padding: 8px; width: 67px;">${ +quantity.toFixed(2) }</div>
-			        <div style="display: inline-block; padding: 8px; width: 67px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + curr.clientRate.value.toFixed(2) } </div>
-			        <div style="display: inline-block; padding: 8px; width: 67px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + cost.toFixed(2) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 66px;">${ +quantity.toFixed(2) }</div>
+			        <div style="display: inline-block; padding: 8px; width: 66px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + curr.clientRate.value.toFixed(2) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 66px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + cost.toFixed(2) } </div>
 				    </div>`
 		return acc
 	}, '')
@@ -55,9 +55,9 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 					        <div style="display: inline-block; padding: 8px; width: 127px;">Service</div>
 					        <div style="display: inline-block; padding: 8px; width: 132px;">Language</div>
 					        <div style="display: inline-block; padding: 8px; width: 137px;">Unit</div>
-					        <div style="display: inline-block; padding: 8px; width: 67px;">Quantity</div>
-					        <div style="display: inline-block; padding: 8px; width: 67px;">Unit Price</div>
-					        <div style="display: inline-block; padding: 8px; width: 67px;">Cost</div>
+					        <div style="display: inline-block; padding: 8px; width: 66px;">Quantity</div>
+					        <div style="display: inline-block; padding: 8px; width: 66px;">Unit Price</div>
+					        <div style="display: inline-block; padding: 8px; width: 66px;">Cost</div>
 					    </div>
 					    ${ data }
 					</div>`
