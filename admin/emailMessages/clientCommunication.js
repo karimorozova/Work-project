@@ -147,7 +147,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 						</div>
 				<div class="body__line" style="background-color: #b5dbdb;height: 1px;"></div>
 			</div>
-			<div class="details" style="padding: 25px; width: 500px; margin-bottom: 70px;">
+			<div class="details" style="padding: 25px; width: 650px; margin-bottom: 70px;">
 				${ getProjectDetails(project) }
 				${ getJobsDetails(project, tasksIds, steps, allUnits) }
 				${ isHideWhenMinimumCharge ? '' : displaySubTotal }
