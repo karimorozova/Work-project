@@ -160,7 +160,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${ total } </div>
 			</div>
 			</div>
-			<div class="footer" style="position: absolute; width: 754px; border-top: 3px solid #c8e4e4;margin-left: 25px;bottom: 0;padding: 15px 0 12px;">
+			<div class="footer" style="position: absolute; width: 754px; border-top: 3px solid #c8e4e4;bottom: 0;padding: 15px 0 12px;">
 				<div class="text-line" style="font-size: 12px;text-align: center;">Pangea Translation Services
 					(Cyprus) LTD</div>
 				<div class="text-line" style="font-size: 12px;text-align: center;">Arch. Leontiou A’ 254, 3020
