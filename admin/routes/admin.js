@@ -72,7 +72,7 @@ router.get('/all-vendors', requiresLogin, async (req, res) => {
 router.get('/users', requiresLogin, async (req, res, next) => {
 	try {
 		const users = await User.find({}, {
-			"_id": 1, username: 1, firstName: 1, lastName: 1, email: 1
+			"_id": 1, firstName: 1, lastName: 1, email: 1
 		}).populate('group')
 		res.send(users)
 	} catch (err) {
@@ -105,13 +105,13 @@ router.get('/user', requiresLogin, async (req, res, next) => {
 
 router.post('/user', requiresLogin, async (req, res) => {
 	const { user } = req.body
-	const { _id, username, firstName, lastName, email, position, group } = user
+	const { _id, firstName, lastName, email, position, group, isActive } = user
 	try {
 		if (_id) {
-			await User.updateOne({ "_id": user._id }, { firstName, lastName, email, position, group })
+			await User.updateOne({ "_id": user._id }, { firstName, lastName, email, position, group, isActive })
 		} else {
 			const password = "pangea1234"
-			await User.create({ username, password, firstName, lastName, email, position, group })
+			await User.create({  password, firstName, lastName, email, position, group, isActive })
 		}
 		res.send("User info saved")
 	} catch (err) {
@@ -160,7 +160,7 @@ router.get('/reps', requiresLogin, (req, res) => {
 router.post('/login', (req, res, next) => {
 	if (req.body.logemail && req.body.logpassword) {
 		User.authenticate(req.body.logemail, req.body.logpassword, async (error, user) => {
-			if (error || !user) {
+			if (error || (!user || !user.isActive)) {
 				var err = new Error('Wrong email or password.')
 				err.status = 401
 				return next(err)
@@ -202,7 +202,7 @@ router.post('/login-with-google',  async (req, res, next) => {
     await User.updateOne({email: email},{$set: {photo: picture}})
     const user = await User.findOne({email: email}).populate("group")
 
-    if (!user) res.send({status: "error"})
+    if (!user || !user.isActive) res.send({status: "error"})
 
     const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
 

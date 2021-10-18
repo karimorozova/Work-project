@@ -7,14 +7,25 @@ const Schema = mongoose.Schema
 // required: true,
 // trim: true
 
+
+// username: {
+// 	type: String,
+// 			unique: true,
+// 			required: true,
+// 			trim: true
+// },
+// gender: {
+// 	type: String,
+// 			trim: true
+// },
+// phone: {
+// 	type: String,
+// default: "",
+// 			trim: true
+// },
+
 const UserSchema = new mongoose.Schema({
 	email: {
-		type: String,
-		unique: true,
-		required: true,
-		trim: true
-	},
-	username: {
 		type: String,
 		unique: true,
 		required: true,
@@ -36,18 +47,13 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		trim: true
 	},
-	gender: {
-		type: String,
-		trim: true
-	},
-	phone: {
-		type: String,
-		default: "",
-		trim: true
-	},
 	position: {
 		type: String,
 		trim: true
+	},
+	isActive: {
+		type: Boolean,
+		default: true
 	},
 	photo: {
 		type: String,

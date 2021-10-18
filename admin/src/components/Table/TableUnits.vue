@@ -247,8 +247,10 @@
 				if (this.currentActive === -1) return
 				const editable = this.units[index].editable
 				this.errors = []
-				if (!this.currentUnit || !this.isUnique(index)) this.errors.push("Unit should not be empty and be unique!")
+        this.areErrors = false
 
+				if (!this.currentUnit || !this.isUnique(index)) this.errors.push("Unit should not be empty and be unique!")
+        if (!this.currentServices.length > 0) this.errors.push("Please, select at least one step.")
 				if (this.errors.length) {
 					this.areErrors = true
 					return

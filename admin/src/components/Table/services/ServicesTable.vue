@@ -128,8 +128,10 @@
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
+        this.areErrors = false
 				if (!this.currentTitle || this.isTitleUnique(index)) this.errors.push("Title should not be empty and be unique!")
 				if (!this.currentLangForm) this.errors.push("Please, select language form.")
+				if (!this.currentStep.length > 0) this.errors.push("Please, select at least one step.")
 				if (this.errors.length) {
 					this.areErrors = true
 					return

@@ -154,6 +154,7 @@
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
+        this.areErrors = false
 				const isNotUnique = this.steps.find((item, ind) => ind !== index && item.title === this.currentStep.title.trim())
 				if (!this.currentStep.title || isNotUnique) this.errors.push("Step title should be unique and not empty")
 				if (!this.currentUnits.length) this.errors.push("Please, select calculation unit.")

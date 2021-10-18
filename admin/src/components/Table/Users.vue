@@ -1,7 +1,7 @@
 <template lang="pug">
   .users
-    .users__table
-      SettingsTable(
+    .table
+      GeneralTable(
         :fields="fields"
         :tableData="users"
         :errors="errors"
@@ -13,36 +13,42 @@
         @closeModal="setDefaults"
       )
         template(slot="headerFirstName" slot-scope="{ field }")
-          .users__head-title {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerLastName" slot-scope="{ field }")
-          .users__head-title {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerEmail" slot-scope="{ field }")
-          .users__head-title {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerPosition" slot-scope="{ field }")
-          .users__head-title {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="headerGroup" slot-scope="{ field }")
-          .users__head-title {{ field.label }}
+          .table__header {{ field.label }}
+        template(slot="headerIsActive" slot-scope="{ field }")
+          .table__header {{ field.label }}
         template(slot="headerIcons" slot-scope="{ field }")
-          .users__head-title {{ field.label }}
+          .table__header {{ field.label }}
         template(slot="firstName" slot-scope="{ row, index }")
-          .users__data(v-if="currentActive !== index") {{ row.firstName }}
-          .users__editing-data(v-else)
-            input.users__data-input(type="text" v-model="currentFirstName")
+          .table__data(v-if="currentActive !== index") {{ row.firstName }}
+          .table__data(v-else)
+            input.table__data-input(type="text" v-model="currentFirstName")
         template(slot="lastName" slot-scope="{ row, index }")
-          .users__data(v-if="currentActive !== index") {{ row.lastName }}
-          .users__editing-data(v-else)
-            input.users__data-input(type="text" v-model="currentLastName")
+          .table__data(v-if="currentActive !== index") {{ row.lastName }}
+          .table__data(v-else)
+            input.table__data-input(type="text" v-model="currentLastName")
         template(slot="email" slot-scope="{ row, index }")
-          .users__data(v-if="currentActive !== index") {{ row.email }}
-          .users__editing-data(v-else)
-            input.users__data-input(type="text" v-model="currentEmail")
+          .table__data(v-if="currentActive !== index") {{ row.email }}
+          .table__data(v-else)
+            input.table__data-input(type="text" v-model="currentEmail")
         template(slot="position" slot-scope="{ row, index }")
-          .users__data(v-if="currentActive !== index") {{ row.position }}
-          .users__editing-data(v-else)
-            input.users__data-input(type="text" v-model="currentPosition")
+          .table__data(v-if="currentActive !== index") {{ row.position }}
+          .table__data(v-else)
+            input.table__data-input(type="text" v-model="currentPosition")
+        template(slot="isActive" slot-scope="{ row, index }")
+          .table__icons( :class="{'filter__opacity': currentActive !== index}")
+            img.table__checkbox(v-if="row.isActive" src="../../assets/images/latest-version/checkbox-brown-1.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
+            img.table__checkbox(v-else src="../../assets/images/latest-version/checkbox-brown-0.png" @click="toggleActive(index)" :class="{'table__opacity': currentActive === index}")
         template(slot="group" slot-scope="{ row, index }")
-          .users__data(v-if="currentActive !== index") {{ row.group.name }}
-          .users__drop-menu(v-else)
+          .table__data(v-if="currentActive !== index") {{ row.group.name }}
+          .table__drop(v-else)
             SelectSingle(
               :isTableDropMenu="isTableDropMenu"
               placeholder="Select"
@@ -52,13 +58,13 @@
               @scrollDrop="scrollDrop"
             )
         template(slot="icons" slot-scope="{ row, index }")
-          .users__icons
-            img.users__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'users_opacity': isActive(key, index)}")
+          .table__icons
+            img.table__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
     Add(@add="addUser")
 </template>
 
 <script>
-	import SettingsTable from "./SettingsTable"
+	import GeneralTable from "../GeneralTable"
 	import SelectSingle from "../SelectSingle"
 	import Add from "../Add"
 	import scrollDrop from "@/mixins/scrollDrop"
@@ -70,12 +76,13 @@
 		data() {
 			return {
 				fields: [
-					{ label: "First Name", headerKey: "headerFirstName", key: "firstName", width: "14%", padding: "0" },
-					{ label: "Last Name", headerKey: "headerLastName", key: "lastName", width: "14%", padding: "0" },
-					{ label: "Email", headerKey: "headerEmail", key: "email", width: "20%", padding: "0" },
-					{ label: "Position", headerKey: "headerPosition", key: "position", width: "20%", padding: "0" },
-					{ label: "Group", headerKey: "headerGroup", key: "group", width: "16%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "16%", padding: "0" }
+					{ label: "First Name", headerKey: "headerFirstName", key: "firstName", style: { width: "12%" }, padding: "0" },
+					{ label: "Last Name", headerKey: "headerLastName", key: "lastName", style: { width: "12%" }, padding: "0" },
+					{ label: "Email", headerKey: "headerEmail", key: "email", style: { width: "20%" }, padding: "0" },
+					{ label: "Position", headerKey: "headerPosition", key: "position", style: { width: "18%" }, padding: "0" },
+					{ label: "Group", headerKey: "headerGroup", key: "group", style: { width: "16%" }, padding: "0" },
+					{ label: "Active", headerKey: "headerIsActive", key: "isActive", style: { width: "6%" }, padding: "0" },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: { width: "16%" }, padding: "0" }
 				],
 				users: [],
 				isTableDropMenu: true,
@@ -134,15 +141,14 @@
 			},
 			async saveUserInfo(index) {
 				const _id = this.users[index]._id ? this.users[index]._id : ""
-				const username = _id ? this.users[index].username : `${ this.currentFirstName }.${ this.currentLastName.slice(0, 5) }`
 				const user = {
 					_id,
-					username: username.toLowerCase(),
 					firstName: this.currentFirstName,
 					lastName: this.currentLastName,
 					email: this.currentEmail,
 					position: this.currentPosition,
-					group: this.currentGroup
+					group: this.currentGroup,
+					isActive: this.users[index].isActive,
 				}
 				try {
 					const result = await this.saveUser({ user })
@@ -182,7 +188,8 @@
 					lastName: "",
 					email: "",
 					position: "",
-					group: { name: "" }
+					group: { name: "" },
+          isActive: false
 				})
 				this.setEditingData(this.users.length - 1)
 			},
@@ -225,6 +232,7 @@
 				this.currentPosition = ""
 				this.currentGroup = null
 				this.isDeleting = false
+        this.getUsers()
 			},
 			closeErrors() {
 				this.areErrors = false
@@ -244,7 +252,11 @@
 				} catch (err) {
 					this.alertToggle({ message: err.message, isShow: true, type: "error" })
 				}
-			}
+			},
+      toggleActive(index) {
+        if (this.currentActive !== index) return
+        this.users[index].isActive = !this.users[index].isActive
+      },
 		},
 		computed: {
 			groupsNames() {
@@ -256,7 +268,7 @@
 			}
 		},
 		components: {
-			SettingsTable,
+      GeneralTable,
 			SelectSingle,
 			Add
 		},
@@ -272,41 +284,86 @@
   @import "../../assets/styles/settingsTable";
 
   .users {
-    @extend %setting-table;
+    background-color: $white;
+    padding: 25px;
+    box-shadow: $box-shadow;
+    position: relative;
+
     width: 1040px;
+    box-sizing: border-box;
     border-radius: 4px;
     margin: 50px;
 
+  }
+
+
+
+  .table {
+    width: 100%;
+
     &__data {
-      @extend %table-data;
-      overflow-x: hidden;
+      padding: 0 7px;
     }
 
-    &__editing-data {
-      @extend %table-data;
-      box-shadow: inset 0 0 7px $brown-shadow;
+    &__header {
+      padding: 0 7px;
     }
 
-    &__data-input {
-      @extend %table-text-input;
+    &__drop {
+      position: relative;
+      height: 32px;
+      max-width: 220px;
+      margin: 0 7px;
+      width: 100%;
+      background: white;
+      border-radius: 4px;
     }
 
     &__icons {
-      @extend %table-icons;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
     }
 
     &__icon {
-      @extend %table-icon;
+      cursor: pointer;
+      opacity: 0.5;
     }
 
-    &__drop-menu {
-      position: relative;
-      box-shadow: inset 0 0 7px $brown-shadow;
-    }
-
-    &_opacity {
+    &__opacity {
       opacity: 1;
     }
+
+    &__input {
+      width: 100%;
+      padding: 0 7px;
+    }
   }
+
+  input {
+    font-size: 14px;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding: 0 7px;
+    outline: none;
+    width: 100%;
+    height: 32px;
+    transition: .1s ease-out;
+
+    &:focus {
+      border: 1px solid $border-focus;
+    }
+  }
+
+  .filter {
+    &__opacity {
+      filter: opacity(0.5);
+    }
+  }
+
 
 </style>
