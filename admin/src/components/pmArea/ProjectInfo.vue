@@ -4,6 +4,20 @@
     .project-info__leftSide
       Project(:project="currentProject")
       .task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
+        NewTasksAndSteps(
+          :originallyLanguages="originallyLanguages"
+          :originallyUnits="originallyUnits"
+          :originallySteps="originallySteps"
+          :originallyServices="originallyServices"
+          :isFinishedStatus="isFinishedStatus"
+          @getMetrics="getMetrics"
+          @setVendor="setVendor"
+          @setDate="setDate"
+          @showErrors="showErrors"
+        )
+          ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
+
+      .task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
         TasksAndSteps(
           :originallyLanguages="originallyLanguages"
           :originallyUnits="originallyUnits"
@@ -51,6 +65,7 @@
 	import ProjectAction from "./ProjectAction"
 	import ProjectFinance from "./ProjectFinance"
 	import TasksAndSteps from "./TasksAndSteps"
+	import NewTasksAndSteps from "./NewTasksAndSteps"
 
 	const Preview = () => import("./Preview")
 	import { mapGetters, mapActions } from 'vuex'
@@ -287,6 +302,7 @@
 			Project,
 			ProjectAction,
 			TasksAndSteps,
+      NewTasksAndSteps,
 			ProjectFinance,
 			Preview,
 			ProjectSubInformation,
