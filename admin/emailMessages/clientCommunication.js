@@ -150,15 +150,10 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 			<div class="details" style="padding: 25px; width: 764px; margin-bottom: 70px;">
 				${ getProjectDetails(project) }
 				${ getJobsDetails(project, tasksIds, steps, allUnits) }
-				${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 				${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
-				${ isHideWhenMinimumCharge || tasksIds.length ? '' : displaySubTotal2 }
 				${ isHideWhenMinimumCharge ? '' : getAdditionsCosts(project, tasksIds) }
 		
-			<div style="text-align: right; padding: 20px 0; font-size: 14px; font-weight: 600;">
-						<div style="display: inline-block; min-width: 110px; text-align: left;">Total:</div>
-						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${ total } </div>
-			</div>
+
 			</div>
 			<div class="footer" style="position: absolute;width: 764px;border-top: 3px solid #c8e4e4;margin-left: 25px;bottom: 0;padding: 15px 0 12px;">
 				<div class="text-line" style="font-size: 12px;text-align: center;">Pangea Translation Services
