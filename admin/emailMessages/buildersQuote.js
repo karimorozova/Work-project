@@ -40,24 +40,24 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 		}
 
 		acc = acc + `<div style="border-bottom: 1px solid #ededed;">
-			        <div style="display: inline-block; padding: 8px; width: 130px;">${ name }</div>
-			        <div style="display: inline-block; padding: 8px; width: 135px;">${ curr.sourceLanguage === curr.targetLanguage ? curr.targetLanguage : curr.sourceLanguage + ' >> ' + curr.targetLanguage } </div>
-			        <div style="display: inline-block; padding: 8px; width: 140px;">${ type } </div>
-			        <div style="display: inline-block; padding: 8px; width: 70px;">${ +quantity.toFixed(2) }</div>
-			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + curr.clientRate.value.toFixed(2) } </div>
-			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + cost.toFixed(2) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 127px;">${ name }</div>
+			        <div style="display: inline-block; padding: 8px; width: 132px;">${ curr.sourceLanguage === curr.targetLanguage ? curr.targetLanguage : curr.sourceLanguage + ' >> ' + curr.targetLanguage } </div>
+			        <div style="display: inline-block; padding: 8px; width: 137px;">${ type } </div>
+			        <div style="display: inline-block; padding: 8px; width: 67px;">${ +quantity.toFixed(2) }</div>
+			        <div style="display: inline-block; padding: 8px; width: 67px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + curr.clientRate.value.toFixed(2) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 67px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + cost.toFixed(2) } </div>
 				    </div>`
 		return acc
 	}, '')
 
 	return `<div style="border: 1px solid #bfbfbf; width: max-content; margin-top: 25px;">
 					    <div style="border-bottom: 1px solid #ededed; background: #f7f7f7;">
-					        <div style="display: inline-block; padding: 8px; width: 130px;">Service</div>
-					        <div style="display: inline-block; padding: 8px; width: 135px;">Language</div>
-					        <div style="display: inline-block; padding: 8px; width: 140px;">Unit</div>
-					        <div style="display: inline-block; padding: 8px; width: 70px;">Quantity</div>
-					        <div style="display: inline-block; padding: 8px; width: 70px;">Unit Price</div>
-					        <div style="display: inline-block; padding: 8px; width: 70px;">Cost</div>
+					        <div style="display: inline-block; padding: 8px; width: 127px;">Service</div>
+					        <div style="display: inline-block; padding: 8px; width: 132px;">Language</div>
+					        <div style="display: inline-block; padding: 8px; width: 137px;">Unit</div>
+					        <div style="display: inline-block; padding: 8px; width: 67px;">Quantity</div>
+					        <div style="display: inline-block; padding: 8px; width: 67px;">Unit Price</div>
+					        <div style="display: inline-block; padding: 8px; width: 67px;">Cost</div>
 					    </div>
 					    ${ data }
 					</div>`
