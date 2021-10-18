@@ -135,7 +135,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 				<div class="header__details" style="margin-left: 271px;">
 					<div class="header__details--line"
 						style="height: 24px;background: #48A6A6;width: 320px;margin-right: -30px;margin-bottom: 5px;"></div>
-					<div class="header__details--title" style="font-size: 26px;margin-bottom: 5px;">Purchase Order</div>
+					<div class="header__details--title" style="font-size: 26px;margin-bottom: 5px;">Quote</div>
 					<div class="header__details--stepId" style="font-size: 14px;">${ projectId }</div>
 				</div>
 			</div>
