@@ -55,9 +55,9 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 					        <div style="display: inline-block; padding: 8px; width: 130px;">Service</div>
 					        <div style="display: inline-block; padding: 8px; width: 135px;">Language</div>
 					        <div style="display: inline-block; padding: 8px; width: 140px;">Unit</div>
-					        <div style="display: inline-block; padding: 8px; width: 70px;">Quantity</div>
-					        <div style="display: inline-block; padding: 8px; width: 70px;">Unit Price</div>
-					        <div style="display: inline-block; padding: 8px; width: 70px;">Cost</div>
+					        <div style="display: inline-block; padding: 8px; width: 69px;">Quantity</div>
+					        <div style="display: inline-block; padding: 8px; width: 69px;">Unit Price</div>
+					        <div style="display: inline-block; padding: 8px; width: 69px;">Cost</div>
 					    </div>
 					    ${ data }
 					</div>`

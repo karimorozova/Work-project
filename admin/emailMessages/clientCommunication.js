@@ -106,14 +106,14 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 
 	const displaySubTotal = discounts.length || TMDiscount > 0.05
 
-			? `<div style="text-align: right; padding: 20px 0; font-size: 14px; font-weight: 600;">
+			? `<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 			<div style="display: inline-block; min-width: 110px; text-align: left;">Sub-total:</div>
 			<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ subTotal }</div>
 			</div>`
 			: ''
 
 	const displaySubTotal2 = project.paymentAdditions.length
-			? `<div style="text-align: right; padding: 20px 0; font-size: 14px; font-weight: 600;">
+			? `<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 			<div style="display: inline-block; min-width: 110px; text-align: left;">${ discounts.length || TMDiscount ? 'Sub-total (II):' : 'Sub-total:' }</div>
 			<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ (total - project.paymentAdditions.reduce((a, c) => a + c.value, 0)).toFixed(2) } </div>
 			</div>`
@@ -139,15 +139,15 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 					<div class="header__details--stepId" style="font-size: 14px;">${ projectId }</div>
 				</div>
 			</div>
-			<div class="body" style="margin-top: 50px; width: 754px;">
+			<div class="body" style="margin: 50px 0; width: 754px;">
 				<div class="body__to" style="font-size: 16px;margin-bottom: 15px;">To: </div>
 				<div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ clientBillingInfo.officialName || '' }</div>
 				<div class="body__address" style="margin-bottom: 50px;">
 								${ clientBillingInfo.address.street1 || clientBillingInfo.address.street2 || '' }, ${ clientBillingInfo.address.city || '' }, ${ clientBillingInfo.address.country || '' }
 						</div>
-				<div class="body__line" style="background-color: #b5dbdb;height: 1px;"></div>
+				<div class="body__line" style="background-color: #b5dbdb; height: 1px;"></div>
 			</div>
-			<div class="details" style="width: 754px; margin-bottom: 70px;">
+			<div class="details" style="width: 754px; margin-bottom: 90px;">
 				${ getProjectDetails(project) }
 				${ getJobsDetails(project, tasksIds, steps, allUnits) }
 				${ isHideWhenMinimumCharge ? '' : displaySubTotal }
@@ -155,7 +155,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 				${ isHideWhenMinimumCharge || tasksIds.length ? '' : displaySubTotal2 }
 				${ isHideWhenMinimumCharge ? '' : getAdditionsCosts(project, tasksIds) }
 		
-			<div style="text-align: right; padding: 20px 0; font-size: 14px; font-weight: 600;">
+			<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 						<div style="display: inline-block; min-width: 110px; text-align: left;">Total:</div>
 						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${ total } </div>
 			</div>
