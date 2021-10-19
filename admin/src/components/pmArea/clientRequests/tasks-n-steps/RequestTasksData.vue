@@ -211,7 +211,7 @@
 			},
 			async getMemoqTemplates() {
 				try {
-					const result = await this.$http.get("/memoqapi/templates")
+					// const result = await this.$http.get("/memoqapi/templates")
 					// this.templates = result.data
           this.templates = [{
             "name" : "2 Steps - character limit [Single]",
