@@ -281,12 +281,8 @@
 			},
 			async getMemoqTemplates() {
 				try {
-          // const result = await this.$http.get("/memoqapi/templates")
-          // this.templates = result.data
-          this.templates = [{
-            "name" : "2 Steps - character limit [Single]",
-            "id" : "06673d4e-3399-4f66-9f5b-337064628718"
-          }]
+          const result = await this.$http.get("/memoqapi/templates")
+          this.templates = result.data
 				} catch (err) {
 				}
 			}
