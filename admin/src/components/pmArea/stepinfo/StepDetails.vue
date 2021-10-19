@@ -52,7 +52,7 @@
 			},
 			goToMemoq(item) {
 				const { WebTransUrl } = item
-				const domainUrl = WebTransUrl.replace('116.203.204.212', 'memoq.pangea.global')
+				const domainUrl = WebTransUrl.replace('/webtrans', 'memoqweb/webtrans')
 				window.open(`${ domainUrl }`, '_blank')
 			},
 			stepLanguages(step) {

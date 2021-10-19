@@ -161,7 +161,7 @@
 					this.documentGuid = DocumentGuid
 					this.backStepModal = true
 				} else {
-					const newUrl = WebTransUrl.replace('116.203.204.212', 'memoq.pangea.global')
+					const newUrl = WebTransUrl.replace('/webtrans', 'memoqweb/webtrans')
 					let link = document.createElement("a")
 					link.target = "_blank"
 					link.href = newUrl
