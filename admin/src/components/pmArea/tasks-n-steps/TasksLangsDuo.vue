@@ -1,252 +1,173 @@
 <template lang="pug">
   .tasks-langs
-    .source
+    .source(v-if="tasksData.service && tasksData.service.languageForm === 'Duo'")
       .tasks-langs__title-source Source Language:
-        span.asterisk *
       .source__drop-menu
         SelectSingle(
-          placeholder="Language",
-          :options="possibleSourceLanguages",
-          :selectedOption="sourceLanguages.length ? sourceLanguages[0] : ''",
+          placeholder="Option",
+          :options="mappedSourceLanguages",
+          :selectedOption="tasksData.source ? tasksData.source.lang : ''",
           @chooseOption="setSource"
         )
+
     .target
-      .tasks-langs__title-target Target Language(s):
-        span.asterisk *
+      .tasks-langs__title-target Target Languages:
       .select-lang-wrapper
         ListManagement(
-          :list="targetAll.map(i=> i.lang)"
+          :list="tasksData.targets ? mappedTargetLanguages.filter(item => !tasksData.targets.map(i => i.lang).includes(item)) : mappedTargetLanguages"
           @moveItem="moveFromAll"
         )
-        ListManagementButtons(
-          @moveAll="moveAll"
-          @removeAll="removeAll"
-        )
+        ListManagementButtons(@moveAll="moveAll" @removeAll="removeAll")
         ListManagement(
-          :list="targetChosen.map(i=> i.lang)"
+          :list="tasksData.targets ? tasksData.targets.map(i => i.lang) : []"
           @moveItem="moveFromChosen"
         )
 
-      .select-target-count Selected languages: {{ targetChosen.length }}
+      .select-target-count Selected languages: {{ tasksData.targets ? tasksData.targets.length : 0 }}
 
 </template>
 
 <script>
-	import ListManagementButtons from "../../ListManagementButtons"
-	import ListManagement from "../../ListManagement"
-	import SelectSingle from "../../SelectSingle"
-	import { mapGetters, mapActions } from "vuex"
-	import TasksLanguages from "../../../mixins/TasksLanguages"
+import ListManagementButtons from "../../ListManagementButtons"
+import ListManagement from "../../ListManagement"
+import SelectSingle from "../../SelectSingle"
+import { mapGetters, mapActions } from "vuex"
 
-	export default {
-		mixins: [ TasksLanguages ],
-		props: {
-			originallyLanguages: {
-				type: Array
-			},
-			sourceLanguages: {
-				type: Array
-			},
-			isRequest: {
-				type: Boolean
-			},
-			setPossibleTargetsAction: {
-				type: Boolean
-			}
-		},
-		data() {
-			return {
-				targetAll: [],
-				targetChosen: [],
-				languagePairs: [],
-				langSearchValue: "",
-				isSearching: true
-			}
-		},
-		methods: {
-			moveFromAll(index) {
-				const lang = this.targetAll.splice(index, 1)
-				this.targetChosen.push(lang[0])
-				this.emitTargets()
-				this.sortLanguages("targetChosen")
-			},
-			moveFromChosen(index) {
-				const lang = this.targetChosen.splice(index, 1)
-				this.targetAll.push(lang[0])
-				this.emitTargets()
-				this.sortLanguages("targetAll")
-			},
-			moveAll() {
-				this.setPossibleTargets()
-				this.targetChosen = this.targetAll
-				this.targetAll = []
-				this.emitTargets()
-			},
-			removeAll() {
-				this.setPossibleTargets()
-				this.targetChosen = []
-				this.emitTargets()
-			},
-			...mapActions({
-				storeProject: "setCurrentProject",
-				setDataValue: "setTasksDataValue"
-			}),
-			sortLanguages(arrProp) {
-				this[arrProp].sort((a, b) => {
-					if (a.lang < b.lang) return -1
-					if (a.lang > b.lang) return 1
-				})
-			},
-			setSource({ option }) {
-				const { symbol } = this.originallyLanguages.find((item) => item.lang === option)
-				this.$emit("setSourceLanguage", { symbol: symbol })
-				this.targetChosen = []
-			},
-
-			setPossibleTargets() {
-				if (this.tasksData.hasOwnProperty('service')) {
-					const { source, service } = this.tasksData
-					const { customer: { services }, industry } = this.currentProject
-
-					this.targetAll = services
-							.filter(({ industries, services, sourceLanguage }) =>
-									services[0] === service._id &&
-									industries[0] === industry._id &&
-									sourceLanguage === source._id
-							)
-							.map(({ targetLanguages }) =>
-									this.originallyLanguages.find(({ _id }) => targetLanguages[0] === _id)
-							)
-				}
-			},
-			emitTargets() {
-				this.$emit("setTargets", { targets: this.targetChosen })
-			},
-			searchValue({ value }, prop) {
-				this.langSearchValue += value.toLowerCase()
-				this[prop].filter(item => item.lang.toLowerCase().indexOf(this.langSearchValue) !== -1)
-			},
-			slice() {
-				this.langSearchValue = this.langSearchValue.slice(0, -1)
-			},
-			clearChecks(prop) {
-				this[prop].forEach((item) => (item.check = false))
-				this.langSearchValue = ""
-			},
-			clearSearch(e, prop) {
-				this.clearChecks(prop)
-			},
-			sortBySearch({ value }, prop) {
-				if (!value) return this.sortLanguages(prop)
-				const val = value.toLowerCase()
-				for (let index in this[prop]) {
-					const n = val.length
-					if (this[prop][index].lang.toLowerCase().slice(0, n) === val) {
-						let replaceLang = this[prop].splice(index, 1)
-						this[prop].unshift(replaceLang[0])
-					}
-				}
-			},
-			runPossibleTargets() {
-				this.setPossibleTargets()
-				this.targetChosen = []
-			}
-		},
-		watch: {
-			setPossibleTargetsAction(val) {
-				if (val) this.runPossibleTargets()
-			}
-		},
-		created() {
-			this.runPossibleTargets()
-		},
-		computed: {
-			...mapGetters({
-				currentProject: "getCurrentProject",
-				tasksData: "getTasksData"
-			}),
-			possibleSourceLanguages() {
-				if (this.currentProject._id) {
-					if (this.tasksData.hasOwnProperty('service')) {
-						return this.getClientLanguagesByServices('sourceLanguage').map(item => item.lang)
-					}
-				}
-			}
-		},
-		components: {
-			SelectSingle,
-			ListManagement,
-			ListManagementButtons
-		}
-	}
+export default {
+  methods: {
+    ...mapActions({
+      alertToggle: 'alertToggle',
+      setDataValue: "setTasksDataValue"
+    }),
+    getServiceSourceLanguages() {
+      const { customer: { services }, industry } = this.currentProject
+      const { service } = this.tasksData
+      const neededServices = services
+          .filter(item => item.services[0] === service._id && item.industries[0] === industry._id)
+          .map(item => item.sourceLanguage)
+      return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
+    },
+    getServiceTargetLanguages() {
+      const { customer: { services }, industry } = this.currentProject
+      const { service, source } = this.tasksData
+      const neededServices = services
+          .filter(item => item.services[0] === service._id && item.industries[0] === industry._id && item.sourceLanguage === source._id)
+          .map(item => item.targetLanguages[0])
+      return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
+    },
+    moveFromAll(lang) {
+      const targets = this.tasksData.targets || []
+      targets.push(this.allLanguages.find(item => item.lang === lang))
+      this.setDataValue({ prop: "targets", value: targets })
+    },
+    moveFromChosen(lang) {
+      const targets = this.tasksData.targets || []
+      this.setDataValue({ prop: "targets", value: targets.filter(item => item.lang !== lang) })
+    },
+    moveAll() {
+      this.setDataValue({ prop: "targets", value: this.allLanguages.filter(item => this.mappedTargetLanguages.includes(item.lang)) })
+    },
+    removeAll() {
+      this.setDataValue({ prop: "targets", value: [] })
+    },
+    setSource({ option }) {
+      const language = this.allLanguages.find(item => item.lang === option)
+      this.setDataValue({ prop: "source", value: language })
+    }
+  },
+  computed: {
+    ...mapGetters({
+      currentProject: "getCurrentProject",
+      tasksData: "getTasksData",
+      allLanguages: "getAllLanguages"
+    }),
+    mappedSourceLanguages() {
+      if (this.currentProject._id && this.tasksData.hasOwnProperty("service") && this.allLanguages.length) {
+        return this.getServiceSourceLanguages().length
+            ? this.getServiceSourceLanguages().map(item => item.lang)
+            : []
+      }
+    },
+    mappedTargetLanguages() {
+      if (this.currentProject._id && this.tasksData.hasOwnProperty("service") && this.allLanguages.length && this.tasksData.hasOwnProperty("source")) {
+        return this.getServiceTargetLanguages().length
+            ? this.getServiceTargetLanguages().map(item => item.lang)
+            : []
+      }
+      return []
+    }
+  },
+  components: {
+    SelectSingle,
+    ListManagement,
+    ListManagementButtons
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  %flex-row {
-    display: flex;
-    align-items: center;
-  }
+%flex-row {
+  display: flex;
+  align-items: center;
+}
 
-  %flex-column {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+%flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  .tasks-langs {
-    padding: 0 10px;
+.tasks-langs {
+  padding: 0 10px;
 
-    &__title {
-      &-source {
-        margin-bottom: 3px;
-        position: relative;
-      }
-
-      &-target {
-        margin-bottom: 3px;
-        position: relative;
-      }
-    }
-  }
-
-  .source {
-    margin-bottom: 20px;
-    @extend %flex-column;
-
-    &__drop-menu {
-      position: relative;
-      width: 220px;
-      height: 32px;
-    }
-  }
-
-  .target {
-    &__arrows {
-    }
-
-    &__from {
+  &__title {
+    &-source {
+      margin-bottom: 3px;
       position: relative;
     }
 
-    &__search-value {
-      position: absolute;
-      top: -20px;
-      font-size: 14px;
-      left: 100%;
+    &-target {
+      margin-bottom: 3px;
+      position: relative;
     }
   }
+}
 
-  .select-lang-wrapper {
-    @extend %flex-row;
-    justify-content: space-between;
+.source {
+  margin-bottom: 20px;
+  @extend %flex-column;
+
+  &__drop-menu {
+    position: relative;
+    width: 220px;
+    height: 32px;
+  }
+}
+
+.target {
+  &__arrows {
   }
 
-  .asterisk {
-    color: red;
+  &__from {
+    position: relative;
   }
-  .select-target-count{
-    margin-top: 8px;
-    opacity: 0.5;
-    float: right;
+
+  &__search-value {
+    position: absolute;
+    top: -20px;
+    font-size: 14px;
+    left: 100%;
   }
+}
+
+.select-lang-wrapper {
+  @extend %flex-row;
+  justify-content: space-between;
+}
+
+.select-target-count {
+  margin-top: 8px;
+  opacity: 0.5;
+  float: right;
+}
 </style>

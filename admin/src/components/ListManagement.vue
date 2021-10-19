@@ -30,8 +30,8 @@
 		},
 		methods: {
 			moveItem(item) {
-				const _idx = this.list.findIndex(it => it === item)
-				this.$emit('moveItem', _idx)
+				const el = this.list.find(it => it === item)
+				this.$emit('moveItem', el)
 			},
 			toggleShowBox() {
 				this.isSearchBox = !this.isSearchBox
@@ -61,17 +61,17 @@
     position: relative;
 
     &__button {
-      background: white;
+      background: #fff;
       border-radius: 4px;
-      height: 24px;
-      width: 32px;
+      height: 30px;
+      width: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: $border;
       font-size: 12px;
       position: absolute;
-      top: -29px;
+      top: -38px;
       cursor: pointer;
       transition: .2s ease-out;
       border: 1px solid $border;
@@ -83,11 +83,11 @@
   }
 
   .list {
-    width: 200px;
+    width: 220px;
     box-sizing: border-box;
     border: 1px solid $border;
     border-radius: 4px;
-    height: 257px;
+    height: 117px;
     overflow-y: auto;
 
     &__item {

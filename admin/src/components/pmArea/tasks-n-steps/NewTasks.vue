@@ -1,5 +1,5 @@
 <template lang="pug">
-  .tasks Tasks
+  .tasks
 </template>
 
 <script>

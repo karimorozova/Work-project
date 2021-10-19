@@ -1,5 +1,5 @@
 <template lang="pug">
-  .steps Steps
+  .steps
 </template>
 
 <script>

@@ -71,31 +71,31 @@ const parseAndWriteLQAReport = async () => {
    * @returns {Array} - returns rather empty array or array of vendors
    */
   function getVendorsData(vendorsObj) {
-    if (!vendorsObj) return [];
-    else {
-      const vendorsArr = [];
-      for (let vendorKey of Object.keys(vendorsObj)) {
-        const vendorInfo = vendorsObj[vendorKey];
-        let { name, otherInfo } = vendorInfo;
-        const ourVendor = vendors.find(({ aliases }) => aliases.includes(name));
-        const ourClient = clients.find(({ aliases }) => aliases.includes(otherInfo.clientName));
-        vendorInfo.tier = getLqaSpecificTierForVendor(vendorInfo);
-        otherInfo = otherInfo.map(item => {
-          if (ourClient) {
-            item.clientId = ObjectId(ourClient._id);
-          } else {
-            item.clientId = null;
-          }
-          return item;
-        });
-        vendorsArr.push({
-          ...vendorInfo,
-          vendor: ourVendor ? ObjectId(ourVendor._id) : null,
-          otherInfo,
-        });
-      }
-      return vendorsArr;
-    }
+    // if (!vendorsObj) return [];
+    // else {
+    //   const vendorsArr = [];
+    //   for (let vendorKey of Object.keys(vendorsObj)) {
+    //     const vendorInfo = vendorsObj[vendorKey];
+    //     let { name, otherInfo } = vendorInfo;
+    //     const ourVendor = vendors.find(({ aliases }) => aliases.includes(name));
+    //     const ourClient = clients.find(({ aliases }) => aliases.includes(otherInfo.clientName));
+    //     vendorInfo.tier = getLqaSpecificTierForVendor(vendorInfo);
+    //     otherInfo = otherInfo.map(item => {
+    //       if (ourClient) {
+    //         item.clientId = ObjectId(ourClient._id);
+    //       } else {
+    //         item.clientId = null;
+    //       }
+    //       return item;
+    //     });
+    //     vendorsArr.push({
+    //       ...vendorInfo,
+    //       vendor: ourVendor ? ObjectId(ourVendor._id) : null,
+    //       otherInfo,
+    //     });
+    //   }
+    //   return vendorsArr;
+    // }
   }
 
   /**

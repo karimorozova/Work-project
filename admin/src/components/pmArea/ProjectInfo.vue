@@ -3,33 +3,25 @@
 
     .project-info__leftSide
       Project(:project="currentProject")
-      .task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
-        NewTasksAndSteps(
-          :originallyLanguages="originallyLanguages"
-          :originallyUnits="originallyUnits"
-          :originallySteps="originallySteps"
-          :originallyServices="originallyServices"
-          :isFinishedStatus="isFinishedStatus"
-          @getMetrics="getMetrics"
-          @setVendor="setVendor"
-          @setDate="setDate"
-          @showErrors="showErrors"
-        )
-          ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
 
-      .task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
-        TasksAndSteps(
-          :originallyLanguages="originallyLanguages"
-          :originallyUnits="originallyUnits"
-          :originallySteps="originallySteps"
-          :originallyServices="originallyServices"
-          :isFinishedStatus="isFinishedStatus"
-          @getMetrics="getMetrics"
-          @setVendor="setVendor"
-          @setDate="setDate"
-          @showErrors="showErrors"
-        )
-          ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
+      NewTasksAndSteps()
+
+        //ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
+
+      //.task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
+      //  TasksAndSteps(
+      //    :originallyLanguages="originallyLanguages"
+      //    :originallyUnits="originallyUnits"
+      //    :originallySteps="originallySteps"
+      //    :originallyServices="originallyServices"
+      //    :isFinishedStatus="isFinishedStatus"
+      //    @getMetrics="getMetrics"
+      //    @setVendor="setVendor"
+      //    @setDate="setDate"
+      //    @showErrors="showErrors"
+      //  )
+      //    ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
+
       Deliverables(v-if="isStageDelivery")
 
     .project-info__rigthSide
@@ -76,10 +68,10 @@
 	export default {
 		data() {
 			return {
-				statuses: [ 'Accepted', 'Draft', 'Open', 'Ready' ],
+				// statuses: [ 'Accepted', 'Draft', 'Open', 'Ready' ],
 				errors: [],
-				areErrorsExist: false,
-				isBlockAbsoulte: true,
+				// areErrorsExist: false,
+				// isBlockAbsoulte: true,
 				isEditAndSend: false,
 				message: '',
 				mailSubject: '',
@@ -201,14 +193,14 @@
 				this.storeCurrentClient(client.data)
 				await this.setProjectProp({ prop: 'customer', value: client.body })
 			},
-			showErrors({ errors }) {
-				this.errors = [ ...errors ]
-				this.areErrorsExist = true
-			},
-			closeErrorsBlock() {
-				this.areErrorsExist = false
-				this.errors = []
-			},
+			// showErrors({ errors }) {
+			// 	this.errors = [ ...errors ]
+			// 	this.areErrorsExist = true
+			// },
+			// closeErrorsBlock() {
+			// 	this.areErrorsExist = false
+			// 	this.errors = []
+			// },
 			editAndSend({ message, subject }) {
 				this.isEditAndSend = true
 				this.message = message.data.message
@@ -302,7 +294,7 @@
 			Project,
 			ProjectAction,
 			TasksAndSteps,
-      NewTasksAndSteps,
+			NewTasksAndSteps,
 			ProjectFinance,
 			Preview,
 			ProjectSubInformation,

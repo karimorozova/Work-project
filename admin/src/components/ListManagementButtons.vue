@@ -33,13 +33,13 @@
 
     &__button {
       display: flex;
-      border-radius: 4px;
-      align-items: center;
-      background-color: $red;
+      border-radius: 2px;
+      line-height: 34px;
+      background-color: $border;
       color: white;
-      font-size: 13px;
-      height: 24px;
-      width: 32px;
+      font-size: 14px;
+      height: 32px;
+      width: 33px;
       justify-content: center;
       transition: .2s ease-out;
 
