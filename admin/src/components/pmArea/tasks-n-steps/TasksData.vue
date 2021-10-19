@@ -364,7 +364,7 @@
 			BigToggler
 		},
 		async created() {
-			// await this.getMemoqTemplates()
+			await this.getMemoqTemplates()
 		}
 	}
 </script>
