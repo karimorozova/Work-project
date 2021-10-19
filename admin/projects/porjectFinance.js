@@ -73,23 +73,23 @@ const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tabl
 	}
 }
 
-const addPaymentAdditions = async (_id, paymentAddition) => {
-	const { finance } = await Projects.findOne({ _id: _id })
-
-	return await getProjectAfterUpdate({ _id }, {
-		$push: { paymentAdditions: paymentAddition },
-		"finance.Price.receivables": +finance.Price.receivables + +paymentAddition.value
-	})
-}
-
-const deletePaymentAddition = async (_id, { _id: paymentAdditionId, value }) => {
-	const { finance } = await Projects.findOne({ _id: _id })
-
-	return await getProjectAfterUpdate({ _id }, {
-		$pull: { "paymentAdditions": { _id: paymentAdditionId } },
-		"finance.Price.receivables": +finance.Price.receivables - +value
-	})
-}
+// const addPaymentAdditions = async (_id, paymentAddition) => {
+// 	const { finance } = await Projects.findOne({ _id: _id })
+//
+// 	return await getProjectAfterUpdate({ _id }, {
+// 		$push: { paymentAdditions: paymentAddition },
+// 		"finance.Price.receivables": +finance.Price.receivables + +paymentAddition.value
+// 	})
+// }
+//
+// const deletePaymentAddition = async (_id, { _id: paymentAdditionId, value }) => {
+// 	const { finance } = await Projects.findOne({ _id: _id })
+//
+// 	return await getProjectAfterUpdate({ _id }, {
+// 		$pull: { "paymentAdditions": { _id: paymentAdditionId } },
+// 		"finance.Price.receivables": +finance.Price.receivables - +value
+// 	})
+// }
 
 
 const recalculateProjectFinance = (finance, tasks, steps, discounts = [], paymentAdditions) => {
@@ -143,6 +143,6 @@ module.exports = {
 	getUpdatedProjectFinanceToZero,
 	updateProjectFinanceOnDiscountsUpdate,
 	getProjectFinancePrice,
-	addPaymentAdditions,
-	deletePaymentAddition
+	// addPaymentAdditions,
+	// deletePaymentAddition
 }

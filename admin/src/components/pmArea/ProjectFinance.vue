@@ -95,7 +95,6 @@
 	import { mapGetters, mapActions } from "vuex"
 	import Discounts from "../clients/pricelists/Discounts"
 	import currencyIconDetected from "../../mixins/currencyIconDetected"
-	import PaymentAdditions from "./PaymentAdditions"
 
 	export default {
 		mixins: [ currencyIconDetected ],
@@ -212,7 +211,6 @@
 			}
 		},
 		components: {
-			PaymentAdditions,
 			Discounts,
 		}
 	}

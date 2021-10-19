@@ -28,7 +28,7 @@
           .steps__datepicker-input
             DatepickerWithTime(
               :isReadonly="true"
-              :value="item.start"
+              :value="item.deadline"
               :format="customFormatter"
               monday-first=true
               :highlighted="highlighted"
@@ -40,6 +40,7 @@
             )
             i.far.fa-calendar-alt
 
+
       .steps__setting
         .steps__setting-title Unit:
           .drop
@@ -47,10 +48,10 @@
               :selectedOption="item.receivables.unit.type || ''"
               :options="item.step.calculationUnit.map(i => i.type)"
               placeholder="Select"
-              @chooseOption="setUnit"
+              @chooseOption="(e) => setUnit(e, 'receivables', index)"
             )
         .steps__setting-title Quantity:
-          input(type="number" min="1" max="100000" :value="item.receivables.quantity" @change="(e) => setQuantity(e)")
+          input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
 
       .steps__setting
         .steps__setting-title Unit:
@@ -59,19 +60,19 @@
               :selectedOption="item.payables.unit.type || ''"
               :options="item.step.calculationUnit.map(i => i.type)"
               placeholder="Select"
-              @chooseOption="setUnit"
+              @chooseOption="(e) => setUnit(e, 'payables', index)"
             )
         .steps__setting-title Quantity:
-          input(type="number" min="1" max="100000" :value="item.payables.quantity" @change="(e) => setQuantity(e)")
+          input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
 
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex"
-import DatepickerWithTime from "../../../DatepickerWithTime"
+import DatepickerWithTime from "../../DatepickerWithTime"
 import moment from "moment"
-import SelectSingle from "../../../SelectSingle"
+import SelectSingle from "../../SelectSingle"
 
 export default {
   components: { SelectSingle, DatepickerWithTime },
@@ -92,32 +93,33 @@ export default {
       return moment(date).format('DD-MM-YYYY, HH:mm')
     },
     setDate(e, prop, index) {
-      console.log('prop', prop, index)
-      // setDataValue({prop: 'setDataValue', value: new Date(e)})
+      let stepsAndUnits = this.tasksData.stepsAndUnits
+      stepsAndUnits[index][prop] = new Date(e)
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    setQuantity() {
-      console.log('setQ')
+    setQuantity(e, prop, index) {
+      let stepsAndUnits = this.tasksData.stepsAndUnits
+      stepsAndUnits[index][prop].quantity = e.target.value
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    setUnit({ option }) {
-      console.log('setUnit', option)
+    setUnit({ option }, prop, index) {
+      let stepsAndUnits = this.tasksData.stepsAndUnits
+      stepsAndUnits[index][prop].unit = this.allUnits.find(({ type }) => type === option)
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     }
   },
   computed: {
     ...mapGetters({
-      tasksData: "getTasksData"
+      tasksData: "getTasksData",
+      allUnits: "getAllUnits"
     })
-    // getServicesSteps() {
-    //   if (this.tasksData.service) {
-    //     console.log(this.tasksData.service.steps)
-    //   }
-    // },
   },
   name: "NewServicesCreationStepsWorkflow"
 }
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../assets/scss/colors";
+@import "../../../assets/scss/colors";
 
 .step {
   margin: 20px;

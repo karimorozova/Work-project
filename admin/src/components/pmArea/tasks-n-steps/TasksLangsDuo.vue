@@ -73,6 +73,7 @@ export default {
     setSource({ option }) {
       const language = this.allLanguages.find(item => item.lang === option)
       this.setDataValue({ prop: "source", value: language })
+      this.setDataValue({ prop: "targets", value: [] })
     }
   },
   computed: {

@@ -11,6 +11,19 @@
         )
 
     .taskData__row
+      div Extra Services:
+      Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
+
+    .taskData__row(v-if="isAdditions")
+      StepsAdditions(
+        :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
+        @save="setAdditions"
+        @delete="setAdditions"
+      )
+
+
+
+    .taskData__row
       div Languages:
       .languages
         TasksLangsDuo
@@ -18,6 +31,8 @@
     .taskData__row
       NewServicesCreationStepsWorkflow
 
+    .taskData__row
+      TasksFiles
 
 </template>
 
@@ -25,7 +40,10 @@
 import { mapActions, mapGetters } from "vuex"
 import SelectSingle from "../../SelectSingle"
 import TasksLangsDuo from "./TasksLangsDuo"
-import NewServicesCreationStepsWorkflow from "./tasksFiles/NewServicesCreationStepsWorkflow"
+import NewServicesCreationStepsWorkflow from "./NewServicesCreationStepsWorkflow"
+import TasksFiles from "./TasksFiles"
+import Toggler from "../../Toggler"
+import StepsAdditions from "./stepsAdditions"
 
 export default {
   name: "NewTasksData",
@@ -42,11 +60,17 @@ export default {
   },
   data() {
     return {
-      templates: []
+      isAdditions: false
     }
   },
   methods: {
     ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" }),
+    setAdditions(data) {
+      this.setDataValue({ prop: "stepsAdditions", value: data })
+    },
+    toggleAdditions() {
+      this.isAdditions = !this.isAdditions
+    },
     buildAutoData() {
       console.log('this.allServices', this.allServices)
       console.log('this.currentProject', this.currentProject)
@@ -56,7 +80,11 @@ export default {
 
       const source = this.getServiceSourceLanguages(service)[0]
       this.setDataValue({ prop: "source", value: source })
+      this.setDataValue({ prop: "targets", value: [] })
 
+      this.setStepsAndUnitByService(service)
+    },
+    setStepsAndUnitByService(service) {
       const stepsAndUnits = []
       for (const { step } of service.steps) {
         stepsAndUnits.push({
@@ -68,8 +96,6 @@ export default {
         })
       }
       this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
-
-
     },
     getServiceSourceLanguages(service) {
       const { customer: { services }, industry } = this.currentProject
@@ -79,7 +105,14 @@ export default {
       return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
     },
     setService({ option }) {
-      this.setDataValue({ prop: "service", value: this.allServices.find(item => item.title === option) })
+      const service = this.allServices.find(item => item.title === option)
+      this.setDataValue({ prop: "service", value: service })
+
+      const source = this.getServiceSourceLanguages(service)[0]
+      this.setDataValue({ prop: "source", value: source })
+      this.setDataValue({ prop: "targets", value: [] })
+
+      this.setStepsAndUnitByService(service)
     },
     activeClientServices() {
       let finalServicesArr = []
@@ -118,18 +151,11 @@ export default {
       if (this.activeClientServices().length) return this.activeClientServices().map(i => i.title)
       return []
     }
-    // async getMemoqTemplates() {
-    // 	try {
-    // 		const result = await this.$http.get("/memoqapi/templates")
-    // 		this.templates = result.data
-    // 	} catch (err) {
-    // 	}
-    // }
   },
   async created() {
     this.buildAutoData()
   },
-  components: { NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
+  components: { StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }
 
 </script>

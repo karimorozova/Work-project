@@ -74,8 +74,8 @@ const {
 const {
 	getProjectAfterFinanceUpdated,
 	updateProjectFinanceOnDiscountsUpdate,
-	addPaymentAdditions,
-	deletePaymentAddition,
+	// addPaymentAdditions,
+	// deletePaymentAddition,
 } = require('./porjectFinance')
 
 const {
@@ -180,6 +180,6 @@ module.exports = {
 	removeMultiDR2,
 	changeNameLang,
 	getProjectsForPortal,
-	addPaymentAdditions,
-	deletePaymentAddition,
+	// addPaymentAdditions,
+	// deletePaymentAddition,
 }
