@@ -52,7 +52,8 @@
 			},
 			goToMemoq(item) {
 				const { WebTransUrl } = item
-				const domainUrl = WebTransUrl.replace('/webtrans', 'memoqweb/webtrans')
+
+				const domainUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
 				window.open(`${ domainUrl }`, '_blank')
 			},
 			stepLanguages(step) {

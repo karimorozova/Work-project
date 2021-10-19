@@ -161,7 +161,7 @@
 					this.documentGuid = DocumentGuid
 					this.backStepModal = true
 				} else {
-					const newUrl = WebTransUrl.replace('/webtrans', 'memoqweb/webtrans')
+					const newUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
 					let link = document.createElement("a")
 					link.target = "_blank"
 					link.href = newUrl
