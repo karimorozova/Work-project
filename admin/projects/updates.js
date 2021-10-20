@@ -176,7 +176,7 @@ async function getTaskTargetFiles({ task, projectId, step }) {
 
 	try {
 		for (let doc of memoqDocs) {
-			const stepCounter = stepId[stepId.length - 1]
+			const stepCounter = stepId.replace('-R', '')[stepId.replace('-R', '').length - 1]
 			const fileName = `${ targetLanguage }-${ stepCounter }-${ Math.floor(Math.random() * 1000000) }-${ doc.ImportPath }`
 			const path = `/projectFiles/${ projectId }/${ fileName }`
 			await downloadMemoqFile({ memoqProjectId, docId: doc.DocumentGuid, path: `./dist${ path }` })
@@ -501,7 +501,7 @@ async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) 
 	})
 
 	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
-	const stepCounter = neededStep.stepId[neededStep.stepId.length - 1]
+	const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
 
 	const tasks = project.tasks.map(item => {
 		if (neededStep.taskId === item.taskId) {
@@ -538,7 +538,7 @@ async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
 	})
 
 	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
-	const stepCounter = neededStep.stepId[neededStep.stepId.length - 1]
+	const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
 
 	const tasks = project.tasks.map(item => {
 		if (neededStep.taskId === item.taskId) {

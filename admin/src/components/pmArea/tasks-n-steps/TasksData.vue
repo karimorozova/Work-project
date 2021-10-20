@@ -280,8 +280,8 @@
 			},
 			async getMemoqTemplates() {
 				try {
-					const result = await this.$http.get("/memoqapi/templates")
-					this.templates = result.data
+          const result = await this.$http.get("/memoqapi/templates")
+          this.templates = result.data
 				} catch (err) {
 				}
 			}
