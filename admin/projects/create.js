@@ -4,7 +4,13 @@ const { createTasksAndStepsForCustomUnits } = require('./taskForCommon')
 const { storeFiles } = require('./files')
 const { getModifiedFiles, createProjectFolder } = require('./helpers')
 const { calculateCrossRate } = require('../helpers/commonFunctions')
-const { storeRequestFilesForTasksAndSteps, getTaskCopiedFiles, getTaskCopiedFilesFromRequestToProject, getClientRequestAfterUpdate, getClientRequestById } = require('../clientRequests')
+const {
+	storeRequestFilesForTasksAndSteps,
+	getTaskCopiedFiles,
+	getTaskCopiedFilesFromRequestToProject,
+	getClientRequestAfterUpdate,
+	getClientRequestById
+} = require('../clientRequests')
 const fs = require('fs')
 const { createMemoqProjectWithTemplate, getProjectTranslationDocs } = require('../services/memoqs/projects')
 const { addProjectFile } = require('../services/memoqs/files')
@@ -62,7 +68,22 @@ const createProjectFromRequest = async (requestId) => {
 	todayEnd.setUTCHours(23, 59, 59, 0)
 
 	const request = await getClientRequestById(requestId)
-	const { projectManager, accountManager, paymentProfile, clientContacts, projectName, clientBillingInfo, isUrgent, brief, notes, deadline, billingDate, industry, customer, createdBy } = request
+	const {
+		projectManager,
+		accountManager,
+		paymentProfile,
+		clientContacts,
+		projectName,
+		clientBillingInfo,
+		isUrgent,
+		brief,
+		notes,
+		deadline,
+		billingDate,
+		industry,
+		customer,
+		createdBy
+	} = request
 	const { _id, minPrice, currency } = customer
 	const { discounts } = await Clients.findOne({ '_id': _id }).populate('discounts')
 
@@ -214,22 +235,21 @@ const createRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 	}
 }
 
-async function createTasks({ tasksInfo, refFiles }) {
+async function createTasks({ sourceFiles, refFiles, tasksInfo }) {
 	try {
-		const stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits)
-		const stepsDates = JSON.parse(tasksInfo.stepsDates)
-		const project = await getProject({ _id: tasksInfo.projectId })
-		const taskRefFiles = await storeFiles(refFiles, tasksInfo.projectId)
-		const allInfo = {
-			...tasksInfo,
-			taskRefFiles,
-			stepsAndUnits,
-			stepsDates,
-			project
-		}
+		if (tasksInfo.source) tasksInfo.source = JSON.parse(tasksInfo.source)
+		else tasksInfo.source = null
 
-		await createTasksAndStepsForCustomUnits(allInfo)
-		return await getProject({ _id: tasksInfo.projectId })
+		tasksInfo.targets = JSON.parse(tasksInfo.targets)
+		tasksInfo.service = JSON.parse(tasksInfo.service)
+		tasksInfo.stepsAdditions = JSON.parse(tasksInfo.stepsAdditions)
+		tasksInfo.stepsAndUnits = JSON.parse(tasksInfo.stepsAndUnits)
+		tasksInfo.industry = JSON.parse(tasksInfo.industry)
+
+		tasksInfo.refFiles = await storeFiles(refFiles, tasksInfo.projectId)
+		tasksInfo.sourceFiles = await storeFiles(sourceFiles, tasksInfo.projectId)
+
+		return await createTasksAndStepsForCustomUnits(tasksInfo)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in createTasks")

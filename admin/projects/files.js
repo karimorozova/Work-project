@@ -22,8 +22,6 @@ const pdfConfig = {
 
 async function storeFiles(filesArr, projectId) {
 	try {
-		const project = await getProject({ "_id": projectId })
-		const { tasks } = project
 		let storedFiles = []
 		if (filesArr && filesArr.length) {
 			for (let file of filesArr) {

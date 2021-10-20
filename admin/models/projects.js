@@ -15,10 +15,10 @@ const GBP = {
 }
 
 const financeExtract = {
-	receivables: "",
-	payables: "",
-	halfReceivables: "",
-	halfPayables: ""
+	receivables: { type: Number },
+	payables: { type: Number },
+	halfReceivables: { type: Number },
+	halfPayables: { type: Number }
 }
 
 const stepFinance = {
@@ -80,17 +80,17 @@ const ProjectsSchema = new mongoose.Schema({
 			required: true
 		}
 	} ],
-	paymentAdditions: [ {
-		name: {
-			type: String,
-			trim: true,
-			required: true
-		},
-		value: {
-			type: Number,
-			required: true
-		}
-	} ],
+	// paymentAdditions: [ {
+	// 	name: {
+	// 		type: String,
+	// 		trim: true,
+	// 		required: true
+	// 	},
+	// 	value: {
+	// 		type: Number,
+	// 		required: true
+	// 	}
+	// } ],
 	industry: {
 		type: Schema.Types.ObjectId, ref: 'Industries'
 	},
@@ -111,11 +111,6 @@ const ProjectsSchema = new mongoose.Schema({
 			type: String,
 			default: ''
 		},
-		// status: {
-		//   type: String,
-		//   default: "Started",
-		//   trim: true
-		// },
 		instructions: {
 			type: Array,
 			default: []
@@ -176,14 +171,8 @@ const ProjectsSchema = new mongoose.Schema({
 				type: String,
 				default: ''
 			},
-			sourceLanguage: {
-				type: Schema.Types.ObjectId,
-				ref: 'Language'
-			},
-			targetLanguage: {
-				type: Schema.Types.ObjectId,
-				ref: 'Language'
-			},
+			sourceLanguage: { type: Schema.Types.ObjectId, ref: 'Language' },
+			targetLanguage: { type: Schema.Types.ObjectId, ref: 'Language' },
 			files: [ {
 				fileName: {
 					type: String,
@@ -285,69 +274,93 @@ const ProjectsSchema = new mongoose.Schema({
 			type: Schema.Types.ObjectId, ref: 'User'
 		}
 	} ],
-	tasks: {
-		type: Array,
-		default: []
-	},
-	steps: [ {
-		vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
-		stepId: '',
-		taskId: "",
-		serviceStep: {
-			step: { type: Schema.Types.ObjectId, ref: 'Step' },
-			unit: { type: Schema.Types.ObjectId, ref: 'Units' },
-			size: {
-				type: Number,
-				default: 1
-			},
-			memoqAssignmentRole: {
-				type: Number
-			},
-			title: {
-				type: String,
-				trim: true
-			}
-		},
-		name: "",
+	tasks: [ {
+		projectId: { type: String, trim: true },
+		taskId: { type: String, trim: true },
+		service: { type: Schema.Types.ObjectId, ref: 'Services' },
+		stepsAndUnits: [],
+		memoqProjectId: "",
+		memoqSource: "",
+		memoqTarget: "",
 		sourceLanguage: "",
 		targetLanguage: "",
+		fullSourceLanguage: { type: Schema.Types.ObjectId, ref: 'Language' },
+		fullTargetLanguage: { type: Schema.Types.ObjectId, ref: 'Language' },
+		memoqDocs: [],
+		memoqFiles: [],
+		status: {
+			type: String,
+			enum: [ 'Created', 'Approved', 'Rejected', 'Quote Sent', 'In progress', 'Pending Approval [DR1]', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
+			default: 'Created'
+		},
+		sourceFiles: [],
+		refFiles: [],
+		targetFiles: [],
+		targetFilesStages: [],
+		metrics: {}
+	} ],
+	steps: [ {
+		projectId: { type: String, trim: true },
+		stepNumber: { type: Number },
+		vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
+		stepId: '',
+		taskId: '',
+		service: { type: Schema.Types.ObjectId, ref: 'Services' },
+		step: { type: Schema.Types.ObjectId, ref: 'Step' },
+		receivablesUnit: { type: Schema.Types.ObjectId, ref: 'Units' },
+		payablesUnit: { type: Schema.Types.ObjectId, ref: 'Units' },
+		sourceLanguage: "",
+		targetLanguage: "",
+		fullSourceLanguage: { type: Schema.Types.ObjectId, ref: 'Language' },
+		fullTargetLanguage: { type: Schema.Types.ObjectId, ref: 'Language' },
 		memoqProjectId: "",
 		memoqSource: "",
 		memoqTarget: "",
 		memoqDocIds: [],
-		packageSize: "",
-		// hours: "",
-		// quantity: "",
-		size: {
-			type: Number,
-			default: 1
-		},
-		totalWords: "",
+		totalWords: { type: Number },
 		start: {},
 		deadline: {},
 		progress: "",
-		status: "",
-		clientRate: {},
-		// targetFile: "",
+		status: {
+			type: String,
+			enum: [ 'Created', 'Accepted', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In Progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
+			default: 'Created'
+		},
 		finance: stepFinance,
 		nativeFinance: stepFinance,
 		defaultStepPrice: 0,
-		vendorRate: "",
-		nativeVendorRate: "",
-		vendorsClickedOffer: Array,
+		clientRate: { type: Number },
+		vendorRate: { type: Number },
+		nativeVendorRate: { type: Number },
+		vendorsClickedOffer: [],
 		isVendorRead: { type: Boolean, default: false },
-		previousStatus: "",
 		isInReportPayables: { type: Boolean, default: false },
 		isInReportReceivables: { type: Boolean, default: false },
-		stepsAndUnits: []
-		// isPaid: { type: Boolean, default: false }
+		stepAndUnit: {},
+		memoqAssignmentRole: { type: Number }
+		// TODO: refactoring serviceStep
+		// serviceStep: {
+		// 	step: { type: Schema.Types.ObjectId, ref: 'Step' },
+		// 	// unit: { type: Schema.Types.ObjectId, ref: 'Units' },
+		// 	memoqAssignmentRole: {
+		// 		type: Number
+		// 	},
+		// 	title: {
+		// 		type: String,
+		// 		trim: true
+		// 	}
+		// }
 	} ],
-	// TODO: refactoring
-	totalCost: {
-		type: String,
-		default: '',
-		trim: true
-	},
+	additionsSteps: [ {
+		taskId: '',
+		title: { type: String, trim: true },
+		isInReportPayables: { type: Boolean, default: false },
+		finance: {
+			Price: {
+				receivables: { type: Number }
+			}
+		}
+	} ],
 	isMetricsExist: {
 		type: Boolean,
 		default: false
@@ -369,25 +382,9 @@ const ProjectsSchema = new mongoose.Schema({
 	accountManager: {
 		type: Schema.Types.ObjectId, ref: 'User'
 	},
-// TODO: refactoring
-	service: {
-		type: Schema.Types.ObjectId, ref: 'Services'
-	},
 	status: {
 		type: String,
 		default: '',
-		trim: true
-	},
-	// TODO: refactoring
-	sourceLanguage: {
-		type: Object,
-		default: {},
-		trim: true
-	},
-	// TODO: refactoring
-	targetLanguages: {
-		type: Array,
-		default: [],
 		trim: true
 	},
 	roi: {
@@ -405,18 +402,6 @@ const ProjectsSchema = new mongoose.Schema({
 	reason: {
 		type: String,
 		default: ''
-	},
-	// TODO: refactoring
-	sourceFiles: {
-		type: Array,
-		default: [],
-		trim: true
-	},
-	// TODO: refactoring
-	refFiles: {
-		type: Array,
-		default: [],
-		trim: true
 	},
 	billingDate: {
 		type: Date

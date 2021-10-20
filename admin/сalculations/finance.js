@@ -3,18 +3,92 @@ const { CurrencyRatio, Clients, Pricelist, Languages, Vendors, Projects, Units }
 const { multiplyPrices } = require('../multipliers')
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
+const { getProject } = require('../projects/getProjects')
+
+
+const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTargetLanguage, metrics, step, receivablesUnit, receivablesQuantity, payablesQuantity }, isMemoq) => {
+	const currencyRatio = await CurrencyRatio.findOne()
+	const { customer, industry, discounts } = await getProject({ "projectId": projectId })
+	const { rates: { pricelistTable }, defaultPricelist, currency } = customer
+	const pricelist = await Pricelist.findOne({ "_id": defaultPricelist })
+
+	const dataForComparison = {
+		sourceLanguage: fullSourceLanguage._id,
+		targetLanguage: fullTargetLanguage._id,
+		step: step._id,
+		unit: receivablesUnit._id,
+		industry: industry._id
+	}
+
+	let clientRate = getPriceFromPersonRates(pricelistTable, dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
+
+	const finance = stepFinance()
+	const nativeFinance = stepFinance()
+	const defaultStepPrice = finance.Price.receivables
+
+	if (discounts.length) {
+		const { Price: { receivables } } = finance
+		finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
+	}
+
+	function stepFinance() {
+		return {
+			Quantity: {
+				receivables: receivablesQuantity,
+				payables: payablesQuantity
+			},
+			Wordcount: {
+				receivables: 0,
+				payables: 0
+			},
+			Price: {
+				receivables: +(clientRate * receivablesQuantity).toFixed(2),
+				payables: 0
+			}
+		}
+		// function getTotalStepPriceClient() {
+		// 	return +clientRate.value * getRelativeWordCountByEntity('client', receivablesQuantity)
+		// }
+		//
+		// function getTotalStepPriceVendor() {
+		// 	if (vendor) {
+		// 		const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
+		// 		return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
+		// 	}
+		// 	return 0
+		// }
+		//
+		// function getRelativeWordCountByEntity(entity, quantity) {
+		// 	quantity = quantity || 0
+		// 	if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
+		// 			? +getRelativeQuantity(metrics, entity)
+		// 			: +quantity
+		//
+		// 	return +quantity
+		// }
+	}
+
+	return {
+		clientRate,
+		vendorRate: 0,
+		nativeVendorRate: 0,
+		finance,
+		nativeFinance,
+		defaultStepPrice
+	}
+}
 
 const getStepFinanceData = async (projectData, forWords = false) => {
 	const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData
-	const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
+	// const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
 	const { metrics, sourceLanguage, targetLanguage } = task
-	const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
-	const client = await Clients.findOne({ _id: customer })
-	const { rates, defaultPricelist, currency } = client
-	const currencyRatio = await CurrencyRatio.findOne()
-	const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
-	const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
-	const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
+
+	// const client = await Clients.findOne({ _id: customer })
+	// const { rates, defaultPricelist, currency } = client
+	// const currencyRatio = await CurrencyRatio.findOne()
+	// const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
+	// const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
+	// const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
 	const { step, unit, size, title } = serviceStep
 	const fullUnit = await Units.findOne({ _id: unit })
 
@@ -109,39 +183,32 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 
 
 const getPriceFromPersonRates = (pricelistTable, data) => {
-	const { sourceLanguage, targetLanguage, step, unit, size, industry } = data
+	const { sourceLanguage, targetLanguage, step, unit, industry } = data
 	const row = pricelistTable.find(row => (
 			row.sourceLanguage.toString() === sourceLanguage.toString() &&
 			row.targetLanguage.toString() === targetLanguage.toString() &&
 			row.industry.toString() === industry.toString() &&
 			row.step.toString() === step.toString() &&
-			row.unit.toString() === unit.toString() &&
-			row.size.toString() === size.toString()
+			row.unit.toString() === unit.toString()
 	))
 	return row ? row.price : undefined
 }
 
 const getPriceFromPricelist = (pricelist, data, currency, currencyRatio) => {
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = pricelist
-	const { sourceLanguage, targetLanguage, step, unit, size, industry } = data
-	let row = basicPricesTable.find(langPair => (
-			`${ langPair.sourceLanguage } ${ langPair.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`
-	))
+	const { sourceLanguage, targetLanguage, step, unit, industry } = data
+	let row = basicPricesTable.find(langPair => `${ langPair.sourceLanguage } ${ langPair.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`)
 	if (!row) row = {
-		euroBasicPrice: 1,
+		euroBasicPrice: 0,
 		usdBasicPrice: currencyRatio.USD,
 		gbpBasicPrice: currencyRatio.GBP
 	}
-	const stepRow = stepMultipliersTable.find(item => (
-			`${ item.step } ${ item.unit } ${ item.size }` === `${ step } ${ unit } ${ size }`
-	))
+	const stepRow = stepMultipliersTable.find(item => `${ item.step } ${ item.unit }` === `${ step } ${ unit }`)
 	const stepMultiplier = stepRow ? stepRow.multiplier : 100
-	const industryRow = industryMultipliersTable.find(item => (
-			item.industry.toString() === industry.toString()
-	))
+	const industryRow = industryMultipliersTable.find(item => item.industry.toString() === industry.toString())
 	const industryMultiplier = industryRow ? industryRow.multiplier : 100
 	const basicPrice = getCorrectBasicPrice(row, currency)
-	return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier)
+	return multiplyPrices(basicPrice, stepMultiplier, industryMultiplier)
 }
 
 const getRelativeQuantity = (metrics, key) => {
@@ -165,5 +232,6 @@ module.exports = {
 	getStepFinanceData,
 	getPriceFromPersonRates,
 	getPriceFromPricelist,
-	getCorrectBasicPrice
+	getCorrectBasicPrice,
+	getNewStepFinanceData
 }

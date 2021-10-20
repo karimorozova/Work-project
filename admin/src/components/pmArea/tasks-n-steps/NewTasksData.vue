@@ -119,14 +119,14 @@ export default {
       }
       data.append('targets', JSON.stringify(tasksData.targets))
       data.append('service', JSON.stringify(tasksData.service))
-      data.append('stepsAdditions', JSON.stringify(tasksData.stepsAdditions))
+      data.append('stepsAdditions', JSON.stringify(tasksData.stepsAdditions || []))
       data.append('stepsAndUnits', JSON.stringify(tasksData.stepsAndUnits))
 
-      data.append('projectId', JSON.stringify(this.currentProject._id))
-      data.append('internalProjectId', JSON.stringify(this.currentProject.projectId))
-      data.append('nativeProjectName', JSON.stringify(this.currentProject.projectName))
       data.append('industry', JSON.stringify(this.currentProject.industry))
-      data.append('projectManager', JSON.stringify(this.currentProject.projectManager._id))
+      data.append('projectId', this.currentProject._id)
+      data.append('internalProjectId', this.currentProject.projectId)
+      data.append('nativeProjectName', this.currentProject.projectName)
+      data.append('projectManager', this.currentProject.projectManager._id)
       data.append('customerName', this.currentProject.customer.name)
 
       return data

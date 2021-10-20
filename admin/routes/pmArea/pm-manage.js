@@ -56,7 +56,7 @@ const {
 	saveCertificateTODR1Files,
 	setStepDeadlineProjectAndMemoq,
 	autoCreatingTranslationTaskInProject,
-	cancelProjectInMemoq,
+	cancelProjectInMemoq
 	// addPaymentAdditions,
 	// deletePaymentAddition
 } = require('../../projects')
@@ -298,12 +298,9 @@ router.delete('/delete-request-tasks/:id/:projectId', async (req, res) => {
 
 router.post('/project-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
-		let tasksInfo = { ...req.body }
-		if (tasksInfo.source) tasksInfo.source = JSON.parse(tasksInfo.source)
-		tasksInfo.targets = JSON.parse(tasksInfo.targets)
-		tasksInfo.service = JSON.parse(tasksInfo.service)
+		let tasksInfo = req.body
 		const { sourceFiles, refFiles } = req.files
-		const updatedProject = await createTasks({ tasksInfo, refFiles })
+		const updatedProject = await createTasks({ sourceFiles, refFiles, tasksInfo })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -1177,16 +1174,15 @@ router.post('/update-filters-and-fields/:userId', async (req, res) => {
 
 router.post('/step-finance-edit/:projectId', async (req, res) => {
 	const { projectId } = req.params
-	const data  = req.body
+	const data = req.body
 	try {
-		console.log({projectId, data})
+		console.log({ projectId, data })
 		res.send("done!")
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on update project filters')
 	}
 })
-
 
 
 // XTRF API ==================================================================
