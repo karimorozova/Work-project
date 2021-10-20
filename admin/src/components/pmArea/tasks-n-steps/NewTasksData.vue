@@ -1,5 +1,8 @@
 <template lang="pug">
   .taskData
+    .taskData__errorModal
+      ValidationErrors(v-if="IsErrorModal" :errors="errors" @closeErrors="closeErrors")
+
     .taskData__row
       div Service:
       .drop
@@ -21,8 +24,6 @@
         @delete="setAdditions"
       )
 
-
-
     .taskData__row
       div Languages:
       .languages
@@ -34,6 +35,9 @@
     .taskData__row
       TasksFiles
 
+    .taskData__row
+      Button(:value="'Add Tasks'" @clicked="saveTasksChecks")
+
 </template>
 
 <script>
@@ -44,6 +48,8 @@ import NewServicesCreationStepsWorkflow from "./NewServicesCreationStepsWorkflow
 import TasksFiles from "./TasksFiles"
 import Toggler from "../../Toggler"
 import StepsAdditions from "./stepsAdditions"
+import Button from "../../Button"
+import ValidationErrors from "../../ValidationErrors"
 
 export default {
   name: "NewTasksData",
@@ -60,11 +66,75 @@ export default {
   },
   data() {
     return {
-      isAdditions: false
+      isAdditions: false,
+      IsErrorModal: false,
+      errors: []
     }
   },
   methods: {
-    ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" }),
+    saveTasksChecks() {
+      this.errors = []
+      if (!this.tasksData.targets || !this.tasksData.targets.length) this.errors.push("Please, select Target language(s).")
+      if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation")) {
+        if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
+          this.errors.push("Please, upload Source file(s).")
+        }
+        if (this.tasksData.targets.map((i) => i.lang).includes(this.tasksData.source.lang)) {
+          this.errors.push('Target and Source Languages cannot be a same if a step "Translation" is selected')
+        }
+      }
+      if (this.errors.length) {
+        this.IsErrorModal = true
+        return
+      }
+      this.saveTasks()
+    },
+    async saveTasks() {
+      const data = this.getDataForTasks(this.tasksData)
+      try {
+        if (true) {
+          await this.addProjectTasks(data)
+        }
+        if (false) {
+          await this.addProjectWordsTasks(data)
+        }
+      } catch (err) {
+        this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
+      }
+    },
+    getDataForTasks(tasksData) {
+      let data = new FormData()
+      if (tasksData.sourceFiles && tasksData.sourceFiles.length) {
+        for (let file of tasksData.sourceFiles) {
+          data.append('sourceFiles', file)
+        }
+      }
+      if (tasksData.refFiles && tasksData.refFiles.length) {
+        for (let file of tasksData.refFiles) {
+          data.append('refFiles', file)
+        }
+      }
+      if (tasksData.source) {
+        data.append('source', JSON.stringify(tasksData.source))
+      }
+      data.append('targets', JSON.stringify(tasksData.targets))
+      data.append('service', JSON.stringify(tasksData.service))
+      data.append('stepsAdditions', JSON.stringify(tasksData.stepsAdditions))
+      data.append('stepsAndUnits', JSON.stringify(tasksData.stepsAndUnits))
+
+      data.append('projectId', JSON.stringify(this.currentProject._id))
+      data.append('internalProjectId', JSON.stringify(this.currentProject.projectId))
+      data.append('nativeProjectName', JSON.stringify(this.currentProject.projectName))
+      data.append('industry', JSON.stringify(this.currentProject.industry))
+      data.append('projectManager', JSON.stringify(this.currentProject.projectManager._id))
+      data.append('customerName', this.currentProject.customer.name)
+
+      return data
+    },
+    closeErrors() {
+      this.errors = []
+      this.IsErrorModal = false
+    },
     setAdditions(data) {
       this.setDataValue({ prop: "stepsAdditions", value: data })
     },
@@ -128,25 +198,19 @@ export default {
         }
       })
       return finalServicesArr
-    }
+    },
+    ...mapActions({
+      alertToggle: 'alertToggle',
+      setDataValue: "setTasksDataValue",
+      addProjectTasks: "addProjectTasks",
+      addProjectWordsTasks: "addProjectWordsTasks",
+      setCurrentProject: "setCurrentProject"
+    })
   },
   computed: {
     ...mapGetters({
       tasksData: "getTasksData"
     }),
-    // selectedWorkflow() {
-    // 	return this.tasksData.workflow ? this.tasksData.workflow : { name: "" }
-    // },
-    // workflowStepsNames() {
-    // 	let result = this.workflowSteps.map((item) => item.name)
-    // 	const { steps } = this.tasksData.service
-    // 	if (this.tasksData.service && steps.length === 2 && this.isActiveStepInRates(steps[0].step._id) && this.isActiveStepInRates(steps[1].step._id)) {
-    // 		return result
-    // 	} else {
-    // 		result.pop()
-    // 		return result
-    // 	}
-    // },
     mappedClientServices() {
       if (this.activeClientServices().length) return this.activeClientServices().map(i => i.title)
       return []
@@ -155,7 +219,7 @@ export default {
   async created() {
     this.buildAutoData()
   },
-  components: { StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
+  components: { ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }
 
 </script>
