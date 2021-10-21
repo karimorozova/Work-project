@@ -38,34 +38,14 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 				payables: payablesQuantity
 			},
 			Wordcount: {
-				receivables: 0,
+				receivables: +getRelativeQuantity(metrics, 'client'),
 				payables: 0
 			},
 			Price: {
-				receivables: +(clientRate * receivablesQuantity).toFixed(2),
+				receivables: isMemoq ? +(clientRate * +getRelativeQuantity(metrics, 'client')).toFixed(2) : +(clientRate * receivablesQuantity).toFixed(2),
 				payables: 0
 			}
 		}
-		// function getTotalStepPriceClient() {
-		// 	return +clientRate.value * getRelativeWordCountByEntity('client', receivablesQuantity)
-		// }
-		//
-		// function getTotalStepPriceVendor() {
-		// 	if (vendor) {
-		// 		const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
-		// 		return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
-		// 	}
-		// 	return 0
-		// }
-		//
-		// function getRelativeWordCountByEntity(entity, quantity) {
-		// 	quantity = quantity || 0
-		// 	if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
-		// 			? +getRelativeQuantity(metrics, entity)
-		// 			: +quantity
-		//
-		// 	return +quantity
-		// }
 	}
 
 	return {

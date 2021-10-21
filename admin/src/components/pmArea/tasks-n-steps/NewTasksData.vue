@@ -30,7 +30,9 @@
         TasksLangsDuo
 
     .taskData__row
-      NewServicesCreationStepsWorkflow
+      NewServicesCreationStepsWorkflow(
+        :templates="templates"
+      )
 
     .taskData__row
       TasksFiles
@@ -66,6 +68,7 @@ export default {
   },
   data() {
     return {
+      templates: [],
       isAdditions: false,
       IsErrorModal: false,
       errors: []
@@ -92,12 +95,21 @@ export default {
     async saveTasks() {
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (true) {
+        if (this.tasksData.template) {
+          try {
+            const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
+            const { creatorUserId } = memoqCreatorUser.data
+            if (!creatorUserId) throw new Error()
+            data.append('creatorUserId', creatorUserId)
+            this.isInfo = true
+          } catch (err) {
+            this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
+          }
+          await this.addProjectWordsTasks(data)
+        } else {
           await this.addProjectTasks(data)
         }
-        if (false) {
-          await this.addProjectWordsTasks(data)
-        }
+        this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
       }
@@ -105,17 +117,16 @@ export default {
     getDataForTasks(tasksData) {
       let data = new FormData()
       if (tasksData.sourceFiles && tasksData.sourceFiles.length) {
-        for (let file of tasksData.sourceFiles) {
-          data.append('sourceFiles', file)
-        }
+        for (let file of tasksData.sourceFiles) data.append('sourceFiles', file)
       }
       if (tasksData.refFiles && tasksData.refFiles.length) {
-        for (let file of tasksData.refFiles) {
-          data.append('refFiles', file)
-        }
+        for (let file of tasksData.refFiles) data.append('refFiles', file)
       }
       if (tasksData.source) {
         data.append('source', JSON.stringify(tasksData.source))
+      }
+      if (tasksData.template) {
+        data.append('template', JSON.stringify(tasksData.template))
       }
       data.append('targets', JSON.stringify(tasksData.targets))
       data.append('service', JSON.stringify(tasksData.service))
@@ -141,12 +152,14 @@ export default {
     toggleAdditions() {
       this.isAdditions = !this.isAdditions
     },
-    buildAutoData() {
+    async buildAutoData() {
       console.log('this.allServices', this.allServices)
       console.log('this.currentProject', this.currentProject)
 
       const service = this.activeClientServices()[0]
       this.setDataValue({ prop: "service", value: service })
+
+      if (service.title === 'Translation') await this.getMemoqTemplates()
 
       const source = this.getServiceSourceLanguages(service)[0]
       this.setDataValue({ prop: "source", value: source })
@@ -174,9 +187,11 @@ export default {
           .map(item => item.sourceLanguage)
       return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
     },
-    setService({ option }) {
+    async setService({ option }) {
       const service = this.allServices.find(item => item.title === option)
       this.setDataValue({ prop: "service", value: service })
+
+      if (service.title === 'Translation') await this.getMemoqTemplates()
 
       const source = this.getServiceSourceLanguages(service)[0]
       this.setDataValue({ prop: "source", value: source })
@@ -199,6 +214,15 @@ export default {
       })
       return finalServicesArr
     },
+    async getMemoqTemplates() {
+      try {
+        const result = await this.$http.get("/memoqapi/templates")
+        console.log(result.data)
+        this.templates = result.data
+      } catch (err) {
+        this.templates = [ { name: 'No Templates' } ]
+      }
+    },
     ...mapActions({
       alertToggle: 'alertToggle',
       setDataValue: "setTasksDataValue",
@@ -217,7 +241,7 @@ export default {
     }
   },
   async created() {
-    this.buildAutoData()
+    await this.buildAutoData()
   },
   components: { ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }

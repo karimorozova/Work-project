@@ -51,8 +51,14 @@
                 @chooseOption="(e) => setUnit(e, 'receivables', index)"
               )
           .steps__setting-title Memoq:
-            .drop
-              | -
+            .drop(v-if="templates.length")
+              SelectSingle(
+                :hasSearch="true"
+                :selectedOption="tasksData.template ? tasksData.template.name : ''"
+                :options="templates.map(i => i.name)"
+                placeholder="Select"
+                @chooseOption="setTemplate"
+              )
 
       .steps__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
         .steps__setting
@@ -90,9 +96,14 @@ import SelectSingle from "../../SelectSingle"
 
 export default {
   components: { SelectSingle, DatepickerWithTime },
+  props: {
+    templates: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
-      stepsAndUnits: [],
       highlighted: {
         days: [ 6, 0 ]
       },
@@ -103,6 +114,10 @@ export default {
   },
   methods: {
     ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" }),
+    setTemplate({ option }) {
+      const template = this.templates.find(i => i.name === option)
+      this.setDataValue({ prop: 'template', value: template })
+    },
     customFormatter(date) {
       return moment(date).format('DD-MM-YYYY, HH:mm')
     },

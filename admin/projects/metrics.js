@@ -72,40 +72,6 @@ async function tryToGetMemoqMetrics(memoqProjectId, analysis) {
 	})
 }
 
-
-function getTaskMetrics({ task, matrix, analysis }) {
-	const { AnalysisResultForLang } = analysis
-	let targetMetrics = AnalysisResultForLang
-	if (Array.isArray(AnalysisResultForLang)) {
-		targetMetrics = AnalysisResultForLang.find(({ TargetLangCode }) => TargetLangCode === task.memoqTarget)
-	}
-	const { Summary } = targetMetrics
-	const metrics = Object.keys(Summary).reduce((acc, cur) => {
-		const { SourceWordCount } = Summary[cur]
-		return cur !== 'Fragments' ? { ...acc, [cur]: +SourceWordCount } : acc
-	}, {})
-
-	const memoqFilledMetrics = getFilledMemoqMetrics(metrics)
-	let taskMetrics = setTaskMetrics({ metrics: memoqFilledMetrics, matrix, prop: "client" })
-	return { ...taskMetrics, totalWords: metrics.All }
-}
-
-function getFilledMemoqMetrics(metrics) {
-	const { Hit50_74, Hit101, Hit100, NoMatch, Repetition, Hit75_84, Hit85_94, XTranslated, Hit95_99 } = metrics
-	return {
-		xTranslated: { text: "X translated", value: +XTranslated },
-		repeat: { text: "Repetition", value: +Repetition },
-		contextMatch: { text: "Context match", value: +Hit101 },
-		repeat100: { text: "100%", value: +Hit100 },
-		repeat50: { text: "50-74%", value: +Hit50_74 },
-		repeat75: { text: "75-84%", value: +Hit75_84 },
-		repeat85: { text: "85-94%", value: +Hit85_94 },
-		repeat95: { text: "95-99%", value: +Hit95_99 },
-		noMatch: { text: "No match", value: +NoMatch }
-	}
-}
-
-
 // async function getProjectWithUpdatedFinance(project) {
 // 	let projectToUpdate = { ...project._doc, id: project.id }
 // 	let { tasks, steps } = projectToUpdate
@@ -197,24 +163,7 @@ async function generateStepsForCATTasks(task, industry, customer, discounts, pro
 }
 
 
-function setStepsProgress(symbol, docs) {
-	//TODO: refactoring Services/Step  stepTitle+unit
-	const prop = symbol === 'translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
-	const totalProgress = docs.reduce((acc, cur) => {
-		acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop]
-		const { TotalWordCount } = cur
-		acc.totalWordCount = acc.totalWordCount ? acc.totalWordCount + +TotalWordCount : +TotalWordCount
-		return acc
-	}, {})
-	let stepProgress = {}
-	for (let doc of docs) {
-		const { DocumentGuid, TotalWordCount, DocumentName } = doc
-		stepProgress[DocumentGuid] = {
-			wordsDone: +doc[prop], totalWordCount: +TotalWordCount, fileName: DocumentName
-		}
-	}
-	return { ...stepProgress, ...totalProgress }
-}
+
 
 module.exports = {
 	updateProjectMetricsAndCreateSteps

@@ -303,8 +303,8 @@ const ProjectsSchema = new mongoose.Schema({
 		projectId: { type: String, trim: true },
 		stepNumber: { type: Number },
 		vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
-		stepId: '',
-		taskId: '',
+		stepId: { type: String, trim: true },
+		taskId: { type: String, trim: true },
 		service: { type: Schema.Types.ObjectId, ref: 'Services' },
 		step: { type: Schema.Types.ObjectId, ref: 'Step' },
 		receivablesUnit: { type: Schema.Types.ObjectId, ref: 'Units' },
@@ -338,21 +338,10 @@ const ProjectsSchema = new mongoose.Schema({
 		isInReportReceivables: { type: Boolean, default: false },
 		stepAndUnit: {},
 		memoqAssignmentRole: { type: Number }
-		// TODO: refactoring serviceStep
-		// serviceStep: {
-		// 	step: { type: Schema.Types.ObjectId, ref: 'Step' },
-		// 	// unit: { type: Schema.Types.ObjectId, ref: 'Units' },
-		// 	memoqAssignmentRole: {
-		// 		type: Number
-		// 	},
-		// 	title: {
-		// 		type: String,
-		// 		trim: true
-		// 	}
-		// }
 	} ],
 	additionsSteps: [ {
-		taskId: '',
+		projectId: { type: String, trim: true },
+		taskId: { type: String, trim: true },
 		title: { type: String, trim: true },
 		isInReportPayables: { type: Boolean, default: false },
 		finance: {

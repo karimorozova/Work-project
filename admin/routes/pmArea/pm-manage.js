@@ -311,8 +311,8 @@ router.post('/project-tasks', upload.fields([ { name: 'sourceFiles' }, { name: '
 router.post('/project-words-tasks', async (req, res) => {
 	const { tasksInfo, docs } = req.body
 	try {
-		const result = await createTasksForWordcount(tasksInfo, docs)
-		res.send(result)
+		const updatedProject = await createTasksForWordcount({ ...tasksInfo, docs })
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on adding project\'s words tasks')

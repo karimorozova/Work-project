@@ -111,6 +111,7 @@ async function generateStepsForCustomUnits({ tasks, stepsAdditions }) {
 
 		for (let i = 0; i < stepsAdditions.length; i++) {
 			additions.push({
+				projectId,
 				taskId,
 				title: stepsAdditions[i].title,
 				finance: {
