@@ -75,13 +75,13 @@
               :enum="'PngSysProject'"
             )
 
-          .additional-functions
-            PaymentAdditions(
-              :paramsIsEdit="paramsIsEdit"
-              :projectStatus="currentProject.status"
-              :enum="'PngSysProject'"
-              :projectCurrency="currentProject.projectCurrency"
-            )
+          //.additional-functions
+          //  PaymentAdditions(
+          //    :paramsIsEdit="paramsIsEdit"
+          //    :projectStatus="currentProject.status"
+          //    :enum="'PngSysProject'"
+          //    :projectCurrency="currentProject.projectCurrency"
+          //  )
 
         .project-finance__total
           .project-finance__total-title Total:

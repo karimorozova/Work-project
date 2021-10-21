@@ -40,30 +40,44 @@
             )
             i.far.fa-calendar-alt
 
+      .steps__settings(v-if="index === 0 && item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
+        .steps__setting
+          .steps__setting-title Unit:
+            .drop
+              SelectSingle(
+                :selectedOption="item.receivables.unit.type || ''"
+                :options="item.step.calculationUnit.map(i => i.type)"
+                placeholder="Select"
+                @chooseOption="(e) => setUnit(e, 'receivables', index)"
+              )
+          .steps__setting-title Memoq:
+            .drop
+              | -
 
-      .steps__setting
-        .steps__setting-title Unit:
-          .drop
-            SelectSingle(
-              :selectedOption="item.receivables.unit.type || ''"
-              :options="item.step.calculationUnit.map(i => i.type)"
-              placeholder="Select"
-              @chooseOption="(e) => setUnit(e, 'receivables', index)"
-            )
-        .steps__setting-title Quantity:
-          input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
+      .steps__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
+        .steps__setting
+          .steps__setting-title Unit:
+            .drop
+              SelectSingle(
+                :selectedOption="item.receivables.unit.type || ''"
+                :options="item.step.calculationUnit.map(i => i.type)"
+                placeholder="Select"
+                @chooseOption="(e) => setUnit(e, 'receivables', index)"
+              )
+          .steps__setting-title Quantity:
+            input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
 
-      .steps__setting
-        .steps__setting-title Unit:
-          .drop
-            SelectSingle(
-              :selectedOption="item.payables.unit.type || ''"
-              :options="item.step.calculationUnit.map(i => i.type)"
-              placeholder="Select"
-              @chooseOption="(e) => setUnit(e, 'payables', index)"
-            )
-        .steps__setting-title Quantity:
-          input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
+        .steps__setting
+          .steps__setting-title Unit:
+            .drop
+              SelectSingle(
+                :selectedOption="item.payables.unit.type || ''"
+                :options="item.step.calculationUnit.map(i => i.type)"
+                placeholder="Select"
+                @chooseOption="(e) => setUnit(e, 'payables', index)"
+              )
+          .steps__setting-title Quantity:
+            input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
 
 </template>
