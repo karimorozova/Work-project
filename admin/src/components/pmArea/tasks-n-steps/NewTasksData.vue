@@ -264,9 +264,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../../../assets/scss/colors";
+
 .taskData {
-  //border: 2px solid #ededed;
-  border: 2px solid royalblue;
+  border: 2px solid $light-border;
   border-radius: 4px;
   padding: 25px;
 

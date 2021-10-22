@@ -2,50 +2,12 @@
   .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
     draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
       .step(v-for="(item, index) in tasksData.stepsAndUnits" )
-        .draggable__element-icon
-          i.fas.fa-arrows-alt-v.handle
-        .step__element-icon(@click="deleteStep(index)")
-          i.fas.fa-trash
-        h4 Step {{ index + 1 }}
-        h4 {{ item.step.title }}
 
-        .steps__date
-          .steps__datepicker
-            .steps__datepicker-title Start:
-            .steps__datepicker-input
-              DatepickerWithTime(
-                :isReadonly="true"
-                :value="item.start"
-                :format="customFormatter"
-                monday-first=true
-                :highlighted="highlighted"
-                inputClass="datepicker-custom"
-                inputClass2="datepicker-custom-mod"
-                calendarClass="calendar-custom"
-                :placeholder="'Date'"
-                @selected="(e) => setDate(e, 'start', index)"
-              )
-              i.far.fa-calendar-alt.calendar
+        .step__titleRow
+          .step__titleRow-title {{ item.step.title }}
 
-          .steps__datepicker
-            .steps__datepicker-title Deadline:
-            .steps__datepicker-input
-              DatepickerWithTime(
-                :isReadonly="true"
-                :value="item.deadline"
-                :format="customFormatter"
-                monday-first=true
-                :highlighted="highlighted"
-                inputClass="datepicker-custom"
-                inputClass2="datepicker-custom-mod"
-                calendarClass="calendar-custom"
-                :placeholder="'Date'"
-                @selected="(e) => setDate(e, 'deadline', index)"
-              )
-              i.far.fa-calendar-alt.calendar
-
-        .steps__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
-          .steps__setting
+        .step__detailsRow
+          .steps__setting(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
             .steps__setting-title Unit:
               .drop
                 SelectSingle(
@@ -64,33 +26,70 @@
                   @chooseOption="setTemplate"
                 )
 
-        .steps__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
-          .steps__setting
+          .steps__setting(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
             .steps__setting-title Unit:
-              .drop
-                SelectSingle(
-                  :selectedOption="item.receivables.unit.type || ''"
-                  :options="item.step.calculationUnit.map(i => i.type)"
-                  placeholder="Select"
-                  @chooseOption="(e) => setUnit(e, 'receivables', index)"
-                )
+            .drop
+              SelectSingle(
+                :selectedOption="item.receivables.unit.type || ''"
+                :options="item.step.calculationUnit.map(i => i.type)"
+                placeholder="Select"
+                @chooseOption="(e) => setUnit(e, 'receivables', index)"
+              )
             .steps__setting-title Quantity:
               input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
 
-          .steps__setting
+          .steps__setting(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
             .steps__setting-title Unit:
-              .drop
-                SelectSingle(
-                  :selectedOption="item.payables.unit.type || ''"
-                  :options="item.step.calculationUnit.map(i => i.type)"
-                  placeholder="Select"
-                  @chooseOption="(e) => setUnit(e, 'payables', index)"
-                )
+            .drop
+              SelectSingle(
+                :selectedOption="item.payables.unit.type || ''"
+                :options="item.step.calculationUnit.map(i => i.type)"
+                placeholder="Select"
+                @chooseOption="(e) => setUnit(e, 'payables', index)"
+              )
             .steps__setting-title Quantity:
               input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
+          .steps__date
+            .steps__datepicker
+              .steps__datepicker-title Start:
+              .steps__datepicker-input
+                DatepickerWithTime(
+                  :isReadonly="true"
+                  :value="item.start"
+                  :format="customFormatter"
+                  monday-first=true
+                  :highlighted="highlighted"
+                  inputClass="datepicker-custom"
+                  inputClass2="datepicker-custom-mod"
+                  calendarClass="calendar-custom"
+                  :placeholder="'Date'"
+                  @selected="(e) => setDate(e, 'start', index)"
+                )
+                i.far.fa-calendar-alt.calendar
 
+            .steps__datepicker
+              .steps__datepicker-title Deadline:
+              .steps__datepicker-input
+                DatepickerWithTime(
+                  :isReadonly="true"
+                  :value="item.deadline"
+                  :format="customFormatter"
+                  monday-first=true
+                  :highlighted="highlighted"
+                  inputClass="datepicker-custom"
+                  inputClass2="datepicker-custom-mod"
+                  calendarClass="calendar-custom"
+                  :placeholder="'Date'"
+                  @selected="(e) => setDate(e, 'deadline', index)"
+                )
+                i.far.fa-calendar-alt.calendar
 
+        .steps__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
+          .step__element-icon(@click="deleteStep(index)")
+            i.fas.fa-trash
+          .draggable__element-icon
+            i.fas.fa-arrows-alt-v.handle
 </template>
 
 <script>
@@ -139,15 +138,23 @@ export default {
     },
     setUnit({ option }, prop, index) {
       let stepsAndUnits = this.tasksData.stepsAndUnits
-      stepsAndUnits[index][prop].unit = this.allUnits.find(({ type }) => type === option)
-      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+      const unit = this.allUnits.find(({ type }) => type === option)
+
+      if (this.tasksData.service.title === 'Translation') {
+        for (let i = 0; i < stepsAndUnits.length; i++) {
+          for (const prop of [ 'receivables', 'payables' ]) stepsAndUnits[i][prop].unit = unit
+        }
+      } else {
+        stepsAndUnits[index][prop].unit = unit
+        this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+      }
     },
     dragAndDropSteps(stepsAndUnits) {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
     deleteStep(index) {
-      const stepsAndUnits = [...this.tasksData.stepsAndUnits]
-      stepsAndUnits.splice(index,1)
+      const stepsAndUnits = [ ...this.tasksData.stepsAndUnits ]
+      stepsAndUnits.splice(index, 1)
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     }
   },
@@ -165,19 +172,47 @@ export default {
 @import "../../../assets/scss/colors";
 
 .steps {
-  background: lavenderblush;
-  padding: 25px 25px 1px 25px;
-
+  padding: 25px;
+  background: aliceblue;
+  
   &__datepicker {
     position: relative;
+    height: 55px;
+  }
+
+  &__settings {
+    display: flex;
+  }
+
+  &__setting {
+
+    &-title {
+
+    }
   }
 }
 
 .step {
-  margin-bottom: 25px;
+  &__titleRow {
+    display: flex;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid firebrick;
+
+    &-title {
+      font-size: 16px;
+      font-family: Myriad600;
+    }
+  }
+
+  background: lightsteelblue;
   padding: 25px;
-  background: #fff;
-  display: flex;
+  border-radius: 4px;
+  margin: 20px 0;
+
+  &__detailsRow {
+    display: flex;
+  }
 }
 
 .drop {
@@ -196,7 +231,7 @@ input {
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
-  width: 100%;
+  width: 220px;
   height: 32px;
   transition: .1s ease-out;
 
