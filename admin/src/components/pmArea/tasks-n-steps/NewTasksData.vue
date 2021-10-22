@@ -270,6 +270,7 @@ export default {
   border: 2px solid $light-border;
   border-radius: 4px;
   padding: 25px;
+  margin-bottom: 25px;
 
   &__row {
     &-servicesLanguages {

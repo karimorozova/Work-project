@@ -168,9 +168,8 @@ export default {
 
 .select-target-count {
   margin-top: 6px;
-  opacity: .6;
+  opacity: .4;
   float: right;
-  font-family: 'MYRIAD300';
-  letter-spacing: 0.2px;
+  font-size: 14px;
 }
 </style>

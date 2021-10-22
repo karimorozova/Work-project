@@ -5,10 +5,23 @@
 
         .step__titleRow
           .step__titleRow-title {{ item.step.title }}
+          .step__titleRow-desctiptions
+            .step__titleRow-desctiptions-title Receivables
+            .step__titleRow-desctiptions-title Payables
+            .step__titleRow-desctiptions-title Dates
 
         .step__detailsRow
-          .steps__setting(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
-            .steps__setting-title Unit:
+
+          .step__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
+            .step__icon(@click="deleteStep(index)" style="cursor: pointer;")
+              i.fas.fa-trash
+            .step__icon.handle(style="cursor: grab")
+              i.fas.fa-arrows-alt-v
+
+
+          .step__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
+            .step__setting
+              .step__setting-title Unit:
               .drop
                 SelectSingle(
                   :selectedOption="item.receivables.unit.type || ''"
@@ -16,7 +29,8 @@
                   placeholder="Select"
                   @chooseOption="(e) => setUnit(e, 'receivables', index)"
                 )
-            .steps__setting-title Memoq:
+            .step__setting
+              .step__setting-title Memoq:
               .drop(v-if="templates.length")
                 SelectSingle(
                   :hasSearch="true"
@@ -26,34 +40,38 @@
                   @chooseOption="setTemplate"
                 )
 
-          .steps__setting(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
-            .steps__setting-title Unit:
-            .drop
-              SelectSingle(
-                :selectedOption="item.receivables.unit.type || ''"
-                :options="item.step.calculationUnit.map(i => i.type)"
-                placeholder="Select"
-                @chooseOption="(e) => setUnit(e, 'receivables', index)"
-              )
-            .steps__setting-title Quantity:
+          .step__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
+            .step__setting
+              .step__setting-title Unit:
+              .drop
+                SelectSingle(
+                  :selectedOption="item.receivables.unit.type || ''"
+                  :options="item.step.calculationUnit.map(i => i.type)"
+                  placeholder="Select"
+                  @chooseOption="(e) => setUnit(e, 'receivables', index)"
+                )
+            .step__setting
+              .step__setting-title Quantity:
               input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
 
-          .steps__setting(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
-            .steps__setting-title Unit:
-            .drop
-              SelectSingle(
-                :selectedOption="item.payables.unit.type || ''"
-                :options="item.step.calculationUnit.map(i => i.type)"
-                placeholder="Select"
-                @chooseOption="(e) => setUnit(e, 'payables', index)"
-              )
-            .steps__setting-title Quantity:
+          .step__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
+            .step__setting
+              .step__setting-title Unit:
+              .drop
+                SelectSingle(
+                  :selectedOption="item.payables.unit.type || ''"
+                  :options="item.step.calculationUnit.map(i => i.type)"
+                  placeholder="Select"
+                  @chooseOption="(e) => setUnit(e, 'payables', index)"
+                )
+            .step__setting
+              .step__setting-title Quantity:
               input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
-          .steps__date
-            .steps__datepicker
-              .steps__datepicker-title Start:
-              .steps__datepicker-input
+          .step__date
+            .step__datepicker
+              .step__datepicker-title Start:
+              .step__datepicker-input
                 DatepickerWithTime(
                   :isReadonly="true"
                   :value="item.start"
@@ -68,9 +86,9 @@
                 )
                 i.far.fa-calendar-alt.calendar
 
-            .steps__datepicker
-              .steps__datepicker-title Deadline:
-              .steps__datepicker-input
+            .step__datepicker
+              .step__datepicker-title Deadline:
+              .step__datepicker-input
                 DatepickerWithTime(
                   :isReadonly="true"
                   :value="item.deadline"
@@ -85,11 +103,6 @@
                 )
                 i.far.fa-calendar-alt.calendar
 
-        .steps__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
-          .step__element-icon(@click="deleteStep(index)")
-            i.fas.fa-trash
-          .draggable__element-icon
-            i.fas.fa-arrows-alt-v.handle
 </template>
 
 <script>
@@ -98,9 +111,10 @@ import DatepickerWithTime from "../../DatepickerWithTime"
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
+import JobDescriptors from "../JobDescriptors"
 
 export default {
-  components: { SelectSingle, DatepickerWithTime, draggable },
+  components: { JobDescriptors, SelectSingle, DatepickerWithTime, draggable },
   props: {
     templates: {
       type: Array,
@@ -172,46 +186,90 @@ export default {
 @import "../../../assets/scss/colors";
 
 .steps {
-  padding: 25px;
-  background: aliceblue;
-  
-  &__datepicker {
-    position: relative;
-    height: 55px;
-  }
 
-  &__settings {
-    display: flex;
-  }
-
-  &__setting {
-
-    &-title {
-
-    }
-  }
 }
 
-.step {
-  &__titleRow {
-    display: flex;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid firebrick;
 
-    &-title {
-      font-size: 16px;
-      font-family: Myriad600;
+.step {
+  margin: 20px 0;
+  background: $body;
+  border: 1px solid $light-border;
+  border-radius: 4px;
+  padding: 10px 20px;
+
+  &__icons {
+    width: 143px;
+    display: flex;
+    gap: 14px;
+
+  }
+
+  &__icon {
+    color: $dark-border;
+    transition: .2s ease-out;
+    font-size: 14px;
+    height: 30px;
+    width: 30px;
+    background: white;
+    border: 1px solid #bfbfbf;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+
+    &:hover {
+      color: $text;
     }
   }
 
-  background: lightsteelblue;
-  padding: 25px;
-  border-radius: 4px;
-  margin: 20px 0;
+  &__titleRow {
+    display: flex;
+    margin-bottom: 12px;
+    border-bottom: 1px solid $dark-border;
+    padding-bottom: 8px;
+    padding-top: 2px;
+    justify-content: space-between;
+    height: 17px;
+    align-items: center;
+
+    &-title {
+      width: 143px;
+      font-size: 15px;
+    }
+
+    &-desctiptions {
+      display: flex;
+
+      &-title {
+        width: 220px;
+        margin-left: 15px;
+        padding-left: 15px;
+      }
+    }
+
+    &-title {
+      font-size: 15px;
+      font-family: Myriad900;
+    }
+  }
+
+  &__setting,
+  &__datepicker {
+    height: 56px;
+    width: 220px;
+    position: relative;
+    margin-left: 15px;
+    padding-left: 15px;
+    border-left: 1px solid $light-border;
+
+    &-title {
+      margin-bottom: 2px;
+    }
+  }
 
   &__detailsRow {
     display: flex;
+    justify-content: end;
   }
 }
 
@@ -253,4 +311,12 @@ input {
   right: 8px;
   font-size: 16px;
 }
+
+.sortable-ghost {
+}
+
+.sortable-chosen {
+  background: $light-border;
+}
+
 </style>
