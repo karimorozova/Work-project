@@ -39,11 +39,11 @@
         template(slot="progress" slot-scope="{ row, index }")
           .job-files__progress(v-if="row.category === 'Source file' && isCAT")
             ProgressLine(:progress="getProgress(row)")
+
         template(slot="source" slot-scope="{ row, index }")
-          .job-files_flex-centered(v-if="row.category === 'Reference file'")
+          .job-files_flex-centered
             a.job-files__link(:href='row.source')
               img.job-files__image(src="../../../assets/images/download.png")
-          .job-files_flex-centered(v-else) -
 
         template(slot="target" slot-scope="{ row, index }")
           .job-files_flex-centered(v-if="row.category === 'Source file'")
