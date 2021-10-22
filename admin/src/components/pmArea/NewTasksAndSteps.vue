@@ -1,7 +1,9 @@
 <template lang="pug">
   .TS
     .TS__title Tasks and Steps
-
+    .TS__modals
+      .modal(v-if="isModalOpen")
+        VendorManage(:steps="currentProject.steps" :industry="currentProject.industry" @closeVendorManage="closeVendorManage")
     transition(name="slide-fade")
       NewTasksData(
         v-if="allServices.length && currentProject._id && allLanguages.length"
@@ -10,10 +12,21 @@
         :currentProject="currentProject"
       )
 
-    NewTasks
+    Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTabQuery")
+    NewTasks(
+      v-if="selectedTabQuery === 'Tasks'"
+      :tasks="currentProject.tasks"
+    )
 
-    NewSteps
-
+    NewSteps(
+      v-if="selectedTabQuery === 'Steps'"
+      :steps="currentProject.steps"
+    )
+    Button(style="margin-top: 20px;" value="Manage Vendors" :outline="true" @clicked="openVendorManage")
+    additionsSteps(
+      v-if="selectedTabQuery === 'Additional Steps'"
+      :additionsSteps="currentProject.additionsSteps"
+    )
 
 </template>
 
@@ -21,24 +34,54 @@
 import NewTasksData from "./tasks-n-steps/NewTasksData"
 import NewTasks from "./tasks-n-steps/NewTasks"
 import NewSteps from "./tasks-n-steps/NewSteps"
+import AdditionsSteps from "./tasks-n-steps/AdditionsSteps"
+import Tabs from "../Tabs"
+import Button from "../Button"
+import VendorManage from "./VendorManage"
 import { mapGetters } from "vuex"
 
 
 export default {
   name: "NewTaskAndSteps",
-
+  data() {
+    return {
+      tabs: ['Tasks', 'Steps', 'Additional Steps'],
+      isModalOpen: false,
+    }
+  },
+  methods: {
+    setTab({ index }) {
+      this.$router.replace({ 'query': {selectedTab: this.tabs[index]} }).catch((err) => err)
+    },
+    querySetter(vm, to) {
+      if (to.query['selectedTab'] != null) vm['selectedTab'] = to.query['selectedTab']
+    },
+    openVendorManage() {
+      this.isModalOpen = true
+    },
+    closeVendorManage() {
+      this.isModalOpen = false
+    },
+  },
   computed: {
     ...mapGetters({
       allServices: "getAllServices",
       currentProject: "getCurrentProject",
       allLanguages: 'getAllLanguages'
-    })
+    }),
+    selectedTabQuery() {
+      return this.$route.query.selectedTab || 'Tasks'
+    },
   },
 
   components: {
     NewTasksData,
     NewTasks,
-    NewSteps
+    NewSteps,
+    Tabs,
+    AdditionsSteps,
+    VendorManage,
+    Button,
   }
 }
 </script>
@@ -59,6 +102,23 @@ export default {
   &__title {
     font-size: 19px;
     font-family: 'Myriad600';
+  }
+  &__modals {
+    position: relative;
+  }
+  .modal {
+    position: absolute;
+    left: -25px;
+    top: -25px;
+    z-index: 10;
+
+    box-sizing: border-box;
+    min-width: 1040px;
+    width: 1040px;
+    padding: 25px;
+    box-shadow: $box-shadow;
+    background: white;
+    border-radius: 4px;
   }
 }
 
