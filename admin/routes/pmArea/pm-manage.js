@@ -1075,6 +1075,17 @@ router.post('/update-project-discounts', async (req, res) => {
 	}
 })
 
+router.post('/update-project-additions', async (req, res) => {
+	const { _id, additionsSteps } = req.body
+	try {
+		const updatedProject = await Projects.updateOne({_id}, {additionsSteps})
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on updating project\'s discounts')
+	}
+})
+
 // router.post('/update-project-payment-additions', async (req, res) => {
 // 	const { _id, addItem } = req.body
 // 	try {

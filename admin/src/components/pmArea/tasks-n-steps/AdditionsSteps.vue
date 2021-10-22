@@ -3,6 +3,9 @@
     GeneralTable(
       :fields="fields"
       :tableData="additionsSteps"
+      :errors="errors"
+      :areErrors="areErrors"
+      @closeErrors="closeErrors"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header {{ field.label }}
@@ -20,11 +23,11 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
-          img.table__icon(v-for="(icon, key) in icon" :src="icon.icon" @click="makeAction( key,index)" :class="{'table__opacity': isActive(key, index)}")
+          img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction( key,index)" :class="{'table__opacity': isActive(key, index)}")
 
     .table__empty(v-show="!additionsSteps.length") No data...
 
-    Add(@add="addData")
+    Add(@add="addAdditionStep")
 
 </template>
 
@@ -32,6 +35,7 @@
 import GeneralTable from '../../GeneralTable'
 import Add from '../../Add'
 import crudIcons from "../../../mixins/crudIcons"
+import { mapGetters } from "vuex"
 
 export default {
   mixins: [crudIcons],
@@ -53,6 +57,9 @@ export default {
       currentAmount: '',
 
       currentActive: -1,
+
+      errors: [],
+      areErrors: false,
     }
   },
   methods: {
@@ -65,20 +72,42 @@ export default {
           this.setEditingData(index);
           break;
         case "cancel":
-          this.cancelEdition(index);
+          this.cancelEdition();
           break;
         case "save":
           this.checkErrors();
           break;
-        // case "delete":
-        //   this.deleteRate(index);
+        case "delete":
+          this.deleteAdditionsStep(index);
       }
     },
-    addData() {
+    deleteAdditionsStep(index) {
+      this.additionsSteps.splice(index, 1)
+      this.currentActive = -1
+      this.sendData()
+    },
 
+    addAdditionStep() {
+      if (this.currentActive !== -1) return this.isEditing()
+      this.additionsSteps.push({ })
+      this.currentActive = this.additionsSteps.length - 1
     },
     checkErrors() {
-
+      this.errors = []
+      this.areErrors = false
+      if (!this.currentTitle || !this.currentAmount) this.errors.push("Fields cannot be empty")
+      if (this.errors.length) {
+        this.areErrors = true
+        return
+      }
+      this.saveAdditionsSteps()
+    },
+    async saveAdditionsSteps () {
+      const currentAdditions = this.additionsSteps[this.currentActive]
+      currentAdditions.title = this.currentTitle
+      currentAdditions.finance = {Price: {receivables: this.currentAmount}}
+      await this.sendData()
+      this.cancelEdition()
     },
     setEditingData(index) {
       this.currentActive = index;
@@ -86,17 +115,24 @@ export default {
       this.currentAmount = this.additionsSteps[index].finance.Price.receivables
     },
     cancelEdition( ) {
+      if (!this.additionsSteps[this.currentActive].hasOwnProperty('finance')) this.additionsSteps.pop()
       this.currentActive = -1
       this.currentTitle = ''
       this.currentAmount = ''
+    },
+    closeErrors() {
+      this.areErrors = false
+    },
+    async sendData() {
+      try{
+        await this.$http.post('/pm-manage/update-project-additions', {_id: this.currentProject._id, additionsSteps: this.additionsSteps})
+      } catch (e) {
+        console.log(e)
+      }
     }
   },
   computed: {
-    manageIcons() {
-      console.log(this.icons)
-      const { "delete": del, ...result } = this.icons
-      return result
-    }
+    ...mapGetters({currentProject: "getCurrentProject"}),
   },
   components: {
     GeneralTable,
