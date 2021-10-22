@@ -38,7 +38,7 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 				payables: payablesQuantity
 			},
 			Wordcount: {
-				receivables: +getRelativeQuantity(metrics, 'client'),
+				receivables: isMemoq ? +getRelativeQuantity(metrics, 'client') : 0,
 				payables: 0
 			},
 			Price: {
