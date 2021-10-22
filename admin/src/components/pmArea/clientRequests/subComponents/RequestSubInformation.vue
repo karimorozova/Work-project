@@ -430,13 +430,13 @@
 
   .sub-information {
     box-sizing: border-box;
-    padding: 20px;
+    padding: 25px;
     box-shadow: $box-shadow;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    min-width: 400px;
-    width: 400px;
+    min-width: 440px;
+    width: 440px;
     background: white;
     border-radius: 4px;
 
