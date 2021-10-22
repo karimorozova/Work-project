@@ -92,7 +92,7 @@ export default {
     async saveTasks() {
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (this.tasksData.template) {
+        if (this.tasksData.template && this.tasksData.service.title === 'Translation') {
           try {
             const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
             const { creatorUserId } = memoqCreatorUser.data
