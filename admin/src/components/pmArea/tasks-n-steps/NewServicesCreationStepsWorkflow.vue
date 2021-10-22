@@ -1,89 +1,92 @@
 <template lang="pug">
   .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
+    draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
+      .step(v-for="(item, index) in tasksData.stepsAndUnits" )
+        .draggable__element-icon
+          i.fas.fa-arrows-alt-v.handle
+        h4 Step {{ index + 1 }}
+        h4 {{ item.step.title }}
 
-    .step(v-for="(item, index) in tasksData.stepsAndUnits" )
-      h4 Step {{ index + 1 }}
-      h4 {{ item.step.title }}
-
-      .steps__date
-        .steps__datepicker
-          .steps__datepicker-title Start:
-          .steps__datepicker-input
-            DatepickerWithTime(
-              :isReadonly="true"
-              :value="item.start"
-              :format="customFormatter"
-              monday-first=true
-              :highlighted="highlighted"
-              inputClass="datepicker-custom"
-              inputClass2="datepicker-custom-mod"
-              calendarClass="calendar-custom"
-              :placeholder="'Date'"
-              @selected="(e) => setDate(e, 'start', index)"
-            )
-            i.far.fa-calendar-alt.calendar
-
-        .steps__datepicker
-          .steps__datepicker-title Deadline:
-          .steps__datepicker-input
-            DatepickerWithTime(
-              :isReadonly="true"
-              :value="item.deadline"
-              :format="customFormatter"
-              monday-first=true
-              :highlighted="highlighted"
-              inputClass="datepicker-custom"
-              inputClass2="datepicker-custom-mod"
-              calendarClass="calendar-custom"
-              :placeholder="'Date'"
-              @selected="(e) => setDate(e, 'deadline', index)"
-            )
-            i.far.fa-calendar-alt.calendar
-
-      .steps__settings(v-if="index === 0 && item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
-        .steps__setting
-          .steps__setting-title Unit:
-            .drop
-              SelectSingle(
-                :selectedOption="item.receivables.unit.type || ''"
-                :options="item.step.calculationUnit.map(i => i.type)"
-                placeholder="Select"
-                @chooseOption="(e) => setUnit(e, 'receivables', index)"
+        .steps__date
+          .steps__datepicker
+            .steps__datepicker-title Start:
+            .steps__datepicker-input
+              DatepickerWithTime(
+                :isReadonly="true"
+                :value="item.start"
+                :format="customFormatter"
+                monday-first=true
+                :highlighted="highlighted"
+                inputClass="datepicker-custom"
+                inputClass2="datepicker-custom-mod"
+                calendarClass="calendar-custom"
+                :placeholder="'Date'"
+                @selected="(e) => setDate(e, 'start', index)"
               )
-          .steps__setting-title Memoq:
-            .drop(v-if="templates.length")
-              SelectSingle(
-                :hasSearch="true"
-                :selectedOption="tasksData.template ? tasksData.template.name : ''"
-                :options="templates.map(i => i.name)"
-                placeholder="Select"
-                @chooseOption="setTemplate"
-              )
+              i.far.fa-calendar-alt.calendar
 
-      .steps__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
-        .steps__setting
-          .steps__setting-title Unit:
-            .drop
-              SelectSingle(
-                :selectedOption="item.receivables.unit.type || ''"
-                :options="item.step.calculationUnit.map(i => i.type)"
-                placeholder="Select"
-                @chooseOption="(e) => setUnit(e, 'receivables', index)"
+          .steps__datepicker
+            .steps__datepicker-title Deadline:
+            .steps__datepicker-input
+              DatepickerWithTime(
+                :isReadonly="true"
+                :value="item.deadline"
+                :format="customFormatter"
+                monday-first=true
+                :highlighted="highlighted"
+                inputClass="datepicker-custom"
+                inputClass2="datepicker-custom-mod"
+                calendarClass="calendar-custom"
+                :placeholder="'Date'"
+                @selected="(e) => setDate(e, 'deadline', index)"
               )
-          .steps__setting-title Quantity:
-            input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
+              i.far.fa-calendar-alt.calendar
 
-        .steps__setting
-          .steps__setting-title Unit:
-            .drop
-              SelectSingle(
-                :selectedOption="item.payables.unit.type || ''"
-                :options="item.step.calculationUnit.map(i => i.type)"
-                placeholder="Select"
-                @chooseOption="(e) => setUnit(e, 'payables', index)"
-              )
-          .steps__setting-title Quantity:
-            input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
+        .steps__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
+          .steps__setting
+            .steps__setting-title Unit:
+              .drop
+                SelectSingle(
+                  :selectedOption="item.receivables.unit.type || ''"
+                  :options="item.step.calculationUnit.map(i => i.type)"
+                  placeholder="Select"
+                  @chooseOption="(e) => setUnit(e, 'receivables', index)"
+                )
+            .steps__setting-title Memoq:
+              .drop(v-if="templates.length")
+                SelectSingle(
+                  :hasSearch="true"
+                  :selectedOption="tasksData.template ? tasksData.template.name : ''"
+                  :options="templates.map(i => i.name)"
+                  placeholder="Select"
+                  @chooseOption="setTemplate"
+                )
+
+        .steps__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
+          .steps__setting
+            .steps__setting-title Unit:
+              .drop
+                SelectSingle(
+                  :selectedOption="item.receivables.unit.type || ''"
+                  :options="item.step.calculationUnit.map(i => i.type)"
+                  placeholder="Select"
+                  @chooseOption="(e) => setUnit(e, 'receivables', index)"
+                )
+            .steps__setting-title Quantity:
+              input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
+
+          .steps__setting
+            .steps__setting-title Unit:
+              .drop
+                SelectSingle(
+                  :selectedOption="item.payables.unit.type || ''"
+                  :options="item.step.calculationUnit.map(i => i.type)"
+                  placeholder="Select"
+                  @chooseOption="(e) => setUnit(e, 'payables', index)"
+                )
+            .steps__setting-title Quantity:
+              input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
+
 
 
 </template>
@@ -93,9 +96,10 @@ import { mapActions, mapGetters } from "vuex"
 import DatepickerWithTime from "../../DatepickerWithTime"
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
+import draggable from "vuedraggable"
 
 export default {
-  components: { SelectSingle, DatepickerWithTime },
+  components: { SelectSingle, DatepickerWithTime, draggable },
   props: {
     templates: {
       type: Array,
@@ -134,6 +138,9 @@ export default {
     setUnit({ option }, prop, index) {
       let stepsAndUnits = this.tasksData.stepsAndUnits
       stepsAndUnits[index][prop].unit = this.allUnits.find(({ type }) => type === option)
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+    },
+    dragAndDropSteps(stepsAndUnits) {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     }
   },
@@ -189,6 +196,12 @@ input {
   &:focus {
     border: 1px solid $border-focus;
   }
+}
+
+.draggable__element-icon {
+  font-size: 16px;
+  color: $dark-border;
+  cursor: grab;
 }
 
 .calendar {
