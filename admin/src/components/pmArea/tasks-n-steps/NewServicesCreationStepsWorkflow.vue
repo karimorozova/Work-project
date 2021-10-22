@@ -4,6 +4,8 @@
       .step(v-for="(item, index) in tasksData.stepsAndUnits" )
         .draggable__element-icon
           i.fas.fa-arrows-alt-v.handle
+        .step__element-icon(@click="deleteStep(index)")
+          i.fas.fa-trash
         h4 Step {{ index + 1 }}
         h4 {{ item.step.title }}
 
@@ -141,6 +143,11 @@ export default {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
     dragAndDropSteps(stepsAndUnits) {
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+    },
+    deleteStep(index) {
+      const stepsAndUnits = [...this.tasksData.stepsAndUnits]
+      stepsAndUnits.splice(index,1)
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     }
   },
