@@ -1,5 +1,5 @@
 <template lang="pug">
-  .steps(v-if="tasksData.stepsAndUnits.length")
+  .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
 
     .step(v-for="(item, index) in tasksData.stepsAndUnits" )
       h4 Step {{ index + 1 }}
@@ -21,7 +21,7 @@
               :placeholder="'Date'"
               @selected="(e) => setDate(e, 'start', index)"
             )
-            i.far.fa-calendar-alt
+            i.far.fa-calendar-alt.calendar
 
         .steps__datepicker
           .steps__datepicker-title Deadline:
@@ -38,7 +38,7 @@
               :placeholder="'Date'"
               @selected="(e) => setDate(e, 'deadline', index)"
             )
-            i.far.fa-calendar-alt
+            i.far.fa-calendar-alt.calendar
 
       .steps__settings(v-if="index === 0 && item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
         .steps__setting
@@ -150,10 +150,19 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
 
+.steps {
+  background: lavenderblush;
+  padding: 25px 25px 1px 25px;
+
+  &__datepicker {
+    position: relative;
+  }
+}
+
 .step {
-  margin: 20px;
-  padding: 20px;
-  background: lightsteelblue;
+  margin-bottom: 25px;
+  padding: 25px;
+  background: #fff;
   display: flex;
 }
 
@@ -180,5 +189,13 @@ input {
   &:focus {
     border: 1px solid $border-focus;
   }
+}
+
+.calendar {
+  position: absolute;
+  top: 24px;
+  opacity: .3;
+  right: 8px;
+  font-size: 16px;
 }
 </style>

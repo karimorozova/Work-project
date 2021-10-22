@@ -1,32 +1,31 @@
 <template lang="pug">
-  .taskData
+  .taskData(v-if="allServices.length")
     .taskData__errorModal
       ValidationErrors(v-if="IsErrorModal" :errors="errors" @closeErrors="closeErrors")
 
-    .taskData__row
-      div Service:
-      .drop
-        SelectSingle(
-          :selectedOption="tasksData.service ? tasksData.service.title : ''"
-          :options="mappedClientServices"
-          placeholder="Option"
-          @chooseOption="setService"
-        )
+    .taskData__row-servicesLanguages
+      .service
+        .drop__title Service:
+        .drop
+          SelectSingle(
+            :selectedOption="tasksData.service ? tasksData.service.title : ''"
+            :options="mappedClientServices"
+            placeholder="Option"
+            @chooseOption="setService"
+          )
 
-    .taskData__row
-      div Extra Services:
-      Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
+        .extraServices
+          .extraServices__title Extra Services:
+          Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
 
-    .taskData__row(v-if="isAdditions")
-      StepsAdditions(
-        :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
-        @save="setAdditions"
-        @delete="setAdditions"
-      )
+        .extraServicesTable(v-if="isAdditions")
+          StepsAdditions(
+            :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
+            @save="setAdditions"
+            @delete="setAdditions"
+          )
 
-    .taskData__row
-      div Languages:
-      .languages
+      .language
         TasksLangsDuo
 
     .taskData__row
@@ -56,9 +55,6 @@ import ValidationErrors from "../../ValidationErrors"
 export default {
   name: "NewTasksData",
   props: {
-    allServices: {
-      type: Array
-    },
     allLanguages: {
       type: Array
     },
@@ -68,6 +64,7 @@ export default {
   },
   data() {
     return {
+      allServices: [],
       templates: [],
       isAdditions: false,
       IsErrorModal: false,
@@ -217,10 +214,27 @@ export default {
     async getMemoqTemplates() {
       try {
         const result = await this.$http.get("/memoqapi/templates")
-        console.log(result.data)
         this.templates = result.data
       } catch (err) {
         this.templates = [ { name: 'No Templates' } ]
+      }
+    },
+    async getAllServices() {
+      try {
+        const units = await this.$http.get("/api/units")
+        const services = await this.$http.get("/api/services")
+        this.allServices = services.data.map(i => {
+          i.steps.map(j => {
+            j.step.calculationUnit = j.step.calculationUnit.map(k => {
+              k = units.data.find(({ _id }) => `${ _id }` === `${ k }`)
+              return k
+            })
+            return j
+          })
+          return i
+        })
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Services", isShow: true, type: "error" })
       }
     },
     ...mapActions({
@@ -241,6 +255,7 @@ export default {
     }
   },
   async created() {
+    await this.getAllServices()
     await this.buildAutoData()
   },
   components: { ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
@@ -250,14 +265,37 @@ export default {
 
 <style scoped lang="scss">
 .taskData {
-  &__row {
+  //border: 2px solid #ededed;
+  border: 2px solid royalblue;
+  border-radius: 4px;
+  padding: 25px;
 
+  &__row {
+    &-servicesLanguages {
+      display: flex;
+      justify-content: space-between;
+    }
   }
+}
+
+.service {
+  width: 410px;
+}
+
+.extraServices {
+  display: flex;
+  gap: 10px;
+  margin: 17px 0;
 }
 
 .drop {
   width: 220px;
   position: relative;
   height: 32px;
+
+  &__title {
+    margin-bottom: 3px;
+    position: relative;
+  }
 }
 </style>

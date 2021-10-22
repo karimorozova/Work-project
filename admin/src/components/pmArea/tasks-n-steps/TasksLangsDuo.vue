@@ -119,8 +119,6 @@ export default {
 }
 
 .tasks-langs {
-  padding: 0 10px;
-
   &__title {
     &-source {
       margin-bottom: 3px;
@@ -135,7 +133,6 @@ export default {
 }
 
 .source {
-  margin-bottom: 20px;
   @extend %flex-column;
 
   &__drop-menu {
@@ -146,6 +143,9 @@ export default {
 }
 
 .target {
+  width: 495px;
+  margin-top: 30px;
+
   &__arrows {
   }
 
@@ -167,8 +167,10 @@ export default {
 }
 
 .select-target-count {
-  margin-top: 8px;
-  opacity: 0.5;
+  margin-top: 6px;
+  opacity: .6;
   float: right;
+  font-family: 'MYRIAD300';
+  letter-spacing: 0.2px;
 }
 </style>

@@ -23,7 +23,7 @@
 
         template(slot="steps" slot-scope="{ row, index }")
           .table__data(v-if="currentActive !== index") {{ row.value }}
-          .table__drop(v-else)
+          .table__data(v-else)
             input(type="number" v-model="data[index].value")
 
         template(slot="icons" slot-scope="{ row, index }")
@@ -52,19 +52,19 @@ export default {
           label: "Service title",
           headerKey: "headerTitle",
           key: "unit",
-          style: { width: "70%" }
+          style: { width: "50%" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "steps",
-          style: { width: "10%" }
+          style: { width: "20%" }
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: { width: "20%" }
+          style: { width: "30%" }
         }
       ],
       data: JSON.parse(JSON.stringify(this.stepsAdditions)),
