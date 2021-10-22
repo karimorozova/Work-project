@@ -16,32 +16,32 @@ function setTaskMetrics({ metrics, matrix, prop }) {
 	return taskMetrics
 }
 
-async function getAfterWordcountPayablesUpdated({ project, step }) {
-	try {
-		let { tasks, steps, customer, industry, discounts, _id: projectId } = project
-		const taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
-		const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId)
-
-		tasks[taskIndex].metrics = setTaskMetrics({ metrics: tasks[taskIndex].metrics, matrix: step.vendor.matrix, prop: 'vendor' })
-		const { serviceStep, vendor } = step
-
-		const quantity = { receivables: tasks[taskIndex].metrics.totalWords, payables: tasks[taskIndex].metrics.totalWords }
-
-		const { finance, vendorRate, nativeFinance, nativeVendorRate } =
-				await getStepFinanceData({ customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId }, true)
-
-		steps[stepIndex].finance = finance
-		steps[stepIndex].vendorRate = vendorRate
-
-		steps[stepIndex].nativeFinance = nativeFinance
-		steps[stepIndex].nativeVendorRate = nativeVendorRate
-
-		return await updateProject({ '_id': project.id }, { tasks, steps })
-	} catch (err) {
-		console.log(err)
-		console.log('Error in getAfterWordcountPayablesUpdated')
-	}
-}
+// async function getAfterWordcountPayablesUpdated({ project, step }) {
+// 	try {
+// 		let { tasks, steps, customer, industry, discounts, _id: projectId } = project
+// 		const taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
+// 		const stepIndex = steps.findIndex(item => item.taskId === step.taskId && item.stepId === step.stepId)
+//
+// 		tasks[taskIndex].metrics = setTaskMetrics({ metrics: tasks[taskIndex].metrics, matrix: step.vendor.matrix, prop: 'vendor' })
+// 		const { serviceStep, vendor } = step
+//
+// 		const quantity = { receivables: tasks[taskIndex].metrics.totalWords, payables: tasks[taskIndex].metrics.totalWords }
+//
+// 		const { finance, vendorRate, nativeFinance, nativeVendorRate } =
+// 				await getStepFinanceData({ customer, industry, serviceStep, task: tasks[taskIndex], vendorId: vendor._id, quantity, discounts, projectId }, true)
+//
+// 		steps[stepIndex].finance = finance
+// 		steps[stepIndex].vendorRate = vendorRate
+//
+// 		steps[stepIndex].nativeFinance = nativeFinance
+// 		steps[stepIndex].nativeVendorRate = nativeVendorRate
+//
+// 		return await updateProject({ '_id': project.id }, { tasks, steps })
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log('Error in getAfterWordcountPayablesUpdated')
+// 	}
+// }
 
 async function payablesCalc({ metrics, project, step }) {
 	const { crossRate, projectCurrency } = project
@@ -166,6 +166,6 @@ module.exports = {
 	updateProjectCosts,
 	calcCost,
 	setTaskMetrics,
-	getAfterWordcountPayablesUpdated,
+	// getAfterWordcountPayablesUpdated,
 	returnVendorRate
 }

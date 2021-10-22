@@ -76,12 +76,11 @@ async function sendQuoteToVendorsAfterProjectAccepted(projectSteps, project) {
 	}
 }
 
-async function stepReassignedNotification(step, reason) {
+async function stepReassignedNotification(step) {
 	try {
 		const { vendor, status, stepId } = step
 		if (status === 'Created') return
-
-		const message = vendorReassignmentMessage(step, reason)
+		const message = vendorReassignmentMessage(step)
 		await sendEmail({ to: vendor.email, subject: `Step ${ stepId } has been reassigned (ID V001.1)` }, message)
 	} catch (err) {
 		console.log(err)

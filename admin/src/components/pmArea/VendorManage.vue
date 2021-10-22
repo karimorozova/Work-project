@@ -3,18 +3,19 @@
     .vendor-manage__title
       span Manage Vendors
       .vendor-manage__close(@click.stop="closeVendorManage") &#215;
+
     .vendor-manage__body
       .vendor-manage__steps
         .tabs
-          .tabs__option(
-            v-for="(tab, index) in actualSteps"
-            @click="setTab(index)"
-            :class="{'tabs_active': tab === selectedTab}"
-          ) {{ tab }}
-        .block(v-for="stepsGroup of groupedByTaskId")
-          span {{stepsGroup[0].sourceLanguage + ">>" + stepsGroup[0].targetLanguage }}
-          p(v-for="step of stepsGroup" ) {{step.step}}:
-            input(:value="selectedVendor[step._id] ? selectedVendor[step._id].firstName : (step.vendor && step.vendor.firstName) || '-'" @click="chooseStep(step)")
+          .tabs__option(v-for="(tab, index) in actualSteps" @click="setTab(index)" :class="{'tabs_active': tab === selectedTab}") {{ tab }}
+
+        .blocks
+          .block(v-for="stepsGroup of groupedByTaskId")
+            .block__language {{stepsGroup[0].sourceLanguage + ">>" + stepsGroup[0].targetLanguage }}
+            .block__step(v-for="step of stepsGroup" )
+              .block__step-title {{ step.step.title }}:
+              .block__step-status (status)
+              input(readonly="true" placeholder="Vendor" :value="selectedVendor[step._id] ? selectedVendor[step._id].firstName : (step.vendor && step.vendor.firstName) || '-'" @click="chooseStep(step)")
 
       .vendor-manage__vendors
         .vendor-manage__options
@@ -28,14 +29,20 @@
         .vendor-manage__vendor(v-for=" vendor of getVendorsForStep")
           span {{vendor.firstName}}
           Button(value="Use this Vendor" @clicked="setVendorToStep(vendor)")
+
+    .vendor-manage__footer
+      Button(@clicked="saveVendors" :value="'Assign Vendors'")
+
 </template>
 
 <script>
 import Tabs from '../Tabs'
 import Button from "../Button"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 import _ from "lodash"
+import { setStepVendors } from "../../vuex/general/actions"
+
 export default {
   props: {
     steps: {
@@ -48,7 +55,7 @@ export default {
   },
   data() {
     return {
-      selectedTab: 'Steps',
+      selectedTab: 'All Steps',
       newSteps: [],
 
       currentSourceLanguage: '-',
@@ -61,11 +68,28 @@ export default {
       isDisabledIndustry: false,
       showAllVendor: false,
 
-      selectedVendor: {},
+      selectedVendor: {}
 
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: 'alertToggle',
+      setStepVendors: 'setStepVendors'
+    }),
+    async saveVendors() {
+      try {
+        const stepsVendors = {}
+        for (const key in this.selectedVendor) stepsVendors[key] = this.selectedVendor[key]._id
+
+        this.setStepVendors({
+          projectId: this.$route.params.id,
+          stepsVendors
+        })
+      } catch (err) {
+        this.alertToggle({ message: 'Error in assigns vendors', isShow: true, type: "error" })
+      }
+    },
     toggleLangNotStrict() {
       this.isLangNotStrict = !this.isLangNotStrict
     },
@@ -76,9 +100,9 @@ export default {
       this.showAllVendor = !this.showAllVendor
     },
     setVendorToStep(vendor) {
-      this.$set(this.selectedVendor,this.currentStepId, vendor )
+      this.$set(this.selectedVendor, this.currentStepId, vendor)
     },
-    setTab(index){
+    setTab(index) {
       const selected = this.actualSteps[index]
       this.selectedTab = selected
     },
@@ -91,7 +115,7 @@ export default {
       this.currentSourceLanguage = step.sourceLanguage
       this.currentTargetLanguage = step.targetLanguage
       this.currentStepName = step.step
-      this.currentUnit = this.units.find(({ _id })=> _id.toString() === step.serviceStep.unit.toString()).type
+      this.currentUnit = 'ads'
 
       // this.currentVendors =  this.getVendorsForStep()
     },
@@ -117,7 +141,7 @@ export default {
       // userGroup: "getUserGroup"
     }),
     groupedByTaskId() {
-      return Object.values(_.groupBy(this.steps, ({taskId}) => taskId))
+      return Object.values(_.groupBy(this.steps, ({ taskId }) => taskId))
     },
     // filteredSteps() {
     //   if(this.selectedTab = "Steps") return this.groupedByTaskId()
@@ -126,23 +150,23 @@ export default {
     //   })
     // },
     actualSteps() {
-      let actualSteps = new Set(['Steps'])
+      let actualSteps = new Set([ 'All Steps' ])
       for (const step of this.groupedByTaskId) {
-        for (const {name} of step) {
-          actualSteps.add(name)
+        for (const { step } of step) {
+          actualSteps.add(step.title)
         }
       }
-      return [...actualSteps]
+      return [ ...actualSteps ]
     },
     getVendorsForStep() {
       if (!this.currentSourceLanguage) return ''
-      if(this.showAllVendor) return this.vendors
-      return this.vendors.filter(({rates}) => {
+      if (this.showAllVendor) return this.vendors
+      return this.vendors.filter(({ rates }) => {
         const pricelistTable = rates.pricelistTable
         const { source, target } = this.getLang
 
         const some = pricelistTable.some(({ sourceLanguage, targetLanguage, industry, step, unit }) => {
-          const checkLang = this.isLangEqualOrEqualLangBase( sourceLanguage.lang, source.lang, this.isLangNotStrict)
+          const checkLang = this.isLangEqualOrEqualLangBase(sourceLanguage.lang, source.lang, this.isLangNotStrict)
               && this.isLangEqualOrEqualLangBase(targetLanguage.lang, target.lang, this.isLangNotStrict)
           const chekIndustry = this.isDisabledIndustry ? true : industry._id === this.industry._id
           return checkLang && chekIndustry && step.title === this.currentStepName && unit['type'] === this.currentUnit
@@ -152,8 +176,8 @@ export default {
       })
     },
     getLang() {
-      return {source: this.getLanguageBySymbol(this.currentSourceLanguage) || { lang: ''}, target: this.getLanguageBySymbol(this.currentTargetLanguage) || { lang: '' }}
-    },
+      return { source: this.getLanguageBySymbol(this.currentSourceLanguage) || { lang: '' }, target: this.getLanguageBySymbol(this.currentTargetLanguage) || { lang: '' } }
+    }
 
   },
   async created() {
@@ -161,107 +185,153 @@ export default {
   },
   components: {
     Tabs,
-    Button,
+    Button
   }
 }
 </script>
 
 <style scoped lang="scss">
-  @import "../../assets/scss/colors";
-  .vendor-manage {
-    &__title {
-      font-size: 19px;
-      font-family: Myriad600;
-    }
-    &__close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 22px;
-      cursor: pointer;
-      height: 22px;
-      width: 22px;
-      justify-content: center;
-      display: flex;
-      align-items: center;
-      font-family: Myriad900;
-      opacity: 0.8;
-      transition: ease 0.2s;
+@import "../../assets/scss/colors";
 
-      &:hover {
-        opacity: 1
-      }
-    }
-    &__body {
-      display: flex;
-    }
-    &__steps {
-      width: 30%;
-    }
-    &__vendors {
-      width: 70%;
-    }
-    &__step-info,
-    &__options{
-      display: flex;
-      gap: 25px;
-    }
-    &__step-info {
-      margin: 10px 0;
-    }
-    &__vendor{
-      display: flex;
-      align-items: center;
-      gap: 25px;
-      margin: 10px 0;
+.vendor-manage {
+  &__title {
+    font-size: 19px;
+    font-family: Myriad600;
+    margin-bottom: 20px;
+  }
+
+  &__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-family: Myriad900;
+    opacity: 0.8;
+    transition: ease 0.2s;
+
+    &:hover {
+      opacity: 1
     }
   }
-  .tabs {
+
+  &__body {
     display: flex;
+  }
 
-    &__option {
-      cursor: pointer;
-      border-left: none;
-      border-top: 1px solid $border;
-      border-right: 1px solid $border;
-      border-bottom: none;
-      background-color: $table-list;
-      padding: 1px 15px 0 8px;
-      height: 31px;
-      display: flex;
-      align-items: center;
-      color: #33333370;
+  .blocks {
 
-      &:first-child {
-        border-left: 1px solid $border !important;
-        border-top-left-radius: 4px;
-      }
+  }
 
-      &:last-child {
-        border-top-right-radius: 4px;
-      }
+  .block {
+    &__language {
+      font-size: 16px;
+      font-family: 'Myriad600';
     }
 
-    &_active {
-      background-color: $white;
+    &__step {
+      display: flex;
+      lign-items: center;
+
+      &-title {
+        width: 90px;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+
+  &__steps {
+    width: 40%;
+    display: flex;
+    background: lightcyan;
+  }
+
+  &__vendors {
+    width: 60%;
+    background: lightgrey;
+  }
+
+  &__step-info,
+  &__options {
+    display: flex;
+    gap: 25px;
+  }
+
+  &__step-info {
+    margin: 10px 0;
+  }
+
+  &__vendor {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin: 10px 0;
+  }
+}
+
+.tabs {
+  width: 160px;
+  margin-right: 20px;
+
+  &__option {
+    cursor: pointer;
+    border-left: none;
+    border-top: 1px solid $border;
+    border-right: 1px solid $border;
+    border-left: 1px solid $border;
+    border-bottom: none;
+    background-color: $table-list;
+    padding: 1px 15px 0 8px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    color: #33333370;
+    transition: all .1s;
+
+    &:hover {
       color: $text;
     }
-  }
-  input {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    height: 32px;
-    transition: .1s ease-out;
-    width: 220px;
-    font-family: 'Myriad400';
 
-    &:focus {
-      border: 1px solid $border-focus;
+    &:last-child {
+      border: 1px solid $border;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+
+    &:first-child {
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
     }
   }
+
+  &_active {
+    background-color: $white;
+    color: $text;
+  }
+}
+
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  height: 32px;
+  transition: .1s ease-out;
+  width: 200px;
+  font-family: 'Myriad400';
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
 </style>

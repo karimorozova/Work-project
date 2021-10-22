@@ -21,7 +21,7 @@ const {
 } = require('../../сalculations/wordcount')
 
 const {
-	getAfterPayablesUpdated
+	assignVendorToStep
 } = require('../../сalculations/updates')
 
 const {
@@ -539,16 +539,16 @@ router.post('/vendor-request', async (req, res) => {
 	}
 })
 
-router.post('/vendor-assignment', async (req, res) => {
-	const { step } = req.body
-	try {
-		await stepReassignedNotification(step)
-		res.send('messages sent')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on sending emails to vendors')
-	}
-})
+// router.post('/vendor-assignment-notification', async (req, res) => {
+// 	const { step } = req.body
+// 	try {
+// 		await stepReassignedNotification(step)
+// 		res.send('messages sent')
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on sending emails to vendors')
+// 	}
+// })
 
 router.post('/reassign-vendor', async (req, res) => {
 	const reassignData = { ...req.body }
@@ -575,10 +575,10 @@ router.post('/reassign-vendor', async (req, res) => {
 // 	}
 // })
 
-router.post('/step-payables', async (req, res) => {
-	let { projectId, step, index } = req.body
+router.post('/vendor-assigment', async (req, res) => {
+	let { projectId, stepsVendors } = req.body
 	try {
-		const updatedProject = await getAfterPayablesUpdated({ projectId, step, index })
+		const updatedProject = await assignVendorToStep({ projectId, stepsVendors })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

@@ -21,6 +21,15 @@ async function getProjects(obj) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.receivablesUnit')
+			.populate('steps.payablesUnit')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
+			.populate('tasks.service')
+			.populate('tasks.fullSourceLanguage')
+			.populate('tasks.fullTargetLanguage')
 			.populate('requestId', [ 'projectId' ])
 
 }
@@ -59,7 +68,15 @@ async function getProject(obj) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.receivablesUnit')
+			.populate('steps.payablesUnit')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
 			.populate('tasks.service')
+			.populate('tasks.fullSourceLanguage')
+			.populate('tasks.fullTargetLanguage')
 			.populate('requestId', [ 'projectId' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
@@ -77,6 +94,15 @@ async function updateProject(query, update) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.receivablesUnit')
+			.populate('steps.payablesUnit')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
+			.populate('tasks.service')
+			.populate('tasks.fullSourceLanguage')
+			.populate('tasks.fullTargetLanguage')
 			.populate('requestId', [ 'projectId' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo
@@ -94,6 +120,15 @@ async function getProjectAfterUpdate(query, update) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.receivablesUnit')
+			.populate('steps.payablesUnit')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
+			.populate('tasks.service')
+			.populate('tasks.fullSourceLanguage')
+			.populate('tasks.fullTargetLanguage')
 			.populate('requestId', [ 'projectId' ])
 
 	project._doc.clientBillingInfo = !!project.clientBillingInfo

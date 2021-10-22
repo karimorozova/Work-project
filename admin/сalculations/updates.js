@@ -1,25 +1,34 @@
-const { Units } = require('../models')
-const { getVendor } = require('../vendors/getVendors')
-const { getAfterWordcountPayablesUpdated } = require("./wordcount")
-const { getAfterHoursPayablesUpdated } = require("./commonUnits")
-const { updateProject } = require("../projects")
+const { getProject, updateProject } = require("../projects/getProjects")
+const { getNewStepPayablesFinanceData } = require("./finance")
+const { stepReassignedNotification } = require("../utils/projectMails")
+const { Vendors } = require("../models")
 
-async function getAfterPayablesUpdated({ projectId, step, index }) {
+async function assignVendorToStep({ projectId, stepsVendors }) {
 	try {
-		delete step.check
-		step.vendor = await getVendor({ "_id": step.vendor._id })
-		const queryStr = `steps.${ index }`
-		let project = await updateProject({ "_id": projectId }, { $set: { [queryStr]: step } })
-		let { type } = await Units.findOne({ _id: step.serviceStep.unit })
+		const { steps, industry, projectCurrency, crossRate, tasks } = await getProject({ '_id': projectId })
 
-		return type === 'CAT Wordcount'
-				? await getAfterWordcountPayablesUpdated({ project, step })
-				: await getAfterHoursPayablesUpdated({ project, step })
+		for (const stepId in stepsVendors) {
+			const vendorId = stepsVendors[stepId].toString()
+			const _idxS = steps.findIndex(({ _id }) => `${ _id }` === `${ stepId }`)
+			const _idxT = tasks.findIndex(({ taskId }) => taskId === steps[_idxS].taskId)
+
+			if (!steps[_idxS].vendor || `${ steps[_idxS].vendor._id }` !== vendorId) {
+				const vendor = await Vendors.findOne({ _id: vendorId })
+				steps[_idxS].vendor = vendor
+
+				const { task, step } = await getNewStepPayablesFinanceData({ step: steps[_idxS], vendor, industry, projectCurrency, crossRate, task: tasks[_idxT] })
+				steps[_idxS] = step
+				tasks[_idxT] = task
+				await stepReassignedNotification(steps[_idxS])
+			}
+		}
+
+		return await updateProject({ '_id': projectId }, { steps, tasks })
 
 	} catch (err) {
 		console.log(err)
-		console.log('Error in getAfterPayablesUpdated')
+		console.log('Error in assignVendorToStep')
 	}
 }
 
-module.exports = { getAfterPayablesUpdated }
+module.exports = { assignVendorToStep }

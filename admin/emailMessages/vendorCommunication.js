@@ -197,7 +197,7 @@ function stepMiddleCancelledMessage(obj) {
             </div>`
 }
 
-function vendorReassignmentMessage(obj, reason) {
+function vendorReassignmentMessage(obj) {
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
                 <header style="background-color:#efefef;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
@@ -205,7 +205,7 @@ function vendorReassignmentMessage(obj, reason) {
                 <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName }</span></p>
                     <p style="font-weight: 400;">
-                        We would like to update you that ${ obj.stepId } ${ obj.serviceStep.title } has been reassigned to a different vendor.
+                        We would like to update you that ${ obj.stepId } ${ obj.step.title } has been reassigned to a different vendor.
                     </p>
                 </div>
                 <footer>

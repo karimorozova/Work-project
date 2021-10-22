@@ -1,10 +1,45 @@
-const { CurrencyRatio, Clients, Pricelist, Languages, Vendors, Projects, Units } = require('../models')
+const { CurrencyRatio, Pricelist, Vendors, Units } = require('../models')
 
 const { multiplyPrices } = require('../multipliers')
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
 const { getProject } = require('../projects/getProjects')
+const { setTaskMetrics } = require("../сalculations/wordcount")
 
+const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task }) => {
+	const currencyRatio = await CurrencyRatio.findOne()
+	const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
+	const { fullSourceLanguage, fullTargetLanguage, payablesUnit } = step
+	const { type } = payablesUnit
+	const isMemoqCatUnit = type === 'CAT Wordcount'
+
+	const dataForComparison = {
+		sourceLanguage: fullSourceLanguage._id,
+		targetLanguage: fullTargetLanguage._id,
+		step: step._id,
+		unit: payablesUnit._id,
+		industry: industry._id
+	}
+
+	let vendorPrice = getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
+			|| getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
+			|| 0
+
+	step.vendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate)
+	step.nativeVendorRate = +vendorPrice
+
+	if (isMemoqCatUnit) {
+		task.metrics = setTaskMetrics({ metrics: task.metrics, matrix: vendor.matrix, prop: "vendor" })
+		step.finance.Wordcount.payables = +getRelativeQuantity(task.metrics, 'vendor')
+	}
+
+	const quantity = isMemoqCatUnit ? step.finance.Wordcount.payables : step.finance.Quantity.payables
+
+	step.finance.Price.payables = (quantity * step.vendorRate).toFixed(2)
+	step.nativeFinance.Price.payables = (quantity * step.nativeVendorRate).toFixed(2)
+
+	return { task, step }
+}
 
 const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTargetLanguage, metrics, step, receivablesUnit, receivablesQuantity, payablesQuantity }, isMemoq) => {
 	const currencyRatio = await CurrencyRatio.findOne()
@@ -59,105 +94,105 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 }
 
 const getStepFinanceData = async (projectData, forWords = false) => {
-	const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData
-	// const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
-	const { metrics, sourceLanguage, targetLanguage } = task
-
-	// const client = await Clients.findOne({ _id: customer })
-	// const { rates, defaultPricelist, currency } = client
-	// const currencyRatio = await CurrencyRatio.findOne()
-	// const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
-	// const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
-	// const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
-	const { step, unit, size, title } = serviceStep
-	const fullUnit = await Units.findOne({ _id: unit })
-
-	let vendor
-	if (vendorId) vendor = await Vendors.findOne({ _id: vendorId })
-
-	const dataForComparison = {
-		sourceLanguage: sourceId,
-		targetLanguage: targetId,
-		step,
-		unit,
-		size: size ? size : 1,
-		industry: industry._id
-	}
-
-	let clientPrice = getPriceFromPersonRates(rates.pricelistTable, dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
-	let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) : 0
-
-	vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
-
-	const clientRate = {
-		value: clientPrice,
-		active: true
-	}
-
-	let vendorRate = ""
-	let nativeVendorRate = ""
-
-	if (!!vendor) {
-		vendorRate = { value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate), active: true }
-		nativeVendorRate = { value: +vendorPrice, active: true }
-	}
-
-	const finance = stepFinance(false)
-	const nativeFinance = stepFinance(true)
-
-	const defaultStepPrice = finance.Price.receivables
-	if (discounts.length) {
-		const { Price: { receivables } } = finance
-		finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
-	}
-
-	return {
-		clientRate,
-		vendorRate,
-		nativeVendorRate,
-		vendor: vendor ? vendor._id : null,
-		finance,
-		nativeFinance,
-		defaultStepPrice
-	}
-
-	function stepFinance(isNative) {
-		return {
-			Quantity: {
-				receivables: quantity.receivables,
-				payables: quantity.payables
-			},
-			Wordcount: {
-				receivables: getRelativeWordCountByEntity('client', quantity.receivables),
-				payables: getRelativeWordCountByEntity('vendor', quantity.payables)
-			},
-			Price: {
-				receivables: getTotalStepPriceClient(),
-				payables: getTotalStepPriceVendor()
-			}
-		}
-
-		function getTotalStepPriceClient() {
-			return +clientRate.value * getRelativeWordCountByEntity('client', quantity.receivables)
-		}
-
-		function getTotalStepPriceVendor() {
-			if (vendor) {
-				const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
-				return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
-			}
-			return 0
-		}
-
-		function getRelativeWordCountByEntity(entity, quantity) {
-			quantity = quantity || 0
-			if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
-					? +getRelativeQuantity(metrics, entity)
-					: +quantity
-
-			return +quantity
-		}
-	}
+	// const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData
+	// // const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
+	// const { metrics, sourceLanguage, targetLanguage } = task
+	//
+	// // const client = await Clients.findOne({ _id: customer })
+	// // const { rates, defaultPricelist, currency } = client
+	// // const currencyRatio = await CurrencyRatio.findOne()
+	// // const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
+	// // const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
+	// // const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
+	// const { step, unit, size, title } = serviceStep
+	// const fullUnit = await Units.findOne({ _id: unit })
+	//
+	// let vendor
+	// if (vendorId) vendor = await Vendors.findOne({ _id: vendorId })
+	//
+	// const dataForComparison = {
+	// 	sourceLanguage: sourceId,
+	// 	targetLanguage: targetId,
+	// 	step,
+	// 	unit,
+	// 	size: size ? size : 1,
+	// 	industry: industry._id
+	// }
+	//
+	// let clientPrice = getPriceFromPersonRates(rates.pricelistTable, dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
+	// let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) : 0
+	//
+	// vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
+	//
+	// const clientRate = {
+	// 	value: clientPrice,
+	// 	active: true
+	// }
+	//
+	// let vendorRate = ""
+	// let nativeVendorRate = ""
+	//
+	// if (!!vendor) {
+	// 	vendorRate = { value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate), active: true }
+	// 	nativeVendorRate = { value: +vendorPrice, active: true }
+	// }
+	//
+	// const finance = stepFinance(false)
+	// const nativeFinance = stepFinance(true)
+	//
+	// const defaultStepPrice = finance.Price.receivables
+	// if (discounts.length) {
+	// 	const { Price: { receivables } } = finance
+	// 	finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
+	// }
+	//
+	// return {
+	// 	clientRate,
+	// 	vendorRate,
+	// 	nativeVendorRate,
+	// 	vendor: vendor ? vendor._id : null,
+	// 	finance,
+	// 	nativeFinance,
+	// 	defaultStepPrice
+	// }
+	//
+	// function stepFinance(isNative) {
+	// 	return {
+	// 		Quantity: {
+	// 			receivables: quantity.receivables,
+	// 			payables: quantity.payables
+	// 		},
+	// 		Wordcount: {
+	// 			receivables: getRelativeWordCountByEntity('client', quantity.receivables),
+	// 			payables: getRelativeWordCountByEntity('vendor', quantity.payables)
+	// 		},
+	// 		Price: {
+	// 			receivables: getTotalStepPriceClient(),
+	// 			payables: getTotalStepPriceVendor()
+	// 		}
+	// 	}
+	//
+	// 	function getTotalStepPriceClient() {
+	// 		return +clientRate.value * getRelativeWordCountByEntity('client', quantity.receivables)
+	// 	}
+	//
+	// 	function getTotalStepPriceVendor() {
+	// 		if (vendor) {
+	// 			const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
+	// 			return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
+	// 		}
+	// 		return 0
+	// 	}
+	//
+	// 	function getRelativeWordCountByEntity(entity, quantity) {
+	// 		quantity = quantity || 0
+	// 		if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
+	// 				? +getRelativeQuantity(metrics, entity)
+	// 				: +quantity
+	//
+	// 		return +quantity
+	// 	}
+	// }
 
 }
 
@@ -213,5 +248,6 @@ module.exports = {
 	getPriceFromPersonRates,
 	getPriceFromPricelist,
 	getCorrectBasicPrice,
-	getNewStepFinanceData
+	getNewStepFinanceData,
+	getNewStepPayablesFinanceData
 }

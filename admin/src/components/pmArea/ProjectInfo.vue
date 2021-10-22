@@ -94,16 +94,16 @@
 				'sendProjectDetails',
 				'storeCurrentClient'
 			]),
-			async setVendor({ vendor, index }) {
-				if (this.currentProject.steps[index].vendor &&
-						this.currentProject.steps[index].vendor._id === vendor._id) {
-					return
-				}
-				try {
-					await this.setStepVendor({ vendor, index })
-				} catch (err) {
-				}
-			},
+			// async setVendor({ vendor, index }) {
+			// 	if (this.currentProject.steps[index].vendor &&
+			// 			this.currentProject.steps[index].vendor._id === vendor._id) {
+			// 		return
+			// 	}
+			// 	try {
+			// 		await this.setStepVendor({ vendor, index })
+			// 	} catch (err) {
+			// 	}
+			// },
 			async setDate({ date, prop, stepId }) {
 				try {
 					let { steps, _id } = this.currentProject

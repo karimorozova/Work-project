@@ -233,4 +233,4 @@ function setStepsProgress(service, memoqDocs) {
 	return { ...stepProgress, ...totalProgress }
 }
 
-module.exports = { createTasksForWordcount }
+module.exports = { createTasksForWordcount, getTaskMetrics}

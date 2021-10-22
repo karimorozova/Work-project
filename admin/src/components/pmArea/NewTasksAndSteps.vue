@@ -1,9 +1,10 @@
 <template lang="pug">
   .TS
     .TS__title Tasks and Steps
-    .TS__modals
-      .modal(v-if="isModalOpen")
-        VendorManage(:steps="currentProject.steps" :industry="currentProject.industry" @closeVendorManage="closeVendorManage")
+
+    .modal(v-if="isModalOpen")
+      VendorManage(:steps="currentProject.steps" :industry="currentProject.industry" @closeVendorManage="closeVendorManage")
+
     transition(name="slide-fade")
       NewTasksData(
         v-if="allServices.length && currentProject._id && allLanguages.length"
@@ -93,7 +94,7 @@ export default {
   background-color: $white;
   padding: 25px;
   box-shadow: $box-shadow;
-  position: relative;
+  //position: relative;
   width: 1040px;
   box-sizing: border-box;
   border-radius: 4px;
@@ -103,18 +104,15 @@ export default {
     font-size: 19px;
     font-family: 'Myriad600';
   }
-  &__modals {
-    position: relative;
-  }
+
   .modal {
     position: absolute;
-    left: -25px;
-    top: -25px;
-    z-index: 10;
-
+    left: 0px;
+    top: 0px;
+    z-index: 45;
     box-sizing: border-box;
-    min-width: 1040px;
-    width: 1040px;
+    min-width: 1530px;
+    width: 1530px;
     padding: 25px;
     box-shadow: $box-shadow;
     background: white;
