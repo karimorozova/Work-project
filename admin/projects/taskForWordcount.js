@@ -2,7 +2,7 @@ const { Projects } = require('../models')
 const { getProject, updateProject } = require("./getProjects")
 const { getProjectAnalysis } = require("../services/memoqs/projects")
 const { setTaskMetrics } = require("../сalculations/wordcount")
-const { getNewStepFinanceData } = require("../сalculations/finance")
+const { getNewStepFinanceData, calculateProjectTotal } = require("../сalculations/finance")
 
 async function createTasksForWordcount(tasksInfo) {
 	const {
@@ -52,7 +52,9 @@ async function createTasksForWordcount(tasksInfo) {
 			memoqProjectId
 		})
 		let { steps, additions } = await generateStepsForCATMemoqUnit({ tasks, stepsAdditions })
-		return await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
+		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
+		return await calculateProjectTotal(projectId)
+
 	} catch (err) {
 		console.log(err)
 		console.log("Error in createTasksForWordcount")
@@ -75,9 +77,9 @@ async function generateTasksForCATMemoqUnit(
 			taskId,
 			service,
 			stepsAndUnits,
-			memoqSource: item.memoq,
+			memoqSource: source.memoq,
 			memoqTarget: item.memoq,
-			sourceLanguage: item.symbol,
+			sourceLanguage: source.symbol,
 			targetLanguage: item.symbol,
 			fullSourceLanguage: source,
 			fullTargetLanguage: item,

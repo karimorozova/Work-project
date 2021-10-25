@@ -1,6 +1,6 @@
 const { updateProject, getProject } = require("./getProjects")
 // const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor')
-const { getStepFinanceData, getNewStepFinanceData } = require('../сalculations/finance')
+const { getStepFinanceData, getNewStepFinanceData, calculateProjectTotal } = require('../сalculations/finance')
 // const { gatherServiceStepInfo } = require('./helpers')
 const ObjectId = require('mongodb').ObjectID
 
@@ -26,7 +26,9 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 	try {
 		let tasks = await generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles }, iterator)
 		let { steps, additions } = await generateStepsForCustomUnits({ tasks, stepsAdditions })
-		return await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
+		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
+		return await calculateProjectTotal(projectId)
+
 	} catch (err) {
 		console.log(err)
 		console.log("Error in createTasksAndStepsForCustomUnits")

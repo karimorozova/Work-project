@@ -1,10 +1,41 @@
-const { CurrencyRatio, Pricelist, Vendors, Units } = require('../models')
+const { CurrencyRatio, Pricelist, Projects } = require('../models')
 
 const { multiplyPrices } = require('../multipliers')
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
-const { getProject } = require('../projects/getProjects')
+const { getProject, updateProject } = require('../projects/getProjects')
 const { setTaskMetrics } = require("../сalculations/wordcount")
+const {} = require('../models')
+
+const calculateProjectTotal = async (projectId) => {
+	const { steps, additionsSteps } = await Projects.findOne({ "_id": projectId })
+
+	const finance = {
+		"Price": {
+			receivables: 0,
+			payables: 0
+		}
+	}
+
+	steps.forEach(step => {
+		const { status, finance: { Price } } = step
+
+		if (status === 'Cancelled Halfway') {
+			finance.Price.receivables += Price.halfReceivables
+			finance.Price.payables += Price.halfPayables
+		} else {
+			finance.Price.receivables += Price.receivables
+			finance.Price.payables += Price.payables
+		}
+	})
+
+	additionsSteps.forEach(step => {
+		const { finance: { Price } } = step
+		finance.Price.receivables += Price.receivables
+	})
+
+	return await updateProject({ '_id': projectId }, { finance })
+}
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task }) => {
 	const currencyRatio = await CurrencyRatio.findOne()
@@ -249,5 +280,6 @@ module.exports = {
 	getPriceFromPricelist,
 	getCorrectBasicPrice,
 	getNewStepFinanceData,
-	getNewStepPayablesFinanceData
+	getNewStepPayablesFinanceData,
+	calculateProjectTotal
 }

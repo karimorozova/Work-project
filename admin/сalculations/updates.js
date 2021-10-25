@@ -1,5 +1,5 @@
 const { getProject, updateProject } = require("../projects/getProjects")
-const { getNewStepPayablesFinanceData } = require("./finance")
+const { getNewStepPayablesFinanceData, calculateProjectTotal } = require("./finance")
 const { stepReassignedNotification } = require("../utils/projectMails")
 const { Vendors } = require("../models")
 
@@ -23,7 +23,8 @@ async function assignVendorToStep({ projectId, stepsVendors }) {
 			}
 		}
 
-		return await updateProject({ '_id': projectId }, { steps, tasks })
+		await updateProject({ '_id': projectId }, { steps, tasks })
+		return await calculateProjectTotal(projectId)
 
 	} catch (err) {
 		console.log(err)

@@ -146,19 +146,6 @@ router.get('/request', async (req, res) => {
 	}
 })
 
-//old
-router.get('/language-pairs', async (req, res) => {
-	const { customerId } = req.query
-	try {
-		const customer = await getClient({ '_id': customerId })
-		const { monoRates, wordsRates, hoursRates } = customer
-		res.send({ monoRates, wordsRates, hoursRates })
-	} catch (err) {
-		console.log(err)
-		console.log('Error on getting Project')
-	}
-})
-
 router.post('/new-project', async (req, res) => {
 	let { project, user } = req.body
 	try {
@@ -169,7 +156,6 @@ router.post('/new-project', async (req, res) => {
 		res.status(500).send('Error on creating a project!')
 	}
 })
-
 
 router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), async (req, res) => {
 	try {
@@ -539,17 +525,6 @@ router.post('/vendor-request', async (req, res) => {
 	}
 })
 
-// router.post('/vendor-assignment-notification', async (req, res) => {
-// 	const { step } = req.body
-// 	try {
-// 		await stepReassignedNotification(step)
-// 		res.send('messages sent')
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on sending emails to vendors')
-// 	}
-// })
-
 router.post('/reassign-vendor', async (req, res) => {
 	const reassignData = { ...req.body }
 	try {
@@ -562,18 +537,6 @@ router.post('/reassign-vendor', async (req, res) => {
 		res.status(500).send('Error on sending emails to vendors')
 	}
 })
-
-// router.get('/costs', async (req, res) => {
-// 	const { projectId } = req.query
-// 	try {
-// 		let project = await getProject({ _id: projectId })
-// 		const updatedProject = await updateProjectCosts(project)
-// 		res.send(updatedProject)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on getting costs')
-// 	}
-// })
 
 router.post('/vendor-assigment', async (req, res) => {
 	let { projectId, stepsVendors } = req.body
@@ -642,21 +605,6 @@ router.post('/steps-reopen', async (req, res) => {
 		res.status(500).send('Error on reopening steps')
 	}
 })
-// TODO: refactoring client request
-// router.get('/review-status', async (req, res) => {
-// 	const { group, projectId, taskId, userId } = req.query
-// 	try {
-// 		if (group === 'Administrators' || group === 'Developers') {
-// 			return res.send('available')
-// 		}
-// 		const reviewStatus = await checkPermission({ projectId, taskId, userId })
-// 		res.send(reviewStatus)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on checking delivery review status')
-// 	}
-// })
-
 
 router.post('/close-project', async (req, res) => {
 	const { projectId } = req.body
@@ -695,55 +643,6 @@ router.post('/step-finance', async (req, res) => {
 	}
 })
 
-// TODO: refactoring client request
-router.post('/request-file', upload.fields([ { name: 'newFile' } ]), async (req, res) => {
-	// const { id, oldFile } = req.body
-	// const files = req.files['newFile']
-	// const existingFile = JSON.parse(oldFile)
-	// const prop = existingFile.type === 'Source File' ? 'sourceFiles' : 'refFiles'
-	// try {
-	// 	let request = await getClientRequest({ '_id': id })
-	// 	const requestFiles = await addRequestFile({ request, files, existingFile, prop })
-	// 	request[prop] = requestFiles
-	// 	await request.save()
-	// 	res.send(request)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on saving request file')
-	// }
-})
-// TODO: refactoring client request
-router.post('/remove-request-file', async (req, res) => {
-	// const { id, prop, path } = req.body
-	// try {
-	// 	let request = await getClientRequest({ '_id': id })
-	// 	request[prop] = await removeRequestFile({ path, files: request[prop] })
-	// 	await request.save()
-	// 	res.send(request)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on removing request file')
-	// }
-})
-// TODO: refactoring client request
-router.post('/delete-request-files', async (req, res) => {
-	// const { id, sourceFiles, refFiles } = req.body
-	// try {
-	// 	let request = await getClientRequest({ '_id': id })
-	// 	if (sourceFiles.length) {
-	// 		request.sourceFiles = await removeRequestFiles(sourceFiles, request.sourceFiles)
-	// 	}
-	// 	if (refFiles.length) {
-	// 		request.refFiles = await removeRequestFiles(refFiles, request.refFiles)
-	// 	}
-	// 	await request.save()
-	// 	res.send(request)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on removing request file')
-	// }
-})
-// TODO: refactoring client request
 router.post('/delete-project', async (req, res) => {
 	const { projectId } = req.body
 	try {
@@ -753,52 +652,6 @@ router.post('/delete-project', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Error on removing request file')
 	}
-})
-// TODO: refactoring client request
-router.post('/file-approvement', async (req, res) => {
-	// const { id, file, prop } = req.body
-	// try {
-	// 	let request = await getClientRequest({ '_id': id })
-	// 	request[prop] = request[prop].map(item => {
-	// 		if (item.fileName === file.fileName && item.path === file.path) {
-	// 			return { ...item, isApproved: file.isApproved }
-	// 		}
-	// 		return item
-	// 	})
-	// 	await request.save()
-	// 	res.send(request)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on approvement of request file')
-	// }
-})
-// TODO: refactoring client request
-router.post('/prop-approvement', async (req, res) => {
-	// const { id, prop } = req.body
-	// try {
-	// 	let request = await getClientRequest({ '_id': id })
-	// 	request[prop] = !request[prop]
-	// 	request.save()
-	// 	res.send(request)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on approvement of request file')
-	// }
-})
-// TODO: refactoring client request
-router.post('/request-value', async (req, res) => {
-	// const { id, prop, value, isEmail } = req.body
-	// let updateQuery = prop === 'accountManager' ? { [prop]: value, isAssigned: false } : { [prop]: value }
-	// try {
-	// 	const updatedRequest = await updateClientRequest({ '_id': id }, updateQuery)
-	// 	if (isEmail) {
-	// 		await sendNotificationToManager(updatedRequest, prop)
-	// 	}
-	// 	res.send(updatedRequest)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error on saving request property value')
-	// }
 })
 
 router.post('/project-value', async (req, res) => {
@@ -818,26 +671,6 @@ router.post('/project-value', async (req, res) => {
 		console.log(err)
 		res.status(500).send('Error on saving project property value')
 	}
-})
-
-router.post('/step-target', upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
-	// TODO not used! refactoring
-	// const { jobId } = req.body
-	// try {
-	// 	const project = await getProject({ 'steps._id': jobId })
-	// 	const { targetFile } = req.files
-	// 	const paths = await storeFiles(targetFile, project.id)
-	// 	const updatedProject = await updateNonWordsTaskTargetFiles({
-	// 		project,
-	// 		path: paths[0],
-	// 		jobId,
-	// 		fileName: targetFile[0].filename
-	// 	})
-	// 	res.send(updatedProject)
-	// } catch (err) {
-	// 	console.log(err)
-	// 	res.status(500).send('Error / Cannot add Target file to the Steps array of Project')
-	// }
 })
 
 function getAccManagerAndContact(project) {
@@ -882,17 +715,6 @@ router.post('/urgent', async (req, res) => {
 		res.status(500).send('Error on updating project urgent')
 	}
 })
-
-// router.post('/payment-profile', async (req, res) => {
-// 	const { projectId, paymentProfile } = req.body
-// 	try {
-// 		const project = await getProjectAfterUpdate({ _id: projectId }, { paymentProfile })
-// 		res.send(project)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on updating payment profile')
-// 	}
-// })
 
 router.post('/client-contact', async (req, res) => {
 	const { projectId, contact, oldContact: { _id: oldContact } } = req.body
@@ -1053,17 +875,6 @@ router.get('/get-project-discounts', async (req, res) => {
 	}
 })
 
-// router.get('/get-project-payment-additions', async (req, res) => {
-// 	const { id } = req.query
-// 	try {
-// 		const paymentAdditions = await Projects.findOne({ "_id": id }, { paymentAdditions: 1 })
-// 		res.send(paymentAdditions)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on getting project discounts')
-// 	}
-// })
-
 router.post('/update-project-discounts', async (req, res) => {
 	const { _id, updatedArray } = req.body
 	try {
@@ -1078,34 +889,13 @@ router.post('/update-project-discounts', async (req, res) => {
 router.post('/update-project-additions', async (req, res) => {
 	const { _id, additionsSteps } = req.body
 	try {
-		const updatedProject = await Projects.updateOne({_id}, {additionsSteps})
+		const updatedProject = await Projects.updateOne({ _id }, { additionsSteps })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on updating project\'s discounts')
 	}
 })
-
-// router.post('/update-project-payment-additions', async (req, res) => {
-// 	const { _id, addItem } = req.body
-// 	try {
-// 		const updatedProject = await addPaymentAdditions(_id, addItem)
-// 		res.send(updatedProject)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on updating project\'s discounts')
-// 	}
-// })
-// router.post('/delete-project-payment-additions', async (req, res) => {
-// 	const { _id, deleteItem } = req.body
-// 	try {
-// 		const updatedProject = await deletePaymentAddition(_id, deleteItem)
-// 		res.send(updatedProject)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on updating project\'s discounts')
-// 	}
-// })
 
 router.post('/update-minimum-charge', async (req, res) => {
 	const { _id, value, toIgnore } = req.body
@@ -1127,10 +917,6 @@ router.post('/remove-vendor-from-step', async (req, res) => {
 		const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
 		const updatedProject = await updateProject({ '_id': projectId }, { steps, tasks })
 		res.send(updatedProject)
-
-		//FIN53
-		// const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
-		// res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on remove-vendor-from-step!')

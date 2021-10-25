@@ -270,7 +270,7 @@ export default {
   border: 2px solid $light-border;
   border-radius: 4px;
   padding: 25px;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 
   &__button {
     margin-top: 20px;

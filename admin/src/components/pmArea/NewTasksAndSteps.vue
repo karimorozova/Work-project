@@ -62,7 +62,7 @@ export default {
     return {
       tabs: [ 'Tasks', 'Steps', 'Additional Steps' ],
       isModalOpen: false,
-      isTaskData: true
+      isTaskData: false
     }
   },
   methods: {

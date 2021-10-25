@@ -5,16 +5,10 @@ export const decrementRequestCounter = ({ commit }) => commit('endRequest')
 export const loadingToggle = ({ commit }, payload) => commit('loadingValue', payload)
 export const servicesGetting = ({ commit }, payload) => commit('servicesFill', payload)
 export const setAllCustomers = ({ commit }, payload) => commit('allCustomers', payload)
-export const gettingClientLangs = ({ commit }, payload) => commit('customerlangs', payload)
-
 export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload)
 
-
-export const duoRatesGetting = ({ commit }, payload) => commit('duoRatesFill', payload)
-export const setAllProjects = ({ commit }, payload) => commit('allProjects', payload)
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload)
 export const setProjectProp = ({ commit }, payload) => commit('storeProjectProp', payload)
-// export const setStepDate = ({ commit }, payload) => commit('stepDateStore', payload);
 export const removeStepVendor = ({ commit }, payload) => commit('stepVendorDelete', payload)
 export const vendorsSetting = ({ commit }, payload) => commit('allVendors', payload)
 
@@ -65,11 +59,8 @@ export const getSteps = async ({ commit, dispatch }) => {
 	commit('startRequest')
 	try {
 		const result = await Vue.http.get('/api/steps')
-		const allSteps = result.body
-		allSteps.sort((a, b) => {
-			return a.sortIndex - b.sortIndex
-		})
-		dispatch('servicesGetting', allSteps)
+		dispatch('servicesGetting', result.body)
+		return result.body
 	} catch (err) {
 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
 	} finally {
@@ -103,7 +94,6 @@ export const sendCancelProjectMessage = async ({ commit, state, dispatch }, payl
 	}
 }
 
-
 export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
 	commit('startRequest')
 	try {
@@ -124,9 +114,8 @@ export const setStepVendors = async ({ commit, dispatch, state }, payload) => {
 	commit('startRequest')
 	try {
 		const { projectId, stepsVendors } = payload
-		const updatedProject = await Vue.http.post('/pm-manage/vendor-assigment', { projectId, stepsVendors });
-		await commit('storeCurrentProject', updatedProject.body)
-		// dispatch('alertToggle', { message: "Step data updated", isShow: true })
+		const updatedProject = await Vue.http.post('/pm-manage/vendor-assigment', { projectId, stepsVendors })
+		await commit('storeCurrentProject', updatedProject.data)
 	} catch (err) {
 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
 	} finally {
@@ -134,21 +123,7 @@ export const setStepVendors = async ({ commit, dispatch, state }, payload) => {
 	}
 }
 
-// export const updateCurrentProject = async ({ commit, dispatch, state }, payload) => {
-//     commit('startRequest')
-//     try {
-//         const updatedProject = await Vue.http.post('/pm-manage/update-project', {...payload});
-//         const index = state.projects.findIndex(item => item._id === updatedProject.data._id);
-//         state.projects[index] = updatedProject.data;
-//         await commit('storeCurrentProject', updatedProject.data);
-//     } catch(err) {
-//         dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
-//     } finally {
-//         commit('endRequest');
-//     }
-// }
-
-export const updateMatrix = async ({ commit }, payload) => {
+export const updateMatrix = async ({ commit, dispatch }, payload) => {
 	commit('startRequest')
 	commit('updateMatrixData', payload)
 	try {
@@ -161,7 +136,7 @@ export const updateMatrix = async ({ commit }, payload) => {
 	}
 }
 
-export const updateReport = async ({ commit }, payload) => {
+export const updateReport = async ({ commit, dispatch }, payload) => {
 	commit('startRequest')
 	try {
 		const { id, notes, isWorkingDay } = payload
@@ -199,19 +174,19 @@ export const sendClientQuote = async ({ commit, state, dispatch }, payload) => {
 	}
 }
 
-export const sendProjectDetails = async ({ commit, state }, payload) => {
+export const sendProjectDetails = async ({ commit, state, dispatch }, payload) => {
 	commit('startRequest')
 	try {
 		const { message } = payload
 		await Vue.http.post('/pm-manage/project-details', { id: state.currentProject._id, message })
 	} catch (err) {
-		// dispatch('alertToggle', {message: err.body, isShow: true, type: "error"});
+		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
 	} finally {
 		commit('endRequest')
 	}
 }
 
-export const saveUser = async ({ commit }, payload) => {
+export const saveUser = async ({ commit, dispatch }, payload) => {
 	commit('startRequest')
 	try {
 		await Vue.http.post('/user', payload)
@@ -260,10 +235,6 @@ export const login = ({ commit, state }, payload) => {
 	})
 }
 
-// export const logout = ({ commit }) => {
-//     localStorage.removeItem("token");
-// }
-
 export const setUser = async ({ commit, state, dispatch }) => {
 	commit('startRequest')
 	try {
@@ -302,11 +273,3 @@ export const setSteps = async ({ commit }) => {
 	let result = await Vue.http.get('/api/steps')
 	commit('allSteps', result.data)
 }
-// export const allUsers = ({ commit }, payload) => commit('allUsers', payload);
-//
-// export const allLanguages = ({ commit }, payload) => commit('allLangs', payload);
-//
-// export const allIndustries = ({ commit }, payload) => commit('allIndustries', payload);
-// export const allSteps = ({ commit }, payload) => commit('allSteps', payload);
-// export const allUnits = ({ commit }, payload) => commit('allUnits', payload);
-// export const allServices = ({ commit }, payload) => commit('allServices', payload);
