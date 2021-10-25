@@ -1,13 +1,13 @@
 <template lang="pug">
   .wrapper
-    .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
-      .steps__modal
-        .modal-title Add steps to workflow:
+    .steps(v-if="tasksData.service && tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
+      .steps__modal(v-if="isAddModal")
+        .modal-title Add steps to workflow
         .step__setting-title Steps:
-        .drop
+        .drop(style="width: 220px;")
           SelectSingle(
             :selectedOption="newStep"
-            :options="tasksData.service.steps.map(i => i.step.title)"
+            :options="possibleStepsForAdding"
             placeholder="Option"
             @chooseOption="setNewStep"
           )
@@ -15,7 +15,7 @@
           .buttons__btn
             Button(@clicked="addStep" value="Add" )
           .buttons__btn
-            Button(@clicked="closeAddStepModal" value="Add" :outline="true")
+            Button(@clicked="closeAddStepModal" value="Cancel" :outline="true")
 
       draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
@@ -127,7 +127,7 @@
     .add(v-if="!isCatUnit" )
       .add__row
         .add__add(v-if="tasksData.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
-          Add(add="openAddStepModal")
+          Add(@add="openAddStepModal")
         .add__add(v-else)
         .add__options
           CheckBox(:isChecked="isDisabledPayablesEdit" @check="toggleBox" @uncheck="toggleBox")
@@ -169,15 +169,15 @@ export default {
   },
   methods: {
     addStep() {
-      // const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep)
-      // let stepsAndUnits = this.tasksData.stepsAndUnits
-      // stepsAndUnits.push({
-      //   step,
-      //   start: '',
-      //   deadline: '',
-      //   receivables: { unit: step.calculationUnit[0], quantity: 0 },
-      //   payables: { unit: step.calculationUnit[0], quantity: 0 }
-      // })
+      const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
+      let stepsAndUnits = this.tasksData.stepsAndUnits
+      stepsAndUnits.push({
+        step,
+        start: '',
+        deadline: '',
+        receivables: { unit: step.calculationUnit[0], quantity: 0 },
+        payables: { unit: step.calculationUnit[0], quantity: 0 }
+      })
       this.closeAddStepModal()
     },
     setNewStep({ option }) {
@@ -251,6 +251,12 @@ export default {
       if (this.tasksData && this.tasksData.service) {
         return this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
       }
+    },
+    possibleStepsForAdding() {
+      if (this.tasksData.service) {
+        return this.tasksData.service.steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
+      }
+      return []
     }
   },
   name: "NewServicesCreationStepsWorkflow"
@@ -261,7 +267,32 @@ export default {
 @import "../../../assets/scss/colors";
 
 .steps {
+  position: relative;
 
+  &__modal {
+    z-index: 12;
+    width: fit-content;
+    background: white;
+    box-shadow: $box-shadow;
+    padding: 25px;
+    border-radius: 4px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.modal-title {
+  margin-bottom: 15px;
+  font-size: 19px;
+  font-family: Myriad600;
 }
 
 .add {
@@ -393,8 +424,8 @@ input {
 
 .calendar {
   position: absolute;
-  top: 24px;
-  opacity: .3;
+  top: 25px;
+  opacity: .2;
   right: 8px;
   font-size: 16px;
 }
