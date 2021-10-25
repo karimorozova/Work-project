@@ -53,8 +53,9 @@
 			goToMemoq(item) {
 				const { WebTransUrl } = item
 
-				const domainUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
-				window.open(`${ domainUrl }`, '_blank')
+				// const domainUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
+
+				window.open(`${ 'https://memoq.pangea.global/memoqwebLegacy/webtrans/' + WebTransUrl.split('/webtrans/').pop() }`, '_blank')
 			},
 			stepLanguages(step) {
 				const { sourceLanguage, targetLanguage } = step

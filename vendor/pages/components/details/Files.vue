@@ -162,8 +162,9 @@
 					this.documentGuid = DocumentGuid
 					this.backStepModal = true
 				} else {
-					const newUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
-					let link = document.createElement("a")
+          // const newUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
+          const newUrl = `${ 'https://memoq.pangea.global/memoqwebLegacy/webtrans/' + WebTransUrl.split('/webtrans/').pop() }`
+          let link = document.createElement("a")
 					link.target = "_blank"
 					link.href = newUrl
 					link.click()
