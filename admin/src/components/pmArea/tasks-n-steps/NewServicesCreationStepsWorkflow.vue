@@ -13,9 +13,9 @@
           )
         .buttons
           .buttons__btn
-            Button(@clicked="closeAddStepModal" value="Add" )
+            Button(@clicked="addStep" value="Add" )
           .buttons__btn
-            Button(@clicked="Close" value="Add" :outline="true")
+            Button(@clicked="closeAddStepModal" value="Add" :outline="true")
 
       draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
@@ -168,8 +168,20 @@ export default {
     }
   },
   methods: {
+    addStep() {
+      // const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep)
+      // let stepsAndUnits = this.tasksData.stepsAndUnits
+      // stepsAndUnits.push({
+      //   step,
+      //   start: '',
+      //   deadline: '',
+      //   receivables: { unit: step.calculationUnit[0], quantity: 0 },
+      //   payables: { unit: step.calculationUnit[0], quantity: 0 }
+      // })
+      this.closeAddStepModal()
+    },
     setNewStep({ option }) {
-        this.newStep = option
+      this.newStep = option
     },
     openAddStepModal() {
       this.isAddModal = true
