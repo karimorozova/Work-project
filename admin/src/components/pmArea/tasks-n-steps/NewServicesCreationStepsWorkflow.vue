@@ -1,6 +1,22 @@
 <template lang="pug">
   .wrapper
     .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
+      .steps__modal
+        .modal-title Add steps to workflow:
+        .step__setting-title Steps:
+        .drop
+          SelectSingle(
+            :selectedOption="newStep"
+            :options="tasksData.service.steps.map(i => i.step.title)"
+            placeholder="Option"
+            @chooseOption="setNewStep"
+          )
+        .buttons
+          .buttons__btn
+            Button(@clicked="closeAddStepModal" value="Add" )
+          .buttons__btn
+            Button(@clicked="Close" value="Add" :outline="true")
+
       draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
 
@@ -30,7 +46,7 @@
                   SelectSingle(
                     :selectedOption="item.receivables.unit.type || ''"
                     :options="item.step.calculationUnit.map(i => i.type)"
-                    placeholder="Select"
+                    placeholder="Option"
                     @chooseOption="(e) => setUnit(e, 'receivables', index)"
                   )
               .step__setting
@@ -40,7 +56,7 @@
                     :hasSearch="true"
                     :selectedOption="tasksData.template ? tasksData.template.name : ''"
                     :options="templates.map(i => i.name)"
-                    placeholder="Select"
+                    placeholder="Option"
                     @chooseOption="setTemplate"
                   )
 
@@ -51,7 +67,7 @@
                   SelectSingle(
                     :selectedOption="item.receivables.unit.type || ''"
                     :options="item.step.calculationUnit.map(i => i.type)"
-                    placeholder="Select"
+                    placeholder="Option"
                     @chooseOption="(e) => setUnit(e, 'receivables', index)"
                   )
               .step__setting
@@ -65,7 +81,7 @@
                   SelectSingle(
                     :selectedOption="item.payables.unit.type || ''"
                     :options="item.step.calculationUnit.map(i => i.type)"
-                    placeholder="Select"
+                    placeholder="Option"
                     @chooseOption="(e) => setUnit(e, 'payables', index)"
                     :isDisabled="isDisabledPayablesEdit"
                   )
@@ -111,7 +127,7 @@
     .add(v-if="!isCatUnit" )
       .add__row
         .add__add(v-if="tasksData.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
-          Add
+          Add(add="openAddStepModal")
         .add__add(v-else)
         .add__options
           CheckBox(:isChecked="isDisabledPayablesEdit" @check="toggleBox" @uncheck="toggleBox")
@@ -128,9 +144,10 @@ import draggable from "vuedraggable"
 import JobDescriptors from "../JobDescriptors"
 import Add from "../../Add"
 import CheckBox from "../../CheckBox"
+import Button from "../../Button"
 
 export default {
-  components: { CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable },
+  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable },
   props: {
     templates: {
       type: Array,
@@ -140,16 +157,27 @@ export default {
   data() {
     return {
       isDisabledPayablesEdit: true,
+      isAddModal: false,
       highlighted: {
         days: [ 6, 0 ]
       },
       disabled: {
         to: moment().add(-1, 'day').endOf('day').toDate()
-      }
+      },
+      newStep: ''
     }
   },
   methods: {
-    ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" }),
+    setNewStep({ option }) {
+        this.newStep = option
+    },
+    openAddStepModal() {
+      this.isAddModal = true
+    },
+    closeAddStepModal() {
+      this.isAddModal = false
+      this.newStep = ''
+    },
     toggleBox() {
       this.isDisabledPayablesEdit = !this.isDisabledPayablesEdit
     },
@@ -199,7 +227,8 @@ export default {
       const stepsAndUnits = [ ...this.tasksData.stepsAndUnits ]
       stepsAndUnits.splice(index, 1)
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
-    }
+    },
+    ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" })
   },
   computed: {
     ...mapGetters({

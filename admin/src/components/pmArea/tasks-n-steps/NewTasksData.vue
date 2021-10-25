@@ -33,11 +33,11 @@
         :templates="templates"
       )
 
-    .taskData__row
+    .taskData__files
       TasksFiles
 
-    .taskData__row
-      Button(:value="'Add Tasks'" @clicked="saveTasksChecks")
+    .taskData__button
+      Button(:value="'Add Tasks & Steps'" @clicked="saveTasksChecks")
 
 </template>
 
@@ -271,6 +271,16 @@ export default {
   border-radius: 4px;
   padding: 25px;
   margin-bottom: 25px;
+
+  &__button {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__files {
+    margin-top: 30px;
+  }
 
   &__row {
     &-servicesLanguages {
