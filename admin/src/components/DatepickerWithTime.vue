@@ -1235,6 +1235,9 @@
   .datepicker-custom-mod {
     width: 220px;
   }
+  .datepicker-custom-mod2 {
+    width: 200px;
+  }
 
   .steps__custom-input {
     color: $text;

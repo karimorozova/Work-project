@@ -1,107 +1,121 @@
 <template lang="pug">
-  .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
-    draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
-      .step(v-for="(item, index) in tasksData.stepsAndUnits" )
+  .wrapper
+    .steps(v-if="tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
+      draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
+        .step(v-for="(item, index) in tasksData.stepsAndUnits" )
 
-        .step__titleRow
-          .step__titleRow-title {{ item.step.title }}
-          .step__titleRow-desctiptions
-            .step__titleRow-desctiptions-title Receivables
-            .step__titleRow-desctiptions-title Payables
-            .step__titleRow-desctiptions-title Dates
+          .step__titleRow
+            .step__titleRow-title {{ item.step.title }}
+            .step__titleRow-desctiptions(v-if="isCatUnit || isDisabledPayablesEdit" )
+              .step__titleRow-desctiptions-title Receivables & Payables
+              .step__titleRow-desctiptions-title Dates
+            .step__titleRow-desctiptions(v-else)
+              .step__titleRow-desctiptions-title Receivables
+              .step__titleRow-desctiptions-title Payables
+              .step__titleRow-desctiptions-title Dates
 
-        .step__detailsRow
+          .step__detailsRow
 
-          .step__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
-            .step__icon(@click="deleteStep(index)" style="cursor: pointer;")
-              i.fas.fa-trash
-            .step__icon.handle(style="cursor: grab")
-              i.fas.fa-arrows-alt-v
+            .step__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
+              .step__icon(@click="deleteStep(index)" style="cursor: pointer;")
+                i.fas.fa-trash
+              .step__icon.handle(style="cursor: grab")
+                i.fas.fa-arrows-alt-v
 
 
-          .step__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
-            .step__setting
-              .step__setting-title Unit:
-              .drop
-                SelectSingle(
-                  :selectedOption="item.receivables.unit.type || ''"
-                  :options="item.step.calculationUnit.map(i => i.type)"
-                  placeholder="Select"
-                  @chooseOption="(e) => setUnit(e, 'receivables', index)"
-                )
-            .step__setting
-              .step__setting-title Memoq:
-              .drop(v-if="templates.length")
-                SelectSingle(
-                  :hasSearch="true"
-                  :selectedOption="tasksData.template ? tasksData.template.name : ''"
-                  :options="templates.map(i => i.name)"
-                  placeholder="Select"
-                  @chooseOption="setTemplate"
-                )
+            .step__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
+              .step__setting
+                .step__setting-title Unit:
+                .drop
+                  SelectSingle(
+                    :selectedOption="item.receivables.unit.type || ''"
+                    :options="item.step.calculationUnit.map(i => i.type)"
+                    placeholder="Select"
+                    @chooseOption="(e) => setUnit(e, 'receivables', index)"
+                  )
+              .step__setting
+                .step__setting-title Memoq:
+                .drop(v-if="templates.length")
+                  SelectSingle(
+                    :hasSearch="true"
+                    :selectedOption="tasksData.template ? tasksData.template.name : ''"
+                    :options="templates.map(i => i.name)"
+                    placeholder="Select"
+                    @chooseOption="setTemplate"
+                  )
 
-          .step__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
-            .step__setting
-              .step__setting-title Unit:
-              .drop
-                SelectSingle(
-                  :selectedOption="item.receivables.unit.type || ''"
-                  :options="item.step.calculationUnit.map(i => i.type)"
-                  placeholder="Select"
-                  @chooseOption="(e) => setUnit(e, 'receivables', index)"
-                )
-            .step__setting
-              .step__setting-title Quantity:
-              input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
+            .step__settings(v-if="!isCatUnit")
+              .step__setting
+                .step__setting-title Unit:
+                .drop
+                  SelectSingle(
+                    :selectedOption="item.receivables.unit.type || ''"
+                    :options="item.step.calculationUnit.map(i => i.type)"
+                    placeholder="Select"
+                    @chooseOption="(e) => setUnit(e, 'receivables', index)"
+                  )
+              .step__setting
+                .step__setting-title Quantity:
+                input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
 
-          .step__settings(v-if="tasksData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount'")
-            .step__setting
-              .step__setting-title Unit:
-              .drop
-                SelectSingle(
-                  :selectedOption="item.payables.unit.type || ''"
-                  :options="item.step.calculationUnit.map(i => i.type)"
-                  placeholder="Select"
-                  @chooseOption="(e) => setUnit(e, 'payables', index)"
-                )
-            .step__setting
-              .step__setting-title Quantity:
-              input(type="number" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
+            .step__settings(v-if="!isCatUnit && !isDisabledPayablesEdit")
+              .step__setting
+                .step__setting-title Unit:
+                .drop
+                  SelectSingle(
+                    :selectedOption="item.payables.unit.type || ''"
+                    :options="item.step.calculationUnit.map(i => i.type)"
+                    placeholder="Select"
+                    @chooseOption="(e) => setUnit(e, 'payables', index)"
+                    :isDisabled="isDisabledPayablesEdit"
+                  )
+              .step__setting
+                .step__setting-title Quantity:
+                input(type="number" :disabled="isDisabledPayablesEdit" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
-          .step__date
-            .step__datepicker
-              .step__datepicker-title Start:
-              .step__datepicker-input
-                DatepickerWithTime(
-                  :isReadonly="true"
-                  :value="item.start"
-                  :format="customFormatter"
-                  monday-first=true
-                  :highlighted="highlighted"
-                  inputClass="datepicker-custom"
-                  inputClass2="datepicker-custom-mod"
-                  calendarClass="calendar-custom"
-                  :placeholder="'Date'"
-                  @selected="(e) => setDate(e, 'start', index)"
-                )
-                i.far.fa-calendar-alt.calendar
+            .step__date
+              .step__datepicker
+                .step__datepicker-title Start:
+                .step__datepicker-input
+                  DatepickerWithTime(
+                    :isReadonly="true"
+                    :value="item.start"
+                    :format="customFormatter"
+                    monday-first=true
+                    :highlighted="highlighted"
+                    inputClass="datepicker-custom"
+                    inputClass2="datepicker-custom-mod2"
+                    calendarClass="calendar-custom"
+                    :placeholder="'Date'"
+                    @selected="(e) => setDate(e, 'start', index)"
+                  )
+                  i.far.fa-calendar-alt.calendar
 
-            .step__datepicker
-              .step__datepicker-title Deadline:
-              .step__datepicker-input
-                DatepickerWithTime(
-                  :isReadonly="true"
-                  :value="item.deadline"
-                  :format="customFormatter"
-                  monday-first=true
-                  :highlighted="highlighted"
-                  inputClass="datepicker-custom"
-                  inputClass2="datepicker-custom-mod"
-                  calendarClass="calendar-custom"
-                  :placeholder="'Date'"
-                  @selected="(e) => setDate(e, 'deadline', index)"
-                )
-                i.far.fa-calendar-alt.calendar
+              .step__datepicker
+                .step__datepicker-title Deadline:
+                .step__datepicker-input
+                  DatepickerWithTime(
+                    :isReadonly="true"
+                    :value="item.deadline"
+                    :format="customFormatter"
+                    monday-first=true
+                    :highlighted="highlighted"
+                    inputClass="datepicker-custom"
+                    inputClass2="datepicker-custom-mod2"
+                    calendarClass="calendar-custom"
+                    :placeholder="'Date'"
+                    @selected="(e) => setDate(e, 'deadline', index)"
+                  )
+                  i.far.fa-calendar-alt.calendar
+
+    .add(v-if="!isCatUnit" )
+      .add__row
+        .add__add(v-if="tasksData.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
+          Add
+        .add__add(v-else)
+        .add__options
+          CheckBox(:isChecked="isDisabledPayablesEdit" @check="toggleBox" @uncheck="toggleBox")
+          span Same payable options
 
 </template>
 
@@ -112,9 +126,11 @@ import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
 import JobDescriptors from "../JobDescriptors"
+import Add from "../../Add"
+import CheckBox from "../../CheckBox"
 
 export default {
-  components: { JobDescriptors, SelectSingle, DatepickerWithTime, draggable },
+  components: { CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable },
   props: {
     templates: {
       type: Array,
@@ -123,6 +139,7 @@ export default {
   },
   data() {
     return {
+      isDisabledPayablesEdit: true,
       highlighted: {
         days: [ 6, 0 ]
       },
@@ -133,6 +150,9 @@ export default {
   },
   methods: {
     ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" }),
+    toggleBox() {
+      this.isDisabledPayablesEdit = !this.isDisabledPayablesEdit
+    },
     setTemplate({ option }) {
       const template = this.templates.find(i => i.name === option)
       this.setDataValue({ prop: 'template', value: template })
@@ -147,7 +167,12 @@ export default {
     },
     setQuantity(e, prop, index) {
       let stepsAndUnits = this.tasksData.stepsAndUnits
-      stepsAndUnits[index][prop].quantity = e.target.value
+      if (this.isDisabledPayablesEdit) {
+        stepsAndUnits[index]['receivables'].quantity = e.target.value
+        stepsAndUnits[index]['payables'].quantity = e.target.value
+      } else {
+        stepsAndUnits[index][prop].quantity = e.target.value
+      }
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
     setUnit({ option }, prop, index) {
@@ -159,6 +184,10 @@ export default {
           for (const prop of [ 'receivables', 'payables' ]) stepsAndUnits[i][prop].unit = unit
         }
       } else {
+        if (this.isDisabledPayablesEdit) {
+          stepsAndUnits[index]['receivables'].unit = unit
+          stepsAndUnits[index]['payables'].unit = unit
+        }
         stepsAndUnits[index][prop].unit = unit
         this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
       }
@@ -176,7 +205,12 @@ export default {
     ...mapGetters({
       tasksData: "getTasksData",
       allUnits: "getAllUnits"
-    })
+    }),
+    isCatUnit() {
+      if (this.tasksData && this.tasksData.service) {
+        return this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
+      }
+    }
   },
   name: "NewServicesCreationStepsWorkflow"
 }
@@ -189,16 +223,28 @@ export default {
 
 }
 
+.add {
+  &__row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__options {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+}
 
 .step {
   margin: 20px 0;
-  background: $body;
+  background: #f7f7f759;
   border: 1px solid $light-border;
   border-radius: 4px;
   padding: 10px 20px;
 
   &__icons {
-    width: 143px;
+    width: 100%;
     display: flex;
     gap: 14px;
 
@@ -233,22 +279,22 @@ export default {
     align-items: center;
 
     &-title {
-      width: 143px;
-      font-size: 15px;
+      width: 201px;
+      font-size: 14px;
     }
 
     &-desctiptions {
       display: flex;
 
       &-title {
-        width: 220px;
+        width: 200px;
         margin-left: 15px;
         padding-left: 15px;
       }
     }
 
     &-title {
-      font-size: 15px;
+      font-size: 14px;
       font-family: Myriad900;
     }
   }
@@ -256,7 +302,7 @@ export default {
   &__setting,
   &__datepicker {
     height: 56px;
-    width: 220px;
+    width: 200px;
     position: relative;
     margin-left: 15px;
     padding-left: 15px;
@@ -276,7 +322,7 @@ export default {
 .drop {
   background: white;
   border-radius: 4px;
-  width: 220px;
+  width: 200px;
   height: 32px;
   position: relative;
 }
@@ -289,7 +335,7 @@ input {
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
-  width: 220px;
+  width: 200px;
   height: 32px;
   transition: .1s ease-out;
 
