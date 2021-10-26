@@ -358,11 +358,14 @@ const setApprovedStepStatus = ({ project, step, steps }) => {
 				const { stepNumber } = step
 				const prevStep = brotherlySteps.find(item => item.stepNumber === stepNumber - 1)
 				if (prevStep && isProjectApprovedStatus) {
-					item.status = prevStep === 'Completed' ? 'Ready to Start' : 'Waiting to Start'
+					item.status = prevStep.status === 'Completed' ? 'Ready to Start' : 'Waiting to Start'
+					return item
 				}
-				item.status = 'Approved'
+				item.status = isProjectApprovedStatus ? 'Ready to Start' : 'Approved'
+				return item
 			}
 			item.status = isProjectApprovedStatus ? 'Ready to Start' : 'Approved'
+			return item
 		}
 		return item
 	})
