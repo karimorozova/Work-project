@@ -3,7 +3,17 @@ const { checkVendor } = require('../../middleware')
 const jwt = require("jsonwebtoken")
 const { secretKey } = require('../../configs')
 const { Vendors, PaymentTerms } = require('../../models')
-const { getVendor, getVendorAfterUpdate, saveHashedPassword, getPhotoLink, removeOldVendorFile, getJobs, updateStepProp, hasVendorCompetenciesAndPending, managePaymentMethods } = require('../../vendors')
+const {
+	getVendor,
+	getVendorAfterUpdate,
+	saveHashedPassword,
+	getPhotoLink,
+	removeOldVendorFile,
+	getJobs,
+	updateStepProp,
+	hasVendorCompetenciesAndPending,
+	managePaymentMethods
+} = require('../../vendors')
 const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
 const { createMemoqUser } = require('../../services/memoqs/users')
@@ -11,8 +21,17 @@ const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunicatio
 const { assignMemoqTranslator, getProject, updateProjectProgress, regainWorkFlowStatusByStepId } = require('../../projects')
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
-const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles } = require('../../projects')
-const { getPayableByVendorId, getPayablePaidByVendorId, setPayablesNextStatus, getPaidPayables, getPayable, clearPayablesStepsPrivateKeys, invoiceSubmission, invoiceReloadFile } = require('../../invoicingPayables')
+const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles, updateProject } = require('../../projects')
+const {
+	getPayableByVendorId,
+	getPayablePaidByVendorId,
+	setPayablesNextStatus,
+	getPaidPayables,
+	getPayable,
+	clearPayablesStepsPrivateKeys,
+	invoiceSubmission,
+	invoiceReloadFile
+} = require('../../invoicingPayables')
 
 
 router.get("/reports", checkVendor, async (req, res) => {
@@ -211,7 +230,7 @@ router.post("/job", checkVendor, async (req, res) => {
 router.post("/selected-job", checkVendor, async (req, res) => {
 	const { jobId, value } = req.body
 	try {
-		await updateStepProp({ jobId, prop: 'isVendorRead', value })
+		await updateProject({ "steps._id": jobId }, { $set: { "steps.$.isVendorRead": value } }, { arrayFilters: [ { 'i._id': jobId } ] })
 		res.send("Terms agreement status changed")
 	} catch (err) {
 		console.log(err)
@@ -358,8 +377,12 @@ router.post('/step-target', checkVendor, upload.fields([ { name: 'targetFile' } 
 	try {
 		const project = await getProject({ 'steps._id': jobId })
 		const { targetFile } = req.files
+
 		const paths = await storeFiles(targetFile, project.id)
-		await updateNonWordsTaskTargetFile({ project, path: paths[0], jobId, fileName: targetFile[0].filename })
+		await updateNonWordsTaskTargetFiles({ project, paths, jobId })
+		// experimental
+		// const paths = await storeFiles(targetFile, project.id)
+		// await updateNonWordsTaskTargetFile({ project, path: paths[0], jobId, fileName: targetFile[0].filename })
 		res.send(true)
 	} catch (err) {
 		console.log(err)
@@ -401,10 +424,10 @@ router.get("/payment-terms", checkVendor, async (req, res) => {
 })
 
 router.post("/payment-terms/:id/update", checkVendor, async (req, res) => {
-	const {id} = req.params
-	const {billingInfo} = req.body
+	const { id } = req.params
+	const { billingInfo } = req.body
 	try {
-		const vendor = await Vendors.updateOne({_id: id}, {billingInfo})
+		const vendor = await Vendors.updateOne({ _id: id }, { billingInfo })
 		res.send(vendor)
 	} catch (err) {
 		console.log(err)
@@ -434,7 +457,6 @@ router.post('/manage-payment-methods/:_id/:index/delete', async (req, res) => {
 		res.status(500).send('Error on get /deleting | payment-terms')
 	}
 })
-
 
 
 module.exports = router

@@ -5,7 +5,8 @@ const {
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	nextVendorCanStartWorkNotification,
-	notifyStepDecisionMade
+	notifyStepDecisionMade,
+	setApprovedStepStatus
 } = require('../projects')
 
 const { Projects, Delivery, Languages } = require('../models')
@@ -84,10 +85,11 @@ function getPrevStepData(stepTask, steps, step) {
 async function updateStepProp({ jobId, prop, value }) {
 	try {
 		const project = await getProject({ 'steps._id': jobId })
+
 		const steps = project.steps.map(item => {
 			if (item.id === jobId) {
-				item[prop] = value
-				if (prop === "status" || value === "Accepted" || value === "Rejected") item.vendorsClickedOffer = [ item.vendor ]
+				item.status = value
+				if (prop === "status" && (value === "Approved" || value === "Rejected")) item.vendorsClickedOffer = [ item.vendor ]
 			}
 			return item
 		})
@@ -95,6 +97,7 @@ async function updateStepProp({ jobId, prop, value }) {
 		if (prop === "status") {
 			return await manageStatuses({ project, steps, jobId, status: value })
 		}
+
 		await Projects.updateOne({ 'steps._id': jobId }, { steps })
 	} catch (err) {
 		console.log(err)
@@ -103,15 +106,16 @@ async function updateStepProp({ jobId, prop, value }) {
 }
 
 async function manageStatuses({ project, steps, jobId, status }) {
+	let { status: projectStatus, _id, tasks } = project
 	const step = steps.find(item => item.id === jobId)
-	const task = project.tasks.find(item => item.taskId === step.taskId)
+	const _taskIdx = tasks.findIndex(item => item.taskId === step.taskId)
 	try {
 		if (status === "Completed") {
-			return await manageCompletedStatus({ project, jobId, steps, task })
+			return await manageCompletedStatus({ project, jobId, steps, tasks, taskIndex: tasks[_taskIdx] })
 		}
 
-		if (status === "Accepted") {
-			const updatedSteps = await setAcceptedStepStatus({ project, steps, jobId })
+		if (status === "Approved") {
+			const updatedSteps = setApprovedStepStatus({ project, step, steps })
 			await notifyStepDecisionMade({ project, step, decision: 'accept' })
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
@@ -122,42 +126,47 @@ async function manageStatuses({ project, steps, jobId, status }) {
 			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
-		if (status === "Started") {
-			if (task.status !== "Started") {
-				await setTaskStatusAndSave({ project, jobId, steps, status: "Started" })
-				return await notifyManagerStepStarted(project, step)
+		if (status === "In progress") {
+			if (tasks[_taskIdx].status !== "In progress") {
+				tasks[_taskIdx].status = "In progress"
+				projectStatus = projectStatus === 'Approved' ? 'In progress' : projectStatus
+				await notifyManagerStepStarted(project, step)
 			}
-			await notifyManagerStepStarted(project, step)
 		}
 
-		await Projects.updateOne({ 'steps._id': jobId }, { steps })
+		await Projects.updateOne({ 'steps._id': jobId }, { steps, tasks, status: projectStatus })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in manageStatuses")
 	}
 }
 
-async function manageCompletedStatus({ project, jobId, steps, task }) {
+async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }) {
 	const step = steps.find(item => item.id === jobId)
-	const stage1step = task.service.steps.find(item => item.stage === 'stage1')
-	const stage1stepId = typeof stage1step.step === 'string' ? stage1step.step.toString() : stage1step.step._id.toString()
-	const ifThisIsFirstStep = step.serviceStep.step.toString() === stage1stepId
+	const task = tasks[taskIndex]
+
 	try {
 		await stepCompletedNotifyPM(project, step)
 
-		if (isAllStepsCompleted({ steps, task })) {
-			await setTaskStatusAndSave({ project, jobId, steps, status: "Pending Approval [DR1]" })
+		if (isAllStepsCompleted({ steps, task: tasks[taskIndex] })) {
+			tasks[taskIndex].status = 'Pending Approval [DR1]'
+			await Projects.updateOne({ "steps._id": jobId }, { tasks })
 			await pushTasksToDR1(project, task, step)
-			return await taskCompleteNotifyPM(project, task)
+			await taskCompleteNotifyPM(project, task)
+		} else {
+			const nextStep = steps
+					.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+					.find(item => item.stepNumber === step.stepNumber + 1)
+
+			if (nextStep) {
+				tasks[taskIndex].status = 'In progress'
+				const updatedSteps = setApprovedStepStatus({ project, step, steps })
+				await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
+				await nextVendorCanStartWorkNotification({ task, steps, jobId })
+			}
 		}
 
-		if (ifThisIsFirstStep) {
-			const updatedSteps = getWithReadyToStartSteps({ task, steps })
-			await nextVendorCanStartWorkNotification({ task, steps, jobId })
-			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
-		}
-
-		return await Projects.updateOne({ "steps._id": jobId }, { steps })
+		return await Projects.findOne({ "steps._id": jobId })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in manageCompletedStatus")
@@ -198,45 +207,13 @@ function getTaskTargetFilesWithCopy(project, task) {
 }
 
 function getWithReadyToStartSteps({ task, steps }) {
-	const stage2step = task.service.steps.find(item => item.stage === 'stage2')
-	return steps.map(item => {
-		if (stage2step && item.status === 'Waiting to Start' && item.taskId === task.taskId) {
-			item.status = 'Ready to Start'
-		}
-		return item
-	})
-}
-
-async function setAcceptedStepStatus({ project, steps, jobId }) {
-	let status = "Accepted"
-	try {
-
-		const isProjectApproved = (project.status === 'In progress' || project.status === 'Approved')
-		const step = steps.find(item => item.id === jobId)
-		const task = project.tasks.find(item => item.taskId === step.taskId)
-		const taskSteps = steps.filter(item => item.taskId === task.taskId)
-
-		if (taskSteps.length === 1) {
-			status = isProjectApproved ? 'Ready to Start' : 'Waiting to Start'
-		} else {
-			const _jobIndex = taskSteps.findIndex(({ _id }) => `${ _id }` === `${ jobId }`)
-			if (!_jobIndex) {
-				status = isProjectApproved ? 'Ready to Start' : 'Waiting to Start'
-			} else {
-				status = isProjectApproved && taskSteps[0].status === 'Completed' ? 'Ready to Start' : 'Waiting to Start'
-			}
-		}
-
-		return steps.map(item => {
-			item.status = `${ item.id }` === `${ jobId }` && item.status !== 'Rejected' ? status : item.status
-			return item
-		})
-
-		// await updateMemoqProjectUsers(updatedSteps)
-	} catch (err) {
-		console.log(err)
-		console.log("Error in setAcceptedStepStatus")
-	}
+	// const stage2step = task.service.steps.find(item => item.stage === 'stage2')
+	// return steps.map(item => {
+	// 	if (stage2step && item.status === 'Waiting to Start' && item.taskId === task.taskId) {
+	// 		item.status = 'Ready to Start'
+	// 	}
+	// 	return item
+	// })
 }
 
 function setRejectedStatus({ steps, jobId }) {
@@ -248,43 +225,51 @@ function setRejectedStatus({ steps, jobId }) {
 	})
 }
 
-async function setTaskStatusAndSave({ project, jobId, steps, status }) {
-	const { tasks } = project
-	const { taskId } = steps.find(item => item._id.toString() === jobId)
-	const currSteps = steps
-			.filter(item => item.taskId === taskId)
-			.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
-	const updatedTasks = tasks.map(item => {
-		if (item.taskId === taskId) {
-			if (currSteps.length === 2 && currSteps[0].status === "Completed" && currSteps[1].status === "Completed" ||
-					currSteps.length === 1 && currSteps[0].status === "Completed"
-			) {
-				item.status = "Pending Approval [DR1]"
-			} else {
-				item.status = 'In progress'
-			}
-			return item
-		}
-		return item
-	})
-	let projectStatus = getProjectStatus({ project, status, updatedTasks })
-	try {
-		await Projects.updateOne({ 'steps._id': jobId }, { status: projectStatus, tasks: updatedTasks, steps })
-	} catch (err) {
-		console.log(err)
-		console.log("Error in setTaskStatusAndSave")
-	}
+async function setTaskStatusDR1({ project, jobId, steps, status }) {
+	// let { tasks } = project
+	// const { taskId } = steps.find(item => item._id.toString() === jobId)
+	//
+	// const currSteps = steps
+	// 		.filter(item => item.taskId === taskId)
+	// 		.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+	//
+	// const stepNumbers = currSteps.map(item => item.stepNumber)
+	// const maxStepNumber = Math.max.apply(null, stepNumbers)
+	//
+	//
+	// const updatedTasks = tasks.map(item => {
+	// 	if (item.taskId === taskId) {
+	//
+	// 		if (currSteps.stepNumber === maxStepNumber) {
+	//
+	// 		} else {
+	// 			item.status = 'In progress'
+	// 		}
+	// 		return item
+	//
+	// 		// if (currSteps.length === 2 && currSteps[0].status === "Completed" && currSteps[1].status === "Completed" ||
+	// 		// 		currSteps.length === 1 && currSteps[0].status === "Completed"
+	// 		// ) {
+	// 		// 	item.status = "Pending Approval [DR1]"
+	// 		// } else {
+	// 		//
+	// 		// }
+	// 		// return item
+	//
+	// 	}
+	// 	return item
+	// })
+	//
+	// projectStatus = projectStatus === 'Approved' ? 'In progress' : projectStatus
+	// try {
+	// 	await Projects.updateOne({ 'steps._id': jobId }, { status: projectStatus, tasks: updatedTasks, steps })
+	// } catch (err) {
+	// 	console.log(err)
+	// 	console.log("Error in setTaskStatusDR1")
+	// }
 }
 
-function getProjectStatus({ project, status, updatedTasks }) {
-	let projectStatus = project.status
-	if (projectStatus === "Approved" || projectStatus === "Started") {
-		return status === 'Started' ? 'In progress' : projectStatus
-	}
-	const incompletedTasks = updatedTasks.find(item => item.status !== 'Ready for Delivery' && item.status !== 'Cancelled')
-	return incompletedTasks ? projectStatus : "Ready for Delivery"
-}
 
 function isAllStepsCompleted({ steps, task }) {
 	const taskSteps = steps

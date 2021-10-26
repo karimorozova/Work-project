@@ -618,9 +618,7 @@ export default {
   }
 
   &__button {
-    :first-child {
-      margin-right: 10px;
-    }
+    margin-right: 20px;
   }
 
   &__checkbox {

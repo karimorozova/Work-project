@@ -531,40 +531,46 @@ function setStepsProgress(title, docs) {
 }
 
 async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) {
-	const steps = project.steps.map(item => {
-		if (item.id === jobId) {
-			item.status = 'Completed'
-			item.progress = 100
-			// item.targetFile = path
-		}
-		return item
-	})
-
-	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
-	const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
-
-	const tasks = project.tasks.map(item => {
-		if (neededStep.taskId === item.taskId) {
-			let targetFiles = []
-			let targetFilesStage1 = item.targetFilesStage1 || []
-			let targetFilesStage2 = item.targetFilesStage2 || []
-
-			targetFiles.push({ fileName, path: path.split('./dist').pop() })
-			eval('targetFilesStage' + stepCounter).push({ fileName, path: path.split('./dist').pop() })
-
-			item.targetFiles = targetFiles
-			item.targetFilesStage1 = targetFilesStage1
-			item.targetFilesStage2 = targetFilesStage2
-		}
-		return item
-	})
-	try {
-		return await updateProject({ "_id": project.id }, { steps, tasks })
-	} catch (err) {
-		console.log(err)
-		console.log("Error in updateNonWordsTaskTargetFiles")
-		throw new Error(err.message)
-	}
+	// const steps = project.steps.map(item => {
+	// 	if (item.id === jobId) {
+	// 		item.status = 'Completed'
+	// 		item.progress = 100
+	// 	}
+	// 	return item
+	// })
+	//
+	// const neededStep = steps.find(item => item.id.toString() === jobId.toString())
+	// // const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
+	//
+	// const tasks = project.tasks.map(item => {
+	// 	if (neededStep.taskId === item.taskId) {
+	// 		let targetFiles = []
+	// 		targetFiles.push({ fileName, path: path.split('./dist').pop() })
+	// 		item.targetFiles = targetFiles
+	//
+	//
+	// 		// let targetFilesStage1 = item.targetFilesStage1 || []
+	// 		// let targetFilesStage2 = item.targetFilesStage2 || []
+	//
+	//
+	//
+	// 		// eval('targetFilesStage' + stepCounter).push({ fileName, path: path.split('./dist').pop() })
+	//
+	//
+	// 		// item.targetFilesStage1 = targetFilesStage1
+	// 		// item.targetFilesStage2 = targetFilesStage2
+	//
+	// 	}
+	// 	return item
+	// })
+	//
+	// try {
+	// 	return await updateProject({ "_id": project.id }, { steps, tasks })
+	// } catch (err) {
+	// 	console.log(err)
+	// 	console.log("Error in updateNonWordsTaskTargetFiles")
+	// 	throw new Error(err.message)
+	// }
 }
 
 async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
@@ -572,28 +578,28 @@ async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
 		if (item.id === jobId) {
 			item.status = 'Completed'
 			item.progress = 100
-			// item.targetFile = paths
 		}
 		return item
 	})
 
 	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
-	const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
 
 	const tasks = project.tasks.map(item => {
 		if (neededStep.taskId === item.taskId) {
 			let targetFiles = []
-			let targetFilesStage1 = item.targetFilesStage1 || []
-			let targetFilesStage2 = item.targetFilesStage2 || []
+			const _idxStage = item.targetFilesStages.findIndex(item => item.stepId === neededStep._id)
 
 			for (let path of paths) {
 				targetFiles.push({ fileName: path.split("/").pop(), path: path.split('./dist').pop() })
-				eval('targetFilesStage' + stepCounter).push({ fileName: path.split("/").pop(), path: path.split('./dist').pop() })
+			}
+
+			if(_idxStage === -1){
+				item.targetFilesStages[_idxStage].push({stepId: neededStep._id, files: targetFiles })
+			}else{
+				item.targetFilesStages[_idxStage].files = targetFiles
 			}
 
 			item.targetFiles = targetFiles
-			item.targetFilesStage1 = targetFilesStage1
-			item.targetFilesStage2 = targetFilesStage2
 		}
 		return item
 	})

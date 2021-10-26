@@ -30,7 +30,7 @@
       template(slot="projectName" slot-scope="{ row, index }")
         .jobs__data {{ row.projectName }}
       template(slot="type" slot-scope="{ row, index }")
-        .jobs__data {{ row.name }}
+        .jobs__data {{ row.step.title }}
       template(slot="status" slot-scope="{ row, index }")
         .jobs__data {{ row.status }}
       template(slot="deadLine" slot-scope="{ row, index }")
@@ -72,8 +72,8 @@
 				errors: [],
 				isDeleting: false,
 				icons: {
-					Approve: { icon: require("../../../../../assets/images/Approve-icon.png"), active: true },
-					Reject: { icon: require("../../../../../assets/images/Reject-icon.png"), active: true }
+					Approved: { icon: require("../../../../../assets/images/Approve-icon.png"), active: true },
+					Rejected: { icon: require("../../../../../assets/images/Reject-icon.png"), active: true }
 				}
 			}
 		},

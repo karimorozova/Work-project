@@ -3,81 +3,81 @@
     .text(v-if="!files.length") Drag and drop deliverable file here or click here to select deliverable file from your computer
     .text(v-else) Uploaded file(s): &nbsp;
 
-      span.text_strong(v-if="job.serviceStep.title === 'Compliance'") {{ filesNames() }}
+      span.text_strong(v-if="job.step.title === 'Compliance'") {{ filesNames() }}
       span.text_strong(v-else) {{ files[0].name }}
 
-    .upload-area(v-if="job.serviceStep.title === 'Compliance'")
+    .upload-area(v-if="job.step.title === 'Compliance'")
       input.upload-area__input(type="file" @change="setFile" multiple)
     .upload-area(v-else)
       input.upload-area__input(type="file" @change="setFile")
 </template>
 
 <script>
-	export default {
-		props: {
-			job: {
-				type: Object
-			}
-		},
-		data() {
-			return {
-				files: []
-			}
-		},
-		methods: {
-			filesNames() {
-				return this.files.reduce((a, c) => {
-					a = a + c.name + '; '
-					return a
-				}, '')
-			},
-			setFile(e) {
-				this.files = Array.from(e.target.files)
-				this.$emit('setDeliverables', { files: this.files })
-			}
-		}
-	}
+export default {
+  props: {
+    job: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      files: []
+    }
+  },
+  methods: {
+    filesNames() {
+      return this.files.reduce((a, c) => {
+        a = a + c.name + '; '
+        return a
+      }, '')
+    },
+    setFile(e) {
+      this.files = Array.from(e.target.files)
+      this.$emit('setDeliverables', { files: this.files })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors.scss";
+@import "../../../assets/scss/colors.scss";
 
-  .deliverable-upload {
-    padding: 35px 0 10px;
-    position: relative;
-    border: 2px dotted rgb(197, 191, 181);
+.deliverable-upload {
+  padding: 35px 0 10px;
+  position: relative;
+  border: 2px dotted rgb(197, 191, 181);
+  border-radius: 4px;
+}
+
+.text {
+  text-align: center;
+
+  &_strong {
+  }
+}
+
+.upload-area {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: url("../../../assets/images/Other/upload-icon.png");
+  background-repeat: no-repeat;
+  background-position: center 25%;
+  transition: ease 0.2s;
+
+  &:hover {
+    box-shadow: 0 0 0px 2px rgb(197, 191, 181);
     border-radius: 4px;
   }
 
-  .text {
-    text-align: center;
-
-    &_strong {
-    }
+  &__input {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
   }
-
-  .upload-area {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    background: url("../../../assets/images/Other/upload-icon.png");
-    background-repeat: no-repeat;
-    background-position: center 25%;
-    transition: ease 0.2s;
-
-    &:hover {
-      box-shadow: 0 0 0px 2px rgb(197, 191, 181);
-      border-radius: 4px;
-    }
-
-    &__input {
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-  }
+}
 
 </style>

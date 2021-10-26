@@ -40,7 +40,7 @@
 	export default {
 		data() {
 			return {
-				jobStatuses: ["Request Sent", "Accepted", "Ready to Start", "Waiting to Start"],
+				jobStatuses: ["Request Sent", "Approved", "Ready to Start", "Waiting to Start"],
 				currentIndex: -1,
 				isApproveModal: false
 			}
@@ -74,7 +74,7 @@
 
 			},
 			async makeAction({ index, key }, prop) {
-				const status = key === "Approve" ? "Accepted" : "Rejected"
+				const status = key
 				try {
 					await this.setJobStatus({ jobId: this[prop][index]._id, status })
 				} catch (err) {

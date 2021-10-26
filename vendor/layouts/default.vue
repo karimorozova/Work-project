@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <transition name="slide-fade">
       <AlertMessage v-if="isAlert" :text="alertMessage" :type="alertType"></AlertMessage>
@@ -9,8 +8,8 @@
 </template>
 
 <script>
-import AlertMessage from "../components/AlertMessage";
-import { mapGetters } from "vuex";
+import AlertMessage from "../components/AlertMessage"
+import { mapGetters } from "vuex"
 
 export default {
   computed: {
@@ -28,29 +27,36 @@ export default {
 
 
 <style lang="scss">
-  @import "../assets/scss/colors.scss";
+@import "../assets/scss/colors.scss";
+
 body {
   color: $text;
   font-size: 14px;
   font-family: Myriad400;
 }
 
-  input::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
+input::-webkit-input-placeholder {
+  opacity: 0.5;
+}
 
+::-moz-selection { /* Code for Firefox */
+  color: $text;
+  background: #F5C653AA;
+}
 
-  /*.fa-angle-double-right{*/
-/*  font-size: 14px;*/
-/*  margin: 0 5px;*/
-/*}*/
+::selection {
+  color: $text;
+  background: #F5C653;
+}
 
 .slide-fade-enter-active {
   transition: all .5s ease;
 }
+
 .slide-fade-leave-active {
   transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
+
 .slide-fade-enter, .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;

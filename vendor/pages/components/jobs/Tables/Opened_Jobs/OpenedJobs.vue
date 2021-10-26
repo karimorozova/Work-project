@@ -32,7 +32,7 @@
       template(slot="projectName" slot-scope="{ row, index }")
         .jobs__data {{ row.projectName }}
       template(slot="type" slot-scope="{ row, index }")
-        .jobs__data {{ row.name }}
+        .jobs__data {{ row.step.title }}
       template(slot="status" slot-scope="{ row, index }")
         .jobs__data {{ row.status | stepStatusFilter }}
       template(slot="progress" slot-scope="{ row, index }")
@@ -110,7 +110,7 @@
 				return row.status === "Request Sent" || row.status === "Created" || row.status === "Quote sent"
 			},
 			isEnterIcon(status) {
-				const statuses = [ "Accepted", "Ready to Start", "Started" ]
+				const statuses = [ "Approved", "Ready to Start", "Started" ]
 				return statuses.indexOf(status) !== -1
 			},
 			isCompleteIcon(row) {
