@@ -36,7 +36,8 @@ const {
 	updateProjectStatusForClientPortalProject,
 	regainWorkFlowStatusByStepId,
 	setStepDeadlineProjectAndMemoq,
-	cancelProjectInMemoq
+	cancelProjectInMemoq,
+	setApprovedStepStatus
 } = require('./updates')
 
 const {
@@ -106,6 +107,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	setApprovedStepStatus,
 	getProjectsForVendorPortal,
 	generateReceivablesReportsByTemplate,
 	generatePOFile,

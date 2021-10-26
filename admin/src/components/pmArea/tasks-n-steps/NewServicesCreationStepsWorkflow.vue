@@ -105,7 +105,7 @@
                     :placeholder="'Date'"
                     @selected="(e) => setDate(e, 'start', index)"
                   )
-                  i.far.fa-calendar-alt.calendar
+                  //i.far.fa-calendar-alt.calendar
 
               .step__datepicker
                 .step__datepicker-title Deadline:
@@ -122,7 +122,7 @@
                     :placeholder="'Date'"
                     @selected="(e) => setDate(e, 'deadline', index)"
                   )
-                  i.far.fa-calendar-alt.calendar
+                  //i.far.fa-calendar-alt.calendar
 
     .add(v-if="!isCatUnit" )
       .add__row

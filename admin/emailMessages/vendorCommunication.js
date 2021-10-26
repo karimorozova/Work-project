@@ -362,11 +362,10 @@ function sendMemoqCredentials(obj) {
 
 async function generatePO(requestInfo, fullVendor, project) {
 	const { firstName, surname } = fullVendor
-	let { stepId, start, deadline, name, sourceLanguage, targetLanguage, industry, nativeFinance, serviceStep, totalWords, taskId, nativeVendorRate: { value: rate } } = requestInfo
+	let { stepId, start, deadline, step, sourceLanguage, targetLanguage, industry, nativeFinance, payablesUnit, totalWords, taskId, nativeVendorRate: rate } = requestInfo
 	const { Wordcount, Price, Quantity } = nativeFinance
-	const { unit: unitId } = serviceStep
-	const { type } = await Units.findOne({ "_id": unitId })
-	const isTranslationJob = name === 'Translation'
+	const { type } = payablesUnit
+	const isTranslationJob = step.title === 'Translation'
 	start = moment(start).format('DD-MM-YYYY, HH:mm')
 	deadline = moment(deadline).format('DD-MM-YYYY, HH:mm')
 	let col1 = ''

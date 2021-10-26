@@ -346,34 +346,71 @@ async function updateProjectStatus(id, status, reason) {
 	}
 }
 
-function setStepsStatus({ steps, status, project }) {
-	const { steps: projectSteps, tasks } = project
-	const stepIdentify = steps.map(item => item._id.toString())
-	return updateStepsStatuses({ projectSteps, tasks, status, stepIdentify })
-}
 
-function updateStepsStatuses({ projectSteps, tasks, status, stepIdentify }) {
-	return projectSteps.map(item => {
-		if (stepIdentify.indexOf(item.id.toString()) !== -1) {
-			let newStatus = status
-			if (status === "Ready to Start" && isPrevStep({ tasks, projectSteps, step: item })) {
-				newStatus = "Waiting to Start"
+const setApprovedStepStatus = ({ project, step, steps }) => {
+	const { status } = project
+	const isProjectApprovedStatus = status === 'Approved' || status === 'In progress'
+	const brotherlySteps = steps.filter(item => item.taskId === step.taskId)
+
+	return steps.map(item => {
+		if (item._id === step._id) {
+			if (brotherlySteps.length > 1) {
+				const { stepNumber } = step
+				const prevStep = brotherlySteps.find(item => item.stepNumber === stepNumber - 1)
+				if (prevStep && isProjectApprovedStatus) {
+					item.status = prevStep === 'Completed' ? 'Ready to Start' : 'Waiting to Start'
+				}
+				item.status = 'Approved'
 			}
-			item.status = newStatus
+			item.status = isProjectApprovedStatus ? 'Ready to Start' : 'Approved'
 		}
 		return item
 	})
+}
 
-	function isPrevStep({ tasks, projectSteps, step }) {
-		const stepTask = tasks.find(item => item.taskId === step.taskId)
-		const sameSteps = projectSteps.filter(item => {
-			return item.taskId === stepTask.taskId
-					&& item.stepId !== step.stepId
-					&& item.status !== "Completed"
-		})
-		const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1')
-		return sameSteps.length && stage1.step.title !== step.serviceStep.title
-	}
+
+function setStepsStatus({ steps, status, project }) {
+
+	// const { steps: allSteps, tasks } = project
+	// const comingSteps = steps
+	// const comingStepsIds = steps.map(item => item._id.toString())
+	// return updateStepsStatuses({ allSteps, comingSteps, comingStepsIds, tasks, status })
+}
+
+function updateStepsStatuses({ allSteps, comingSteps, comingStepsIds, tasks, status }) {
+
+	return allSteps.map(step => {
+		// if (comingStepsIds.indexOf(step._id.toString()) !== -1) {
+		// 	const neededTask = tasks.find(item => item.taskId === step.taskId)
+		// 	const allStepsFromCurrentTask = allSteps.filter(item => item.taskId === neededTask.taskId)
+		// 	const stepNumbers = allStepsFromCurrentTask.map(item => item.stepNumber)
+		// 	const maxStepNumber = Math.max.apply(null, stepNumbers)
+		//
+		// 	if(stepNumbers.length === 1){
+		// 		step.status = ''
+		// 	}
+		//
+		// 	// let newStatus = status
+		//
+		// 	// if (status === "Ready to Start" && isPrevStep({ tasks, allSteps, step: item })) {
+		// 	// 	newStatus = "Waiting to Start"
+		// 	// }
+		// 	//
+		// 	// item.status = newStatus
+		// }
+		// return step
+	})
+
+	// function isPrevStep({ tasks, allSteps, step }) {
+	// 	const stepTask = tasks.find(item => item.taskId === step.taskId)
+	// 	const sameSteps = allSteps.filter(item => {
+	// 		return item.taskId === stepTask.taskId
+	// 				&& item.stepId !== step.stepId
+	// 				&& item.status !== "Completed"
+	// 	})
+	// 	const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1')
+	// 	return sameSteps.length && stage1.step.title !== step.serviceStep.title
+	// }
 }
 
 // /**
@@ -771,5 +808,6 @@ module.exports = {
 	checkProjectHasMemoqStep,
 	updateProjectStatusForClientPortalProject,
 	regainWorkFlowStatusByStepId,
-	setStepDeadlineProjectAndMemoq
+	setStepDeadlineProjectAndMemoq,
+	setApprovedStepStatus
 }

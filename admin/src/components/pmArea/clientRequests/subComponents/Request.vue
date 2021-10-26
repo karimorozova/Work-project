@@ -406,7 +406,7 @@
         position: absolute;
         right: 6px;
         top: 8px;
-        font-size: 16px;
+        font-size: 15px;
         cursor: pointer;
       }
     }
@@ -548,10 +548,11 @@
     &__calendar-icon {
       position: absolute;
       bottom: 6px;
-      right: 5px;
+      right: 3px;
       width: 18px;
       cursor: pointer;
-      font-size: 19px;
+      font-size: 16px;
+      opacity: 0.2;
     }
 
     &__button {

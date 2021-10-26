@@ -14,13 +14,12 @@ const {
 	getStepsSubTotal,
 	getProjectDetails,
 	getJobsDetails,
-	getAdditionsCosts
 } = require('./buildersQuote')
 
-function messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps) {
+async function messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps) {
 	const date = Date.now()
 	const token = jwt.sign({ id: project._id }, secretKey, { expiresIn: '21d' })
-	let { accountManager, tasks, steps, finance, discounts, projectCurrency } = project
+	let { accountManager, tasks, steps, finance, discounts, projectCurrency, additionsSteps } = project
 	steps = steps.filter(item => item.status !== "Cancelled")
 	const subTotal = getStepsSubTotal(tasksIds, steps, allUnits)
 	const TMDiscount = +(getStepsSubTotal(tasksIds, steps, allUnits) - getStepsTotal(tasksIds, steps, allUnits)).toFixed(2)
@@ -28,12 +27,15 @@ function messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps
 	let total = isHideWhenMinimumCharge ? project.minimumCharge.value : finance.Price.receivables
 	total = tasksIds.length ? steps.filter(i => tasksIds.includes(i.taskId)).reduce((a, c) => a + c.finance.Price.receivables, 0).toFixed(2) : total
 
-	const displaySubTotal = discounts.length || TMDiscount > 0.05
-			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> <span>Sub-total: ${ subTotal } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</span> </p>`
-			: ''
+	let totalForAdditions = 0
+	if (additionsSteps.length && !tasksIds.length) {
+		for (let curStep of additionsSteps) {
+			totalForAdditions += +curStep.finance.Price.receivables
+		}
+	}
 
-	const displaySubTotal2 = project.paymentAdditions.length
-			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> ${ discounts.length || TMDiscount ? 'Sub-total (II):' : 'Sub-total:' } ${ (total - project.paymentAdditions.reduce((a, c) => a + c.value, 0)).toFixed(2) } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</p>`
+	const displaySubTotal = discounts.length || TMDiscount > 0.05
+			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> <span>Sub-total: ${ subTotal + totalForAdditions } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</span> </p>`
 			: ''
 
 	const displayFinanceDetails = discounts.length || TMDiscount > 0.05
@@ -72,8 +74,6 @@ function messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps
                     ${ getJobsDetails(project, tasksIds, steps, allUnits) }
 										${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 										${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
-										${ isHideWhenMinimumCharge || tasksIds.length ? '' : displaySubTotal2 }
-										${ isHideWhenMinimumCharge ? '' : getAdditionsCosts(project, tasksIds) }
 										<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Total: ${ total } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
 										 <p>By clicking on one of the link below, you can accept or reject our offer.
 										 <br>Clicking "I accept" will also approve and accept our <a style="color:#333;" href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" class="link">terms and conditions</a>
@@ -95,7 +95,7 @@ function messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps
 
 
 function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
-	let { steps, finance, discounts, projectCurrency, projectId, clientBillingInfo } = project
+	let { steps, finance, discounts, projectCurrency, projectId, clientBillingInfo, additionsSteps } = project
 
 	steps = steps.filter(item => item.status !== "Cancelled")
 	const subTotal = getStepsSubTotal(tasksIds, steps, allUnits)
@@ -104,17 +104,17 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 	let total = isHideWhenMinimumCharge ? project.minimumCharge.value : finance.Price.receivables
 	total = tasksIds.length ? steps.filter(i => tasksIds.includes(i.taskId)).reduce((a, c) => a + c.finance.Price.receivables, 0).toFixed(2) : total
 
+	let totalForAdditions = 0
+	if (additionsSteps.length && !tasksIds.length) {
+		for (let curStep of additionsSteps) {
+			totalForAdditions += +curStep.finance.Price.receivables
+		}
+	}
+
 	const displaySubTotal = discounts.length || TMDiscount > 0.05
 			? `<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 			<div style="display: inline-block; min-width: 110px; text-align: left;">Sub-total:</div>
-			<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ subTotal }</div>
-			</div>`
-			: ''
-
-	const displaySubTotal2 = project.paymentAdditions.length
-			? `<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
-			<div style="display: inline-block; min-width: 110px; text-align: left;">${ discounts.length || TMDiscount ? 'Sub-total (II):' : 'Sub-total:' }</div>
-			<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ (total - project.paymentAdditions.reduce((a, c) => a + c.value, 0)).toFixed(2) } </div>
+			<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ subTotal + totalForAdditions }</div>
 			</div>`
 			: ''
 
@@ -151,8 +151,6 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 				${ getJobsDetails(project, tasksIds, steps, allUnits) }
 				${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 				${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
-				${ isHideWhenMinimumCharge || tasksIds.length ? '' : displaySubTotal2 }
-				${ isHideWhenMinimumCharge ? '' : getAdditionsCosts(project, tasksIds) }
 		
 			<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 						<div style="display: inline-block; min-width: 110px; text-align: left;">Total:</div>
@@ -171,21 +169,24 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 		</div>`
 }
 
-function messageForClientSendCostQuote(project, allUnits, allSettingsSteps) {
+async function messageForClientSendCostQuote(project, allUnits, allSettingsSteps) {
 	const tasksIds = []
-	let { accountManager, tasks, steps, finance, discounts, projectCurrency } = project
+	let { accountManager, tasks, steps, finance, discounts, projectCurrency, additionsSteps } = project
 	steps = steps.filter(item => item.status !== "Cancelled")
 	const subTotal = getStepsSubTotal(tasksIds, steps, allUnits)
 	const TMDiscount = +(getStepsSubTotal(tasksIds, steps, allUnits) - getStepsTotal(tasksIds, steps, allUnits)).toFixed(2)
 	const isHideWhenMinimumCharge = project.minimumCharge.value > project.finance.Price.receivables && !project.minimumCharge.toIgnore
 	let total = isHideWhenMinimumCharge ? project.minimumCharge.value : finance.Price.receivables
 
-	const displaySubTotal = discounts.length || TMDiscount > 0.05
-			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Sub-total: ${ subTotal } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</p>`
-			: ''
+	let totalForAdditions = 0
+	if (additionsSteps.length && !tasksIds.length) {
+		for (let curStep of additionsSteps) {
+			totalForAdditions += +curStep.finance.Price.receivables
+		}
+	}
 
-	const displaySubTotal2 = project.paymentAdditions.length
-			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> ${ discounts.length || TMDiscount ? 'Sub-total (II):' : 'Sub-total:' } ${ (total - project.paymentAdditions.reduce((a, c) => a + c.value, 0)).toFixed(2) } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</p>`
+	const displaySubTotal = discounts.length || TMDiscount > 0.05
+			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Sub-total: ${ subTotal + + totalForAdditions } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</p>`
 			: ''
 
 	const displayFinanceDetails = discounts.length || TMDiscount > 0.05
@@ -212,8 +213,6 @@ function messageForClientSendCostQuote(project, allUnits, allSettingsSteps) {
                     ${ getJobsDetails(project, tasksIds, steps, allUnits) }
 										${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 										${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
-										${ isHideWhenMinimumCharge || tasksIds.length ? '' : displaySubTotal2 }
-										${ isHideWhenMinimumCharge ? '' : getAdditionsCosts(project, tasksIds) }
 										<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Total: ${ total } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
 										
 										<p>This is a Cost Quote and provides only estimation.</p>
@@ -541,7 +540,6 @@ async function pdfPPPReportTemplate(report, BI) {
 							${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 							${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
 							${ isHideWhenMinimumCharge || tasksIds.length ? '' : displaySubTotal2 }
-							${ isHideWhenMinimumCharge ? '' : getAdditionsCosts(project, tasksIds) }
 							<p style="padding: 5px 0; text-align: right; font-size: 14px; font-weight: 600;"> Total: ${ total } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
 			    </div>
 			</div>`

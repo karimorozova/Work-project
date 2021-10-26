@@ -16,7 +16,7 @@ const { checkCollections } = require('./helpers/dbSetDefault');
 require('./schedule');
 
 //NEW DB
-checkCollections()
+// checkCollections()
 
 
 const allowedOrigins = [

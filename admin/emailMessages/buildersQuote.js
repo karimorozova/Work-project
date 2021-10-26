@@ -1,52 +1,50 @@
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 const moment = require('moment')
 
-function getAdditionsCosts(project, tasksIds) {
-	if (tasksIds.length) return ''
-	if (project.paymentAdditions.length) {
-		const data = project.paymentAdditions.reduce((acc, curr) => {
-			acc += `<div class="row" style="border-bottom: 1px solid #ededed;">
-							<div class="key" style="display: inline-block; padding: 8px; min-width: 200px;">${ curr.name }:</div>
-							<div class="value" style="display: inline-block; padding: 8px; min-width: 200px;"> ${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ curr.value }</div>
-            </div>`
-			return acc
-		}, '')
-
-		return `<div class="block" style="border: 1px solid #bfbfbf; width: max-content;">${ data }</div>`
-	}
-	return ''
-}
-
 function getJobsDetails(project, tasksIds, steps, allUnits) {
 	let allSteps = steps
 	if (tasksIds.length) allSteps = steps.filter(i => tasksIds.includes(i.taskId))
 	const isHideWhenMinimumCharge = project.minimumCharge.value > project.finance.Price.receivables && !project.minimumCharge.toIgnore
 
 	const data = allSteps.reduce((acc, curr) => {
-		const { type } = allUnits.find(({ _id }) => _id.toString() === curr.serviceStep.unit.toString())
-		const name = type === 'CAT Wordcount' ? curr.serviceStep.memoqAssignmentRole === 0 ? 'Translation' : 'Revising' : curr.name
-		let quantity = 0
+		const { type } = curr.receivablesUnit
+		const name = type === 'CAT Wordcount' ? curr.memoqAssignmentRole === 0 ? 'Translation' : 'Revising' : curr.step.title
+		let quantity
 		let cost = 0
 
 		if (type === 'CAT Wordcount') {
 			quantity = +curr.totalWords
-			cost += +curr.totalWords * +curr.clientRate.value
+			cost += +curr.totalWords * +curr.clientRate
 		} else {
 			quantity = +curr.finance.Quantity.receivables
-			cost += +curr.finance.Quantity.receivables * +curr.clientRate.value
+			cost += +curr.finance.Quantity.receivables * +curr.clientRate
 		}
-
 
 		acc = acc + `<div style="border-bottom: 1px solid #ededed;">
 			        <div style="display: inline-block; padding: 8px; width: 130px;">${ name }</div>
 			        <div style="display: inline-block; padding: 8px; width: 135px;">${ curr.sourceLanguage === curr.targetLanguage ? curr.targetLanguage : curr.sourceLanguage + ' >> ' + curr.targetLanguage } </div>
 			        <div style="display: inline-block; padding: 8px; width: 140px;">${ type } </div>
 			        <div style="display: inline-block; padding: 8px; width: 70px;">${ +quantity.toFixed(2) }</div>
-			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + +curr.clientRate.value.toFixed(3) } </div>
+			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + +curr.clientRate.toFixed(3) } </div>
 			        <div style="display: inline-block; padding: 8px; width: 70px;"> ${ isHideWhenMinimumCharge ? '-' : returnIconCurrencyByStringCode(project.projectCurrency) + +cost.toFixed(2) } </div>
 				    </div>`
 		return acc
 	}, '')
+
+	let additionsSteps = ''
+	if (project.additionsSteps) {
+		additionsSteps = project.additionsSteps.reduce((acc, curr) => {
+			acc = acc + `<div style="border-bottom: 1px solid #ededed;">
+			        <div style="display: inline-block; padding: 8px; width: 130px;">${ curr.title }</div>
+			        <div style="display: inline-block; padding: 8px; width: 135px;">-</div>
+			        <div style="display: inline-block; padding: 8px; width: 140px;">-</div>
+			        <div style="display: inline-block; padding: 8px; width: 70px;">1</div>
+			        <div style="display: inline-block; padding: 8px; width: 70px;">${ returnIconCurrencyByStringCode(project.projectCurrency) + +curr.finance.Price.receivables.toFixed(2) }</div>
+			        <div style="display: inline-block; padding: 8px; width: 70px;">${ returnIconCurrencyByStringCode(project.projectCurrency) + +curr.finance.Price.receivables.toFixed(2) }</div>
+				    </div>`
+			return acc
+		}, '')
+	}
 
 	return `<div style="border: 1px solid #bfbfbf; width: max-content; margin-top: 25px;">
 					    <div style="border-bottom: 1px solid #ededed; background: #f7f7f7;">
@@ -58,6 +56,7 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 					        <div style="display: inline-block; padding: 8px; width: 70px;">Cost</div>
 					    </div>
 					    ${ data }
+					    ${ additionsSteps }
 					</div>`
 }
 
@@ -90,16 +89,17 @@ function getStepsSubTotal(tasksIds, steps, allUnits) {
 	if (tasksIds.length) allSteps = steps.filter(i => tasksIds.includes(i.taskId))
 
 	for (let curStep of allSteps) {
-		const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString())
+		const { type } = curStep.receivablesUnit
 
 		if (type === 'CAT Wordcount') {
-			subTotal += +curStep.totalWords * +curStep.clientRate.value
+			subTotal += +curStep.totalWords * +curStep.clientRate
 		} else {
-			subTotal += +curStep.finance.Quantity.receivables * +curStep.clientRate.value
+			subTotal += +curStep.finance.Quantity.receivables * +curStep.clientRate
 		}
 	}
 	return +subTotal.toFixed(2)
 }
+
 
 function getStepsTotal(tasksIds, steps, allUnits) {
 	let total = 0
@@ -107,11 +107,11 @@ function getStepsTotal(tasksIds, steps, allUnits) {
 	if (tasksIds.length) allSteps = steps.filter(i => tasksIds.includes(i.taskId))
 
 	for (let curStep of allSteps) {
-		const { type } = allUnits.find(({ _id }) => _id.toString() === curStep.serviceStep.unit.toString())
+		const { type } = curStep.receivablesUnit
 		if (type === 'CAT Wordcount') {
-			total += +curStep.finance.Wordcount.receivables * +curStep.clientRate.value
+			total += +curStep.finance.Wordcount.receivables * +curStep.clientRate
 		} else {
-			total += +curStep.finance.Quantity.receivables * +curStep.clientRate.value
+			total += +curStep.finance.Quantity.receivables * +curStep.clientRate
 		}
 	}
 	return +total.toFixed(2)
@@ -143,5 +143,4 @@ module.exports = {
 	getStepsSubTotal,
 	getProjectDetails,
 	getJobsDetails,
-	getAdditionsCosts
 }

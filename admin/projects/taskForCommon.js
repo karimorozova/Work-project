@@ -27,7 +27,7 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 		let tasks = await generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles }, iterator)
 		let { steps, additions } = await generateStepsForCustomUnits({ tasks, stepsAdditions })
 		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
-		return await calculateProjectTotal(projectId)
+		return await calculateProjectTotal(_id)
 
 	} catch (err) {
 		console.log(err)

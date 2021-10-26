@@ -53,7 +53,7 @@ async function createTasksForWordcount(tasksInfo) {
 		})
 		let { steps, additions } = await generateStepsForCATMemoqUnit({ tasks, stepsAdditions })
 		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
-		return await calculateProjectTotal(projectId)
+		return await calculateProjectTotal(_id)
 
 	} catch (err) {
 		console.log(err)
@@ -146,7 +146,8 @@ async function generateStepsForCATMemoqUnit({ tasks, stepsAdditions }) {
 				defaultStepPrice,
 				clientRate,
 				vendorRate,
-				nativeVendorRate
+				nativeVendorRate,
+				totalWords: metrics.totalWords
 			})
 		}
 

@@ -1,30 +1,27 @@
 const EventEmitter = require('events')
 const emitter = new EventEmitter()
 const { Projects, InvoicingReceivables } = require('../models')
-const { setStepsStatus, notifyStepDecisionMade } = require('../projects')
+const { setStepsStatus, notifyStepDecisionMade, setApprovedStepStatus } = require('../projects')
 const { notifyManagerProjectStarts, sendQuoteToVendorsAfterProjectAccepted, notifyManagerProjectRejected } = require('../utils')
 const { getAllSteps, createReports, createAndSendZohoInvoice } = require("../invoicingReceivables")
 const { createDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")
-
 const DIR = './dist/clientReportsFiles/'
 
 
 emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
-	let { steps, status } = project
+	let { steps } = project
 	const _idx = steps.findIndex(item => item._id.toString() === stepId.toString())
 
 	if (prop === 'accept') {
-		const isProjectApproved = status === 'Approved' || status === 'In progress'
-		steps[_idx].status = isProjectApproved ? "Ready to Start" : 'Approved'
+		steps	= setApprovedStepStatus({ project, step: steps[_idx]._doc, steps })
 		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'accept' })
 	}
 	if (prop === 'reject') {
 		steps[_idx].status = 'Rejected'
 		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'rejected' })
 	}
-
 	steps[_idx].vendorsClickedOffer.push(vendorId)
-	steps = setStepsStatus({ steps: [ { ...steps[_idx]._doc } ], status: steps[_idx].status, project })
+
 	await Projects.updateOne({ "_id": project.id }, { steps })
 })
 

@@ -160,7 +160,7 @@ async function sendRequestToVendor(project, step) {
 		await sendEmailFromUser(project.projectManager, {
 			to: step.vendor.email,
 			attachments,
-			subject: `Availability approval for a Step ${ step.stepId } (${ step.serviceStep.title }) (ID V001.0)`
+			subject: `Availability approval for a Step ${ step.stepId } (${ step.step.title }) (ID V001.0)`
 		}, message)
 		fs.unlink(pdf, (err) => {
 			if (err) console.log(err)

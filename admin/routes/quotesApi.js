@@ -131,14 +131,14 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 			item.deadline = new Date(newDeadline).toISOString()
 			return item
 		})
-		await Projects.updateOne({ _id }, { $set: { tasks, steps, deadline: new Date(newDeadline).toISOString(), status: "Approved", isClientOfferClicked: true } })
+		await Projects.updateOne({ _id }, { $set: { startDate: new Date(), tasks, steps, deadline: new Date(newDeadline).toISOString(), status: "Approved", isClientOfferClicked: true } })
 	}
 	if (prop === 'reject') {
 		const tasks = tasks.map(task => {
 			if (task.status === 'Quote sent') task.status = 'Rejected'
 			return task
 		})
-		await Projects.updateOne({ _id }, { $set: { tasks, status: "Rejected", isClientOfferClicked: true } })
+		await Projects.updateOne({ _id }, { $set: { startDate: new Date(), tasks, status: "Rejected", isClientOfferClicked: true } })
 	}
 
 	quoteEmitter.emit('client-decide', project, prop)
@@ -249,7 +249,7 @@ router.get('/vendor-data-to-display', getProjectManageToken, async (req, res) =>
 			industry,
 			deadline: currStep.deadline,
 			amount: (currStep.nativeFinance.Price.payables).toFixed(2),
-			services: currStep.name,
+			services: currStep.step.title,
 			languages: currStep.sourceLanguage === currStep.targetLanguage ? currStep.targetLanguage : currStep.sourceLanguage + ' >> ' + currStep.targetLanguage,
 			projectCurrency: 'EUR'
 		}
@@ -264,7 +264,7 @@ router.get('/client-data-to-display', getProjectManageToken, async (req, res) =>
 	const { projectId: _id } = req.query
 	try {
 		const { projectName, projectId, industry: { name: industry }, steps, finance, projectCurrency, deadline } = await getProject({ _id })
-		const services = [ ...new Set(steps.map(i => i.name)) ].join(', ')
+		const services = [ ...new Set(steps.map(i => i.step.title)) ].join(', ')
 		const languages = [ ...new Set(steps.map(i => i.targetLanguage)) ].join(', ')
 
 		const data = {
@@ -290,7 +290,7 @@ router.get('/client-data-tasks-to-display', getProjectManageToken, async (req, r
 		tasksIds = tasksIds.replace(/['_']/g, ' ').split('*')
 		const { projectName, projectId, industry: { name: industry }, steps: allSteps, projectCurrency, deadline } = await getProject({ _id })
 		const steps = allSteps.filter(i => tasksIds.includes(i.taskId))
-		const services = [ ...new Set(steps.map(i => i.name)) ].join(', ')
+		const services = [ ...new Set(steps.map(i => i.step.title)) ].join(', ')
 		const languages = [ ...new Set(steps.map(i => i.targetLanguage)) ].join(', ')
 		const amount = steps.reduce((a, c) => a + c.finance.Price.receivables, 0).toFixed(2)
 
