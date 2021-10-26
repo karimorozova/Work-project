@@ -95,10 +95,10 @@ async function updateStepProp({ jobId, prop, value }) {
 		})
 
 		if (prop === "status") {
-			return await manageStatuses({ project, steps, jobId, status: value })
+			await manageStatuses({ project, steps, jobId, status: value })
 		}
 
-		await Projects.updateOne({ 'steps._id': jobId }, { steps })
+		// await Projects.updateOne({ 'steps._id': jobId }, { steps })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in updateStepProp")
@@ -110,20 +110,21 @@ async function manageStatuses({ project, steps, jobId, status }) {
 	const step = steps.find(item => item.id === jobId)
 	const _taskIdx = tasks.findIndex(item => item.taskId === step.taskId)
 	try {
+
 		if (status === "Completed") {
-			return await manageCompletedStatus({ project, jobId, steps, tasks, taskIndex: tasks[_taskIdx] })
+			await manageCompletedStatus({ project, jobId, steps, tasks, taskIndex: _taskIdx })
 		}
 
 		if (status === "Approved") {
 			const updatedSteps = setApprovedStepStatus({ project, step, steps })
 			await notifyStepDecisionMade({ project, step, decision: 'accept' })
-			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
+			await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
 		if (status === "Rejected") {
 			const updatedSteps = setRejectedStatus({ steps, jobId })
 			await notifyStepDecisionMade({ project, step, decision: 'rejected' })
-			return await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
+			await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps })
 		}
 
 		if (status === "In progress") {
@@ -132,9 +133,9 @@ async function manageStatuses({ project, steps, jobId, status }) {
 				projectStatus = projectStatus === 'Approved' ? 'In progress' : projectStatus
 				await notifyManagerStepStarted(project, step)
 			}
+			await Projects.updateOne({ 'steps._id': jobId }, { steps, tasks, status: projectStatus })
 		}
 
-		await Projects.updateOne({ 'steps._id': jobId }, { steps, tasks, status: projectStatus })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in manageStatuses")
@@ -144,13 +145,12 @@ async function manageStatuses({ project, steps, jobId, status }) {
 async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }) {
 	const step = steps.find(item => item.id === jobId)
 	const task = tasks[taskIndex]
-
 	try {
 		await stepCompletedNotifyPM(project, step)
 
 		if (isAllStepsCompleted({ steps, task: tasks[taskIndex] })) {
 			tasks[taskIndex].status = 'Pending Approval [DR1]'
-			await Projects.updateOne({ "steps._id": jobId }, { tasks })
+			await Projects.updateOne({ "steps._id": jobId }, { tasks, steps })
 			await pushTasksToDR1(project, task, step)
 			await taskCompleteNotifyPM(project, task)
 		} else {
@@ -160,13 +160,11 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 
 			if (nextStep) {
 				tasks[taskIndex].status = 'In progress'
-				const updatedSteps = setApprovedStepStatus({ project, step, steps })
+				const updatedSteps = setApprovedStepStatus({ project, step: nextStep, steps })
 				await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
-				await nextVendorCanStartWorkNotification({ task, steps, jobId })
+				await nextVendorCanStartWorkNotification({ nextStep })
 			}
 		}
-
-		return await Projects.findOne({ "steps._id": jobId })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in manageCompletedStatus")
@@ -175,16 +173,24 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 
 const pushTasksToDR1 = async (project, task, step) => {
 	const { _id, projectManager, accountManager } = project
-	const instructions = step.serviceStep.title === 'Compliance' ? drInstructionsCompliance : dr1Instructions
+	const instructions = step.step.title === 'Compliance' ? drInstructionsCompliance : dr1Instructions
 	const files = getTaskTargetFilesWithCopy(project, task)
-	project.tasksDR1.push({
-		dr1Manager: projectManager,
-		dr2Manager: accountManager,
-		instructions,
-		taskId: task.taskId,
-		files
-	})
-	return await Projects.updateOne({ _id: _id }, { tasksDR1: project.tasksDR1 })
+
+	const _idxTaskDr1 = project.tasksDR1.findIndex(item => item.taskId === task.taskId)
+
+	if (_idxTaskDr1 === -1) {
+		project.tasksDR1.push({
+			dr1Manager: projectManager,
+			dr2Manager: accountManager,
+			instructions,
+			taskId: task.taskId,
+			files
+		})
+	} else {
+		project.tasksDR1[_idxTaskDr1].files = files
+	}
+
+	await Projects.updateOne({ _id: _id }, { tasksDR1: project.tasksDR1 })
 }
 
 function getTaskTargetFilesWithCopy(project, task) {

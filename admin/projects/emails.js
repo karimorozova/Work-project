@@ -580,25 +580,12 @@ async function notifyVendorStepStart(steps, allSteps, project) {
 	}
 }
 
-const nextVendorCanStartWorkNotification = async ({ task, steps, jobId }) => {
-	const { service, taskId } = task
-	const { steps: serviceSteps } = service
-	const { serviceStep: { step: stepId } } = steps.find(({ _id }) => `${ _id }` === `${ jobId }`)
-
-	const { stage } = serviceSteps.find(({ step }) => `${ typeof step === 'string' ? step : step._id }` === `${ stepId }`)
-
-	if (serviceSteps.length === 2 && stage === 'stage1') {
-		const [ firstStep, secondStep ] = steps
-				.filter(({ taskId: id }) => id === taskId)
-				.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
-
-		if (!!secondStep.vendor) {
-			const message = vendorCanStartStartedSecondStep({ vendor: secondStep.vendor, step: secondStep })
-			const subject = `STEP-${ secondStep.name } is ready to start (V001.21)`
-			await sendEmail({ to: secondStep.vendor.email, subject }, message)
+const nextVendorCanStartWorkNotification = async ({ nextStep }) => {
+		if (!!nextStep.vendor) {
+			const message = vendorCanStartStartedSecondStep({ vendor: nextStep.vendor, step: nextStep })
+			const subject = `STEP-${ nextStep.step.title } is ready to start (V001.21)`
+			await sendEmail({ to: nextStep.vendor.email, subject }, message)
 		}
-	}
-
 }
 
 
