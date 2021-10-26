@@ -436,7 +436,7 @@ async function generatePO(requestInfo, fullVendor, project) {
 			                </div>
 			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
 			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Job Type:</div>
-			                    <div class="value">${ name }</div>
+			                    <div class="value">${ step.title }</div>
 			                </div>
 			                <div class="row" style="display: -webkit-box;margin-bottom: 15px;">
 			                    <div class="key" style="font-weight: 600;margin-right: 10px;">Source Language:</div>
