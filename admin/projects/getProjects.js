@@ -10,7 +10,15 @@ async function getProjectsForVendorPortal(obj) {
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
-
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.receivablesUnit')
+			.populate('steps.payablesUnit')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
+			.populate('tasks.service')
+			.populate('tasks.fullSourceLanguage')
+			.populate('tasks.fullTargetLanguage')
 }
 
 async function getProjects(obj) {

@@ -312,7 +312,7 @@ const ProjectsSchema = new mongoose.Schema({
 		progress: "",
 		status: {
 			type: String,
-			enum: [ 'Created', 'Accepted', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In Progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
+			enum: [ 'Created', 'Accepted', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
 			default: 'Created'
 		},
 		finance: stepFinance,
@@ -360,10 +360,11 @@ const ProjectsSchema = new mongoose.Schema({
 	accountManager: {
 		type: Schema.Types.ObjectId, ref: 'User'
 	},
+
 	status: {
 		type: String,
-		default: '',
-		trim: true
+		enum: [ 'Draft', 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'In progress', 'Closed' ],
+		default: 'Draft'
 	},
 	roi: {
 		type: String,

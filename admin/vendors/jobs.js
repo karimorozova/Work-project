@@ -35,28 +35,28 @@ function getSteps(project, id, allLanguages) {
 		let assignedSteps = []
 		let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id)
 		for (let step of filteredSteps) {
-			if (step.name !== 'invalid') {
-				const stepTask = tasks.find(item => item.taskId === step.taskId)
-				const prevStep = getPrevStepData(stepTask, steps, step)
-				const { targetLanguage, sourceLanguage } = step._doc
-				assignedSteps.push({
-					...step._doc,
-					project_Id: project._id,
-					projectId: project.projectId,
-					projectName: project.projectName,
-					projectStatus: project.status,
-					brief: project.brief,
-					manager: project.projectManager,
-					industry: project.industry,
-					memocDocs: stepTask.memoqDocs,
-					sourceFiles: stepTask.sourceFiles,
-					refFiles: stepTask.refFiles,
-					taskTargetFiles: stepTask.targetFiles,
-					fullSourceLanguage: getLangBySymbol(sourceLanguage),
-					fullTargetLanguage: getLangBySymbol(targetLanguage),
-					prevStep
-				})
-			}
+			// if (step.name !== 'invalid') {
+			const stepTask = tasks.find(item => item.taskId === step.taskId)
+			const prevStep = getPrevStepData(stepTask, steps, step)
+			const { targetLanguage, sourceLanguage } = step._doc
+			assignedSteps.push({
+				...step._doc,
+				project_Id: project._id,
+				projectId: project.projectId,
+				projectName: project.projectName,
+				projectStatus: project.status,
+				brief: project.brief,
+				manager: project.projectManager,
+				industry: project.industry,
+				memocDocs: stepTask.memoqDocs,
+				sourceFiles: stepTask.sourceFiles,
+				refFiles: stepTask.refFiles,
+				taskTargetFiles: stepTask.targetFiles,
+				fullSourceLanguage: getLangBySymbol(sourceLanguage),
+				fullTargetLanguage: getLangBySymbol(targetLanguage),
+				prevStep
+			})
+			// }
 		}
 		return assignedSteps
 
@@ -69,14 +69,12 @@ function getSteps(project, id, allLanguages) {
 }
 
 function getPrevStepData(stepTask, steps, step) {
-	const sameSteps = steps.filter(item => item.taskId === stepTask.taskId && item.stepId !== step.stepId)
-	const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1')
-	if (!sameSteps.length || stage1.step.title === step.serviceStep.title) {
-		return false
-	}
-	const prevStep = sameSteps.find(item => item.serviceStep.title === stage1.step.title)
+
+	const brotherlySteps = steps.filter(item => item.taskId === stepTask.taskId)
+	const prevStep = brotherlySteps.find(item => item.stepNumber === step.stepNumber - 1)
 	if (!prevStep) return false
 	const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2) : prevStep.progress
+
 	return {
 		status: prevStep.status,
 		progress: prevProgress

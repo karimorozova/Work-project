@@ -12,10 +12,11 @@
 </template>
 
 <script>
-import Button from "../components/overall/Button";
+import Button from "../components/overall/Button"
+
 export default {
-  components: {Button},
-  props: ['error'],
+  components: { Button },
+  props: [ 'error' ],
   methods: {
     redirectToMain() {
       this.$router.push('/dashboard')
@@ -25,44 +26,50 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .error {
-    &__body {
-      color: #67573e;
-      font-family: Myriad400;
-      max-width: 767px;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+.error {
+  &__body {
+    color: #333;
+    font-family: Myriad400;
+    max-width: 767px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 
-    }
-    &__code {
-      font-size: 186px;
-      font-family: Myriad900;
-      margin: 0 0 25px 0;
-      text-transform: uppercase;
-      line-height: 0.85;
-      span:nth-child(1) {
-        color: #ebbb46
-      }
-      span:nth-child(2) {
-        color: #4ba5a5
-      }
-      span:nth-child(3) {
-        color: #cb644a
-      }
+  }
+
+  &__code {
+    font-size: 186px;
+    font-family: Myriad900;
+    margin: 0 0 30px 0;
+    text-transform: uppercase;
+    line-height: 0.85;
+
+    span:nth-child(1) {
+      color: #ebbb46
     }
 
-    &__title {
-      font-size: 26px;
-      font-family: Myriad600;
-      margin: 0;
+    span:nth-child(2) {
+      color: #4ba5a5
     }
-    &__text {
-      margin: 0;
-      margin-bottom: 15px;
-      font-size: 20px;
-      opacity: 0.7;
+
+    span:nth-child(3) {
+      color: #cb644a
     }
   }
+
+  &__title {
+    font-size: 25px;
+    font-family: Myriad600;
+    margin: 0;
+    margin-bottom: 5px;
+  }
+
+  &__text {
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    opacity: 0.5;
+  }
+}
 </style>
