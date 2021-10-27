@@ -32,7 +32,8 @@ const {
 	updateProject,
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
-	setStepsStatus,
+	// setStepsStatus,
+	setApprovedStepStatus,
 	getAfterReopenSteps,
 	getProjectAfterFinanceUpdated,
 	updateProjectProgress,
@@ -578,14 +579,24 @@ router.post('/send-task-cancel-message', async (req, res) => {
 })
 
 router.post('/step-status', async (req, res) => {
+	const { setRejectedStatus } = require('../../vendors/jobs')
+
 	const { id, status, steps } = req.body
 	try {
 		const project = await getProject({ '_id': id })
-		const updatedSteps = setStepsStatus({ steps, status, project })
-		const memoqAssignResult = await updateMemoqProjectUsers(updatedSteps)
-		if (memoqAssignResult) throw memoqAssignResult
-		await notifyVendorStepStart(steps, updatedSteps, project)
-		const updatedProject = await updateProject({ '_id': id }, { steps: updatedSteps })
+		let updateSteps = project.steps
+		if (status === 'Approved') {
+			for(const step of steps) {
+				updateSteps = setApprovedStepStatus({project, step: step, steps: updateSteps})
+				await notifyVendorStepStart(steps, updateSteps, project)
+			}
+		} else {
+			for(const step of steps) {
+				setRejectedStatus({steps: updateSteps, jobId: step._id })
+			}
+
+		}
+		const updatedProject = await updateProject({ '_id': id }, { steps: updateSteps })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -985,6 +996,7 @@ router.post('/step-finance-edit/:projectId', async (req, res) => {
 // XTRF API ==================================================================
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
+const { setRejectedStatus } = require("../../vendors/jobs")
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params

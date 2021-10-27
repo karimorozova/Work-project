@@ -353,7 +353,7 @@ const setApprovedStepStatus = ({ project, step, steps }) => {
 	const brotherlySteps = steps.filter(item => item.taskId === step.taskId)
 
 	return steps.map(item => {
-		if (item._id === step._id) {
+		if (item._id.toString() === step._id.toString()) {
 			if (brotherlySteps.length > 1) {
 				const { stepNumber } = step
 				const prevStep = brotherlySteps.find(item => item.stepNumber === stepNumber - 1)

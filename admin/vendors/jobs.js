@@ -279,4 +279,4 @@ function isAllStepsCompleted({ steps, task }) {
 	return !taskSteps.length ? false : taskSteps.every(item => item.status === 'Completed')
 }
 
-module.exports = { getJobs, updateStepProp }
+module.exports = { getJobs, updateStepProp, setRejectedStatus }

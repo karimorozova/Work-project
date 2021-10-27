@@ -561,7 +561,8 @@ async function notifyVendorStepStart(steps, allSteps, project) {
 	try {
 		const notifyingSteps = allSteps.filter(item => {
 			if (stepIds.length) {
-				return item.status === 'Ready to Start' && stepIds.indexOf(item.id) !== -1
+				// return (item.status === 'Ready to Start' || item.status === 'Approved' || item.status === 'Waiting to Start')   && stepIds.indexOf(item.id) !== -1
+				return (item.status === 'Ready to Start' )   && stepIds.indexOf(item.id) !== -1
 			}
 			return item.status === 'Ready to Start'
 		})

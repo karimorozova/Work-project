@@ -122,7 +122,7 @@ function requestMessageForVendor(obj) {
 											  </div>
 								        <div style="border-bottom: 1px solid #ededed;">
 											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Work type:</div>
-											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ obj.name }</div>
+											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ obj.stepAndUnit.step.title }</div>
 											  </div>
 											  <div style="border-bottom: 1px solid #ededed;">
 											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Language:</div>

@@ -28,20 +28,25 @@
         :currentProject="currentProject"
       )
 
-    Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTabQuery")
     NewTasks(
       v-if="selectedTabQuery === 'Tasks'"
       :tasks="currentProject.tasks"
+      :tabs="tabs"
+      @setTab="setTab"
     )
 
     NewSteps(
       v-if="selectedTabQuery === 'Steps'"
       :steps="currentProject.steps"
+      :tabs="tabs"
+      @setTab="setTab"
     )
 
     additionsSteps(
       v-if="selectedTabQuery === 'Additional Steps'"
       :additionsSteps="currentProject.additionsSteps"
+      :tabs="tabs"
+      @setTab="setTab"
     )
 
 </template>

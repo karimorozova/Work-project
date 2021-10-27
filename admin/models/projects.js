@@ -312,7 +312,7 @@ const ProjectsSchema = new mongoose.Schema({
 		progress: "",
 		status: {
 			type: String,
-			enum: [ 'Created', 'Accepted', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
+			enum: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
 			default: 'Created'
 		},
 		finance: stepFinance,

@@ -1,5 +1,6 @@
 <template lang="pug">
   .addition-steps
+    Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTabQuery")
     GeneralTable(
       :fields="fields"
       :tableData="additionsSteps"
@@ -35,6 +36,7 @@
 import GeneralTable from '../../GeneralTable'
 import Add from '../../Add'
 import crudIcons from "../../../mixins/crudIcons"
+import Tabs from "../../Tabs"
 import { mapGetters } from "vuex"
 
 export default {
@@ -42,6 +44,10 @@ export default {
   name: "AdditionsSteps",
   props: {
     additionsSteps: {
+      type: Array,
+      default: []
+    },
+    tabs: {
       type: Array,
       default: []
     }
@@ -129,14 +135,23 @@ export default {
       } catch (e) {
         console.log(e)
       }
+    },
+
+    setTab({ index }) {
+      this.$emit('setTab', {index})
     }
   },
   computed: {
     ...mapGetters({currentProject: "getCurrentProject"}),
+
+    selectedTabQuery() {
+      return this.$route.query.selectedTab || 'Tasks'
+    },
   },
   components: {
     GeneralTable,
     Add,
+    Tabs,
   }
 }
 </script>
