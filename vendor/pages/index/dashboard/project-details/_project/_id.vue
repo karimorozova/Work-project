@@ -115,8 +115,8 @@ export default {
           await this.getJobInfo()
         }
         // if (this.job.status !== "Started") return
-        const { type } = this.originallyUnits.find(item => item._id.toString() === this.job.serviceStep.unit.toString())
-        console.log(type)
+
+        const { type } = this.job.payablesUnit
         const isCatTool = type === 'CAT Wordcount'
         await this.$axios.post('/vendor/update-progress', { token: this.getToken, projectId: this.job.project_Id, isCatTool })
         await this.getJobs()

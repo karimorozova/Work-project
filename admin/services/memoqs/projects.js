@@ -202,7 +202,7 @@ async function assignMemoqTranslators({ memoqProjectId, assignedSteps, users }) 
 				let users = acc[docId].users || []
 				users.push({
 					deadline: cur.deadline,
-					memoqRole: cur.serviceStep.memoqAssignmentRole,
+					memoqRole: cur.memoqAssignmentRole,
 					userId: user.id
 				})
 				acc[docId].users = users

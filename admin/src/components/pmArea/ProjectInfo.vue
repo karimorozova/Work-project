@@ -154,31 +154,33 @@ export default {
     },
 
     async updateProjectProgress() {
-      const wordcountTasks = this.currentProject.tasks.filter(item => item.stepsAndUnits.map(i => i.unit).includes('CAT Wordcount'))
-      try {
-        wordcountTasks.length
-            ? await this.updateProgress({ projectId: this.currentProject._id, isCatTool: true })
-            : await this.updateProgress({ projectId: this.currentProject._id, isCatTool: false })
-
-        this.alertToggle({ message: "Project are updated.", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Project are updated.", isShow: true, type: "success" })
-      }
+      // BUTTON METRICS
+      // const wordcountTasks = this.currentProject.tasks.filter(item => item.stepsAndUnits.map(i => i.unit).includes('CAT Wordcount'))
+      // try {
+      //   wordcountTasks.length
+      //       ? await this.updateProgress({ projectId: this.currentProject._id, isCatTool: true })
+      //       : await this.updateProgress({ projectId: this.currentProject._id, isCatTool: false })
+      //
+      //   this.alertToggle({ message: "Project are updated.", isShow: true, type: "success" })
+      // } catch (err) {
+      //   this.alertToggle({ message: "Project are updated.", isShow: true, type: "success" })
+      // }
     },
 
     async getMetrics() {
-      try {
-        if (this.currentProject.isMetricsExist) return await this.updateProjectProgress()
-
-        await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id })
-
-        // const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
-        // await this.setCurrentProject(updatedProject.body)
-
-        this.alertToggle({ message: "Metrics are received.", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Internal server error. Cannot get metrics.", isShow: true, type: "error" })
-      }
+      // UPdate Memoq progress
+      // try {
+      //   if (this.currentProject.isMetricsExist) return await this.updateProjectProgress()
+      //
+      //   await this.$http.post('/memoqapi/metrics', { projectId: this.currentProject._id })
+      //
+      //   // const updatedProject = await this.$http.get(`/pm-manage/costs?projectId=${ this.currentProject._id }`)
+      //   // await this.setCurrentProject(updatedProject.body)
+      //
+      //   this.alertToggle({ message: "Metrics are received.", isShow: true, type: "success" })
+      // } catch (err) {
+      //   this.alertToggle({ message: "Internal server error. Cannot get metrics.", isShow: true, type: "error" })
+      // }
     },
     async getVendorsForProject() {
       try {

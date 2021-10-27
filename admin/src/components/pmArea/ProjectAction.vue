@@ -394,7 +394,8 @@ export default {
       }
     },
     async acceptQuote() {
-      const status = this.project.isStartAccepted ? "Started" : "Approved"
+      // const status = this.project.isStartAccepted ? "Started" : "Approved"
+      const status = "Approved"
       try {
         await this.setStatus(status)
       } catch (err) {

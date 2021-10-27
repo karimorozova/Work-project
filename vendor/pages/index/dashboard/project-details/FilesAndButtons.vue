@@ -149,8 +149,8 @@ export default {
   data() {
     return {
       icons: {
-        Approve: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
-        Reject: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
+        Approved: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
+        Rejected: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
       },
       emailAlert: false
     }

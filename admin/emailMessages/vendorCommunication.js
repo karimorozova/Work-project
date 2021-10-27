@@ -223,7 +223,7 @@ function vendorCanStartStartedSecondStep(obj) {
                 <div class="main" style="padding:25px;" >
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ obj.vendor.firstName } ${ obj.vendor.surname || '' }</span></p>
                     <p style="font-weight: 400;">
-                    	Step <b>${ obj.step.stepId }: ${ obj.step.name }</b> is now ready to start.
+                    	Step <b>${ obj.step.stepId }: ${ obj.step.step.title }</b> is now ready to start.
 										</p>
                     <p style="font-weight: 400;">
                     	You can go to the system at the link below.

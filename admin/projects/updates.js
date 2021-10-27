@@ -43,15 +43,12 @@ async function updateProjectProgress(project, isCatTool) {
 	let { steps, tasks } = project
 	try {
 		for (let task of tasks) {
-			const units = task.stepsAndUnits
-			for (let { unit } of units) {
-				if (unit === 'CAT Wordcount' && isCatTool) {
-					const docs = await getProjectTranslationDocs(task.memoqProjectId)
-					task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [ docs ]
-					steps = updateWordcountStepsProgress({ steps, task })
-				} else if (!isCatTool) {
-					steps = updateStepsProgress(task, steps)
-				}
+			if (task.memoqDocs.length && isCatTool) {
+				const docs = await getProjectTranslationDocs(task.memoqProjectId)
+				task.memoqDocs = Array.isArray(docs) ? docs.filter(item => item.TargetLangCode === task.memoqTarget) : [ docs ]
+				steps = updateWordcountStepsProgress({ steps, task })
+			} else if (!isCatTool) {
+				steps = updateStepsProgress(task, steps)
 			}
 		}
 		return await updateProject({ "_id": project.id }, { steps, tasks })
@@ -167,28 +164,29 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projec
 }
 
 async function getTaskTargetFiles({ task, projectId, step }) {
-	let { memoqDocs, memoqProjectId, targetLanguage, targetFilesStage1, targetFilesStage2 } = task
-	let { stepId } = step
-
+	let { memoqDocs, memoqProjectId, targetLanguage, targetFilesStages } = task
+	let { _id, stepNumber } = step
 	let targetFiles = []
-	if (!targetFilesStage1) targetFilesStage1 = []
-	if (!targetFilesStage2) targetFilesStage2 = []
 
 	try {
 		for (let doc of memoqDocs) {
-			const stepCounter = stepId.replace('-R', '')[stepId.replace('-R', '').length - 1]
-			const fileName = `${ targetLanguage }-${ stepCounter }-${ Math.floor(Math.random() * 1000000) }-${ doc.ImportPath }`
+			const fileName = `${ targetLanguage }-${ stepNumber }-${ Math.floor(Math.random() * 1000000) }-${ doc.ImportPath }`
 			const path = `/projectFiles/${ projectId }/${ fileName }`
 			await downloadMemoqFile({ memoqProjectId, docId: doc.DocumentGuid, path: `./dist${ path }` })
 			targetFiles.push({ fileName, path })
-			eval('targetFilesStage' + stepCounter).push({ fileName, path })
+		}
+		const _idxStage = targetFilesStages.findIndex(item => item.stepId === _id)
+
+		if (_idxStage === -1) {
+			targetFilesStages.push({ stepId: _id, files: targetFiles })
+		} else {
+			targetFilesStages[_idxStage].files = targetFiles
 		}
 
 		return {
-			...task,
+			...task._doc,
 			targetFiles,
-			targetFilesStage1,
-			targetFilesStage2
+			targetFilesStages
 		}
 
 	} catch (err) {
@@ -200,17 +198,17 @@ async function getTaskTargetFiles({ task, projectId, step }) {
 
 async function downloadCompletedFiles(stepId) {
 	try {
-		let { id, steps, tasks } = await getProject({ "steps._id": stepId })
-		const step = steps.find(item => item.id === stepId)
+		let { _id, steps, tasks } = await getProject({ "steps._id": stepId })
+		const step = steps.find(item => item._id.toString() === stepId.toString())
 		const _taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
 
 		tasks[_taskIndex] = await getTaskTargetFiles({
 			task: tasks[_taskIndex],
-			projectId: id,
+			projectId: _id,
 			step
 		})
 
-		await Projects.updateOne({ "_id": id }, { tasks })
+		await Projects.updateOne({ _id }, { tasks })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in downloadCompletedFiles")
@@ -496,7 +494,7 @@ function getApprovedStepStatus(stepTask, step) {
 function updateStepsProgress(task, steps) {
 	return steps.map(item => {
 		if (task.taskId === item.taskId) {
-			item.progress = item.status === 'Started' && item.targetFile ? 100 : item.progress
+			item.progress = item.status === 'In progress' && item.targetFile ? 100 : item.progress
 		}
 		return item
 	})
@@ -506,7 +504,7 @@ function updateWordcountStepsProgress({ steps, task }) {
 	const { memoqDocs: docs } = task
 	return steps.map(item => {
 		if (task.taskId === item.taskId) {
-			item.progress = (item.status === 'Started' || item.status === 'In progress') ? setStepsProgress(item.serviceStep.title, docs) : item.progress
+			item.progress = item.status === 'In progress' ? setStepsProgress(item.step.title, docs) : item.progress
 		}
 		return item
 	})
@@ -593,9 +591,9 @@ async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
 				targetFiles.push({ fileName: path.split("/").pop(), path: path.split('./dist').pop() })
 			}
 
-			if(_idxStage === -1){
-				item.targetFilesStages[_idxStage].push({stepId: neededStep._id, files: targetFiles })
-			}else{
+			if (_idxStage === -1) {
+				item.targetFilesStages.push({ stepId: neededStep._id, files: targetFiles })
+			} else {
 				item.targetFilesStages[_idxStage].files = targetFiles
 			}
 
@@ -648,11 +646,12 @@ async function updateOtherProject(query, update) {
 
 const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	const vendor = await Vendors.findOne({ _id: vendorId })
-	const { steps } = await Projects.findOne({ _id: projectId }).populate('steps.vendor')
+	const { steps, tasks } = await Projects.findOne({ _id: projectId }).populate('steps.vendor')
 	const users = await getMemoqUsers()
 
 	const neededStep = steps.find(step => step.stepId === stepId)
-	const { memoqProjectId, taskId } = neededStep
+	const { taskId } = neededStep
+	const { memoqProjectId } = tasks.find(item => item.taskId === taskId)
 
 	let assignedSteps = []
 	if (/(\sS02)/.exec(`${ stepId }`)) {
@@ -715,7 +714,7 @@ const checkProjectHasMemoqStep = async (projectId) => {
 const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 	let workFlowStatus
 	let { steps, tasks } = await Projects.findOne({ 'steps.stepId': stepId })
-	const { taskId, serviceStep: { title: jobType }, memoqDocIds } = steps.find(item => item.stepId === stepId)
+	const { taskId, step: { title: jobType }, memoqDocIds } = steps.find(item => item.stepId === stepId)
 	const { memoqProjectId } = tasks.find(item => item.taskId === taskId)
 
 	if (jobType === 'Translation') {
