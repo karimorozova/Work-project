@@ -1,7 +1,7 @@
 const EventEmitter = require('events')
 const emitter = new EventEmitter()
 const { Projects, InvoicingReceivables } = require('../models')
-const { setStepsStatus, notifyStepDecisionMade, setApprovedStepStatus } = require('../projects')
+const { notifyStepDecisionMade, setApprovedStepStatus } = require('../projects')
 const { notifyManagerProjectStarts, sendQuoteToVendorsAfterProjectAccepted, notifyManagerProjectRejected } = require('../utils')
 const { getAllSteps, createReports, createAndSendZohoInvoice } = require("../invoicingReceivables")
 const { createDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")

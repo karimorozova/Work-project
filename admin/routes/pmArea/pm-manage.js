@@ -114,6 +114,10 @@ const {
 	pushNewLangs
 } = require('../../multipliers')
 
+const {
+	setRejectedStatus
+} = require('../../vendors/jobs')
+
 router.post('/allprojects', async (req, res) => {
 	const filters = { ...req.body }
 	try {
@@ -188,11 +192,12 @@ router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), 
 
 router.post('/update-steps-dates', async (req, res) => {
 	try {
-		const { projectId, steps, step, stepId, type, prop } = req.body
-		const updatedProject = await updateProject({ '_id': projectId }, { steps })
+		const { projectId, step, stepId, type, prop } = req.body
+		if(step.hasOwnProperty('isCheck')) delete step.isCheck
+		const updatedProject = await updateProject({ "_id": projectId, "steps._id": stepId }, { $set: { "steps.$": step } })
 
-		if (prop === 'deadline' && type === 'CAT Wordcount' && !!step.vendor && (step.status === 'Started' || step.status === 'In progress')) {
-			await setStepDeadlineProjectAndMemoq({ projectId, stepId })
+		if (prop === 'deadline' && type === 'CAT Wordcount' && !!step.vendor && step.status === 'In progress') {
+			await setStepDeadlineProjectAndMemoq({ projectId, stepId: step.stepId })
 		}
 		res.send(updatedProject)
 	} catch (err) {
@@ -579,25 +584,27 @@ router.post('/send-task-cancel-message', async (req, res) => {
 })
 
 router.post('/step-status', async (req, res) => {
-	const { setRejectedStatus } = require('../../vendors/jobs')
-
 	const { id, status, steps } = req.body
-	try {
-		const project = await getProject({ '_id': id })
-		let updateSteps = project.steps
-		if (status === 'Approved') {
-			for(const step of steps) {
-				updateSteps = setApprovedStepStatus({project, step: step, steps: updateSteps})
-				await notifyVendorStepStart(steps, updateSteps, project)
-			}
-		} else {
-			for(const step of steps) {
-				setRejectedStatus({steps: updateSteps, jobId: step._id })
-			}
+	let project = await getProject({ '_id': id })
+	let allSteps = project.steps
 
+	try {
+		if (status === 'Approved') {
+			for await (const step of steps) {
+				allSteps = setApprovedStepStatus({ project, step: step, steps: allSteps })
+				await notifyVendorStepStart(steps, allSteps, project)
+			}
+			project = await updateProject({ '_id': id }, { steps: allSteps })
 		}
-		const updatedProject = await updateProject({ '_id': id }, { steps: updateSteps })
-		res.send(updatedProject)
+
+		if (status === 'Rejected') {
+			for await (const step of steps) {
+				allSteps = setRejectedStatus({ steps: allSteps, jobId: step._id })
+			}
+			project = await updateProject({ '_id': id }, { steps: allSteps })
+		}
+
+		res.send(project)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send(err.message)
@@ -996,7 +1003,6 @@ router.post('/step-finance-edit/:projectId', async (req, res) => {
 // XTRF API ==================================================================
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
-const { setRejectedStatus } = require("../../vendors/jobs")
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params

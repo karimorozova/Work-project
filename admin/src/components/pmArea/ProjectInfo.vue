@@ -104,34 +104,34 @@ export default {
     // 	} catch (err) {
     // 	}
     // },
-    async setDate({ date, prop, stepId }) {
-      try {
-        let { steps, _id } = this.currentProject
-        const _idx = steps.findIndex(item => item.stepId === stepId)
-
-        steps[_idx][prop] = date
-        if (prop === 'deadline' && _idx + 1 < steps.length && steps[_idx].taskId === steps[_idx + 1].taskId) {
-          steps[_idx + 1].start = date
-        }
-
-        const { type } = this.originallyUnits
-            .find(item => item._id.toString() === steps[_idx].serviceStep.unit)
-
-        if (steps[_idx].status !== 'Completed' && steps[_idx].status !== 'Cancelled' && steps[_idx].status !== 'Cancelled Halfway') {
-
-          const finalSteps = steps.reduce((acc, curr) => {
-            delete curr.check
-            acc.push(curr)
-            return acc
-          }, [])
-
-          const updatedProject = await this.$http.post('/pm-manage/update-steps-dates', { projectId: _id, steps: finalSteps, step: finalSteps[_idx], stepId, type, prop })
-          await this.setCurrentProject(updatedProject.data)
-        }
-      } catch (err) {
-        this.alertToggle({ message: 'Error on Set Step Deadline', isShow: true, type: "error" })
-      }
-    },
+    // async setDate({ date, prop, stepId }) {
+    //   try {
+    //     let { steps, _id } = this.currentProject
+    //     const _idx = steps.findIndex(item => item.stepId === stepId)
+    //
+    //     steps[_idx][prop] = date
+    //     if (prop === 'deadline' && _idx + 1 < steps.length && steps[_idx].taskId === steps[_idx + 1].taskId) {
+    //       steps[_idx + 1].start = date
+    //     }
+    //
+    //     const { type } = this.originallyUnits
+    //         .find(item => item._id.toString() === steps[_idx].serviceStep.unit)
+    //
+    //     if (steps[_idx].status !== 'Completed' && steps[_idx].status !== 'Cancelled' && steps[_idx].status !== 'Cancelled Halfway') {
+    //
+    //       const finalSteps = steps.reduce((acc, curr) => {
+    //         delete curr.check
+    //         acc.push(curr)
+    //         return acc
+    //       }, [])
+    //
+    //       const updatedProject = await this.$http.post('/pm-manage/update-steps-dates', { projectId: _id, steps: finalSteps, step: finalSteps[_idx], stepId, type, prop })
+    //       await this.setCurrentProject(updatedProject.data)
+    //     }
+    //   } catch (err) {
+    //     this.alertToggle({ message: 'Error on Set Step Deadline', isShow: true, type: "error" })
+    //   }
+    // },
     async setStatus({ option }) {
       try {
         await this.setProjectStatus({ id: this.$route.params.id, status: option })

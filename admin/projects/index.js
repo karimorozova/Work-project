@@ -22,7 +22,6 @@ const {
 const {
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
-	setStepsStatus,
 	updateWithApprovedTasks,
 	downloadCompletedFiles,
 	updateProjectProgress,
@@ -148,7 +147,6 @@ module.exports = {
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
 	stepCancelNotifyVendor,
-	setStepsStatus,
 	createProject,
 	createTasks,
 	taskCompleteNotifyPM,

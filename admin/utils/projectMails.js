@@ -38,7 +38,7 @@ async function notifyManagerProjectStarts(project, isNotifyClientContacts = true
 		const messageToAM = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...accountManager })
 		await managerNotifyMail(accountManager, messageToAM, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 
-		if(isNotifyClientContacts) for await (let contact of contacts) {
+		if (isNotifyClientContacts) for await (let contact of contacts) {
 			const message = managersAndClientAcceptedMessage({ nativeProjectId: project._id, ...project._doc, ...contact })
 			await managerNotifyMail(contact, message, `Quote accepted: ${ project.projectId } - ${ project.projectName } (C002.1)`)
 		}
@@ -115,12 +115,15 @@ async function stepVendorsRequestSending(project, checkedSteps) {
 	try {
 		let steps = [ ...project.steps ]
 		const assignedStepsCheck = checkedSteps.map(item => item.stepId.toString())
+
 		for await (let step of steps) {
-			if (assignedStepsCheck.indexOf(step.stepId.toString()) !== -1 && step.status === 'Created') {
+			// if (assignedStepsCheck.indexOf(step.stepId.toString()) !== -1 && step.status === 'Created') {
+			if (assignedStepsCheck.indexOf(step.stepId.toString()) !== -1) {
 				await sendRequestToVendor(project, step)
 				step.status = "Request Sent"
 			}
 		}
+
 		return steps
 	} catch (err) {
 		console.log(err)

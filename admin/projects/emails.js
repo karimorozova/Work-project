@@ -557,14 +557,12 @@ async function notifyStepReopened(steps, projectId) {
 }
 
 async function notifyVendorStepStart(steps, allSteps, project) {
-	const stepIds = steps.length ? steps.map(item => item._id) : steps
+	const stepIds = steps.map(item => item._id.toString())
 	try {
 		const notifyingSteps = allSteps.filter(item => {
 			if (stepIds.length) {
-				// return (item.status === 'Ready to Start' || item.status === 'Approved' || item.status === 'Waiting to Start')   && stepIds.indexOf(item.id) !== -1
-				return (item.status === 'Ready to Start' )   && stepIds.indexOf(item.id) !== -1
+				return (item.status === 'Ready to Start' && item.vendor && stepIds.indexOf(item._id.toString()) !== -1)
 			}
-			return item.status === 'Ready to Start'
 		})
 		if (notifyingSteps.length) {
 			for (let step of notifyingSteps) {

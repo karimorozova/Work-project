@@ -6,9 +6,23 @@
         :approveValue="modalTexts.approve"
         :notApproveValue="modalTexts.notApprove"
         @approve="approveAction"
-        @notApprove="notApproveAction"
+        @notApprove="closeApproveModal"
         @close="closeApproveModal"
       )
+
+    .steps__change-deadline(v-if="deadlineModal")
+      .steps__change-deadline-close(@click="closeErrorsDeadline") &#215;
+      DatepickerWithTime(
+        @selected="(e) => setMassDeadline(e)"
+        :inline="true",
+        calendarClass="steps__calendar-custom"
+        :format="customFormatter"
+        monday-first=true
+        :disabled="disabled"
+        :disabledPicker="isDatePickDisabled"
+        :highlighted="highlighted"
+      )
+
     .steps__action(v-if="!isProjectFinished")
       .steps__title Steps Actions:
       .steps__drop-menu
@@ -18,7 +32,9 @@
           placeholder="Select Action"
           @chooseOption="setAction"
         )
+
     Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTabQuery")
+
     GeneralTable(
       :fields="fields"
       :tableData="copySteps"
@@ -62,8 +78,8 @@
 
       template(slot="start" slot-scope="{ row, index }")
         .table__data
-          Datepicker(
-            @selected="(e) => changeDate(e, 'start', row.stepId)"
+          DatepickerWithTime(
+            @selected="(e) => setDate(e, 'start', row._id)"
             v-model="row.start"
             inputClass="steps__custom-input"
             calendarClass="steps__calendar-custom"
@@ -71,13 +87,12 @@
             monday-first=true
             :disabledPicker="isDatePickDisabled"
             :highlighted="highlighted"
-            @scrollDrop="scrollDrop"
           )
 
       template(slot="deadline" slot-scope="{ row, index }")
         .table__data
-          Datepicker(
-            @selected="(e) => changeDate(e, 'deadline', row.stepId)"
+          DatepickerWithTime(
+            @selected="(e) => setDate(e, 'deadline', row._id)"
             v-model="row.deadline"
             inputClass="steps__custom-input"
             calendarClass="steps__calendar-custom"
@@ -86,7 +101,6 @@
             :disabled="disabled"
             :disabledPicker="isDatePickDisabled"
             :highlighted="highlighted"
-            @scrollDrop="scrollDrop"
           )
 
       //template(slot="progress" slot-scope="{ row, index }")
@@ -134,11 +148,12 @@ import scrollDrop from "../../../mixins/scrollDrop"
 import Tabs from "../../Tabs"
 import SelectSingle from "../../SelectSingle"
 import ApproveModal from "../../ApproveModal"
-import _ from "lodash"
 import { mapActions, mapGetters } from "vuex"
+import moment from "moment"
+import DatepickerWithTime from "../../DatepickerWithTime"
 
 export default {
-  mixins: [ scrollDrop],
+  mixins: [ scrollDrop ],
   name: "NewSteps",
   props: {
     steps: {
@@ -153,6 +168,7 @@ export default {
   data() {
     return {
       // copySteps: JSON.parse(JSON.stringify(this.steps)),
+      deadlineModal: false,
       selectedAction: '',
       isApproveActionShow: false,
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
@@ -169,8 +185,8 @@ export default {
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "11%" } },
-        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "6%" } },
-      ],
+        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "6%" } }
+      ]
     }
   },
   methods: {
@@ -178,10 +194,18 @@ export default {
       "alertToggle",
       // "setProjectProp",
       "setCurrentProject",
-      "setStepsStatus",
+      "setStepsStatus"
       // "setProjectStatus",
       // "reopenSteps"
     ]),
+    closeErrorsDeadline() {
+      this.deadlineModal = false
+      this.selectedAction = ''
+      this.toggleAll(false)
+    },
+    customFormatter(date) {
+      return moment(date).format('MMM D, HH:mm')
+    },
     getStepPair(step) {
       return `<span>${ step.sourceLanguage }</span><span> &#8811; </span><span>${ step.targetLanguage }</span>`
     },
@@ -198,246 +222,134 @@ export default {
       return 0
     },
     vendorName(vendor) {
-      const surname = vendor && (vendor.surname && vendor.surname !== "undefined") ? vendor.surname : ""
-      return vendor ? vendor.firstName + ' ' + surname : ""
+      return vendor ? vendor.firstName + ' ' + vendor.surname || '' : ""
     },
-
     setTab({ index }) {
-      this.$emit('setTab', {index})
+      this.$emit('setTab', { index })
     },
     async setAction({ option }) {
       this.selectedAction = option
-      if (option === 'Change Deadline') {
+      if (option === 'Set Deadline' || option === 'Set Start') {
         this.deadlineModal = true
       } else {
-        this.setModalTexts(option)
+        this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
         this.isApproveActionShow = true
-      }
-
-      // switch (option) {
-      //   case "Mark as accept/reject":
-      //   case "Request confirmation":
-      //   case "ReOpen":
-      //     this.setModalTexts(option)
-      //     this.isApproveActionShow = true
-      //     break
-      //   case "Change Deadline" :
-      //     this.deadlineModal = true
-      //     break
-      // }
-    },
-    setModalTexts(option) {
-      this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
-      switch (this.selectedAction) {
-        case "Request confirmation":
-          this.modalTexts.main = "Please, choose action:"
-          this.modalTexts.approve = "Send"
-          this.modalTexts.notApprove = "Cancel"
-          break
-        case "Mark as accept/reject":
-          this.modalTexts.main = "Select the status:"
-          this.modalTexts.approve = "Accepted"
-          this.modalTexts.notApprove = "Rejected"
       }
     },
     toggleAll(isCheck) {
-        this.copySteps = this.copySteps.reduce((acc, cur) => {
-          acc.push({ ...cur, isCheck: isCheck })
-          return acc
-        }, [])
+      this.currentProject.steps = this.currentProject.steps.reduce((acc, cur) => {
+        acc.push({ ...cur, isCheck: isCheck })
+        return acc
+      }, [])
     },
     toggleCheck(index, isCheck) {
       this.$set(this.copySteps[index], "isCheck", isCheck)
     },
-    isEvery(stepStatus) {
-      const checkedSteps = this.copySteps.filter(item => item.isCheck)
-      if (checkedSteps.length) return checkedSteps.every(({ status }) => status === stepStatus)
+    getStepByStatus(statuses) {
+      const filtered = []
+      statuses.forEach(status => filtered.push(...this.checkedSteps.filter(step => step.status === status)))
+      return filtered
     },
-
     async approveAction() {
-      try {
-        const groupedByStatus = this.checkedSteps.reduce((acc, step) => {
-          if (!acc.hasOwnProperty(step.status)) {
-            acc[step.status] = [ step ]
-          } else {
-            acc[step.status].push(step)
-          }
-          return acc
-        }, {})
-
-        for (const [ stepStatus, steps ] of Object.entries(groupedByStatus)) {
-          //[ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In Progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
-          const statusAndAction = this.getStatusAndAction(stepStatus, this.selectedAction)
-          console.log(statusAndAction)
-          switch (statusAndAction) {
-            //Action MARK AS ACCEPT/REJECT
-            case "Created__Mark-as-accept/reject":
-            case "Approved__Mark-as-accept/reject":
-            case "Rejected__Mark-as-accept/reject":
-            case "Request-Sent__Mark-as-accept/reject":
-              const assignedSteps = steps.filter(item => item.vendor)
-              if (assignedSteps.length) await this.decideOnSteps(assignedSteps, "Approved")
-              break
-
-            //Action REQUEST CONFIRMATION
-            case "Created__Request-confirmation":
-            case "Rejected__Request-confirmation":
-            case "Request-Sent__Request-confirmation":
-              await this.requestConfirmation(this.checkedSteps)
-              break
-
-            //Action CHANGE DEADLINE
-            case "Created__Change-Deadline":
-            case "Request-Sent__Change-Deadline":
-            case "Completed__Change-Deadline":
-
-              break
-
-            //Action RE OPEN
-            case "Completed__ReOpen":
-
-              break
-
-            default:
-              console.log(statusAndAction)
-          }
-
-        }
-      } catch (e) {
-
-      } finally {
-        this.closeApproveModal()
+      switch (this.selectedAction) {
+        case "Request Confirmation" :
+          await this.requestConfirmation(this.getStepByStatus([ 'Created', 'Rejected', 'Request Sent' ]))
+          break
+        case "Mark as Approved" :
+          await this.decideOnSteps('Approved', this.getStepByStatus([ 'Created', 'Rejected', 'Request Sent' ]))
+          break
+        case "Mark as Rejected" :
+          await this.decideOnSteps('Rejected', this.getStepByStatus([ 'Created', 'Rejected', 'Request Sent', 'Approved', 'Ready to Start', 'Waiting to Start' ]))
+          break
       }
-      // this.isApproveActionShow = false
-      // const checkedSteps = this.checkedSteps
-      // !checkedSteps.length ? this.closeApproveModal() : await this.doStepApproveAction(checkedSteps)
+      this.closeApproveModal()
     },
-    async notApproveAction() {
-      const checkedSteps = this.checkedSteps
-      if (!checkedSteps.length) return this.closeApproveModal()
-      try {
-        switch (this.modalTexts.notApprove) {
-          case "No":
-          case "Cancel":
-            this.closeApproveModal()
-            break
-          case "Rejected":
-            const assignedSteps = checkedSteps.filter(item => item.vendor)
-            if (assignedSteps.length) {
-              await this.decideOnSteps(assignedSteps, "Rejected")
-            }
-        }
-      } catch (err) {
-        this.alertToggle({ message: "Internal server error.Try later.", isShow: true, type: 'error' })
-      } finally {
-        this.closeApproveModal()
+    async setMassDeadline(date) {
+      const prop = this.selectedAction === 'Set Start' ? 'start' : 'deadline'
+      for await (const step of this.checkedSteps) {
+        await this.setDate(date, prop, step._id)
       }
+      this.closeErrorsDeadline()
     },
-
+    async setDate(date, prop, stepId) {
+      const step = this.currentProject.steps.find(item => item._id === stepId)
+      step[prop] = new Date(date)
+      const { type } = step.receivablesUnit
+      await this.sendStepsDates({ _id: this.currentProject._id, step, stepId, type, prop })
+    },
     closeApproveModal() {
       this.isApproveActionShow = false
       this.selectedAction = ""
+      this.toggleAll(false)
     },
-
-    getStatusAndAction(status, action ) {
-      //TODO: add status * to accept all statuses Example: *__Change-deadline accept change deadline to all statuses
-      return (status + '__' + action).replaceAll(' ', '-')
-    },
-
-    //-------------- Actions Functions -------------------------------------------
-
-    async decideOnSteps(assignedSteps, selectedStatus) {
+    async decideOnSteps(status, steps) {
+      if (!steps.length) return
       try {
-        const withPayables = assignedSteps.filter(item => item.finance.Price.payables)
-        if (withPayables.length) {
-          const status = selectedStatus === 'Accepted' ? this.getAcceptedStepStatus() : selectedStatus
-          await this.setStepsStatus({ status, steps: withPayables })
-        }
-        if (withPayables.length < assignedSteps.length) {
-          // this.showErrors([ `One or more steps could not be ${ selectedStatus.toLowerCase() } as payables are missing` ])
-        }
+        await this.setStepsStatus({ status, steps })
       } catch (err) {
-        console.log(err)
+        this.alertToggle({ message: `Error:  Status: ${ status }, cannot be set.`, isShow: true, type: 'error' })
       }
     },
-
-    async requestConfirmation(steps) {
-      const filteredSteps = steps.filter(item => item.status === "Created" || item.status === "Rejected")
-      if (!filteredSteps.length) return
-      // const zeroPayablesStep = filteredSteps.find(item => !item.finance.Price.payables)
-      // if (!!zeroPayablesStep) {
-      //   return this.showErrors([ "There are steps with no payables!" ])
-      // }
+    async sendStepsDates({ _id, step, stepId, type, prop }) {
       try {
-        const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: filteredSteps, projectId: this.currentProject._id })
+        const updatedProject = await this.$http.post('/pm-manage/update-steps-dates', { projectId: _id, step, stepId, type, prop })
+        await this.setCurrentProject(updatedProject.data)
+      } catch (err) {
+        this.alertToggle({ message: `Error on setting steps dates.`, isShow: true, type: 'error' })
+      }
+    },
+    async requestConfirmation(steps) {
+      if (!steps.length) return
+      try {
+        const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: steps, projectId: this.currentProject._id })
         await this.setCurrentProject(result.data)
         this.selectedAction = ""
         this.alertToggle({ message: "Requests has been sent.", isShow: true, type: 'success' })
       } catch (err) {
         this.alertToggle({ message: "Error: Request Confirmation cannot be sent.", isShow: true, type: 'error' })
       }
-    },
-
-    getAcceptedStepStatus() {
-      if (this.currentProject.status === 'Approved' || this.currentProject.status === 'In progress') {
-        return 'Ready to Start'
-      }
-      return "Accepted"
-    },
+    }
   },
   computed: {
     ...mapGetters({
-      currentProject: 'getCurrentProject',
+      currentProject: 'getCurrentProject'
     }),
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
     },
     stepActions() {
-      // console.log(this.copySteps)
-      // const checkedSteps = this.copySteps.filter(item => item.isCheck).map(item => item.status)
-      // const availableStatusForChangeDeadline = [ 'Created', 'Ready to Start', 'Request Sent', 'Waiting to Start', 'In progress', 'Started' ]
-      // const indexesForAvailableStatuses = checkedSteps.map(item => availableStatusForChangeDeadline.indexOf(item))
-      // console.log(this.isEvery('Created'))
-      // if (this.isEvery('Created')) {
-      //   return [ "Mark as accept/reject", "Request confirmation", "Change Deadline" ]
-      // } else if (this.isEvery('Request Sent')) {
-      //   return [ "Mark as accept/reject", "Change Deadline" ]
-      // } else if (this.isEvery('Completed')) {
-      //   return [ "ReOpen" ]
-      // } else if (indexesForAvailableStatuses.length && !indexesForAvailableStatuses.includes(-1)) {
-      //   return [ "Change Deadline" ]
-      // }
-
-      if(this.checkedSteps.length < 1) return []
-      return [ "Mark as accept/reject", "Request confirmation", "Change Deadline", "ReOpen" ]
-
+      if (this.checkedSteps.length < 1) return []
+      return [ "Request Confirmation", "Mark as Approved", "Mark as Rejected", "Set Start", "Set Deadline" ]
     },
     checkedSteps() {
-      return this.copySteps.filter(({isCheck})=> isCheck)
+      return this.copySteps.filter(({ isCheck }) => isCheck)
     },
     copySteps() {
       return this.currentProject.steps
     },
     isAllSelected() {
       return (this.copySteps && this.copySteps.length) && this.copySteps.every(i => i.isCheck)
-    },
+    }
   },
   components: {
+    DatepickerWithTime,
     GeneralTable,
     CheckBox,
     Datepicker,
     ProgressLineStep,
     Tabs,
     SelectSingle,
-    ApproveModal,
+    ApproveModal
   }
 }
 </script>
 
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
+
 .steps {
   position: relative;
+
   &__action {
     align-self: flex-end;
   }
@@ -458,11 +370,45 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     background-color: #fff;
     border-radius: 4px;
   }
+
+  &__change-deadline {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    box-shadow: $box-shadow;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 30px 0 0 0;
+    width: 258px;
+
+    &-close {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
 }
+
 .table {
   width: 100%;
 
@@ -510,6 +456,7 @@ export default {
     width: 100%;
     padding: 0 6px;
   }
+
   &__space-between {
     padding: 0 6px;
     word-break: break-word;

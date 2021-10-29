@@ -316,9 +316,8 @@ async function updateProjectStatusForClientPortalProject(projectId, action) {
 async function updateProjectStatus(id, status, reason) {
 	try {
 		const project = await getProject({ "_id": id })
-
-		if (status === 'fromCancelled') return await reOpenProject(project)
-		if (status === 'fromClosed') return await reOpenProject(project, false)
+		// if (status === 'fromCancelled') return await reOpenProject(project)
+		// if (status === 'fromClosed') return await reOpenProject(project, false)
 		if (status !== "Cancelled" && status !== "Cancelled Halfway") return await setNewProjectDetails(project, status, reason)
 
 		if (status === "Cancelled" || status === "Cancelled Halfway") {
@@ -369,70 +368,10 @@ const setApprovedStepStatus = ({ project, step, steps }) => {
 	})
 }
 
-
-function setStepsStatus({ steps, status, project }) {
-
-	// const { steps: allSteps, tasks } = project
-	// const comingSteps = steps
-	// const comingStepsIds = steps.map(item => item._id.toString())
-	// return updateStepsStatuses({ allSteps, comingSteps, comingStepsIds, tasks, status })
-}
-
-function updateStepsStatuses({ allSteps, comingSteps, comingStepsIds, tasks, status }) {
-
-	return allSteps.map(step => {
-		// if (comingStepsIds.indexOf(step._id.toString()) !== -1) {
-		// 	const neededTask = tasks.find(item => item.taskId === step.taskId)
-		// 	const allStepsFromCurrentTask = allSteps.filter(item => item.taskId === neededTask.taskId)
-		// 	const stepNumbers = allStepsFromCurrentTask.map(item => item.stepNumber)
-		// 	const maxStepNumber = Math.max.apply(null, stepNumbers)
-		//
-		// 	if(stepNumbers.length === 1){
-		// 		step.status = ''
-		// 	}
-		//
-		// 	// let newStatus = status
-		//
-		// 	// if (status === "Ready to Start" && isPrevStep({ tasks, allSteps, step: item })) {
-		// 	// 	newStatus = "Waiting to Start"
-		// 	// }
-		// 	//
-		// 	// item.status = newStatus
-		// }
-		// return step
-	})
-
-	// function isPrevStep({ tasks, allSteps, step }) {
-	// 	const stepTask = tasks.find(item => item.taskId === step.taskId)
-	// 	const sameSteps = allSteps.filter(item => {
-	// 		return item.taskId === stepTask.taskId
-	// 				&& item.stepId !== step.stepId
-	// 				&& item.status !== "Completed"
-	// 	})
-	// 	const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1')
-	// 	return sameSteps.length && stage1.step.title !== step.serviceStep.title
-	// }
-}
-
-// /**
-//  *
-//  * @param {Array} changedTasks
-//  * @param {String} status
-//  * @returns {string} - returns project's status
-//  */
-// function getProjectNewStatus(changedTasks, status) {
-//   const notFullyCancelledTask = changedTasks.find(item => {
-//     return item.status === "Cancelled Halfway" ||
-//         item.status === "Ready for Delivery" ||
-//         item.status === "Delivered";
-//   });
-//   return notFullyCancelledTask ? "Cancelled Halfway" : status;
-// }
-
 async function setNewProjectDetails(project, status, reason) {
 	try {
-		if (status === "Started" || status === "Approved") {
-			return await getApprovedProject(project, status)
+		if (status === "Approved") {
+			return await getApprovedProject(project)
 		}
 		if (status === "Rejected") {
 			const client = { ...project.customer._doc, id: project.customer.id }
@@ -447,7 +386,7 @@ async function setNewProjectDetails(project, status, reason) {
 	}
 }
 
-async function getApprovedProject(project, status) {
+async function getApprovedProject(project) {
 	const taskIds = project.tasks.map(item => item.taskId)
 	const { tasks, steps } = updateWithApprovedTasks({ taskIds, project })
 	project.isStartAccepted = true
@@ -455,10 +394,11 @@ async function getApprovedProject(project, status) {
 		if (project.isStartAccepted) {
 			await notifyManagerProjectStarts(project, false)
 		}
-		await notifyVendorStepStart([], steps, project)
-		const updatedProject = await updateProject({ "_id": project.id }, { status, isStartAccepted: true, tasks, steps, isPriceUpdated: false })
 
-		const updatedSteps = await sendQuoteToVendorsAfterProjectAccepted(updatedProject.steps, updatedProject)
+		await notifyVendorStepStart(steps, steps, project)
+		const updatedProject = await updateProject({ "_id": project.id }, { status: 'Approved', isStartAccepted: true, tasks, steps, isPriceUpdated: false })
+
+		let updatedSteps = await sendQuoteToVendorsAfterProjectAccepted(updatedProject.steps, updatedProject)
 		return await updateProject({ "_id": project.id }, { steps: updatedSteps })
 	} catch (err) {
 		console.log(err)
@@ -473,22 +413,12 @@ function updateWithApprovedTasks({ taskIds, project }) {
 		return task
 	})
 
-	const steps = project.steps.map(step => {
-		if (step.status === 'Accepted' && taskIds.indexOf(step.taskId) !== -1) {
-			const stepTask = tasks.find(item => item.taskId === step.taskId)
-			step.status = getApprovedStepStatus(stepTask, step)
-		}
-		return step
-	})
-	return { tasks, steps }
-}
-
-function getApprovedStepStatus(stepTask, step) {
-	const stage1 = stepTask.service.steps.find(item => item.stage === 'stage1')
-	if (stage1.step.title === step.serviceStep.title) {
-		return 'Ready to Start'
+	let steps = []
+	const approvedSteps = project.steps.filter(item => item.status === 'Approved')
+	for (const step of approvedSteps) {
+		steps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps: project.steps })
 	}
-	return 'Waiting to Start'
+	return { tasks, steps }
 }
 
 function updateStepsProgress(task, steps) {
@@ -613,7 +543,7 @@ async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
 
 async function getAfterReopenSteps(steps, project) {
 	try {
-		const updatedSteps = setStepsStatus({ steps, status: 'Started', project })
+		// const updatedSteps = setStepsStatus({ steps, status: 'Started', project })
 		const stepIdentify = steps.map(item => item.taskId + item.name)
 		const chosenSteps = updatedSteps.filter(item => stepIdentify.indexOf(item.taskId + item.name) !== -1)
 		const updatedtasks = getTasksAfterReopen({ steps: chosenSteps, tasks: project.tasks })
@@ -742,7 +672,7 @@ const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 	const users = await getMemoqUsers()
 	const allVendors = await Vendors.find()
-	let { steps } = await Projects.findOne({ '_id': projectId })
+	let { steps, tasks } = await Projects.findOne({ '_id': projectId })
 
 	const { taskId } = steps.find(item => item.stepId === stepId)
 
@@ -764,10 +694,8 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 	}
 
 	async function setDeadlineByStepId(stepId, structure) {
-		const {
-			memoqProjectId,
-			memoqDocIds
-		} = steps.find(item => item.stepId === stepId)
+		const { memoqDocIds, taskId } = steps.find(item => item.stepId === stepId)
+		const { memoqProjectId } = tasks.find(item => item.taskId === taskId)
 
 		for await (let documentGuid of memoqDocIds)
 			await setMemoqDocsDeadline(memoqProjectId, documentGuid, structure)
@@ -775,17 +703,11 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 
 	function generateStructure(arrIds, steps) {
 		return arrIds.reduce((acc, curr) => {
-			const {
-				deadline,
-				serviceStep: { memoqAssignmentRole },
-				vendor: vendorId
-			} = steps.find(item => item.stepId === curr)
+			const { deadline, memoqAssignmentRole, vendor: vendorId } = steps.find(item => item.stepId === curr)
 
-			const { email } = allVendors
-					.find(({ _id }) => _id.toString() === vendorId.toString())
+			const { email } = allVendors.find(({ _id }) => _id.toString() === vendorId.toString())
 
-			const user = users
-					.find(item => item.email === email)
+			const user = users.find(item => item.email === email)
 
 			acc = acc + `
 					<ns:TranslationDocumentUserRoleAssignment>
@@ -803,7 +725,6 @@ module.exports = {
 	cancelProjectInMemoq,
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
-	setStepsStatus,
 	downloadCompletedFiles,
 	updateProjectProgress,
 	updateWithApprovedTasks,
