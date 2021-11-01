@@ -74,7 +74,7 @@ export default {
     },
     async check() {
       try {
-        const value = this.project.tasks.map(item => ({taskId: item.taskId, link: ''}))
+        const value = this.project.tasks.map(item => ({ taskId: item.taskId, link: '' }))
         const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLinks', value })
         await this.setCurrentProject(result.body)
         this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
@@ -143,9 +143,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  @import "../../assets/scss/colors";
-  .xtrf-tasks {
-    margin: 10px 0;
+@import "../../assets/scss/colors";
+
+.xtrf-tasks {
+  margin: 10px 0;
 
   &__group {
     display: flex;
@@ -179,32 +180,35 @@ export default {
       margin: 5px 0 0 0;
     }
   }
+}
 
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-  .projectToXtrf {
-    box-sizing: border-box;
-    padding: 20px;
-    box-shadow: $box-shadow;
-    min-width: 400px;
-    width: 400px;
-    background: white;
-    border-radius: 4px;
-    margin-bottom: 40px;
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.projectToXtrf {
+  box-sizing: border-box;
+  padding: 20px;
+  box-shadow: $box-shadow;
+  min-width: 400px;
+  width: 400px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 40px;
 
 
-    &__info {
-      margin-top: 10px;
-      margin-bottom: 2px;
-      letter-spacing: .6px;
-      font-size: 11px;
-      opacity: .5;
-      .dont-close-text {
-        margin: 5px 0 0 0;
-      }
+  &__info {
+    margin-top: 10px;
+    margin-bottom: 2px;
+    letter-spacing: .6px;
+    font-size: 11px;
+    opacity: .5;
+
+    .dont-close-text {
+      margin: 5px 0 0 0;
     }
+  }
 
   .red {
     color: #d15f45;
