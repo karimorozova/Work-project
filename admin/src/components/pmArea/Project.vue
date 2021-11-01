@@ -56,8 +56,6 @@
             inputClass="datepicker-custom-project-info"
             calendarClass="calendar-custom"
             :format="customFormatter"
-            :disabledPicker="isBilling || isProjectFinished"
-            :disabled="disabled"
           )
           .project__calendar-icon(@click="billingOpen")
             i.far.fa-calendar-alt
