@@ -8,7 +8,15 @@
         | &nbsp;&nbsp;
         i(class="fas fa-check-circle cursor-pointer" @click="updateFinance")
 
-
+    .projectToXtrf__buttons(style="display: flex; align-items: center; margin-top: 10px;")
+      CheckBox(
+        :isChecked="project.isSendToXtrf"
+        @check="check"
+        @uncheck="uncheck"
+      )
+      span(style="margin-left: 10px;") Marks as Transferred
+    div(v-if="project.isSendToXtrf" style="margin-top: 10px;")
+      input(v-model="project.xtrfLink" @change="setUrl")
 
     .projectToXtrf__info
       .red
@@ -21,102 +29,156 @@
 </template>
 
 <script>
-	import Button from "../Button"
-	import axios from "axios"
-	import { mapActions } from "vuex"
+import Button from "../Button"
+import axios from "axios"
+import { mapActions } from "vuex"
+import CheckBox from "../CheckBox"
+import { setCurrentProject } from "../../vuex/general/actions"
 
-	export default {
-		props: {
-			project: {
-				type: Object
-			}
-		},
-		data() {
-			return {
-				isDisable: false
-			}
-		},
-		methods: {
-			...mapActions({
-				alertToggle: "alertToggle"
-			}),
-			async updateFinance() {
-				try {
-					await this.$http.get('/pm-manage/updateXtrfProject/' + this.$route.params.id)
-					this.alertToggle({
-						message: "Updated",
-						isShow: true,
-						type: "success"
-					})
-				} catch (err) {
-					this.alertToggle({
-						message: "Error on updating finance",
-						isShow: true,
-						type: "error"
-					})
-				}
-			},
-			sendTo() {
-				this.isDisable = true
-				axios
-						.get('/pm-manage/createXtrfProjectWithFinance/' + this.$route.params.id)
-						.then((res) => res.data)
-						.then((data) => {
-							if (data.isSuccess) {
-								const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
-								this.alertToggle({
-									message: "Send success" + notFoundVendorsMessage,
-									isShow: true,
-									type: "success"
-								})
-								this.$emit('refreshProject')
-							} else {
-								this.alertToggle({
-									message: data.message,
-									isShow: true,
-									type: "error"
-								})
-							}
-						})
-						.finally(() => this.isDisable = false)
-			}
-		},
-		components: { Button }
-	}
+export default {
+  props: {
+    project: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      isDisable: false
+    }
+  },
+  methods: {
+    ...mapActions({
+      alertToggle: "alertToggle",
+      setCurrentProject: "setCurrentProject"
+    }),
+    async setUrl() {
+      try {
+        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLink', value: this.project.xtrfLink })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
+    async check() {
+      try {
+        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'isSendToXtrf', value: true })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
+    async uncheck() {
+      try {
+        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'isSendToXtrf', value: false })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
+    async updateFinance() {
+      try {
+        await this.$http.get('/pm-manage/updateXtrfProject/' + this.$route.params.id)
+        this.alertToggle({
+          message: "Updated",
+          isShow: true,
+          type: "success"
+        })
+      } catch (err) {
+        this.alertToggle({
+          message: "Error on updating finance",
+          isShow: true,
+          type: "error"
+        })
+      }
+    },
+    sendTo() {
+      this.isDisable = true
+      axios
+          .get('/pm-manage/createXtrfProjectWithFinance/' + this.$route.params.id)
+          .then((res) => res.data)
+          .then((data) => {
+            if (data.isSuccess) {
+              const notFoundVendorsMessage = data.noFoundVendors.length ? ", but we can not find some vendors: " + data.noFoundVendors.join(", ") : ''
+              this.alertToggle({
+                message: "Send success" + notFoundVendorsMessage,
+                isShow: true,
+                type: "success"
+              })
+              this.$emit('refreshProject')
+            } else {
+              this.alertToggle({
+                message: data.message,
+                isShow: true,
+                type: "error"
+              })
+            }
+          })
+          .finally(() => this.isDisable = false)
+    }
+  },
+  components: { CheckBox, Button }
+}
 </script>
 
 <style scoped lang="scss">
-  .projectToXtrf {
-    box-sizing: border-box;
-    padding: 20px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-    min-width: 400px;
-    width: 400px;
-    background: white;
-    border-radius: 4px;
-    margin-bottom: 40px;
+@import "../../assets/scss/colors";
+
+.projectToXtrf {
+  box-sizing: border-box;
+  padding: 20px;
+  box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+  min-width: 400px;
+  width: 400px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 40px;
 
 
-    &__info {
-      margin-top: 10px;
-      margin-bottom: 2px;
-      letter-spacing: .6px;
-      font-size: 11px;
-      opacity: .5;
-      .dont-close-text {
-        margin: 5px 0 0 0;
-      }
-    }
-    .red {
-      color: #d15f45;
-      margin-bottom: 3px;
-    }
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-    .margin-bottom {
-      margin-bottom: 10px;
+  &__info {
+    margin-top: 10px;
+    margin-bottom: 2px;
+    letter-spacing: .6px;
+    font-size: 11px;
+    opacity: .5;
+
+    .dont-close-text {
+      margin: 5px 0 0 0;
     }
   }
+
+  .red {
+    color: #d15f45;
+    margin-bottom: 3px;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .margin-bottom {
+    margin-bottom: 10px;
+  }
+}
+
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  height: 32px;
+  width: 100%;
+  font-family: 'Myriad400';
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
 </style>
