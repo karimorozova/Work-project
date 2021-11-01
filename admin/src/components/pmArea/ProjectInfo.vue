@@ -20,7 +20,7 @@
 
     .project-info__rigthSide
       ImportProjectToXtrf(
-        v-if="canSendToXtrf"
+        v-if="canSendToXtrf || true"
         :project="currentProject"
         @refreshProject="refreshProject"
       )
