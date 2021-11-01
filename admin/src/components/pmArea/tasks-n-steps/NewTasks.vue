@@ -23,15 +23,14 @@
         )
 
     Tabs(:tabs="tabs" @setTab="setTab" :selectedTab="selectedTabQuery")
+
     GeneralTable(
       :fields="fields"
       :tableData="copyTasks"
     )
-
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header(v-if="field.headerKey === 'headerCheck'")
           CheckBox(:isChecked="isAllSelected" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        //.table__header(v-if="field.headerKey === 'headerCheck' && isEdit")
         .table__header(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
@@ -62,7 +61,7 @@
 
       template(slot="payables" slot-scope="{ row }")
         .table__data
-            span -
+          span -
         //  span(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
         //    span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
         //  span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
@@ -76,7 +75,7 @@
           //span(v-if="marginCalc(row)") {{ marginCalc(row) }}
           //sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
-      template(slot="delivery" slot-scope="{ row }")
+      template(slot="icons" slot-scope="{ row }")
         .table__data
           img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
 
@@ -88,13 +87,15 @@ import CheckBox from '../../CheckBox'
 import ProgressLine from '../../ProgressLine'
 import Tabs from '../../Tabs'
 import SelectSingle from '../../SelectSingle'
+import { mapGetters } from "vuex"
+
 export default {
   name: "NewTasks",
   props: {
-    tasks: {
-      type: Array,
-      default: []
-    },
+    // tasks: {
+    //   type: Array,
+    //   default: []
+    // },
     tabs: {
       type: Array,
       default: []
@@ -104,7 +105,7 @@ export default {
     return {
       isCancelApproveModal: false,
       selectedAction: "",
-      copyTasks: JSON.parse(JSON.stringify(this.tasks)),
+      // copyTasks: JSON.parse(JSON.stringify(this.tasks)),
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       fields: [
         { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
@@ -114,13 +115,16 @@ export default {
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } },
-        { label: "", headerKey: "headerDelivery", key: "delivery", style: { "width": "4%" } }
-      ],
+        { label: "", headerKey: "headerDelivery", key: "icons", style: { "width": "10%" } }
+      ]
     }
   },
   methods: {
     getPair(task) {
-      return `<span>${ task.sourceLanguage }</span><span> &#8811; </span><span>${ task.targetLanguage }</span>`
+      return `
+       <span>${ task.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span><span>${ task.targetLanguage }</span>
+
+<span> &#8811; </span>`
     },
     progress(task) {
       let progress = 20
@@ -130,17 +134,14 @@ export default {
     toggleCheck(index, isCheck) {
       this.$set(this.copyTasks[index], "isCheck", isCheck)
     },
-
     toggleAll(val) {
       this.copyTasks = this.copyTasks.reduce((acc, cur) => {
         acc.push({ ...cur, isCheck: val })
         return acc
       }, [])
-
-      // this.setProjectProp({ value: tasks, prop: 'tasks' })
     },
     setTab({ index }) {
-      this.$emit('setTab', {index})
+      this.$emit('setTab', { index })
     },
     // async approveCancelAction() {
     //   try {
@@ -190,10 +191,6 @@ export default {
     //   }
     //
     // },
-    getStatusAndAction(status, action ) {
-      //TODO: add status * to accept all statuses example *__Change-deadline accept change deadline to all statuses
-      return (status + '__' + action).replaceAll(' ', '-')
-    },
     // async approveCancelAction() {
     //   const checkedTasks = this.copyTasks.filter(item => item.isChecked)
     //   // if (!checkedTasks.length) return this.closeApproveModal()
@@ -211,50 +208,51 @@ export default {
       this.selectedAction = ""
     },
     async setAction({ option }) {
-
       this.selectedAction = option
-      try {
-        const groupedByStatus = this.checkedTasks.reduce((acc, step) => {
-          if (!acc.hasOwnProperty(step.status)) {
-            acc[step.status] = [ step ]
-          } else {
-            acc[step.status].push(step)
-          }
-          return acc
-        }, {})
 
-        for (const [ taskStatus, tasks ] of Object.entries(groupedByStatus)) {
-          const statusAndAction = this.getStatusAndAction(taskStatus, this.selectedAction)
-          //     [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
-          switch (statusAndAction) {
-              //Action MANAGE REFERENCE FILES
-            case "Created__Manage-reference-files":
 
-              //Action UPLOAD REFERENCE FILES
-            case "Created__Request-confirmation":
-
-              break
-
-              //Action SEND A QUOTE
-            case "Created__Change-Deadline":
-            case "Request-Sent__Change-Deadline":
-            case "Completed__Change-Deadline":
-
-              break
-
-              //Action CANCEL
-            case "Completed__ReOpen":
-
-              break
-
-            default:
-              console.log(statusAndAction)
-          }
-        }
-
-      } catch (e) {
-
-      }
+      // try {
+      //   const groupedByStatus = this.checkedTasks.reduce((acc, step) => {
+      //     if (!acc.hasOwnProperty(step.status)) {
+      //       acc[step.status] = [ step ]
+      //     } else {
+      //       acc[step.status].push(step)
+      //     }
+      //     return acc
+      //   }, {})
+      //
+      //   for (const [ taskStatus, tasks ] of Object.entries(groupedByStatus)) {
+      //     const statusAndAction = this.getStatusAndAction(taskStatus, this.selectedAction)
+      //     //     [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
+      //     switch (statusAndAction) {
+      //         //Action MANAGE REFERENCE FILES
+      //       case "Created__Manage-reference-files":
+      //
+      //         //Action UPLOAD REFERENCE FILES
+      //       case "Created__Request-confirmation":
+      //
+      //         break
+      //
+      //         //Action SEND A QUOTE
+      //       case "Created__Change-Deadline":
+      //       case "Request-Sent__Change-Deadline":
+      //       case "Completed__Change-Deadline":
+      //
+      //         break
+      //
+      //         //Action CANCEL
+      //       case "Completed__ReOpen":
+      //
+      //         break
+      //
+      //       default:
+      //         console.log(statusAndAction)
+      //     }
+      //   }
+      //
+      // } catch (e) {
+      //
+      // }
 
 
       // switch (option) {
@@ -281,50 +279,57 @@ export default {
       //     this.manageFileModal = true
       //     break
       // }
-    },
+    }
   },
   computed: {
+    ...mapGetters({
+      currentProject: 'getCurrentProject'
+    }),
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
     },
     availableActionsOptions() {
-    //   const { status, tasks } = this.currentProject
-    //   const checkedTasks = tasks.filter(item => item.isChecked)
-    //   if (checkedTasks.length) {
-    //     if (this.isEvery('Created')) {
-    //
-    //       if (status !== "Draft" && status !== "Cost Quote" && status !== "Rejected") {
-    //         return [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
-    //       } else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
-    //         return [ 'Manage reference files', 'Upload reference files', 'Cancel' ]
-    //       } else {
-    //         return [ 'Cancel' ]
-    //       }
-    //
-    //     } else if (this.isEvery("Pending Approval [DR1]")) {
-    //
-    //       let elements = []
-    //       const [ first ] = checkedTasks
-    //       const isSameService = checkedTasks.every(({ service }) => service.title === first.service.title)
-    //       if (isSameService) elements.push('Complete DR1')
-    //       if (this.canChangeDR1Manager) elements.push('Reassign DR1')
-    //       return elements
-    //     //
-    //     // } else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
-    //     //   return [ 'Upload reference files', 'Cancel' ]
-    //     // } else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
-    //     //   return [ 'Manage reference files', 'Upload reference files', 'Cancel' ]
-    //     }
-    //   }
-      return  [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
-    },
+      //   const { status, tasks } = this.currentProject
+      //   const checkedTasks = tasks.filter(item => item.isChecked)
+      //   if (checkedTasks.length) {
+      //     if (this.isEvery('Created')) {
+      //
+      //       if (status !== "Draft" && status !== "Cost Quote" && status !== "Rejected") {
+      //         return [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
+      //       } else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
+      //         return [ 'Manage reference files', 'Upload reference files', 'Cancel' ]
+      //       } else {
+      //         return [ 'Cancel' ]
+      //       }
+      //
+      //     } else if (this.isEvery("Pending Approval [DR1]")) {
+      //
+      //       let elements = []
+      //       const [ first ] = checkedTasks
+      //       const isSameService = checkedTasks.every(({ service }) => service.title === first.service.title)
+      //       if (isSameService) elements.push('Complete DR1')
+      //       if (this.canChangeDR1Manager) elements.push('Reassign DR1')
+      //       return elements
+      //     //
+      //     // } else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length > 1) {
+      //     //   return [ 'Upload reference files', 'Cancel' ]
+      //     // } else if (checkedTasks.every(({ status }) => this.fileUploadStatus.includes(status)) && checkedTasks.length === 1) {
+      //     //   return [ 'Manage reference files', 'Upload reference files', 'Cancel' ]
+      //     }
+      //   }
+      //   return  [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
+      return [ 'Send a Quote', 'Cancel' ]
 
+    },
+    copyTasks() {
+      return this.currentProject.tasks
+    },
     checkedTasks() {
-      return this.copyTasks.filter(({isCheck})=> isCheck)
+      return this.copyTasks.filter(({ isCheck }) => isCheck)
     },
     isAllSelected() {
       return (this.copyTasks && this.copyTasks.length) && this.copyTasks.every(i => i.isCheck)
-    },
+    }
 
   },
   components: {
@@ -332,93 +337,95 @@ export default {
     CheckBox,
     ProgressLine,
     Tabs,
-    SelectSingle,
+    SelectSingle
   }
 }
 </script>
 
 <style scoped lang="scss">
-  @import "../../../assets/scss/colors";
-  .tasks {
-    &__action {
-      align-self: flex-end;
-    }
+@import "../../../assets/scss/colors";
 
-    &__title {
-      margin-bottom: 4px;
-    }
-
-    &__drop-menu {
-      position: relative;
-      width: 220px;
-      height: 32px;
-    }
-  }
-  .table {
-    width: 100%;
-
-    &__data {
-      padding: 0 7px;
-    }
-
-    &__header {
-      padding: 0 7px;
-    }
-
-    &__drop {
-      position: relative;
-      height: 32px;
-      max-width: 220px;
-      margin: 0 7px;
-      width: 100%;
-      background: white;
-      border-radius: 4px;
-    }
-
-    &__icons {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      gap: 8px;
-    }
-
-    &__icon {
-      cursor: pointer;
-      opacity: 0.5;
-    }
-
-    &__opacity {
-      opacity: 1;
-    }
-
-    &__input {
-      width: 100%;
-      padding: 0 7px;
-    }
-
-    &__statusAndProgress {
-      width: 100%;
-      padding: 0 6px;
-    }
-
+.tasks {
+  &__action {
+    align-self: flex-end;
   }
 
-  input {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    width: 100%;
+  &__title {
+    margin-bottom: 4px;
+  }
+
+  &__drop-menu {
+    position: relative;
+    width: 220px;
     height: 32px;
-    transition: .1s ease-out;
-
-    &:focus {
-      border: 1px solid $border-focus;
-    }
   }
+}
+
+.table {
+  width: 100%;
+
+  &__data {
+    padding: 0 7px;
+  }
+
+  &__header {
+    padding: 0 7px;
+  }
+
+  &__drop {
+    position: relative;
+    height: 32px;
+    max-width: 220px;
+    margin: 0 7px;
+    width: 100%;
+    background: white;
+    border-radius: 4px;
+  }
+
+  &__icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+  }
+
+  &__icon {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+
+  &__opacity {
+    opacity: 1;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0 7px;
+  }
+
+  &__statusAndProgress {
+    width: 100%;
+    padding: 0 6px;
+  }
+
+}
+
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  width: 100%;
+  height: 32px;
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
 
 </style>

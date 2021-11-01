@@ -167,7 +167,6 @@ export default {
   },
   data() {
     return {
-      // copySteps: JSON.parse(JSON.stringify(this.steps)),
       deadlineModal: false,
       selectedAction: '',
       isApproveActionShow: false,
