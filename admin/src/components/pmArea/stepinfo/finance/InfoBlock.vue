@@ -67,9 +67,6 @@
         @close="noSave"
       )
 
-    .finance-info__tabs(v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'")
-      Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
-    TableMatrix(v-if="getUnitTypeByUnitId === 'CAT Wordcount' && step.name === 'Translation'", :step="step" :selectedTab="selectedTab")
 
 </template>
 
@@ -125,10 +122,7 @@
 				updateVendorRate: "updateVendorRate",
 				alertToggle: "alertToggle",
 			}),
-			setTab({ index }) {
-				if(!this.step.vendor && index === 1) return;
-				this.selectedTab = this.tabs[index];
-			},
+
 			closeErrorsBlock() {
 				this.areErrorsExist = false;
 				this.errors = [];

@@ -33,11 +33,10 @@
 
   .progress-line {
     width: 100%;
-    height: 10px;
+    height: 7px;
     border: 1px solid $border;
     position: relative;
     box-sizing: border-box;
-    border-radius: 2px;
 
     &__tooltip {
       position: absolute;

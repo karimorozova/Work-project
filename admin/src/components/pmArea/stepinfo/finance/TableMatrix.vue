@@ -1,6 +1,6 @@
 <template lang="pug">
   .tableMatrix
-    DataTable(
+    GeneralTable(
       :fields="fields"
       :tableData="tableData"
       :bodyRowClass="'settings-table-row'"
@@ -22,105 +22,105 @@
 </template>
 
 <script>
-	import DataTable from "../../../DataTable"
-	import { mapGetters } from "vuex"
-	import { isInteger } from "lodash"
+import { mapGetters } from "vuex"
+import { isInteger } from "lodash"
+import GeneralTable from "../../../GeneralTable"
 
-	export default {
-		props: {
-			step: {
-				type: Object
-			},
-			selectedTab: {
-				type: String
-			}
-		},
-		data() {
-			return {
-				fields: [
-					{
-						label: "",
-						headerKey: "headerEmpty",
-						key: "empty",
-						width: "25%"
-					},
-					{
-						label: "%",
-						headerKey: "headerTranslated",
-						key: "1",
-						width: "25%"
-					},
-					{
-						label: "Source Word",
-						headerKey: "headerRepetitions",
-						key: "2",
-						width: "25%"
-					},
-					{
-						label: "Rate",
-						headerKey: "headerContextMatch",
-						key: "3",
-						width: "25%"
-					}
-				],
-				tableData: []
-			}
-		},
-		components: {
-			DataTable
-		},
-		methods: {
-			findCurrentTask() {
-				return this.currentProject.tasks.find(task => task.taskId === this.step.taskId)
-			},
-			getStepMetrics() {
-				const { metrics } = this.findCurrentTask()
-				return metrics
-			},
-			changeFormatForMetrics() {
-				let arrayOfMetrics = []
-				const subtitles = {
-					subtitles: [ "%", "Source Word", "Rate" ]
-				}
-				for (let iterator in this.getStepMetrics()) {
-					arrayOfMetrics.push(
-							Object.assign(this.getStepMetrics()[iterator], subtitles)
-					)
-				}
-				return arrayOfMetrics
-			},
-			calculatedRate(rate, wordCount) {
-				rate === undefined && this.findCurrentTask()
-				const currentNumber = (rate * wordCount) / 100
-				return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(1)
-			},
-			buildMatrixArray() {
-				let matrixArr = this.changeFormatForMetrics()
-				if (!matrixArr[matrixArr.length - 1].hasOwnProperty('client')) {
-					matrixArr.pop()
-				}
-				this.tableData = matrixArr
-			}
-		},
-		computed: {
-			...mapGetters({
-				currentProject: "getCurrentProject"
-			})
-		},
-		mounted() {
-			this.buildMatrixArray()
-		}
+export default {
+  props: {
+    step: {
+      type: Object
+    },
+    selectedTab: {
+      type: String
+    }
+  },
+  data() {
+    return {
+      fields: [
+        {
+          label: "",
+          headerKey: "headerEmpty",
+          key: "empty",
+          style: { width: "25%" }
+        },
+        {
+          label: "%",
+          headerKey: "headerTranslated",
+          key: "1",
+          style: { width: "25%" }
+        },
+        {
+          label: "Source Word",
+          headerKey: "headerRepetitions",
+          key: "2",
+          style: { width: "25%" }
+        },
+        {
+          label: "Rate",
+          headerKey: "headerContextMatch",
+          key: "3",
+          style: { width: "25%" }
+        }
+      ],
+      tableData: []
+    }
+  },
+  components: {
+    GeneralTable
+  },
+  methods: {
+    findCurrentTask() {
+      return this.currentProject.tasks.find(task => task.taskId === this.step.taskId)
+    },
+    getStepMetrics() {
+      const { metrics } = this.findCurrentTask()
+      return metrics
+    },
+    changeFormatForMetrics() {
+      let arrayOfMetrics = []
+      const subtitles = {
+        subtitles: [ "%", "Source Word", "Rate" ]
+      }
+      for (let iterator in this.getStepMetrics()) {
+        arrayOfMetrics.push(
+            Object.assign(this.getStepMetrics()[iterator], subtitles)
+        )
+      }
+      return arrayOfMetrics
+    },
+    calculatedRate(rate, wordCount) {
+      rate === undefined && this.findCurrentTask()
+      const currentNumber = (rate * wordCount) / 100
+      return isInteger(currentNumber) ? currentNumber : currentNumber.toFixed(1)
+    },
+    buildMatrixArray() {
+      let matrixArr = this.changeFormatForMetrics()
+      if (!matrixArr[matrixArr.length - 1].hasOwnProperty('client')) {
+        matrixArr.pop()
+      }
+      this.tableData = matrixArr
+    }
+  },
+  computed: {
+    ...mapGetters({
+      currentProject: "getCurrentProject"
+    })
+  },
+  mounted() {
+    this.buildMatrixArray()
+  }
 
-	}
+}
 </script>
 
 <style lang="scss" scoped>
-  .tableMatrix {
-    &__data {
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-    }
+.tableMatrix {
+  &__data {
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
   }
+}
 </style>

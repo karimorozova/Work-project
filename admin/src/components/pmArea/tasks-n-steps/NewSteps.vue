@@ -1,5 +1,15 @@
 <template lang="pug">
   .steps
+
+    .steps__stepDetails(v-if="isStepInfo")
+      StepInfo(
+        :step="copySteps[infoIndex]"
+        :index="infoIndex"
+        :task="getTask(infoIndex)"
+        @closeStepInfo="closeStepInfo"
+        :projectCurrency="currentProject.projectCurrency"
+      )
+
     .steps__approve-action(v-if="isApproveActionShow")
       ApproveModal(
         :text="modalTexts.main"
@@ -43,38 +53,21 @@
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header(v-if="field.headerKey === 'headerCheck'")
           CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        //.table__header(v-if="field.headerKey === 'headerCheck' && isEdit")
         .table__header(v-else) {{ field.label }}
+
       template(slot="check" slot-scope="{ row, index }")
         .table__data
           CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(index, true)" @uncheck="()=>toggleCheck(index, false)" customClass="tasks-n-steps")
 
-      //template(slot="id" slot-scope="{ row }")
-        .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
       template(slot="name" slot-scope="{ row }")
-        .table__data {{ row.stepAndUnit.step.title }}
+        .table__data {{ row.step.title }}
+
       template(slot="language" slot-scope="{ row }")
         .table__data(v-html="getStepPair(row)")
 
       template(slot="vendor" slot-scope="{ row, index }")
-        //.table__drop(v-if="isVendorSelect(row.status)")
-        //  PersonSelect(
-        //    :persons="extendedVendors(index)"
-        //    :selectedPerson="vendorName(row.vendor)"
-        //    :isExtended="isAllShow"
-        //    :isAdditionalShow="isAdditionalShow"
-        //    @setPerson="(person) => setVendor(person, index)"
-        //    @togglePersonsData="toggleVendors"
-        //    @scrollDrop="personSelectDrop(row)"
-        //    @removeVendorFromStep="removeVendorFromStep"
-        //  )
-
         .table__data(v-if="row.vendor") {{ vendorName(row.vendor) }}
-          //.steps__vendor-replace(v-if="row.vendor && row.status === 'Started'")
-          //  .steps__replace-icon(@click="showReassignment(index)")
-          //    i.fas.fa-exchange-alt
-          //  .steps__tooltip Reassign Vendor
-        .table__data(v-else) No Vendor
+        .table__data(v-else) -
 
       template(slot="start" slot-scope="{ row, index }")
         .table__data
@@ -103,40 +96,38 @@
             :highlighted="highlighted"
           )
 
-      //template(slot="progress" slot-scope="{ row, index }")
-        .table__data(style="width: 100%")
-
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
           .status {{ row.status | stepsAndTasksStatusFilter }}
           .progress
             ProgressLineStep(:progress="progress(row.progress)" :status="row.status" :lastProgress="lastProgress(row, index)")
 
+
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
-          //span(v-if="isShowValue(row, 'receivables')")
-          //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          //  span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
-          //  span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
+          span(v-if="isShowValue(row, 'receivables')")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
+            span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance
-          //span(v-if="isShowValue(row, 'payables')")
-          //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          //  span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
-          //  span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
+          span(v-if="isShowValue(row, 'payables')")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
+            span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__finance(:id="'margin'+index")
-          //span(v-if="marginCalc(row)")
-          //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          //span(v-if="marginCalc(row)") {{ marginCalc(row) }}
-          //sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
+          span(v-if="marginCalc(row)")
+            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span(v-if="marginCalc(row)") {{ marginCalc(row) }}
+          sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
       template(slot="info" slot-scope="{row, index}")
-        .table__space-between
+        .table__icons
           img(src="../../../assets/images/latest-version/view-details.png" style="cursor: pointer;" @click="showStepDetails(index)")
-          img(src="../../../assets/images/latest-version/view-details.png" style="cursor: pointer;" @click="showFinanceEditing(index)")
+          img(src="../../../assets/images/latest-version/money.png" style="cursor: pointer;" @click="showFinanceEditing(index)")
 </template>
 
 <script>
@@ -151,9 +142,11 @@ import ApproveModal from "../../ApproveModal"
 import { mapActions, mapGetters } from "vuex"
 import moment from "moment"
 import DatepickerWithTime from "../../DatepickerWithTime"
+import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import StepInfo from "./StepInfo"
 
 export default {
-  mixins: [ scrollDrop ],
+  mixins: [ scrollDrop, currencyIconDetected ],
   name: "NewSteps",
   props: {
     steps: {
@@ -167,24 +160,25 @@ export default {
   },
   data() {
     return {
+      infoIndex: -1,
+      isStepInfo: false,
+      isFinanceEdit: false,
       deadlineModal: false,
       selectedAction: '',
       isApproveActionShow: false,
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       fields: [
         { label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-        // { label: "Id", headerKey: "headerId", key: "id", style: { "width": "4%" } },
-        { label: "Step", headerKey: "headerName", key: "name", style: { "width": "10%" } },
-        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "10%" } },
-        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "18%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "10%" } },
-        // { label: "Progress", headerKey: "headerProgress", key: "progress", style: { "width": "8%" } },
+        { label: "Step", headerKey: "headerName", key: "name", style: { "width": "11%" } },
+        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
+        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "12%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
         { label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
         { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
-        { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "11%" } },
-        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "6%" } }
+        { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } },
+        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "7%" } }
       ]
     }
   },
@@ -197,6 +191,49 @@ export default {
       // "setProjectStatus",
       // "reopenSteps"
     ]),
+    closeStepInfo() {
+      this.isStepInfo = false
+      this.infoIndex = -1
+    },
+    closeFinanceEditing() {
+      this.infoIndex = -1
+      this.isFinanceEdit = false
+    },
+    getTask(index) {
+      return this.currentProject.tasks.find(item => {
+        return item.taskId === this.copySteps[index].taskId
+      })
+    },
+    showStepDetails(index) {
+      this.infoIndex = index
+      this.isStepInfo = true
+    },
+    showFinanceEditing(index) {
+      this.infoIndex = index
+      this.isFinanceEdit = true
+    },
+    marginCalc(step) {
+      const { Price } = step.finance
+      let margin = 0
+      if (Price.halfReceivables >= 0) margin = +Price.halfReceivables - +Price.halfPayables
+      else margin = +Price.receivables - +Price.payables
+      return margin.toFixed(2)
+    },
+    marginCalcPercent(step) {
+      const { Price } = step.finance
+      let percent = NaN
+      if (Price.halfReceivables >= 0) percent = 100 - (+Price.halfPayables / +Price.halfReceivables) * 100
+      percent = 100 - (Price.payables / Price.receivables) * 100
+      return Number.isNaN(percent) ? 0 : percent.toFixed(0)
+    },
+    isShowValue(step, prop) {
+      if (step.status === "Cancelled Halfway") {
+        const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables"
+        const val = step.finance.Price[halfProp]
+        return val === 0 ? true : step.finance.Price[halfProp]
+      }
+      return step.finance.Price[prop] === 0 ? true : step.finance.Price[prop]
+    },
     closeErrorsDeadline() {
       this.deadlineModal = false
       this.selectedAction = ''
@@ -206,7 +243,9 @@ export default {
       return moment(date).format('MMM D, HH:mm')
     },
     getStepPair(step) {
-      return `<span>${ step.sourceLanguage }</span><span> &#8811; </span><span>${ step.targetLanguage }</span>`
+      return step.sourceLanguage === step.targetLanguage
+          ? `${ step.targetLanguage }`
+          : `<span>${ step.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ step.targetLanguage }</span>`
     },
     progress(prog) {
       return prog.hasOwnProperty('totalWordCount') ? +((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : +prog
@@ -331,6 +370,7 @@ export default {
     }
   },
   components: {
+    StepInfo,
     DatepickerWithTime,
     GeneralTable,
     CheckBox,
@@ -361,6 +401,18 @@ export default {
     position: relative;
     width: 220px;
     height: 32px;
+  }
+
+  &__stepDetails {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    box-shadow: $box-shadow;
+    background-color: #fff;
+    border-radius: 4px;
+    width: 600px;
   }
 
   &__approve-action {
@@ -415,6 +467,10 @@ export default {
     padding: 0 7px;
   }
 
+  &__finance {
+    padding: 0 3px 0 7px;
+  }
+
   &__header {
     padding: 0 7px;
   }
@@ -455,14 +511,6 @@ export default {
     width: 100%;
     padding: 0 6px;
   }
-
-  &__space-between {
-    padding: 0 6px;
-    word-break: break-word;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-  }
 }
 
 input {
@@ -480,5 +528,13 @@ input {
   &:focus {
     border: 1px solid $border-focus;
   }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

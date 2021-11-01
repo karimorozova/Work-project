@@ -315,7 +315,7 @@
 
   td {
     border-left: 1px solid $light-border;
-    height: 40px;
+    height: 42px;
     display: flex;
     align-items: center;
     box-sizing: border-box;
@@ -343,7 +343,7 @@
   }
 
   tbody {
-    max-height: 480px;
+    max-height: 504px;
     display: block;
     color: $text;
   }
@@ -380,6 +380,6 @@
   }
 
   .shortBody {
-    max-height: 240px;
+    max-height: 252px;
   }
 </style>

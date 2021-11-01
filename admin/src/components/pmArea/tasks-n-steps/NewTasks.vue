@@ -36,20 +36,23 @@
       template(slot="check" slot-scope="{ row, index }")
         .table__data
           CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(index, true)" @uncheck="()=>toggleCheck( index, false)" customClass="tasks-n-steps")
-      template(slot="fileDetails" slot-scope="{row, index}")
-        .table__data(style="cursor: pointer;" @click="showFileDetails(index)")
-          img(src="../../../assets/images/latest-version/files.png")
-      template(slot="taskId" slot-scope="{ row }")
-        .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
+
       template(slot="service" slot-scope="{ row }")
         .table__data {{ row.service.title }}
+
+      //template(slot="fileDetails" slot-scope="{row, index}")
+        .table__data(style="cursor: pointer;" @click="showFileDetails(index)")
+          img(src="../../../assets/images/latest-version/files.png")
+      //template(slot="taskId" slot-scope="{ row }")
+        .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
+
       template(slot="language" slot-scope="{ row }")
         .table__data(v-html="getPair(row)")
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
           .status {{ row.status | stepsAndTasksStatusFilter }}
-          .progress
-            ProgressLine(:progress="progress(row.progress)" :status="row.status")
+          //.progress
+            //ProgressLine(:progress="progress(row.progress)" :status="row.status")
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
@@ -84,7 +87,6 @@
 <script>
 import GeneralTable from '../../GeneralTable'
 import CheckBox from '../../CheckBox'
-import ProgressLine from '../../ProgressLine'
 import Tabs from '../../Tabs'
 import SelectSingle from '../../SelectSingle'
 import { mapGetters } from "vuex"
@@ -105,11 +107,10 @@ export default {
     return {
       isCancelApproveModal: false,
       selectedAction: "",
-      // copyTasks: JSON.parse(JSON.stringify(this.tasks)),
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       fields: [
         { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-        { label: "Service", headerKey: "headerService", key: "service", style: { "width": "10%" } },
+        { label: "Service", headerKey: "headerService", key: "service", style: { "width": "11%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
         { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
@@ -121,15 +122,9 @@ export default {
   },
   methods: {
     getPair(task) {
-      return `
-       <span>${ task.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span><span>${ task.targetLanguage }</span>
-
-<span> &#8811; </span>`
-    },
-    progress(task) {
-      let progress = 20
-
-      return progress.toFixed(2)
+      return task.sourceLanguage === task.targetLanguage
+          ? `${ task.targetLanguage }`
+          : `<span>${ task.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ task.targetLanguage }</span>`
     },
     toggleCheck(index, isCheck) {
       this.$set(this.copyTasks[index], "isCheck", isCheck)
@@ -335,7 +330,6 @@ export default {
   components: {
     GeneralTable,
     CheckBox,
-    ProgressLine,
     Tabs,
     SelectSingle
   }
