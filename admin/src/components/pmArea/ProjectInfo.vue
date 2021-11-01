@@ -20,7 +20,7 @@
 
     .project-info__rigthSide
       ImportProjectToXtrf(
-        v-if="canSendToXtrf || true"
+        v-if="canSendToXtrf"
         :project="currentProject"
         @refreshProject="refreshProject"
       )
@@ -261,7 +261,7 @@
 						|| tasks.every(({ service }) => service.title === 'Editing')
 				)
 
-				return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
+				return (closedCheck || true) && (status === 'Closed' || status === 'In progress' || status === 'Approved')
 			},
 			canSendTaskToXtrf() {
 				const { status, tasks } = this.currentProject
