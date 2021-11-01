@@ -270,10 +270,10 @@ export default {
           || tasks.every(({ service }) => service.title === 'Editing')
       )
 
-      return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
-    },
-    canSendTaskToXtrf() {
-      const { status, tasks } = this.currentProject
+				return (closedCheck || true) && (status === 'Closed' || status === 'In progress' || status === 'Approved')
+			},
+			canSendTaskToXtrf() {
+				const { status, tasks } = this.currentProject
 
       const closedCheck = tasks.length && (
           tasks.every(({ service }) => service.title === 'Compliance')
