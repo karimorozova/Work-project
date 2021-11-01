@@ -37,7 +37,7 @@ export default {
 
 .progress-line {
   width: 100%;
-  height: 7px;
+  height: 8px;
   border: 1px solid $border;
   position: relative;
   box-sizing: border-box;

@@ -10,6 +10,13 @@
         :projectCurrency="currentProject.projectCurrency"
       )
 
+    .steps__stepFinance(v-if="isFinanceEdit")
+      ProjectFinanceModal(
+        :step="copySteps[infoIndex]"
+        :projectCurrency="currentProject.projectCurrency"
+        @closeFinanceEditing="closeFinanceEditing"
+      )
+
     .steps__approve-action(v-if="isApproveActionShow")
       ApproveModal(
         :text="modalTexts.main"
@@ -144,6 +151,7 @@ import moment from "moment"
 import DatepickerWithTime from "../../DatepickerWithTime"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import StepInfo from "./StepInfo"
+import ProjectFinanceModal from "../ProjectFinanceModal"
 
 export default {
   mixins: [ scrollDrop, currencyIconDetected ],
@@ -370,6 +378,7 @@ export default {
     }
   },
   components: {
+    ProjectFinanceModal,
     StepInfo,
     DatepickerWithTime,
     GeneralTable,
@@ -413,6 +422,20 @@ export default {
     background-color: #fff;
     border-radius: 4px;
     width: 600px;
+    padding: 25px;
+  }
+
+  &__stepFinance {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    box-shadow: $box-shadow;
+    background-color: #fff;
+    border-radius: 4px;
+    width: 600px;
+    padding: 25px;
   }
 
   &__approve-action {

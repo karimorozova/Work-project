@@ -7,6 +7,7 @@
       .info Profit: 10t
       .info Margin: 12t
       .info ROI: 15%
+
     .edit-finance__table
       .table
         GeneralTable(
@@ -56,98 +57,96 @@ export default {
       fields: [
         { label: "", headerKey: "headerTitle", key: "title", style: { width: "50%" } },
         { label: "Receivables", headerKey: "headerReceivables", key: "receivables", style: { width: "25%" } },
-        { label: "Payables", headerKey: "headerPayables", key: "payables", style: { width: "25%" } },
+        { label: "Payables", headerKey: "headerPayables", key: "payables", style: { width: "25%" } }
       ],
 
-      currentQuantityReceivables: 0,
-      currentQuantityPayables: 0,
-      currentRateReceivables: 0,
-      currentRatePayables: 0,
-      currentTotalReceivables: 0,
-      currentTotalPayables: 0,
+      quantityReceivables: 0,
+      quantityPayables: 0,
+      rateReceivables: 0,
+      ratePayables: 0,
+      totalReceivables: 0,
+      totalPayables: 0,
 
-      isEdited: true,
-
+      isEdited: true
     }
   },
   methods: {
     saveFinance() {
       const data = {
         stepId: this.step.stepId,
-        currentQuantityReceivables: this.currentQuantityReceivables,
-        currentQuantityPayables: this.currentQuantityPayables,
-        currentRateReceivables: this.currentRateReceivables,
-        currentRatePayables: this.currentRatePayables,
-        currentTotalReceivables: this.currentTotalReceivables,
-        currentTotalPayables: this.currentTotalPayables,
+        quantityReceivables: this.quantityReceivables,
+        quantityPayables: this.quantityPayables,
+        rateReceivables: this.rateReceivables,
+        ratePayables: this.ratePayables,
+        totalReceivables: this.totalReceivables,
+        totalPayables: this.totalPayables
       }
-      this.$http.post(`/pm-manage/step-finance-edit/${this.$route.params.id}` , data)
+      this.$http.post(`/pm-manage/step-finance-edit/${ this.$route.params.id }`, data)
     },
     cancelEditing() {
       return this.$emit('closeFinanceEditing')
     },
-    setFinanceData({ finance,  vendorRate, clientRate,  }) {
-      if (this.getUnit.type === 'CAT Wordcount' ) {
-        this.currentQuantityReceivables = finance.Wordcount.receivables
-        this.currentQuantityPayables = finance.Wordcount.payables
+    setFinanceData() {
+      const { finance, vendorRate, clientRate, receivablesUnit, payablesUnit } = this.step
+
+      if (receivablesUnit.type === 'CAT Wordcount') {
+        this.quantityReceivables = finance.Wordcount.receivables
+        this.quantityPayables = finance.Wordcount.payables
       } else {
-        this.currentQuantityReceivables = finance.Quantity.receivables
-        this.currentQuantityPayables = finance.Quantity.payables
+        this.quantityReceivables = finance.Quantity.receivables
+        this.quantityPayables = finance.Quantity.payables
       }
 
-      this.currentRateReceivables = clientRate.value || 0
-      this.currentRatePayables = vendorRate.value || 0
-      this.currentTotalReceivables = Number.isNaN(finance.Price.receivables) ? +finance.Price.receivables : 0
-      this.currentTotalPayables =  Number.isNaN(finance.Price.payables) ? +finance.Price.payables : 0
+      this.rateReceivables = clientRate || 0
+      this.ratePayables = vendorRate || 0
+
+      this.totalReceivables = +finance.Price.receivables || 0
+      this.totalPayables = +finance.Price.payables || 0
     },
-    setReceivables( event, title) {
+    setReceivables(event, title) {
       this.isEdited = false
       this['current' + title + 'Receivables'] = event.target.value
     },
-    setPayables( event, title) {
+    setPayables(event, title) {
       this.isEdited = false
       this['current' + title + 'Payables'] = event.target.value
     }
   },
   watch: {
-    currentQuantityReceivables: function (val) {
-      this.currentTotalReceivables = +(+this.currentRateReceivables * +val).toFixed(2)
+    quantityReceivables: function (val) {
+      this.totalReceivables = +(+this.rateReceivables * +val).toFixed(2)
     },
-    currentRateReceivables: function (val) {
-      this.currentTotalReceivables = +(+this.currentQuantityReceivables * +val).toFixed(2)
+    rateReceivables: function (val) {
+      this.totalReceivables = +(+this.quantityReceivables * +val).toFixed(2)
     },
-    currentTotalReceivables: function (val) {
-      this.currentRateReceivables = +(+val / +this.currentQuantityReceivables).toFixed(4)
+    totalReceivables: function (val) {
+      this.rateReceivables = +(+val / +this.quantityReceivables).toFixed(4)
     },
-    currentQuantityPayables: function (val) {
-      this.currentTotalPayables = +(+this.currentRatePayables * +val).toFixed(2)
+    quantityPayables: function (val) {
+      this.totalPayables = +(+this.ratePayables * +val).toFixed(2)
     },
-    currentRatePayables: function (val) {
-      this.currentTotalPayables = +(+this.currentQuantityPayables * +val).toFixed(2)
+    ratePayables: function (val) {
+      this.totalPayables = +(+this.quantityPayables * +val).toFixed(2)
     },
-    currentTotalPayables: function (val) {
-      this.currentRatePayables = +(+val / +this.currentQuantityPayables).toFixed(4)
+    totalPayables: function (val) {
+      this.ratePayables = +(+val / +this.quantityPayables).toFixed(4)
     }
   },
   computed: {
     ...mapGetters({
-      units: "getAllUnits",
+      units: "getAllUnits"
     }),
-    getUnit() {
-      const {serviceStep : {unit}} = this.step
-      return this.units.find(({_id}) => _id === unit)
-    },
     currentDataTo() {
       return [
-        {title: 'Unit', receivables: this.getUnit.type, payables: this.getUnit.type},
-        {title: 'Quantity', receivables: this.currentQuantityReceivables, payables: this.currentQuantityPayables},
-        {title: `Rate`, receivables: this.currentRateReceivables, payables: this.currentRatePayables},
-        {title: `Total`, receivables: this.currentTotalReceivables, payables: this.currentTotalPayables},
+        { title: 'Unit', receivables: this.step.receivablesUnit.type, payables: this.step.payablesUnit.type },
+        { title: 'Quantity', receivables: this.quantityReceivables, payables: this.quantityPayables },
+        { title: `Rate`, receivables: this.rateReceivables, payables: this.ratePayables },
+        { title: `Total`, receivables: this.totalReceivables, payables: this.totalPayables }
       ]
     }
   },
   created() {
-    this.setFinanceData(this.step)
+    this.setFinanceData()
   },
   components: {
     GeneralTable,
@@ -158,40 +157,41 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors";
-.edit-finance {
-  width: 800px;
-  padding: 25px;
-  background: white;
-  position: absolute;
-  box-shadow: $box-shadow;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 501;
 
-  &__title {
-    font-size: 19px;
-    font-family: Myriad600;
-    margin-bottom: 10px;
-  }
-
-  &__status-bar {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px;
-    border: 2px solid $light-border;
-    border-radius: 4px;
-
-    gap: 30px;
-  }
-
-  &__buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    gap: 20px;
-  }
-}
+//.edit-finance {
+//  width: 800px;
+//  padding: 25px;
+//  background: white;
+//  position: absolute;
+//  box-shadow: $box-shadow;
+//  top: 50%;
+//  left: 50%;
+//  transform: translate(-50%, -50%);
+//  z-index: 501;
+//
+//  &__title {
+//    font-size: 19px;
+//    font-family: Myriad600;
+//    margin-bottom: 10px;
+//  }
+//
+//  &__status-bar {
+//    display: flex;
+//    margin: 10px 0;
+//    padding: 10px;
+//    border: 2px solid $light-border;
+//    border-radius: 4px;
+//
+//    gap: 30px;
+//  }
+//
+//  &__buttons {
+//    display: flex;
+//    justify-content: center;
+//    margin-top: 20px;
+//    gap: 20px;
+//  }
+//}
 
 
 .table {

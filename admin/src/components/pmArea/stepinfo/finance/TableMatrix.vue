@@ -3,9 +3,7 @@
     GeneralTable(
       :fields="fields"
       :tableData="tableData"
-      :bodyRowClass="'settings-table-row'"
-      :bodyClass="['', {'tbody_visible-overflow': tableData.length < 6}]"
-      :tableheadRowClass="tableData.length < 6 ? 'tbody_visible-overflow' : ''"
+      :isBodyShort="true"
     )
       template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
         .tableMatrix__head-title {{ field.label }}
@@ -42,25 +40,25 @@ export default {
           label: "",
           headerKey: "headerEmpty",
           key: "empty",
-          style: { width: "25%" }
+          style: { width: "40%" }
         },
         {
           label: "%",
           headerKey: "headerTranslated",
           key: "1",
-          style: { width: "25%" }
+          style: { width: "20%" }
         },
         {
           label: "Source Word",
           headerKey: "headerRepetitions",
           key: "2",
-          style: { width: "25%" }
+          style: { width: "20%" }
         },
         {
           label: "Rate",
           headerKey: "headerContextMatch",
           key: "3",
-          style: { width: "25%" }
+          style: { width: "20%" }
         }
       ],
       tableData: []
@@ -116,8 +114,9 @@ export default {
 
 <style lang="scss" scoped>
 .tableMatrix {
-  &__data {
-    padding: 0 5px;
+  &__data,
+  &__head-title {
+    padding: 0 7px;
     display: flex;
     align-items: center;
     box-sizing: border-box;
