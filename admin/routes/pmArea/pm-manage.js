@@ -118,6 +118,8 @@ const {
 	setRejectedStatus
 } = require('../../vendors/jobs')
 
+const { setUpdatedFinanceData } = require('../../сalculations/finance')
+
 router.post('/allprojects', async (req, res) => {
 	const filters = { ...req.body }
 	try {
@@ -193,7 +195,7 @@ router.post('/upload-reference-files', upload.fields([ { name: 'refFiles' } ]), 
 router.post('/update-steps-dates', async (req, res) => {
 	try {
 		const { projectId, step, stepId, type, prop } = req.body
-		if(step.hasOwnProperty('isCheck')) delete step.isCheck
+		if (step.hasOwnProperty('isCheck')) delete step.isCheck
 		const updatedProject = await updateProject({ "_id": projectId, "steps._id": stepId }, { $set: { "steps.$": step } })
 
 		if (prop === 'deadline' && type === 'CAT Wordcount' && !!step.vendor && step.status === 'In progress') {
@@ -991,8 +993,8 @@ router.post('/step-finance-edit/:projectId', async (req, res) => {
 	const { projectId } = req.params
 	const data = req.body
 	try {
-		console.log({ projectId, data })
-		res.send("done!")
+		const updatedProject = await setUpdatedFinanceData({ projectId, ...data })
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on update project filters')

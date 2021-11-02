@@ -1,11 +1,44 @@
 const { CurrencyRatio, Pricelist, Projects } = require('../models')
-
 const { multiplyPrices } = require('../multipliers')
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
-const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
+const { rateExchangeVendorOntoProject, rateExchangeProjectOntoVendor } = require('../helpers/commonFunctions')
 const { getProject, updateProject } = require('../projects/getProjects')
 const { setTaskMetrics } = require("../сalculations/wordcount")
-const {} = require('../models')
+
+const setUpdatedFinanceData = async (data) => {
+	const { projectId, stepId, quantityReceivables, quantityPayables, rateReceivables, ratePayables, totalReceivables, totalPayables } = data
+	const project = await getProject({ "_id": projectId })
+	const { steps, projectCurrency, crossRate } = project
+	const _idx = steps.findIndex(item => item._id.toString() === stepId.toString())
+
+	if (_idx === -1) return project
+
+	const { receivablesUnit } = steps[_idx]
+	const objectKey = receivablesUnit.type === 'CAT Wordcount' ? 'Wordcount' : 'Quantity'
+
+	steps[_idx].finance.Price = {
+		receivables: totalReceivables,
+		payables: totalPayables
+	}
+
+	steps[_idx].finance[objectKey] = steps[_idx].nativeFinance[objectKey] = {
+		receivables: quantityReceivables,
+		payables: quantityPayables
+	}
+
+	steps[_idx].clientRate = rateReceivables
+	steps[_idx].vendorRate = ratePayables
+	steps[_idx].nativeVendorRate = rateExchangeProjectOntoVendor(projectCurrency, 'EUR', +ratePayables, crossRate)
+
+	steps[_idx].nativeFinance.Price = {
+		receivables: totalReceivables,
+		payables: +(rateExchangeProjectOntoVendor(projectCurrency, 'EUR', +ratePayables, crossRate) * quantityPayables).toFixed(2)
+	}
+
+	await Projects.updateOne({ "_id": projectId }, { steps })
+
+	return await calculateProjectTotal(projectId)
+}
 
 const calculateProjectTotal = async (projectId) => {
 	const { steps, additionsSteps } = await Projects.findOne({ "_id": projectId })
@@ -47,7 +80,7 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 	const dataForComparison = {
 		sourceLanguage: fullSourceLanguage._id,
 		targetLanguage: fullTargetLanguage._id,
-		step: step._id,
+		step: step.step._id,
 		unit: payablesUnit._id,
 		industry: industry._id
 	}
@@ -227,7 +260,6 @@ const getStepFinanceData = async (projectData, forWords = false) => {
 
 }
 
-
 const getPriceFromPersonRates = (pricelistTable, data) => {
 	const { sourceLanguage, targetLanguage, step, unit, industry } = data
 	const row = pricelistTable.find(row => (
@@ -275,6 +307,7 @@ const getCorrectBasicPrice = (basicPriceRow, currency) => {
 }
 
 module.exports = {
+	setUpdatedFinanceData,
 	getStepFinanceData,
 	getPriceFromPersonRates,
 	getPriceFromPricelist,

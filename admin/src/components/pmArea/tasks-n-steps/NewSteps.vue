@@ -13,6 +13,7 @@
     .steps__stepFinance(v-if="isFinanceEdit")
       ProjectFinanceModal(
         :step="copySteps[infoIndex]"
+        :index="infoIndex"
         :projectCurrency="currentProject.projectCurrency"
         @closeFinanceEditing="closeFinanceEditing"
       )
@@ -132,9 +133,12 @@
           sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
       template(slot="info" slot-scope="{row, index}")
-        .table__icons
+        .table__icons(v-if="!isFinanceEdit && !isStepInfo")
           img(src="../../../assets/images/latest-version/view-details.png" style="cursor: pointer;" @click="showStepDetails(index)")
           img(src="../../../assets/images/latest-version/money.png" style="cursor: pointer;" @click="showFinanceEditing(index)")
+        .table__icons(v-else)
+          img(src="../../../assets/images/latest-version/view-details.png" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../../assets/images/latest-version/money.png" style="cursor: default; filter: opacity(0.5);")
 </template>
 
 <script>
@@ -199,6 +203,7 @@ export default {
       // "setProjectStatus",
       // "reopenSteps"
     ]),
+
     closeStepInfo() {
       this.isStepInfo = false
       this.infoIndex = -1
@@ -434,7 +439,7 @@ export default {
     box-shadow: $box-shadow;
     background-color: #fff;
     border-radius: 4px;
-    width: 600px;
+    width: 550px;
     padding: 25px;
   }
 

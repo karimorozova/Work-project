@@ -79,7 +79,7 @@
           //sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
       template(slot="icons" slot-scope="{ row }")
-        .table__data
+        .table__icons
           img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
 
 </template>
@@ -105,6 +105,8 @@ export default {
   },
   data() {
     return {
+      reviewTask: [],
+      isDeliveryReview: false,
       isCancelApproveModal: false,
       selectedAction: "",
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
@@ -137,6 +139,11 @@ export default {
     },
     setTab({ index }) {
       this.$emit('setTab', { index })
+    },
+    reviewForDelivery(task) {
+      this.reviewTask = task
+      this.isDeliveryReview = true
+      // this.setShowTasksAndDeliverables(false)
     },
     // async approveCancelAction() {
     //   try {

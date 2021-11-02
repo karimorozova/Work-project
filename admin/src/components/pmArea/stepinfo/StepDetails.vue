@@ -1,14 +1,5 @@
 <template lang="pug">
   .details
-    .details__title1
-      span(v-if="!!vendor") {{ currentVendorName(vendor) }}
-      span(v-if="!!vendor")  &ensp;/&ensp;
-      span {{ step.name }}
-      span &ensp;/&ensp;
-      //span {{ getUnitType(step.serviceStep.unit) }}
-      span &ensp;/&ensp;
-      span(v-html="stepLanguages(step)")
-
     .details__links
       .details__vendorLinks(v-if="!!vendor")
         .link
@@ -25,7 +16,6 @@
           .link__title {{ item.DocumentName }}
           .link__icon(@click="goToMemoq(item)")
             i.fas.fa-external-link-alt
-
 
 </template>
 
@@ -44,20 +34,10 @@ export default {
     }
   },
   methods: {
-    // getUnitType(id) {
-    // 	return this.originallyUnits.find(item => item._id.toString() === id.toString()).type || ''
-    // },
     goToMemoq(item) {
       const { WebTransUrl } = item
       // const domainUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
       window.open(`${ 'https://memoq.pangea.global/memoqwebLegacy/webtrans/' + WebTransUrl.split('/webtrans/').pop() }`, '_blank')
-    },
-    stepLanguages(step) {
-      const { sourceLanguage, targetLanguage } = step
-      return sourceLanguage === targetLanguage ? targetLanguage : `<span>${ step.sourceLanguage }</span><span> &#8811; </span><span>${ step.targetLanguage }</span>`
-    },
-    currentVendorName(vendor) {
-      return vendor.firstName + ' ' + (vendor.surname || '')
     },
     gotToVendorInfo() {
       window.open(`/pangea-vendors/all/details/${ this.vendor._id }`, '_blank')
@@ -82,16 +62,16 @@ export default {
   }
 
   &__vendorLinks {
-    margin: 20px 0;
-    border-left: 3px solid $light-green;
-    padding: 0 8px;
+    margin-bottom: 20px;
+    border-left: 2px solid $light-red;
+    padding: 0 10px;
     width: 200px;
   }
 
   &__memoqLinks {
-    margin: 20px 0;
-    border-left: 3px solid $light-green;
-    padding: 0 8px;
+    margin-bottom: 20px;
+    border-left: 2px solid $light-red;
+    padding: 0 10px;
     height: max-content;
   }
 

@@ -1,7 +1,14 @@
 <template lang="pug">
   .step-info
-    .step-info__title {{ step.stepId }}
+    .step-info__title Details
     .step-info__close(@click.stop="closeInfo") &#215;
+
+    .info
+      .info__link(@click="openFinanceModal") View finance
+      .info__title {{ step.step.title }}
+      .info__value {{ step.stepId }}
+      .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
+      .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
 
     .step-info__block
       StepDetails(
@@ -49,6 +56,11 @@ export default {
     }
   },
   methods: {
+    openFinanceModal(){
+      const { closeStepInfo, showFinanceEditing } = this.$parent
+      closeStepInfo()
+      showFinanceEditing(this.index)
+    },
     setTab({ index }) {
       if (!this.step.vendor && index === 1) return
       this.selectedTab = this.tabs[index]
@@ -84,11 +96,43 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
 
+.info {
+  border-radius: 4px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border: 1px solid $light-border;
+  position: relative;
+
+  &__link {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+
+  &__title {
+    font-size: 24px;
+    font-family: Myriad300;
+    color: $red;
+    margin-bottom: 10px;
+  }
+
+  &__value {
+    font-size: 14px;
+    font-family: Myriad300;
+    margin-top: 6px;
+  }
+}
+
 .step-info {
   &__title {
     font-size: 19px;
     font-family: Myriad600;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 
   &__finance {

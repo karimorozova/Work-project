@@ -8,25 +8,25 @@
       :areErrors="areErrors"
       @closeErrors="closeErrors"
     )
+
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header {{ field.label }}
 
-
       template(slot="title" slot-scope="{ row, index }")
-          .table__data(v-if="currentActive !== index") {{ row.title }}
-          .table__data(v-else)
-            input(type="text" placeholder="Value" v-model="currentTitle")
+        .table__data(v-if="currentActive !== index") {{ row.title }}
+        .table__data(v-else)
+          input(type="text" placeholder="Extra Service" v-model="currentTitle")
 
       template(slot="amount" slot-scope="{ row, index }")
-        .table__data(v-if="currentActive !== index") {{ row.finance.Price.receivables }}
+        .table__data(v-if="currentActive !== index")
+          span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span {{ row.finance.Price.receivables }}
         .table__data(v-else)
-          input(type="number" v-model="currentAmount")
+          input(type="number" placeholder="Value" v-model="currentAmount")
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
           img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction( key,index)" :class="{'table__opacity': isActive(key, index)}")
-
-    .table__empty(v-show="!additionsSteps.length") No data...
 
     Add(@add="addAdditionStep")
 
@@ -38,9 +38,10 @@ import Add from '../../Add'
 import crudIcons from "../../../mixins/crudIcons"
 import Tabs from "../../Tabs"
 import { mapGetters } from "vuex"
+import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 export default {
-  mixins: [crudIcons],
+  mixins: [ crudIcons, currencyIconDetected ],
   name: "AdditionsSteps",
   props: {
     additionsSteps: {
@@ -55,9 +56,9 @@ export default {
   data() {
     return {
       fields: [
-        { label: "Service title", headerKey: "headerServiceTitle", key: "title", style: { "width": "60%" } },
-        { label: "Amount", headerKey: "headerAmount", key: "amount", style: { "width": "25%" } },
-        { label: "", headerKey: "headerIcons", key: "icons", style: { "width": "15%" } },
+        { label: "Service", headerKey: "headerServiceTitle", key: "title", style: { "width": "70%" } },
+        { label: "Amount", headerKey: "headerAmount", key: "amount", style: { "width": "15%" } },
+        { label: "", headerKey: "headerIcons", key: "icons", style: { "width": "15%" } }
       ],
       currentTitle: '',
       currentAmount: '',
@@ -65,26 +66,26 @@ export default {
       currentActive: -1,
 
       errors: [],
-      areErrors: false,
+      areErrors: false
     }
   },
   methods: {
     makeAction(key, index) {
-      if(this.currentActive !== -1 && this.currentActive !== index) {
-        return this.isEditing();
+      if (this.currentActive !== -1 && this.currentActive !== index) {
+        return this.isEditing()
       }
-      switch(key) {
+      switch (key) {
         case "edit":
-          this.setEditingData(index);
-          break;
+          this.setEditingData(index)
+          break
         case "cancel":
-          this.cancelEdition();
-          break;
+          this.cancelEdition()
+          break
         case "save":
-          this.checkErrors();
-          break;
+          this.checkErrors()
+          break
         case "delete":
-          this.deleteAdditionsStep(index);
+          this.deleteAdditionsStep(index)
       }
     },
     deleteAdditionsStep(index) {
@@ -95,7 +96,7 @@ export default {
 
     addAdditionStep() {
       if (this.currentActive !== -1) return this.isEditing()
-      this.additionsSteps.push({ })
+      this.additionsSteps.push({})
       this.currentActive = this.additionsSteps.length - 1
     },
     checkErrors() {
@@ -108,19 +109,19 @@ export default {
       }
       this.saveAdditionsSteps()
     },
-    async saveAdditionsSteps () {
+    async saveAdditionsSteps() {
       const currentAdditions = this.additionsSteps[this.currentActive]
       currentAdditions.title = this.currentTitle
-      currentAdditions.finance = {Price: {receivables: this.currentAmount}}
+      currentAdditions.finance = { Price: { receivables: this.currentAmount } }
       await this.sendData()
       this.cancelEdition()
     },
     setEditingData(index) {
-      this.currentActive = index;
+      this.currentActive = index
       this.currentTitle = this.additionsSteps[index].title
       this.currentAmount = this.additionsSteps[index].finance.Price.receivables
     },
-    cancelEdition( ) {
+    cancelEdition() {
       if (!this.additionsSteps[this.currentActive].hasOwnProperty('finance')) this.additionsSteps.pop()
       this.currentActive = -1
       this.currentTitle = ''
@@ -130,28 +131,30 @@ export default {
       this.areErrors = false
     },
     async sendData() {
-      try{
-        await this.$http.post('/pm-manage/update-project-additions', {_id: this.currentProject._id, additionsSteps: this.additionsSteps})
+      try {
+        await this.$http.post('/pm-manage/update-project-additions', { _id: this.currentProject._id, additionsSteps: this.additionsSteps })
       } catch (e) {
         console.log(e)
       }
     },
 
     setTab({ index }) {
-      this.$emit('setTab', {index})
+      this.$emit('setTab', { index })
     }
   },
   computed: {
-    ...mapGetters({currentProject: "getCurrentProject"}),
+    ...mapGetters({
+      currentProject: "getCurrentProject"
+    }),
 
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
-    },
+    }
   },
   components: {
     GeneralTable,
     Add,
-    Tabs,
+    Tabs
   }
 }
 </script>
@@ -164,6 +167,7 @@ export default {
 
   &__data {
     padding: 0 7px;
+    width: 100%;
   }
 
   &__header {

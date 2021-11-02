@@ -1,14 +1,39 @@
 <template lang="pug">
-  .edit-finance
-    .edit-finance__title Finance
-    .edit-finance__status-bar
-      .info StepId: {{step.stepId}}
-      .info Step: {{step.name}}
-      .info Profit: 10t
-      .info Margin: 12t
-      .info ROI: 15%
+  .finance
+    .finance__title Finance
+    .finance__close(@click.stop="cancelEditing") &#215;
 
-    .edit-finance__table
+    .info
+      .info__link(@click="openDetailsModal") View details
+      .info__title {{ step.step.title }}
+      .info__value {{ step.stepId }}
+      .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
+      .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
+
+    .stats
+      .multi-graph
+        .graph( :style="{'--percentage' : 100, '--fill': '#d15f45'}")
+        .graph( :style="{'--percentage' : chartMargin, '--fill': '#47A6A6'}")
+      .stats__details
+        .details__row
+          .details__row-color1
+          .details__row-title Margin:
+          .details__row-value {{ getMargin }} %
+        .details__row
+          .details__row-color2
+          .details__row-title Payables:
+          .details__row-value {{ getPayables }}%
+      .stats__details
+        .details__row
+          .details__row-title Profit:
+          .details__row-value
+            span {{ getProfit }}
+            span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
+        .details__row
+          .details__row-title ROI:
+          .details__row-value {{ getROI }} %
+
+    .finance__table
       .table
         GeneralTable(
           :fields="fields"
@@ -23,29 +48,35 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input(type="number" @keyup="setReceivables($event, row.title)" v-model="row.receivables")
+              input( @keyup="setReceivables($event, row.title)" v-model="row.receivables")
 
           template(slot="payables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.payables }}
             .table__data(v-else)
-              input(type="number" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor")
+              input( @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor")
 
-    .edit-finance__buttons
-      Button(value="Update" @clicked="saveFinance" :isDisabled="isEdited")
+    .finance__buttons
+      Button(value="Save" @clicked="saveFinance" :isDisabled="isEdited")
       Button(value="Cancel" :outline="true" @clicked="cancelEditing")
+
 </template>
 
 <script>
 import GeneralTable from "../GeneralTable"
 import Button from "../Button"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
+import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 export default {
   name: "ProjectFinanceModal",
+  mixins: [ currencyIconDetected ],
   props: {
     step: {
       type: Object,
       default: {}
+    },
+    index: {
+      type: [ Number, String ]
     },
     projectCurrency: {
       type: String,
@@ -55,9 +86,9 @@ export default {
   data() {
     return {
       fields: [
-        { label: "", headerKey: "headerTitle", key: "title", style: { width: "50%" } },
-        { label: "Receivables", headerKey: "headerReceivables", key: "receivables", style: { width: "25%" } },
-        { label: "Payables", headerKey: "headerPayables", key: "payables", style: { width: "25%" } }
+        { label: "", headerKey: "headerTitle", key: "title", style: { width: "30%" } },
+        { label: "Receivables", headerKey: "headerReceivables", key: "receivables", style: { width: "35%" } },
+        { label: "Payables", headerKey: "headerPayables", key: "payables", style: { width: "35%" } }
       ],
 
       quantityReceivables: 0,
@@ -71,9 +102,15 @@ export default {
     }
   },
   methods: {
-    saveFinance() {
+    ...mapActions([ 'setCurrentProject' ]),
+    openDetailsModal() {
+      const { closeFinanceEditing, showStepDetails } = this.$parent
+      closeFinanceEditing()
+      showStepDetails(this.index)
+    },
+    async saveFinance() {
       const data = {
-        stepId: this.step.stepId,
+        stepId: this.step._id,
         quantityReceivables: this.quantityReceivables,
         quantityPayables: this.quantityPayables,
         rateReceivables: this.rateReceivables,
@@ -81,7 +118,8 @@ export default {
         totalReceivables: this.totalReceivables,
         totalPayables: this.totalPayables
       }
-      this.$http.post(`/pm-manage/step-finance-edit/${ this.$route.params.id }`, data)
+      const updatedProject = await this.$http.post(`/pm-manage/step-finance-edit/${ this.$route.params.id }`, data)
+      this.setCurrentProject(updatedProject.data)
     },
     cancelEditing() {
       return this.$emit('closeFinanceEditing')
@@ -105,11 +143,11 @@ export default {
     },
     setReceivables(event, title) {
       this.isEdited = false
-      this['current' + title + 'Receivables'] = event.target.value
+      this[title.toLowerCase() + 'Receivables'] = parseFloat(event.target.value)
     },
     setPayables(event, title) {
       this.isEdited = false
-      this['current' + title + 'Payables'] = event.target.value
+      this[title.toLowerCase() + 'Payables'] = parseFloat(event.target.value)
     }
   },
   watch: {
@@ -136,12 +174,43 @@ export default {
     ...mapGetters({
       units: "getAllUnits"
     }),
+    getProfit() {
+      return +(this.totalReceivables - this.totalPayables).toFixed(2)
+    },
+    getMargin() {
+      return Math.round(100 - (this.totalPayables / this.totalReceivables) * 100)
+    },
+    getPayables() {
+      return Math.round((this.totalPayables / this.totalReceivables) * 100)
+    },
+    getROI() {
+      return Math.round(((this.totalReceivables - this.totalPayables) / this.totalPayables) * 100)
+    },
+    chartMargin(){
+      return this.getMargin < 0 ? 0 : this.getMargin > 100 ? 100 : this.getMargin
+    },
     currentDataTo() {
       return [
-        { title: 'Unit', receivables: this.step.receivablesUnit.type, payables: this.step.payablesUnit.type },
-        { title: 'Quantity', receivables: this.quantityReceivables, payables: this.quantityPayables },
-        { title: `Rate`, receivables: this.rateReceivables, payables: this.ratePayables },
-        { title: `Total`, receivables: this.totalReceivables, payables: this.totalPayables }
+        {
+          title: 'Unit',
+          receivables: this.step.receivablesUnit.type,
+          payables: this.step.payablesUnit.type
+        },
+        {
+          title: 'Quantity',
+          receivables: this.quantityReceivables,
+          payables: this.quantityPayables
+        },
+        {
+          title: `Rate`,
+          receivables: this.rateReceivables,
+          payables: this.ratePayables
+        },
+        {
+          title: `Total`,
+          receivables: this.totalReceivables,
+          payables: this.totalPayables
+        }
       ]
     }
   },
@@ -158,7 +227,167 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors";
 
-//.edit-finance {
+.details {
+  &__row {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: center;
+
+    &-value {
+      width: 70px;
+    }
+
+    &-title {
+      width: 100px;
+    }
+
+    &-color1 {
+      height: 5px;
+      width: 7px;
+      background: $green;
+      margin-right: 10px;
+    }
+
+    &-color2 {
+      height: 5px;
+      width: 7px;
+      background: $red;
+      margin-right: 10px;
+    }
+  }
+}
+
+.stats {
+  display: flex;
+  justify-content: space-evenly;
+  background: $table-list;
+  align-items: center;
+  padding: 12px 0;
+
+  &__details {
+    margin-top: 15px;
+    width: 140px;
+  }
+}
+
+.multi-graph {
+  margin-right: 25px;
+  margin-left: 10px;
+  width: 130px;
+  height: 65px;
+  position: relative;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  .graph {
+    width: 130px;
+    height: 65px;
+    border: 6px solid var(--fill);
+    border-top: none;
+    position: absolute;
+    transform-origin: 50% 0% 0;
+    border-radius: 0 0 130px 130px;
+    left: 0;
+    top: 100%;
+    z-index: 5;
+    animation: 1s fillGraphAnimation ease-in;
+    transform: rotate(calc(1deg * (var(--percentage) * 1.8)));
+    box-sizing: border-box;
+
+    &:after {
+      counter-reset: varible var(--percentage);
+      background: var(--fill);
+      box-sizing: border-box;
+      border-radius: 2px;
+      color: #fff;
+      font-weight: 200;
+      font-size: 12px;
+      height: 20px;
+      padding: 3px 5px;
+      top: 0px;
+      position: absolute;
+      left: 0;
+      transform: rotate(calc(-1deg * var(--percentage) * 1.8)) translate(-30px, 0px);
+      transition: 0.2s ease-in;
+      transform-origin: 0 50% 0;
+      opacity: 0;
+    }
+  }
+}
+
+.info {
+  border-radius: 4px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border: 1px solid $light-border;
+  position: relative;
+
+  &__link {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__title {
+    font-size: 24px;
+    font-family: Myriad300;
+    color: $red;
+    margin-bottom: 10px;
+  }
+
+  &__value {
+    font-size: 14px;
+    font-family: Myriad300;
+    margin-top: 6px;
+  }
+}
+
+.finance {
+  &__title {
+    font-size: 19px;
+    font-family: Myriad600;
+    margin-bottom: 20px;
+  }
+
+  &__close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-family: Myriad900;
+    opacity: 0.8;
+    transition: ease 0.2s;
+
+    &:hover {
+      opacity: 1
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+    gap: 20px;
+  }
+}
+
+//.finance {
 //  width: 800px;
 //  padding: 25px;
 //  background: white;
@@ -185,12 +414,6 @@ export default {
 //    gap: 30px;
 //  }
 //
-//  &__buttons {
-//    display: flex;
-//    justify-content: center;
-//    margin-top: 20px;
-//    gap: 20px;
-//  }
 //}
 
 

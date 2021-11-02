@@ -34,7 +34,6 @@ axios.interceptors.request.use(config => {
 
 Vue.use(GAuth, gauthOption)
 Vue.use(VueResource);
-Vue.use(require('vue-chartist'))
 
 Vue.http.interceptors.push((request, next) => {
   store.dispatch('incrementRequestCounter');
