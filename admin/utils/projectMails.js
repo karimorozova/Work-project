@@ -58,8 +58,8 @@ async function notifyManagerProjectStarts(project, isNotifyClientContacts = true
 }
 
 async function sendQuoteToVendorsAfterProjectAccepted(projectSteps, project) {
-	let steps = []
 	try {
+		let steps = []
 		for (let step of projectSteps) {
 			if (!!step.vendor && step.status === 'Created') {
 				step.status = "Request Sent"

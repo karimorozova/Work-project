@@ -318,7 +318,9 @@ async function updateProjectStatus(id, status, reason) {
 		const project = await getProject({ "_id": id })
 		// if (status === 'fromCancelled') return await reOpenProject(project)
 		// if (status === 'fromClosed') return await reOpenProject(project, false)
-		if (status !== "Cancelled" && status !== "Cancelled Halfway") return await setNewProjectDetails(project, status, reason)
+		if (status !== "Cancelled" && status !== "Cancelled Halfway") {
+			return await setNewProjectDetails(project, status, reason)
+		}
 
 		if (status === "Cancelled" || status === "Cancelled Halfway") {
 			const { tasks, steps } = project
@@ -414,10 +416,16 @@ function updateWithApprovedTasks({ taskIds, project }) {
 	})
 
 	let steps = []
+	let readySteps = []
+
 	const approvedSteps = project.steps.filter(item => item.status === 'Approved')
+	const notApprovedSteps = project.steps.filter(item => item.status !== 'Approved')
+
 	for (const step of approvedSteps) {
-		steps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps: project.steps })
+		readySteps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps: project.steps })
 	}
+	steps.push(...notApprovedSteps, ...readySteps)
+
 	return { tasks, steps }
 }
 
@@ -643,7 +651,7 @@ const checkProjectHasMemoqStep = async (projectId) => {
 
 const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 	let workFlowStatus
-	let { steps, tasks } = await Projects.findOne({ 'steps.stepId': stepId })
+	let { steps, tasks } = await Projects.findOne({ 'steps.stepId': stepId }).populate('steps.step')
 	const { taskId, step: { title: jobType }, memoqDocIds } = steps.find(item => item.stepId === stepId)
 	const { memoqProjectId } = tasks.find(item => item.taskId === taskId)
 

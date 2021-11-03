@@ -91,15 +91,15 @@
 					if (item.status === 'Request Sent') {
 						return item
 					}
-					return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== 'Started'
+					return this.jobStatuses.indexOf(item.status) !== -1 && item.projectStatus !== 'In progress'
 							&& item.projectStatus !== 'Approved' && item.projectStatus !== 'In progress'
 				})
 			},
 			openedJobs() {
 				let statuses = this.jobStatuses.filter(item => item !== "Request Sent")
-				statuses.push("Started")
+				statuses.push("In progress")
 				return this.jobs.filter(item => {
-					return statuses.indexOf(item.status) !== -1 && (item.projectStatus === 'Started'
+					return statuses.indexOf(item.status) !== -1 && (item.projectStatus === 'In progress'
 							|| item.projectStatus === 'Approved' || item.projectStatus === 'In progress')
 				})
 			}

@@ -86,7 +86,7 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 	}
 
 	let vendorPrice = getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
-			|| getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
+			|| getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio) / 2
 			|| 0
 
 	step.vendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate)

@@ -155,7 +155,7 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 			await taskCompleteNotifyPM(project, task)
 		} else {
 			const nextStep = steps
-					.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
+					.filter(({ status, taskId }) => status !== 'Cancelled' && status !== 'Cancelled Halfway' && taskId === task.taskId)
 					.find(item => item.stepNumber === step.stepNumber + 1)
 
 			if (nextStep) {

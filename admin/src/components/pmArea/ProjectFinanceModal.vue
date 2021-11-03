@@ -262,7 +262,7 @@ export default {
   justify-content: space-evenly;
   background: $table-list;
   align-items: center;
-  padding: 12px 0;
+  padding: 15px 0;
 
   &__details {
     margin-top: 15px;

@@ -1,5 +1,10 @@
 <template lang="pug">
   .tasks
+    .tasks__fileDetails(v-if="isFilesDetailsModal && fileDetailsIndex !== null")
+      Files(
+        @close="hideFileDetails"
+        :task="copyTasks[fileDetailsIndex]"
+      )
     .tasks__approve-action(v-if="isCancelApproveModal")
       ApproveModalPayment(
         :isCheckbox="isAppearCheckBox()"
@@ -42,7 +47,7 @@
 
       //template(slot="fileDetails" slot-scope="{row, index}")
         .table__data(style="cursor: pointer;" @click="showFileDetails(index)")
-          img(src="../../../assets/images/latest-version/files.png")
+          img(src="../../../assets/images/latest-version/files.png" @click="showFileDetails(index))
       //template(slot="taskId" slot-scope="{ row }")
         .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
 
@@ -78,10 +83,29 @@
           //span(v-if="marginCalc(row)") {{ marginCalc(row) }}
           //sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
-      template(slot="icons" slot-scope="{ row }")
+      template(slot="icons" slot-scope="{ row, index }")
         .table__icons
-          img.tasks__delivery-image(v-if="row.status.indexOf('Pending Approval') !== -1" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
+          img(v-if="row.status.indexOf('Pending Approval') !== -1"  style="cursor: pointer;" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
+          img(src="../../../assets/images/latest-version/files.png"  style="cursor: pointer;" @click="showFileDetails(index)")
 
+    .tasks__review(v-if="isDeliveryReviewMulti && reviewTasksMulti.length")
+      DeliveryOneMulti(
+        @close="closeMultiReview"
+        :user="user"
+        :users="users"
+        :project="currentProject"
+        :allTasks="currentProject.tasks"
+        :deliveryTasks="currentProject.tasksDR1.filter(item => reviewTasksMulti.includes(item.taskId))"
+      )
+    .tasks__review(v-if="isDeliveryReview")
+      DeliveryOne(
+        :project="currentProject"
+        :user="user"
+        :users="users"
+        :task="reviewTask"
+        :deliveryTask="currentProject.tasksDR1.find(({taskId}) => taskId === reviewTask.taskId)"
+        @close="closeReview"
+      )
 </template>
 
 <script>
@@ -90,6 +114,9 @@ import CheckBox from '../../CheckBox'
 import Tabs from '../../Tabs'
 import SelectSingle from '../../SelectSingle'
 import { mapGetters } from "vuex"
+import Files from "../stepinfo/Files"
+import DeliveryOneMulti from "./DeliveryOneMulti"
+import DeliveryOne from "./DeliveryOne"
 
 export default {
   name: "NewTasks",
@@ -106,7 +133,11 @@ export default {
   data() {
     return {
       reviewTask: [],
+      reviewTasksMulti: [],
+      fileDetailsIndex: null,
+      isFilesDetailsModal: false,
       isDeliveryReview: false,
+      isDeliveryReviewMulti: false,
       isCancelApproveModal: false,
       selectedAction: "",
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
@@ -114,7 +145,7 @@ export default {
         { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
         { label: "Service", headerKey: "headerService", key: "service", style: { "width": "11%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "16%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } },
@@ -123,6 +154,24 @@ export default {
     }
   },
   methods: {
+    closeReview() {
+      this.isDeliveryReview = false
+      this.selectedAction = ""
+    },
+    closeMultiReview(e) {
+      this.reviewTasksMulti = []
+      this.isDeliveryReviewMulti = false
+      this.selectedAction = ""
+      this.toggleAll(e, false)
+    },
+    showFileDetails(index) {
+      this.fileDetailsIndex = index
+      this.isFilesDetailsModal = true
+    },
+    hideFileDetails() {
+      this.fileDetailsIndex = null
+      this.isFilesDetailsModal = false
+    },
     getPair(task) {
       return task.sourceLanguage === task.targetLanguage
           ? `${ task.targetLanguage }`
@@ -132,7 +181,7 @@ export default {
       this.$set(this.copyTasks[index], "isCheck", isCheck)
     },
     toggleAll(val) {
-      this.copyTasks = this.copyTasks.reduce((acc, cur) => {
+      this.currentProject.tasks = this.currentProject.tasks.reduce((acc, cur) => {
         acc.push({ ...cur, isCheck: val })
         return acc
       }, [])
@@ -143,7 +192,6 @@ export default {
     reviewForDelivery(task) {
       this.reviewTask = task
       this.isDeliveryReview = true
-      // this.setShowTasksAndDeliverables(false)
     },
     // async approveCancelAction() {
     //   try {
@@ -212,6 +260,13 @@ export default {
     async setAction({ option }) {
       this.selectedAction = option
 
+      switch (this.selectedAction) {
+        case 'Approve [DR1]':
+          this.reviewTasksMulti = this.checkedTasks.map(i => i.taskId)
+          this.isDeliveryReviewMulti = true
+          break
+      }
+
 
       // try {
       //   const groupedByStatus = this.checkedTasks.reduce((acc, step) => {
@@ -258,11 +313,7 @@ export default {
 
 
       // switch (option) {
-      //   case 'Complete DR1':
-      //     this.reviewTasksMulti = this.checkedTasks.map(item => item.taskId)
-      //     this.isDeliveryReviewMulti = true
-      //     this.setShowTasksAndDeliverables(false)
-      //     break
+
       //   case 'Send a Quote':
       //     await this.getSendQuoteMessage()
       //     break
@@ -285,7 +336,9 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentProject: 'getCurrentProject'
+      currentProject: 'getCurrentProject',
+      user: 'getUser',
+      users: 'getUsers'
     }),
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
@@ -320,7 +373,7 @@ export default {
       //     }
       //   }
       //   return  [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
-      return [ 'Send a Quote', 'Cancel' ]
+      return [ 'Approve [DR1]', 'Send a Quote', 'Cancel' ]
 
     },
     copyTasks() {
@@ -335,6 +388,9 @@ export default {
 
   },
   components: {
+    DeliveryOne,
+    DeliveryOneMulti,
+    Files,
     GeneralTable,
     CheckBox,
     Tabs,
@@ -347,6 +403,24 @@ export default {
 @import "../../../assets/scss/colors";
 
 .tasks {
+  position: relative;
+
+  &__review {
+    position: absolute;
+    top: -70px;
+    right: -20px;
+    left: -20px;
+    bottom: 0;
+    z-index: 50;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: fit-content;
+    padding-bottom: 150px;
+  }
+
+
   &__action {
     align-self: flex-end;
   }
@@ -359,6 +433,17 @@ export default {
     position: relative;
     width: 220px;
     height: 32px;
+  }
+
+  &__fileDetails {
+    padding: 25px;
+    background: white;
+    position: absolute;
+    box-shadow: $box-shadow;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 501;
   }
 }
 

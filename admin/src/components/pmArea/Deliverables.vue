@@ -234,7 +234,6 @@
 				storeProject: "setCurrentProject",
 				approveDeliver: "approveDeliver",
 				approveDeliverMany: "approveDeliverMany",
-				setShowTasksAndDeliverables: "setShowTasksAndDeliverables"
 			}),
 			projectLanguages(tasks) {
 				if (!tasks.length) return '-'
@@ -431,7 +430,6 @@
 						break
 					case "dr2":
 						this.isDR2Modal = true
-						this.setShowTasksAndDeliverables(false)
 						break
 					case "download":
 						this.createLinkAndDownload(_id)
@@ -441,7 +439,6 @@
 			closeDR2() {
 				this.currentReviewId = this.currentReviewType = null
 				this.isDR2Modal = false
-				this.setShowTasksAndDeliverables(true)
 			},
 			getLangPair(row, type) {
 				const source = this.allLang.find(({ _id }) => row.sourceLanguage.toString() === _id.toString())

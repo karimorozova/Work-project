@@ -110,11 +110,11 @@
 				return row.status === "Request Sent" || row.status === "Created" || row.status === "Quote sent"
 			},
 			isEnterIcon(status) {
-				const statuses = [ "Approved", "Ready to Start", "Started" ]
+				const statuses = [ "Approved", "Ready to Start", "In progress" ]
 				return statuses.indexOf(status) !== -1
 			},
 			isCompleteIcon(row) {
-				return this.progress(row.progress) >= 100 && row.status === "Started"
+				return this.progress(row.progress) >= 100 && row.status === "In progress"
 			},
 			progress(prog) {
 				return prog.totalWordCount ? ((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : prog

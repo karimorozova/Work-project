@@ -313,7 +313,6 @@ export default {
           await this.decideOnSteps('Rejected', this.getStepByStatus([ 'Created', 'Rejected', 'Request Sent', 'Approved', 'Ready to Start', 'Waiting to Start' ]))
           break
       }
-      this.closeApproveModal()
     },
     async setMassDeadline(date) {
       const prop = this.selectedAction === 'Set Start' ? 'start' : 'deadline'
@@ -336,6 +335,8 @@ export default {
     async decideOnSteps(status, steps) {
       if (!steps.length) return
       try {
+        steps = steps.filter(item => !!item.vendor)
+        this.closeApproveModal()
         await this.setStepsStatus({ status, steps })
       } catch (err) {
         this.alertToggle({ message: `Error:  Status: ${ status }, cannot be set.`, isShow: true, type: 'error' })
@@ -352,7 +353,9 @@ export default {
     async requestConfirmation(steps) {
       if (!steps.length) return
       try {
-        const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps: steps, projectId: this.currentProject._id })
+        const checkedSteps = steps.filter(item => !!item.vendor)
+        this.closeApproveModal()
+        const result = await this.$http.post('/pm-manage/vendor-request', { checkedSteps, projectId: this.currentProject._id })
         await this.setCurrentProject(result.data)
         this.selectedAction = ""
         this.alertToggle({ message: "Requests has been sent.", isShow: true, type: 'success' })
@@ -439,7 +442,7 @@ export default {
     box-shadow: $box-shadow;
     background-color: #fff;
     border-radius: 4px;
-    width: 550px;
+    width: 560px;
     padding: 25px;
   }
 

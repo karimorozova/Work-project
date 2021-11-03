@@ -226,6 +226,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../../../assets/scss/colors";
 
 .table {
   &__header,
@@ -281,7 +282,7 @@ export default {
     margin-right: 15px;
 
     &-red {
-      color: red;
+      color: $red;
       font-size: 14px;
       margin-right: 15px;
     }
@@ -289,7 +290,7 @@ export default {
 
   &__main {
     padding: 30px 20px 20px 20px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     position: absolute;
     z-index: 9999;
     background: white;
@@ -297,6 +298,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
+    border-radius: 4px;
   }
 
   &__close {
@@ -325,7 +327,7 @@ export default {
 
   &__tooltip {
     text-align: center;
-    opacity: 0.6;
+    opacity: 0.5;
     margin-top: 20px;
   }
 }

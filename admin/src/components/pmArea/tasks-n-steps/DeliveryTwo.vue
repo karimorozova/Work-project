@@ -139,19 +139,14 @@
 				deliveryName: ''
 			}
 		},
-		beforeDestroy() {
-			this.setShowTasksAndDeliverables(true)
-		},
 		methods: {
 			...mapActions([
 				"approveInstructionDR2",
-				"approveDeliveryFileDR2",
 				"approveReady",
 				"approveNotify",
 				"approveDeliver",
 				"alertToggle",
 				"setCurrentProject",
-				"setShowTasksAndDeliverables"
 			]),
 			async generateCertificate() {
 				const tasks = this.type === 'single'
@@ -541,7 +536,7 @@
   .review {
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 25px;
     box-sizing: border-box;
     box-shadow: $box-shadow;
     background-color: $white;

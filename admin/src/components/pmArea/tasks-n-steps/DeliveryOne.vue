@@ -121,16 +121,12 @@
 				isApproveModal: false
 			}
 		},
-		beforeDestroy() {
-			this.setShowTasksAndDeliverables(true)
-		},
 		methods: {
 			...mapActions([
 				"approveInstruction",
 				"changeReviewManager",
 				"alertToggle",
 				"setCurrentProject",
-				"setShowTasksAndDeliverables"
 			]),
 			openApproveModal() {
 				this.isApproveModal = true
@@ -362,12 +358,13 @@
   .review {
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 25px;
     box-sizing: border-box;
     box-shadow: $box-shadow;
     background-color: $white;
     position: relative;
     width: 1040px;
+    min-width: 1040px;
     border-radius: 4px;
 
 
