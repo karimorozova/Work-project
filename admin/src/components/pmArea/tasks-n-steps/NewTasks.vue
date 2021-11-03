@@ -8,17 +8,32 @@
     .tasks__preview(v-if="isEditAndSendQuote")
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
 
+    .manager__modal(v-if="changeManagerModal")
+      .manager__title Assign new [DR1] Manager
+      .manager__close-modal(@click="closeManagerModal()") &#215;
+      .manager__body
+        .manager__itemsContacts
+          .manager__selectTitle Choose Manager:
+          .manager__select
+            SelectSingle(
+              :options="['managersNames']"
+              :selectedOption="selectedDr1Manager"
+              placeholder="Select Manager"
+              @chooseOption="setManager"
+            )
+
+        .manager__button-change
+          Button(value="Change" :isDisabled="!selectedManager" @clicked="changeManager")
+
     .tasks__approve-action(v-if="isCancelApproveModal")
       ApproveModalPayment(
-        :isCheckbox="isAppearCheckBox()"
+        :isCheckbox="false"
         :text="modalTexts.main"
         :approveValue="modalTexts.approve"
         :notApproveValue="modalTexts.notApprove"
         @approve="approveCancelAction"
-        @notApprove="notApproveAction"
+        @notApprove="closeApproveModal"
         @close="closeApproveModal"
-        @returnData="getApproveModalData"
-
       )
     .tasks__action(v-if="!isProjectFinished")
       .tasks__title Tasks Actions:
@@ -55,37 +70,24 @@
         .table__data(v-html="getPair(row)")
 
       template(slot="status" slot-scope="{ row }")
-        .table__statusAndProgress
-          .status {{ row.status | stepsAndTasksStatusFilter }}
+        .table__data
+          .status {{ row.status }}
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
           span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span {{ getReceivables(row) }}
-          //span(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
-          //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          //span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
-          //span(v-if="row.finance.Price.halfReceivables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__data
           span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span {{ getPayables(row) }}
-        //  span(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
-        //    span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-        //  span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
-        //  span(v-if="row.finance.Price.halfPayables && row.status === 'Cancelled Halfway'") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__data
           span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span {{ +(getReceivables(row) - getPayables(row)).toFixed(2) }}
           sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }") {{ marginCalcPercent(row) }}%
-
-          //span(v-if="marginCalc(row)")
-          //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          //span(v-if="marginCalc(row)") {{ marginCalc(row) }}
-
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
@@ -123,6 +125,7 @@ import Files from "../stepinfo/Files"
 import DeliveryOneMulti from "./DeliveryOneMulti"
 import DeliveryOne from "./DeliveryOne"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import ApproveModalPayment from "../../ApproveModalPayment"
 
 export default {
   name: "NewTasks",
@@ -143,9 +146,12 @@ export default {
       isDeliveryReviewMulti: false,
       isCancelApproveModal: false,
       isEditAndSendQuote: false,
+      changeManagerModal: false,
+      selectedManager: null,
       selectedAction: "",
       previewMessageQuote: "",
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
+      validCancelStatuses: [ "Created", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
       fields: [
         { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
         { label: "ID", headerKey: "headerTaskId", key: "taskId", style: { "width": "17%" } },
@@ -189,7 +195,6 @@ export default {
         return acc
       }, 0).toFixed(2))
     },
-
     closeReview() {
       this.isDeliveryReview = false
       this.selectedAction = ""
@@ -229,66 +234,19 @@ export default {
       this.reviewTask = task
       this.isDeliveryReview = true
     },
-    // async approveCancelAction() {
-    //   try {
-    //     const groupedByStatus = this.checkedTasks.reduce((acc, step) => {
-    //       if (!acc.hasOwnProperty(step.status)) {
-    //         acc[step.status] = [ step ]
-    //       } else {
-    //         acc[step.status].push(step)
-    //       }
-    //       return acc
-    //     }, {})
-    //
-    //     for (const [ stepStatus, steps ] of Object.entries(groupedByStatus)) {
-    //       const statusAndAction = this.getStatusAndAction(stepStatus, this.selectedAction)
-    //
-    //       switch (statusAndAction) {
-    //           //Action MARK AS ACCEPT/REJECT
-    //         case "Created__Mark-as-accept/reject":
-    //         case "Request_Sent__Mark-as-accept/reject":
-    //
-    //           //Action REQUEST CONFIRMATION
-    //         case "Created__Request-confirmation":
-    //
-    //           break
-    //
-    //           //Action CHANGE DEADLINE
-    //         case "Created__Change-Deadline":
-    //         case "Request-Sent__Change-Deadline":
-    //         case "Completed__Change-Deadline":
-    //
-    //           break
-    //
-    //           //Action RE OPEN
-    //         case "Completed__ReOpen":
-    //
-    //           break
-    //
-    //         default:
-    //           console.log(statusAndAction)
-    //       }
-    //
-    //     }
-    //   } catch (e) {
-    //
-    //   } finally {
-    //     // this.closeApproveModal()
-    //   }
-    //
-    // },
-    // async approveCancelAction() {
-    //   const checkedTasks = this.copyTasks.filter(item => item.isChecked)
-    //   // if (!checkedTasks.length) return this.closeApproveModal()
-    //   try {
-    //     await this.cancelTasks(checkedTasks)
-    //     this.alertToggle({ message: "Cancelled", isShow: true, type: "success" })
-    //     this.closeApproveModal()
-    //     this.unCheckAllTasks()
-    //   } catch (e) {
-    //     this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
-    //   }
-    // },
+    async approveCancelAction() {
+      if (!this.checkedTasks.length) return this.closeApproveModal()
+      const filteredTasks = this.checkedTasks.filter(item => this.validCancelStatuses.indexOf(item.status) !== -1)
+      try {
+        const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
+        await this.setCurrentProject(updatedProject.data)
+
+        this.alertToggle({ message: "Tasks cancelled", isShow: true, type: "success" })
+        this.closeApproveModal()
+      } catch (e) {
+        this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
+      }
+    },
     closePreview() {
       this.isEditAndSend = false
       this.isEditAndSendQuote = false
@@ -333,6 +291,36 @@ export default {
     closeApproveModal() {
       this.isCancelApproveModal = false
       this.selectedAction = ""
+      this.toggleAll(false)
+    },
+    closeManagerModal() {
+      this.changeManagerModal = false
+      this.selectedAction = ""
+      this.toggleAll(false)
+    },
+    manageDR1() {
+      this.changeManagerModal = true
+    },
+    setManager({ option }) {
+      console.log(option)
+      // const managerIndex = this.managersNames.indexOf(option)
+      // this.selectedManager = this.managers[managerIndex]
+    },
+    async changeManager() {
+      // try {
+      //   const result = await this.$http.post('/delivery/change-managers', {
+      //     projectId: this.currentProject._id,
+      //     checkedTasksId: this.currentProject.tasks.filter(item => item.isChecked).map(({ taskId }) => taskId),
+      //     manager: this.selectedManager
+      //   })
+      //
+      //   await this.setCurrentProject(result.data)
+      //   this.closeManagerModal()
+      //   this.selectedAction = ""
+      //   this.selectedManager = null
+      // } catch (err) {
+      //   this.alertToggle({ message: err.message, isShow: true, type: "error" })
+      // }
     },
     async setAction({ option }) {
       this.selectedAction = option
@@ -345,56 +333,16 @@ export default {
         case 'Send a Quote':
           await this.getSendQuoteMessage()
           break
+        case 'Cancel':
+          this.isCancelApproveModal = true
+          break
+        case 'Assign [DR1] Manager':
+          await this.manageDR1()
+          break
       }
 
-
-      // try {
-      //   const groupedByStatus = this.checkedTasks.reduce((acc, step) => {
-      //     if (!acc.hasOwnProperty(step.status)) {
-      //       acc[step.status] = [ step ]
-      //     } else {
-      //       acc[step.status].push(step)
-      //     }
-      //     return acc
-      //   }, {})
-      //
-      //   for (const [ taskStatus, tasks ] of Object.entries(groupedByStatus)) {
-      //     const statusAndAction = this.getStatusAndAction(taskStatus, this.selectedAction)
-      //     //     [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
-      //     switch (statusAndAction) {
-      //         //Action MANAGE REFERENCE FILES
-      //       case "Created__Manage-reference-files":
-      //
-      //         //Action UPLOAD REFERENCE FILES
-      //       case "Created__Request-confirmation":
-      //
-      //         break
-      //
-      //         //Action SEND A QUOTE
-      //       case "Created__Change-Deadline":
-      //       case "Request-Sent__Change-Deadline":
-      //       case "Completed__Change-Deadline":
-      //
-      //         break
-      //
-      //         //Action CANCEL
-      //       case "Completed__ReOpen":
-      //
-      //         break
-      //
-      //       default:
-      //         console.log(statusAndAction)
-      //     }
-      //   }
-      //
-      // } catch (e) {
-      //
-      // }
-
       // switch (option) {
-      //   case 'Reassign DR1':
-      //     await this.manageDR1()
-      //     break
+
       //   case 'Cancel':
       //     this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
       //     this.isCancelApproveModal = true
@@ -415,6 +363,9 @@ export default {
       user: 'getUser',
       users: 'getUsers'
     }),
+    selectedDr1Manager() {
+      return this.selectedManager ? `${ this.selectedManager.firstName } ${ this.selectedManager.lastName }` : ""
+    },
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
     },
@@ -455,7 +406,7 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
-      return [ ...isSendStatus, 'Approve [DR1]', 'Cancel' ]
+      return [ ...isSendStatus, 'Assign [DR1] Manager', 'Approve [DR1]', 'Cancel' ]
 
     },
     copyTasks() {
@@ -470,6 +421,7 @@ export default {
 
   },
   components: {
+    ApproveModalPayment,
     DeliveryOne,
     DeliveryOneMulti,
     Files,
@@ -484,6 +436,66 @@ export default {
 
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
+
+.manager {
+  &__modal {
+    padding: 25px;
+    background: white;
+    position: absolute;
+    box-shadow: $box-shadow;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 500;
+  }
+
+  &__selectTitle {
+    margin-bottom: 3px;
+  }
+
+  &__button-change {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  &__select {
+    position: relative;
+    height: 32px;
+    width: 220px;
+  }
+
+  &__itemsContacts {
+    display: flex;
+    justify-content: center;
+  }
+
+  &__title {
+    font-size: 19px;
+    margin-bottom: 20px;
+    font-family: Myriad600;
+  }
+
+  &__close-modal {
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    font-size: 22px;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-family: Myriad900;
+    opacity: 0.8;
+    transition: ease 0.2s;
+
+    &:hover {
+      opacity: 1
+    }
+  }
+
+}
 
 .tasks {
   position: relative;
@@ -516,6 +528,14 @@ export default {
     position: relative;
     width: 220px;
     height: 32px;
+  }
+
+  &__approve-action {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 502;
   }
 
   &__fileDetails {
@@ -571,11 +591,6 @@ export default {
   &__input {
     width: 100%;
     padding: 0 7px;
-  }
-
-  &__statusAndProgress {
-    width: 100%;
-    padding: 0 6px;
   }
 
 }

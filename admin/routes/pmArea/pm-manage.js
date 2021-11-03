@@ -562,7 +562,7 @@ router.post('/cancel-tasks', async (req, res) => {
 	try {
 		const project = await getProject({ '_id': projectId })
 		const updatedProject = await getProjectAfterCancelTasks(tasks, project)
-		const wordsCancelledTasks = tasks.filter(item => item.hasOwnProperty('metrics'))
+		const wordsCancelledTasks = tasks.filter(item => item.memoqDocs.length)
 		if (wordsCancelledTasks.length) {
 			await cancelMemoqDocs(wordsCancelledTasks)
 		}

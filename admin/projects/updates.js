@@ -27,6 +27,7 @@ const { downloadMemoqFile } = require('../services/memoqs/files')
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users')
 const { notifyManagerProjectStarts } = require('../utils')
 const { sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
+const { calculateProjectTotal } = require("../сalculations/finance")
 
 
 const cancelProjectInMemoq = async (project) => {
@@ -60,13 +61,14 @@ async function updateProjectProgress(project, isCatTool) {
 
 async function getProjectAfterCancelTasks(tasks, project) {
 	try {
-
 		const { changedTasks, changedSteps, stepIdentify } = await cancelTasks(tasks, project)
-		const Price = getProjectFinancePrice(project.tasks)
+
 		const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps
 		await stepCancelNotifyVendor(notifySteps)
-		Price.receivables += +project.paymentAdditions.reduce((acc, { value }) => acc += +value, 0)
-		return await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps, finance: { ...project.finance, Price } })
+
+		await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps })
+		return await calculateProjectTotal(project.id)
+
 	} catch (err) {
 		console.log(err)
 		console.log("Error in getProjectAfterCancelTasks")
@@ -82,22 +84,23 @@ async function cancelTasks(tasks, project) {
 
 	if (projectSteps.length) {
 		inCompletedSteps = projectSteps.map(item => {
-			if (item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) {
-				return { ...item._doc }
-			}
+			if (item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) return { ...item._doc }
 		}).filter(item => !!item)
 	}
 
 	const stepIdentify = inCompletedSteps.length ? inCompletedSteps.map(step => step.stepId) : []
 	const changedSteps = stepIdentify.length ? cancelSteps({ stepIdentify, steps: projectSteps }) : []
+
 	try {
-		const changedTasks = await cancelCheckedTasks({
-			tasksIds, projectTasks, projectId: project.id, changedSteps
-		})
-		return { changedTasks, changedSteps, stepIdentify }
+		const changedTasks = await cancelCheckedTasks({ tasksIds, projectTasks, changedSteps })
+		return {
+			changedTasks,
+			changedSteps,
+			stepIdentify
+		}
 	} catch (err) {
 		console.log(err)
-		console.log("Error in getProjectAfterCancelTasks")
+		console.log("Error in cancelTasks")
 		throw new Error(err.message)
 	}
 }
@@ -106,22 +109,19 @@ function cancelSteps({ stepIdentify, steps }) {
 	return steps.map(item => {
 		if (stepIdentify.indexOf(item.stepId) !== -1) {
 			let newStatus = item.status !== 'Completed' ? "Cancelled" : item.status
+
 			if (+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
 				newStatus = "Cancelled Halfway"
 				let finance = getStepNewFinance(item)
 				return { ...item._doc, previousStatus: item.status, status: newStatus, finance }
 			} else {
 				item.finance = {
-					Wordcount: {
-						receivables: 0,
-						payables: 0
-					},
-					Price: {
-						receivables: 0,
-						payables: 0
-					}
+					Quantity: { receivables: 0, payables: 0 },
+					Wordcount: { receivables: 0, payables: 0 },
+					Price: { receivables: 0, payables: 0 }
 				}
 			}
+
 			item.previousStatus = item.status
 			item.status = newStatus
 		}
@@ -129,30 +129,14 @@ function cancelSteps({ stepIdentify, steps }) {
 	})
 }
 
-async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps, projectId }) {
-	const unchangingStatuses = [ 'Ready for Delivery', 'Pending Approval [DR1]', 'Pending Approval [DR2]', 'Delivered' ]
+async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps }) {
+	const unchangingStatuses = [ 'Pending Approval [DR1]', 'Completed' ]
 	let tasks = [ ...projectTasks ]
 	try {
 		for (let task of tasks) {
 			if (tasksIds.indexOf(task.taskId) !== -1 && unchangingStatuses.indexOf(task.status) === -1) {
 				task.previousStatus = task.status
 				task.status = getTaskStatusAfterCancel(changedSteps, task.taskId) || task.status
-				if (task.status === "Cancelled Halfway") {
-					task.finance = getTaskNewFinance(changedSteps, task)
-					// TODO: Cancelled Halfway memoq file downloading issue
-					// task.targetFiles = await getTaskTargetFiles({ task, projectId })
-				} else {
-					task.finance = {
-						Wordcount: {
-							receivables: 0,
-							payables: 0
-						},
-						Price: {
-							receivables: 0,
-							payables: 0
-						}
-					}
-				}
 			}
 		}
 		return tasks
@@ -216,46 +200,52 @@ async function downloadCompletedFiles(stepId) {
 	}
 }
 
-function getTaskNewFinance(changedSteps, task) {
-	const { priceValues } = updateTaskNewFinance(changedSteps, task)
-	const { finance } = task
-	const Price = {
-		...finance.Price,
-		halfReceivables: +(priceValues.receivables.toFixed(2)),
-		halfPayables: +(priceValues.payables.toFixed(2))
-	}
-	return { ...finance, Price }
-}
+// function getTaskNewFinance(changedSteps, task) {
+// 	const { priceValues } = updateTaskNewFinance(changedSteps, task)
+// 	const { finance } = task
+// 	const Price = {
+// 		...finance.Price,
+// 		halfReceivables: +(priceValues.receivables.toFixed(2)),
+// 		halfPayables: +(priceValues.payables.toFixed(2))
+// 	}
+// 	return { ...finance, Price }
+// }
 
-function updateTaskNewFinance(changedSteps, task) {
-	let priceValues = { receivables: 0, payables: 0 }
-	const taskSteps = changedSteps.filter(item => item.taskId === task.taskId)
-	for (let step of taskSteps) {
-		if (step.status === "Cancelled Halfway") {
-			priceValues.receivables += +step.finance.Price.halfReceivables
-			priceValues.payables += +step.finance.Price.halfPayables
-		} else if (step.status === "Completed") {
-			priceValues.receivables += +step.finance.Price.receivables
-			priceValues.payables += +step.finance.Price.payables
-		}
-	}
-	return { priceValues }
-}
+// function updateTaskNewFinance(changedSteps, task) {
+// 	let priceValues = { receivables: 0, payables: 0 }
+// 	const taskSteps = changedSteps.filter(item => item.taskId === task.taskId)
+// 	for (let step of taskSteps) {
+// 		if (step.status === "Cancelled Halfway") {
+// 			priceValues.receivables += +step.finance.Price.halfReceivables
+// 			priceValues.payables += +step.finance.Price.halfPayables
+// 		} else if (step.status === "Completed") {
+// 			priceValues.receivables += +step.finance.Price.receivables
+// 			priceValues.payables += +step.finance.Price.payables
+// 		}
+// 	}
+// 	return { priceValues }
+// }
 
 function getTaskStatusAfterCancel(steps, taskId) {
 	const taskSteps = steps.filter(item => item.taskId === taskId).map(step => step.status)
-	const cancelledSteps = taskSteps.filter(item => item === "Cancelled")
-	const completedSteps = taskSteps.filter(item => item === "Completed")
-	const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway")
-	if (cancelledSteps.length === taskSteps.length || !steps.length) {
-		return "Cancelled"
-	}
-	if (completedSteps.length === taskSteps.length) {
-		return "Pending Approval [DR1]"
-	}
-	if (halfCancelledSteps.length || (completedSteps.length && completedSteps.length < taskSteps.length)) {
-		return "Cancelled Halfway"
-	}
+
+	return taskSteps.map(i => i.status).includes('Cancelled Halfway')
+			? 'Cancelled Halfway'
+			: 'Cancelled'
+
+	// const cancelledSteps = taskSteps.filter(item => item === "Cancelled")
+	// const completedSteps = taskSteps.filter(item => item === "Completed")
+	// const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway")
+	//
+	// if (cancelledSteps.length === taskSteps.length || !steps.length) {
+	// 	return "Cancelled"
+	// }
+	// if (completedSteps.length === taskSteps.length) {
+	// 	return "Pending Approval [DR1]"
+	// }
+	// if (halfCancelledSteps.length || (completedSteps.length && completedSteps.length < taskSteps.length)) {
+	// 	return "Cancelled Halfway"
+	// }
 }
 
 function getStepNewFinance(step) {
@@ -284,7 +274,7 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 	function reopenItem(arr) {
 		return arr.map(item => {
 			if (item.status === "Cancelled" || item.status === "Cancelled Halfway") {
-				item.status = item.previousStatus
+				// item.status = item.previousStatus
 			}
 			return item
 		})

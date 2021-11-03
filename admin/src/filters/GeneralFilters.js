@@ -30,14 +30,6 @@ Vue.filter("maxRateCount", (num) => {
 	return newNum;
 });
 
-Vue.filter("stepsAndTasksStatusFilter", (status) => {
-	let newStatus = status;
-	if (status === "Started") {
-    newStatus = 'In progress';
-  }
-	return newStatus;
-});
-
 Vue.filter("formatDate", (value) => {
   return moment(value).format('DD-MM-YYYY, HH:mm');
 });

@@ -3,13 +3,13 @@ export default {
 		returnIconCurrencyByStringCode(currencyStingCode) {
 			switch (currencyStingCode) {
 				case "EUR":
-					return "&nbsp;&euro;&nbsp;";
+					return "<span>&euro;</span>";
 				case "USD":
-					return "&nbsp;&#36;&nbsp;";
+					return "<span>&#36;</span>";
 				case "GBP":
-					return "&nbsp;&pound;&nbsp;";
+					return "<span>&pound;</span>";
 				default:
-					return "&nbsp;&euro;&nbsp;";
+					return "<span>&euro;</span>";
 			}
 		}
 	}
