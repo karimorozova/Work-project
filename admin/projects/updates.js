@@ -510,7 +510,7 @@ async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) 
 			let targetFilesStage2 = item.targetFilesStage2 || []
 
 			targetFiles.push({ fileName, path: path.split('./dist').pop() })
-			if(stepCounter > 2) stepCounter = 1
+			if(stepCounter > 2 || stepCounter < 1) stepCounter = 1
 			eval('targetFilesStage' + stepCounter).push({ fileName, path: path.split('./dist').pop() })
 
 			item.targetFiles = targetFiles
