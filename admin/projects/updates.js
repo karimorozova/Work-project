@@ -501,7 +501,7 @@ async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) 
 	})
 
 	const neededStep = steps.find(item => item.id.toString() === jobId.toString())
-	const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
+	let stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
 
 	const tasks = project.tasks.map(item => {
 		if (neededStep.taskId === item.taskId) {
@@ -510,6 +510,7 @@ async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) 
 			let targetFilesStage2 = item.targetFilesStage2 || []
 
 			targetFiles.push({ fileName, path: path.split('./dist').pop() })
+			if(stepCounter > 2) stepCounter = 1
 			eval('targetFilesStage' + stepCounter).push({ fileName, path: path.split('./dist').pop() })
 
 			item.targetFiles = targetFiles
