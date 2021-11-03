@@ -72,19 +72,35 @@ async function updateProjectMetricsAndCreateSteps(projectId, tasks) {
 }
 
 function getTaskMetrics({ task, matrix, analysis }) {
-	const { AnalysisResultForLang } = analysis;
-	let targetMetrics = AnalysisResultForLang;
-	if(Array.isArray(AnalysisResultForLang)) {
-		targetMetrics = AnalysisResultForLang.find(({ TargetLangCode }) => TargetLangCode === task.memoqTarget);
+	const { AnalysisResultForLang } = analysis
+	let targetMetrics = AnalysisResultForLang
+	if (Array.isArray(AnalysisResultForLang)) {
+		targetMetrics = AnalysisResultForLang.find(({ TargetLangCode }) => TargetLangCode === task.memoqTarget)
 	}
-	const { Summary } = targetMetrics;
+
+	if (!targetMetrics) {
+		const [ bestOne ] = AnalysisResultForLang.map(item => {
+			return {
+				TargetLangCode: item.TargetLangCode,
+				count: [ 'NoMatch', 'Hit50_74', 'Hit75_84', 'Hit85_94' ].filter(item => item !== 'All').reduce((acc, curr) => {
+					acc = acc + +item.Summary[curr].SourceWordCount
+					return acc
+				}, 0)
+			}
+		}).sort((a, b) => b.count - a.count)
+
+		const { TargetLangCode } = bestOne
+		targetMetrics = AnalysisResultForLang.find(({ TargetLangCode: L }) => L === TargetLangCode)
+	}
+
+	const { Summary } = targetMetrics
 	const metrics = Object.keys(Summary).reduce((acc, cur) => {
-		const { SourceWordCount } = Summary[cur];
-		return cur !== 'Fragments' ? { ...acc, [cur]: +SourceWordCount } : acc;
-	}, {});
-	const memoqFilledMetrics = getFilledMemoqMetrics(metrics);
-	let taskMetrics = setTaskMetrics({ metrics: memoqFilledMetrics, matrix, prop: "client" });
-	return { ...taskMetrics, totalWords: metrics.All };
+		const { SourceWordCount } = Summary[cur]
+		return cur !== 'Fragments' ? { ...acc, [cur]: +SourceWordCount } : acc
+	}, {})
+	const memoqFilledMetrics = getFilledMemoqMetrics(metrics)
+	let taskMetrics = setTaskMetrics({ metrics: memoqFilledMetrics, matrix, prop: "client" })
+	return { ...taskMetrics, totalWords: metrics.All }
 }
 
 function getFilledMemoqMetrics(metrics) {
