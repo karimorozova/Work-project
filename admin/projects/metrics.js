@@ -79,11 +79,6 @@ function getTaskMetrics({ task, matrix, analysis }) {
 	}
 
 	if (!targetMetrics) {
-		if(!AnalysisResultForLang){
-			getProjectAnalysis(task.memoqProjectId).then((data) =>{
-				console.log(data)
-			})
-		}
 		const [ bestOne ] = AnalysisResultForLang.map(item => {
 			return {
 				TargetLangCode: item.TargetLangCode,
