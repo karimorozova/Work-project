@@ -94,7 +94,7 @@
 				icons: {
 					download: { src: require("../../../assets/images/latest-version/download-file.png") },
 					upload: { src: require("../../../assets/images/latest-version/upload-file.png") },
-					delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
+					delete: { src: require("../../../assets/images/latest-version/i-delete.png") }
 				},
 				selectedAction: "",
 				actions: [ "Approve", "Generate Deliverable", "Download" ],
@@ -179,7 +179,7 @@
 				if (this.files.length > 1) {
 					result = {
 						...result,
-						delete: { src: require("../../../assets/images/latest-version/delete-icon.png") }
+						delete: { src: require("../../../assets/images/latest-version/i-delete.png") }
 					}
 				}
 				return result

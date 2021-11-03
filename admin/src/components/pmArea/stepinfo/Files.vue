@@ -48,9 +48,9 @@ export default {
       isAllChecked: false,
       fields: [
         { label: "File Name", headerKey: "headerFileName", key: "fileName", style: { width: "47%" } },
-        { label: "Stage", headerKey: "headerStage", key: "stage", style: { width: "25%" } },
-        { label: "Category", headerKey: "headerCategory", key: "category", style: { width: "18%" } },
-        { label: "Link", headerKey: "headerLink", key: "link", style: { width: "10%" } }
+        { label: "Stage", headerKey: "headerStage", key: "stage", style: { width: "28%" } },
+        { label: "Category", headerKey: "headerCategory", key: "category", style: { width: "16%" } },
+        { label: "Link", headerKey: "headerLink", key: "link", style: { width: "9%" } }
       ]
     }
   },
@@ -71,25 +71,24 @@ export default {
       const files = []
       if (Object.keys(this.task).length && this.currentProject) {
         const { steps } = this.currentProject
-        const neededSteps = steps.filter(item => item.taskId === this.task.taskId).filter(({ status }) => status !== 'Cancelled Halfway')
         if (this.task.refFiles) {
           this.task.refFiles.forEach(elem => {
-            files.push({ fileName: `${ elem.split('/').pop() }`, path: `${ elem.split('./dist').pop() }`, stage: `Uploaded by manager`, category: 'Reference' })
+            files.push({ fileName: `${ elem.split('/').pop() }`, path: `${ elem.split('./dist').pop() }`, stage: `Original file`, category: 'Reference' })
           })
         }
         if (this.task.sourceFiles) {
           this.task.sourceFiles.forEach(elem => {
-            files.push({ fileName: `${ elem.split('/').pop() }`, path: `${ elem.split('./dist').pop() }`, stage: `Uploaded by manager`, category: 'Source' })
+            files.push({ fileName: `${ elem.split('/').pop() }`, path: `${ elem.split('./dist').pop() }`, stage: `Original file`, category: 'Source' })
           })
         }
-        if (this.task.targetFilesStage1) {
-          this.task.targetFilesStage1.forEach(elem => {
-            files.push({ ...elem, stage: `${ neededSteps[0].name } finished`, category: 'Target' })
-          })
-        }
-        if (this.task.targetFilesStage2) {
-          this.task.targetFilesStage2.forEach(elem => {
-            files.push({ ...elem, stage: `${ neededSteps[1].name } finished`, category: 'Target' })
+        if (this.task.targetFilesStages.length) {
+          this.task.targetFilesStages.forEach(elem => {
+            const neededSteps = steps.find(item => item._id.toString() === elem.stepId.toString())
+            if (elem.files.length) {
+              elem.files.forEach(file => {
+                files.push({ fileName: `${ file.fileName }`, path: `${ file.path }`, stage: `[S${ neededSteps.stepNumber }] ${ neededSteps.step.title }`, category: 'Target' })
+              })
+            }
           })
         }
       }

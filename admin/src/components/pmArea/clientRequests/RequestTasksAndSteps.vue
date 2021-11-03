@@ -56,7 +56,7 @@
               .tasks__icon(@click="editTasksData(row.taskId)")
                 img(src="../../../assets/images/Other/edit-icon-qa.png")
               .tasks__icon(@click="deleteTask(row.taskId)")
-                img(src="../../../assets/images/latest-version/delete-icon.png")
+                img(src="../../../assets/images/latest-version/i-delete.png")
 
 
             .tasks__icons(v-else)
@@ -118,7 +118,7 @@
 		data() {
 			return {
 				icons: {
-					delete: '../../../assets/images/latest-version/delete-icon.png',
+					delete: '../../../assets/images/latest-version/i-delete.png',
 					edit: '../../../assets/images/Other/edit-icon-qa.png'
 				},
 				errors: [],

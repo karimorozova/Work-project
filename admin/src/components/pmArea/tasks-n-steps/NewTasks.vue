@@ -473,7 +473,7 @@ export default {
     align-items: center;
     justify-content: center;
     width: 100%;
-    gap: 8px;
+    gap: 10px;
   }
 
   &__icon {

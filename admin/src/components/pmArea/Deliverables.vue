@@ -117,13 +117,13 @@
       .deliverables__header(v-if="isShowTasksAndDeliverables")
         .deliverables__title Deliverables
         //.deliverablesActions(v-if="!isProjectFinished")
-        .deliverablesActions()
-          .deliverablesActions__title Deliverables Action:
+        .deliverablesActions
+          //.deliverablesActions__title Deliverables Action:
           .deliverablesActions__drop-menu
             SelectSingle(
               :selectedOption="selectedAction"
               :options="availableActionsOptions"
-              placeholder="Select Action"
+              placeholder="Deliverables Action"
               @chooseOption="setAction"
             )
 
@@ -414,7 +414,7 @@
 				} else if (type === 'single' && !files.length && (this.isAdmin || `${ AMId }` === `${ this.user._id }` || `${ PMId }` === `${ this.user._id }`)
 				) {
 					icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
-					icons.delete = { src: require("../../assets/images/latest-version/delete-icon.png") }
+					icons.delete = { src: require("../../assets/images/latest-version/i-delete.png") }
 				} else {
 					icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
 				}
@@ -604,7 +604,7 @@
 						this.currentProject.tasksDR1.map(({ dr1Manager }) => dr1Manager.toString()).includes(this.user._id.toString())
 			},
 			deliverables() {
-				if (!this.currentProject.hasOwnProperty('tasksDR2')) return []
+				if (Object.keys(this.currentProject).length  && !this.currentProject.hasOwnProperty('tasksDR2')) return []
 
 				const singleLang = this.currentProject.tasksDR2.hasOwnProperty('singleLang') ?
 						this.currentProject.tasksDR2.singleLang.map(item => {
@@ -903,7 +903,7 @@
 
   .deliverables {
     box-sizing: border-box;
-    padding: 20px;
+    padding: 25px;
     min-width: 1040px;
     width: 1040px;
     margin-top: 40px;

@@ -89,8 +89,7 @@
   .dropsManagers {
     margin-bottom: 20px;
     background: $table-list;
-    border: 1px solid $border;
-    padding: 20px;
+    padding: 25px;
     border-radius: 4px;
 
     &__body {
