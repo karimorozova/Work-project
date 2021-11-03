@@ -58,24 +58,6 @@
 <style lang='scss'>
   @import "assets/scss/colors";
 
-  /** {*/
-  /*  scrollbar-width: thin;*/
-  /*}*/
-  /* Works on Chrome, Edge, and Safari */
-  /**::-webkit-scrollbar {*/
-  /*  width: 8px;*/
-  /*}*/
-
-  /**::-webkit-scrollbar-track {*/
-  /*  background: orange;*/
-  /*}*/
-
-  /**::-webkit-scrollbar-thumb {*/
-  /*  background-color: blue;*/
-  /*  border-radius: 20px;*/
-  /*  border: 3px solid orange;*/
-  /*}*/
-
   body {
     font-family: Myriad400;
     color: $text;
@@ -105,7 +87,7 @@
   sup {
     margin-left: 4px;
     font-size: 11px;
-    color: $border-focus;
+    color: $dark-border;
   }
 
   .b-log-in,

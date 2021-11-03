@@ -114,21 +114,21 @@
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
           span(v-if="isShowValue(row, 'receivables')")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
             span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance
           span(v-if="isShowValue(row, 'payables')")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
             span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
             span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__finance(:id="'margin'+index")
           span(v-if="marginCalc(row)")
-            span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span(v-if="marginCalc(row)") {{ marginCalc(row) }}
           sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
@@ -183,13 +183,13 @@ export default {
         { label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
         { label: "Step", headerKey: "headerName", key: "name", style: { "width": "11%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
-        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "12%" } },
+        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "11%" } },
         { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
         { label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
         { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
-        { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } },
+        { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "10%" } },
         { label: "", headerKey: "headerInfo", key: "info", style: { "width": "7%" } }
       ]
     }
@@ -567,5 +567,12 @@ input {
 
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+.currency {
+  margin-right: 4px;
+  color: $dark-border;
+}
+.red-color{
+  color: $red;
 }
 </style>

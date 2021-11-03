@@ -514,7 +514,6 @@
 				} catch (err) {
 					this.alertToggle({ message: "Server error / Cannot cancel chosen tasks", isShow: true, type: "error" })
 				}
-
 			},
 			async messageTemplateFormation(filteredTasks) {
 				const tasksIds = filteredTasks.map(item => item.taskId)

@@ -6,7 +6,7 @@
         .TS__button
           .TS__addTask(style="font-size: 14px;" v-if="!isProjectFinished && !isTaskData" @click="toggleVendorManage")
             i.fas.fa-user(style="margin-right: 6px;")
-            span Manage Vendors
+            span(style="margin-top: 2px;") Manage Vendors
 
         .TS__button
           .TS__addTask(v-if="!isProjectFinished && !isTaskData" @click="toggleTaskData")
@@ -14,6 +14,9 @@
           .TS__closeAddTask(v-if="!isProjectFinished && isTaskData" @click="toggleTaskData")
             i.fas.fa-times-circle
 
+        .TS__button
+          .TS__refresh(v-if="!isProjectFinished" @click="refreshProject")
+            i.fas.fa-sync
 
 
     .modal(v-if="isModalOpen")
@@ -59,7 +62,7 @@ import AdditionsSteps from "./tasks-n-steps/AdditionsSteps"
 import Tabs from "../Tabs"
 import Button from "../Button"
 import VendorManage from "./VendorManage"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   name: "NewTaskAndSteps",
@@ -71,6 +74,16 @@ export default {
     }
   },
   methods: {
+    ...mapActions([ 'setCurrentProject', 'alertToggle' ]),
+    async refreshProject() {
+      try {
+        const { id } = this.$route.params
+        const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
+        this.setCurrentProject(curProject.data)
+        this.alertToggle({ message: "Project refreshed", isShow: true, type: "success" })
+      } catch (err) {
+      }
+    },
     toggleTaskData() {
       this.isTaskData = !this.isTaskData
     },
@@ -134,7 +147,24 @@ export default {
     margin-bottom: 20px;
   }
 
-  &
+  &__refresh {
+    font-size: 15px;
+    border: 1px solid $border;
+    border-radius: 4px;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: .2s ease-out;
+    justify-content: center;
+    color: $dark-border;
+
+    &:hover {
+      color: $text;
+    }
+  }
+
   &__addTask,
   &__closeAddTask {
     padding: 0 7px;

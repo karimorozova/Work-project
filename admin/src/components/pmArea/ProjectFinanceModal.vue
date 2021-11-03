@@ -186,7 +186,7 @@ export default {
     getROI() {
       return Math.round(((this.totalReceivables - this.totalPayables) / this.totalPayables) * 100)
     },
-    chartMargin(){
+    chartMargin() {
       return this.getMargin < 0 ? 0 : this.getMargin > 100 ? 100 : this.getMargin
     },
     currentDataTo() {
@@ -242,15 +242,15 @@ export default {
     }
 
     &-color1 {
-      height: 5px;
-      width: 7px;
+      height: 6px;
+      min-width: 6px;
       background: $green;
       margin-right: 10px;
     }
 
     &-color2 {
-      height: 5px;
-      width: 7px;
+      height: 6px;
+      min-width: 6px;
       background: $red;
       margin-right: 10px;
     }
@@ -265,7 +265,7 @@ export default {
   padding: 15px 0;
 
   &__details {
-    margin-top: 15px;
+    margin-top: 20px;
     width: 140px;
   }
 }
@@ -273,8 +273,8 @@ export default {
 .multi-graph {
   margin-right: 25px;
   margin-left: 10px;
-  width: 130px;
-  height: 65px;
+  width: 140px;
+  height: 70px;
   position: relative;
   color: #fff;
   font-size: 22px;
@@ -286,13 +286,13 @@ export default {
   box-sizing: border-box;
 
   .graph {
-    width: 130px;
-    height: 65px;
+    width: 140px;
+    height: 70px;
     border: 6px solid var(--fill);
     border-top: none;
     position: absolute;
     transform-origin: 50% 0% 0;
-    border-radius: 0 0 130px 130px;
+    border-radius: 0 0 140px 140px;
     left: 0;
     top: 100%;
     z-index: 5;

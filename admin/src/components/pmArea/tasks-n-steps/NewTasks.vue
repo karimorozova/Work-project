@@ -5,6 +5,9 @@
         @close="hideFileDetails"
         :task="copyTasks[fileDetailsIndex]"
       )
+    .tasks__preview(v-if="isEditAndSendQuote")
+      PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
+
     .tasks__approve-action(v-if="isCancelApproveModal")
       ApproveModalPayment(
         :isCheckbox="isAppearCheckBox()"
@@ -42,26 +45,23 @@
         .table__data
           CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(index, true)" @uncheck="()=>toggleCheck( index, false)" customClass="tasks-n-steps")
 
+      template(slot="taskId" slot-scope="{ row }")
+        .table__data {{ row.taskId }}
+
       template(slot="service" slot-scope="{ row }")
         .table__data {{ row.service.title }}
 
-      //template(slot="fileDetails" slot-scope="{row, index}")
-        .table__data(style="cursor: pointer;" @click="showFileDetails(index)")
-          img(src="../../../assets/images/latest-version/files.png" @click="showFileDetails(index))
-      //template(slot="taskId" slot-scope="{ row }")
-        .table__data {{ row.taskId.substring(row.taskId.length - 3) }}
-
       template(slot="language" slot-scope="{ row }")
         .table__data(v-html="getPair(row)")
-      template(slot="status" slot-scope="{ row, index }")
+
+      template(slot="status" slot-scope="{ row }")
         .table__statusAndProgress
           .status {{ row.status | stepsAndTasksStatusFilter }}
-          //.progress
-            //ProgressLine(:progress="progress(row.progress)" :status="row.status")
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
-          span -
+          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span {{ getReceivables(row) }}
           //span(v-if="row.finance.Price.receivables || row.finance.Price.receivables === 0")
           //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           //span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
@@ -69,7 +69,8 @@
 
       template(slot="payables" slot-scope="{ row }")
         .table__data
-          span -
+          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span {{ getPayables(row) }}
         //  span(v-if="row.finance.Price.payables || row.finance.Price.payables === 0")
         //    span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
         //  span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
@@ -77,11 +78,14 @@
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__data
-          span -
+          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span {{ +(getReceivables(row) - getPayables(row)).toFixed(2) }}
+          sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }") {{ marginCalcPercent(row) }}%
+
           //span(v-if="marginCalc(row)")
           //  span(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           //span(v-if="marginCalc(row)") {{ marginCalc(row) }}
-          //sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
+
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
@@ -109,22 +113,21 @@
 </template>
 
 <script>
+import PreviewQuote from "../WYSIWYGMultiMails"
 import GeneralTable from '../../GeneralTable'
 import CheckBox from '../../CheckBox'
 import Tabs from '../../Tabs'
 import SelectSingle from '../../SelectSingle'
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import Files from "../stepinfo/Files"
 import DeliveryOneMulti from "./DeliveryOneMulti"
 import DeliveryOne from "./DeliveryOne"
+import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 export default {
   name: "NewTasks",
+  mixins: [ currencyIconDetected ],
   props: {
-    // tasks: {
-    //   type: Array,
-    //   default: []
-    // },
     tabs: {
       type: Array,
       default: []
@@ -139,21 +142,54 @@ export default {
       isDeliveryReview: false,
       isDeliveryReviewMulti: false,
       isCancelApproveModal: false,
+      isEditAndSendQuote: false,
       selectedAction: "",
+      previewMessageQuote: "",
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       fields: [
         { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-        { label: "Service", headerKey: "headerService", key: "service", style: { "width": "11%" } },
+        { label: "ID", headerKey: "headerTaskId", key: "taskId", style: { "width": "17%" } },
+        { label: "Service", headerKey: "headerService", key: "service", style: { "width": "13%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "16%" } },
-        { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
-        { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
-        { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "9%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "17%" } },
+        { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "9%" } },
+        { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "9%" } },
+        { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "11%" } },
         { label: "", headerKey: "headerDelivery", key: "icons", style: { "width": "10%" } }
       ]
     }
   },
   methods: {
+    ...mapActions([
+      "alertToggle",
+      "setCurrentProject"
+    ]),
+    marginCalcPercent(task) {
+      const [ receivables, payables ] = [ this.getReceivables(task), this.getPayables(task) ]
+      let percent = NaN
+      percent = 100 - (payables / receivables) * 100
+      return Number.isNaN(percent) ? 0 : percent.toFixed(0)
+    },
+    getPayables(task) {
+      return this.getCalculationByProp(task, 'vendor')
+    },
+    getReceivables(task) {
+      return this.getCalculationByProp(task, 'client')
+    },
+    getCalculationByProp(task, prop) {
+      const { steps } = this.currentProject
+      const neededSteps = steps.filter(item => item.taskId === task.taskId && item.status !== 'Cancelled')
+
+      const key = prop === 'client' ? 'receivables' : 'payables'
+      const key2 = prop === 'client' ? 'halfReceivables' : 'halfPayables'
+
+      return +(neededSteps.reduce((acc, cur) => {
+        if (cur.status === 'Cancelled Halfway') acc = acc + cur.finance.Price[key2]
+        else acc = acc + cur.finance.Price[key]
+        return acc
+      }, 0).toFixed(2))
+    },
+
     closeReview() {
       this.isDeliveryReview = false
       this.selectedAction = ""
@@ -253,6 +289,47 @@ export default {
     //     this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
     //   }
     // },
+    closePreview() {
+      this.isEditAndSend = false
+      this.isEditAndSendQuote = false
+      this.selectedAction = ""
+    },
+    openPreviewQuote() {
+      this.isEditAndSendQuote = true
+    },
+    async getSendQuoteMessage() {
+      try {
+        const tasksIds = this.checkedTasks.filter(item => item.status === "Created").map(item => item.taskId)
+        if (!tasksIds.length) return
+
+        const template = await this.$http.post(`/pm-manage/task-quote-message`, {
+          projectId: this.currentProject._id,
+          tasksIds
+        })
+        this.previewMessageQuote = template.body.message
+        this.openPreviewQuote()
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" })
+      }
+    },
+    async sendMessageQuote({ message, arrayOfEmails }) {
+      try {
+        const tasksIds = this.checkedTasks.filter(item => item.status === "Created").map(item => item.taskId)
+        if (!tasksIds.length) return
+
+        const result = await this.$http.post("/pm-manage/send-task-quote", {
+          projectId: this.currentProject._id,
+          message: message,
+          arrayOfEmails: arrayOfEmails,
+          tasksIds
+        })
+        this.setCurrentProject(result.data)
+        this.alertToggle({ message: "Message sent", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" })
+      }
+      this.closePreview()
+    },
     closeApproveModal() {
       this.isCancelApproveModal = false
       this.selectedAction = ""
@@ -264,6 +341,9 @@ export default {
         case 'Approve [DR1]':
           this.reviewTasksMulti = this.checkedTasks.map(i => i.taskId)
           this.isDeliveryReviewMulti = true
+          break
+        case 'Send a Quote':
+          await this.getSendQuoteMessage()
           break
       }
 
@@ -311,12 +391,7 @@ export default {
       //
       // }
 
-
       // switch (option) {
-
-      //   case 'Send a Quote':
-      //     await this.getSendQuoteMessage()
-      //     break
       //   case 'Reassign DR1':
       //     await this.manageDR1()
       //     break
@@ -342,6 +417,9 @@ export default {
     }),
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
+    },
+    projectClientContacts() {
+      return this.currentProject.clientContacts.map(({ email }) => email)
     },
     availableActionsOptions() {
       //   const { status, tasks } = this.currentProject
@@ -373,7 +451,11 @@ export default {
       //     }
       //   }
       //   return  [ 'Manage reference files', 'Upload reference files', 'Send a Quote', 'Cancel' ]
-      return [ 'Approve [DR1]', 'Send a Quote', 'Cancel' ]
+
+      if (!this.checkedTasks.length) return []
+
+      const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
+      return [ ...isSendStatus, 'Approve [DR1]', 'Cancel' ]
 
     },
     copyTasks() {
@@ -394,7 +476,8 @@ export default {
     GeneralTable,
     CheckBox,
     Tabs,
-    SelectSingle
+    SelectSingle,
+    PreviewQuote
   }
 }
 </script>
@@ -514,4 +597,12 @@ input {
   }
 }
 
+.currency {
+  margin-right: 4px;
+  color: $dark-border;
+}
+
+.red-color {
+  color: $red;
+}
 </style>

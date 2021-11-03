@@ -161,7 +161,7 @@
 
     &__text {
       color: #ccc;
-      font-size: 11px;
+      font-size: 10px;
       margin-left: 13px;
       margin-top: 5px;
       position: absolute;

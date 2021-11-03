@@ -6,11 +6,9 @@
     .sub-information__project
       .sub-information__project-title(id="id") {{ project.projectId }}
       .sub-information__project-icons
-        .icon
-          span(class="click-copy" @click="copyId")
-            i.far.fa-copy(aria-hidden="true")
-        .icon(@click="refreshProject")
-          i.fas.fa-sync
+
+        .iconId(class="click-copy" @click="copyId")
+          i.far.fa-copy
 
     .sub-information__row
       .row__title Project Status:
@@ -135,9 +133,6 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject"
     }),
-    refreshProject() {
-      this.$emit("refreshProject")
-    },
     copyId() {
       let id = document.getElementById('id')
       let elementText = id.textContent
@@ -386,6 +381,26 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
 @import "../../assets/styles/settingsTable";
+
+
+.iconId {
+  font-size: 15px;
+  border-radius: 4px;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: .2s ease-out;
+  justify-content: center;
+  border: 1px solid $border;
+  color: $dark-border;
+  margin-left: 10px;
+
+  &:hover {
+    color: $text;
+  }
+}
 
 .client-table {
   width: 100%;
