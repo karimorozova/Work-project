@@ -106,7 +106,7 @@
 
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
-          .status {{ row.status | stepsAndTasksStatusFilter }}
+          .status {{ row.status }}
           .progress
             ProgressLineStep(:progress="progress(row.progress)" :status="row.status" :lastProgress="lastProgress(row, index)")
 
