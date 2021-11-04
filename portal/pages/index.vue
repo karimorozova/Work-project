@@ -13,7 +13,8 @@
     .content
       Header
       .content__body
-        nuxt-child(:client='client' :user="user" :projects="projects" :requests="requests" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
+        //nuxt-child(:client='client' :user="user" :projects="projects" :requests="requests" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
+        nuxt-child( @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 
   //.wrapper
     .menu
@@ -211,6 +212,8 @@
 				requestInfo: "requestInfo",
 				loadLangs: "loadLangs",
 				servicesGetting: "servicesGetting",
+        getClient: "getClient",
+        getUser: "getUser",
 				getProjectsAndRequests: "getProjectsAndRequests"
 			})
 		},
@@ -227,7 +230,9 @@
 		},
 		mounted() {
       this.domain = process.env.domain
-      this.getProjectsAndRequests()
+      // this.getProjectsAndRequests()
+      this.getClient()
+      this.getUser()
       this.mainPageRender()
       this.setToken()
       this.getServices()
@@ -239,10 +244,10 @@
 		},
 		computed: {
 			...mapGetters({
-				projects: "getAllProjects",
-				requests: "getAllRequests",
-				user: "getUserInfo",
-				client: "getClientInfo"
+				// projects: "getAllProjects",
+				// requests: "getAllRequests",
+				// user: "getUserInfo",
+				clientInfo: "getClientInfo"
 			})
 		}
 	}

@@ -46,7 +46,7 @@ const translationServiceRequest = async (formData, client) => {
 const complianceServiceRequest = async (formData, client) => {
 	//TODO: refactor | Client PaymentType
 	const {  paymentType: paymentProfile , _id } = client
-	const { deadline, projectName, brief, startOption } = formData
+	const { deadline, projectName, brief, startOption, service } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
 	const targetLanguages = JSON.parse(formData.targetLanguages)
@@ -74,7 +74,7 @@ const complianceServiceRequest = async (formData, client) => {
 			sourceLanguage,
 			targetLanguages: [ targetLanguages ],
 			startOption,
-			service: await Services.findOne({ title: 'Compliance' }),
+			service: await Services.findOne({ title: service }),
 			complianceOptions: complianceTemplate
 		}
 	})

@@ -27,15 +27,20 @@
 			async getProjectInfo() {
 				const { id } = this.$route.params
 				try {
-					//MM
-					// if(!this.allProjects.length || !this.allRequests.length) {
-					//     await this.getProjectsAndRequests();
+					// //MM
+					// // if(!this.allProjects.length || !this.allRequests.length) {
+					// //     await this.getProjectsAndRequests();
+					// // }
+					// if (!this.allProjects.length) {
+					// 	await this.getProjectsAndRequests()
 					// }
-					if (!this.allProjects.length) {
-						await this.getProjectsAndRequests()
-					}
-					const projectsAndRequests = [...this.allProjects, ...this.allRequests]
-					const currentProject = projectsAndRequests.find(item => item._id === id)
+					// const projectsAndRequests = [...this.allProjects, ...this.allRequests]
+					// const currentProject = projectsAndRequests.find(item => item._id === id)
+
+          const { project } = (await this.$axios.get('/portal/project/' + id + '?token=' + this.token)).data
+          const currentProject = JSON.parse(window.atob(project))
+
+
 					await this.selectProject(currentProject)
 				} catch (err) {
 
@@ -45,8 +50,9 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				allProjects: "getAllProjects",
-				allRequests: "getAllRequests"
+				// allProjects: "getAllProjects",
+				// allRequests: "getAllRequests"
+        token: "getToken"
 			}),
 			title() {
 				let result = "Quote Details"

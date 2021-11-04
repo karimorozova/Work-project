@@ -22,15 +22,18 @@
 			...mapActions({
 				getProjects: "getProjectsAndRequests",
 				selectProject: "selectProject",
-				alertToggle: "alertToggle"
+				alertToggle: "alertToggle",
 			}),
 			async getProjectInfo() {
 				const { id } = this.$route.params
 				try {
-					if (!this.allProjects.length) {
-						await this.getProjects()
-					}
-					const currentProject = this.allProjects.find(item => item._id === id)
+					// if (!this.allProjects.length) {
+					// 	await this.getProjects()
+					// }
+					// const currentProject = this.allProjects.find(item => item._id === id)
+          const { project } = (await this.$axios.get('/portal/project/' + id + '?token=' + this.token)).data
+          const currentProject = JSON.parse(window.atob(project))
+
 					await this.selectProject(currentProject)
 				} catch (err) {
 
@@ -40,7 +43,8 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				allProjects: "getAllProjects"
+				// allProjects: "getAllProjects",
+        token: "getToken",
 			}),
 			title() {
 				let result = "Quote Details"

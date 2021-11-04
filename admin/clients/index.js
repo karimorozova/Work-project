@@ -7,6 +7,7 @@ const {
 	getClientRates,
 	getClientWithActions,
   getSimpleClients,
+	getClientForPortal
 } = require('./getClients')
 
 const {
@@ -79,7 +80,8 @@ const clients = {
 	filteredCombinationsResultRatesTable,
   updateTaskDataByCondition,
   getSimpleClients,
-	updateClientRatesFromSettings
+	updateClientRatesFromSettings,
+	getClientForPortal,
 }
 
 module.exports = clients

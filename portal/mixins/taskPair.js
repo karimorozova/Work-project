@@ -1,10 +1,11 @@
 export default {
     methods: {
+        //TODO: rewrite this functions
         getLanguagePair(task) {
             //MAX
-            const sourceLang = this.getLangInfoBySymbol(task.sourceLanguage)
-            const targetLang = this.getLangInfoBySymbol(task.targetLanguage)
-            return `${sourceLang.lang} >> ${targetLang.lang}`
+            // const sourceLang = this.getLangInfoBySymbol(task.sourceLanguage)
+            // const targetLang = this.getLangInfoBySymbol(task.targetLanguage)
+            return `${task.fullSourceLanguage.lang} >> ${task.fullTargetLanguage.lang}`
             // const unit = task.service.calculationUnit.toLowerCase();
             //
             // let ratesProp = unit === 'packages' ? 'monoRates' : `${unit}Rates`;
@@ -23,7 +24,10 @@ export default {
             // })
         },
         getLangInfoBySymbol(symbol) {
-          return this.languages.find((lang) => lang.symbol === symbol )
+          return this.languages.find((lang) => {
+              console.log(lang)
+              return lang === symbol
+          })
         }
     }
 }

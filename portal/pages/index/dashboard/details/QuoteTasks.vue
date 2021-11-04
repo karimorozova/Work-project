@@ -13,11 +13,11 @@
       .tasks-table__header(slot="headerCost" slot-scope="{ field }") {{ field.label }}
       .tasks-table__data(slot="pair" slot-scope="{ row }") {{ getLanguagePairs(row) }}
       .tasks-table__data(slot="wordcount" slot-scope="{ row }")
-        .tasks-table__finance(v-if="project.status !== 'Requested'") {{ row.finance.Wordcount.receivables }}
+        .tasks-table__finance(v-if="project.status !== 'Requested'") {{ taskFinance[row.taskId].worldCount }}
         .tasks-table__finance(v-else) -
       .tasks-table__data(slot="cost" slot-scope="{ row }")
-        .tasks-table__finance(v-if="project.status !== 'Requested'") {{ row.finance.Price.receivables }}
-          span.tasks-table__currency(v-if="row.finance.Price.receivables")
+        .tasks-table__finance(v-if="project.status !== 'Requested'") {{ taskFinance[row.taskId].receivables }}
+          span.tasks-table__currency(v-if="taskFinance[row.taskId].receivables")
           span(v-html="currencyIconDetected(project.projectCurrency)")
         .tasks-table__finance(v-else) -
 
@@ -45,15 +45,15 @@
 				// if(this.project.status === "Requested") {
 				// 	return this.project.packageSize ? `${ row.lang } / ${ this.project.packageSize.size }` : `${ this.project.sourceLanguage.lang } => ${ row.lang }`;
 				// }
-        const sourceLang = this.getLangInfoBySymbol(row.sourceLanguage)
-        const targetLang = this.getLangInfoBySymbol(row.targetLanguage)
-				return `${sourceLang.lang} >> ${targetLang.lang}`
+        // const sourceLang = this.getLangInfoBySymbol(row.sourceLanguage)
+        // const targetLang = this.getLangInfoBySymbol(row.targetLanguage)
+				return `${row.fullSourceLanguage.lang} >> ${row.fullTargetLanguage.lang}`
 				//MAX
 				//   return this.getQuotePairs(row);
 			},
-      getLangInfoBySymbol(symbol) {
-			  return this.languages.find((lang) => lang.symbol === symbol )
-      }
+      // getLangInfoBySymbol(symbol) {
+			//   return this.languages.find((lang) => lang.symbol === symbol )
+      // }
 			// getQuotePairs(task) {
 			// 	return `${task.sourceLanguage} >> ${task.targetLanguage}`
 			// 	// let ratesProp = 'monoRates';
@@ -76,15 +76,26 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				clientLanguages: "getCombinations",
-        languages: "allLanguages",
+				// clientLanguages: "getCombinations",
+        // languages: "allLanguages",
 			}),
 			tableData() {
 				if(this.project.status !== 'Requested') {
 					return this.project.tasks.filter(task => task.status !== "Cancelled");
 				}
 				return this.project.targetLanguages;
-			}
+			},
+      taskFinance() {
+        return this.project.steps.reduce((acc, step) => {
+          if(!acc.hasOwnProperty(step.taskId) ) {
+            acc[step.taskId] = {receivables: step.finance.Price.receivables, worldCount: step.finance.Quantity.receivables}
+          } else {
+            acc[step.taskId].receivables += step.finance.Price.receivables
+            acc[step.taskId].worldCount += ', ' + step.finance.Quantity.receivables
+          }
+          return acc
+        }, {})
+      }
 		},
 		components: {
 			DataTable

@@ -31,8 +31,19 @@
                   :disabled="disabled"
                   ref="deadline"
                 )
+          .form__row
             .form__col
               .form__select(style="margin-top: 20px;")
+                .form__input-title Service:
+                .width-220
+                  SelectSingle(
+                    :selectedOption="selectedService"
+                    :options="mappedService"
+                    placeholder="Option"
+                    @chooseOption="(e) => setServices(e)"
+                  )
+            .form__col
+              .form__select(v-if="selectedService !== ''" style="margin-top: 20px;")
                 .form__input-title Industry:
                 .width-220
                   SelectSingle(
@@ -41,6 +52,7 @@
                     placeholder="Option"
                     @chooseOption="(e) => setIndustry(e)"
                   )
+
 
         .form__title(v-if="Object.keys(currentIndustries).length") Languages
         .form__part(v-if="Object.keys(currentIndustries).length")
@@ -100,29 +112,19 @@
 
         .form__title Project Details
         .form__part
-          .form__row
-            .form__col
-              .form__select
-                .form__input-title Template:
-                .width-220
-                  SelectSingle(
-                    :selectedOption="currentComplianceTemplate.title"
-                    :options="mappedComplianceTemplates"
-                    :hasSearch="true"
-                    placeholder="Option"
-                    @chooseOption="(e) => setComplianceTemplate(e)"
-                  )
-            .form__col
-              .form__select
-                .width-310
-                  ul(v-html="currentComplianceTemplate.description")
 
           .form__row
             .form__col
-              .form__select(style="margin-top: 20px;")
+              .form__select-block
                 .form__input-title-margin9 Enter a short brief:
-                div(style="width: 625px")
-                  textarea.form__textarea(rows="4" v-model="currentBrief")
+                .form__details(id="instructions" contenteditable="true" @input="selectOnlyExisted" )
+                  p
+            .form__col
+              .form__select-block(v-if="selectedService" style="width: 240px")
+                .form__input-title-margin9 Select instructions:
+                .form__checked(v-for=" ( instruction, index) of instructions[selectedService]" style="width: 50%")
+                  CheckBox(:isChecked="instruction.isActive" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+                  span {{instruction.name}}
 
         //.form__ckeckbox
         //  TextRadio(
@@ -163,7 +165,7 @@
 
           .order__row
             .order__subTitle Service:
-            .order__value Compliance
+            .order__value {{selectedService}}
               .order__details(v-if="!!currentComplianceTemplate") {{currentComplianceTemplate.title}}
 
           .order__row(v-if="Object.keys(currentIndustries).length")
@@ -187,7 +189,7 @@
 </template>
 
 <script>
-	import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 	import SelectSingle from "../../../../components/pangea/SelectSingle"
 	import DatepickerWithTime from "../../../../components/pangea/DatepickerWithTime"
 	import moment from "moment"
@@ -201,9 +203,15 @@
 	import ValidationErrors from "../../../../components/ValidationErrors"
 	import GeneralTable from "../../../../components/pangea/GeneralTable"
 
+  import CheckBox from "../../../../components/CheckBox"
+import { getUser } from "../../../../store/actions"
+
+
 	export default {
 		data() {
 			return {
+        editorData: '',
+        selectedService: '',
 				isRequestSend: false,
 				currentDeadline: '',
 				currentProjectName: '',
@@ -231,111 +239,165 @@
 
 				errors: [],
 				showError: false,
-
-				complianceTemplates: [
-					{
-						title: '[1] POI (Proof of Identity Documents)',
-						description:
-								'<li>Full name</li>' +
-								'<li>DOB</li>' +
-								'<li>Issue date</li>' +
-								'<li>Expiry date if there is any</li>'
-					},
-					{
-						title: '[2] POA (Proof of Address Documents)',
-						description:
-								'<li>Full name</li>' +
-								'<li>Address</li>' +
-								'<li>Issue date</li>' +
-								'<li>Who Issued</li>'
-					},
-					{
-						title: '[3] Tax declarations',
-						description:
-								'<li>Name of taxpayer</li>' +
-								'<li>Net annual declared income</li>' +
-								'<li>Dividend’s amount (from which company)</li>' +
-								'<li>Salaries amount</li>' +
-								'<li>Other income amount (specify the source of income in rent, insurances, royalties, sale of property)</li>' +
-						    '<li>Net annual declared income</li>' +
-								'<li>Year of declaration</li>' +
-								'<li>Issue date</li>' +
-								"<li>Employer's details</li>" +
-								'<li>Currency</li>'
-					},
-					{
-						title: '[4] Salary certificates / letters of employment',
-						description:
-								'<li>Name</li>' +
-								'<li>Net salary</li>' +
-								'<li>Employer</li>' +
-								'<li>Issue date</li>' +
-								'<li>Currency</li>'
-					},
-					{
-						title: '[5] Sales / purchase agreements',
-						description:
-								'<li>Name of seller</li>' +
-								'<li>Name of buyer if any</li>' +
-								'<li>Amount of the sale</li>' +
-								'<li>Date of agreement</li>' +
-								'<li>Issuing authority</li>' +
-								'<li>Currency</li>'
-					},
-					{
-						title: '[6] Cancellation letters of bank accounts / CCs',
-						description:
-								'<li>Account holder name</li>' +
-								'<li>Account number</li>' +
-								'<li>Issuing credit institution</li>' +
-								'<li>CC digits</li>' +
-								'<li>Issue date</li>'
-					},
-					{
-						title: '[7] Specific transactions on bank statements',
-						description:
-								'<li>Brief description of specific transaction</li>'
-					},
-					{
-						title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
-						description:
-								'<li>Type of doc</li>' +
-								'<li>Names involved</li>' +
-								'<li>Relation</li>'
-					},
-					{
-						title: '[9] Corporate Documents',
-						description:
-								'<li>Registered name</li>' +
-								'<li>Incorporation date</li>' +
-								'<li>Directors and Authorised Signatories</li>' +
-								'<li>Shareholders / Beneficial owners</li>' +
-								'<li>Registered and Business address (if available)</li>' +
-								'<li>Share capital</li>' +
-								'<li>Any information on Directors and Shareholders</li>'+
-								'<li>Form of the legal entity (limited company/partnership/sole proprietorship etc)</li>' +
-								'<li>Nature of business of the company</li>' +
-								'<li>Any other important points</li>'
-					},
-					{
-						title: '[10] Financial statements',
-						description:
-								'<li>Company name and year of FSs</li>' +
-								'<li>Declared gross and net profit/loss for the year (amount and currency)</li>' +
-								'<li>Declared accumulated reserves (amount and currency)</li>' +
-								'<li>Any information regarding payments to and from shareholders and/or directors</li>' +
-								'<li>Any company obligations/loans to/from capital owners and management</li>' +
-								'<li>Taxes due from company</li>' +
-								'<li>References to distributions of dividends or profits to shareholders</li>'
-					},
-					{
-						title: 'N/A - no template',
-						description: ''
-					}
-				]
-			}
+        instructions: {
+          "Translation": [
+            {
+              name: "test",
+              pattern: "It is test text. Just for test"
+            },
+            {
+              name: "test2",
+              pattern: "It is test2 text. Just for test"
+            },
+            {
+              name: "test3",
+              pattern: "It is test3 text. Just for test"
+            },
+            {
+              name: "test4",
+              pattern: "It is test4 text. Just for test"
+            },
+          ],
+          "Localization": [
+            {
+              name: "test",
+              pattern: "It is test text. Just for test"
+            },
+            {
+              name: "test2",
+              pattern: "It is test2 text. Just for test"
+            },
+            {
+              name: "test3",
+              pattern: "It is test3 text. Just for test"
+            },
+            {
+              name: "test4",
+              pattern: "It is test4 text. Just for test"
+            },
+          ],
+        },
+				// complianceTemplates: [
+				// 	{
+				// 		title: '[1] POI (Proof of Identity Documents)',
+				// 		description:
+				// 				'<li>Full name</li>' +
+				// 				'<li>DOB</li>' +
+				// 				'<li>Issue date</li>' +
+				// 				'<li>Expiry date if there is any</li>'
+				// 	},
+				// 	{
+				// 		title: '[2] POA (Proof of Address Documents)',
+				// 		description:
+				// 				'<li>Full name</li>' +
+				// 				'<li>Address</li>' +
+				// 				'<li>Issue date</li>' +
+				// 				'<li>Who Issued</li>'
+				// 	},
+				// 	{
+				// 		title: '[3] Tax declarations',
+				// 		description:
+				// 				'<li>Name of taxpayer</li>' +
+				// 				'<li>Net annual declared income</li>' +
+				// 				'<li>Dividend’s amount (from which company)</li>' +
+				// 				'<li>Salaries amount</li>' +
+				// 				'<li>Other income amount (specify the source of income in rent, insurances, royalties, sale of property)</li>' +
+				// 		    '<li>Net annual declared income</li>' +
+				// 				'<li>Year of declaration</li>' +
+				// 				'<li>Issue date</li>' +
+				// 				"<li>Employer's details</li>" +
+				// 				'<li>Currency</li>'
+				// 	},
+				// 	{
+				// 		title: '[4] Salary certificates / letters of employment',
+				// 		description:
+				// 				'<li>Name</li>' +
+				// 				'<li>Net salary</li>' +
+				// 				'<li>Employer</li>' +
+				// 				'<li>Issue date</li>' +
+				// 				'<li>Currency</li>'
+				// 	},
+				// 	{
+				// 		title: '[5] Sales / purchase agreements',
+				// 		description:
+				// 				'<li>Name of seller</li>' +
+				// 				'<li>Name of buyer if any</li>' +
+				// 				'<li>Amount of the sale</li>' +
+				// 				'<li>Date of agreement</li>' +
+				// 				'<li>Issuing authority</li>' +
+				// 				'<li>Currency</li>'
+				// 	},
+				// 	{
+				// 		title: '[6] Cancellation letters of bank accounts / CCs',
+				// 		description:
+				// 				'<li>Account holder name</li>' +
+				// 				'<li>Account number</li>' +
+				// 				'<li>Issuing credit institution</li>' +
+				// 				'<li>CC digits</li>' +
+				// 				'<li>Issue date</li>'
+				// 	},
+				// 	{
+				// 		title: '[7] Specific transactions on bank statements',
+				// 		description:
+				// 				'<li>Brief description of specific transaction</li>'
+				// 	},
+				// 	{
+				// 		title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
+				// 		description:
+				// 				'<li>Type of doc</li>' +
+				// 				'<li>Names involved</li>' +
+				// 				'<li>Relation</li>'
+				// 	},
+				// 	{
+				// 		title: '[9] Corporate Documents',
+				// 		description:
+				// 				'<li>Registered name</li>' +
+				// 				'<li>Incorporation date</li>' +
+				// 				'<li>Directors and Authorised Signatories</li>' +
+				// 				'<li>Shareholders / Beneficial owners</li>' +
+				// 				'<li>Registered and Business address (if available)</li>' +
+				// 				'<li>Share capital</li>' +
+				// 				'<li>Any information on Directors and Shareholders</li>'+
+				// 				'<li>Form of the legal entity (limited company/partnership/sole proprietorship etc)</li>' +
+				// 				'<li>Nature of business of the company</li>' +
+				// 				'<li>Any other important points</li>'
+				// 	},
+				// 	{
+				// 		title: '[10] Financial statements',
+				// 		description:
+				// 				'<li>Company name and year of FSs</li>' +
+				// 				'<li>Declared gross and net profit/loss for the year (amount and currency)</li>' +
+				// 				'<li>Declared accumulated reserves (amount and currency)</li>' +
+				// 				'<li>Any information regarding payments to and from shareholders and/or directors</li>' +
+				// 				'<li>Any company obligations/loans to/from capital owners and management</li>' +
+				// 				'<li>Taxes due from company</li>' +
+				// 				'<li>References to distributions of dividends or profits to shareholders</li>'
+				// 	},
+				// 	{
+				// 		title: 'N/A - no template',
+				// 		description: ''
+				// 	}
+				// ],
+      }
 		},
 		methods: {
+		  ...mapActions({
+        getLanguages: "getLanguages",
+        getUser: "getUser"
+      }),
+      selectOnlyExisted(){
+		    if (!this.selectedService) return []
+        const allIds = document.querySelectorAll('#instructions > p')
+        const current =  allIds ? [...allIds].map(({id}) => id) : []
+         this.instructions[this.selectedService].forEach((instruction, index) => {
+          // instruction.isActive = current.includes(instruction.name)
+           this.$set(this.instructions[this.selectedService][index], 'isActive', current.includes(instruction.name))
+          return instruction
+        })
+        // this.instructions
+        // this.$set(this.instructions, this.selectedService, selectExistedInEditor)
+
+      },
 			groupAllData() {
 				return {
 					currentProjectName: this.currentProjectName,
@@ -349,6 +411,19 @@
 					startOption: this.startOption
 				}
 			},
+
+      toggleCheck(index, status ) {
+		    const toggledInstruction = this.instructions[this.selectedService][index]
+		    if (status) {
+		      document.querySelector('#instructions').innerHTML += `<p id='${toggledInstruction.name}'> ${toggledInstruction.pattern}</p>`
+          // this.editorData += `<ast data-test='tadsadas'> ${toggledInstruction.pattern}</ast>`
+        } else {
+		      document.querySelector(`#${toggledInstruction.name}`).remove()
+          // this.editorConfig.replace('<.* id=".*>.*>')
+        }
+
+		    this.$set(toggledInstruction, "isActive", status)
+      },
 
 			closeErrors() {
 
@@ -370,6 +445,7 @@
 			async addService() {
 				this.isRequestSend = true
 				let formData = new FormData()
+				formData.append('service', this.selectedService)
 				formData.append('deadline', this.currentDeadline)
 				formData.append('projectName', this.currentProjectName)
 				formData.append('sourceLanguage', JSON.stringify(this.currentSourceLang))
@@ -434,12 +510,11 @@
 				const servicesIndustries = [
 					...new Set(
 							this.clientInfo.services
-									.filter(i => i.services[0].title === "Compliance")
+									.filter(({services}) => services[0].title === this.selectedService)
 									.map(i => i.industries[0])
 					)
 				]
-
-				this.currentIndustries = servicesIndustries.find(({ name }) => name === option)
+        this.currentIndustries = servicesIndustries.find(({ name }) => name === option)
 				this.currentSourceLang = {}
 				this.currentTargetLang = {}
 			},
@@ -475,7 +550,11 @@
 			deleteFile(e, name, type) {
 				if (type === 'Source') this.deleteFileByIdx(this.sourceFiles)
 				if (type === 'Reference') this.deleteFileByIdx(this.refFiles)
-			}
+			},
+      setServices({option}){
+        this.selectedService = option
+        document.querySelector('#instructions').innerHTML = '<p></p>'
+      }
 		},
 		computed: {
 			...mapGetters({
@@ -486,7 +565,7 @@
 			}),
 			isCompleteForm() {
 				return this.currentContacts.length &&
-						!!this.currentComplianceTemplate &&
+						// !!this.currentComplianceTemplate &&
 						!!this.startOption &&
 						(this.refFiles.length || this.sourceFiles.length) &&
 						Object.keys(this.currentIndustries).length &&
@@ -507,7 +586,7 @@
 						...new Set(
 								this.clientInfo.services
 										.filter(i => i.industries[0].name === this.currentIndustries.name)
-										.filter(i => i.services[0].title === "Compliance")
+										.filter(i => i.services[0].title === this.selectedService)
 										.map(i => i.sourceLanguage.lang)
 										.filter(i => i !== "English" && i !== "English (United States)")
 						)
@@ -520,19 +599,29 @@
 						...new Set(
 								this.clientInfo.services
 										.filter(i => i.industries[0].name === this.currentIndustries.name)
-										.filter(i => i.services[0].title === "Compliance")
+										.filter(i => i.services[0].title === this.selectedService)
 										.map(i => i.targetLanguages[0].lang)
 										.filter(i => i !== "English" && i !== "English (United States)")
 						)
 					]
 				}
 			},
+      mappedService() {
+        if (!this.clientInfo.services) return []
+        const services = [
+          ...new Set(
+              this.clientInfo.services.map(({ services })=> services[0].title)
+          )
+        ]
+        return services
+
+      },
 			mappedIndustries() {
 				if (this.clientInfo.services) {
 					const servicesIndustries = [
 						...new Set(
 								this.clientInfo.services
-										.filter(i => i.services[0].title === "Compliance")
+										.filter(i => i.services[0].title === this.selectedService)
 										.map(i => i.industries[0].name)
 						)
 					]
@@ -544,7 +633,10 @@
 				return this.complianceTemplates.map(i => i.title)
 			}
 		},
-		components: {
+    created() {
+      this.getLanguages()
+    },
+    components: {
 			GeneralTable,
 			ValidationErrors,
 			ClientRequestCompleted,
@@ -555,7 +647,8 @@
 			UploadFileButton,
 			DatepickerWithTime,
 			SelectSingle,
-			ClientTable
+			ClientTable,
+      CheckBox,
 		}
 
 	}
@@ -745,6 +838,19 @@
       position: relative;
     }
 
+    &__select-block {
+      min-height: 30px;
+      position: relative;
+    }
+
+    &__checked {
+      display: flex;
+      margin: 10px 0;
+      & span {
+        margin-left: 5px;
+      }
+    }
+
     &__input-title {
       align-items: center;
       display: flex;
@@ -771,6 +877,18 @@
         border-bottom: 1px solid $border;
         margin-bottom: 15px;
       }
+    }
+    &__details {
+      width: 500px;
+      height: 400px;
+      margin-top: 4px;
+      border-radius: 4px;
+      border: 1px solid #bfbfbf;
+      padding: 5px;
+      color: #333;
+      box-sizing: border-box;
+      word-wrap: break-word;
+      overflow-x: auto;
     }
 
     &__textarea {

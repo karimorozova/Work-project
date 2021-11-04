@@ -29,7 +29,29 @@ async function getClient(obj) {
 			.populate('defaultPricelist', [ 'name' ])
 			.populate('services.services', [ 'title', 'steps' ])
 }
-
+async function getClientForPortal(obj) {
+	return await Clients.findOne(obj)
+			// .populate('industries', [ 'name', 'icon' ])
+			// .populate('nativeLanguage', [ 'lang' ])
+			// .populate('services.sourceLanguage', [ 'lang' ])
+			// .populate('services.targetLanguages', [ 'lang' ])
+			// .populate('services.industries', [ 'name' ])
+			// .populate('sourceLanguages', [ 'lang' ])
+			// .populate('targetLanguages', [ 'lang' ])
+			// .populate('rates.industryMultipliersTable.industry', [ 'name', 'icon' ])
+			// .populate('rates.stepMultipliersTable.step', [ 'title' ])
+			// .populate('rates.stepMultipliersTable.unit', [ 'type' ])
+			// .populate('rates.basicPricesTable.sourceLanguage', [ 'lang', 'iso1' ])
+			// .populate('rates.basicPricesTable.targetLanguage', [ 'lang', 'iso1' ])
+			// .populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+			// .populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+			// .populate('rates.pricelistTable.step', [ 'title' ])
+			// .populate('rates.pricelistTable.unit', [ 'type' ])
+			// .populate('rates.pricelistTable.industry', [ 'name' ])
+			// .populate('timeZone')
+			// .populate('defaultPricelist', [ 'name' ])
+			// .populate('services.services', [ 'title', 'steps' ])
+}
 async function getSimpleClients(find = {}, filter = {}) {
   return await Clients.find(find, filter)
     .populate('industries', [ 'name', 'icon' ])
@@ -188,4 +210,5 @@ module.exports = {
 	getClientRates,
   getClientWithActions,
   getSimpleClients,
+	getClientForPortal,
 }

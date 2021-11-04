@@ -1,7 +1,8 @@
 <template lang="pug">
-  .details(v-if="clientRequests.length")
-    ClientRequestTranslationCompleted(v-if="currentClientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
-    ClientRequestCompleted(v-else :isStartOption="false" :values="groupAllData()")
+  .test {{clientRequests}}
+    .details(v-if="clientRequests.length")
+      ClientRequestTranslationCompleted(v-if="clientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
+      ClientRequestCompleted(v-else :isStartOption="false" :values="groupAllData()")
 </template>
 
 <script>
@@ -14,7 +15,9 @@
 
 	export default {
 		data() {
-			return {}
+			return {
+        clientRequest: {}
+      }
 		},
 		methods: {
       customFormatter(date) {
@@ -22,30 +25,33 @@
       },
       groupAllData() {
         return {
-          currentProjectName: this.currentClientRequest.projectName,
-          currentDeadline: this.customFormatter(this.currentClientRequest.deadline),
-          currentIndustries: this.currentClientRequest.industry,
-          currentSourceLang: this.currentClientRequest.requestForm.sourceLanguage,
-          currentTargetLang: this.currentClientRequest.requestForm.targetLanguages,
-          currentService: this.currentClientRequest.requestForm.service.title,
+          currentProjectName: this.clientRequest.projectName,
+          currentDeadline: this.customFormatter(this.clientRequest.deadline),
+          currentIndustries: this.clientRequest.industry,
+          currentSourceLang: this.clientRequest.requestForm.sourceLanguage,
+          currentTargetLang: this.clientRequest.requestForm.targetLanguages,
+          currentService: this.clientRequest.requestForm.service.title,
           files: this.files,
-          currentComplianceTemplate: this.currentClientRequest.requestForm.complianceOptions,
-          currentBrief: this.currentClientRequest.brief,
+          currentComplianceTemplate: this.clientRequest.requestForm.complianceOptions,
+          currentBrief: this.clientRequest.brief,
 
         }
+      },
+      async currentClientRequest() {
+        const { id } = this.$route.params
+        const { requests } = (await this.$axios.get('/portal/client-requests/' + id + '?token=' + this.token)).data
+        console.log({requests: JSON.parse(window.atob(requests))})
+        this.clientRequest = JSON.parse(window.atob(requests))
       },
 		},
 		computed: {
 			...mapGetters({
         clientRequests: "getClientRequests",
+        token: "getToken"
 			}),
-      currentClientRequest() {
-        const { id } = this.$route.params
-        return this.clientRequests.find(({_id}) => id === _id)
-      },
       files() {
-        const sourceFiles = this.currentClientRequest.requestForm.sourceFiles
-        const refFiles = this.currentClientRequest.requestForm.refFiles
+        const sourceFiles = this.clientRequest.requestForm.sourceFiles
+        const refFiles = this.clientRequest.requestForm.refFiles
         return [
           ...Array.from(sourceFiles).map(item => ({ type: 'Source', name: item.filename })),
           ...Array.from(refFiles).map(item => ({ type: 'Reference', name: item.filename }))
@@ -71,8 +77,8 @@
 			// MainInfo,
 			// OtherInfo
 		},
-		mounted() {
-			// this.getProjectInfo()
+		created() {
+			this.currentClientRequest()
 		}
 	}
 </script>

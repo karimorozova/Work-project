@@ -55,6 +55,17 @@ export const SET_PROJECTS = (state, payload) => {
     state.projects = projects;
 };
 
+export const SET_OPEN_PROJECTS = (state, payload) => {
+    let projects = [];
+    if(payload.length) {
+        projects = payload.sort((a, b) => {
+            if (a.startDate > b.startDate) return -1
+            if (a.startDate < b.startDate) return 1;
+        });
+    }
+    state.openProjects = projects;
+};
+
 export const SET_REQUESTS = (state, payload) => {
     let requests = [];
     if(payload.length) {
@@ -64,6 +75,29 @@ export const SET_REQUESTS = (state, payload) => {
         });
     }
     state.requests = requests;
+};
+export const SET_OPEN_REQUESTS = (state, payload) => {
+    console.log({ payload })
+    let requests = [];
+    // if(payload.length) {
+    //     requests = payload.sort((a, b) => {
+    //         if (a.startDate > b.startDate) return -1
+    //         if (a.startDate < b.startDate) return 1;
+    //     });
+    // }
+    state.openRequests = payload;
+};
+
+export const SET_OPEN_QUOTES = (state, payload) => {
+    console.log({ payload })
+    let quotes = [];
+    if(payload.length) {
+        quotes = payload.sort((a, b) => {
+            if (a.startDate > b.startDate) return -1
+            if (a.startDate < b.startDate) return 1;
+        });
+    }
+    state.openQuotes = quotes;
 };
 
 export const SET_MONO_COMBINATIONS = (state, payload) => {

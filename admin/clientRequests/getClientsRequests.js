@@ -94,6 +94,23 @@ async function getClientsRequestsForPortal(filters) {
 	}
 }
 
+async function getClientsRequestForPortal(filters) {
+	try {
+		return await ClientRequest.findOne(filters).populate([
+			"requestForm.sourceLanguage",
+			"requestForm.targetLanguages",
+			"requestForm.service",
+			"industry",
+			"accountManager",
+			"projectManager",
+		])
+
+	} catch(err) {
+		console.log(err);
+		console.log("Error on getting filtered client requests");
+	}
+}
+
 
 async function getClientRequestById(id) {
 	try {
@@ -158,4 +175,5 @@ module.exports = {
   getClientRequestAfterUpdate,
 	removeClientRequestById,
 	getClientsRequestsForPortal,
+	getClientsRequestForPortal,
 }

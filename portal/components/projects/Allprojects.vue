@@ -28,6 +28,12 @@
 	import { mapGetters, mapActions } from "vuex"
 
 	export default {
+    props: {
+      allProjects: {
+        type: Array,
+        default: () => []
+      }
+    },
 		data() {
 			return {
 				requestFilter: {
@@ -67,7 +73,7 @@
 		},
 		computed: {
 			...mapGetters({
-				allProjects: "getAllProjects"
+				// allProjects: "getAllProjects"
 			}),
 			filteredProjects() {
 				let statuses = [ 'Quote sent', 'Requested' ]

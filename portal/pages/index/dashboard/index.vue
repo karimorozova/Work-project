@@ -1,18 +1,18 @@
 <template lang="pug">
-  .dashboard(v-if="Object.keys(client).length")
+  .dashboard(v-if="Object.keys(client).length && client")
     .row
       .col
-        AllOpenRequests(:client="client" :allRequests="filteredRequest")
+        AllOpenRequests(:client="client" :allRequests="clientRequests")
       .col
         MyOpenRequests(:client="client" :myRequests="myFilteredRequest")
     .row
       .col
-        AllOpenQuotes( :allQuotes="filteredQuotes" @changeQuoteStatus="makeQuoteAction")
+        AllOpenQuotes( :allQuotes="openQuotes" @changeQuoteStatus="makeQuoteAction")
       .col
         MyOpenQuotes( :myQuotes="myFilteredQuotes")
     .row
       .col
-        AllOpenProjects( :allProjects="filteredProjects")
+        AllOpenProjects( :allProjects="projects")
       .col
         MyOpenProjects( :myProjects="myFilteredProjects")
 </template>
@@ -26,15 +26,16 @@
 	import MyOpenProjects from "../../../components/Tables/dashboard/MyOpenProjects"
 	import { mapActions, mapGetters } from "vuex"
   import moment from "moment"
+  import { updateOpenProjects } from "../../../store/actions"
 
 	export default {
 		props: {
-			projects: {
-				type: Array
-			},
-			requests: {
-				type: Array
-			}
+			// projects: {
+			// 	type: Array
+			// },
+			// requests: {
+			// 	type: Array
+			// }
 		},
 		data() {
 			return {
@@ -42,7 +43,11 @@
 		},
 		methods: {
 			...mapActions({
-				updateQuoteStatus: "updateQuoteStatus",
+        setQuoteStatus: "setQuoteStatus",
+        setOpenProjects: "setOpenProjects",
+        setOpenRequests: "setOpenRequests",
+        setOpenQuotes: "setOpenQuotes",
+        getClient: "getClient",
 			}),
 			filterByStatus(statuses) {
 				return this.projects.filter(item => {
@@ -62,7 +67,7 @@
       //   this.$router.push(`/client-request/details/${ id }`)
       // },
 			async makeQuoteAction({ _id, status }) {
-        const quote = this.filteredQuotes.find((quote) => quote._id === _id)
+        const quote = this.openQuotes.find((quote) => quote._id === _id)
 				try {
 					await this.updateQuoteStatus({ quote, key: status })
 				} catch (err) {
@@ -95,35 +100,42 @@
 		},
 		computed: {
 		  ...mapGetters({
+        projects: "getAllOpenProjects",
         user: "getUserInfo",
-        clientRequests: "getClientRequests",
-			  client: "getClientInfo"
+        clientRequests: "getAllOpenRequests",
+        openQuotes: "getAllOpenQuotes",
+        client: "getClientInfo"
       }),
-			filteredProjects() {
-				let statuses = [ 'Started', 'Approved', 'In progress', 'Ready for Delivery' ]
-				const result = this.filterByStatus(statuses)
-				return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1)
-			},
-			filteredQuotes() {
-				let statuses = [ 'Quote sent', 'Requested' ]
-				const projects = this.filterByStatus(statuses)
-				return projects
-			},
-      filteredRequest() {
-				return this.clientRequests.filter(clientRequest => clientRequest.status !== 'Closed')
-			},
+			// projects() {
+			// 	let statuses = [ 'Started', 'Approved', 'In progress', 'Ready for Delivery' ]
+			// 	const result = this.filterByStatus(statuses)
+			// 	return result.sort((a, b) => a.startDate < b.startDate ? 1 : -1)
+			// },
+			// openQuotes() {
+			// 	let statuses = [ 'Quote sent', 'Requested' ]
+			// 	const projects = this.filterByStatus(statuses)
+			// 	return projects
+			// },
+      // filteredRequest() {
+			// 	return this.clientRequests.filter(clientRequest => clientRequest.status !== 'Closed')
+			// },
       myFilteredQuotes() {
-		    return this.filteredQuotes.filter(quote =>  quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
+		    return this.openQuotes.filter(quote =>  quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
           // return quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ firstName, surname }) => firstName + surname).includes(this.user.firstName + this.user.surname )})
       },
       myFilteredProjects() {
-		    return this.filteredProjects.filter(project => project.hasOwnProperty('clientContacts') && project.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
+		    return this.projects.filter(project => project.hasOwnProperty('clientContacts') && project.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
       },
       myFilteredRequest() {
-		    return this.filteredRequest.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
+		    return this.clientRequests.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id ))
       }
 		},
-		components: {
+    created() {
+      this.setOpenProjects()
+      this.setOpenQuotes()
+      this.setOpenRequests()
+    },
+    components: {
 			// Table,
       AllOpenRequests,
       MyOpenRequests,

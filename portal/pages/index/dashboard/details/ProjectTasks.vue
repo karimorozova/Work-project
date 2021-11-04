@@ -21,13 +21,13 @@
           .tasks-table__time-data {{ getDeliveredTime(row.deliveredTime) }}
       .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row, index }")
         ProgressLine(:progress="getProgress(row, index)")
-      .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ getWordcount(row)}}
+      .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ taskFinance[row.taskId].worldCount}}
       template(slot="cost" slot-scope="{ row }")
-        .tasks-table__data(v-if="!isCancelledHalfway(row)") {{ row.finance.Price.receivables }}
-          .tasks-table__currency(v-if="row.finance.Price.receivables")
+        .tasks-table__data(v-if="!isCancelledHalfway(row)") {{ taskFinance[row.taskId].receivables }}
+          .tasks-table__currency(v-if="taskFinance[row.taskId].receivables")
             span(v-html="currencyIconDetected(project.projectCurrency)")
-        .tasks-table__data(v-if="isCancelledHalfway(row)") {{ row.finance.Price.halfReceivables }}
-          .tasks-table__currency(v-if="row.finance.Price.halfReceivables")
+        .tasks-table__data(v-if="isCancelledHalfway(row)") {{ taskFinance[row.taskId].halfReceivables }}
+          .tasks-table__currency(v-if="taskFinance[row.taskId].halfReceivables")
             span(v-html="currencyIconDetected(project.projectCurrency)")
       .tasks-table__data.tasks-table_centered(slot="icons" slot-scope="{ row }")
         .tasks-table__icons(v-if="isApproveReject(row)")
@@ -56,7 +56,7 @@
 					{ label: "Langauge Pair", headerKey: "headerPair", key: "pair", width: "28%", padding: "0" },
 					{ label: "Status", headerKey: "headerStatus", key: "status", width: "15%", padding: "0" },
 					{ label: "Progress", headerKey: "headerProgress", key: "progress", width: "15%", padding: "0" },
-					{ label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "12%", padding: "0" },
+					// { label: "Wordcount", headerKey: "headerWordcount", key: "wordcount", width: "12%", padding: "0" },
 					{ label: "Cost", headerKey: "headerCost", key: "cost", width: "15%", padding: "0" },
 					{ label: "Quote Action", headerKey: "headerDownload", key: "icons", width: "15%", padding: "0" }
 				],
@@ -72,9 +72,11 @@
 				alertToggle: "alertToggle",
 				updateTaskStatus: "updateTaskStatus",
 			}),
-			getWordcount(row) {
-				return row.finance.Wordcount.receivables
-			},
+			// getWordcount(row) {
+      //   console.log({ row })
+      //   // return row.finance.Wordcount.receivables
+      //   return 0
+			// },
 			isCancelledHalfway(task) {
 				return task.status === 'Cancelled Halfway'
 			},
@@ -136,7 +138,17 @@
 			}),
 			projectTasks() {
 				return this.project.tasks.filter(({ status }) => status !== 'Created')
-			}
+			},
+			taskFinance() {
+        return this.project.steps.reduce((acc, step) => {
+          if(!acc.hasOwnProperty(step.taskId) ) {
+            acc[step.taskId] = {receivables: step.finance.Price.receivables}
+          } else {
+            acc[step.taskId].receivables += step.finance.Price.receivables
+          }
+          return acc
+        }, {})
+			},
 		},
 		mounted() {
 			this.domain = process.env.domain

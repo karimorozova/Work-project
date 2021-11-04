@@ -26,20 +26,136 @@ export const requestType = ({commit}, payload) => {
   commit('ORDER_TYPE', payload)
 };
 
-export const getProjectsAndRequests = async function({ commit, dispatch, state}) {
-  try {
-    const result = await this.$axios.get(`/portal/projects?token=${state.token}`);
-    let { client, user, projects, memoqProjects, requests, languages } = result.data;
 
-    projects = JSON.parse(window.atob(projects)).sort((a, b) => b.startDate - a.startDate);
-    projects.push(...memoqProjects);
-    commit('SET_PROJECTS', projects);
+
+export const getProjectsAndRequests = async function({ commit, dispatch, state}) {
+  // try {
+  //   const result = await this.$axios.get(`/portal/open-projects?token=${state.token}`);
+  //   let { client, user, projects, memoqProjects, requests, languages } = result.data;
+  //
+  //   projects = JSON.parse(window.atob(projects)).sort((a, b) => b.startDate - a.startDate);
+  //   projects.push(...memoqProjects);
+  //   commit('SET_PROJECTS', projects);
+    commit('SET_REQUESTS', requests);
+    // dispatch('setClientRequests', JSON.parse(window.atob(requests)) );
+    // commit('SET_USER', JSON.parse(window.atob(user)) );
+    // commit('SET_CLIENT', JSON.parse(window.atob(client)));
+    // commit('SET_LANGUAGES', languages);
+    // dispatch('setLangCombinations', JSON.parse(window.atob(client)));
+  // } catch(err) {
+  //   const redirectErrors = ["jwt malformed", "jwt expired"]
+  //   console.log(err);
+  //   if (redirectErrors.includes(err.response.data)) {
+  //     this.dispatch('logout')
+  //     this.$router.replace({ path: '/login' })
+  //   }
+  //   dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+  // }
+}
+
+export const setOpenProjects = async function({ commit, dispatch, state}) {
+  try {
+    const result = await this.$axios.get(`/portal/open-projects?token=${state.token}`);
+    let { projects } = result.data;
+
+    projects = JSON.parse(window.atob(projects));
+    // projects.push(...memoqProjects);
+    commit('SET_OPEN_PROJECTS', projects);
     // commit('SET_REQUESTS', requests);
-    dispatch('setClientRequests', JSON.parse(window.atob(requests)) );
-    commit('SET_USER', JSON.parse(window.atob(user)) );
+    // dispatch('setClientRequests', JSON.parse(window.atob(requests)) );
+    // commit('SET_USER', JSON.parse(window.atob(user)) );
+    // commit('SET_CLIENT', JSON.parse(window.atob(client)));
+    // commit('SET_LANGUAGES', languages);
+    // dispatch('setLangCombinations', JSON.parse(window.atob(client)));
+  } catch(err) {
+    const redirectErrors = ["jwt malformed", "jwt expired"]
+    console.log(err);
+    if (redirectErrors.includes(err.response.data)) {
+      this.dispatch('logout')
+      this.$router.replace({ path: '/login' })
+    }
+    dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+  }
+}
+
+export const setOpenRequests = async function({ commit, dispatch, state}) {
+  try {
+    const result = await this.$axios.get(`/portal/open-requests?token=${state.token}`);
+    console.log({ result })
+
+    let { requests } = result.data;
+
+
+    commit('SET_OPEN_REQUESTS',  JSON.parse(window.atob(requests))  );
+  } catch(err) {
+    const redirectErrors = ["jwt malformed", "jwt expired"]
+    console.log(err);
+    if (redirectErrors.includes(err.response.data)) {
+      this.dispatch('logout')
+      this.$router.replace({ path: '/login' })
+    }
+    dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+  }
+}
+
+export const setOpenQuotes = async function({ commit, dispatch, state}) {
+  try {
+    const result = await this.$axios.get(`/portal/open-quotes?token=${state.token}`);
+    let { quotes } = result.data;
+    quotes = JSON.parse(window.atob(quotes));
+
+    commit('SET_OPEN_QUOTES', quotes);
+  } catch(err) {
+    const redirectErrors = ["jwt malformed", "jwt expired"]
+    console.log(err);
+    if (redirectErrors.includes(err.response.data)) {
+      this.dispatch('logout')
+      this.$router.replace({ path: '/login' })
+    }
+    dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+  }
+}
+
+export const getClient = async function({ commit, dispatch, state}) {
+  try {
+    const result = await this.$axios.get(`/portal/client?token=${state.token}`);
+    let { client } = result.data;
+
     commit('SET_CLIENT', JSON.parse(window.atob(client)));
+  } catch(err) {
+    const redirectErrors = ["jwt malformed", "jwt expired"]
+    console.log(err);
+    if (redirectErrors.includes(err.response.data)) {
+      this.dispatch('logout')
+      this.$router.replace({ path: '/login' })
+    }
+    dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+  }
+}
+
+export const getLanguages = async function({ commit, dispatch, state}) {
+  try {
+    const result = await this.$axios.get(`/portal/all-languages?token=${state.token}`);
+    let { languages } = result.data;
+
     commit('SET_LANGUAGES', languages);
-    dispatch('setLangCombinations', JSON.parse(window.atob(client)));
+  } catch(err) {
+    const redirectErrors = ["jwt malformed", "jwt expired"]
+    console.log(err);
+    if (redirectErrors.includes(err.response.data)) {
+      this.dispatch('logout')
+      this.$router.replace({ path: '/login' })
+    }
+    dispatch("alertToggle", {message: err.response.data, isShow: true, type: "error"});
+  }
+}
+
+export const getUser = async function({ commit, dispatch, state}) {
+  try {
+    const result = await this.$axios.get(`/portal/user?token=${state.token}`);
+    let { user } = result.data;
+
+    commit('SET_USER', JSON.parse(window.atob(user)) );
   } catch(err) {
     const redirectErrors = ["jwt malformed", "jwt expired"]
     console.log(err);

@@ -98,15 +98,10 @@
 <script>
 import Button from "../buttons/Button";
 import ValidationErrors from "../ValidationErrors";
-import {mapActions} from "vuex";
+import { mapActions, mapGetters } from "vuex"
 import SelectSingle from "../dropdowns/SelectSingle";
 
 export default {
-  props: {
-    user: {
-      type: Object
-    }
-  },
   data() {
     return {
       passType1: "password",
@@ -158,6 +153,7 @@ export default {
           : this.user[name]
     },
     previewPhoto() {
+      // if (document.getElementsByClassName('upload-button__input').length < 1) return
       let input = document.getElementsByClassName('upload-button__input')[0];
       if (this.checkFile(input.files)) {
         this.showPhoto(input);
@@ -166,6 +162,7 @@ export default {
       }
     },
     showPhoto(input) {
+      // if (document.getElementsByClassName('upload-button__input').length < 1) return
       this.photoFile = input.files;
       this.imageExist = true;
       let reader = new FileReader();
@@ -193,7 +190,9 @@ export default {
       this.newData = {}
       this.password = ''
       this.confirmPassword = ""
-      document.getElementsByClassName('photo__image')[0].src = this.domain + this.user.photo
+
+      if (document.getElementsByClassName('photo__image').length > 0)
+        document.getElementsByClassName('photo__image')[0].src = this.domain + this.user.photo
       this.closeErrors();
     },
     setValue(value, prop) {
@@ -236,9 +235,15 @@ export default {
         this.setDefault();
         this.alertToggle({message: "Updated", isShow: true, type: "success"});
       }catch (err) {
+        console.log(err)
         this.alertToggle({message: "Error on saving changes", isShow: true, type: "error"});
       }
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: "getUserInfo"
+    })
   },
   watch: {
     photoFile() {

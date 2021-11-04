@@ -4,6 +4,7 @@ const {
 	getClientsRequests,
 	removeClientRequestById,
 	getClientsRequestsForPortal,
+	getClientsRequestForPortal,
 } = require('./getClientsRequests')
 
 const {
@@ -56,4 +57,5 @@ module.exports = {
 	removeContactClientRequest,
 	sendMailToClient,
 	getClientsRequestsForPortal,
+	getClientsRequestForPortal,
 }

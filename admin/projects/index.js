@@ -5,7 +5,8 @@ const {
 	updateProject,
 	getFilteredProjects,
 	getProjectAfterUpdate,
-	getProjectsForVendorPortal
+	getProjectsForVendorPortal,
+	getProjectsForPortalList,
 } = require('./getProjects')
 
 const {
@@ -180,6 +181,7 @@ module.exports = {
 	removeMultiDR2,
 	changeNameLang,
 	getProjectsForPortal,
+	getProjectsForPortalList,
 	// addPaymentAdditions,
 	// deletePaymentAddition,
 }
