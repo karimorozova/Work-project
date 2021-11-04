@@ -3,13 +3,13 @@
     .text(v-if="!files.length") Drag and drop deliverable file here or click here to select deliverable file from your computer
     .text(v-else) Uploaded file(s): &nbsp;
 
-      span.text_strong(v-if="job.step.title === 'Compliance'") {{ filesNames() }}
-      span.text_strong(v-else) {{ files[0].name }}
+      span.text_strong {{ filesNames() }}
+
 
     .upload-area(v-if="job.step.title === 'Compliance'")
       input.upload-area__input(type="file" @change="setFile" multiple)
     .upload-area(v-else)
-      input.upload-area__input(type="file" @change="setFile")
+      input.upload-area__input(type="file" @change="setFile" multiple)
 </template>
 
 <script>
