@@ -9,21 +9,21 @@
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
 
     .manager__modal(v-if="changeManagerModal")
-      .manager__title Assign new [DR1] Manager
+      .manager__title New Manager [DR1]
       .manager__close-modal(@click="closeManagerModal()") &#215;
       .manager__body
         .manager__itemsContacts
           .manager__selectTitle Choose Manager:
           .manager__select
             SelectSingle(
-              :options="['managersNames']"
-              :selectedOption="selectedDr1Manager"
+              :options="projectManagers"
+              :selectedOption="selectedManager"
               placeholder="Select Manager"
               @chooseOption="setManager"
             )
 
         .manager__button-change
-          Button(value="Change" :isDisabled="!selectedManager" @clicked="changeManager")
+          Button(value="Save" :isDisabled="!selectedManager" @clicked="changeManager")
 
     .tasks__approve-action(v-if="isCancelApproveModal")
       ApproveModalPayment(
@@ -126,6 +126,7 @@ import DeliveryOneMulti from "./DeliveryOneMulti"
 import DeliveryOne from "./DeliveryOne"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import ApproveModalPayment from "../../ApproveModalPayment"
+import Button from "../../Button"
 
 export default {
   name: "NewTasks",
@@ -302,25 +303,26 @@ export default {
       this.changeManagerModal = true
     },
     setManager({ option }) {
-      console.log(option)
-      // const managerIndex = this.managersNames.indexOf(option)
-      // this.selectedManager = this.managers[managerIndex]
+      this.selectedManager = option
     },
     async changeManager() {
-      // try {
-      //   const result = await this.$http.post('/delivery/change-managers', {
-      //     projectId: this.currentProject._id,
-      //     checkedTasksId: this.currentProject.tasks.filter(item => item.isChecked).map(({ taskId }) => taskId),
-      //     manager: this.selectedManager
-      //   })
-      //
-      //   await this.setCurrentProject(result.data)
-      //   this.closeManagerModal()
-      //   this.selectedAction = ""
-      //   this.selectedManager = null
-      // } catch (err) {
-      //   this.alertToggle({ message: err.message, isShow: true, type: "error" })
-      // }
+      const checkedTasksId = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(({ taskId }) => taskId)
+      if (!checkedTasksId.length) return
+
+      try {
+        const result = await this.$http.post('/delivery/change-managers', {
+          projectId: this.currentProject._id,
+          checkedTasksId,
+          manager: this.users.find(item => `${ item.firstName } ${ item.lastName }` === this.selectedManager)
+        })
+
+        await this.setCurrentProject(result.data)
+        this.closeManagerModal()
+        this.selectedAction = ""
+        this.selectedManager = null
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" })
+      }
     },
     async setAction({ option }) {
       this.selectedAction = option
@@ -336,7 +338,7 @@ export default {
         case 'Cancel':
           this.isCancelApproveModal = true
           break
-        case 'Assign [DR1] Manager':
+        case 'Assign Manager [DR1]':
           await this.manageDR1()
           break
       }
@@ -363,9 +365,6 @@ export default {
       user: 'getUser',
       users: 'getUsers'
     }),
-    selectedDr1Manager() {
-      return this.selectedManager ? `${ this.selectedManager.firstName } ${ this.selectedManager.lastName }` : ""
-    },
     selectedTabQuery() {
       return this.$route.query.selectedTab || 'Tasks'
     },
@@ -406,7 +405,7 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
-      return [ ...isSendStatus, 'Assign [DR1] Manager', 'Approve [DR1]', 'Cancel' ]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel' ]
 
     },
     copyTasks() {
@@ -417,10 +416,15 @@ export default {
     },
     isAllSelected() {
       return (this.copyTasks && this.copyTasks.length) && this.copyTasks.every(i => i.isCheck)
+    },
+    projectManagers() {
+      if (this.users) {
+        return this.users.filter(item => item.group.name === 'Project Managers').map(item => `${ item.firstName } ${ item.lastName }`)
+      }
     }
-
   },
   components: {
+    Button,
     ApproveModalPayment,
     DeliveryOne,
     DeliveryOneMulti,
@@ -462,11 +466,6 @@ export default {
     position: relative;
     height: 32px;
     width: 220px;
-  }
-
-  &__itemsContacts {
-    display: flex;
-    justify-content: center;
   }
 
   &__title {

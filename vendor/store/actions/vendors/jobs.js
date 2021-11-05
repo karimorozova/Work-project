@@ -15,7 +15,7 @@ export const setJobComplianceStatus = async function ({ commit, dispatch, state 
 		if (targetFile) {
 			let fileData = new FormData()
 			fileData.append('jobId', jobId)
-			for (let file of targetFile){
+			for (let file of targetFile) {
 				fileData.append('targetFile', file)
 			}
 			await this.$axios.post('/vendor/step-target-compliance', fileData)
@@ -33,7 +33,10 @@ export const setJobStatus = async function ({ commit, dispatch, state }, payload
 		if (targetFile) {
 			let fileData = new FormData()
 			fileData.append('jobId', jobId)
-			fileData.append('targetFile', targetFile)
+
+			for (let file of targetFile) {
+				fileData.append('targetFile', file)
+			}
 			await this.$axios.post('/vendor/step-target', fileData)
 		}
 		if (status === "Completed" && !targetFile) {

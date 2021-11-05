@@ -99,10 +99,11 @@ export default {
         if (type === 'CAT Wordcount') {
           await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
           await this.$axios.post('/vendor/set-workFlowStatus', { token: this.getToken, stepId: this.job.stepId, stepAction: 'Finish' })
+
         } else if (this.job.step.title === "Compliance") {
           await this.setJobComplianceStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles })
         } else {
-          await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles[0] })
+          await this.setJobStatus({ jobId: this.job._id, status: "Completed", targetFile: this.targetFiles })
         }
         this.setCurrentJob()
         this.targetFiles = []
