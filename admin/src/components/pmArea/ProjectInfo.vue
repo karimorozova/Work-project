@@ -261,14 +261,12 @@
 						|| tasks.every(({ service }) => service.title === 'Editing')
 				)
 
-				return (closedCheck || true) && (status === 'Closed' || status === 'In progress' || status === 'Approved')
+				return (closedCheck) && (status === 'Closed' || status === 'In progress' || status === 'Approved')
 			},
 			canSendTaskToXtrf() {
 				const { status, tasks } = this.currentProject
 
-				const closedCheck = tasks.length && (
-						tasks.every(({ service }) => service.title === 'Compliance')
-				)
+				const closedCheck = tasks.length && (tasks.every(({ service }) => service.title === 'Compliance'))
 
 				return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
 			},
