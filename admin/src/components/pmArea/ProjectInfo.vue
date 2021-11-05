@@ -29,6 +29,12 @@
         :project="currentProject"
         @refreshProject="refreshProject"
       )
+      .span(v-if="!canSendToXtrf && !canSendTaskToXtrf")
+        span (Only manually)
+        ImportProjectToXtrf(
+          :project="currentProject"
+          @refreshProject="refreshProject"
+        )
       ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
       .project-info__action
         ProjectAction(
