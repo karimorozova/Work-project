@@ -13,52 +13,53 @@
           .input-title
             .input-title__text Start Date & Time:
             span.require *
-          DatepickerWithTime(
-            v-model="project.startDate"
-            @selected="(e) => updateProjectDate(e, 'startDate')"
-            :highlighted="highlighted"
-            monday-first=true
-            inputClass="datepicker-custom-project-info"
-            calendarClass="calendar-custom"
-            :format="customFormatter"
-            :disabled="disabled"
+          DatePicker(
+            :value="new Date(project.startDate)"
+            @confirm="(e) => updateProjectDate(e, 'startDate')"
+            format="DD-MM-YYYY, HH:mm"
+            type="datetime"
             ref="start"
-            :disabledPicker="disabledPicker && isProjectFinished"
+            :clearable="false"
+            :confirm="true"
+            confirm-text="Set date"
+            :disabled-date="notBeforeToday"
+            :disabled="disabledPicker && isProjectFinished"
+            prefix-class="xmx"
           )
-          .project__calendar-icon( @click="startOpen")
-            i.far.fa-calendar-alt
+
         .project__date
           .input-title
             .input-title__text Deadline:
             span.require *
-          DatepickerWithTime(
-            v-model="project.deadline"
-            @selected="(e) => updateProjectDate(e, 'deadline')"
-            monday-first=true
-            inputClass="datepicker-custom-project-info"
-            calendarClass="calendar-custom"
-            :format="customFormatter"
-            :disabledPicker="isBilling && isProjectFinished"
-            :disabled="disabled"
+          DatePicker(
+            :value="new Date(project.deadline)"
+            @confirm="(e) => updateProjectDate(e, 'deadline')"
+            format="DD-MM-YYYY, HH:mm"
+            type="datetime"
             ref="deadline"
+            :clearable="false"
+            :confirm="true"
+            confirm-text="Set date"
+            :disabled-date="notBeforeStartDate"
+            :disabled="isBilling && isProjectFinished"
+            prefix-class="xmx"
           )
-          .project__calendar-icon(@click="deadlineOpen")
-            i.far.fa-calendar-alt
 
         .project__date
           .input-title
             .input-title__text Billing Date:
-          DatepickerWithTime(
-            v-model="project.billingDate"
+          DatePicker(
+            :value="new Date(project.billingDate)"
+            @confirm="(e) => updateProjectDate(e, 'billingDate')"
+            format="DD-MM-YYYY, HH:mm"
+            type="datetime"
             ref="billingDate"
-            @selected="(e) => updateProjectDate(e, 'billingDate')"
-            monday-first=true
-            inputClass="datepicker-custom-project-info"
-            calendarClass="calendar-custom"
-            :format="customFormatter"
+            :clearable="false"
+            :confirm="true"
+            confirm-text="Set date"
+            :disabled-date="notBeforeStartDate"
+            prefix-class="xmx"
           )
-          .project__calendar-icon(@click="billingOpen")
-            i.far.fa-calendar-alt
 
         .project__same.checkbox
           input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
@@ -142,6 +143,9 @@
 	import { mapGetters, mapActions } from "vuex"
 	import DatepickerWithTime from "../DatepickerWithTime"
 
+  import DatePicker from 'vue2-datepicker';
+  import '../../assets/scss/datepicker.scss';
+
 	export default {
 		props: {
 			project: {
@@ -175,6 +179,12 @@
 				"setProjectDate",
 				"setCurrentProject"
 			]),
+      notBeforeToday(date) {
+        return date < new Date(new Date().setHours(0, 0, 0, 0));
+      },
+      notBeforeStartDate(date) {
+        return date < new Date(this.project.startDate);
+      },
 			async updateBrief(e) {
 				const { value } = e.target
 				if (!this.project._id) {
@@ -205,6 +215,7 @@
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			async updateProjectDate(e, prop) {
+        console.log({ e, prop })
 				if (this.project._id) {
 					if (prop === 'deadline' && this.isBilling) {
 						const date = { ['billingDate']: e }
@@ -365,7 +376,9 @@
 			isBillingDate() {
 				if (this.$refs.deadline.value === "") {
 					this.isBilling = false
-				} else this.isBilling = this.$refs.deadline.value === this.$refs.billingDate.value
+				} else {
+          this.isBilling = this.$refs.deadline.value.valueOf() === this.$refs.billingDate.value.valueOf()
+        }
 			},
 			setIsBillingTrue() {
 				this.isBilling = true
@@ -413,6 +426,7 @@
 		},
 		components: {
 			DatepickerWithTime,
+      DatePicker,
 			SelectSingle,
 			SelectMulti,
 			Datepicker,

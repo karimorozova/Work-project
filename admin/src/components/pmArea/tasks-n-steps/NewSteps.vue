@@ -3,7 +3,7 @@
 
     .steps__stepDetails(v-if="isStepInfo")
       StepInfo(
-        :step="copySteps[infoIndex]"
+        :step="finalData[infoIndex]"
         :index="infoIndex"
         :task="getTask(infoIndex)"
         @closeStepInfo="closeStepInfo"
@@ -12,7 +12,7 @@
 
     .steps__stepFinance(v-if="isFinanceEdit")
       ProjectFinanceModal(
-        :step="copySteps[infoIndex]"
+        :step="finalData[infoIndex]"
         :index="infoIndex"
         :projectCurrency="currentProject.projectCurrency"
         @closeFinanceEditing="closeFinanceEditing"
@@ -30,15 +30,16 @@
 
     .steps__change-deadline(v-if="deadlineModal")
       .steps__change-deadline-close(@click="closeErrorsDeadline") &#215;
-      DatepickerWithTime(
-        @selected="(e) => setMassDeadline(e)"
-        :inline="true",
-        calendarClass="steps__calendar-custom"
-        :format="customFormatter"
-        monday-first=true
-        :disabled="disabled"
-        :disabledPicker="isDatePickDisabled"
-        :highlighted="highlighted"
+      DatePicker(
+        class="no-border"
+        @confirm="(e) => setMassDeadline(e)"
+        type="datetime"
+        :clearable="false"
+        :confirm="true"
+        confirm-text="Set date"
+        :disabled-date="notBeforeStartDate"
+        :inline="true"
+        prefix-class="xmx"
       )
 
     .steps__action(v-if="!isProjectFinished")
@@ -55,7 +56,19 @@
 
     GeneralTable(
       :fields="fields"
-      :tableData="copySteps"
+      :tableData="finalData"
+
+
+      :isFilterShow="true"
+      :isFilterAbsolute="true"
+      :isBodyShort="true"
+
+      @addSortKey="addSortKey"
+      @changeSortKey="changeSortKey"
+      @removeSortKey="removeSortKey"
+      @setFilter="setFilter"
+      @removeFilter="removeFilter"
+      @clearAllFilters="clearAllFilters"
     )
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -67,7 +80,7 @@
         .table__data
           CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(index, true)" @uncheck="()=>toggleCheck(index, false)" customClass="tasks-n-steps")
 
-      template(slot="name" slot-scope="{ row }")
+      template(slot="step" slot-scope="{ row }")
         .table__data {{ row.step.title }}
 
       template(slot="language" slot-scope="{ row }")
@@ -79,30 +92,58 @@
 
       template(slot="start" slot-scope="{ row, index }")
         .table__data
-          DatepickerWithTime(
-            @selected="(e) => setDate(e, 'start', row._id)"
-            v-model="row.start"
-            inputClass="steps__custom-input"
-            calendarClass="steps__calendar-custom"
-            :format="customFormatter"
-            monday-first=true
-            :disabledPicker="isDatePickDisabled"
-            :highlighted="highlighted"
+          DatePicker(
+            :value="new Date(row.start)"
+            :editable="false"
+            input-class="table-input"
+            @confirm="(e) => setDate(e, 'start', row._id)"
+            format="MMM D, HH:mm"
+            type="datetime"
+            :clearable="false"
+            icon-calendar=''
+            :confirm="true"
+            confirm-text="Set date"
+            :disabled-date="notBeforeStartDate"
+            prefix-class="xmx"
           )
+          //DatepickerWithTime(
+          //  @selected="(e) => setDate(e, 'start', row._id)"
+          //  v-model="row.start"
+          //  inputClass="steps__custom-input"
+          //  calendarClass="steps__calendar-custom"
+          //  :format="customFormatter"
+          //  monday-first=true
+          //  :disabledPicker="isDatePickDisabled"
+          //  :highlighted="highlighted"
+          //)
 
       template(slot="deadline" slot-scope="{ row, index }")
         .table__data
-          DatepickerWithTime(
-            @selected="(e) => setDate(e, 'deadline', row._id)"
-            v-model="row.deadline"
-            inputClass="steps__custom-input"
-            calendarClass="steps__calendar-custom"
-            :format="customFormatter"
-            monday-first=true
-            :disabled="disabled"
-            :disabledPicker="isDatePickDisabled"
-            :highlighted="highlighted"
+          DatePicker(
+            :value="new Date(row.deadline)"
+            :editable="false"
+            input-class="table-input"
+            @confirm="(e) => setDate(e, 'deadline', row._id)"
+            format="MMM D, HH:mm"
+            type="datetime"
+            :clearable="false"
+            icon-calendar=''
+            :confirm="true"
+            confirm-text="Set date"
+            :disabled-date="notBeforeStartDate"
+            prefix-class="xmx"
           )
+          //DatepickerWithTime(
+          //  @selected="(e) => setDate(e, 'deadline', row._id)"
+          //  v-model="row.deadline"
+          //  inputClass="steps__custom-input"
+          //  calendarClass="steps__calendar-custom"
+          //  :format="customFormatter"
+          //  monday-first=true
+          //  :disabled="disabled"
+          //  :disabledPicker="isDatePickDisabled"
+          //  :highlighted="highlighted"
+          //)
 
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
@@ -154,11 +195,17 @@ import { mapActions, mapGetters } from "vuex"
 import moment from "moment"
 import DatepickerWithTime from "../../DatepickerWithTime"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 import StepInfo from "./StepInfo"
 import ProjectFinanceModal from "../ProjectFinanceModal"
 
+
+
+import DatePicker from 'vue2-datepicker';
+import '../../../assets/scss/datepicker.scss';
+
 export default {
-  mixins: [ scrollDrop, currencyIconDetected ],
+  mixins: [ scrollDrop, currencyIconDetected, tableSortAndFilter],
   name: "NewSteps",
   props: {
     steps: {
@@ -179,14 +226,23 @@ export default {
       selectedAction: '',
       isApproveActionShow: false,
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
+    // {
+    //   label: "Services",
+    //       headerKey: "headerService",
+    //     key: "services",
+    //     dataKey: "title",
+    //     sortInfo: { isSort: true, order: 'default' },
+    //   filterInfo: { isFilter: true },
+    //   style: {width: "20%"},
+    // },
       fields: [
         { label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-        { label: "Step", headerKey: "headerName", key: "name", style: { "width": "11%" } },
+        { label: "Step", headerKey: "headerName", key: "step", dataKey: "title", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
         { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "11%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "11%" } },
-        { label: "Start", headerKey: "headerStart", key: "start", style: { "width": "10%" } },
-        { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { "width": "10%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
+        { label: "Start", headerKey: "headerStart", key: "start",  sortInfo: { isSort: true, order: 'default' },  style: { "width": "10%" } },
+        { label: "Deadline", headerKey: "headerDeadline", key: "deadline",  sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "10%" } },
@@ -214,7 +270,7 @@ export default {
     },
     getTask(index) {
       return this.currentProject.tasks.find(item => {
-        return item.taskId === this.copySteps[index].taskId
+        return item.taskId === this.finalData[index].taskId
       })
     },
     showStepDetails(index) {
@@ -294,7 +350,7 @@ export default {
       }, [])
     },
     toggleCheck(index, isCheck) {
-      this.$set(this.copySteps[index], "isCheck", isCheck)
+      this.$set(this.finalData[index], "isCheck", isCheck)
     },
     getStepByStatus(statuses) {
       const filtered = []
@@ -376,13 +432,16 @@ export default {
       return [ "Request Confirmation", "Mark as Approved", "Mark as Rejected", "Set Start", "Set Deadline" ]
     },
     checkedSteps() {
-      return this.copySteps.filter(({ isCheck }) => isCheck)
+      return this.finalData.filter(({ isCheck }) => isCheck)
     },
-    copySteps() {
-      return this.currentProject.steps
-    },
+    // finalData() {
+    //   return this.currentProject.steps
+    // },
     isAllSelected() {
-      return (this.copySteps && this.copySteps.length) && this.copySteps.every(i => i.isCheck)
+      return (this.finalData && this.finalData.length) && this.finalData.every(i => i.isCheck)
+    },
+    rawData() {
+      return this.currentProject.steps
     }
   },
   components: {
@@ -395,7 +454,8 @@ export default {
     ProgressLineStep,
     Tabs,
     SelectSingle,
-    ApproveModal
+    ApproveModal,
+    DatePicker,
   }
 }
 </script>
@@ -467,7 +527,7 @@ export default {
     background-color: #fff;
     border-radius: 4px;
     padding: 30px 0 0 0;
-    width: 258px;
+    width: 250px;
 
     &-close {
       position: absolute;

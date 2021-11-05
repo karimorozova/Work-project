@@ -3,7 +3,7 @@
     .tasks__fileDetails(v-if="isFilesDetailsModal && fileDetailsIndex !== null")
       Files(
         @close="hideFileDetails"
-        :task="copyTasks[fileDetailsIndex]"
+        :task="finalData[fileDetailsIndex]"
       )
     .tasks__preview(v-if="isEditAndSendQuote")
       PreviewQuote( @closePreview="closePreview"  :allMails="projectClientContacts" :message="previewMessageQuote" @send="sendMessageQuote")
@@ -49,7 +49,18 @@
 
     GeneralTable(
       :fields="fields"
-      :tableData="copyTasks"
+      :tableData="finalData"
+
+      :isFilterShow="true"
+      :isFilterAbsolute="true"
+      :isBodyShort="true"
+
+      @addSortKey="addSortKey"
+      @changeSortKey="changeSortKey"
+      @removeSortKey="removeSortKey"
+      @setFilter="setFilter"
+      @removeFilter="removeFilter"
+      @clearAllFilters="clearAllFilters"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header(v-if="field.headerKey === 'headerCheck'")
@@ -125,12 +136,13 @@ import Files from "../stepinfo/Files"
 import DeliveryOneMulti from "./DeliveryOneMulti"
 import DeliveryOne from "./DeliveryOne"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 import ApproveModalPayment from "../../ApproveModalPayment"
 import Button from "../../Button"
 
 export default {
   name: "NewTasks",
-  mixins: [ currencyIconDetected ],
+  mixins: [ currencyIconDetected, tableSortAndFilter ],
   props: {
     tabs: {
       type: Array,
@@ -154,11 +166,11 @@ export default {
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       validCancelStatuses: [ "Created", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
       fields: [
-        { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-        { label: "ID", headerKey: "headerTaskId", key: "taskId", style: { "width": "17%" } },
-        { label: "Service", headerKey: "headerService", key: "service", style: { "width": "13%" } },
+        { label: "check", headerKey: "headerCheck", key: "check",  style: { "width": "3%" } },
+        { label: "ID", headerKey: "headerTaskId", key: "taskId", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "17%" } },
+        { label: "Service", headerKey: "headerService", key: "service", dataKey: "title", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "13%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", style: { "width": "17%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "17%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "9%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "9%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "11%" } },
@@ -220,7 +232,7 @@ export default {
           : `<span>${ task.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ task.targetLanguage }</span>`
     },
     toggleCheck(index, isCheck) {
-      this.$set(this.copyTasks[index], "isCheck", isCheck)
+      this.$set(this.finalData[index], "isCheck", isCheck)
     },
     toggleAll(val) {
       this.currentProject.tasks = this.currentProject.tasks.reduce((acc, cur) => {
@@ -408,14 +420,17 @@ export default {
       return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel' ]
 
     },
-    copyTasks() {
+    // finalData() {
+    //   return this.currentProject.tasks
+    // },
+    rawData() {
       return this.currentProject.tasks
     },
     checkedTasks() {
-      return this.copyTasks.filter(({ isCheck }) => isCheck)
+      return this.finalData.filter(({ isCheck }) => isCheck)
     },
     isAllSelected() {
-      return (this.copyTasks && this.copyTasks.length) && this.copyTasks.every(i => i.isCheck)
+      return (this.finalData && this.finalData.length) && this.finalData.every(i => i.isCheck)
     },
     projectManagers() {
       if (this.users) {

@@ -1,0 +1,32 @@
+$namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />
+
+$default-color: #555;
+$primary-color: rgb(209, 95, 69);
+
+@import '~vue2-datepicker/scss/index.scss';
+@import "colors";
+
+.project__date .xmx-datepicker {
+  width: 220px;
+}
+
+.table__data .xmx-datepicker {
+  width: auto;
+  & .xmx-icon-calendar {
+    display: none;
+  }
+}
+.no-border .xmx-datepicker-main {
+  border: none;
+}
+
+.table-input {
+  color: $text;
+  border: none;
+  width: 100%;
+  background-color: transparent;
+  cursor: pointer;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+}

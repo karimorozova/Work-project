@@ -123,6 +123,17 @@
                     @selected="(e) => setDate(e, 'deadline', index)"
                   )
                   //i.far.fa-calendar-alt.calendar
+          DatePicker(
+            :value="[item.start, item.deadline]"
+            @input="(e) => setDates(e, index)"
+            format="DD-MM-YYYY, HH:mm"
+            prefix-class="xmx"
+            range-separator=" - "
+            :clearable="false"
+            type="datetime"
+            range
+            placeholder="Select datetime range")
+
 
     .add(v-if="!isCatUnit" )
       .add__row
@@ -138,6 +149,10 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import DatepickerWithTime from "../../DatepickerWithTime"
+
+
+import DatePicker from 'vue2-datepicker';
+import '../../../assets/scss/datepicker.scss';
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
@@ -147,7 +162,7 @@ import CheckBox from "../../CheckBox"
 import Button from "../../Button"
 
 export default {
-  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable },
+  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable, DatePicker },
   props: {
     templates: {
       type: Array,
@@ -156,6 +171,7 @@ export default {
   },
   data() {
     return {
+      time: {  },
       isDisabledPayablesEdit: true,
       isAddModal: false,
       highlighted: {
@@ -199,6 +215,11 @@ export default {
     },
     customFormatter(date) {
       return moment(date).format('DD-MM-YYYY, HH:mm')
+    },
+
+    setDates(e, index) {
+      this.setDate(e[0], 'start', index)
+      this.setDate(e[1], 'deadline', index)
     },
     setDate(e, prop, index) {
       let stepsAndUnits = this.tasksData.stepsAndUnits
