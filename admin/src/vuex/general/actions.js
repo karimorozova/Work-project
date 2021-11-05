@@ -5,7 +5,7 @@ export const decrementRequestCounter = ({ commit }) => commit('endRequest')
 export const loadingToggle = ({ commit }, payload) => commit('loadingValue', payload)
 export const servicesGetting = ({ commit }, payload) => commit('servicesFill', payload)
 export const setAllCustomers = ({ commit }, payload) => commit('allCustomers', payload)
-export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload)
+// export const setVendorsForProject = ({ commit }, payload) => commit('allVendorsForProject', payload)
 
 export const setCurrentProject = ({ commit }, payload) => commit('storeCurrentProject', payload)
 export const setProjectProp = ({ commit }, payload) => commit('storeProjectProp', payload)

@@ -83,7 +83,7 @@ export default {
       "setProjectProp",
       'setProjectStatus',
       'setCurrentProject',
-      'setVendorsForProject',
+      // 'setVendorsForProject',
       'alertToggle',
       'removeStepVendor',
       // 'setStepVendor',
@@ -182,14 +182,14 @@ export default {
       //   this.alertToggle({ message: "Internal server error. Cannot get metrics.", isShow: true, type: "error" })
       // }
     },
-    async getVendorsForProject() {
-      try {
-        const result = await this.$http.get('/pm-manage/vendors-for-project')
-        this.setVendorsForProject(result.data)
-      } catch (err) {
-        this.alertToggle({ message: "Internal service error. Cannot get Vendors.", isShow: true, type: "error" })
-      }
-    },
+    // async getVendorsForProject() {
+    //   try {
+    //     const result = await this.$http.get('/pm-manage/vendors-for-project')
+    //     this.setVendorsForProject(result.data)
+    //   } catch (err) {
+    //     this.alertToggle({ message: "Internal service error. Cannot get Vendors.", isShow: true, type: "error" })
+    //   }
+    // },
     async refreshCustomerInfo() {
       const client = await this.$http.get(`/clientsapi/client?id=${ this.currentProject.customer._id }`)
       this.storeCurrentClient(client.data)
@@ -304,7 +304,7 @@ export default {
   },
   async created() {
     await this.getProject()
-    await this.getVendorsForProject()
+    // await this.getVendorsForProject()
   },
   beforeDestroy() {
     this.setCurrentProject({})

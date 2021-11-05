@@ -118,6 +118,10 @@ const {
 	setRejectedStatus
 } = require('../../vendors/jobs')
 
+const {
+	getVendorsForSteps
+} = require('../../vendors/getVendors')
+
 const { setUpdatedFinanceData } = require('../../сalculations/finance')
 
 router.post('/allprojects', async (req, res) => {
@@ -943,20 +947,30 @@ router.post('/remove-vendor-from-step', async (req, res) => {
 	}
 })
 
-router.get('/vendors-for-project', async (req, res) => {
+router.get('/vendors-for-steps', async (req, res) => {
 	try {
-		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1, "rates.pricelistTable": 1 })
-				.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
-				.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
-				.populate('rates.pricelistTable.step', [ 'title' ])
-				.populate('rates.pricelistTable.unit', [ 'type' ])
-				.populate('rates.pricelistTable.industry', [ 'name' ])
+		const result = await getVendorsForSteps()
 		res.send(result)
 	} catch (err) {
 		console.log(err)
-		res.status(500).send('Error on vendors-for-project!')
+		res.status(500).send('Error on vendor-for-steps!')
 	}
 })
+
+// router.get('/vendors-for-project', async (req, res) => {
+// 	try {
+// 		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1, "rates.pricelistTable": 1 })
+// 				.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+// 				.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+// 				.populate('rates.pricelistTable.step', [ 'title' ])
+// 				.populate('rates.pricelistTable.unit', [ 'type' ])
+// 				.populate('rates.pricelistTable.industry', [ 'name' ])
+// 		res.send(result)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on vendors-for-project!')
+// 	}
+// })
 router.get('/vendors-for-options', async (req, res) => {
 	try {
 		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1 })

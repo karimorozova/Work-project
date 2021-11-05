@@ -174,7 +174,7 @@
 		},
 		computed: {
 			...mapGetters({
-				allVendors: "getAllVendorsForProject",
+				// allVendors: "getAllVendorsForProject",
 				currentProject: "getCurrentProject",
 				userGroup: "getUserGroup"
 			}),

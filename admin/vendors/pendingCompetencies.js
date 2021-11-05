@@ -107,15 +107,9 @@ const extendVendorsPendingCompetencies = async (pendingCompetencies) => {
 			industry: { _id: industryPC }
 		} = item
 
-		const euroBasicPrice = basicPricesTable.find(({ sourceLanguage, targetLanguage }) =>
-				`${ sourceLanguage }-${ targetLanguage }` === `${ sourceLanguagePC }-${ targetLanguagePC }`)
-
-		const stepMultiplier = stepMultipliersTable.find(({ step, unit, size }) =>
-				item.step.title === 'Translation' ? `${ step }-${ unit }-${ size }` === `${ stepPC }-${ catUnitId }-${ 1 }` : `${ step }-${ unit }-${ size }` === `${ stepPC }-${ sourceWordId }-${ 1 }`)
-
-		const industryMultiplier = industryMultipliersTable.find(({ industry }) =>
-				`${ industry }` === `${ industryPC }`)
-
+		const euroBasicPrice = basicPricesTable.find(({ sourceLanguage, targetLanguage }) => `${ sourceLanguage }-${ targetLanguage }` === `${ sourceLanguagePC }-${ targetLanguagePC }`)
+		const stepMultiplier = stepMultipliersTable.find(({ step, unit }) => `${ step }-${ unit }` === `${ stepPC }-${ sourceWordId }`)
+		const industryMultiplier = industryMultipliersTable.find(({ industry }) => `${ industry }` === `${ industryPC }`)
 		const systemRate = euroBasicPrice && stepMultiplier && industryMultiplier ? calculateRate(euroBasicPrice, stepMultiplier, industryMultiplier) : 0
 
 		return {
@@ -220,7 +214,7 @@ const rejectedPendingCompetence = async (vendorId, pendingCompetence, template) 
 
 	const { sourceLanguage: { lang: source }, targetLanguage: { lang: target }, industry: { name } } = pendingCompetence
 
-	sendEmail({
+	await sendEmail({
 		to: vendor.email,
 		subject: `Competency: ${ source } >> ${ target } for ${ name } has been declined (ID CAN012.0)`
 	}, template)
