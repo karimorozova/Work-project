@@ -33,9 +33,14 @@
         .vendor-manage__vendors(v-if="currentStep")
           .vendors__body
             .header
-              .header__toggler
-                Toggler(:isDisabled="false" :isActive="isEditable" @toggle="toggleEditable")
-                .header__toggler-text Editable
+              .header__togglers
+                .header__toggler(v-if="isEditable")
+                  Toggler(:isDisabled="false" :isActive="isAllVendors" @toggle="toggleAllVendors")
+                  .header__toggler-text All vendors
+
+                .header__toggler(v-if="!isAllVendors" )
+                  Toggler(:isDisabled="false" :isActive="isEditable" @toggle="toggleEditable")
+                  .header__toggler-text Editable
 
               .header__description
                 .header__description-text {{ selectedStep }}
@@ -44,7 +49,7 @@
                 .header__description-langs {{ currentStep.fullSourceLanguage.lang === selectedTarget ? selectedTarget : currentStep.fullSourceLanguage.lang + ' to ' + selectedTarget }}
 
               transition(name="fade")
-                .header__options(v-if="isEditable")
+                .header__options(v-if="isEditable && !isAllVendors")
                   .header__option
                     .header__option-title Target:
                     .drop
@@ -88,14 +93,21 @@
 
 
             .vendors__search
-              .vendors__search-title Vendors
+              .vendors__search-title Vendors:
               .vendors__search-serch
                 input(type="text" placeholder="🔎︎  Search" v-model="vendorsSearch")
                 .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
                   i.fas.fa-backspace
 
-            .vendors(v-for="item in listOfVendors")
+            .vendors(v-if="listOfVendors.length" v-for="item in listOfVendors")
               .vendor {{ item.firstName }}
+            .vendors(v-else) No vendors...
+
+
+        .vendor-manage__vendors(v-else)
+          .logo
+
+
         //.vendor-manage__options
         //  Button(value="Lang" @clicked="toggleLangNotStrict")
         //  Button(value="Disable Industry" @clicked="toggleDisabledIndustry")
@@ -141,6 +153,7 @@ export default {
       optionIndustries: true,
 
       isEditable: false,
+      isAllVendors: false,
 
       selectedTarget: '',
       selectedUnit: '',
@@ -169,7 +182,19 @@ export default {
       this.selectedUnit = option
     },
     toggleEditable() {
+      if (this.isEditable) this.isAllVendors = false
       this.isEditable = !this.isEditable
+    },
+    toggleAllVendors() {
+      if (this.isAllVendors) {
+        this.isEditable = false
+      }
+      this.selectedTarget = this.currentStep.fullTargetLanguage.lang
+      this.selectedUnit = this.currentStep.payablesUnit.type
+      this.selectedStep = this.currentStep.step.title
+      this.selectedIndustry = this.currentProject.industry.name
+
+      this.isAllVendors = !this.isAllVendors
     },
     getLanguage(s, t) {
       return `<span>${ s }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i className="fas fa-angle-double-right"></i></span><span>${ t }</span>`
@@ -222,6 +247,9 @@ export default {
       this.currentStep = null
     },
     chooseStep(step) {
+      this.isAllVendors = false
+      this.isEditable = false
+
       if (this.currentStepId === step._id.toString()) {
         this.currentStepId = null
         this.currentStep = null
@@ -279,32 +307,45 @@ export default {
       return [ ...list ]
     },
     listOfVendors() {
-      if (!this.allVendors.length) return []
-      const vendor = this.allVendors
+      if (!this.allVendors.length || !this.currentStepId) return []
+      let vendors = this.allVendors
 
-      if (this.vendorsSearch.length) {
-
+      if (!this.isAllVendors) {
+        vendors = vendors.filter(item => item.rates.pricelistTable
+            .map(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }`)
+            .includes(`${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`)
+        )
       }
 
-      return this.allVendors
-    },
-    getVendorsForStep() {
-      if (!this.currentSourceLanguage) return ''
-      if (this.showAllVendor) return this.vendors
-      return this.vendors.filter(({ rates }) => {
-        const pricelistTable = rates.pricelistTable
-        const { source, target } = this.getLang
+      if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
 
-        const some = pricelistTable.some(({ sourceLanguage, targetLanguage, industry, step, unit }) => {
-          const checkLang = this.isLangEqualOrEqualLangBase(sourceLanguage.lang, source.lang, this.isLangNotStrict)
-              && this.isLangEqualOrEqualLangBase(targetLanguage.lang, target.lang, this.isLangNotStrict)
-          const chekIndustry = this.isDisabledIndustry ? true : industry._id === this.industry._id
-          return checkLang && chekIndustry && step.title === this.currentStepName && unit['type'] === this.currentUnit
-        })
-
-        return some
+      vendors = vendors.map(item => {
+        // const { name, rates: { pricelistTable } } = item
+        // return {
+        //   name
+        // }
+        return item
       })
+
+      return vendors
     }
+    // getVendorsForStep() {
+    //   if (!this.currentSourceLanguage) return ''
+    //   if (this.showAllVendor) return this.vendors
+    //   return this.vendors.filter(({ rates }) => {
+    //     const pricelistTable = rates.pricelistTable
+    //     const { source, target } = this.getLang
+    //
+    //     const some = pricelistTable.some(({ sourceLanguage, targetLanguage, industry, step, unit }) => {
+    //       const checkLang = this.isLangEqualOrEqualLangBase(sourceLanguage.lang, source.lang, this.isLangNotStrict)
+    //           && this.isLangEqualOrEqualLangBase(targetLanguage.lang, target.lang, this.isLangNotStrict)
+    //       const chekIndustry = this.isDisabledIndustry ? true : industry._id === this.industry._id
+    //       return checkLang && chekIndustry && step.title === this.currentStepName && unit['type'] === this.currentUnit
+    //     })
+    //
+    //     return some
+    //   })
+    // }
   },
   async created() {
     await this.getVendorsForSteps()
@@ -322,7 +363,25 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
+.logo {
+  background-image: url("../../assets/images/balloons-old.png");
+  height: 100%;
+  width: 100%;
+  background-size: 20%;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  min-height: 150px;
+  filter: grayscale(100%);
+  opacity: 0.2;
+}
+
 .header {
+  &__togglers {
+    display: flex;
+    justify-content: end;
+    gap: 30px;
+  }
+
   &__toggler {
     display: flex;
     align-items: center;
@@ -340,11 +399,12 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    border: 1px solid lightgrey;
-    padding-top: 10px;
-    background-color: white;
+    border: 1px solid #d3d3d3;
+    padding-top: 20px;
+    background-color: #fff;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+    padding-bottom: 10px;
   }
 
   &__option {
@@ -354,7 +414,7 @@ export default {
     margin-bottom: 10px;
 
     &-title {
-      width: 60px;
+      width: 65px;
     }
   }
 
@@ -375,7 +435,7 @@ export default {
 
 .vendors {
   &__body {
-    padding-left: 30px;
+    padding-left: 25px;
   }
 
   &__search {
@@ -403,7 +463,8 @@ export default {
 
 .block {
   &__name {
-
+    width: 170px;
+    margin-right: 20px;
   }
 
   &__steps {
@@ -416,7 +477,7 @@ export default {
 
   &__step {
     margin-bottom: 10px;
-    padding: 10px 15px;
+    padding: 7px 15px;
     border-radius: 4px;
     border: 1px dotted lightgray;
     transition: .1s ease-out;
@@ -424,18 +485,17 @@ export default {
     align-items: center;
 
     &-title {
-      //width: 120px;
-      //margin-right: 10px;
+      text-align: center;
     }
 
     &-status {
-      //width: 110px;
-      //margin-right: 20px;
-      //text-align: center;
+      text-align: center;
+      margin-top: 1px;
     }
 
     &-vendor {
-      width: 160px;
+      width: 170px;
+      text-align: center;
     }
 
     &:last-child {
@@ -490,13 +550,13 @@ export default {
   }
 
   &__steps {
-    width: 49%;
+    width: 45%;
     display: flex;
     background: linen;
   }
 
   &__vendors {
-    width: 51%;
+    width: 55%;
     background: #f4f2f1;
     border-left: 2px solid green;
   }
@@ -583,39 +643,35 @@ input {
 }
 
 .todo {
-  padding: 2px 6px;
+  padding: 1px 5px;
   background: $table-list;
   color: $dark-border;
-  font-size: 12px;
-  border-bottom: 1px solid $dark-border;
-  border-radius: 2px;
+  font-size: 11px;
+  border-radius: 4px;
 }
 
 .doing {
-  padding: 2px 6px;
+  padding: 1px 5px;
   background: $table-list;
   color: $light-yellow;
-  font-size: 12px;
-  border-bottom: 1px solid $light-yellow;
-  border-radius: 2px;
+  font-size: 11px;
+  border-radius: 4px;
 }
 
 .done {
-  padding: 2px 6px;
+  padding: 1px 5px;
   background: $table-list;
   color: $green;
-  font-size: 12px;
-  border-bottom: 1px solid $green;
-  border-radius: 2px;
+  font-size: 11px;
+  border-radius: 4px;
 }
 
 .stop {
-  padding: 2px 6px;
+  padding: 1px 5px;
   background: $table-list;
   color: $red;
-  font-size: 12px;
-  border-bottom: 1px solid $red;
-  border-radius: 2px;
+  font-size: 11px;
+  border-radius: 4px;
 }
 
 .empty {
