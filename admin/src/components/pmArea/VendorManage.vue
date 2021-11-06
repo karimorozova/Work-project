@@ -100,7 +100,7 @@
                   i.fas.fa-backspace
 
             .vendors(v-if="listOfVendors.length" v-for="item in listOfVendors")
-              .vendor {{ item.firstName }}
+              .vendor {{item}}
             .vendors(v-else) No vendors...
 
 
@@ -309,22 +309,28 @@ export default {
     listOfVendors() {
       if (!this.allVendors.length || !this.currentStepId) return []
       let vendors = this.allVendors
+      const query = `${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
 
       if (!this.isAllVendors) {
         vendors = vendors.filter(item => item.rates.pricelistTable
             .map(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }`)
-            .includes(`${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`)
+            .includes(query)
         )
       }
 
       if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
 
       vendors = vendors.map(item => {
-        // const { name, rates: { pricelistTable } } = item
-        // return {
-        //   name
-        // }
-        return item
+        const { name, rates: { pricelistTable } } = item
+
+        const rates = pricelistTable.find(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }` === query)
+
+        return {
+          rate: rates.price || 0,
+          benchmark: rates.benchmark,
+          benchmarkMargin: rates.benchmarkMargin,
+          name
+        }
       })
 
       return vendors

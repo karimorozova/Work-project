@@ -18,12 +18,15 @@ const getVendorsForSteps = async () => {
 			.populate('rates.pricelistTable.industry', [ 'name' ])
 
 	dbVendors.forEach(vendor => {
-		vendor.rates.pricelistTable = vendor.rates.pricelistTable.map(item => {
-			Object.assign(item, getAdditions(item))
-			return item
+		const pricelistTable = vendor.rates.pricelistTable.map(item => {
+				return { ...item._doc, ...getAdditions(item) }
 		})
+
 		vendors.push({
 			...vendor._doc,
+			rates: {
+				pricelistTable
+			},
 			name: `${ vendor.firstName } ${ vendor.surname || '' }`
 		})
 	})
