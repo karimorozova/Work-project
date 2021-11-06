@@ -9,8 +9,12 @@ const getVendorsForSteps = async () => {
 	let vendors = []
 	let dbVendors = await Vendors.find(
 			{ status: "Active" },
-			{ "firstName": 1, "surname": 1, "rates.pricelistTable": 1 }
-	)
+			{ 
+				"firstName": 1, 
+				"surname": 1, 
+				"rates.pricelistTable": 1,
+				"email": 1,
+			})
 			.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
 			.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
 			.populate('rates.pricelistTable.step', [ 'title' ])
@@ -27,7 +31,7 @@ const getVendorsForSteps = async () => {
 			rates: {
 				pricelistTable
 			},
-			name: `${ vendor.firstName } ${ vendor.surname || '' }`
+			name: `${ vendor.firstName } ${ vendor.surname || '' }`,
 		})
 	})
 

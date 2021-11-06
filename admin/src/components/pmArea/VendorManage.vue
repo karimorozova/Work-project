@@ -100,8 +100,61 @@
                   i.fas.fa-backspace
 
             .vendors(v-if="listOfVendors.length" v-for="item in listOfVendors")
-              .vendor {{item}}
+              .vendor
+                //- | {{item}}
+                .vendor__row1
+                  .vendor__user
+                    .user
+                      .user__image
+                        img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
+                      .user__description
+                        .user__name {{ item.name }}
+                        .user__email {{ item.email }}
+                        
+                  .vendor__stats
+                    .stats__row.border-bottom
+                      .stats__colLong
+                        .stats__col-bigTitle RATE
+                        .stats__col-bigValue 0.145
+
+                    .stats__row
+                      .stats__col.border-right
+                        .stats__col-smallValue 0.123
+                        .stats__col-smallTitle B.MARK
+                      .stats__col 
+                        .stats__col-smallValue 0.032
+                        .stats__col-smallTitle MARGIN
+
+                  .vendor__stats
+                    .stats__row.border-bottom
+                      .stats__colLong
+                        .stats__col-bigTitle PRICE
+                        .stats__col-bigValue 123.23
+
+                    .stats__row
+                      .stats__col.border-right
+                        .stats__col-smallValue 334.34
+                        .stats__col-smallTitle TOTAL
+                      .stats__col 
+                        .stats__col-smallValue 235
+                        .stats__col-smallTitle MARGIN
+
+                  .vendor__marks
+                    .marks__row
+                      .marks__title TQI
+                      .marks__value 87
+                    .marks__row
+                      .marks__title LQA1
+                      .marks__value 23
+                    .marks__row
+                      .marks__title LQA2
+                      .marks__value 32
+                    .marks__row
+                      .marks__title LQA3
+                      .marks__value -
+
             .vendors(v-else) No vendors...
+
 
 
         .vendor-manage__vendors(v-else)
@@ -321,7 +374,7 @@ export default {
       if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
 
       vendors = vendors.map(item => {
-        const { name, rates: { pricelistTable } } = item
+        const { name, email, rates: { pricelistTable } } = item
 
         const rates = pricelistTable.find(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }` === query)
 
@@ -329,7 +382,8 @@ export default {
           rate: rates.price || 0,
           benchmark: rates.benchmark,
           benchmarkMargin: rates.benchmarkMargin,
-          name
+          name,
+          email,
         }
       })
 
@@ -368,6 +422,93 @@ export default {
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
+
+.marks{
+  &__row{
+    display: flex;
+    margin-bottom: 2px;
+  }
+  &__title{
+      color: #3333;
+      width: 45px;
+      font-family: 'Myriad600';
+  }
+}
+
+.vendor{
+  padding: 15px;
+  border: 1px solid $light-border;
+
+  &__row1{
+    display: flex;
+  }
+  &__stats{
+    border: 1px solid $light-border;
+    height: fit-content;
+    margin-left: 10px;
+    border-radius: 8px;
+  }
+}
+
+.stats{
+  &__row{
+    display: flex;
+    justify-content: space-evenly;
+  }
+  &__col{
+    display: flex;
+    width: 75px;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 0;
+    text-align: center;
+
+    &-bigTitle{
+      font-size: 14px;
+      color: #3333;
+      font-family: Myriad900;
+      letter-spacing: .2px;
+    }
+
+    &-bigValue{
+      font-family: 'Myriad600';
+    }
+
+    &-smallTitle{
+      color: #3333;
+      font-size: 12px;
+      margin-top: 1px;
+      letter-spacing: .2px;
+    }
+  }
+  &__colLong{
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 9px 8px 8px 8px;
+    gap: 8px;
+    align-items: center;
+  }
+}
+
+.user{
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  
+  &__image{
+    height: 60px;
+    width: 60px;
+
+    img{
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+  }
+}
 
 .logo {
   background-image: url("../../assets/images/balloons-old.png");
@@ -563,7 +704,7 @@ export default {
 
   &__vendors {
     width: 55%;
-    background: #f4f2f1;
+    // background: #f4f2f1;
     border-left: 2px solid green;
   }
 
@@ -712,5 +853,12 @@ input {
   &:hover {
     color: $text;
   }
+}
+
+.border-bottom{
+  border-bottom: 1px solid $light-border;
+}
+.border-right{
+  border-right: 1px solid $light-border;
 }
 </style>
