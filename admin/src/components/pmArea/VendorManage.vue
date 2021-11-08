@@ -13,7 +13,7 @@
         .blocks
           .block(v-for="stepsGroup of groupedByTaskId")
             .block__language
-              span [{{ stepsGroup[0].taskId.substring(stepsGroup[0].taskId.length - 3) }}]
+              .taskId {{ stepsGroup[0].taskId.substring(stepsGroup[0].taskId.length - 3) }}
               span(v-html="getLanguage( stepsGroup[0].sourceLanguage,  stepsGroup[0].targetLanguage)" )
 
             .block__steps
@@ -24,6 +24,7 @@
                     span(:class="getStatusClass(step.status)") {{ step.status }}
 
                 .block__step-vendor(v-if="step.vendor") {{ step.vendor.firstName }} {{ step.vendor.surname || '' }}
+                .block__step-vendor(v-else-if="selectedVendors[step._id]") {{selectedVendors[step._id].name }}
                 .block__step-vendor.empty(v-else) No vendor...
 
               //.block__step-status {{ step.status }}
@@ -99,8 +100,8 @@
                 .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
                   i.fas.fa-backspace
 
-            .vendors(v-if="listOfVendors.length" v-for="item in listOfVendors")
-              .vendor
+            .vendors(:style="isEditable && !isAllVendors ? 'max-height: 392px' : 'max-height: 510px' ")
+              .vendor(v-if="listOfVendors.length" v-for="item in listOfVendors")
                 //- | {{item}}
                 .vendor__row1
                   .vendor__user
@@ -108,50 +109,76 @@
                       .user__image
                         img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
                       .user__description
-                        .user__name {{ item.name }}
-                        .user__email {{ item.email }}
-                        
-                  .vendor__stats
-                    .stats__row.border-bottom
-                      .stats__colLong
-                        .stats__col-bigTitle RATE
-                        .stats__col-bigValue 0.145
+                        .user__name
+                          router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${item._id}`}")
+                            span {{ item.name }}
 
-                    .stats__row
-                      .stats__col.border-right
-                        .stats__col-smallValue 0.123
-                        .stats__col-smallTitle B.MARK
-                      .stats__col 
-                        .stats__col-smallValue 0.032
-                        .stats__col-smallTitle MARGIN
+                        .user__email {{ item.email }} (клик письмо)
+                        .buttons
+                          .buttons__btn(@click="setVendorToStep({_id: item._id, name: item.name})") Assign
+                          .buttons__btn() Details
 
                   .vendor__stats
                     .stats__row.border-bottom
                       .stats__colLong
                         .stats__col-bigTitle PRICE
-                        .stats__col-bigValue 123.23
+                        .stats__col-bigValue
+                          .stats__col-bigValue-num {{ item.price }}
+                          .stats__col-bigValue-currency
+                            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                          .stats__col-bigValue-image(v-if="(item.total / 2) < item.price" )
+                            img(:src="icons.down")
+                          .stats__col-bigValue-image(v-if="(item.total / 2) > item.price" )
+                            img(:src="icons.up")
 
                     .stats__row
                       .stats__col.border-right
-                        .stats__col-smallValue 334.34
+                        .stats__col-smallValue {{ item.total }}
                         .stats__col-smallTitle TOTAL
-                      .stats__col 
-                        .stats__col-smallValue 235
+                      .stats__col
+                        .stats__col-smallValue {{ item.margin }}
+                        .stats__col-smallTitle MARGIN
+
+                  .vendor__stats
+                    .stats__row.border-bottom
+                      .stats__colLong
+                        .stats__col-bigTitle RATE
+                        .stats__col-bigValue
+                          .stats__col-bigValue-num {{ item.rate }}
+                          .stats__col-bigValue-currency
+                            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                          .stats__col-bigValue-image(v-if="item.benchmarkMargin < 0" )
+                            img(:src="icons.down")
+                          .stats__col-bigValue-image(v-if="item.benchmarkMargin > 0" )
+                            img(:src="icons.up")
+
+                    .stats__row
+                      .stats__col.border-right
+                        .stats__col-smallValue {{ item.benchmark }}
+                        .stats__col-smallTitle B.MARK
+                      .stats__col
+                        .stats__col-smallValue {{ item.benchmarkMargin }}
                         .stats__col-smallTitle MARGIN
 
                   .vendor__marks
                     .marks__row
                       .marks__title TQI
-                      .marks__value 87
+                      .marks__value {{ item.tqi }}
                     .marks__row
                       .marks__title LQA1
-                      .marks__value 23
+                      .marks__value {{ item.lqa1 }}
                     .marks__row
                       .marks__title LQA2
-                      .marks__value 32
+                      .marks__value {{ item.lqa2 }}
                     .marks__row
                       .marks__title LQA3
-                      .marks__value -
+                      .marks__value {{ item.lqa3 }}
+
+                //.vendor__row2
+                  .availability Availability soon...
+                  .buttons
+                    .buttons__assign(@click="setVendorToStep({_id: item._id, name: item.name})") Assign
+
 
             .vendors(v-else) No vendors...
 
@@ -173,8 +200,9 @@
         //  span {{vendor.firstName}}
         //  Button(value="Use this Vendor" @clicked="setVendorToStep(vendor)")
 
-    //.vendor-manage__footer
-      Button(@clicked="saveVendors" :value="'Assign Vendors'")
+    .vendor-manage__footer
+      Button(@clicked="saveVendors" :value="'Approve assignments'")
+      Button(:value="'Cancel'" :outline="true")
 
 </template>
 
@@ -187,8 +215,11 @@ import { setStepVendors } from "../../vuex/general/actions"
 import CheckBox from "../CheckBox"
 import Toggler from "../Toggler"
 import SelectSingle from "../SelectSingle"
+import currencyIconDetected from "../../mixins/currencyIconDetected"
+import { rateExchangeVendorOntoProject } from "../../../helpers/commonFunctions"
 
 export default {
+  mixins: [ currencyIconDetected ],
   props: {
     steps: {
       type: Array,
@@ -215,7 +246,11 @@ export default {
 
       allVendors: [],
       selectedVendors: {},
-      vendorsSearch: ''
+      vendorsSearch: '',
+      icons: {
+        up: require("../../assets/images/latest-version/up.png"),
+        down: require("../../assets/images/latest-version/down.png")
+      }
     }
   },
   methods: {
@@ -250,7 +285,7 @@ export default {
       this.isAllVendors = !this.isAllVendors
     },
     getLanguage(s, t) {
-      return `<span>${ s }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i className="fas fa-angle-double-right"></i></span><span>${ t }</span>`
+      return `<span>${ s }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ t }</span>`
     },
     getStatusClass(status) {
       switch (status) {
@@ -292,6 +327,7 @@ export default {
       this.showAllVendor = !this.showAllVendor
     },
     setVendorToStep(vendor) {
+      console.log(vendor)
       this.$set(this.selectedVendors, this.currentStepId, vendor)
     },
     setTab(index) {
@@ -360,32 +396,54 @@ export default {
       return [ ...list ]
     },
     listOfVendors() {
-      if (!this.allVendors.length || !this.currentStepId) return []
+      if (!this.allVendors.length || !this.currentStepId || !this.currentProject) return []
       let vendors = this.allVendors
       const query = `${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
+      const { projectCurrency, crossRate } = this.currentProject
+      const { finance, clientRate, payablesUnit, vendor } = this.currentStep
 
+      //searching ==>
       if (!this.isAllVendors) {
         vendors = vendors.filter(item => item.rates.pricelistTable
             .map(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }`)
-            .includes(query)
-        )
+            .includes(query))
       }
-
       if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
+
+      console.log('vendor', vendor)
+      // if (vendor) vendors = vendors.filter(({ name }) => !name.toUpperCase().includes(`${ vendor.firstName } ${ vendor.surname || '' }`))
+      // searching <==
 
       vendors = vendors.map(item => {
         const { name, email, rates: { pricelistTable } } = item
 
         const rates = pricelistTable.find(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }` === query)
 
+        const rate = rates
+            ? rateExchangeVendorOntoProject(projectCurrency, 'EUR', +rates.price, crossRate)
+            : 0
+
+        const quantity = payablesUnit.type === 'CAT Wordcount' ? finance.Wordcount.receivables : finance.Quantity.payables
+
         return {
-          rate: rates.price || 0,
-          benchmark: rates.benchmark,
-          benchmarkMargin: rates.benchmarkMargin,
+          _id: item._id,
+          photo: item.photo,
+          rate,
+          benchmark: rates ? rates.benchmark : 0,
+          benchmarkMargin: rates ? rates.benchmarkMargin : 0,
+          tqi: rates ? rates.tqi : 0,
+          lqa1: rates ? rates.lqa1 : 0,
+          lqa2: rates ? rates.lqa2 : 0,
+          lqa3: rates ? rates.lqa3 : 0,
           name,
           email,
+          total: +(finance.Price.receivables).toFixed(2),
+          margin: rates ? +(finance.Price.receivables - (quantity * rate)).toFixed(2) : 0,
+          price: rates ? +(quantity * rate).toFixed(2) : 0
         }
       })
+
+      console.log('mapped vendors', vendors)
 
       return vendors
     }
@@ -423,65 +481,150 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
-.marks{
-  &__row{
+.buttons {
+  margin-top: 10px;
+  display: flex;
+  justify-content: start;
+  gap: 12px;
+
+  &__btn {
+    transition: .2s ease-out;
+    text-align: center;
+    width: 100px;
+    height: 26px;
+    font-size: 14px;
+    line-height: 26px;
+    border-radius: 2px;
+    background-color: #fff;
+    outline: none;
+    letter-spacing: .2px;
+    cursor: pointer;
+    box-shadow: $box-shadow;
+
+    &:hover {
+      background-color: $light-border;
+    }
+  }
+
+}
+
+.availability {
+  color: #4ba5a557;
+}
+
+.marks {
+  &__row {
     display: flex;
     margin-bottom: 2px;
   }
-  &__title{
-      color: #3333;
-      width: 45px;
-      font-family: 'Myriad600';
+
+  &__title {
+    color: #3333;
+    width: 45px;
+  }
+
+  &__value {
+    color: $dark-border;
   }
 }
 
-.vendor{
-  padding: 15px;
-  border: 1px solid $light-border;
+.vendor {
+  padding: 10px 15px;
+  border: 1px dotted $light-border;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  //transition: .2s ease-out;
 
-  &__row1{
+  //&:hover {
+  //  border: 1px solid $light-border;
+  //}
+
+  &__row1 {
     display: flex;
   }
-  &__stats{
+
+  //&__row2 {
+  //  margin-top: 15px;
+  //  border-top: 1px solid $light-border;
+  //  padding-top: 15px;
+  //  display: flex;
+  //  align-items: center;
+  //  justify-content: space-between;
+  //}
+
+  &__stats {
     border: 1px solid $light-border;
     height: fit-content;
     margin-left: 10px;
     border-radius: 8px;
+    margin-left: 20px;
+  }
+
+  &__marks {
+    margin-top: 5px;
+    margin-left: 20px;
+  }
+
+  &__user {
+    display: flex;
   }
 }
 
-.stats{
-  &__row{
+.stats {
+  &__row {
     display: flex;
     justify-content: space-evenly;
   }
-  &__col{
+
+  &__col {
     display: flex;
-    width: 75px;
+    width: 80px;
     flex-direction: column;
     align-items: center;
     padding: 6px 0;
     text-align: center;
 
-    &-bigTitle{
+    &-bigTitle {
       font-size: 14px;
       color: #3333;
-      font-family: Myriad900;
+      font-family: Myriad600;
       letter-spacing: .2px;
     }
 
-    &-bigValue{
-      font-family: 'Myriad600';
+    &-bigValue {
+      display: flex;
+      align-items: center;
+
+      &-currency {
+        font-size: 14px;
+        color: $dark-border;
+        margin-left: 3px;
+      }
+
+      &-num {
+        //font-family: 'Myriad600';
+      }
+
+      &-image {
+        height: 16px;
+        margin-left: 8px;
+      }
+
     }
 
-    &-smallTitle{
+    &-smallTitle {
       color: #3333;
       font-size: 12px;
       margin-top: 1px;
       letter-spacing: .2px;
     }
+
+    &-smallValue {
+      color: $dark-border;
+    }
   }
-  &__colLong{
+
+  &__colLong {
     height: fit-content;
     display: flex;
     justify-content: center;
@@ -492,16 +635,36 @@ export default {
   }
 }
 
-.user{
+.user {
   display: flex;
   gap: 15px;
+  width: 310px;
   align-items: center;
-  
-  &__image{
-    height: 60px;
-    width: 60px;
 
-    img{
+  &__description {
+    width: 230px;
+  }
+
+  &__rating {
+    color: #4ba5a557;
+    margin-top: 10px;
+  }
+
+  &__name {
+    font-family: Myriad600;
+    margin-bottom: 3px;
+  }
+
+  &__email {
+    color: #3333;
+  }
+
+  &__image {
+    height: 65px;
+    width: 65px;
+    min-width: 65px;
+
+    img {
       width: 100%;
       height: 100%;
       border-radius: 8px;
@@ -546,7 +709,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    border: 1px solid #d3d3d3;
+    border: 2px solid $table-list;
     padding-top: 20px;
     background-color: #fff;
     border-bottom-left-radius: 4px;
@@ -569,18 +732,20 @@ export default {
     display: flex;
     gap: 12px;
     justify-content: center;
-    padding: 15px;
-    background: lightgrey;
-    font-family: 'Myriad600';
+    padding: 12px;
+    background: $table-list;
+    font-family: Myriad600;
 
-    &-title {
+    &-text {
       padding-right: 12px;
-      border-right: 1px solid;
+      border-right: 1px solid $dark-border;
     }
   }
 }
 
 .vendors {
+  overflow-y: auto;
+
   &__body {
     padding-left: 25px;
   }
@@ -610,14 +775,14 @@ export default {
 
 .block {
   &__name {
-    width: 170px;
+    width: 160px;
     margin-right: 20px;
   }
 
   &__steps {
     margin-left: 20px;
     padding-left: 20px;
-    border-left: 1px solid #d3d3d3;
+    border-left: 1px solid $light-border;
     padding-bottom: 15px;
     padding-top: 15px;
   }
@@ -641,7 +806,7 @@ export default {
     }
 
     &-vendor {
-      width: 170px;
+      width: 160px;
       text-align: center;
     }
 
@@ -659,13 +824,20 @@ export default {
   &__language {
     font-size: 14px;
     width: 150px;
-    background: lightgrey;
-    padding: 7px 10px;
+    background: $light-border;
+    padding: 6px 10px 5px 10px;
     box-sizing: border-box;
+    display: flex;
+    gap: 8px;
+
+    .taskId {
+      color: $border;
+    }
   }
 }
 
 .vendor-manage {
+
   &__title {
     font-size: 19px;
     font-family: Myriad600;
@@ -697,15 +869,15 @@ export default {
   }
 
   &__steps {
-    width: 45%;
+    width: 43%;
+    height: 667px;
+    overflow-y: auto;
     display: flex;
-    background: linen;
   }
 
   &__vendors {
-    width: 55%;
-    // background: #f4f2f1;
-    border-left: 2px solid green;
+    width: 57%;
+    border-left: 1px solid $border;
   }
 
   &__step-info,
@@ -724,10 +896,16 @@ export default {
     gap: 25px;
     margin: 10px 0;
   }
+
+  &__footer {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+  }
 }
 
 .tabs {
-  width: 170px;
+  width: 160px;
   margin-right: 25px;
 
   &__option {
@@ -855,10 +1033,21 @@ input {
   }
 }
 
-.border-bottom{
+.border-bottom {
   border-bottom: 1px solid $light-border;
 }
-.border-right{
+
+.border-right {
   border-right: 1px solid $light-border;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

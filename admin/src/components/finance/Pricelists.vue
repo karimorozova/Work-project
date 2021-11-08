@@ -379,12 +379,16 @@
 
     &__approve {
       position: absolute;
-      left: 30%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 222;
     }
 
     &__table {
       @extend %setting-table;
       width: 800px;
+      position: relative;
     }
 
     &__data {

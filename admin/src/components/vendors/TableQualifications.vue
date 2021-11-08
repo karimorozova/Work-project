@@ -6,10 +6,10 @@
       VendorLqa(:vendorData="lqaData", @closeForm="closeForm", @saveVendorLqa="saveVendorLqa")
     .qualifications__approveModal(v-if="isSendMessageModalPassed")
       ApproveModal(
-        text="Do you want to notify the vendor by email with the attached Passed Test?"
+        text="Notify vendor by email with the attached 'Passed' test?"
         :optionWithoutClosing="true"
         approveValue="Yes"
-        notApproveValue="Cancel"
+        notApproveValue="No"
         @approve="sendMessageVendorPassed"
         @notApprove="notSendMessageVendorPassed"
       )
@@ -17,10 +17,10 @@
       VendorLqa(:vendorData="lqaDataNotPassed", @closeForm="closeFormNotPassed", @saveVendorLqa="saveNotPassedTest")
     .qualifications__approveModal(v-if="isSendMessageModalNotPassed")
       ApproveModal(
-        text="Do you want to notify the vendor by email with the attached Not Passed Test?"
+        text="Notify vendor by email with the attached 'Not Passed' test?"
         :optionWithoutClosing="true"
         approveValue="Yes"
-        notApproveValue="Cancel"
+        notApproveValue="No"
         @approve="sendMessageVendorNotPassed"
         @notApprove="notSendMessageVendorNotPassed"
       )

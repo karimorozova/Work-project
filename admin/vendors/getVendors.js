@@ -1,7 +1,7 @@
 const { Vendors, Pricelist } = require("../models")
 const { getFilteringQuery, getFilteringQueryPotential } = require("./filter")
 const moment = require('moment')
-
+const _ = require('lodash')
 
 const getVendorsForSteps = async () => {
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
@@ -9,11 +9,14 @@ const getVendorsForSteps = async () => {
 	let vendors = []
 	let dbVendors = await Vendors.find(
 			{ status: "Active" },
-			{ 
-				"firstName": 1, 
-				"surname": 1, 
+			{
+				"firstName": 1,
+				"surname": 1,
 				"rates.pricelistTable": 1,
 				"email": 1,
+				"qualifications": 1,
+				"assessments": 1,
+				"photo": 1
 			})
 			.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
 			.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
@@ -21,24 +24,75 @@ const getVendorsForSteps = async () => {
 			.populate('rates.pricelistTable.unit', [ 'type' ])
 			.populate('rates.pricelistTable.industry', [ 'name' ])
 
+
 	dbVendors.forEach(vendor => {
+
+		const vendorAssessments = _.flatten(vendor.assessments.map(item => {
+			const res = []
+			item.industries.forEach(industry => {
+				industry.steps.forEach(step => {
+					res.push({
+						[`${ item.sourceLanguage }-${ item.targetLanguage }-${ step.step }-${ industry.industry }`]: {
+							lqa1: step.lqa1.grade ||  0,
+							lqa2: step.lqa2.grade ||  0,
+							lqa3: step.lqa3.grade ||  0
+						}
+					})
+				})
+			})
+			return res
+		}))
+
+		const vendorQualifications = _.flatten(vendor.qualifications.map(item => {
+			const res = []
+			item.industries.forEach(industry => {
+				item.steps.forEach(step => {
+					res.push({ [`${ item.source }-${ item.target }-${ step }-${ industry }`]: item.tqi })
+				})
+			})
+			return res
+		}))
+
 		const pricelistTable = vendor.rates.pricelistTable.map(item => {
-				return { ...item._doc, ...getAdditions(item) }
+			return {
+				...item._doc,
+				...getBenchmarkAdditions(item),
+				...getTQI(vendorQualifications, item),
+				...getLQA(vendorAssessments, item)
+			}
 		})
+
+		delete vendor._doc.qualifications
+		delete vendor._doc.assessments
 
 		vendors.push({
 			...vendor._doc,
 			rates: {
 				pricelistTable
 			},
-			name: `${ vendor.firstName } ${ vendor.surname || '' }`,
+			name: `${ vendor.firstName } ${ vendor.surname || '' }`
 		})
 	})
 
 	return vendors
 
+	function getLQA(assessments, rate){
+		const grades = assessments.find(item =>
+				Object.keys(item)[0] === `${ rate.sourceLanguage._id }-${ rate.targetLanguage._id }-${ rate.step._id }-${ rate.industry._id }`
+		)
+		return grades ? Object.values(grades)[0] : {lqa1: 0, lqa2: 0, lqa3: 0}
+	}
 
-	function getAdditions(item) {
+	function getTQI(qualifications, rate) {
+		const tqi = qualifications.find(item =>
+				Object.keys(item)[0] === `${ rate.sourceLanguage._id }-${ rate.targetLanguage._id }-${ rate.step._id }-${ rate.industry._id }`
+		)
+		return {
+			tqi: tqi ? Object.values(tqi)[0] : 0
+		}
+	}
+
+	function getBenchmarkAdditions(item) {
 		const L = basicPricesTable.find(({ sourceLanguage, targetLanguage }) =>
 				`${ sourceLanguage }-${ targetLanguage }` === `${ item.sourceLanguage._id }-${ item.targetLanguage._id }`)
 		const S = stepMultipliersTable.find(({ step, unit }) =>
@@ -46,11 +100,11 @@ const getVendorsForSteps = async () => {
 		const I = industryMultipliersTable.find(({ industry }) =>
 				`${ industry }` === `${ item.industry._id }`)
 
-		const benchmark = L && S && I ? calculateBenchmark(L, S, I) : 0
+		const benchmark = L && S && I ? +(calculateBenchmark(L, S, I)).toFixed(4) : 0
 
 		return {
 			benchmark,
-			benchmarkMargin: benchmark ? benchmark - item.price : 0
+			benchmarkMargin: benchmark ? +(benchmark - item.price).toFixed(4) : 0
 		}
 
 		function calculateBenchmark(euroBasicPrice, stepMultiplier, industryMultiplier) {
