@@ -8,6 +8,10 @@
           .project__nameDisabled(v-if="!existProjectAccessChangeName") {{ nameOfProject }}
           input.project__name(v-else type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
 
+        .project__test.checkbox
+          input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
+          label(for="test") Test
+
       .project__info-row
         .project__date
           .input-title
@@ -23,7 +27,7 @@
             :confirm="true"
             confirm-text="Set date"
             :disabled-date="notBeforeToday"
-            :disabled="disabledPicker && isProjectFinished"
+            :disabled="true"
             prefix-class="xmx"
           )
 
@@ -61,9 +65,9 @@
             prefix-class="xmx"
           )
 
-        .project__same.checkbox
-          input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
-          label(for="same") As deadline
+        //.project__same.checkbox
+        //  input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
+        //  label(for="same") As deadline
 
       .project__info-row
         .project__client
@@ -107,17 +111,29 @@
               @chooseOption="choseBillingInfo"
               placeholder="Option"
             )
-        .project__test.checkbox
-          input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
-          label(for="test") Test
 
-      .project__info-row.project_no-margin
-        .project__textarea
-          LabelValue(label="Project Brief" customClass="project_textarea")
-            textarea.project__text(type="text" rows="9" v-model="project.brief" @change="updateBrief")
-        .project__textarea
-          LabelValue(label="Internal Notes" customClass="project_textarea")
-            textarea.project__text(type="text" rows="9" v-model="project.notes"  @change="updateNotes")
+
+      .project__block-row.project_no-margin
+        .project__block
+          .block__header(@click="toggleBlock('isBrief')" :class="{'block__header-grey': !isBrief}")
+            .title Project Brief
+            .icon(v-if="!isBrief")
+              i.fas.fa-chevron-down
+            .icon(v-else)
+              i.fas.fa-chevron-right
+          .block__data(v-if="isBrief")
+            ckeditor(v-model="project.brief" :config="editorConfig" @blur="updateBrief")
+            //textarea.project__text(type="text" rows="9" v-model="project.brief" @change="updateBrief")
+        .project__block
+          .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
+            .title Project Notes
+            .icon(v-if="!isNotes")
+              i.fas.fa-chevron-down
+            .icon(v-else)
+              i.fas.fa-chevron-right
+          .block__data(v-if="isNotes")
+            ckeditor(v-model="project.notes" :config="editorConfig" @blur="updateNotes")
+            //textarea.project__text(type="text" rows="9" v-model="project.notes"  @change="updateNotes")
 
       .project__button(v-if="!project.projectId")
         Button(
@@ -142,6 +158,8 @@
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 	import DatepickerWithTime from "../DatepickerWithTime"
+  import CKEditor from "ckeditor4-vue"
+  import '../../assets/scss/ckeditor.scss'
 
   import DatePicker from 'vue2-datepicker';
   import '../../assets/scss/datepicker.scss';
@@ -154,7 +172,28 @@
 		},
 		data() {
 			return {
-				isBilling: false,
+        editorConfig: {
+          extraPlugins: [ 'colorbutton', 'smiley' ],
+          toolbarGroups: [
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+            { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+            { name: 'forms', groups: [ 'forms' ] },
+            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+            { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+            { name: 'links', groups: [ 'links' ] },
+            // { name: 'insert', groups: [ 'insert' ] },
+            { name: 'styles', groups: [ 'styles' ] },
+            { name: 'colors', groups: [ 'colors' ] },
+            { name: 'tools', groups: [ 'tools' ] },
+            { name: 'others', groups: [ 'others' ] },
+            { name: 'about', groups: [ 'about' ] }
+          ],
+          removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
+          uiColor: "#ffffff",
+          height: 80
+        },
+        isBilling: false,
 				isTest: false,
 				selectedIndustry: "",
 				disabled: {
@@ -170,7 +209,9 @@
 				isRequiredField: true,
 				errors: [],
 				areErrorsExist: false,
-				clients: []
+				clients: [],
+        isBrief: false,
+        isNotes: false,
 			}
 		},
 		methods: {
@@ -179,25 +220,22 @@
 				"setProjectDate",
 				"setCurrentProject"
 			]),
+      toggleBlock(prop) {
+        this[prop] = !this[prop]
+      },
       notBeforeToday(date) {
         return date < new Date(new Date().setHours(0, 0, 0, 0));
       },
       notBeforeStartDate(date) {
         return date < new Date(this.project.startDate);
       },
-			async updateBrief(e) {
-				const { value } = e.target
-				if (!this.project._id) {
-					return this.$emit('setValue', { prop: 'brief', option: value })
-				}
-				await this.setProjectProp({ prop: 'brief', value })
+			async updateBrief() {
+        await this.setProjectProp({ prop: 'brief', value: this.project.brief })
+        // return this.$emit('setValue', { prop: 'brief', option: this.project.brief })
 			},
-			async updateNotes(e) {
-				const { value } = e.target
-				if (!this.project._id) {
-					return this.$emit('setValue', { prop: 'notes', option: value })
-				}
-				await this.setProjectProp({ prop: 'notes', value })
+			async updateNotes() {
+        await this.setProjectProp({ prop: 'notes', value: this.project.notes })
+        // return this.$emit('setValue', { prop: 'notes', option: this.project.notes })
 			},
 			async changeProjectName(projectName) {
 				this.errors = []
@@ -215,7 +253,6 @@
 				return moment(date).format('DD-MM-YYYY, HH:mm')
 			},
 			async updateProjectDate(e, prop) {
-        console.log({ e, prop })
 				if (this.project._id) {
 					if (prop === 'deadline' && this.isBilling) {
 						const date = { ['billingDate']: e }
@@ -234,21 +271,14 @@
 				await this.setProjectDate({ date, projectId: this.project._id })
 			},
 			async setTest(e) {
-				if (!this.project._id) {
-					this.isTest = e.target.checked
-				} else {
-					await this.setProjectProp({ prop: 'isTest', value: e.target.checked })
-				}
+        await this.setProjectProp({ prop: 'isTest', value: e.target.checked })
 			},
 			async setSameDate(e) {
 				this.isBilling = e.target.checked
-				if (!this.project._id) {
-					this.project.billingDate = e.target.checked ? this.project.deadline : this.project.billingDate
-				} else {
-					e.target.checked ?
-							this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
-							this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
-				}
+					e.target.checked
+              ? this.updateProjectDate(this.$refs.deadline.value, 'billingDate')
+							: this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
+
 			},
 			async setProjectProp({ prop, value }) {
 				try {
@@ -275,12 +305,8 @@
 			},
 			async choseBillingInfo({ option }) {
 				const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-				if (!this.project._id) {
-					this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
-				} else {
-					await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
-					await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
-				}
+        await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
+        await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
 			},
 			setBillingInfo(billingInfo) {
 				this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
@@ -432,7 +458,8 @@
 			Datepicker,
 			LabelValue,
 			Button,
-			ValidationErrors
+			ValidationErrors,
+      ckeditor: CKEditor.component,
 		},
 		async created() {
 			await this.getProjectData()
@@ -462,6 +489,27 @@
   .project {
     display: flex;
     flex-direction: column;
+
+    &__block {
+      box-sizing: border-box;
+      margin-bottom: 20px;
+      border: 1px solid $light-border;
+      position: relative;
+      border-radius: 4px;
+      background-color: white;
+
+      &-row{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+
+        ::-webkit-input-placeholder {
+          opacity: 0.4;
+        }
+      }
+    }
 
     &__nameDisabled {
       display: flex;
@@ -600,7 +648,7 @@
       }
     }
 
-    &__textarea {
+    &__block {
       width: 471px;
     }
 
@@ -702,7 +750,37 @@
       }
     }
   }
+  .block {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      cursor: pointer;
+      align-items: center;
+      transition: .2s ease;
+      align-items: center;
+      letter-spacing: 0.2px;
+      border-radius: 4px;
 
+      &-grey {
+        background-color: white;
+      }
+
+      .title {
+        font-size: 16px;
+      }
+
+      .icon {
+        font-size: 15px;
+        color: $text;
+      }
+    }
+
+    &__data {
+      //padding: 20px 20px 20px;
+      border-top: 2px solid $light-border;
+    }
+  }
   #same,
   #test {
     width: 0;

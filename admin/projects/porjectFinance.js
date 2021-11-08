@@ -2,6 +2,7 @@ const { updateProject, getProjectAfterUpdate } = require('./getProjects')
 const { getProjectAfterUpdate: getMemoqProjectAfterUpdate } = require('../services/memoqs/otherProjects/getMemoqProject')
 const { getPriceAfterApplyingDiscounts } = require('./helpers')
 const { Projects } = require('../models')
+const { calculateProjectTotal } = require("../сalculations/finance")
 
 
 async function getProjectAfterFinanceUpdated({ project, steps, tasks }) {
@@ -50,27 +51,10 @@ function getUpdatedProjectFinanceToZero(tasks) {
 	// return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) }
 }
 
-const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts, tableName = Projects) => {
-	// let project = await tableName.findOne({ _id })
-	// let { finance, tasks, steps, paymentAdditions } = project
-	// const {
-	// 	steps: updatedSteps,
-	// 	tasks: updatedTasks,
-	// 	finance: updatedFinance,
-	// 	roi
-	// } = recalculateProjectFinance(finance, tasks, steps, updatedDiscounts, paymentAdditions)
-	// const itemsToUpdate = {
-	// 	finance: updatedFinance,
-	// 	tasks: updatedTasks,
-	// 	steps: updatedSteps,
-	// 	discounts: updatedDiscounts,
-	// 	roi
-	// }
-	// if (tableName === Projects) {
-	// 	return await getProjectAfterUpdate({ _id }, { ...itemsToUpdate })
-	// } else {
-	// 	return await getMemoqProjectAfterUpdate({ _id }, { ...itemsToUpdate })
-	// }
+const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts) => {
+	 await Projects.updateOne({ _id }, {  discounts: updatedDiscounts, })
+	return await calculateProjectTotal(_id)
+
 }
 
 // const addPaymentAdditions = async (_id, paymentAddition) => {

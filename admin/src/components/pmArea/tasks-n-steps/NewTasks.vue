@@ -53,7 +53,6 @@
 
       :isFilterShow="true"
       :isFilterAbsolute="true"
-      :isBodyShort="true"
 
       @addSortKey="addSortKey"
       @changeSortKey="changeSortKey"
@@ -69,7 +68,7 @@
 
       template(slot="check" slot-scope="{ row, index }")
         .table__data
-          CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(index, true)" @uncheck="()=>toggleCheck( index, false)" customClass="tasks-n-steps")
+          CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(row._id, true)" @uncheck="()=>toggleCheck( row._id, false)" customClass="tasks-n-steps")
 
       template(slot="taskId" slot-scope="{ row }")
         .table__data {{ row.taskId }}
@@ -231,8 +230,12 @@ export default {
           ? `${ task.targetLanguage }`
           : `<span>${ task.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ task.targetLanguage }</span>`
     },
-    toggleCheck(index, isCheck) {
-      this.$set(this.finalData[index], "isCheck", isCheck)
+    toggleCheck(id, isCheck) {
+      const index = this.currentProject.tasks.findIndex(step => step._id === id)
+      const obj = this.currentProject.tasks[index]
+      obj.isCheck = isCheck
+      this.currentProject.tasks.splice(index, 1, obj)
+      // this.$set(this.finalData[index], "isCheck", isCheck)
     },
     toggleAll(val) {
       this.currentProject.tasks = this.currentProject.tasks.reduce((acc, cur) => {

@@ -4,6 +4,7 @@ const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject, rateExchangeProjectOntoVendor } = require('../helpers/commonFunctions')
 const { getProject, updateProject } = require('../projects/getProjects')
 const { setTaskMetrics } = require("../сalculations/wordcount")
+const { getProjectAfterUpdate } = require("../projects/getProjects")
 
 const setUpdatedFinanceData = async (data) => {
 	const { projectId, stepId, quantityReceivables, quantityPayables, rateReceivables, ratePayables, totalReceivables, totalPayables } = data
@@ -41,7 +42,8 @@ const setUpdatedFinanceData = async (data) => {
 }
 
 const calculateProjectTotal = async (projectId) => {
-	const { steps, additionsSteps } = await Projects.findOne({ "_id": projectId })
+	await projectWithUpdatedSteps(projectId)
+	const { steps } = await Projects.findOne({ "_id": projectId })
 
 	const finance = {
 		"Price": {
@@ -62,12 +64,59 @@ const calculateProjectTotal = async (projectId) => {
 		}
 	})
 
-	additionsSteps.forEach(step => {
-		const { finance: { Price } } = step
-		finance.Price.receivables += Price.receivables
-	})
+	// additionsSteps.forEach(step => {
+	// 	const { finance: { Price } } = step
+	// 	finance.Price.receivables += Price.receivables
+	// })
 
 	return await updateProject({ '_id': projectId }, { finance })
+}
+
+const projectWithUpdatedSteps = async (_id) => {
+	const {steps, discounts, minimumCharge, finance: projFinance} = await Projects.findOne({_id}).lean()
+	const updateStepsFinanceIncludeDiscount = updateStepsFinanceWithDiscounts(steps, discounts)
+	let queryToUpdateSteps = { steps: updateStepsFinanceIncludeDiscount.steps }
+	if (!minimumCharge.toIgnore && (+updateStepsFinanceIncludeDiscount.sum.toFixed(2) <= +minimumCharge.value.toFixed(2))) {
+		queryToUpdateSteps = await updateStepsWithMinimal( steps, projFinance, minimumCharge )
+	}
+	await Projects.updateOne({ _id }, { ...queryToUpdateSteps })
+}
+
+const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
+	// if (!discounts.length)  return steps
+	steps = steps.filter(({ status }) => status !== 'Cancelled')
+	let sum = 0
+	for (let step of steps) {
+		let { finance: { Price: { receivables } }, clientRate:  value } = step
+		const { receivablesUnit: {type} } = step
+		const isMemoqCatUnit = type === 'CAT Wordcount'
+		const quantity = isMemoqCatUnit ? step.finance.Wordcount.receivables : step.finance.Quantity.receivables
+		if (!value) value = 0
+		receivables = +quantity * +value
+		const newReceivable = discounts.length
+			? getPriceAfterApplyingDiscounts(discounts, receivables).toFixed(2)
+			: receivables.toFixed(2)
+		sum += +newReceivable
+		step.finance.Price.receivables = newReceivable
+	}
+	return { steps, sum }
+
+}
+
+
+const updateStepsWithMinimal = async ( steps, finance, minimumCharge ) => {
+	// if (!minimumCharge.toIgnore && finance.Price.receivables < minimumCharge.value) {
+		return {'$set': {'steps.$[].finance.Price.receivables': minimumCharge.value/steps.length}}
+	// }
+
+	// for (const step of steps) {
+	// 	const { receivablesUnit: {type} } = step
+	// 	const isMemoqCatUnit = type === 'CAT Wordcount'
+	// 	const quantity = isMemoqCatUnit ? step.finance.Wordcount.receivables : step.finance.Quantity.receivables
+	// 	step.finance.Price.receivables = (quantity * step.clientRate).toFixed(2)
+	// }
+	// return {steps}
+
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task }) => {
@@ -314,5 +363,6 @@ module.exports = {
 	getCorrectBasicPrice,
 	getNewStepFinanceData,
 	getNewStepPayablesFinanceData,
-	calculateProjectTotal
+	calculateProjectTotal,
+	projectWithUpdatedSteps,
 }

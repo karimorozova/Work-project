@@ -61,7 +61,6 @@
 
       :isFilterShow="true"
       :isFilterAbsolute="true"
-      :isBodyShort="true"
 
       @addSortKey="addSortKey"
       @changeSortKey="changeSortKey"
@@ -78,7 +77,7 @@
 
       template(slot="check" slot-scope="{ row, index }")
         .table__data
-          CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(index, true)" @uncheck="()=>toggleCheck(index, false)" customClass="tasks-n-steps")
+          CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(row._id, true)" @uncheck="()=>toggleCheck(row._id, false)" customClass="tasks-n-steps")
 
       template(slot="step" slot-scope="{ row }")
         .table__data {{ row.step.title }}
@@ -349,8 +348,12 @@ export default {
         return acc
       }, [])
     },
-    toggleCheck(index, isCheck) {
-      this.$set(this.finalData[index], "isCheck", isCheck)
+    toggleCheck(id, isCheck) {
+      const index = this.currentProject.steps.findIndex(step => step._id === id)
+      const obj = this.currentProject.steps[index]
+      obj.isCheck = isCheck
+      this.currentProject.steps.splice(index, 1, obj)
+      // this.$set(this.finalData[index], "isCheck", isCheck)
     },
     getStepByStatus(statuses) {
       const filtered = []
