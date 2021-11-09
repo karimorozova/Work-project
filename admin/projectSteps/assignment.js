@@ -4,21 +4,19 @@ const { assignedDefaultTranslator } = require('../services/memoqs/projects')
 const { Units, Projects } = require('../models')
 const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
 
-async function removeVendorFromStep(projectData) {
-	const { stepId, projectId } = projectData
+async function removeVendorFromStep({ stepId, projectId }) {
 	const project = await Projects.findOne({ _id: projectId })
 	let { steps } = project
-	const idx = steps.findIndex(({ stepId: sId }) => sId === stepId)
-	if (idx !== -1) {
-		steps[idx].nativeFinance.Price.payables = steps[idx].finance.Price.payables = steps[idx].nativeFinance.Wordcount.payables = steps[idx].finance.Wordcount.payables = 0
-		steps[idx].nativeVendorRate = steps[idx].vendorRate = ""
-		steps[idx].vendor = null
-		steps[idx].vendorsClickedOffer = []
+	const _idx = steps.findIndex(({ _id }) => _id.toString() === stepId.toString())
+
+	if (_idx !== -1) {
+		steps[_idx].nativeFinance.Price.payables = steps[_idx].finance.Price.payables = steps[_idx].nativeFinance.Wordcount.payables = steps[_idx].finance.Wordcount.payables = 0
+		steps[_idx].nativeVendorRate = steps[_idx].vendorRate = 0
+		steps[_idx].vendor = null
+		steps[_idx].vendorsClickedOffer = []
 		await Projects.updateOne({ _id: projectId }, { steps })
-		return steps[idx]
 	}
 }
-
 
 async function reassignVendor(project, reassignData) {
 	const allUnits = await Units.find()

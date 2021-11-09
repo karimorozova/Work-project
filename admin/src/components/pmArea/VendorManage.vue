@@ -23,12 +23,11 @@
                   .block__step-status
                     span(:class="getStatusClass(step.status)") {{ step.status }}
 
-                .block__step-vendor(v-if="step.vendor") {{ step.vendor.firstName }} {{ step.vendor.surname || '' }}
-                .block__step-vendor(v-else-if="selectedVendors[step._id]") {{selectedVendors[step._id].name }}
+                .block__step-vendor(v-if="step.vendor && !selectedVendors[step._id]") {{ step.vendor.firstName }} {{ step.vendor.surname || '' }}
+                .block__step-vendor(v-else-if="selectedVendors[step._id]") {{ selectedVendors[step._id].name }}
                 .block__step-vendor.empty(v-else) No vendor...
-
-              //.block__step-status {{ step.status }}
-              //input(readonly="true" placeholder="Vendor" :value="selectedVendors[step._id] ? selectedVendors[step._id].firstName : (step.vendor && step.vendor.firstName) || '-'" @click="chooseStep(step)")
+                //.block__step-vendorDelete(v-if="(step.vendor || selectedVendors[step._id]) && deleteVendorStatuses(step.status)" @click.stop="removeVendor(step._id)")
+                  i(class="fas fa-times-circle")
 
       transition(name="fade")
         .vendor-manage__vendors(v-if="currentStep")
@@ -92,6 +91,21 @@
                         @chooseOption="setFakeUnit"
                       )
 
+            .assignedVendor(v-if="currentStepId && ( steps.find(i => i._id.toString() === currentStepId).vendor || selectedVendors[currentStepId])" )
+              .assignedVendor__user
+                .assignedVendor__user-image
+                  .assignedVendor__user-circle1
+                  .assignedVendor__user-circle2
+                  img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
+                .assignedVendor__user-description
+                  .assignedVendor__user-name
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
+                      span {{ getAssignedVendorInfo().name }}
+                      span.assigned(style="margin-left: 10px;") [Assigned]
+                  .assignedVendor__user-email {{ getAssignedVendorInfo().email }} (клик письмо)
+                  .buttons
+                    .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
+
 
             .vendors__search
               .vendors__search-title Vendors:
@@ -100,9 +114,8 @@
                 .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
                   i.fas.fa-backspace
 
-            .vendors(:style="isEditable && !isAllVendors ? 'max-height: 392px' : 'max-height: 510px' ")
+            .vendors(:style="getMaxHeight()")
               .vendor(v-if="listOfVendors.length" v-for="item in listOfVendors")
-                //- | {{item}}
                 .vendor__row1
                   .vendor__user
                     .user
@@ -115,7 +128,7 @@
 
                         .user__email {{ item.email }} (клик письмо)
                         .buttons
-                          .buttons__btn(@click="setVendorToStep({_id: item._id, name: item.name})") Assign
+                          .buttons__btn(@click="setVendorToStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
                           .buttons__btn() Details
 
                   .vendor__stats
@@ -128,7 +141,7 @@
                             span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
                           .stats__col-bigValue-image(v-if="(item.total / 2) < item.price" )
                             img(:src="icons.down")
-                          .stats__col-bigValue-image(v-if="(item.total / 2) > item.price" )
+                          .stats__col-bigValue-image(v-if="item.price > 0 && (item.total / 2) > item.price" )
                             img(:src="icons.up")
 
                     .stats__row
@@ -180,7 +193,7 @@
                     .buttons__assign(@click="setVendorToStep({_id: item._id, name: item.name})") Assign
 
 
-            .vendors(v-else) No vendors...
+              .noVendors(v-if="!listOfVendors.length" ) No vendors...
 
 
 
@@ -254,6 +267,52 @@ export default {
     }
   },
   methods: {
+    getMaxHeight(){
+      let max = 510
+      if(this.isEditable && !this.isAllVendors) max = max - 118
+      if(this.currentStepId && (this.steps.find(i => i._id.toString() === this.currentStepId).vendor || this.selectedVendors[this.currentStepId]))  max = max - 110
+      return 'max-height:' + max + 'px'
+    },
+    getAssignedVendorInfo() {
+      const step = this.steps.find(i => i._id.toString() === this.currentStepId)
+      const res = {}
+
+      if ((!step.vendor && this.selectedVendors[this.currentStepId]) || (step.vendor && this.selectedVendors[this.currentStepId])) {
+        resSetter(this.selectedVendors[this.currentStepId])
+      } else if (step.vendor && !this.selectedVendors[this.currentStepId]) {
+        resSetter(step.vendor)
+      }
+      return res
+
+      function resSetter(dataIn) {
+        const { email, _id } = dataIn
+        res._id = _id
+        res.name = dataIn.name || `${ dataIn.firstName } ${ dataIn.surname || '' }`
+        res.email = email
+      }
+    },
+    deleteVendorStatuses({ status }) {
+      const STATUSES = [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start' ]
+      return STATUSES.includes(status)
+    },
+    async removeVendor(stepId) {
+      if (this.selectedVendors[stepId]) {
+        const copy = { ...this.selectedVendors }
+        delete copy[stepId]
+        this.selectedVendors = copy
+      } else {
+        try {
+          const updatedProject = await this.$http.post('/pm-manage/remove-vendor-from-step', {
+            projectId: this.currentProject._id,
+            stepId
+          })
+          this.setCurrentProject(updatedProject.data)
+          this.currentStep = updatedProject.data.steps.find(item => item._id.toString() === stepId)
+        } catch (err) {
+          this.alertToggle({ message: "Error can't remove Vendor from Step", isShow: true, type: 'success' })
+        }
+      }
+    },
     removeVendorsSearch() {
       this.vendorsSearch = ''
     },
@@ -310,9 +369,10 @@ export default {
     },
     async saveVendors() {
       try {
-        const stepsVendors = {}
-        for (const key in this.selectedVendors) stepsVendors[key] = this.selectedVendors[key]._id
-        this.setStepVendors({ projectId: this.$route.params.id, stepsVendors })
+        // const stepsVendors = {}
+        // for (const key in this.selectedVendors) stepsVendors[key] = this.selectedVendors[key]._id
+        this.setStepVendors({ projectId: this.$route.params.id, stepsVendors: this.selectedVendors })
+        this.selectedVendors = {}
       } catch (err) {
         this.alertToggle({ message: 'Error in assigns vendors', isShow: true, type: "error" })
       }
@@ -374,7 +434,8 @@ export default {
     },
     ...mapActions({
       alertToggle: 'alertToggle',
-      setStepVendors: 'setStepVendors'
+      setStepVendors: 'setStepVendors',
+      setCurrentProject: 'setCurrentProject'
     })
   },
   computed: {
@@ -400,7 +461,7 @@ export default {
       let vendors = this.allVendors
       const query = `${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
       const { projectCurrency, crossRate } = this.currentProject
-      const { finance, clientRate, payablesUnit, vendor } = this.currentStep
+      const { finance, payablesUnit, vendor } = this.currentStep
 
       //searching ==>
       if (!this.isAllVendors) {
@@ -411,7 +472,14 @@ export default {
       if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
 
       console.log('vendor', vendor)
-      // if (vendor) vendors = vendors.filter(({ name }) => !name.toUpperCase().includes(`${ vendor.firstName } ${ vendor.surname || '' }`))
+
+      if (vendor && !this.selectedVendors[this.currentStepId]) {
+        vendors = vendors.filter(({ name }) => name.toUpperCase() !== (`${ vendor.firstName } ${ vendor.surname || '' }`).toUpperCase())
+      } else if (vendor && this.selectedVendors[this.currentStepId]) {
+        vendors = vendors.filter(({ name }) => name.toUpperCase() !== (this.selectedVendors[this.currentStepId].name).toUpperCase())
+      } else if (!vendor && this.selectedVendors[this.currentStepId]) {
+        vendors = vendors.filter(({ name }) => name.toUpperCase() !== (this.selectedVendors[this.currentStepId].name).toUpperCase())
+      }
       // searching <==
 
       vendors = vendors.map(item => {
@@ -429,6 +497,7 @@ export default {
           _id: item._id,
           photo: item.photo,
           rate,
+          nativeRate: rates ? rates.price : 0,
           benchmark: rates ? rates.benchmark : 0,
           benchmarkMargin: rates ? rates.benchmarkMargin : 0,
           tqi: rates ? rates.tqi : 0,
@@ -481,8 +550,73 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
+.assignedVendor {
+  margin-top: 20px;
+  padding: 10px 15px;
+  border: 1px dotted $light-border;
+  display: flex;
+  justify-content: space-between;
+
+  &__user {
+    display: flex;
+    gap: 15px;
+    width: 400px;
+    align-items: center;
+
+    &-circle1 {
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      border-radius: 20px;
+      background-color: white;
+      right: -8px;
+      top: 12px;
+    }
+
+    &-circle2 {
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      border-radius: 10px;
+      background-color: $green;
+      right: -5px;
+      top: 15px;
+    }
+
+    &-name {
+      font-family: Myriad600;
+      margin-bottom: 3px;
+    }
+
+    &-email {
+      color: #3333;
+    }
+
+    &-image {
+      height: 65px;
+      width: 65px;
+      min-width: 65px;
+      position: relative;
+
+      img {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+    }
+
+  }
+}
+
+.assigned {
+  margin-left: 5px;
+  color: $green;
+  font-family: 'Myriad300';
+}
+
 .buttons {
-  margin-top: 10px;
+  margin-top: 6px;
   display: flex;
   justify-content: start;
   gap: 12px;
@@ -776,7 +910,12 @@ export default {
 .block {
   &__name {
     width: 160px;
-    margin-right: 20px;
+    margin-right: 15px;
+  }
+
+  &__vendorDelete {
+    height: 15px;
+    width: 15px;
   }
 
   &__steps {
@@ -789,8 +928,7 @@ export default {
 
   &__step {
     margin-bottom: 10px;
-    padding: 7px 15px;
-    border-radius: 4px;
+    padding: 7px 10px 6px 15px;
     border: 1px dotted lightgray;
     transition: .1s ease-out;
     display: flex;
@@ -806,7 +944,7 @@ export default {
     }
 
     &-vendor {
-      width: 160px;
+      width: 170px;
       text-align: center;
     }
 
@@ -824,11 +962,12 @@ export default {
   &__language {
     font-size: 14px;
     width: 150px;
-    background: $light-border;
-    padding: 6px 10px 5px 10px;
+    background: $table-list;
+    padding: 4.5px 10px 1px;
     box-sizing: border-box;
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    border-bottom: 2px solid $light-border;
 
     .taskId {
       color: $border;
@@ -1033,6 +1172,20 @@ input {
   }
 }
 
+.fa-times-circle {
+  font-size: 15px;
+  transition: .2s ease-out;
+  color: $dark-border;
+  cursor: pointer;
+  //position: absolute;
+  //right: 8px;
+  //top: 8px;
+
+  &:hover {
+    color: $text;
+  }
+}
+
 .border-bottom {
   border-bottom: 1px solid $light-border;
 }
@@ -1049,5 +1202,9 @@ a {
   &:hover {
     text-decoration: underline;
   }
+}
+
+.noVendors {
+  opacity: .3;
 }
 </style>

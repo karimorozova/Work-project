@@ -936,12 +936,14 @@ router.post('/update-minimum-charge', async (req, res) => {
 router.post('/remove-vendor-from-step', async (req, res) => {
 	const { stepId, projectId } = req.body
 	try {
-		const step = await removeVendorFromStep({ stepId, projectId })
-		const project = await getProject({ '_id': projectId })
-		const steps = await getStepsWithFinanceUpdated(step, project)
-		const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
-		const updatedProject = await updateProject({ '_id': projectId }, { steps, tasks })
+		await removeVendorFromStep({ stepId, projectId })
+		const updatedProject = await calculateProjectTotal(projectId)
 		res.send(updatedProject)
+		// const project = await getProject({ '_id': projectId })
+		// const steps = await getStepsWithFinanceUpdated(step, project)
+		// const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
+		// const updatedProject = await updateProject({ '_id': projectId }, { steps, tasks })
+		// res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on remove-vendor-from-step!')

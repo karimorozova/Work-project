@@ -100,7 +100,6 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 		step.finance.Price.receivables = newReceivable
 	}
 	return { steps, sum }
-
 }
 
 
@@ -119,7 +118,7 @@ const updateStepsWithMinimal = async ( steps, finance, minimumCharge ) => {
 
 }
 
-const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task }) => {
+const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {
 	const currencyRatio = await CurrencyRatio.findOne()
 	const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
 	const { fullSourceLanguage, fullTargetLanguage, payablesUnit } = step
@@ -134,9 +133,9 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 		industry: industry._id
 	}
 
-	let vendorPrice = getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison)
-			|| getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio) / 2
-			|| 0
+	let vendorPrice = !!nativeRate
+			? nativeRate
+			: getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) || getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio) / 2 || 0
 
 	step.vendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate)
 	step.nativeVendorRate = +vendorPrice
