@@ -72,7 +72,7 @@
 
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header(v-if="field.headerKey === 'headerCheck'")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+          CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
         .table__header(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
