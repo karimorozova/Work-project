@@ -74,7 +74,6 @@ const {
 
 const {
 	getProjectAfterFinanceUpdated,
-	updateProjectFinanceOnDiscountsUpdate,
 	// addPaymentAdditions,
 	// deletePaymentAddition,
 } = require('./porjectFinance')
@@ -173,7 +172,6 @@ module.exports = {
 	updateProjectStatusForClientPortalProject,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
-	updateProjectFinanceOnDiscountsUpdate,
 	getPriceAfterApplyingDiscounts,
 	regainWorkFlowStatusByStepId,
 	addDR2,

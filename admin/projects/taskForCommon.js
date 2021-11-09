@@ -1,6 +1,6 @@
 const { updateProject, getProject } = require("./getProjects")
 // const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor')
-const { getStepFinanceData, getNewStepFinanceData, calculateProjectTotal } = require('../сalculations/finance')
+const { getStepFinanceData, getNewStepFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../сalculations/finance')
 // const { gatherServiceStepInfo } = require('./helpers')
 const ObjectId = require('mongodb').ObjectID
 
@@ -27,6 +27,7 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 		let tasks = await generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles }, iterator)
 		let { steps, additions } = await generateStepsForCustomUnits({ tasks, stepsAdditions })
 		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
+		await recalculateStepFinance(_id)
 		return await calculateProjectTotal(_id)
 
 	} catch (err) {

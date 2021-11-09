@@ -2,7 +2,7 @@ const { Projects } = require('../models')
 const { getProject, updateProject } = require("./getProjects")
 const { getProjectAnalysis } = require("../services/memoqs/projects")
 const { setTaskMetrics } = require("../сalculations/wordcount")
-const { getNewStepFinanceData, calculateProjectTotal } = require("../сalculations/finance")
+const { getNewStepFinanceData, calculateProjectTotal, recalculateStepFinance } = require("../сalculations/finance")
 
 async function createTasksForWordcount(tasksInfo) {
 	const {
@@ -53,6 +53,7 @@ async function createTasksForWordcount(tasksInfo) {
 		})
 		let { steps, additions } = await generateStepsForCATMemoqUnit({ tasks, stepsAdditions })
 		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
+		await recalculateStepFinance(_id)
 		return await calculateProjectTotal(_id)
 
 	} catch (err) {

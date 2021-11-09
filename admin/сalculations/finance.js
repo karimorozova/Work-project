@@ -42,8 +42,6 @@ const setUpdatedFinanceData = async (data) => {
 }
 
 const calculateProjectTotal = async (projectId) => {
-	await projectWithUpdatedSteps(projectId)
-
 	const { steps } = await Projects.findOne({ "_id": projectId })
 
 	const finance = {
@@ -65,16 +63,11 @@ const calculateProjectTotal = async (projectId) => {
 		}
 	})
 
-	// additionsSteps.forEach(step => {
-	// 	const { finance: { Price } } = step
-	// 	finance.Price.receivables += Price.receivables
-	// })
-
 	return await updateProject({ '_id': projectId }, { finance })
 }
 
-const projectWithUpdatedSteps = async (_id) => {
-	const { steps, discounts, minimumCharge } = await getProject({ _id })
+const recalculateStepFinance = async (projectId) => {
+	const { steps, discounts, minimumCharge } = await getProject({ _id: projectId })
 	const newSteps = updateStepsFinanceWithDiscounts(steps, discounts)
 	let queryToUpdateSteps = { steps: newSteps }
 	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
@@ -83,7 +76,7 @@ const projectWithUpdatedSteps = async (_id) => {
 		queryToUpdateSteps = await updateStepsWithMinimal(steps, minimumCharge)
 	}
 
-	await Projects.updateOne({ _id }, { ...queryToUpdateSteps })
+	await Projects.updateOne({ _id: projectId }, { ...queryToUpdateSteps })
 }
 
 const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
@@ -352,5 +345,5 @@ module.exports = {
 	getNewStepFinanceData,
 	getNewStepPayablesFinanceData,
 	calculateProjectTotal,
-	projectWithUpdatedSteps
+	recalculateStepFinance
 }

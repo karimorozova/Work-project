@@ -42,7 +42,6 @@ const {
 } = require('../services/memoqs/otherProjects')
 
 const {
-	updateProjectFinanceOnDiscountsUpdate,
 	manageProjectName
 } = require('../projects')
 
@@ -413,8 +412,8 @@ router.get('/get-project-discounts', async (req, res) => {
 router.post('/update-project-discounts', async (req, res) => {
 	const { _id, updatedArray } = req.body
 	try {
-		const updatedProject = await updateProjectFinanceOnDiscountsUpdate(_id, updatedArray, MemoqProject)
-		res.send(updatedProject)
+		// const updatedProject = await updateProjectFinanceOnDiscountsUpdate(_id, updatedArray, MemoqProject)
+		// res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on updating project\'s discounts')

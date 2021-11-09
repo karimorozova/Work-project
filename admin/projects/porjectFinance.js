@@ -51,12 +51,6 @@ function getUpdatedProjectFinanceToZero(tasks) {
 	// return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) }
 }
 
-const updateProjectFinanceOnDiscountsUpdate = async (_id, updatedDiscounts) => {
-	 await Projects.updateOne({ _id }, {  discounts: updatedDiscounts, })
-	return await calculateProjectTotal(_id)
-
-}
-
 // const addPaymentAdditions = async (_id, paymentAddition) => {
 // 	const { finance } = await Projects.findOne({ _id: _id })
 //
@@ -125,7 +119,6 @@ const findStepMultiplier = (step) => {
 module.exports = {
 	getProjectAfterFinanceUpdated,
 	getUpdatedProjectFinanceToZero,
-	updateProjectFinanceOnDiscountsUpdate,
 	getProjectFinancePrice,
 	// addPaymentAdditions,
 	// deletePaymentAddition

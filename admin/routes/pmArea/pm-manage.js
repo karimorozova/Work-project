@@ -122,7 +122,7 @@ const {
 	getVendorsForSteps
 } = require('../../vendors/getVendors')
 
-const { setUpdatedFinanceData, calculateProjectTotal } = require('../../сalculations/finance')
+const { setUpdatedFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../../сalculations/finance')
 
 router.post('/allprojects', async (req, res) => {
 	const filters = { ...req.body }
@@ -902,7 +902,9 @@ router.get('/get-project-discounts', async (req, res) => {
 router.post('/update-project-discounts', async (req, res) => {
 	const { _id, updatedArray } = req.body
 	try {
-		const updatedProject = await updateProjectFinanceOnDiscountsUpdate(_id, updatedArray)
+		await Projects.updateOne({ _id }, { discounts: updatedArray })
+		await recalculateStepFinance(_id)
+		const updatedProject = await calculateProjectTotal(_id)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -924,7 +926,8 @@ router.post('/update-project-additions', async (req, res) => {
 router.post('/update-minimum-charge', async (req, res) => {
 	const { _id, value, toIgnore } = req.body
 	try {
-		await Projects.updateOne({ _id }, { minimumCharge: { value, toIgnore }})
+		await Projects.updateOne({ _id }, { minimumCharge: { value, toIgnore } })
+		await recalculateStepFinance(_id)
 		const updatedProject = await calculateProjectTotal(_id)
 		res.send(updatedProject)
 	} catch (err) {
