@@ -3,10 +3,10 @@
     .project__all-info
 
       .project__info-row
-        input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name" style="margin-bottom: 10px")
-        span.project__nameBody(v-else)
-          .project__nameDisabled(v-if="!existProjectAccessChangeName") {{ nameOfProject }}
-          input.project__name(v-else type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
+        //input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name" style="margin-bottom: 10px")
+        //span.project__nameBody(v-else)
+        //.project__nameDisabled(v-if="!existProjectAccessChangeName") {{ nameOfProject }}
+        input.project__name( type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
 
         .project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")

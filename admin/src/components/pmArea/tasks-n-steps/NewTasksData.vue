@@ -1,7 +1,7 @@
 <template lang="pug">
   .taskData(v-if="allServices.length")
     .taskData__errorModal
-      ValidationErrors(v-if="IsErrorModal" :errors="errors" @closeErrors="closeErrors")
+      ValidationErrors(v-if="IsErrorModal" :errors="errors" :isAbsolute="true" @closeErrors="closeErrors")
 
     .taskData__row-servicesLanguages
       .service
@@ -83,6 +83,27 @@ export default {
           this.errors.push('Target and Source Languages cannot be a same if a step "Translation" is selected')
         }
       }
+      if (!this.tasksData.stepsAndUnits.length) {
+        this.errors.push("Please, select minimum one Step")
+      } else {
+        if(this.isStepsWithCATWordcount && !this.isStepsTemplateSet ) {
+          this.errors.push("Please, select Memoq field")
+        }
+
+        if( !this.isStepsWithCATWordcount && !this.isStepsQuantitySet) {
+          this.errors.push("Please, write correct quantity (min: 1 | max: 1000)  ")
+        }
+      }
+
+      for(const stepAndUnit of this.tasksData.stepsAndUnits) {
+        if( !stepAndUnit.start && stepAndUnit.start === '' || !stepAndUnit.deadline && stepAndUnit.deadline === '' ) {
+          this.errors.push(`Please, check dates for ${stepAndUnit.step.title}`)
+        }
+        // if(!stepAndUnit.deadline && stepAndUnit.deadline === '') {
+        //   this.errors.push(`Please select deadline for step ${stepAndUnit.step.title}`)
+        // }
+      }
+
       if (this.errors.length) {
         this.IsErrorModal = true
         return
@@ -249,6 +270,15 @@ export default {
     ...mapGetters({
       tasksData: "getTasksData"
     }),
+    isStepsWithCATWordcount() {
+      return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount" )
+    },
+    isStepsQuantitySet() {
+      return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({payables, receivables}) =>  +payables.quantity > 0 && +receivables.quantity > 0)
+    },
+    isStepsTemplateSet() {
+      return this.tasksData.template && this.tasksData.template.hasOwnProperty('name')
+    },
     mappedClientServices() {
       if (this.activeClientServices().length) return this.activeClientServices().map(i => i.title)
       return []
@@ -267,6 +297,7 @@ export default {
 @import "../../../assets/scss/colors";
 
 .taskData {
+  position: relative;
   border: 2px solid $light-border;
   border-radius: 4px;
   padding: 25px;

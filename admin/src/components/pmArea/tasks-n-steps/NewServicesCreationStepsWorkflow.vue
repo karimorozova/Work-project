@@ -1,6 +1,15 @@
 <template lang="pug">
   .wrapper
-    .steps(v-if="tasksData.service && tasksData.stepsAndUnits && tasksData.stepsAndUnits.length")
+    .steps(v-if="tasksData.service && tasksData.stepsAndUnits")
+      .steps__modal-without-border(v-if="isDeleteStep")
+        ApproveModal(
+          text="Are you sure?"
+          approveValue="Yes"
+          notApproveValue="Cancel"
+          @approve="deleteStep"
+          @close="closeAcceptModal"
+          @notApprove="closeAcceptModal"
+        )
       .steps__modal(v-if="isAddModal")
         .modal-title Add steps to workflow
         .step__setting-title Steps:
@@ -23,22 +32,38 @@
           .step__titleRow
             .step__titleRow-title {{ item.step.title }}
             .step__titleRow-desctiptions(v-if="isCatUnit || isDisabledPayablesEdit" )
-              .step__titleRow-desctiptions-title Receivables & Payables
-              .step__titleRow-desctiptions-title Dates
+              .step__titleRow-desctiptions-title-date Dates
+              .step__titleRow-desctiptions-title(v-if="!isCatUnit || item.step.title !== 'Revising'") Receivables & Payables
             .step__titleRow-desctiptions(v-else)
+              .step__titleRow-desctiptions-title-date Dates
               .step__titleRow-desctiptions-title Receivables
               .step__titleRow-desctiptions-title Payables
-              .step__titleRow-desctiptions-title Dates
 
           .step__detailsRow
 
             .step__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
-              .step__icon(@click="deleteStep(index)" style="cursor: pointer;")
+              .step__icon(@click="openAcceptModal(index)" style="cursor: pointer;")
                 i.fas.fa-trash
               .step__icon.handle(style="cursor: grab")
                 i.fas.fa-arrows-alt-v
 
 
+            .step__date
+              .step__datepicker
+                .step__datepicker-title Start:
+                .step__datepicker-input
+                  DatePicker.range-with-one-panel(
+                    :value="[item.start, item.deadline]"
+                    @input="(e) => setDates(e, index)"
+                    format="DD-MM-YYYY, HH:mm"
+                    prefix-class="xmx"
+                    range-separator=" - "
+                    :clearable="false"
+                    type="datetime"
+                    range
+                    :disabled-date="notBeforeToday"
+                    placeholder="Select datetime range"
+                  )
             .step__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
               .step__setting
                 .step__setting-title Unit:
@@ -72,7 +97,7 @@
                   )
               .step__setting
                 .step__setting-title Quantity:
-                input(type="number" placeholder="Value" min="1" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
+                input(type="number" placeholder="Value" min="0" max="100000" :value="item.receivables.quantity || ''" @change="(e) => setQuantity(e, 'receivables', index)")
 
             .step__settings(v-if="!isCatUnit && !isDisabledPayablesEdit")
               .step__setting
@@ -87,23 +112,23 @@
                   )
               .step__setting
                 .step__setting-title Quantity:
-                input(type="number" :disabled="isDisabledPayablesEdit" placeholder="Value" min="1" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
+                input(type="number" :disabled="isDisabledPayablesEdit" placeholder="Value" min="0" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
-            .step__date
+            //.step__date
               .step__datepicker
                 .step__datepicker-title Start:
                 .step__datepicker-input
                   DatepickerWithTime(
-                    :isReadonly="true"
-                    :value="item.start"
-                    :format="customFormatter"
-                    monday-first=true
-                    :highlighted="highlighted"
-                    inputClass="datepicker-custom"
-                    inputClass2="datepicker-custom-mod2"
-                    calendarClass="calendar-custom"
-                    :placeholder="'Date'"
-                    @selected="(e) => setDate(e, 'start', index)"
+                    //:isReadonly="true"
+                    //:value="item.start"
+                    //:format="customFormatter"
+                    //monday-first=true
+                    //:highlighted="highlighted"
+                    //inputClass="datepicker-custom"
+                    //inputClass2="datepicker-custom-mod2"
+                    //calendarClass="calendar-custom"
+                    //:placeholder="'Date'"
+                    //@selected="(e) => setDate(e, 'start', index)"
                   )
                   //i.far.fa-calendar-alt.calendar
 
@@ -111,28 +136,19 @@
                 .step__datepicker-title Deadline:
                 .step__datepicker-input
                   DatepickerWithTime(
-                    :isReadonly="true"
-                    :value="item.deadline"
-                    :format="customFormatter"
-                    monday-first=true
-                    :highlighted="highlighted"
-                    inputClass="datepicker-custom"
-                    inputClass2="datepicker-custom-mod2"
-                    calendarClass="calendar-custom"
-                    :placeholder="'Date'"
-                    @selected="(e) => setDate(e, 'deadline', index)"
+                    //:isReadonly="true"
+                    //:value="item.deadline"
+                    //:format="customFormatter"
+                    //monday-first=true
+                    //:highlighted="highlighted"
+                    //inputClass="datepicker-custom"
+                    //inputClass2="datepicker-custom-mod2"
+                    //calendarClass="calendar-custom"
+                    //:placeholder="'Date'"
+                    //@selected="(e) => setDate(e, 'deadline', index)"
                   )
                   //i.far.fa-calendar-alt.calendar
-          DatePicker(
-            :value="[item.start, item.deadline]"
-            @input="(e) => setDates(e, index)"
-            format="DD-MM-YYYY, HH:mm"
-            prefix-class="xmx"
-            range-separator=" - "
-            :clearable="false"
-            type="datetime"
-            range
-            placeholder="Select datetime range")
+
 
 
     .add(v-if="!isCatUnit" )
@@ -160,9 +176,10 @@ import JobDescriptors from "../JobDescriptors"
 import Add from "../../Add"
 import CheckBox from "../../CheckBox"
 import Button from "../../Button"
+import ApproveModal from "../../ApproveModal"
 
 export default {
-  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable, DatePicker },
+  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable, DatePicker, ApproveModal },
   props: {
     templates: {
       type: Array,
@@ -174,6 +191,8 @@ export default {
       time: {  },
       isDisabledPayablesEdit: true,
       isAddModal: false,
+      isDeleteStep: false,
+      deleteStepIndex: '',
       highlighted: {
         days: [ 6, 0 ]
       },
@@ -184,6 +203,9 @@ export default {
     }
   },
   methods: {
+    notBeforeToday(date) {
+      return date < new Date(this.project.startDate) || new Date(this.project.billingDate) < date ;
+    },
     addStep() {
       const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
       let stepsAndUnits = this.tasksData.stepsAndUnits
@@ -256,20 +278,30 @@ export default {
     dragAndDropSteps(stepsAndUnits) {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    deleteStep(index) {
+    openAcceptModal(id){
+      this.isDeleteStep = true
+      this.deleteStepIndex = id
+    },
+    closeAcceptModal(){
+      this.isDeleteStep = false
+      this.deleteStepIndex = ''
+    },
+    deleteStep() {
       const stepsAndUnits = [ ...this.tasksData.stepsAndUnits ]
-      stepsAndUnits.splice(index, 1)
+      stepsAndUnits.splice(this.deleteStepIndex, 1)
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+      this.closeAcceptModal()
     },
     ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" })
   },
   computed: {
     ...mapGetters({
       tasksData: "getTasksData",
-      allUnits: "getAllUnits"
+      allUnits: "getAllUnits",
+      project: "getCurrentProject",
     }),
     isCatUnit() {
-      if (this.tasksData && this.tasksData.service) {
+      if (this.tasksData && this.tasksData.service &&  this.tasksData.stepsAndUnits.length) {
         return this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
       }
     },
@@ -297,6 +329,15 @@ export default {
     box-shadow: $box-shadow;
     padding: 25px;
     border-radius: 4px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+  }
+  &__modal-without-border {
+    z-index: 12;
+    width: fit-content;
+    background: white;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -384,6 +425,11 @@ export default {
         margin-left: 15px;
         padding-left: 15px;
       }
+      &-title-date {
+        width: 270px;
+        margin-left: 15px;
+        padding-left: 15px;
+      }
     }
 
     &-title {
@@ -404,6 +450,9 @@ export default {
     &-title {
       margin-bottom: 2px;
     }
+  }
+  &__datepicker {
+    width: 270px;
   }
 
   &__detailsRow {
@@ -453,7 +502,9 @@ input {
 
 .sortable-ghost {
 }
-
+.range-with-one-panel{
+  width: 270px;
+}
 .sortable-chosen {
   background: $light-border;
 }

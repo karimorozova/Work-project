@@ -133,6 +133,7 @@ export default {
         // billingDate: "",
       },
       clients: [],
+      areErrorsExist: false,
       errors: [],
     }
   },
@@ -147,16 +148,26 @@ export default {
     },
     setCustomer({option}) {
       this.setValue('customer',option)
-      this.setValue('selectedIndustry',{})
-      this.setValue('clientBillingInfo', {})
-      // this.$emit('setValue', { option, prop: 'customer' })
+
+      if (this.billingInfoList.length === 1) {
+        this.choseBillingInfo({ option: this.billingInfoList[0].name})
+      } else {
+        this.setValue('clientBillingInfo', {})
+      }
+
+      const industry = this.industriesList.length === 1
+        ? this.industriesList[0]
+        : {}
+
+      this.setValue('selectedIndustry',industry)
+
     },
     setIndustry({option}) {
+      console.log(option)
       this.setValue('selectedIndustry',option)
     },
     choseBillingInfo({option}) {
       const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-      // this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
       this.setValue('clientBillingInfo', billingInfo)
     },
     updateProjectDate(date) {
@@ -205,10 +216,9 @@ export default {
         if (!this.project.startDate) this.errors.push("Please, set the start date.")
         if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
         if (!this.project.customer.name) this.errors.push("Please, select a Client.")
-        if (!this.project.selectedIndustry) this.errors.push("Please, choose an industry.")
+        if (!this.project.selectedIndustry.hasOwnProperty('name')) this.errors.push("Please, choose an industry.")
         if (!this.project.clientBillingInfo || !this.project.clientBillingInfo.hasOwnProperty('_id')) this.errors.push("Please, choose an Billing Information.")
         if (this.errors.length) {
-          console.log(this.errors)
           this.areErrorsExist = true
           return
         }
@@ -217,6 +227,10 @@ export default {
         this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
       }
     },
+    closeErrors () {
+      this.areErrorsExist = false
+      this.errors = []
+    }
   },
   computed: {
     ...mapGetters({
