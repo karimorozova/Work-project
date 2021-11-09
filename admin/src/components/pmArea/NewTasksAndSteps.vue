@@ -19,7 +19,7 @@
             i.fas.fa-sync
 
 
-    .modal(v-if="true")
+    .modal(v-if="isModalOpen")
       VendorManage(:steps="currentProject.steps" :industry="currentProject.industry" @closeVendorManage="toggleVendorManage")
 
 

@@ -43,6 +43,7 @@ const setUpdatedFinanceData = async (data) => {
 
 const calculateProjectTotal = async (projectId) => {
 	await projectWithUpdatedSteps(projectId)
+
 	const { steps } = await Projects.findOne({ "_id": projectId })
 
 	const finance = {
@@ -73,49 +74,37 @@ const calculateProjectTotal = async (projectId) => {
 }
 
 const projectWithUpdatedSteps = async (_id) => {
-	const {steps, discounts, minimumCharge, finance: projFinance} = await Projects.findOne({_id}).lean()
-	const updateStepsFinanceIncludeDiscount = updateStepsFinanceWithDiscounts(steps, discounts)
-	let queryToUpdateSteps = { steps: updateStepsFinanceIncludeDiscount.steps }
-	if (!minimumCharge.toIgnore && (+updateStepsFinanceIncludeDiscount.sum.toFixed(2) <= +minimumCharge.value.toFixed(2))) {
-		queryToUpdateSteps = await updateStepsWithMinimal( steps, projFinance, minimumCharge )
+	const { steps, discounts, minimumCharge } = await getProject({ _id })
+	const newSteps = updateStepsFinanceWithDiscounts(steps, discounts)
+	let queryToUpdateSteps = { steps: newSteps }
+	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
+
+	if (!minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2))) {
+		queryToUpdateSteps = await updateStepsWithMinimal(steps, minimumCharge)
 	}
+
 	await Projects.updateOne({ _id }, { ...queryToUpdateSteps })
 }
 
 const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
-	// if (!discounts.length)  return steps
-	steps = steps.filter(({ status }) => status !== 'Cancelled')
-	let sum = 0
 	for (let step of steps) {
-		let { finance: { Price: { receivables } }, clientRate:  value } = step
-		const { receivablesUnit: {type} } = step
+		let { finance: { Price: { receivables } }, clientRate: value } = step
+		const { receivablesUnit: { type } } = step
 		const isMemoqCatUnit = type === 'CAT Wordcount'
 		const quantity = isMemoqCatUnit ? step.finance.Wordcount.receivables : step.finance.Quantity.receivables
 		if (!value) value = 0
 		receivables = +quantity * +value
-		const newReceivable = discounts.length
-			? getPriceAfterApplyingDiscounts(discounts, receivables).toFixed(2)
-			: receivables.toFixed(2)
-		sum += +newReceivable
-		step.finance.Price.receivables = newReceivable
+
+		step.finance.Price.receivables = discounts.length
+				? getPriceAfterApplyingDiscounts(discounts, receivables).toFixed(2)
+				: receivables.toFixed(2)
 	}
-	return { steps, sum }
+
+	return steps
 }
 
-
-const updateStepsWithMinimal = async ( steps, finance, minimumCharge ) => {
-	// if (!minimumCharge.toIgnore && finance.Price.receivables < minimumCharge.value) {
-		return {'$set': {'steps.$[].finance.Price.receivables': minimumCharge.value/steps.length}}
-	// }
-
-	// for (const step of steps) {
-	// 	const { receivablesUnit: {type} } = step
-	// 	const isMemoqCatUnit = type === 'CAT Wordcount'
-	// 	const quantity = isMemoqCatUnit ? step.finance.Wordcount.receivables : step.finance.Quantity.receivables
-	// 	step.finance.Price.receivables = (quantity * step.clientRate).toFixed(2)
-	// }
-	// return {steps}
-
+const updateStepsWithMinimal = async (steps, minimumCharge) => {
+	return { '$set': { 'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {
@@ -173,10 +162,10 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 	const nativeFinance = stepFinance()
 	const defaultStepPrice = finance.Price.receivables
 
-	if (discounts.length) {
-		const { Price: { receivables } } = finance
-		finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
-	}
+	// if (discounts.length) {
+	// 	const { Price: { receivables } } = finance
+	// 	finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
+	// }
 
 	function stepFinance() {
 		return {
@@ -363,5 +352,5 @@ module.exports = {
 	getNewStepFinanceData,
 	getNewStepPayablesFinanceData,
 	calculateProjectTotal,
-	projectWithUpdatedSteps,
+	projectWithUpdatedSteps
 }

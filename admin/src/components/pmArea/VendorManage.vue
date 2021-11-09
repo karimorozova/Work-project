@@ -215,7 +215,7 @@
 
     .vendor-manage__footer
       Button(@clicked="saveVendors" :value="'Approve assignments'")
-      Button(:value="'Cancel'" :outline="true")
+      Button(:value="'Cancel'" @clicked="closeVendorManage" :outline="true")
 
 </template>
 
@@ -369,12 +369,12 @@ export default {
     },
     async saveVendors() {
       try {
-        // const stepsVendors = {}
-        // for (const key in this.selectedVendors) stepsVendors[key] = this.selectedVendors[key]._id
         this.setStepVendors({ projectId: this.$route.params.id, stepsVendors: this.selectedVendors })
         this.selectedVendors = {}
       } catch (err) {
         this.alertToggle({ message: 'Error in assigns vendors', isShow: true, type: "error" })
+      }finally {
+        this.closeVendorManage()
       }
     },
     toggleLangNotStrict() {
