@@ -148,10 +148,6 @@ const ClientRequestSchema = new mongoose.Schema({
 		service: {
 			type: Schema.Types.ObjectId, ref: 'Services'
 		},
-		complianceOptions: {
-			type: Object,
-			default: {}
-		}
 	},
 	checkedForm: {
 		isCheckProjectName: {
@@ -166,10 +162,6 @@ const ClientRequestSchema = new mongoose.Schema({
 			type: Boolean,
 			default: false
 		},
-		isCheckComplianceTemplate: {
-			type: Boolean,
-			default: false
-		}
 	}
 })
 

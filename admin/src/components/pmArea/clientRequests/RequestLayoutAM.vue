@@ -145,13 +145,13 @@
                 div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
                 div Reference: each file can be <= 50Mb
 
-        .form__table
+        //.form__table
           .table(style="margin-top: 20px;")
             GeneralTable(
-              :fields="fields2"
-              :tableData="[currentClientRequest.requestForm.complianceOptions]"
-              :bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
-              :tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
+              //:fields="fields2"
+              //:tableData="[currentClientRequest.requestForm.complianceOptions]"
+              //:bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
+              //:tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
             )
               .table__header(slot="headerTemplate" slot-scope="{ field }") {{ field.label }}
               .table__header(slot="headerDescriptions" slot-scope="{ field }") {{ field.label }}
@@ -161,11 +161,11 @@
                 .table__data(v-if="currentActive !== index") {{row.title}}
                 .table__dataDrop(v-else)
                   SelectSingle(
-                    :isTableDropMenu="true",
-                    placeholder="Select",
-                    :selectedOption="currentTemplate.title",
-                    :options="complianceTemplates.map(({title}) => title)",
-                    @chooseOption="setTemplate"
+                    //:isTableDropMenu="true",
+                    //placeholder="Select",
+                    //:selectedOption="currentTemplate.title",
+                    //:options="complianceTemplates.map(({title}) => title)",
+                    //@chooseOption="setTemplate"
                   )
 
               template(slot="description" slot-scope="{ row, index }")
@@ -177,7 +177,7 @@
                   img.form__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="[{'opacity-1': isActive(key, index)}, {'opacity-04': currentClientRequest.checkedForm.isCheckComplianceTemplate}]")
                   Check(@click="(e) => checkTemplate(e)", :isApproved="currentClientRequest.checkedForm.isCheckComplianceTemplate" :isDisabled="currentActive === index")
 
-      .form__comments
+      //.form__comments
         .form__commentsBlock
           Check(id="checkBrief" @click="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
           .input__title Project Brief:
@@ -185,6 +185,8 @@
         .form__commentsBlock
           .input__title Notes:
           textarea(type="text" rows="9" v-model="currentClientRequest.notes" @change="changeNotes(currentClientRequest.notes)")
+      .form__comments
+        Instructions(:instructions="JSON.parse(currentClientRequest.notes)")
 
       .form__button
         Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
@@ -240,7 +242,21 @@
           Button(v-if="(isAdmin || isAm()) && !isAmSet()" customClass="middle"  class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
           Button(v-if="isAdmin || isAm()" customClass="middle" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
 
-
+      .side__info
+        .form__wrapper(v-if="!canUpdateRequest()")
+        .form__project
+          .form__project-title Billing Info
+        .order__row
+          .order__subTitle Client Billing:
+          .order__value
+            .drop
+              SelectSingle(
+                :hasSearch="true"
+                placeholder="Option"
+                :options="billingInfoList.map(({name}) => name)"
+                :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
+                @chooseOption="choseBillingInfo"
+              )
       .side__info
         .form__wrapper(v-if="!canUpdateRequest()")
         .form__project
@@ -267,6 +283,7 @@
                 :selectedOptions="currentClientRequest.requestForm.targetLanguages.length ? currentClientRequest.requestForm.targetLanguages.map(i => i.lang) : []"
                 @chooseOptions="setTargetLanguages"
               )
+
       //.side__contacts
       //  .form__contacts
       //    DataTable(
@@ -309,11 +326,20 @@
 	import ApproveModal from "../../ApproveModal"
 	import GeneralTable from "../../GeneralTable"
 	import SelectMulti from "../../SelectMulti"
+  import Instructions from "./Instructions"
+
+
+  import CKEditor from "ckeditor4-vue"
+  import '../../../assets/scss/ckeditor.scss'
+  import { instructions } from "../../../../enums"
 
 	export default {
 		mixins: [ crudIcons ],
 		data() {
 			return {
+			  instructions: instructions,
+        // isBrief: true,
+        // isNotes: true,
 				clientRequest: {},
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
@@ -333,52 +359,27 @@
 					{ label: "Client Contacts", headerKey: "headerName", key: "name", style: { width: "80%" } },
 					{ label: "", headerKey: "headerIcon", key: "icon", style: { width: "20%" } }
 				],
-				complianceTemplates: [
-					{
-						title: '[1] POI (Proof of Identity Documents)',
-						description: '<li>Full name</li><li>DOB</li><li>Issue date</li><li>Expiry date if there is any</li>'
-					},
-					{
-						title: '[2] POA (Proof of Address Documents)',
-						description: '<li>Full name</li><li>Address</li><li>Issue date</li>'
-					},
-					{
-						title: '[3] Tax declarations',
-						description: '<li>Name</li><li>Net annual declared income</li><li>Year of declaration</li><li>Issue date</li><li>Currency</li>'
-					},
-					{
-						title: '[4] Salary certificates / letters of employment',
-						description: '<li>Name</li><li>Net salary</li><li>Employer</li><li>Issue date</li><li>Currency</li>'
-					},
-					{
-						title: '[5] Sales / purchase agreements',
-						description: '<li>Name of seller</li><li>Name of buyer if any</li><li>Amount of the sale</li><li>Date of agreement</li><li>Issuing authority</li><li>Currency</li>'
-					},
-					{
-						title: '[6] Cancellation letters of bank accounts / CCs',
-						description: '<li>Account holder name</li><li>Account number</li><li>Issuing credit institution</li><li>CC digits</li><li>Issue date</li>'
-					},
-					{
-						title: '[7] Specific transactions on bank statements',
-						description: '<li>Brief description of specific transaction</li>'
-					},
-					{
-						title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
-						description: '<li>Type of doc</li><li>Names involved</li><li>Relation</li>'
-					},
-					{
-						title: '[9] Corporate: Company Info',
-						description: '<li>Registered name</li><li>Incorporation date</li><li>Directors and Authorised Signatories</li><li>Shareholders/ Beneficial Owners</li><li>Registered AND Business address (if available)</li><li>Share capital</li><li>Any information on Directors and Shareholders</li>'
-					},
-					{
-						title: '[10] Corporate: Financial statements',
-						description: '<li>Profit & Loss: line by line translation</li><li>Balance sheet: line by line translation</li><li>Additional notes: line by line for all table type notes</li><li>Any information regarding payments to shareholders and directors</li>'
-					},
-					{
-						title: 'N/A - no template',
-						description: ''
-					}
-				],
+        editorConfig: {
+          extraPlugins: [ 'colorbutton', 'smiley' ],
+          toolbarGroups: [
+            { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+            { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
+            { name: 'editing', groups: [ 'find', 'selection', 'spellchecker', 'editing' ] },
+            { name: 'forms', groups: [ 'forms' ] },
+            { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+            { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
+            { name: 'links', groups: [ 'links' ] },
+            // { name: 'insert', groups: [ 'insert' ] },
+            { name: 'styles', groups: [ 'styles' ] },
+            { name: 'colors', groups: [ 'colors' ] },
+            { name: 'tools', groups: [ 'tools' ] },
+            { name: 'others', groups: [ 'others' ] },
+            { name: 'about', groups: [ 'about' ] }
+          ],
+          removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
+          uiColor: "#ffffff",
+          height: 80
+        },
 				// forbiddenExtensions: [
 				// 	'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
 				// 	'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
@@ -404,6 +405,9 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
+      toggleBlock(prop) {
+        this[prop] = !this[prop]
+      },
 			getTargets({ requestForm }) {
 				if (!requestForm.targetLanguages.length) return '-'
 				return requestForm.targetLanguages.length > 1 ? requestForm.targetLanguages.map(i => i.lang).join(', ') : requestForm.targetLanguages[0].lang
@@ -838,7 +842,20 @@
 					acc = acc + curr + '; '
 					return acc
 				}, '')
-			}
+			},
+
+      async choseBillingInfo({option}) {
+        const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+        try {
+          const updatedProject = await this.$http.post(`/clients-requests/manage-client-billing-info/${ this.currentClientRequest._id }`, {
+            billingInfoId: billingInfo._id
+          })
+          this.setCurrentClientRequest(updatedProject.data)
+          this.alertToggle({ message: "Project billing info changed!", isShow: true, type: "success" })
+        } catch (err) {
+          this.alertToggle({ message: "Project billing info not changed!", isShow: true, type: "error" })
+        }
+      },
 		},
 		mounted() {
 			this.restructuredFiles(this.currentClientRequest)
@@ -851,6 +868,13 @@
 				languages: "getAllLanguages",
 				currentClientRequest: "getCurrentClientRequest"
 			}),
+      billingInfoList() {
+        if (!this.currentClientRequest.customer.billingInfo || !this.currentClientRequest.customer.billingInfo.length) return []
+
+        const billingInfo = this.currentClientRequest.customer.billingInfo
+        return billingInfo.map(({ _id, paymentType, name }) => ({ _id, paymentType, name }))
+
+      },
 			getSourceLanguages() {
 				if (this.languages.length) {
 					const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
@@ -870,6 +894,7 @@
 							.map(item => item.targetLanguages[0])) ]
 					return neededServices.map(item => this.languages.find(item2 => item2._id.toString() === item))
 				}
+				return []
 			},
 			isAdmin() {
 				const { group: { name } } = this.user
@@ -906,7 +931,7 @@
 				const isSourceFiles = !sourceFiles.length ? true : sourceFiles.every(({ isCheck }) => isCheck)
 				const isRefFiles = !refFiles.length ? true : refFiles.every(({ isCheck }) => isCheck)
 
-				return isSourceFiles && isRefFiles && isCheckProjectName && isCheckDeadline && isCheckBrief && isCheckComplianceTemplate && !!projectManager
+				return isSourceFiles && isRefFiles && isCheckProjectName && isCheckDeadline && isCheckBrief && !!projectManager
 			}
 		},
 
@@ -920,7 +945,9 @@
 			Add,
 			DataTable,
 			Check,
-			DatepickerWithTime
+			DatepickerWithTime,
+      ckeditor: CKEditor.component,
+      Instructions,
 		}
 	}
 </script>
@@ -1041,8 +1068,8 @@
   .form {
     position: relative;
     padding: 20px;
-    min-width: 1000px;
-    max-width: 1000px;
+    min-width: 1040px;
+    max-width: 1040px;
     box-sizing: border-box;
     box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     border-radius: 4px;
@@ -1109,8 +1136,10 @@
     }
 
     &__commentsBlock {
-      display: block;
+      border: 1px solid $light-border;
       position: relative;
+      border-radius: 4px;
+      background-color: white;
       width: 48.5%;
     }
 
@@ -1393,7 +1422,37 @@
       border: 1px solid $border-focus;
     }
   }
+  .block {
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      cursor: pointer;
+      align-items: center;
+      transition: .2s ease;
+      align-items: center;
+      letter-spacing: 0.2px;
+      border-radius: 4px;
 
+      &-grey {
+        background-color: white;
+      }
+
+      .title {
+        font-size: 16px;
+      }
+
+      .icon {
+        font-size: 15px;
+        color: $text;
+      }
+    }
+
+    &__data {
+      //padding: 20px 20px 20px;
+      border-top: 2px solid $light-border;
+    }
+  }
   #checkProject,
   #checkDeadline {
     position: absolute;

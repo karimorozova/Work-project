@@ -5,18 +5,19 @@
       .block__header-right
 
         .header__button
-          .dropdown(v-click-outside="closeRequestsMenu")
+
+          //.dropdown(v-click-outside="closeRequestsMenu")
             .dropdown__block(@click="showDropdown")
               .dropdown__title
                 span New Project
-              .dropdown__icon
+              //.dropdown__icon
                 img(src="../../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
-            .dropdown__dropbox(v-if="dropdownVisible")
+            //.dropdown__dropbox(v-if="dropdownVisible")
               .dropdown__item(v-if="client.name === 'eToro (Europe) Limited'" v-for='(proj, ind) in newProjectOnlyComplianceOption' @click='dataForRequest(ind, "newProjectOnlyComplianceOption")')
                 .dropdown__item-text {{ proj.title }}
               .dropdown__item(v-if="client.name !== 'eToro (Europe) Limited'" v-for='(proj, ind) in newProject' @click='dataForRequest(ind, "newProject")')
                 .dropdown__item-text {{ proj.title }}
-          //Button(value="FOO BAR" @clicked="gotoRequestPage")
+          Button(value="New Project" @clicked="dataForRequest")
 
         div(v-click-outside="clickOutside")
           .header__user(@click="toggleMenu")
@@ -49,13 +50,13 @@
 			return {
 				isDropBox: false,
 				domain: '',
-				dropdownVisible: false,
+				// dropdownVisible: false,
         newProjectOnlyComplianceOption: [
-	        { title: "Compliance", path: "/compliance" }
+	        { title: "Compliance", path: "/new-request" }
         ],
 				newProject: [
 					{ title: "Translation", path: "/translation" },
-          { title: "Compliance", path: "/compliance" }
+          { title: "Compliance", path: "/new-request" }
 
 					// { title: "Copywriting", path: "/copywriting" },
 					// { title: "Marketing", path: "/marketing" },
@@ -71,20 +72,15 @@
 			...mapActions([
 				"logout"
 			]),
-			dataForRequest(ind, dataArr) {
-				this.serviceType = this[dataArr][ind].title
-				// this.navbarList.forEach((item, i) => {
-				// 	item.active = i === ind
-				// })
-				this.$router.push(`/client-request${ this[dataArr][ind].path }`)
-				this.dropdownVisible = false
+			dataForRequest() {
+				this.$router.push(`/client-request/new-request`)
 			},
-			showDropdown() {
-				this.dropdownVisible = !this.dropdownVisible
-			},
-			closeRequestsMenu() {
-				this.dropdownVisible = false
-			},
+			// showDropdown() {
+			// 	this.dropdownVisible = !this.dropdownVisible
+			// },
+			// closeRequestsMenu() {
+			// 	this.dropdownVisible = false
+			// },
 			signOut() {
 				this.logout()
 				this.$router.push('/login')

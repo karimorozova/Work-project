@@ -43,7 +43,7 @@ const translationServiceRequest = async (formData, client) => {
 	})
 }
 
-const complianceServiceRequest = async (formData, client) => {
+const newClientServiceRequest = async (formData, client) => {
 	//TODO: refactor | Client PaymentType
 	const {  paymentType: paymentProfile , _id } = client
 	const { deadline, projectName, brief, startOption, service } = formData
@@ -51,7 +51,7 @@ const complianceServiceRequest = async (formData, client) => {
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
 	const targetLanguages = JSON.parse(formData.targetLanguages)
 	const industry = JSON.parse(formData.industry)
-	const complianceTemplate = JSON.parse(formData.complianceTemplate)
+	// const complianceTemplate = JSON.parse(formData.complianceTemplate)
 	const clientContacts = JSON.parse(formData.clientContacts)
 	const createdBy = JSON.parse(formData.createdBy)
 
@@ -75,7 +75,6 @@ const complianceServiceRequest = async (formData, client) => {
 			targetLanguages: [ targetLanguages ],
 			startOption,
 			service: await Services.findOne({ title: service }),
-			complianceOptions: complianceTemplate
 		}
 	})
 }
@@ -121,7 +120,7 @@ const getNextNumberForProjectName = async () => {
 
 module.exports = {
 	translationServiceRequest,
-	complianceServiceRequest,
+	newClientServiceRequest,
 	notifyAMsRequestCreated,
 	createRequestFiles
 }

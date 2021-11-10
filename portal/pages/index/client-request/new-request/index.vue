@@ -1,6 +1,6 @@
 <template lang="pug">
   .component
-    .title(v-if="!isSent") Compliance Request Form
+    .title(v-if="!isSent") Request Form
     .component__body(v-if="!isSent")
       .component__form
         Validation-errors(v-if="showError"
@@ -114,12 +114,12 @@
         .form__part
 
           .form__row
-            .form__col
+            Instructions(:instructions="instructions" @changedInstructions="setInstructions")
+            //.form__col
               .form__select-block
                 .form__input-title-margin9 Enter a short brief:
                 .form__details(id="instructions" contenteditable="true" @input="selectOnlyExisted" )
-                  p
-            .form__col
+            //.form__col
               .form__select-block(v-if="selectedService" style="width: 240px")
                 .form__input-title-margin9 Select instructions:
                 .form__checked(v-for=" ( instruction, index) of instructions[selectedService]" style="width: 50%")
@@ -195,6 +195,7 @@ import { mapActions, mapGetters } from "vuex"
 	import moment from "moment"
 	import UploadFileButton from "../../../../components/buttons/UploadFileButton"
 	import TextRadio from "../../../components/forms/TextRadio"
+	import Instructions from "../../../components/forms/Instructions"
 	import DataTable from "../../../../components/Tables/DataTable"
 	import Add from "../../../../components/pangea/Add"
 	import ClientTable from "../../../../components/ClientTable"
@@ -204,7 +205,8 @@ import { mapActions, mapGetters } from "vuex"
 	import GeneralTable from "../../../../components/pangea/GeneralTable"
 
   import CheckBox from "../../../../components/CheckBox"
-import { getUser } from "../../../../store/actions"
+  import { instructions } from "../../../../../admin/enums"
+  import { getUser } from "../../../../store/actions"
 
 
 	export default {
@@ -239,145 +241,8 @@ import { getUser } from "../../../../store/actions"
 
 				errors: [],
 				showError: false,
-        instructions: {
-          "Translation": [
-            {
-              name: "test",
-              pattern: "It is test text. Just for test"
-            },
-            {
-              name: "test2",
-              pattern: "It is test2 text. Just for test"
-            },
-            {
-              name: "test3",
-              pattern: "It is test3 text. Just for test"
-            },
-            {
-              name: "test4",
-              pattern: "It is test4 text. Just for test"
-            },
-          ],
-          "Localization": [
-            {
-              name: "test",
-              pattern: "It is test text. Just for test"
-            },
-            {
-              name: "test2",
-              pattern: "It is test2 text. Just for test"
-            },
-            {
-              name: "test3",
-              pattern: "It is test3 text. Just for test"
-            },
-            {
-              name: "test4",
-              pattern: "It is test4 text. Just for test"
-            },
-          ],
-        },
-				// complianceTemplates: [
-				// 	{
-				// 		title: '[1] POI (Proof of Identity Documents)',
-				// 		description:
-				// 				'<li>Full name</li>' +
-				// 				'<li>DOB</li>' +
-				// 				'<li>Issue date</li>' +
-				// 				'<li>Expiry date if there is any</li>'
-				// 	},
-				// 	{
-				// 		title: '[2] POA (Proof of Address Documents)',
-				// 		description:
-				// 				'<li>Full name</li>' +
-				// 				'<li>Address</li>' +
-				// 				'<li>Issue date</li>' +
-				// 				'<li>Who Issued</li>'
-				// 	},
-				// 	{
-				// 		title: '[3] Tax declarations',
-				// 		description:
-				// 				'<li>Name of taxpayer</li>' +
-				// 				'<li>Net annual declared income</li>' +
-				// 				'<li>Dividend’s amount (from which company)</li>' +
-				// 				'<li>Salaries amount</li>' +
-				// 				'<li>Other income amount (specify the source of income in rent, insurances, royalties, sale of property)</li>' +
-				// 		    '<li>Net annual declared income</li>' +
-				// 				'<li>Year of declaration</li>' +
-				// 				'<li>Issue date</li>' +
-				// 				"<li>Employer's details</li>" +
-				// 				'<li>Currency</li>'
-				// 	},
-				// 	{
-				// 		title: '[4] Salary certificates / letters of employment',
-				// 		description:
-				// 				'<li>Name</li>' +
-				// 				'<li>Net salary</li>' +
-				// 				'<li>Employer</li>' +
-				// 				'<li>Issue date</li>' +
-				// 				'<li>Currency</li>'
-				// 	},
-				// 	{
-				// 		title: '[5] Sales / purchase agreements',
-				// 		description:
-				// 				'<li>Name of seller</li>' +
-				// 				'<li>Name of buyer if any</li>' +
-				// 				'<li>Amount of the sale</li>' +
-				// 				'<li>Date of agreement</li>' +
-				// 				'<li>Issuing authority</li>' +
-				// 				'<li>Currency</li>'
-				// 	},
-				// 	{
-				// 		title: '[6] Cancellation letters of bank accounts / CCs',
-				// 		description:
-				// 				'<li>Account holder name</li>' +
-				// 				'<li>Account number</li>' +
-				// 				'<li>Issuing credit institution</li>' +
-				// 				'<li>CC digits</li>' +
-				// 				'<li>Issue date</li>'
-				// 	},
-				// 	{
-				// 		title: '[7] Specific transactions on bank statements',
-				// 		description:
-				// 				'<li>Brief description of specific transaction</li>'
-				// 	},
-				// 	{
-				// 		title: '[8] Proof of relation documents (eg birth certificates, marriage certificates)',
-				// 		description:
-				// 				'<li>Type of doc</li>' +
-				// 				'<li>Names involved</li>' +
-				// 				'<li>Relation</li>'
-				// 	},
-				// 	{
-				// 		title: '[9] Corporate Documents',
-				// 		description:
-				// 				'<li>Registered name</li>' +
-				// 				'<li>Incorporation date</li>' +
-				// 				'<li>Directors and Authorised Signatories</li>' +
-				// 				'<li>Shareholders / Beneficial owners</li>' +
-				// 				'<li>Registered and Business address (if available)</li>' +
-				// 				'<li>Share capital</li>' +
-				// 				'<li>Any information on Directors and Shareholders</li>'+
-				// 				'<li>Form of the legal entity (limited company/partnership/sole proprietorship etc)</li>' +
-				// 				'<li>Nature of business of the company</li>' +
-				// 				'<li>Any other important points</li>'
-				// 	},
-				// 	{
-				// 		title: '[10] Financial statements',
-				// 		description:
-				// 				'<li>Company name and year of FSs</li>' +
-				// 				'<li>Declared gross and net profit/loss for the year (amount and currency)</li>' +
-				// 				'<li>Declared accumulated reserves (amount and currency)</li>' +
-				// 				'<li>Any information regarding payments to and from shareholders and/or directors</li>' +
-				// 				'<li>Any company obligations/loans to/from capital owners and management</li>' +
-				// 				'<li>Taxes due from company</li>' +
-				// 				'<li>References to distributions of dividends or profits to shareholders</li>'
-				// 	},
-				// 	{
-				// 		title: 'N/A - no template',
-				// 		description: ''
-				// 	}
-				// ],
+        selectedInstructions: '',
+				instructions: instructions,
       }
 		},
 		methods: {
@@ -405,25 +270,24 @@ import { getUser } from "../../../../store/actions"
 					currentIndustries: this.currentIndustries,
 					currentSourceLang: this.currentSourceLang,
 					currentTargetLang: this.currentTargetLang,
+          selectedInstructions: this.selectedInstructions,
 					files: this.files,
-					currentBrief: this.currentBrief,
-					currentComplianceTemplate: this.currentComplianceTemplate,
 					startOption: this.startOption
 				}
 			},
 
-      toggleCheck(index, status ) {
-		    const toggledInstruction = this.instructions[this.selectedService][index]
-		    if (status) {
-		      document.querySelector('#instructions').innerHTML += `<p id='${toggledInstruction.name}'> ${toggledInstruction.pattern}</p>`
-          // this.editorData += `<ast data-test='tadsadas'> ${toggledInstruction.pattern}</ast>`
-        } else {
-		      document.querySelector(`#${toggledInstruction.name}`).remove()
-          // this.editorConfig.replace('<.* id=".*>.*>')
-        }
-
-		    this.$set(toggledInstruction, "isActive", status)
-      },
+      // toggleCheck(index, status ) {
+		  //   const toggledInstruction = this.instructions[this.selectedService][index]
+		  //   if (status) {
+		  //     document.querySelector('#instructions').innerHTML += `<p id='${toggledInstruction.name}'> ${toggledInstruction.pattern}</p>`
+      //     // this.editorData += `<ast data-test='tadsadas'> ${toggledInstruction.pattern}</ast>`
+      //   } else {
+		  //     document.querySelector(`#${toggledInstruction.name}`).remove()
+      //     // this.editorConfig.replace('<.* id=".*>.*>')
+      //   }
+      //
+		  //   this.$set(toggledInstruction, "isActive", status)
+      // },
 
 			closeErrors() {
 
@@ -443,7 +307,7 @@ import { getUser } from "../../../../store/actions"
 				}
 			},
 			async addService() {
-				this.isRequestSend = true
+        this.isRequestSend = true
 				let formData = new FormData()
 				formData.append('service', this.selectedService)
 				formData.append('deadline', this.currentDeadline)
@@ -451,7 +315,8 @@ import { getUser } from "../../../../store/actions"
 				formData.append('sourceLanguage', JSON.stringify(this.currentSourceLang))
 				formData.append('targetLanguages', JSON.stringify(this.currentTargetLang))
 				formData.append('industry', JSON.stringify(this.currentIndustries))
-				formData.append('brief', this.currentBrief)
+				formData.append('brief',this.selectedInstructions )
+				// formData.append('brief', this.currentBrief)
 				formData.append('startOption', this.startOption)
 				formData.append('complianceTemplate', JSON.stringify(this.currentComplianceTemplate))
 				formData.append('clientContacts', JSON.stringify(this.currentContacts))
@@ -461,7 +326,7 @@ import { getUser } from "../../../../store/actions"
 				if (this.sourceFiles.length) for (let file of this.sourceFiles) formData.append('sourceFiles', file)
 
 				try {
-					await this.$axios.post('/portal/compliance-service-request', formData)
+					await this.$axios.post('/portal/new-client-service-request', formData)
 					this.isSent = true
 					this.isRequestSend = false
 				} catch (err) {
@@ -477,9 +342,9 @@ import { getUser } from "../../../../store/actions"
 			addContact(data) {
 				this.currentContacts.push(data)
 			},
-			setComplianceTemplate({ option }) {
-				this.currentComplianceTemplate = this.complianceTemplates.find(({ title }) => title === option)
-			},
+			// setComplianceTemplate({ option }) {
+			// 	this.currentComplianceTemplate = this.complianceTemplates.find(({ title }) => title === option)
+			// },
 			outsideClickListener(e) {
 				const layout = document.getElementById("modal")
 				const add = document.getElementById("add")
@@ -551,9 +416,11 @@ import { getUser } from "../../../../store/actions"
 				if (type === 'Source') this.deleteFileByIdx(this.sourceFiles)
 				if (type === 'Reference') this.deleteFileByIdx(this.refFiles)
 			},
+      setInstructions(instructions) {
+		    this.selectedInstructions = instructions
+      },
       setServices({option}){
         this.selectedService = option
-        document.querySelector('#instructions').innerHTML = '<p></p>'
       }
 		},
 		computed: {
@@ -600,6 +467,7 @@ import { getUser } from "../../../../store/actions"
 								this.clientInfo.services
 										.filter(i => i.industries[0].name === this.currentIndustries.name)
 										.filter(i => i.services[0].title === this.selectedService)
+                    .filter(i => i.sourceLanguage.lang === this.currentSourceLang.lang)
 										.map(i => i.targetLanguages[0].lang)
 										.filter(i => i !== "English" && i !== "English (United States)")
 						)
@@ -614,7 +482,6 @@ import { getUser } from "../../../../store/actions"
           )
         ]
         return services
-
       },
 			mappedIndustries() {
 				if (this.clientInfo.services) {
@@ -629,9 +496,9 @@ import { getUser } from "../../../../store/actions"
 					return servicesIndustries
 				}
 			},
-			mappedComplianceTemplates() {
-				return this.complianceTemplates.map(i => i.title)
-			}
+			// mappedComplianceTemplates() {
+			// 	return this.complianceTemplates.map(i => i.title)
+			// }
 		},
     created() {
       this.getLanguages()
@@ -649,6 +516,7 @@ import { getUser } from "../../../../store/actions"
 			SelectSingle,
 			ClientTable,
       CheckBox,
+      Instructions,
 		}
 
 	}

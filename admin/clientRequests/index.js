@@ -8,7 +8,7 @@ const {
 } = require('./getClientsRequests')
 
 const {
-	complianceServiceRequest,
+	newClientServiceRequest,
 	createRequestFiles,
 	notifyAMsRequestCreated,
 	translationServiceRequest
@@ -38,7 +38,7 @@ const {
 module.exports = {
 	translationServiceRequest,
 	notifyAMsRequestCreated,
-	complianceServiceRequest,
+	newClientServiceRequest,
 	createRequestFiles,
 	uploadRequestFiles,
 	checkRequestedFiles,

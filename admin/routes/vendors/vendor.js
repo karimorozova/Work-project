@@ -358,7 +358,7 @@ router.get("/vendor-rates", checkVendor, async (req, res) => {
 	}
 })
 
-router.post('/step-target-compliance', checkVendor, upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
+router.post('/step-target-new-request', checkVendor, upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const { jobId } = req.body
 	try {
 		const project = await getProject({ 'steps._id': jobId })

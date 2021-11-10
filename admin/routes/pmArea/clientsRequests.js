@@ -37,6 +37,18 @@ router.post('/manage-request-languages', async (req, res) => {
 })
 
 
+router.post('/manage-client-billing-info/:id', async (req, res) => {
+	const { billingInfoId } = req.body
+	const { id } = req.params
+	try {
+		await ClientRequest.updateOne({ "_id": id}, { 'clientBillingInfo': billingInfoId  })
+		const updatedProject = await getClientRequestById({ "_id": id })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on setting billing info')
+	}
+})
 router.post('/manage-client-contact', async (req, res) => {
 	const { contact, action, projectId } = req.body
 	try {

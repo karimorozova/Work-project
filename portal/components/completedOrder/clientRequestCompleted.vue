@@ -57,16 +57,8 @@
 
         .form__title Project Details
         .form__part
-          .form__row
-            .form__col
-              .form__select
-                .form__input-title Template:
-
-                .width-220 {{ values.currentComplianceTemplate.title}}
-            .form__col
-              .form__select
-                .width-310
-                  ul(v-html="values.currentComplianceTemplate.description" )
+          .form__select
+            Instructions(:instructions="instructions" :isEditable="false" :selectedStartInstructions="values.selectedInstructions")
 
           //.form__row
           //  .form__col
@@ -100,9 +92,11 @@
 	import TextRadio from "../../pages/components/forms/TextRadio"
 	import { mapActions } from "vuex"
 	import GeneralTable from "../pangea/GeneralTable"
+	import Instructions from "../../pages/components/forms/Instructions"
+  import { instructions } from "../../../admin/enums"
 
 	export default {
-		components: { GeneralTable, TextRadio, DataTable, Button },
+		components: { GeneralTable, TextRadio, DataTable, Button, Instructions },
 		props: {
 			values: {},
 			isStartOption: {
@@ -115,7 +109,8 @@
 				fields: [
 					{ label: "File Name", headerKey: "headerFile", key: "file", style: { width: "70%" } },
 					{ label: "File Type", headerKey: "headerType", key: "type", style: { width: "30%" } }
-				]
+				],
+        instructions: instructions,
 			}
 		},
 		methods: {

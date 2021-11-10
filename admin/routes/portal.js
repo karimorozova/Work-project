@@ -18,7 +18,7 @@ const { getProjectDeliverables } = require('../projects/files')
 const {
 	getClientsRequestsForPortal,
 	getClientsRequestForPortal,
-	complianceServiceRequest,
+	newClientServiceRequest,
 	createRequestFiles,
 	notifyAMsRequestCreated,
 	translationServiceRequest,
@@ -53,11 +53,11 @@ router.post('/translation-service-request', checkClientContact, upload.fields([ 
 	}
 })
 
-router.post('/compliance-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
+router.post('/new-client-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
 		let client = await getClient({ "_id": verificationResult.clientId })
-		const request = await complianceServiceRequest(req.body, client)
+		const request = await newClientServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
 		notifyAMsRequestCreated(request)
 		res.send('Done')
