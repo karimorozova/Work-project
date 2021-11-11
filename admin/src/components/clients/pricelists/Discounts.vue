@@ -1,17 +1,26 @@
 <template lang="pug">
   .discounts
     .discounts__block
-      .discounts__title
-        .discounts__title-name Discount/Surcharge total:
-        .discounts__title-value {{allDiscountsValue}}  &#37;
+      GeneralTable(
+        :fields="fields"
+        :tableData="enumDiscounts"
+        :isBodyShort="true"
+        :errors="errors"
+        :areErrors="areErrors"
+        :isApproveModal="isDeleting"
+        @closeErrors="closeErrors"
+        @approve="deleteDiscount"
+        @closeModal="cancel"
+        @notApprove="cancel"
+      )
+        template(slot="headerDiscount" slot-scope="{ field }")
+          .table__header {{ field.label }}
+        template(slot="headerIcons" slot-scope="{ field }")
+          .table__header {{ field.label }}
 
-      .discounts__lists
-        .discounts__list(v-for="(item, index) in enumDiscounts")
-
-          .discounts__list-name(v-if="item.name")
-            span(:style="textMargin") {{item.name}}
-
-          .discounts__list-dropMenu(v-else)
+        template(slot="discount" slot-scope="{ row, index }")
+          .table__data(v-if="currentActive !== index") {{ row.name }}
+          .table__drop(v-else)
             SelectSingle(
               :isTableDropMenu="true",
               placeholder="Select",
@@ -20,18 +29,11 @@
               :options="filteredDiscounts",
               @chooseOption="setDiscount"
             )
+        template(slot="icons" slot-scope="{ row, index }")
+          .table__icons
+            img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
 
-          .discounts__list-value
-            span(v-if="item.value") {{item.value}} &#37;
-            span(v-if="currentDiscount.value && !item.value") {{currentDiscount.value}} &#37;
-
-          .discounts__list-icons(v-if="paramsIsEdit")
-            img.icon(v-if="item._id" :src="icons.delete.icon" @click="deleteDiscount(item._id)")
-            img.icon(v-else :src="icons.save.icon" @click="checkErrors()")
-          .discounts__list-icons(v-else)
-            img.opacity(:src="icons.delete.icon")
-
-    .discounts__add(v-if="paramsIsEdit")
+    .discounts__add(v-if="true")
       Add(@add="addData")
 
 </template>
@@ -39,6 +41,7 @@
 <script>
 	import crudIcons from "@/mixins/crudIcons"
 	import SelectSingle from "../../SelectSingle"
+	import GeneralTable from "../../GeneralTable"
 	import Add from "../../Add"
 	import { mapActions } from 'vuex'
 
@@ -54,22 +57,59 @@
 		},
 		data() {
 			return {
-				icons: {
-					save: { icon: require("../../../assets/images/Other/save-icon-qa-form.png") },
-					delete: { icon: require("../../../assets/images/Other/delete-icon-qa-form.png") }
-				},
-				textMargin: { 'padding-left': '7px' },
+				fields: [
+					{
+						label: "Discount/Surcharge",
+						headerKey: "headerDiscount",
+						key: "discount",
+						style: { width: "65%" }
+					},
+					{
+						label: "",
+						headerKey: "headerIcons",
+						key: "icons",
+						style: { width: "35%" }
+					}
+				],
 				enumDiscounts: [],
 				allDiscounts: [],
 				currentActive: -1,
 				currentDiscount: {},
 				areErrors: false,
-				errors: []
+				errors: [],
+        isDeleting: false,
+        deleteIndex: -1,
 			}
 		},
 		methods: {
 			...mapActions([ 'alertToggle', 'setCurrentProject' ]),
-
+      async makeAction(index, key) {
+				if (this.currentActive !== -1 && this.currentActive !== index) {
+					return this.isEditing()
+				}
+				if (key === "save") {
+					await this.checkErrors(index)
+				}
+				if (key === "edit") {
+					this.setEditionData(index)
+				}
+				if (key === "cancel") {
+					if (this.currentActive === -1) return
+					this.cancel()
+          await this.getEnumDiscounts()
+				}
+				if (key === "delete") {
+					if (!this.enumDiscounts[index]._id) {
+						this.enumDiscounts.splice(index, 1)
+						return this.cancel()
+					}
+					this.deleteIndex = index
+					this.isDeleting = true
+				}
+			},
+			closeErrors() {
+				this.areErrors = false
+			},
 			setDiscount({ option }) {
 				this.currentDiscount = this.allDiscounts.find(item => item.name === option)
 			},
@@ -85,35 +125,34 @@
 					isActive: true
 				})
 				this.setEditionData(this.enumDiscounts.length - 1)
-				// this.$nextTick(() => this.scrollToEnd());
 			},
-			// scrollToEnd() {
-			// 	const element = this.$el.querySelector('.discounts__lists');
-			// 	element.scrollTop = element.scrollHeight
-			// },
 			cancel() {
 				this.currentActive = -1
-				this.currentDiscount = {}
+				this.currentDiscount = {},
+        this.deleteIndex = -1
+				this.isDeleting = false
 			},
-			async checkErrors() {
+			async checkErrors(index) {
 				if (this.currentActive === -1) return
 				this.errors = []
-				// if(!this.currentName) this.errors.push("Name should not be empty!");
-				// if(!this.currentValue) this.errors.push("Value should not be empty!");
+				if(!this.currentDiscount.name) this.errors.push("Discount/Surcharge should not be empty!");
 				if (this.errors.length) {
 					this.areErrors = true
 					return
 				}
-				await this.saveChanges()
+				await this.saveChanges(index)
 			},
 			updateEnumData(result) {
 				this.enum === 'PngSysProject' && this.setCurrentProject(result.data)
 				this.enum === 'XTRFProject' && this.$emit('updateXTRFProject', result.data)
 			},
-			async saveChanges() {
+			async saveChanges(index) {
 				this.enumDiscounts = this.enumDiscounts.filter(({ name }) => name)
 				const updatedArray = this.enumDiscounts
-				updatedArray.push(this.currentDiscount)
+
+        if(!this.currentDiscount._id) updatedArray.push(this.currentDiscount)
+        else updatedArray.splice(index, 1, this.currentDiscount)
+			
 				try {
 					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray })
 					this.updateEnumData(result)
@@ -125,7 +164,7 @@
 				}
 			},
 			async deleteDiscount(id) {
-				this.enumDiscounts = this.enumDiscounts.filter(item => item._id.toString() !== id.toString())
+				this.enumDiscounts = this.enumDiscounts.filter((item, index) => index !== this.deleteIndex)
 				try {
 					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray: this.enumDiscounts })
 					this.updateEnumData(result)
@@ -155,7 +194,6 @@
 		},
 		watch: {
 			paramsIsEdit(newValue, oldValue) {
-				// if (oldValue && !newValue) this.enumDiscounts = this.enumDiscounts.filter(({ name }) => name)
 				if (!newValue) {
 					this.enumDiscounts = this.enumDiscounts.filter(item => !!item.name)
 					this.cancel()
@@ -179,13 +217,7 @@
 							get: '/pm-manage/get-project-discounts/?id=',
 							update: '/pm-manage/update-project-discounts'
 						}
-					case 'XTRFProject':
-						return {
-							get: '/memoqapi/get-project-discounts/?id=',
-							update: '/memoqapi/update-project-discounts'
-						}
 				}
-
 			},
 			filteredDiscounts() {
 				return this.allDiscounts
@@ -203,105 +235,59 @@
 		},
 		components: {
 			Add,
-			SelectSingle
+			SelectSingle,
+			GeneralTable
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors.scss";
-  @import "../../../assets/styles/settingsTable";
-
-  .discounts {
-    display: block;
-
-    &__block {
-      border: 1px solid $border;
-      width: 356px;
+    .discounts{
+      max-width: 400px;
     }
 
-    &__title {
-      height: 40px;
-      line-height: 40px;
-      padding-left: 7px;
-      border-bottom: 1px solid $border;
+    .table {
+    width: 100%;
+
+    &__data {
+      padding: 0 7px;
+    }
+
+    &__header {
+      padding: 0 7px;
+    }
+
+    &__drop {
+      position: relative;
+      height: 32px;
+      max-width: 220px;
+      margin: 0 7px;
+      width: 100%;
+      background: white;
+      border-radius: 4px;
+    }
+
+    &__icons {
       display: flex;
       align-items: center;
-
-      &-name {
-        width: 234px;
-        font-size: 14px;
-        height: 40px;
-        font-family: 'Myriad600';
-      }
-
-      &-value {
-        width: 50px;
-        text-align: center;
-        font-size: 14px;
-        font-family: 'Myriad600';
-      }
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
     }
 
-    &__add {
-      margin-top: 10px;
+    &__icon {
+      cursor: pointer;
+      opacity: 0.5;
     }
 
-    &__lists {
-      /*max-height: 93px;*/
-      /*overflow-y: scroll;*/
+    &__opacity {
+      opacity: 1;
     }
 
-    &__list {
-      display: flex;
-      height: 40px;
-      border-bottom: 1px solid $light-border;
-      align-items: center;
-
-      &-dropMenu {
-        position: relative;
-        width: 220px;
-        height: 32px;
-        margin: 0 7px;
-      }
-
-      &-name {
-        width: 234px;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        height: 40px;
-      }
-
-      &-value {
-        width: 60px;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-left: 1px solid $light-border;
-        height: 40px;
-      }
-
-      &-icons {
-        width: 50px;
-        border-left: 1px solid $light-border;
-        text-align: center;
-        padding-top: 4px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+    &__input {
+      width: 100%;
+      padding: 0 7px;
     }
-  }
-
-  .opacity {
-    cursor: default;
-    opacity: 0.5;
-  }
-
-  .icon {
-    cursor: pointer;
   }
 </style>
