@@ -1,7 +1,8 @@
 <template lang="pug">
-  .test {{clientRequests}}
-    .details(v-if="clientRequests.length")
+  .test
+    .details(v-if="clientRequest.hasOwnProperty('requestForm')")
       ClientRequestTranslationCompleted(v-if="clientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
+      //ClientRequestTranslationCompleted(v-if="clientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
       ClientRequestCompleted(v-else :isStartOption="false" :values="groupAllData()")
 </template>
 
@@ -31,9 +32,10 @@
           currentSourceLang: this.clientRequest.requestForm.sourceLanguage,
           currentTargetLang: this.clientRequest.requestForm.targetLanguages,
           currentService: this.clientRequest.requestForm.service.title,
+          selectedInstructions: this.clientRequest.notes,
           files: this.files,
-          currentComplianceTemplate: this.clientRequest.requestForm.complianceOptions,
-          currentBrief: this.clientRequest.brief,
+          // currentComplianceTemplate: this.clientRequest.?requestForm.complianceOptions,
+          // currentBrief: this.clientRequest.brief,
 
         }
       },

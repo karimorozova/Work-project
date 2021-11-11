@@ -52,6 +52,7 @@ function getSteps(project, id, allLanguages) {
 				memocDocs: stepTask.memoqDocs,
 				sourceFiles: stepTask.sourceFiles,
 				refFiles: stepTask.refFiles,
+				targetFiles: stepTask.targetFiles,
 				taskTargetFiles: stepTask.targetFiles,
 				fullSourceLanguage: getLangBySymbol(sourceLanguage),
 				fullTargetLanguage: getLangBySymbol(targetLanguage),

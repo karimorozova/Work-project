@@ -69,11 +69,12 @@ export default {
     return {
       jobFiles: [],
       fields: [
-        { label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35.8%", padding: 0 },
+        { label: "File Name", headerKey: "headerFileName", key: "fileName", width: "45.9%", padding: 0 },
+        // { label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35.8%", padding: 0 },
         { label: "Category", headerKey: "headerCategory", key: "category", width: "17.5%", padding: 0 },
         { label: "Progress", headerKey: "headerProgress", key: "progress", width: "17.5%", padding: 0 },
         { label: "Source", headerKey: "headerSource", key: "source", width: "10.1%", padding: 0 },
-        { label: "Target", headerKey: "headerTarget", key: "target", width: "10.1%", padding: 0 },
+        // { label: "Target", headerKey: "headerTarget", key: "target", width: "10.1%", padding: 0 },
         { label: "Editor", headerKey: "headerEditor", key: "editor", width: "9%", padding: 0 }
       ],
       domain: "",
@@ -130,7 +131,10 @@ export default {
       this.isFilesShown = !this.isFilesShown
     },
     fillJobFiles() {
-      if (this.job.sourceFiles) {
+      if (this.job.prevStep.hasOwnProperty("status") && this.job.prevStep.status === "Completed" ) {
+        this.jobFiles.push(...this.jobFilesFiller(this.job.targetFiles.map(({path}) => './dist'+ path), "Source file"))
+      }
+      if (this.job.prevStep === false) {
         this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
       }
       if (this.job.refFiles) {
