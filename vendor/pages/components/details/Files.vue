@@ -134,7 +134,7 @@ export default {
       if (this.job.prevStep.hasOwnProperty("status") && this.job.prevStep.status === "Completed" ) {
         this.jobFiles.push(...this.jobFilesFiller(this.job.targetFiles.map(({path}) => './dist'+ path), "Source file"))
       }
-      if (this.job.prevStep === false) {
+      if (this.job.prevStep === false || this.job.prevStep.status === 'Cancelled Halfway' || this.job.prevStep.status === 'Cancelled') {
         this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
       }
       if (this.job.refFiles) {
@@ -159,7 +159,7 @@ export default {
     },
     async goToMemoqEditor(file) {
       const { TotalWordCount, Reviewer1ConfirmedWordCount, WorkflowStatus, WebTransUrl, DocumentGuid } =
-          this.job.memocDocs.find(item => item.DocumentName === file.fileName && item.TargetLangCode === this.job.memoqTarget)
+          this.job.memoqDocs.find(item => item.DocumentName === file.fileName && item.TargetLangCode === this.job.memoqTarget)
 
       if ((TotalWordCount !== Reviewer1ConfirmedWordCount) && WorkflowStatus === 'Completed' && this.job.name === 'Revising') {
         this.projectGuid = this.job.memoqProjectId

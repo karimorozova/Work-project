@@ -13,6 +13,7 @@ const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs')
+const { log } = require("nodemon/lib/utils")
 
 async function getJobs(id) {
 	const allLanguages = await Languages.find()
@@ -35,6 +36,7 @@ function getSteps(project, id, allLanguages) {
 		const { steps, tasks } = project
 		let assignedSteps = []
 		let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id)
+
 		for (let step of filteredSteps) {
 			// if (step.name !== 'invalid') {
 			const stepTask = tasks.find(item => item.taskId === step.taskId)
@@ -49,7 +51,7 @@ function getSteps(project, id, allLanguages) {
 				brief: project.brief,
 				manager: project.projectManager,
 				industry: project.industry,
-				memocDocs: stepTask.memoqDocs,
+				memoqDocs: stepTask.memoqDocs,
 				sourceFiles: stepTask.sourceFiles,
 				refFiles: stepTask.refFiles,
 				targetFiles: stepTask.targetFiles,

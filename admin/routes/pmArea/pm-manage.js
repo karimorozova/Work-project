@@ -556,13 +556,11 @@ router.post('/reassign-vendor', async (req, res) => {
 	const { projectId, stepId, progress, isStart, isPay, reason, vendor } = req.body
 
 	try {
-		// const project = await getProject({ 'steps._id': reassignData.step._id })
-		const { steps, tasks } = await reassignVendor({ projectId, stepId, progress, isStart, isPay, reason, vendor })
-		// const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
-		// res.send(updatedProject)
+		const updatedProject = await reassignVendor({ projectId, stepId, progress, isStart, isPay, reason, vendor })
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
-		res.status(500).send('Error on sending emails to vendors')
+		res.status(500).send('Error on reassignments vendors')
 	}
 })
 

@@ -108,7 +108,7 @@
                   .assignedVendor__user-email {{ getAssignedVendorInfo().email }} (клик письмо)
                   .buttons
                     .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
-                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="openAssignments") Reassign
+                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
 
               .assignedVendor__user(v-if="Object.keys(selectedReassignedVendor).length")
                 .assignedVendor__user-image
@@ -126,7 +126,7 @@
                       .buttons__btn( @click="removeVendorAssignments()") Remove
                   //.buttons
                     .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
-                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="openAssignments") Reassign
+                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
 
             .assignmentsOptions(v-if="isReassignment")
               div
@@ -164,14 +164,14 @@
 
               Button(value="Approve" @clicked="checkAssignmentsErrors"  :isDisabled="!reason || !Object.keys(selectedReassignedVendor).length" :outline="true")
 
-            .vendors__search(v-if="!progressStepStatuses(steps.find(i => i._id.toString() === currentStepId)) || isReassignment" )
+            .vendors__search(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment")
               .vendors__search-title Vendors:
               .vendors__search-serch
                 input(type="text" placeholder="🔎︎  Search" v-model="vendorsSearch")
                 .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
                   i.fas.fa-backspace
 
-            .vendors(v-if="!progressStepStatuses(steps.find(i => i._id.toString() === currentStepId)) || isReassignment" :style="getMaxHeight()")
+            .vendors(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment" :style="getMaxHeight()")
               .vendor(v-if="listOfVendors.length" v-for="item in listOfVendors")
                 .vendor__row1
                   .vendor__user
@@ -252,7 +252,7 @@
 
 
     .vendor-manage__footer
-      Button(@clicked="saveVendors" :value="'Approve assignments'")
+      Button(@clicked="saveVendors" :isDisabled="isReassignment" :value="'Approve assignments'")
       Button(:value="'Cancel'" @clicked="closeVendorManage" :outline="true")
 
 </template>
@@ -325,10 +325,11 @@ export default {
       // if (payablesUnit.type === 'CAT Wordcount' && this.enteredProgress > this.getCurrentProgress()) {
       //   this.errors.push("Entered progress cannot be higher than current progress.")
       //   this.enteredProgress = ""
-      // }else if(this.enteredProgress >= 100){
-      //   this.errors.push("Entered progress cannot be higher than completed progress.")
-      //   this.enteredProgress = ""
       // }
+      if (this.enteredProgress >= 100) {
+        this.errors.push("Entered progress cannot be higher than completed progress.")
+        this.enteredProgress = ""
+      }
 
       if (this.errors.length) return this.areErrors = true
       await this.saveAssignment()
@@ -342,10 +343,11 @@ export default {
         isPay: this.isPay.yes,
         reason: this.reason,
         vendor: this.selectedReassignedVendor
-      };
+      }
       try {
-        await this.reassignVendor(reassignData);
-        // this.close();
+        await this.reassignVendor(reassignData)
+        this.setTab(0)
+        this.isReassignment = false
       } catch (err) {
       }
     },
@@ -378,7 +380,7 @@ export default {
       this.reason = option
       this.$refs.progress.value = this.enteredProgress || this.getCurrentProgress() || 0
     },
-    openAssignments() {
+    toggleAssignments() {
       if (this.isReassignment) this.removeVendorAssignments()
       this.isReassignment = !this.isReassignment
     },
@@ -421,6 +423,10 @@ export default {
     },
     progressStepStatuses({ status }) {
       const STATUSES = [ 'In progress' ]
+      return STATUSES.includes(status)
+    },
+    cancelledStepStatuses({ status }) {
+      const STATUSES = [ 'Cancelled', 'Cancelled Halfway' ]
       return STATUSES.includes(status)
     },
     removeVendorAssignments() {
@@ -571,7 +577,7 @@ export default {
       allLanguages: "getAllLanguages",
       allUnits: "getAllUnits",
       allSteps: "getAllSteps",
-      allIndustries: "getAllIndustries",
+      allIndustries: "getAllIndustries"
     }),
     progress() {
       return this.enteredProgress || this.getCurrentProgress()
