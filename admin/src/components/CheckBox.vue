@@ -10,36 +10,42 @@
 </template>
 
 <script>
-	export default {
-		props: {
-			isChecked: { type: Boolean },
-			customClass: { type: String },
-			isWhite: { type: Boolean, default: false },
-			isDisabled: { type: Boolean, default: false }
-		},
-		methods: {
-			check() {
-				this.$emit('check')
-			},
-			uncheck() {
-				this.$emit('uncheck')
-			}
-		}
-	}
+export default {
+  props: {
+    isChecked: { type: Boolean },
+    customClass: { type: String },
+    isWhite: { type: Boolean, default: false },
+    isDisabled: { type: Boolean, default: false }
+  },
+  methods: {
+    check() {
+      this.$emit('check')
+    },
+    uncheck() {
+      this.$emit('uncheck')
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 
-  .checkbox {
-    height: 19px;
-    width: 19px;
+.checkbox {
+  height: 19px;
+  width: 19px;
+
+  &__image {
+    background-color: white;
   }
-  .checkbox.size-small {
-    height: 15px;
+}
+
+.checkbox.size-small {
+  height: 15px;
+  width: 15px;
+
+  img {
     width: 15px;
-    img {
-      width: 15px;
-    }
   }
+}
 
 </style>

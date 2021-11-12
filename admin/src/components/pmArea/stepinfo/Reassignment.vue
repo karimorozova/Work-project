@@ -10,7 +10,8 @@
               placeholder="Select"
               :options="cancelReasons"
               @chooseOption="setReason"
-              :selectedOption="reason")
+              :selectedOption="reason"
+            )
       .reassignment__row
         LabelVal(text="New Vendor:")
           .reassignment__drop
@@ -163,18 +164,9 @@
 				} catch (err) {
 				}
 			},
-			// async getReasons() {
-			// 	try {
-			// 		const result = await this.$http.get("/api/reasons");
-			// 		this.reasons = result.body;
-			// 	} catch (err) {
-			// 		this.alertToggle({ message: "Error on getting Reasons.", isShow: true, type: "error" });
-			// 	}
-			// }
 		},
 		computed: {
 			...mapGetters({
-				// allVendors: "getAllVendorsForProject",
 				currentProject: "getCurrentProject",
 				userGroup: "getUserGroup"
 			}),
@@ -197,7 +189,6 @@
 			Button
 		},
 		created() {
-			// this.getReasons();
 		}
 	}
 </script>

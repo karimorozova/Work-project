@@ -52,15 +52,9 @@ const calculateProjectTotal = async (projectId) => {
 	}
 
 	steps.forEach(step => {
-		const { status, finance: { Price } } = step
-
-		if (status === 'Cancelled Halfway') {
-			finance.Price.receivables += Price.halfReceivables
-			finance.Price.payables += Price.halfPayables
-		} else {
-			finance.Price.receivables += Price.receivables
-			finance.Price.payables += Price.payables
-		}
+		const { finance: { Price } } = step
+		finance.Price.receivables += +Price.receivables
+		finance.Price.payables += +Price.payables
 	})
 
 	return await updateProject({ '_id': projectId }, { finance })

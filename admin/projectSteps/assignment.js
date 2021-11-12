@@ -1,8 +1,10 @@
-const { payablesCalc, returnVendorRate } = require('../сalculations/wordcount')
+const { returnVendorRate } = require('../сalculations/wordcount')
 const { stepMiddleAssignNotification, stepMiddleReassignedNotification } = require('../utils')
 const { assignedDefaultTranslator } = require('../services/memoqs/projects')
-const { Units, Projects } = require('../models')
+const { Projects } = require('../models')
 const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
+const { getProject } = require("../projects")
+const { ObjectID: ObjectId } = require("mongodb")
 
 async function removeVendorFromStep({ stepId, projectId }) {
 	const project = await Projects.findOne({ _id: projectId })
@@ -13,42 +15,161 @@ async function removeVendorFromStep({ stepId, projectId }) {
 		steps[_idx].nativeFinance.Price.payables = steps[_idx].finance.Price.payables = steps[_idx].nativeFinance.Wordcount.payables = steps[_idx].finance.Wordcount.payables = 0
 		steps[_idx].nativeVendorRate = steps[_idx].vendorRate = 0
 		steps[_idx].vendor = null
+		steps[_idx].status = 'Created'
 		steps[_idx].vendorsClickedOffer = []
 		await Projects.updateOne({ _id: projectId }, { steps })
 	}
 }
 
-async function reassignVendor(project, reassignData) {
-	const allUnits = await Units.find()
+
+async function reassignVendor({ projectId, stepId, progress, isStart, isPay, reason, vendor }) {
+
+	const project = await getProject({ "_id": projectId })
+	const { steps, tasks, projectCurrency, crossRate } = project
+
+	const _stepIdx = steps.findIndex(({ _id }) => `${ _id }` === `${ stepId }`)
+	const _taskIdx = tasks.findIndex(({ taskId }) => taskId === steps[_stepIdx].taskId)
+
+	const updatedSteps = makeStep({ step: steps[_stepIdx], progress: +progress, vendor, projectCurrency, crossRate, isStart, isPay })
+
+	const oldStep = updatedSteps().getOldStep()
+	const newStep = updatedSteps().getNewStep()
+
+	steps.splice(_stepIdx, 1, oldStep, newStep)
+
+
+	// const oldStep = .getOldStep()
+	// const newStep = makeStep({ step: steps[_stepIdx], progress, vendor }).getNewStep()
+
+
 	try {
-		const { step, vendor, isStart, isPay, reason, progress } = reassignData
-		let { steps, tasks } = project
-		const stepForUpdatedStep = steps.find(item => item.stepId === reassignData.step.stepId)
-		let taskIndex = tasks.findIndex(item => item.taskId === step.taskId)
+		// await Projects.updateOne({ "_id": projectId }, { steps })
+		throw 'Stop'
+		// const { step, vendor, isStart, isPay, reason, progress } = reassignData
+		// console.log(projectId, stepId, progress, isStart, isPay, reason, vendor)
 
-		const newStep = await getNewStep({ isStart, progress, step, vendor, project, task: tasks[taskIndex], allUnits })
-		const updatedStep = updateCurrentStep({ step: stepForUpdatedStep, isStart, isPay, progress, allUnits })
+		// return
 
-		const updatedIndex = steps.findIndex(item => item.stepId === step.stepId)
-		updatedStep.stepId = updatedStep.stepId + '-Cancelled'
+		//
+		// const newStep = await getNewStep({ isStart, progress, step, vendor, project, task: tasks[_taskIdx], allUnits })
+		// const updatedStep = updateCurrentStep({ step: stepForUpdatedStep, isStart, isPay, progress, allUnits })
 
-		steps.splice(updatedIndex, 1, updatedStep, newStep)
+		// const updatedIndex = steps.findIndex(item => item.stepId === step.stepId)
+		// updatedStep.stepId = updatedStep.stepId + '-Cancelled'
 
-		//MM
-		// await updateMemoqProjectUsers(steps);
+		// steps.splice(updatedIndex, 1, updatedStep, newStep)
 
-		await assignedDefaultTranslator(tasks[taskIndex].memoqProjectId, newStep)
-		tasks[taskIndex].finance.Price = getTaskFinance(steps, tasks[taskIndex].taskId)
-		tasks[taskIndex].status = "In progress"
-		await stepMiddleReassignedNotification(updatedStep, reason, isPay)
-		await stepMiddleAssignNotification(newStep, isStart)
 
-		return { steps, tasks }
+		// await assignedDefaultTranslator(tasks[_taskIdx].memoqProjectId, newStep)
+		// tasks[_taskIdx].status = "In progress"
+		// await stepMiddleReassignedNotification(updatedStep, reason, isPay)
+		// await stepMiddleAssignNotification(newStep, isStart)
 
 	} catch (err) {
 		console.log(err)
 		console.log("Error in reassignVendor")
 	}
+}
+
+const makeStep = ({ step, progress, vendor, projectCurrency, crossRate, isStart, isPay }) => {
+	const { finance, receivablesUnit: { type }, vendorRate, nativeVendorRate, nativeFinance, status, stepId, progress: oldProgress } = step._doc
+	const { _id: vendorId, nativeRate: comingNativeVendorRate } = Object.values(vendor)[0]
+	const newVendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +comingNativeVendorRate, crossRate)
+	const restProgress = +(100 - progress).toFixed(2)
+
+	const { _id, ...rest } = step._doc
+	return function () {
+		return {
+			getOldStep: () => ({
+				...rest,
+				stepId: stepId + ' [C]',
+				status: 'Cccc',
+				progress: type === "CAT Wordcount" ? oldProgress : +progress,
+				finance: getOldStepFinance(finance, progress)(vendorRate),
+				nativeFinance: getOldStepFinance(nativeFinance, progress)(nativeVendorRate)
+			}),
+
+			getNewStep: () => ({
+				...rest,
+				stepId: stepId + ' [R]',
+				status: 'Created',
+				vendor: vendorId,
+				vendorRate: newVendorRate,
+				nativeVendorRate: comingNativeVendorRate,
+				vendorsClickedOffer: [],
+				isVendorRead: false,
+				progress: type === "CAT Wordcount" ? getNewStepProgress(oldProgress, restProgress) : restProgress,
+				finance: getNewStepFinance(finance, restProgress)(newVendorRate),
+				nativeFinance: getNewStepFinance(nativeFinance, restProgress)(comingNativeVendorRate)
+			})
+		}
+	}
+
+	function getOldStepFinance(obj, progress) {
+		let finance = JSON.parse(JSON.stringify(obj))
+
+		if (isStart && isPay) {
+
+		} else if (!isStart && !isPay) {
+
+		} else if (isStart && !isPay) {
+
+		}
+
+		finance = mutatedFinanceByPercent(finance, progress)
+
+		return function (rate) {
+			finance.Price.payables = +((finance.Quantity.payables || finance.Wordcount.payables || 0) * rate).toFixed(2)
+			return finance
+		}
+	}
+
+	function getNewStepFinance(obj, progress) {
+		let finance = JSON.parse(JSON.stringify(obj))
+
+		if (isStart && isPay) {
+
+		} else if (!isStart && !isPay) {
+
+		} else if (isStart && !isPay) {
+
+		}
+
+		finance = mutatedFinanceByPercent(finance, progress)
+
+		return function (rate) {
+			finance.Price.payables = +((finance.Quantity.payables || finance.Wordcount.payables || 0) * rate).toFixed(2)
+			return finance
+		}
+	}
+
+	function mutatedFinanceByPercent(finance, progress) {
+		for (const QWP in finance) if (Object.hasOwnProperty.call(finance, QWP)) {
+			for (const RP in finance[QWP]) if (Object.hasOwnProperty.call(finance[QWP], RP)) {
+				finance[QWP][RP] = +(finance[QWP][RP] * (progress / 100)).toFixed(2)
+			}
+		}
+		return finance
+	}
+
+	function getNewStepProgress(oldProgress, progress) {
+		const restProgress = +(100 - progress).toFixed(2)
+		oldProgress.wordsDone = +(restProgress * oldProgress.totalWordCount / 100).toFixed(2)
+		return oldProgress
+	}
+
+
+	// function getNewStepProgress(step, progress, isStart, allUnits) {
+	// 	if (!isStart) {
+	// 		return getUpdatedStepProgress(step, progress, allUnits)
+	// 	}
+	// 	let newProgress = 0
+	// 	if (type === "CAT Wordcount") {
+	// 		newProgress = { ...step.progress, wordsDone: 0 }
+	// 	}
+	// 	return newProgress
+	// }
+
 }
 
 
@@ -97,117 +218,5 @@ function updateCurrentStep({ step, isStart, isPay, progress, allUnits }) {
 
 const sumValues = (A, B) => +(A * B).toFixed(2)
 
-
-function getUpdatedStepProgress(step, progress, allUnits) {
-	const { type } = allUnits.find(item => item._id.toString() === step.serviceStep.unit.toString())
-	if (type === "CAT Wordcount") {
-		let updatedProgress = { ...step.progress }
-		updatedProgress.wordsDone = +(progress * step.progress.totalWordCount / 100).toFixed(2)
-		return updatedProgress
-	}
-	return progress
-}
-
-
-async function getNewStep({ step, vendor, isStart, progress, project, task, allUnits }) {
-	const { _id, ...stepInfo } = { ...step }
-	const stepId = step.stepId + '-R'
-	let newStep = {
-		...stepInfo,
-		stepId,
-		status: 'Created',
-		vendor,
-		vendorsClickedOffer: [],
-		isVendorRead: false,
-		progress: getNewStepProgress(step, progress, isStart, allUnits)
-	}
-
-	const stepWithPaybles = await getStepPayablesAssigment({ task, step: newStep, project, allUnits })
-	if (!isStart && progress > 0) {
-		return updateFinanceForNewStep(stepWithPaybles, progress)
-	}
-	return stepWithPaybles
-}
-
-
-function getNewStepProgress(step, progress, isStart, allUnits) {
-	const { type } = allUnits.find(item => item._id.toString() === step.serviceStep.unit)
-	if (!isStart) {
-		return getUpdatedStepProgress(step, progress, allUnits)
-	}
-	let newProgress = 0
-	if (type === "CAT Wordcount") {
-		newProgress = { ...step.progress, wordsDone: 0 }
-	}
-	return newProgress
-}
-
-
-async function getStepPayablesAssigment({ task, step, project, allUnits }) {
-	const { projectCurrency, crossRate } = project
-	const { type } = allUnits.find(item => item._id.toString() === step.serviceStep.unit)
-	if (type === 'CAT Wordcount') {
-		return await payablesCalc({ metrics: task.metrics, project, step })
-	} else {
-		const nativeVendorRate = await returnVendorRate(step, project)
-		const rate = {
-			value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +nativeVendorRate.value, crossRate)
-		}
-		//FIN53
-		step.finance.Price.payables = +(type === 'Hours' ? step.hours : step.quantity) * +rate.value
-		step.nativeFinance.Price.payables = +(type === 'Hours' ? step.hours : step.quantity) * +nativeVendorRate.value
-		return {
-			...step,
-			vendorRate: rate,
-			nativeVendorRate
-		}
-	}
-}
-
-
-function updateFinanceForNewStep(step, progress) {
-	let { finance, nativeFinance } = step
-	let { receivables, payables } = finance.Price
-	let { payables: nativePayables } = nativeFinance.Price
-	receivables -= receivables * progress / 100
-	return {
-		...step,
-		nativeFinance: {
-			...nativeFinance,
-			Price: {
-				receivables: +receivables,
-				payables: +nativePayables
-			}
-		},
-		finance: {
-			...finance,
-			Price: {
-				receivables: +receivables,
-				payables: +payables
-			}
-		}
-	}
-}
-
-
-function getTaskFinance(steps, taskId) {
-	const taskSteps = steps.filter(item => item.taskId === taskId)
-	const receivables = getSum(taskSteps, 'receivables')
-	const payables = getSum(taskSteps, 'payables')
-	return { receivables, payables }
-}
-
-
-function getSum(steps, prop) {
-	return steps.reduce((acc, cur) => {
-		let money = 0
-		if (prop === 'receivables') {
-			money = cur.status !== 'Cancelled Halfway' ? cur.finance.Price.receivables : cur.finance.Price.halfReceivables
-		} else {
-			money = cur.status !== 'Cancelled Halfway' ? cur.finance.Price.payables : cur.finance.Price.halfPayables
-		}
-		return acc + money
-	}, 0)
-}
 
 module.exports = { reassignVendor, removeVendorFromStep }

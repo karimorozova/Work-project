@@ -1,5 +1,8 @@
 <template lang="pug">
   .vendor-manage
+    .vendor-manage__errors(v-if="areErrors")
+      ValidationErrors(:isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
+
     .vendor-manage__title
       span Vendor management
       .vendor-manage__close(@click.stop="closeVendorManage") &#215;
@@ -101,20 +104,74 @@
                   .assignedVendor__user-name
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
                       span {{ getAssignedVendorInfo().name }}
-                      span.assigned(style="margin-left: 10px;") [Assigned]
+                    span.assigned(style="margin-left: 10px;") [Assigned]
                   .assignedVendor__user-email {{ getAssignedVendorInfo().email }} (клик письмо)
                   .buttons
                     .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
+                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="openAssignments") Reassign
 
+              .assignedVendor__user(v-if="Object.keys(selectedReassignedVendor).length")
+                .assignedVendor__user-image
+                  .assignedVendor__user-circle1
+                  .assignedVendor__user-circle3
+                  img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
+                .assignedVendor__user-description
+                  .assignedVendor__user-name
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getReAssignedVendorInfo()._id}`}")
+                      span {{ getReAssignedVendorInfo().name }}
+                    span.newAssigned(style="margin-left: 10px;") [New assignments]
+                  .assignedVendor__user-email {{ getReAssignedVendorInfo().email }} (клик письмо)
+                  .buttons
+                    .buttons__btn
+                      .buttons__btn( @click="removeVendorAssignments()") Remove
+                  //.buttons
+                    .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
+                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="openAssignments") Reassign
 
-            .vendors__search
+            .assignmentsOptions(v-if="isReassignment")
+              div
+                .assignmentsOptions__text Reason:
+                .drop2
+                  SelectSingle(
+                    placeholder="Option"
+                    :options="reasons"
+                    @chooseOption="setReason"
+                    :selectedOption="reason"
+                  )
+
+              .assignmentsOptions__row
+                .assignmentsOptions__text Start from the beginning?
+                .assignmentsOptions__checks
+                  .assignmentsOptions__check
+                    CheckBox(@check="(e)=>toggle(e, 'isStart', 'yes')" @uncheck="(e)=>toggle(e, 'isStart', 'yes')" :isChecked="isStart.yes")
+                    .assignmentsOptions__check-label Yes
+                  .assignmentsOptions__check
+                    CheckBox(@check="(e)=>toggle(e, 'isStart', 'no')" @uncheck="(e)=>toggle(e, 'isStart', 'no')" :isChecked="isStart.no")
+                    .assignmentsOptions__check-label No
+
+              .assignmentsOptions__row
+                .assignmentsOptions__text Does this part have to be paid for?
+                .assignmentsOptions__checks
+                  .assignmentsOptions__check
+                    CheckBox(@check="(e)=>toggle(e, 'isPay', 'yes')" @uncheck="(e)=>toggle(e, 'isPay', 'yes')" :isChecked="isPay.yes")
+                    .assignmentsOptions__check-label Yes
+                  .assignmentsOptions__check
+                    CheckBox(@check="(e)=>toggle(e, 'isPay', 'no')" @uncheck="(e)=>toggle(e, 'isPay', 'no')" :isChecked="isPay.no")
+                    .assignmentsOptions__check-label No
+                  .assignmentsOptions__work
+                    input.assignmentsOptions__percent(type="text" :value="progress" @input="setProgress" @click.stop="selectInputVal" ref="progress")
+                    span.assignmentsOptions__check-label %  is done
+
+              Button(value="Approve" @clicked="checkAssignmentsErrors"  :isDisabled="!reason || !Object.keys(selectedReassignedVendor).length" :outline="true")
+
+            .vendors__search(v-if="!progressStepStatuses(steps.find(i => i._id.toString() === currentStepId)) || isReassignment" )
               .vendors__search-title Vendors:
               .vendors__search-serch
                 input(type="text" placeholder="🔎︎  Search" v-model="vendorsSearch")
                 .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
                   i.fas.fa-backspace
 
-            .vendors(:style="getMaxHeight()")
+            .vendors(v-if="!progressStepStatuses(steps.find(i => i._id.toString() === currentStepId)) || isReassignment" :style="getMaxHeight()")
               .vendor(v-if="listOfVendors.length" v-for="item in listOfVendors")
                 .vendor__row1
                   .vendor__user
@@ -128,10 +185,11 @@
 
                         .user__email {{ item.email }} (клик письмо)
                         .buttons
-                          .buttons__btn(@click="setVendorToStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
+                          .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
+                          .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
                           .buttons__btn() Details
 
-                  .vendor__stats
+                  .vendor__stats(v-if="!isReassignment")
                     .stats__row.border-bottom
                       .stats__colLong
                         .stats__col-bigTitle PRICE
@@ -187,31 +245,11 @@
                       .marks__title LQA3
                       .marks__value {{ item.lqa3 }}
 
-                //.vendor__row2
-                  .availability Availability soon...
-                  .buttons
-                    .buttons__assign(@click="setVendorToStep({_id: item._id, name: item.name})") Assign
-
-
               .noVendors(v-if="!listOfVendors.length" ) No vendors...
-
-
 
         .vendor-manage__vendors(v-else)
           .logo
 
-
-        //.vendor-manage__options
-        //  Button(value="Lang" @clicked="toggleLangNotStrict")
-        //  Button(value="Disable Industry" @clicked="toggleDisabledIndustry")
-        //  Button(value="Show All" @clicked="toggleShowAllVendor")
-        //.vendor-manage__step-info
-        //  .step-info LanguagePair: {{currentSourceLanguage + " >> " + currentTargetLanguage }}
-        //  .step-info Step: {{currentStepName}}
-        //  .step-info Unit: {{currentUnit}}
-        //.vendor-manage__vendor(v-for=" vendor of getVendorsForStep")
-        //  span {{vendor.firstName}}
-        //  Button(value="Use this Vendor" @clicked="setVendorToStep(vendor)")
 
     .vendor-manage__footer
       Button(@clicked="saveVendors" :value="'Approve assignments'")
@@ -230,6 +268,7 @@ import Toggler from "../Toggler"
 import SelectSingle from "../SelectSingle"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 import { rateExchangeVendorOntoProject } from "../../../helpers/commonFunctions"
+import ValidationErrors from "../ValidationErrors"
 
 export default {
   mixins: [ currencyIconDetected ],
@@ -241,6 +280,13 @@ export default {
   },
   data() {
     return {
+      reasons: [ 'Unresponsive', 'Technical issues', 'Personal issues' ],
+      reason: null,
+      isStart: { yes: false, no: true },
+      isPay: { yes: true, no: false },
+      enteredProgress: "",
+      errors: [],
+
       selectedTab: 'All Steps',
       currentStepId: null,
       currentStep: null,
@@ -249,8 +295,10 @@ export default {
       optionLanguages: true,
       optionIndustries: true,
 
+      areErrors: false,
       isEditable: false,
       isAllVendors: false,
+      isReassignment: false,
 
       selectedTarget: '',
       selectedUnit: '',
@@ -259,6 +307,7 @@ export default {
 
       allVendors: [],
       selectedVendors: {},
+      selectedReassignedVendor: {},
       vendorsSearch: '',
       icons: {
         up: require("../../assets/images/latest-version/up.png"),
@@ -267,11 +316,86 @@ export default {
     }
   },
   methods: {
-    getMaxHeight(){
+    closeErrors() {
+      this.areErrors = false
+    },
+    async checkAssignmentsErrors() {
+      const { payablesUnit } = this.currentStep
+      this.errors = []
+      // if (payablesUnit.type === 'CAT Wordcount' && this.enteredProgress > this.getCurrentProgress()) {
+      //   this.errors.push("Entered progress cannot be higher than current progress.")
+      //   this.enteredProgress = ""
+      // }else if(this.enteredProgress >= 100){
+      //   this.errors.push("Entered progress cannot be higher than completed progress.")
+      //   this.enteredProgress = ""
+      // }
+
+      if (this.errors.length) return this.areErrors = true
+      await this.saveAssignment()
+    },
+    async saveAssignment() {
+      const reassignData = {
+        projectId: this.currentProject._id,
+        stepId: this.currentStepId,
+        progress: this.enteredProgress || this.getCurrentProgress() || 0,
+        isStart: this.isStart.yes,
+        isPay: this.isPay.yes,
+        reason: this.reason,
+        vendor: this.selectedReassignedVendor
+      };
+      try {
+        await this.reassignVendor(reassignData);
+        // this.close();
+      } catch (err) {
+      }
+    },
+    setProgress(e) {
+      const { value } = e.target
+      const regex = /^[0-9]+$/
+      const characters = value.split("").filter(item => regex.test(item))
+      const clearedValue = characters.join("")
+      this.enteredProgress = clearedValue.length > 3 ? clearedValue.slice(0, 3) : clearedValue
+      this.enteredProgress = this.enteredProgress > 100 ? 100 : this.enteredProgress
+      this.$refs.progress.value = this.enteredProgress
+    },
+    getCurrentProgress() {
+      const { progress } = this.currentStep
+      return progress.totalWordCount
+          ? +(progress.wordsDone / progress.totalWordCount * 100).toFixed(2)
+          : progress
+    },
+    selectInputVal() {
+      this.$refs.progress.select()
+    },
+    toggle(e, prop, key) {
+      if (this[prop][key]) return
+      this[prop] = Object.keys(this[prop]).reduce((acc, prev) => {
+        prev === key ? acc[prev] = true : acc[prev] = false
+        return { ...acc }
+      }, {})
+    },
+    setReason({ option }) {
+      this.reason = option
+      this.$refs.progress.value = this.enteredProgress || this.getCurrentProgress() || 0
+    },
+    openAssignments() {
+      if (this.isReassignment) this.removeVendorAssignments()
+      this.isReassignment = !this.isReassignment
+    },
+    getMaxHeight() {
       let max = 510
-      if(this.isEditable && !this.isAllVendors) max = max - 118
-      if(this.currentStepId && (this.steps.find(i => i._id.toString() === this.currentStepId).vendor || this.selectedVendors[this.currentStepId]))  max = max - 110
+      if (this.isEditable && !this.isAllVendors) max = max - 118
+      if (this.currentStepId && (this.steps.find(i => i._id.toString() === this.currentStepId).vendor || this.selectedVendors[this.currentStepId])) max = max - 110
+      if (this.isReassignment) max = max - 119
       return 'max-height:' + max + 'px'
+    },
+    getReAssignedVendorInfo() {
+      const { _id, name, email } = this.selectedReassignedVendor[this.currentStepId]
+      return {
+        _id,
+        name,
+        email
+      }
     },
     getAssignedVendorInfo() {
       const step = this.steps.find(i => i._id.toString() === this.currentStepId)
@@ -294,6 +418,16 @@ export default {
     deleteVendorStatuses({ status }) {
       const STATUSES = [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start' ]
       return STATUSES.includes(status)
+    },
+    progressStepStatuses({ status }) {
+      const STATUSES = [ 'In progress' ]
+      return STATUSES.includes(status)
+    },
+    removeVendorAssignments() {
+      this.selectedReassignedVendor = {}
+      this.isStart = { yes: false, no: true }
+      this.isPay = { yes: true, no: false }
+      this.enteredProgress = ''
     },
     async removeVendor(stepId) {
       if (this.selectedVendors[stepId]) {
@@ -373,22 +507,17 @@ export default {
         this.selectedVendors = {}
       } catch (err) {
         this.alertToggle({ message: 'Error in assigns vendors', isShow: true, type: "error" })
-      }finally {
+      } finally {
         this.closeVendorManage()
       }
     },
-    toggleLangNotStrict() {
-      this.isLangNotStrict = !this.isLangNotStrict
-    },
-    toggleDisabledIndustry() {
-      this.isDisabledIndustry = !this.isDisabledIndustry
-    },
-    toggleShowAllVendor() {
-      this.showAllVendor = !this.showAllVendor
-    },
     setVendorToStep(vendor) {
-      console.log(vendor)
       this.$set(this.selectedVendors, this.currentStepId, vendor)
+    },
+    setVendorToReassignStep(vendor) {
+      this.selectedReassignedVendor = {
+        [this.currentStepId]: vendor
+      }
     },
     setTab(index) {
       this.selectedTab = this.listOfStepsTitles[index]
@@ -398,6 +527,8 @@ export default {
     chooseStep(step) {
       this.isAllVendors = false
       this.isEditable = false
+      this.isReassignment = false
+      this.removeVendorAssignments()
 
       if (this.currentStepId === step._id.toString()) {
         this.currentStepId = null
@@ -415,11 +546,6 @@ export default {
         this.selectedIndustry = this.currentProject.industry.name
       }
     },
-    // isLangEqualOrEqualLangBase(firstLang, secondLang, useBasePart) {
-    //   const first = useBasePart ? firstLang.split(' ')[0] : firstLang
-    //   const second = useBasePart ? secondLang.split(' ')[0] : secondLang
-    //   return first === second
-    // },
     closeVendorManage() {
       this.$emit('closeVendorManage')
     },
@@ -435,18 +561,21 @@ export default {
     ...mapActions({
       alertToggle: 'alertToggle',
       setStepVendors: 'setStepVendors',
-      setCurrentProject: 'setCurrentProject'
+      setCurrentProject: 'setCurrentProject',
+      reassignVendor: "reassignVendor"
     })
   },
   computed: {
     ...mapGetters({
       currentProject: 'getCurrentProject',
-      // vendors: "getAllVendorsForProject",
       allLanguages: "getAllLanguages",
       allUnits: "getAllUnits",
       allSteps: "getAllSteps",
-      allIndustries: "getAllIndustries"
+      allIndustries: "getAllIndustries",
     }),
+    progress() {
+      return this.enteredProgress || this.getCurrentProgress()
+    },
     groupedByTaskId() {
       const steps = this.selectedTab === 'All Steps' ? this.steps : this.steps.filter(({ step }) => step.title === this.selectedTab)
       return Object.values(_.groupBy(steps, ({ taskId }) => taskId))
@@ -479,6 +608,10 @@ export default {
         vendors = vendors.filter(({ name }) => name.toUpperCase() !== (this.selectedVendors[this.currentStepId].name).toUpperCase())
       } else if (!vendor && this.selectedVendors[this.currentStepId]) {
         vendors = vendors.filter(({ name }) => name.toUpperCase() !== (this.selectedVendors[this.currentStepId].name).toUpperCase())
+      }
+
+      if (this.selectedReassignedVendor[this.currentStepId]) {
+        vendors = vendors.filter(({ name }) => name.toUpperCase() !== (this.selectedReassignedVendor[this.currentStepId].name).toUpperCase())
       }
       // searching <==
 
@@ -516,28 +649,12 @@ export default {
 
       return vendors
     }
-    // getVendorsForStep() {
-    //   if (!this.currentSourceLanguage) return ''
-    //   if (this.showAllVendor) return this.vendors
-    //   return this.vendors.filter(({ rates }) => {
-    //     const pricelistTable = rates.pricelistTable
-    //     const { source, target } = this.getLang
-    //
-    //     const some = pricelistTable.some(({ sourceLanguage, targetLanguage, industry, step, unit }) => {
-    //       const checkLang = this.isLangEqualOrEqualLangBase(sourceLanguage.lang, source.lang, this.isLangNotStrict)
-    //           && this.isLangEqualOrEqualLangBase(targetLanguage.lang, target.lang, this.isLangNotStrict)
-    //       const chekIndustry = this.isDisabledIndustry ? true : industry._id === this.industry._id
-    //       return checkLang && chekIndustry && step.title === this.currentStepName && unit['type'] === this.currentUnit
-    //     })
-    //
-    //     return some
-    //   })
-    // }
   },
   async created() {
     await this.getVendorsForSteps()
   },
   components: {
+    ValidationErrors,
     SelectSingle,
     Toggler,
     CheckBox,
@@ -550,6 +667,38 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
+.assignmentsOptions {
+  display: flex;
+  justify-content: space-between;
+  background: $table-list;
+  padding: 15px;
+  align-items: center;
+  margin-top: 20px;
+
+  &__check-label {
+    color: $dark-border;
+    margin-top: 1px;
+  }
+
+  &__percent {
+    width: 70px;
+    margin-right: 6px;
+  }
+
+  &__text {
+    margin-bottom: 6px;
+  }
+
+  &__checks {
+    display: flex;
+    gap: 15px;
+  }
+
+  &__check {
+    margin-top: 1px;
+  }
+}
+
 .assignedVendor {
   margin-top: 20px;
   padding: 10px 15px;
@@ -560,7 +709,8 @@ export default {
   &__user {
     display: flex;
     gap: 15px;
-    width: 400px;
+    width: 380px;
+    max-width: 380px;
     align-items: center;
 
     &-circle1 {
@@ -579,6 +729,16 @@ export default {
       width: 10px;
       border-radius: 10px;
       background-color: $green;
+      right: -5px;
+      top: 15px;
+    }
+
+    &-circle3 {
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      border-radius: 10px;
+      background-color: $red;
       right: -5px;
       top: 15px;
     }
@@ -611,7 +771,13 @@ export default {
 
 .assigned {
   margin-left: 5px;
-  color: $green;
+  color: $dark-border;
+  font-family: 'Myriad300';
+}
+
+.newAssigned {
+  margin-left: 5px;
+  color: $dark-border;
   font-family: 'Myriad300';
 }
 
@@ -1146,6 +1312,14 @@ input {
   height: 32px;
   position: relative;
   width: 220px;
+  background-color: white;
+  border-radius: 4px;
+}
+
+.drop2 {
+  height: 32px;
+  position: relative;
+  width: 200px;
   background-color: white;
   border-radius: 4px;
 }

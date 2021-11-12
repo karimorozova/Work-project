@@ -16,7 +16,6 @@ const {
 } = require('../../clients')
 
 const {
-	calcCost,
 	updateProjectCosts
 } = require('../../сalculations/wordcount')
 
@@ -344,34 +343,50 @@ router.post('/update-progress', async (req, res) => {
 	}
 })
 
-router.post('/update-matrix', async (req, res) => {
-	const { projectId, taskId, step, key, value, prop } = req.body
-	const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' }
-			: { rate: step.vendorRate, costName: 'payables' }
-	try {
-		let project = await getProject({ '_id': projectId })
-		let taskIndex = project.tasks.findIndex(item => {
-			return item.taskId === taskId
-		})
-		let stepIndex = project.steps.findIndex(item => {
-			return item.name === step.name && item.taskId === step.taskId
-		})
-		let tasks = [ ...project.tasks ]
-		let steps = [ ...project.steps ]
-		tasks[taskIndex].metrics[key][prop] = +value / 100
-		const cost = calcCost(tasks[taskIndex].metrics, prop, rate)
-		steps[stepIndex].finance.Price[costName] = cost
-		tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
-			return init + +cur.finance.Price[costName]
-		}, 0)
-		let updatedProject = { ...project._doc, id: projectId, tasks, steps }
-		const result = await updateProjectCosts(updatedProject)
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on updating value of matrix')
-	}
-})
+// router.post('/update-matrix', async (req, res) => {
+// 	const { projectId, taskId, step, key, value, prop } = req.body
+// 	const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' }
+// 			: { rate: step.vendorRate, costName: 'payables' }
+// 	try {
+// 		let project = await getProject({ '_id': projectId })
+// 		let taskIndex = project.tasks.findIndex(item => {
+// 			return item.taskId === taskId
+// 		})
+// 		let stepIndex = project.steps.findIndex(item => {
+// 			return item.name === step.name && item.taskId === step.taskId
+// 		})
+// 		let tasks = [ ...project.tasks ]
+// 		let steps = [ ...project.steps ]
+// 		tasks[taskIndex].metrics[key][prop] = +value / 100
+// 		const cost = calcCost(tasks[taskIndex].metrics, prop, rate)
+// 		steps[stepIndex].finance.Price[costName] = cost
+// 		tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
+// 			return init + +cur.finance.Price[costName]
+// 		}, 0)
+// 		let updatedProject = { ...project._doc, id: projectId, tasks, steps }
+// 		const result = await updateProjectCosts(updatedProject)
+// 		res.send(result)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on updating value of matrix')
+// 	}
+// function calcCost(metrics, field, rate) {
+// 	let cost = 0
+// 	let wordsSum = 0
+// 	const rateValue = rate ? rate.value : 0
+// 	for (let key in metrics) {
+// 		if (key !== 'totalWords') {
+// 			cost += metrics[key].value * metrics[key][field] * rateValue
+// 			wordsSum += metrics[key].value
+// 		}
+// 	}
+// 	cost += (metrics.totalWords - wordsSum) * rateValue
+// 	if (rate && cost < rate.min) {
+// 		cost = rate.min
+// 	}
+// 	return cost
+// }
+// })
 
 router.get('/all-managers', async (req, res) => {
 	const { groupFilters } = req.query
@@ -538,12 +553,13 @@ router.post('/vendor-request', async (req, res) => {
 })
 
 router.post('/reassign-vendor', async (req, res) => {
-	const reassignData = { ...req.body }
+	const { projectId, stepId, progress, isStart, isPay, reason, vendor } = req.body
+
 	try {
-		const project = await getProject({ 'steps._id': reassignData.step._id })
-		const { steps, tasks } = await reassignVendor(project, reassignData)
-		const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
-		res.send(updatedProject)
+		// const project = await getProject({ 'steps._id': reassignData.step._id })
+		const { steps, tasks } = await reassignVendor({ projectId, stepId, progress, isStart, isPay, reason, vendor })
+		// const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
+		// res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on sending emails to vendors')

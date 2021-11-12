@@ -45,7 +45,7 @@ async function assignedDefaultTranslator(projectId, step) {
 							  <ns:UserRoleAssignments>
 							    <ns:TranslationDocumentUserRoleAssignment>
 							        <ns:DeadLine>${ step.deadline }</ns:DeadLine>
-							        <ns:DocumentAssignmentRole>${ step.serviceStep.memoqAssignmentRole }</ns:DocumentAssignmentRole>
+							        <ns:DocumentAssignmentRole>${ step.memoqAssignmentRole }</ns:DocumentAssignmentRole>
 							        <ns:UserGuid>5c758a3b-f723-eb11-8d6a-287fcfe08232</ns:UserGuid>
 							    </ns:TranslationDocumentUserRoleAssignment>
 								</ns:UserRoleAssignments>
