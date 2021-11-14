@@ -23,10 +23,10 @@
                   .pieText
                     .pieDescription
                       .pieDescription__icon(style="background: #f5dfd9;")
-                      .pieDescription__text Payables
+                      .pieDescription__text 46%
                     .pieDescription
                       .pieDescription__icon(style="background: #daeded;")
-                      .pieDescription__text Profit
+                      .pieDescription__text 54%
 
             .client__details
               .project__detailsRow-client-title
