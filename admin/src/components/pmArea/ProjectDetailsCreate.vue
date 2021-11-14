@@ -1,23 +1,22 @@
 <template lang="pug">
   .project-cd
     .project-cd__row
-      input.project-cd__name( type="text" v-model="project.projectName" placeholder="Project Name" style="margin-bottom: 10px")
-      .project-cd__checkbox
+      input.project-cd__name( type="text" v-model="project.projectName" placeholder="Project Name")
+
+      .textCheckbox
         CheckBox(
           :isChecked="project.isTest"
           :isWhite="true"
-          @check="() => setTest(true)" @uncheck="() => setTest(false)"
+          @check="() => setTest(true)"
+          @uncheck="() => setTest(false)"
         )
-        .checkbox__label Test
+        .textCheckbox__label Test
+
     .project-cd__row
       .project-cd__input
         .input-title
           .input-title__text Client Name:
           span.require *
-        .project-cd__input-icons
-          //i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
-          //input.project-cd__input-text2.project-cd__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
-
         .project-cd__select-input
           SelectSingle(
             :selectedOption="project.customer.name"
@@ -26,11 +25,11 @@
             placeholder="Name"
             @chooseOption="setCustomer"
           )
+
       .project-cd__input
         .input-title
           .input-title__text Industry:
           span.require *
-        //input.project-cd__input-text( v-if="project.industry.name"  type="text" :value="project.industry.name" disabled)
         .project-cd__select-input
           SelectSingle(
             placeholder="Industry"
@@ -43,8 +42,6 @@
         .input-title
           .input-title__text Billing Information:
           span.require *
-        // TODO: delete false!
-        //input.project-cd__input-text(v-if="(isProjectFinished && project.clientBillingInfo) || (project._id && project.clientBillingInfo) " type="text" :value="(project.clientBillingInfo.name) " disabled)
         .project-cd__select-input
           SelectSingle(
             placeholder="Option"
@@ -53,6 +50,7 @@
             :isDisabled="!project.customer.name"
             @chooseOption="choseBillingInfo"
           )
+
       .project-cd__input
         .input-title
           .input-title__text Deadline:
@@ -70,17 +68,8 @@
           :disabled="isBilling && isProjectFinished"
           prefix-class="xmx"
         )
-      //.project-cd__input.checkbox
-      //  CheckBox(
-      //    :isChecked="project.isTest"
-      //    @check="() => setTest(true)" @unCheck="() => setTest(false)"
-      //  )
-      //  span Test
 
-
-        //input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
-      //label(for="test") Test
-    .project-cd__row
+    .project-cd__rowButton
       Button(
         value="Create Project"
         @clicked="checkForErrors"
@@ -126,11 +115,6 @@ export default {
         selectedIndustry: {},
         isTest: false,
         billingInfo: {},
-        // clientProjectNumber: "",
-        // template: "",
-        // brief: "",
-        // notes: "",
-        // billingDate: "",
       },
       clients: [],
       areErrorsExist: false,
@@ -266,13 +250,14 @@ export default {
 <style scoped lang="scss">
   @import "../../assets/scss/colors";
   .project-cd {
-    padding: 20px;
+    padding: 25px;
     width: 1040px;
     box-shadow: $box-shadow;
     position: relative;
     background: white;
     border-radius: 4px;
     box-sizing: border-box;
+
     &__row {
       display: flex;
       justify-content: space-between;
@@ -288,18 +273,17 @@ export default {
     }
     &__name {
       font-size: 19px;
-      padding: 0 5px;
-      height: 42px;
-      width: 488px;
+      padding: 0 10px;
+      height: 44px;
+      width: 880px;
       border-radius: 4px;
-      border: 1px solid $border;
+      border: 1px solid $light-border;
       outline: none;
       color: $text;
       transition: .1s ease-out;
-
-      &:focus {
-        border: 1px solid $border-focus;
-      }
+      font-family: 'Myriad600';
+      display: flex;
+      align-items: center;
     }
   }
   .input-title {
@@ -315,16 +299,26 @@ export default {
     }
   }
 
-  .project-cd__checkbox {
+  .textCheckbox{
+    padding: 0 8px;
+    // border: 1px solid $light-border;
+    border-radius: 4px;
+    height: 42px;
+    transition: .2s ease-out;
+    justify-content: center;
+    color: $dark-border;
+    cursor: default;
     display: flex;
-    width: 120px;
-  }
+    align-items: center;
 
-  .checkbox{
     &__label {
       display: flex;
       align-items: center;
-      margin-left: 5px;
+      margin-left: 6px;
+    }
+
+    &:hover{
+      color: $text;
     }
   }
 

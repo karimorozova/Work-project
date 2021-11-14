@@ -1,75 +1,113 @@
 <template lang="pug">
   .project
     .project__all-info
-
       .project__info-row
-        //input.project__name(v-if="!project._id" type="text" v-model="project.projectName" placeholder="Project Name" style="margin-bottom: 10px")
-        //span.project__nameBody(v-else)
-        //.project__nameDisabled(v-if="!existProjectAccessChangeName") {{ nameOfProject }}
-        input.project__name( type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
+        input.project__name(v-if="existProjectAccessChangeName" type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
+        .project__name(style="border: 1px solid white;" v-else) {{ project.projectName }}
 
-        .project__test.checkbox
-          input(type="checkbox" id="test" :checked="project.isTest" @change="setTest")
-          label(for="test") Test
-
-      .project__info-row
-        .project__date
-          .input-title
-            .input-title__text Start Date & Time:
-            span.require *
-          DatePicker(
-            :value="new Date(project.startDate)"
-            @confirm="(e) => updateProjectDate(e, 'startDate')"
-            format="DD-MM-YYYY, HH:mm"
-            type="datetime"
-            ref="start"
-            :clearable="false"
-            :confirm="true"
-            confirm-text="Set date"
-            :disabled-date="notBeforeToday"
-            :disabled="true"
-            prefix-class="xmx"
+        .textCheckbox
+          CheckBox(
+            :isChecked="project.isTest"
+            :isWhite="true"
+            @check="() => setTest(true)"
+            @uncheck="() => setTest(false)"
           )
+          .textCheckbox__label Test
 
-        .project__date
-          .input-title
-            .input-title__text Deadline:
-            span.require *
-          DatePicker(
-            :value="new Date(project.deadline)"
-            @confirm="(e) => updateProjectDate(e, 'deadline')"
-            format="DD-MM-YYYY, HH:mm"
-            type="datetime"
-            ref="deadline"
-            :clearable="false"
-            :confirm="true"
-            confirm-text="Set date"
-            :disabled-date="notBeforeStartDate"
-            :disabled="isBilling && isProjectFinished"
-            prefix-class="xmx"
-          )
+      .project__detailsRow
+        .project__detailsRow-client
+          .client
+            .client__pie
+              .pie-chart(:style="{'--percentage' : 45 + '%'}")
+                .inner
+                  .pieText
+                    .pieDescription
+                      .pieDescription__icon(style="background: #f5dfd9;")
+                      .pieDescription__text Payables
+                    .pieDescription
+                      .pieDescription__icon(style="background: #daeded;")
+                      .pieDescription__text Profit
 
-        .project__date
-          .input-title
-            .input-title__text Billing Date:
-          DatePicker(
-            :value="new Date(project.billingDate)"
-            @confirm="(e) => updateProjectDate(e, 'billingDate')"
-            format="DD-MM-YYYY, HH:mm"
-            type="datetime"
-            ref="billingDate"
-            :clearable="false"
-            :confirm="true"
-            confirm-text="Set date"
-            :disabled-date="notBeforeStartDate"
-            prefix-class="xmx"
-          )
+            .client__details
+              .project__detailsRow-client-title
+                router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${ project.customer._id }`}" target="_blank")
+                  span {{ project.customer.name }}
+              .project__detailsRow-client-subtitle {{ project.clientBillingInfo.name }}
+              .project__detailsRow-client-text {{ project.industry.name }}
+              .project__detailsRow-client-text Start at {{ customFormatter( project.startDate ) }}
+        
 
-        //.project__same.checkbox
-        //  input(type="checkbox" id="same" :disabled="isProjectFinished" :checked="isBilling" @change="setSameDate")
-        //  label(for="same") As deadline
+        .project__detailsRow-finance
+          .project__detailsRow-finance-blocks
+            .block
+              .block__value
+                .block__value-title 333
+                .block__value-icon %
+              .block__key Payables
+            .block
+              .block__value
+                .block__value-title 22
+                .block__value-icon %
+              .block__key Profit
 
-      .project__info-row
+          .project__detailsRow-finance-blocks
+            .block
+              .block__value
+                .block__value-title 333
+                .block__value-icon %
+              .block__key Margin
+            .block
+              .block__value
+                .block__value-title 22
+                .block__value-icon %
+              .block__key Roi
+
+          .project__detailsRow-finance-blocks
+            .block
+              .block__value
+                .block__value-title 777
+                .block__value-icon %
+              .block__key Receivables
+            .block
+              .block__value
+                .block__value-title 1232
+                .block__value-icon %
+              .block__key Total
+
+        .project__detailsRow-dates
+          .project__date(style="margin-bottom: 15px;")
+            .input-title
+              .input-title__text Deadline:
+            DatePicker(
+              :value="new Date(project.deadline)"
+              @confirm="(e) => updateProjectDate(e, 'deadline')"
+              format="DD-MM-YYYY, HH:mm"
+              type="datetime"
+              ref="deadline"
+              :clearable="false"
+              :confirm="true"
+              confirm-text="Set date"
+              :disabled-date="notBeforeStartDate"
+              :disabled="isBilling && isProjectFinished"
+              prefix-class="xmx"
+            )
+          .project__date
+            .input-title
+              .input-title__text Billing Date:
+            DatePicker(
+              :value="new Date(project.billingDate)"
+              @confirm="(e) => updateProjectDate(e, 'billingDate')"
+              format="DD-MM-YYYY, HH:mm"
+              type="datetime"
+              ref="billingDate"
+              :clearable="false"
+              :confirm="true"
+              confirm-text="Set date"
+              :disabled-date="notBeforeStartDate"
+              prefix-class="xmx"
+            )
+
+      //.project__info-row
         .project__client
           .input-title
             .input-title__text Client Name:
@@ -102,7 +140,6 @@
           .input-title
             .input-title__text Billing Information:
             span.require *
-          // TODO: delete false!
           input.project__input-text(v-if="(isProjectFinished && project.clientBillingInfo) || (project._id && project.clientBillingInfo) " type="text" :value="(project.clientBillingInfo.name) " disabled)
           .project__drop-menu(v-else)
             SelectSingle(
@@ -123,7 +160,6 @@
               i.fas.fa-chevron-right
           .block__data(v-if="isBrief")
             ckeditor(v-model="project.brief" :config="editorConfig" @blur="updateBrief")
-            //textarea.project__text(type="text" rows="9" v-model="project.brief" @change="updateBrief")
         .project__block
           .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
             .title Project Notes
@@ -133,7 +169,6 @@
               i.fas.fa-chevron-right
           .block__data(v-if="isNotes")
             ckeditor(v-model="project.notes" :config="editorConfig" @blur="updateNotes")
-            //textarea.project__text(type="text" rows="9" v-model="project.notes"  @change="updateNotes")
 
       .project__button(v-if="!project.projectId")
         Button(
@@ -155,6 +190,7 @@
 	import Datepicker from "../Datepicker"
 	import LabelValue from "./LabelValue"
 	import Button from "../Button"
+  import CheckBox from "../CheckBox"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 	import DatepickerWithTime from "../DatepickerWithTime"
@@ -182,7 +218,6 @@
             { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
             { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
             { name: 'links', groups: [ 'links' ] },
-            // { name: 'insert', groups: [ 'insert' ] },
             { name: 'styles', groups: [ 'styles' ] },
             { name: 'colors', groups: [ 'colors' ] },
             { name: 'tools', groups: [ 'tools' ] },
@@ -191,7 +226,7 @@
           ],
           removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
           uiColor: "#ffffff",
-          height: 80
+          height: 220
         },
         isBilling: false,
 				isTest: false,
@@ -270,16 +305,16 @@
 				if (prop === 'startDate' && this.project.tasks.length) return
 				await this.setProjectDate({ date, projectId: this.project._id })
 			},
-			async setTest(e) {
-        await this.setProjectProp({ prop: 'isTest', value: e.target.checked })
+			async setTest(bool) {
+        await this.setProjectProp({ prop: 'isTest', value: bool })
 			},
-			async setSameDate(e) {
-				this.isBilling = e.target.checked
-					e.target.checked
-              ? this.updateProjectDate(this.$refs.deadline.value, 'billingDate')
-							: this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
+			// async setSameDate(e) {
+			// 	this.isBilling = e.target.checked
+			// 		e.target.checked
+      //         ? this.updateProjectDate(this.$refs.deadline.value, 'billingDate')
+			// 				: this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
 
-			},
+			// },
 			async setProjectProp({ prop, value }) {
 				try {
 					const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value })
@@ -374,10 +409,10 @@
 			billingOpen() {
 				this.$refs.billingDate.showCalendar()
 			},
-			goToClientInfo() {
-				const route = this.$router.resolve({ path: `/pangea-clients/all/details/${ this.project.customer._id }` })
-				window.open(route.href, "_blank")
-			},
+			// goToClientInfo() {
+			// 	const route = this.$router.resolve({ path: `/pangea-clients/all/details/${ this.project.customer._id }` })
+			// 	window.open(route.href, "_blank")
+			// },
 			async getCustomers() {
 				try {
 					if (!this.project._id) {
@@ -418,7 +453,7 @@
 			existProjectAccessChangeName() {
 				if (this.project) {
 					const { status } = this.project
-					return status === 'Draft' || status === 'Quote sent'
+					return status === 'Draft' || status === 'Quote sent' || status === 'Cost Quote'
 				}
 			},
 			industriesList() {
@@ -439,9 +474,9 @@
 				}
 				return []
 			},
-			nameOfProject() {
-				return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName
-			},
+			// nameOfProject() {
+			// 	return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName
+			// },
 			disabledPicker() {
 				return !!(this.project._id && this.project.tasks && this.project.tasks.length)
 			},
@@ -458,12 +493,13 @@
 			Datepicker,
 			LabelValue,
 			Button,
+      CheckBox,
 			ValidationErrors,
       ckeditor: CKEditor.component,
 		},
 		async created() {
 			await this.getProjectData()
-			this.getCustomers()
+			// this.getCustomers()
 			this.isBillingDate()
 			!this.project._id && this.setIsBillingTrue()
 		}
@@ -473,11 +509,77 @@
 <style lang="scss" scoped>
   @import '../../assets/scss/colors';
 
+  .pieDescription{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 2px 0;
+
+    &__icon{
+      height: 5px;
+      width: 5px;
+    }
+
+    &__text{
+      color: #3333;
+      font-size: 12px;
+      font-family: 'Myriad600';
+    }
+  }
+
+  .pieText{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
+
+  .client{
+    display: flex;
+    &__pie{
+      margin-right: 20px;
+    }
+    &__details{
+        border-left: 2px solid $light-border;
+        padding-left: 20px;
+        height: fit-content;
+    }
+  }
+
+  .block{
+    width: 100px;
+    border: 2px dotted $light-border;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 0px 3px 0px;
+    border-radius: 4px;
+    display: flex;
+    margin: 10px 5px;
+
+    &__value{
+      display: flex;
+
+      &-icon{
+        font-size: 14px;
+        color: $dark-border;
+        margin-left: 3px;
+      }
+    }
+    &__key{
+      font-size: 12px;
+      color: #3333;
+      font-family: Myriad600;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+  }
+
   .input-title {
     display: flex;
 
     &__text {
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 
     .require {
@@ -490,9 +592,44 @@
     display: flex;
     flex-direction: column;
 
+    &__detailsRow{
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      align-items: center;
+
+      &-finance{
+        margin-left: 10px;
+        display: flex;
+      }
+
+      &-client{
+
+        &-title{
+          font-size: 18px;
+          font-family: 'Myriad900';
+          margin-bottom: 7px;
+          margin-top: 7px;
+        }
+        &-subtitle{
+          font-family: 'Myriad600';
+          margin-bottom: 7px;
+          font-size: 14px;
+        }
+        &-text{
+          margin-bottom: 7px;
+          font-size: 14px;
+        }
+      }
+
+      &-dates{
+        width: 220px;
+        margin-left: 20px;
+      }
+    }
+
     &__block {
       box-sizing: border-box;
-      margin-bottom: 20px;
       border: 1px solid $light-border;
       position: relative;
       border-radius: 4px;
@@ -509,18 +646,6 @@
           opacity: 0.4;
         }
       }
-    }
-
-    &__nameDisabled {
-      display: flex;
-      font-family: Myriad600;
-      align-items: center;
-      cursor: default;
-      font-size: 19px;
-      height: 42px;
-      width: 488px;
-      color: $text;
-      border: 1px solid white;
     }
 
     &__input-icons {
@@ -545,7 +670,7 @@
     }
 
     &__all-info {
-      padding: 20px;
+      padding: 25px;
       width: 1040px;
       box-shadow: $box-shadow;
       position: relative;
@@ -559,10 +684,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
 
       ::-webkit-input-placeholder {
-        opacity: 0.4;
+        opacity: 0.5;
       }
     }
 
@@ -573,18 +698,21 @@
 
     &__name {
       font-size: 19px;
-      padding: 0 5px;
-      height: 42px;
-      width: 488px;
+      padding: 0 10px;
+      height: 44px;
+      width: 880px;
       border-radius: 4px;
-      border: 1px solid $border;
+      border: 1px solid $light-border;
       outline: none;
       color: $text;
       transition: .1s ease-out;
+      font-family: Myriad600;
+      display: flex;
+      align-items: center;
 
-      &:focus {
-        border: 1px solid $border-focus;
-      }
+      // &:focus {
+      //   border: 1px solid $border-focus;
+      // }
     }
 
     &__date {
@@ -649,7 +777,7 @@
     }
 
     &__block {
-      width: 471px;
+      width: 482px;
     }
 
     &__text {
@@ -692,98 +820,99 @@
       height: 24px;
       width: 120px;
     }
+  }
 
-    .checkbox {
+  .textCheckbox{
+    padding: 0 8px;
+    // border: 1px solid $light-border;
+    border-radius: 4px;
+    height: 42px;
+    transition: .2s ease-out;
+    justify-content: center;
+    color: $dark-border;
+    cursor: default;
+    display: flex;
+    align-items: center;
+
+    &__label {
       display: flex;
+      align-items: center;
+      margin-left: 6px;
+    }
 
-      input[type="checkbox"] {
-        opacity: 0;
-
-        + {
-          label {
-            &::after {
-              content: none;
-            }
-          }
-        }
-
-        &:checked {
-          + {
-            label {
-              &::after {
-                content: "";
-              }
-            }
-          }
-        }
-      }
-
-      label {
-        position: relative;
-        display: inline-block;
-        padding-left: 22px;
-        padding-top: 4px;
-
-        &::before {
-          position: absolute;
-          content: "";
-          display: inline-block;
-          height: 16px;
-          width: 16px;
-          border: 1px solid $border;
-          left: 0px;
-          top: 3px;
-        }
-
-        &::after {
-          position: absolute;
-          content: "";
-          display: inline-block;
-          height: 5px;
-          width: 9px;
-          border-left: 2px solid;
-          border-bottom: 2px solid;
-          transform: rotate(-45deg);
-          left: 4px;
-          top: 7px;
-        }
-      }
+    &:hover{
+      color: $text;
     }
   }
+
   .block {
     &__header {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      cursor: pointer;
-      align-items: center;
-      transition: .2s ease;
-      align-items: center;
-      letter-spacing: 0.2px;
-      border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0px 7px;
+        cursor: pointer;
+        -webkit-box-align: center;
+        transition: .2s ease;
+        align-items: center;
+        letter-spacing: .2px;
+        border-radius: 4px;
+        height: 32px;
 
       &-grey {
         background-color: white;
       }
 
       .title {
-        font-size: 16px;
+        font-size: 14px;
       }
 
       .icon {
-        font-size: 15px;
+        font-size: 13px;
         color: $text;
+        margin-top: 2px;
       }
     }
 
     &__data {
-      //padding: 20px 20px 20px;
-      border-top: 2px solid $light-border;
+      position: absolute;
+      z-index: 300;
+      box-shadow: $box-shadow;
+      margin-top: 15px;
     }
   }
   #same,
   #test {
     width: 0;
   }
+
+    a {
+    color: $text;
+    text-decoration: none;
+    transition: .2s ease-out;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .pie-chart {
+  font-size: 14px;
+  display:grid;
+  place-items: center;
+	background: conic-gradient(#f5dfd9 0,	#f5dfd9  var(--percentage),#daeded 0,	#daeded 100%);
+	position: relative;
+	width: 100px;
+	height: 100px;
+	margin: 0;
+	border-radius:50%;
+}
+
+.inner{
+  position: relative;
+  background:white;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+}
 
 </style>
