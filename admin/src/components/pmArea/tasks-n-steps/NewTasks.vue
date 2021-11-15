@@ -85,8 +85,8 @@
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
-          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span {{ getReceivables(row) }}
+          span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span {{ !currentProject.minimumCharge.isUsed ? getReceivables(row) : '-'  }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__data

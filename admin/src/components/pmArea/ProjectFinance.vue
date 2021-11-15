@@ -70,9 +70,11 @@
                   span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
 
           .discounts
-            Discounts(
+            ProjectDiscounts(
+              v-if="!currentProject.minimumCharge.isUsed"
               :paramsIsEdit="paramsIsEdit"
               :enum="'PngSysProject'"
+              :test="currentProject.discounts"
             )
 
         .project-finance__total
@@ -85,7 +87,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex"
-import Discounts from "../clients/pricelists/Discounts"
+import ProjectDiscounts from "../clients/pricelists/ProjectDiscounts"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 export default {
@@ -203,7 +205,7 @@ export default {
     }
   },
   components: {
-    Discounts
+    ProjectDiscounts
   }
 }
 </script>

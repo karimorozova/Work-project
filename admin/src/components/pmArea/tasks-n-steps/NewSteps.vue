@@ -154,9 +154,9 @@
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
           span(v-if="isShowValue(row, 'receivables')")
-            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-            span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.receivables).toFixed(2) }}
-            span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ (row.finance.Price.halfReceivables).toFixed(2) }}
+            span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+            span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.receivables).toFixed(2) : '-' }}
+            span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.halfReceivables).toFixed(2) : '-' }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance

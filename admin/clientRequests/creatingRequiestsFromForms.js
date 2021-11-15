@@ -46,7 +46,7 @@ const translationServiceRequest = async (formData, client) => {
 const newClientServiceRequest = async (formData, client) => {
 	//TODO: refactor | Client PaymentType
 	const {  paymentType: paymentProfile , _id } = client
-	const { deadline, projectName, brief, startOption, service } = formData
+	const { deadline, projectName, instructions, startOption, service } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
 	const targetLanguages = JSON.parse(formData.targetLanguages)
@@ -68,7 +68,7 @@ const newClientServiceRequest = async (formData, client) => {
 		projectManager: null,
 		accountManager: null,
 		status: "Client Request",
-		notes: brief,
+		instructions: instructions,
 		createdBy,
 		requestForm: {
 			sourceLanguage,

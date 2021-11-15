@@ -37,7 +37,7 @@ const setUpdatedFinanceData = async (data) => {
 	}
 
 	await Projects.updateOne({ "_id": projectId }, { steps })
-
+	await recalculateStepFinance(projectId)
 	return await calculateProjectTotal(projectId)
 }
 
@@ -61,16 +61,19 @@ const calculateProjectTotal = async (projectId) => {
 }
 
 const recalculateStepFinance = async (projectId) => {
-	const { steps, discounts, minimumCharge } = await getProject({ _id: projectId })
+	const { steps, discounts, minimumCharge, customer} = await getProject({ _id: projectId })
+	// let newDiscounts = !discounts.length ? customer.discounts : discounts
+	// console.log({disco: customer.discounts })
 	const newSteps = updateStepsFinanceWithDiscounts(steps, discounts)
 	let queryToUpdateSteps = { steps: newSteps }
 	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
 
-	if (!minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2))) {
+	const isUsedMinimumCharge = !minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2))
+	if (isUsedMinimumCharge) {
 		queryToUpdateSteps = await updateStepsWithMinimal(steps, minimumCharge)
 	}
 
-	await Projects.updateOne({ _id: projectId }, { ...queryToUpdateSteps })
+	await Projects.updateOne({ _id: projectId }, { "minimumCharge.isUsed": isUsedMinimumCharge,...queryToUpdateSteps })
 }
 
 const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
@@ -91,7 +94,7 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 }
 
 const updateStepsWithMinimal = async (steps, minimumCharge) => {
-	return { '$set': { 'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
+	return {'discounts': [], '$set': {  'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {

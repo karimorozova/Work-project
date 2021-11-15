@@ -93,6 +93,10 @@ const ClientRequestSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	instructions: {
+		type: JSON,
+		default: ''
+	},
 	brief: {
 		type: String,
 		default: ''

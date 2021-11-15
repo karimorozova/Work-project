@@ -159,18 +159,18 @@ export default {
       const selectedInstruction = this.instructions.find(({id}) => id === selectedId )
       this.selectedInstructions.push(selectedInstruction)
     },
-    removeInstruction(removeIndex) {
+    removeInstruction() {
       if (!this.isEditable) return
-      this.selectedInstructions.splice(removeIndex, 1)
+      this.selectedInstructions.splice(this.removeIndex, 1)
       this.closeDeleteModal()
     },
     changeInstruction() {
       if (!this.isEditable) return
 
-      if (this.newInstructionTitle.trim() === '' ) {
+      if (this.editableInstruction.title.trim() === '' ) {
         this.errors.push('Please, enter Title')
       }
-      if ( this.newInstructionDescription.trim() === '') {
+      if ( this.editableInstruction.description.trim() === '') {
         this.errors.push('Please, enter Description')
       }
       if(this.errors.length) return
@@ -212,8 +212,9 @@ export default {
     closeErrors() {
       this.errors = []
     },
-    openRemoveModal() {
+    openRemoveModal(removeIndex) {
       this.isDeleting = true
+      this.removeIndex = removeIndex
     },
     closeDeleteModal() {
       this.isDeleting = false
@@ -370,10 +371,10 @@ export default {
     transform: rotate(90deg);
   }
   .slide-fade-enter-active {
-    transition: all .3s ease-in;
+    transition: all .2s ease-out;
   }
   .slide-fade-leave-active {
-    transition: all .3s ease-in;
+    transition: all .2s ease-out;
   }
   .slide-fade-enter, .slide-fade-leave-to
     /* .slide-fade-leave-active до версии 2.1.8 */ {

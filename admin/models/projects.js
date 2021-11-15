@@ -410,6 +410,10 @@ const ProjectsSchema = new mongoose.Schema({
 		toIgnore: {
 			type: Boolean,
 			default: false
+		},
+		isUsed: {
+			type: Boolean,
+			default: false
 		}
 	},
 	isAutoDelivery: {

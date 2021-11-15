@@ -8,6 +8,7 @@
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
+      .info__right(v-if="step.vendor") Discount/Surcharge: {{discounts}}%
       .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
 
     .stats
@@ -48,12 +49,14 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input( @keyup="setReceivables($event, row.title)" v-model="row.receivables")
+              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" v-model="row.receivables")
+              span(v-else) -
 
           template(slot="payables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.payables }}
             .table__data(v-else)
-              input( @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor")
+              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor")
+              span(v-else) -
 
     .finance__buttons
       Button(value="Save" @clicked="saveFinance" :isDisabled="isEdited")
@@ -142,12 +145,14 @@ export default {
       this.totalPayables = +finance.Price.payables || 0
     },
     setReceivables(event, title) {
+      let value = isNaN(parseFloat(event.target.value)) ? 0 : parseFloat(event.target.value)
       this.isEdited = false
-      this[title.toLowerCase() + 'Receivables'] = parseFloat(event.target.value)
+      this[title.toLowerCase() + 'Receivables'] = value
     },
     setPayables(event, title) {
+      let value = isNaN(parseFloat(event.target.value)) ? 0 : parseFloat(event.target.value)
       this.isEdited = false
-      this[title.toLowerCase() + 'Payables'] = parseFloat(event.target.value)
+      this[title.toLowerCase() + 'Payables'] = value
     }
   },
   watch: {
@@ -158,6 +163,7 @@ export default {
       this.totalReceivables = +(+this.quantityReceivables * +val).toFixed(2)
     },
     totalReceivables: function (val) {
+      if (this.quantityReceivables === 0 ) return
       this.rateReceivables = +(+val / +this.quantityReceivables).toFixed(4)
     },
     quantityPayables: function (val) {
@@ -167,13 +173,25 @@ export default {
       this.totalPayables = +(+this.quantityPayables * +val).toFixed(2)
     },
     totalPayables: function (val) {
+      if (this.quantityPayables === 0 ) return
       this.ratePayables = +(+val / +this.quantityPayables).toFixed(4)
     }
   },
   computed: {
     ...mapGetters({
-      units: "getAllUnits"
+      units: "getAllUnits",
+      currentProject: "getCurrentProject",
+
     }),
+    isMinimumChargeUsed() {
+      return this.currentProject.minimumCharge.isUsed
+    },
+    discounts() {
+      return this.currentProject.discounts.reduce((acc, {value})=> acc += value, 0)
+    },
+    // totalRecWithDiscount() {
+    //   return this.isMinimumChargeUsed ? this.totalReceivables : this.totalReceivables +this.totalReceivables/100* this.discounts
+    // },
     getProfit() {
       return +(this.totalReceivables - this.totalPayables).toFixed(2)
     },
@@ -336,6 +354,10 @@ export default {
     &:hover {
       text-decoration: underline;
     }
+  }
+  &__right {
+    position: absolute;
+    right: 12px;
   }
 
   &__title {

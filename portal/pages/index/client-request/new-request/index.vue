@@ -315,7 +315,7 @@ import { mapActions, mapGetters } from "vuex"
 				formData.append('sourceLanguage', JSON.stringify(this.currentSourceLang))
 				formData.append('targetLanguages', JSON.stringify(this.currentTargetLang))
 				formData.append('industry', JSON.stringify(this.currentIndustries))
-				formData.append('brief',this.selectedInstructions )
+				formData.append('instructions',this.selectedInstructions )
 				// formData.append('brief', this.currentBrief)
 				formData.append('startOption', this.startOption)
 				formData.append('complianceTemplate', JSON.stringify(this.currentComplianceTemplate))
