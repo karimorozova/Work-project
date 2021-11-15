@@ -46,11 +46,12 @@ const translationServiceRequest = async (formData, client) => {
 const newClientServiceRequest = async (formData, client) => {
 	//TODO: refactor | Client PaymentType
 	const {  paymentType: paymentProfile , _id } = client
-	const { deadline, projectName, instructions, startOption, service } = formData
+	const { deadline, projectName, notes,startOption, service } = formData
 
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
 	const targetLanguages = JSON.parse(formData.targetLanguages)
 	const industry = JSON.parse(formData.industry)
+	const instructions = JSON.parse(formData.instructions)
 	// const complianceTemplate = JSON.parse(formData.complianceTemplate)
 	const clientContacts = JSON.parse(formData.clientContacts)
 	const createdBy = JSON.parse(formData.createdBy)
@@ -68,6 +69,7 @@ const newClientServiceRequest = async (formData, client) => {
 		projectManager: null,
 		accountManager: null,
 		status: "Client Request",
+		notes,
 		instructions: instructions,
 		createdBy,
 		requestForm: {

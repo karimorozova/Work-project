@@ -179,7 +179,7 @@ export default {
 
         const editedId = this.editableInstruction.id
         const {description} = this.instructions.find(({id}) => id === editedId)
-        this.editableInstruction.isCahnged = this.hasChangedDescription(description)
+        this.editableInstruction.isChanged = this.hasChangedDescription(description)
       }
 
       this.selectedInstructions.splice(this.editableIndex,1, this.editableInstruction )

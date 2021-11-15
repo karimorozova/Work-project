@@ -1,84 +1,82 @@
 <template lang="pug">
   .instructions
-    .instructions__modals
-      ValidationErrors(
-        v-if="errors.length"
-        :errors="errors"
-        :isAbsolute="true"
-        @closeErrors="closeErrors"
-      )
-      ApproveModal(
-        v-if="isDeleting"
-        text="Are you sure?"
-        approveValue="Yes"
-        notApproveValue="No"
-        @approve="removeInstruction"
-        @close="closeDeleteModal"
-        @notApprove="closeDeleteModal"
-      )
-      .modal__add-instruction.modal__border(v-if="isAddingModalOpen")
-        .modal__title Adding
-        .modal__input
-          .input__title Title:
-          input(type="text" placeholder="Title" v-model="newInstructionTitle")
-        .modal__input
-          .input__title Descriptions:
-          ckeditor(v-model="newInstructionDescription" :config="editorConfig" @blur="setNewDescription")
-        .modal__footer
-          Button(value="Add" @clicked="addCustomInstruction")
-          Button(value="Cancel" @clicked="closeAddingModal")
-      .modal__edit-instruction.modal__border(v-if="editableIndex !== ''")
-        .modal__title Editing
-        .modal__input
-          .input__title Title:
-          input(type="text" placeholder="Title" v-model="editableInstruction.title")
-        .modal__input
-          .input__title Descriptions:
-            ckeditor(v-model="editableInstruction.description" :config="editorConfig" @blur="serEditDescription")
-        .modal__footer
-          Button(value="Edit" @clicked="changeInstruction")
-          Button(value="Cancel" @clicked="closeEditModal")
+    //.instructions__modals
+      //ValidationErrors(
+      //  v-if="errors.length"
+      //  :errors="errors"
+      //  :isAbsolute="true"
+      //  @closeErrors="closeErrors"
+      //)
+      //ApproveModal(
+      //  v-if="isDeleting"
+      //  text="Are you sure?"
+      //  approveValue="Yes"
+      //  notApproveValue="No"
+      //  @approve="removeInstruction"
+      //  @close="closeDeleteModal"
+      //  @notApprove="closeDeleteModal"
+      //)
+      //.modal__add-instruction.modal__border(v-if="isAddingModalOpen")
+      //  .modal__title Adding
+      //  .modal__input
+      //    .input__title Title:
+      //    input(type="text" placeholder="Title" v-model="newInstructionTitle")
+      //  .modal__input
+      //    .input__title Descriptions:
+      //    ckeditor(v-model="newInstructionDescription" :config="editorConfig" @blur="setNewDescription")
+      //  .modal__footer
+      //    Button(value="Add" @clicked="addCustomInstruction")
+      //    Button(value="Cancel" @clicked="closeAddingModal")
+      //.modal__edit-instruction.modal__border(v-if="editableIndex !== ''")
+      //  .modal__title Editing
+      //  .modal__input
+      //    .input__title Title:
+      //    input(type="text" placeholder="Title" v-model="editableInstruction.title")
+      //  .modal__input
+      //    .input__title Descriptions:
+      //      ckeditor(v-model="editableInstruction.description" :config="editorConfig" @blur="serEditDescription")
+      //  .modal__footer
+      //    Button(value="Edit" @clicked="changeInstruction")
+      //    Button(value="Cancel" @clicked="closeEditModal")
 
     .instructions__body
-      .col
-        .instructions__title Options
-        .instructions__cards {{unselectedInstructions}}
+      //.instructions__title Options
+      .instructions__cards
+        .card(v-for="({id, title, description,isChanged ,  isOpen = false}, index) of selectedInstructions")
+          .card__header
+            .card__toggle_drop-down(@click="() => toggleDescriptionAll(index)")
+              .icon(:class="{'icon__close': isOpen}")
+                i.fas.fa-chevron-right
+              span {{title}}
+            //IconButton(v-if="isChanged" @clicked="() => openEditModal(index)")
+            i(class="fas fa-pen gray-icon" v-if="isChanged")
+          transition(name="slide-fade")
+            .card__desctiption.animated(v-if="isOpen" v-html="description")
 
-          .card(v-for="({id, title, description, isOpen = false}, index) of unselectedInstructions")
-            .card__header
-              .card__toggle_drop-down(@click="() => toggleDescriptionAll(index)")
-                .icon(:class="{'icon__close': isOpen}")
-                  i.fas.fa-chevron-right
-                span {{title}}
-              IconButton(@clicked="selectInstruction(id)")
-                i.fas.fa-plus
-            transition(name="slide-fade")
-              .card__desctiption.animated(v-if="isOpen" v-html="description")
-
-      .col
-        .instructions__title Selected Options
-        .instructions__cards
-
-          .card(v-for="({ title, description, isOpen = false}, index) of selectedInstructions")
-            .card__header
-              .card__toggle_drop-down(@click="() =>toggleDescriptionSelect(index)")
-                .icon(:class="{'icon__close': isOpen}")
-                  i.fas.fa-chevron-right
-                span {{title}}
-              .card__buttons
-                IconButton(@clicked="() => openEditModal(index)")
-                  i.fas.fa-pen
-                IconButton(@clicked="() => openRemoveModal(index)")
-                  i.fas.fa-trash
-            transition(name="slide-fade")
-              .card__desctiption.animated(v-if="isOpen" v-html="description")
+      //.col
+        //.instructions__title Selected Options
+        //.instructions__cards
+        //
+        //  .card(v-for="({ title, description, isOpen = false}, index) of selectedInstructions")
+        //    .card__header
+        //      .card__toggle_drop-down(@click="() =>toggleDescriptionSelect(index)")
+        //        .icon(:class="{'icon__close': isOpen}")
+        //          i.fas.fa-chevron-right
+        //        span {{title}}
+        //      .card__buttons
+        //        IconButton(@clicked="() => openEditModal(index)")
+        //          i.fas.fa-pen
+        //        IconButton(@clicked="() => openRemoveModal(index)")
+        //          i.fas.fa-trash
+        //    transition(name="slide-fade")
+        //      .card__desctiption.animated(v-if="isOpen" v-html="description")
 
             //.card__header(@click="() => removeInstruction(index)") {{title}}
             //.card__desctiption(@click="() => openEditModal(index)")
             //  div(v-html="description")
-          .card__add(@click="openAddingModal")
-            i.fas.fa-plus
-            span Create New
+          //.card__add(@click="openAddingModal")
+          //  i.fas.fa-plus
+          //  span Create New
 </template>
 
 <script>
@@ -107,22 +105,22 @@ export default {
       type: Array,
       default: () => []
     },
-    selectedStartInstructions: {
-      type: String,
-      default: ''
-    }
+    // selectedStartInstructions: {
+    //   type: String,
+    //   default: ''
+    // }
   },
   data() {
     return {
       test: false,
-      isAddingModalOpen: false,
-      newInstructionTitle: '',
-      newInstructionDescription: '',
+      // isAddingModalOpen: false,
+      // newInstructionTitle: '',
+      // newInstructionDescription: '',
       editableInstruction: {},
       editableIndex: '',
-      selectedInstructions: this.selectedStartInstructions !==  '' ?  JSON.parse(this.selectedStartInstructions) : [],
+      selectedInstructions: this.instructions,
       errors: [],
-      isDeleting: false,
+      // isDeleting: false,
       editorConfig: {
         extraPlugins: [ 'colorbutton', 'smiley' ],
         toolbarGroups: [
@@ -147,49 +145,49 @@ export default {
     }
   },
   methods: {
-    toggleDescriptionSelect(index) {
-      this.$set(this.selectedInstructions[index], 'isOpen', !this.selectedInstructions[index].isOpen)
-    },
+    // toggleDescriptionSelect(index) {
+    //   this.$set(this.selectedInstructions[index], 'isOpen', !this.selectedInstructions[index].isOpen)
+    // },
     toggleDescriptionAll(index) {
       // console.log(this.unselectedInstructions, index)
-      const test = this.unselectedInstructions[index]
-      test.isOpen = !test.isOpen
+      // const test = this.selectedInstructions[index]
+      // test.isOpen = !test.isOpen
       // this.unselectedInstructions.splice(index,1,test )
-      this.unselectedInstructions.splice(this.index, 1, test)
-      // this.$set(this.unselectedInstructions[index], 'isOpen', !this.unselectedInstructions[index].isOpen)
+      // this.selectedInstructions.splice(this.index, 1, test)
+      this.$set(this.selectedInstructions[index], 'isOpen', !this.selectedInstructions[index].isOpen)
     },
-    setNewDescription(e) {
-      if (!this.isEditable) return
-      this.newInstructionDescription = e
-    },
+    // setNewDescription(e) {
+    //   if (!this.isEditable) return
+    //   this.newInstructionDescription = e
+    // },
     serEditDescription(e) {
       if (!this.isEditable) return
       this.editableInstruction.description = e
     },
-    addCustomInstruction() {
-      if (!this.isEditable) return
-      if (this.newInstructionTitle.trim() === '' ) {
-        this.errors.push('Please, enter Title')
-      }
-      if ( this.newInstructionDescription.trim() === '') {
-        this.errors.push('Please, enter Description')
-      }
-      if(this.errors.length) return
-      this.selectedInstructions.push({ title: this.newInstructionTitle, description: this.newInstructionDescription })
-      this.closeAddingModal()
-    },
-    selectInstruction(selectedId) {
-      if (!this.isEditable) return
-      if (this.selectedInstructions.some(({id}) => id === selectedId)) return
-
-      const selectedInstruction = this.instructions.find(({id}) => id === selectedId )
-      this.selectedInstructions.push(selectedInstruction)
-    },
-    removeInstruction() {
-      if (!this.isEditable) return
-      this.selectedInstructions.splice(this.removeIndex, 1)
-      this.closeDeleteModal()
-    },
+    // addCustomInstruction() {
+    //   if (!this.isEditable) return
+    //   if (this.newInstructionTitle.trim() === '' ) {
+    //     this.errors.push('Please, enter Title')
+    //   }
+    //   if ( this.newInstructionDescription.trim() === '') {
+    //     this.errors.push('Please, enter Description')
+    //   }
+    //   if(this.errors.length) return
+    //   this.selectedInstructions.push({ title: this.newInstructionTitle, description: this.newInstructionDescription })
+    //   this.closeAddingModal()
+    // },
+    // selectInstruction(selectedId) {
+    //   if (!this.isEditable) return
+    //   if (this.selectedInstructions.some(({id}) => id === selectedId)) return
+    //
+    //   const selectedInstruction = this.instructions.find(({id}) => id === selectedId )
+    //   this.selectedInstructions.push(selectedInstruction)
+    // },
+    // removeInstruction() {
+    //   if (!this.isEditable) return
+    //   this.selectedInstructions.splice(this.removeIndex, 1)
+    //   this.closeDeleteModal()
+    // },
     changeInstruction() {
       if (!this.isEditable) return
 
@@ -216,15 +214,15 @@ export default {
     hasChangedDescription(description) {
       return description.replace(/ ?<.*?> ?/g, '').replace(/\s/g, '') !== this.editableInstruction.description.replace(/ ?<.*?> ?/g, '').replace(/\s/g, '')
     },
-    openAddingModal() {
-      if (!this.isEditable) return
-      this.isAddingModalOpen = true
-    },
-    closeAddingModal() {
-      this.isAddingModalOpen = false
-      this.newInstructionTitle = ''
-      this.newInstructionDescription = ''
-    },
+    // openAddingModal() {
+    //   if (!this.isEditable) return
+    //   this.isAddingModalOpen = true
+    // },
+    // closeAddingModal() {
+    //   this.isAddingModalOpen = false
+    //   this.newInstructionTitle = ''
+    //   this.newInstructionDescription = ''
+    // },
     openEditModal(index) {
       if (!this.isEditable) return
       this.editableIndex = index
@@ -238,25 +236,25 @@ export default {
     closeErrors() {
       this.errors = []
     },
-    openRemoveModal(removeIndex) {
-      this.isDeleting = true
-      this.removeIndex = removeIndex
-    },
+    // openRemoveModal(removeIndex) {
+    //   this.isDeleting = true
+    //   this.removeIndex = removeIndex
+    // },
     closeDeleteModal() {
       this.isDeleting = false
     }
   },
   computed: {
-    unselectedInstructions() {
-      const selectedIds = this.selectedInstructions.map((instruction) => instruction.hasOwnProperty('id') ? instruction.id : '')
-      return this.instructions.filter(({id}) => !selectedIds.includes(id))
-    }
+    // unselectedInstructions() {
+    //   const selectedIds = this.selectedInstructions.map((instruction) => instruction.hasOwnProperty('id') ? instruction.id : '')
+    //   return this.instructions.filter(({id}) => !selectedIds.includes(id))
+    // }
   },
   watch: {
-    selectedInstructions() {
-      this.$emit('changedInstructions', JSON.stringify(this.selectedInstructions))
-      // this.$emit('changedInstructions', this.selectedInstructions.map(instruction => JSON.stringify(instruction)).join('\n'))
-    }
+    // selectedInstructions() {
+    //   this.$emit('changedInstructions', JSON.stringify(this.selectedInstructions))
+    //   this.$emit('changedInstructions', this.selectedInstructions.map(instruction => JSON.stringify(instruction)).join('\n'))
+    // }
   }
 }
 </script>
@@ -267,6 +265,7 @@ export default {
     position: relative;
     width: 100%;
     &__modals {
+      z-index: 300;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -277,9 +276,11 @@ export default {
       margin-bottom: 8px;
       font-family: 'Myriad600';
     }
+    &__cards {
+      width: 100%;
+    }
     .modal {
-      &__edit-instruction,
-      &__add-instruction {
+      &__edit-instruction{
         width: 550px;
         margin-bottom: 20px;
 
@@ -304,10 +305,6 @@ export default {
       width: 100%;
       gap: 1rem;
     }
-    .col {
-      flex: 1 1 calc((100% / 2) - 1rem);;
-
-    }
   }
   .input {
     &__title {
@@ -320,6 +317,7 @@ export default {
     background-color: $white;
     margin-bottom: 10px;
     &__header {
+      height: 27px;
       border: 1px solid $light-border;
       border-radius: 4px;
       padding: 7px 10px;
@@ -406,5 +404,8 @@ export default {
     //transform: translateY(-30px);
     transform: scaleY(0);
     opacity: 0;
+  }
+  .gray-icon {
+    color: $dark-border;
   }
 </style>

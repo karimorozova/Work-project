@@ -185,8 +185,31 @@
         .form__commentsBlock
           .input__title Notes:
           textarea(type="text" rows="9" v-model="currentClientRequest.notes" @change="changeNotes(currentClientRequest.notes)")
+      .form__block-row.form_no-margin
+        .form__block
+          .block__header(@click="toggleBlock('isBrief')" :class="{'block__header-grey': !isBrief}")
+            .title Project Brief
+            .icon(v-if="!isBrief && canUpdateRequest()")
+              i.fas.fa-chevron-down
+            .icon(v-else)
+              i.fas.fa-chevron-right
+          .block__data(v-if="isBrief && canUpdateRequest()")
+            ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief(currentClientRequest.brief)")
+        .form__block
+          .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
+            IconButton(class="copy-to-brief" @clicked="copyNotesToBrief")
+              i.fas.fa-copy
+            .title Project Notes
+            .icon(v-if="!isNotes && canUpdateRequest()")
+              i.fas.fa-chevron-down
+            .icon(v-else)
+              i.fas.fa-chevron-right
+          .block__data(v-if="isNotes && canUpdateRequest()")
+
+
+            ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes(currentClientRequest.notes)")
       .form__comments
-        Instructions(:instructions="JSON.parse(currentClientRequest.notes)")
+        Instructions(:instructions="currentClientRequest.instructions")
 
       .form__button
         Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
@@ -327,6 +350,7 @@
 	import GeneralTable from "../../GeneralTable"
 	import SelectMulti from "../../SelectMulti"
   import Instructions from "./Instructions"
+  import IconButton from "../../IconButton"
 
 
   import CKEditor from "ckeditor4-vue"
@@ -338,8 +362,8 @@
 		data() {
 			return {
 			  instructions: instructions,
-        // isBrief: true,
-        // isNotes: true,
+        isBrief: true,
+        isNotes: true,
 				clientRequest: {},
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
@@ -405,6 +429,9 @@
 				setCurrentClientRequest: "setCurrentClientRequest",
 				alertToggle: "alertToggle"
 			}),
+      copyNotesToBrief() {
+        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.notes, 'notes': this.currentClientRequest.notes } })
+      },
       toggleBlock(prop) {
         this[prop] = !this[prop]
       },
@@ -948,6 +975,7 @@
 			DatepickerWithTime,
       ckeditor: CKEditor.component,
       Instructions,
+      IconButton,
 		}
 	}
 </script>
@@ -1074,6 +1102,28 @@
     box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
     border-radius: 4px;
     background: white;
+
+    &__block {
+      box-sizing: border-box;
+      border: 1px solid $light-border;
+      position: relative;
+      border-radius: 4px;
+      background-color: white;
+      width: 482px;
+
+
+      &-row{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+
+        ::-webkit-input-placeholder {
+          opacity: 0.4;
+        }
+      }
+    }
 
     &__title {
       font-size: 16px;
@@ -1422,36 +1472,45 @@
       border: 1px solid $border-focus;
     }
   }
+
   .block {
     &__header {
       display: flex;
       justify-content: space-between;
-      padding: 10px;
+      padding: 0px 7px;
       cursor: pointer;
-      align-items: center;
+      -webkit-box-align: center;
       transition: .2s ease;
       align-items: center;
-      letter-spacing: 0.2px;
+      letter-spacing: .2px;
       border-radius: 4px;
+      height: 32px;
 
       &-grey {
         background-color: white;
       }
 
       .title {
-        font-size: 16px;
+        font-size: 14px;
       }
 
       .icon {
-        font-size: 15px;
+        font-size: 13px;
         color: $text;
+        margin-top: 2px;
       }
     }
 
     &__data {
-      //padding: 20px 20px 20px;
-      border-top: 2px solid $light-border;
+      position: absolute;
+      z-index: 300;
+      box-shadow: $box-shadow;
+      margin-top: 15px;
     }
+  }
+  .copy-to-brief {
+    position: absolute;
+    left: -32px;
   }
   #checkProject,
   #checkDeadline {

@@ -93,10 +93,18 @@ const ClientRequestSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	instructions: {
-		type: JSON,
-		default: ''
-	},
+	instructions: [ {
+		title: {
+			type: String,
+		},
+		description: {
+			type: String,
+		},
+		isChanged: {
+			type: Boolean,
+			default: false
+		}
+	} ],
 	brief: {
 		type: String,
 		default: ''
@@ -151,7 +159,7 @@ const ClientRequestSchema = new mongoose.Schema({
 		},
 		service: {
 			type: Schema.Types.ObjectId, ref: 'Services'
-		},
+		}
 	},
 	checkedForm: {
 		isCheckProjectName: {
@@ -165,7 +173,7 @@ const ClientRequestSchema = new mongoose.Schema({
 		isCheckBrief: {
 			type: Boolean,
 			default: false
-		},
+		}
 	}
 })
 
