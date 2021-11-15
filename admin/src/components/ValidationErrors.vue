@@ -51,7 +51,7 @@
         box-shadow: $box-shadow;
         background-color: white;
         border-radius: 4px;
-        border-left: 4px solid $red;
+        border-left: 2px solid $red;
       }
 
       &__errors-title {
@@ -107,7 +107,7 @@
         box-shadow: $box-shadow;
         background-color: white;
         border-radius: 4px;
-        border-left: 4px solid $red;
+        border-left: 2px solid $red;
       }
 
       &__errors-title {

@@ -25,16 +25,16 @@
               @setTargets="setTargets",
             )
           span(v-if="!isMonoService")
-            RequestTasksLangsDuo(
-              :originallyLanguages="originallyLanguages",
-              :calculationUnit="currentUnit",
-              :sourceLanguages="sourceLanguages",
-              @setSourceLanguage="setSourceLang",
-              @setTargets="setTargets",
-              :setPossibleTargetsAction="setPossibleTargetsAction"
-              :currentTaskId="currentTaskId"
-              @endOfSettingTaskData="endOfSettingTaskData"
-            )
+            //RequestTasksLangsDuo(
+            //  :originallyLanguages="originallyLanguages",
+            //  :calculationUnit="currentUnit",
+            //  :sourceLanguages="sourceLanguages",
+            //  @setSourceLanguage="setSourceLang",
+            //  @setTargets="setTargets",
+            //  :setPossibleTargetsAction="setPossibleTargetsAction"
+            //  :currentTaskId="currentTaskId"
+            //  @endOfSettingTaskData="endOfSettingTaskData"
+            //)
 
         .tasks-data__services
           .tasks-data__service-steps(v-if="countCATWordcount === 2")
@@ -75,7 +75,7 @@
 	import RequestServiceAndWorkflow from "./RequestServiceAndWorkflow"
 	import { mapGetters, mapActions } from "vuex"
 	import RequestTasksLangs from "./RequestTasksLangs"
-	import RequestTasksLangsDuo from "./RequestTasksLangsDuo"
+	// import RequestTasksLangsDuo from "./RequestTasksLangsDuo"
 	import RequestJobSettings from "./RequestJobSettings"
 	import RequestTasksFiles from "./RequestTasksFiles"
 	import Button from "../../../Button"
@@ -262,7 +262,7 @@
 			Button,
 			RequestTasksFiles,
 			RequestJobSettings,
-			RequestTasksLangsDuo,
+			// RequestTasksLangsDuo,
 			RequestTasksLangs,
 			// DataTable,
 			// TasksFiles,

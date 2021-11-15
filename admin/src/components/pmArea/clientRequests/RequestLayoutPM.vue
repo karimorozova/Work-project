@@ -61,7 +61,7 @@ export default {
   methods: {
     ...mapActions([ 'alertToggle', 'setCurrentClientRequest' ]),
     async setSourceLanguage({ option }) {
-      this.$children[1].closeTaskDataAndClearTasksRequest()
+      // this.$children[1].closeTaskDataAndClearTasksRequest()
       const neededLanguageObject = this.originallyLanguages.find(item => item.lang === option)
       if (neededLanguageObject._id.toString() === this.mainSourceLanguageId.toString()) return
       this.mainSourceLanguageId = neededLanguageObject._id
@@ -78,7 +78,7 @@ export default {
       }
     },
     async setTargetLanguages({ option }) {
-      this.$children[1].closeTaskDataAndClearTasksRequest()
+      // this.$children[1].closeTaskDataAndClearTasksRequest()
       let data = [ ...this.currentClientRequest.requestForm.targetLanguages ]
       const neededLanguageObject = this.originallyLanguages.find(item => item.lang === option)
 

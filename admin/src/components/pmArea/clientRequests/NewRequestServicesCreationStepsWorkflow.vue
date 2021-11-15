@@ -1,6 +1,6 @@
 <template lang="pug">
   .wrapper
-    .steps(v-if="tasksData.service && tasksData.stepsAndUnits")
+    .steps
       .steps__modal-without-border(v-if="isDeleteStep")
         ApproveModal(
           text="Are you sure?"
@@ -26,7 +26,7 @@
           .buttons__btn
             Button(@clicked="closeAddStepModal" value="Cancel" :outline="true")
 
-      draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
+      draggable(:value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
 
           .step__titleRow
@@ -41,7 +41,7 @@
 
           .step__detailsRow
 
-            .step__icons(v-if="tasksData.service && tasksData.service.title !== 'Translation'")
+            .step__icons(v-if="currentProject.requestForm.service.title !== 'Translation'")
               .step__icon(@click="openAcceptModal(index)" style="cursor: pointer;")
                 i.fas.fa-trash
               .step__icon.handle(style="cursor: grab")
@@ -50,7 +50,7 @@
 
             .step__date
               .step__datepicker
-                .step__datepicker-title Start And Deadline:
+                .step__datepicker-title Start & Deadline:
                 .step__datepicker-input
                   DatePicker.range-with-one-panel(
                     :value="[item.start, item.deadline]"
@@ -116,7 +116,7 @@
 
     .add(v-if="!isCatUnit" )
       .add__row
-        .add__add(v-if="tasksData.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
+        .add__add(v-if="currentProject.requestForm.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
           Add(@add="openAddStepModal")
         .add__add(v-else)
         .add__options
@@ -130,8 +130,8 @@ import { mapActions, mapGetters } from "vuex"
 import DatepickerWithTime from "../../DatepickerWithTime"
 
 
-import DatePicker from 'vue2-datepicker';
-import '../../../assets/scss/datepicker.scss';
+import DatePicker from 'vue2-datepicker'
+import '../../../assets/scss/datepicker.scss'
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
@@ -151,7 +151,7 @@ export default {
   },
   data() {
     return {
-      time: {  },
+      time: {},
       isDisabledPayablesEdit: true,
       isAddModal: false,
       isDeleteStep: false,
@@ -167,10 +167,12 @@ export default {
   },
   methods: {
     notBeforeToday(date) {
-      return date < new Date(this.project.startDate) || new Date(this.project.billingDate) < date ;
+      return date < new Date() || new Date(this.currentProject.deadline) < date
     },
     addStep() {
-      const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
+      const { service } = this.currentProject.requestForm
+      const steps = service.steps.map(item => ({ step: this.allSteps.find(({ _id }) => _id.toString() === item.step.toString()) }))
+      const step = steps.find(item => item.step.title === this.newStep).step
       let stepsAndUnits = this.tasksData.stepsAndUnits
       stepsAndUnits.push({
         step,
@@ -225,7 +227,7 @@ export default {
       let stepsAndUnits = this.tasksData.stepsAndUnits
       const unit = this.allUnits.find(({ type }) => type === option)
 
-      if (this.tasksData.service.title === 'Translation') {
+      if (this.currentProject.requestForm.service.title === 'Translation') {
         for (let i = 0; i < stepsAndUnits.length; i++) {
           for (const prop of [ 'receivables', 'payables' ]) stepsAndUnits[i][prop].unit = unit
         }
@@ -241,11 +243,11 @@ export default {
     dragAndDropSteps(stepsAndUnits) {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    openAcceptModal(id){
+    openAcceptModal(id) {
       this.isDeleteStep = true
       this.deleteStepIndex = id
     },
-    closeAcceptModal(){
+    closeAcceptModal() {
       this.isDeleteStep = false
       this.deleteStepIndex = ''
     },
@@ -255,27 +257,32 @@ export default {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
       this.closeAcceptModal()
     },
-    ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" })
+    ...mapActions({
+      alertToggle: 'alertToggle',
+      setDataValue: "setTasksDataValueRequest"
+    })
   },
   computed: {
     ...mapGetters({
-      tasksData: "getTasksData",
+      tasksData: "getTasksDataRequest",
       allUnits: "getAllUnits",
-      project: "getCurrentProject",
+      currentProject: 'getCurrentClientRequest',
+      allSteps: "getAllSteps"
     }),
     isCatUnit() {
-      if (this.tasksData && this.tasksData.service &&  this.tasksData.stepsAndUnits.length) {
+      if (this.tasksData && this.tasksData.stepsAndUnits.length) {
         return this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
       }
     },
     possibleStepsForAdding() {
-      if (this.tasksData.service) {
-        return this.tasksData.service.steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
+      if (this.allSteps.length && this.currentProject._id) {
+        const { service } = this.currentProject.requestForm
+        const steps = service.steps.map(item => ({ step: this.allSteps.find(({ _id }) => _id.toString() === item.step.toString()) }))
+        return steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
       }
       return []
     }
-  },
-  name: "NewServicesCreationStepsWorkflow"
+  }
 }
 </script>
 
@@ -297,6 +304,7 @@ export default {
     top: 50%;
     transform: translateX(-50%) translateY(-50%);
   }
+
   &__modal-without-border {
     z-index: 12;
     width: fit-content;
@@ -388,6 +396,7 @@ export default {
         margin-left: 15px;
         padding-left: 15px;
       }
+
       &-title-date {
         width: 260px;
         margin-left: 15px;
@@ -414,6 +423,7 @@ export default {
       margin-bottom: 2px;
     }
   }
+
   &__datepicker {
     width: 260px;
   }
@@ -465,9 +475,11 @@ input {
 
 .sortable-ghost {
 }
-.range-with-one-panel{
+
+.range-with-one-panel {
   width: 260px;
 }
+
 .sortable-chosen {
   background: $light-border;
 }

@@ -21,7 +21,7 @@
       //    :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
       //    @chooseOption="setPayment"
       //  )
-      .row__data {{ project.paymentProfile || 'Not assigned' }}
+      .row__data {{ project.clientBillingInfo.paymentType || 'Not assigned' }}
     .sub-information__row
       .row__title Urgent:
       .row__data
