@@ -75,7 +75,7 @@
               .block__key Total
 
         .project__detailsRow-dates
-          .project__date(style="margin-bottom: 15px;")
+          .project__date(style="margin-bottom: 12px; margin-top: -6px;")
             .input-title
               .input-title__text Deadline:
             DatePicker(
@@ -548,10 +548,10 @@
 
   .block{
     width: 100px;
-    border: 2px dotted $light-border;
+    border: 1px dotted $border;
     flex-direction: column;
     align-items: center;
-    padding: 6px 0px 3px 0px;
+    padding: 6px 0px 4px 0px;
     border-radius: 4px;
     display: flex;
     margin: 10px 5px;

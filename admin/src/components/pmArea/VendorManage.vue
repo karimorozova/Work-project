@@ -322,10 +322,10 @@ export default {
     async checkAssignmentsErrors() {
       const { payablesUnit } = this.currentStep
       this.errors = []
-      // if (payablesUnit.type === 'CAT Wordcount' && this.enteredProgress > this.getCurrentProgress()) {
-      //   this.errors.push("Entered progress cannot be higher than current progress.")
-      //   this.enteredProgress = ""
-      // }
+      if (payablesUnit.type === 'CAT Wordcount' && this.enteredProgress > this.getCurrentProgress()) {
+        this.errors.push("Entered progress cannot be higher than current progress.")
+        this.enteredProgress = ""
+      }
       if (this.enteredProgress >= 100) {
         this.errors.push("Entered progress cannot be higher than completed progress.")
         this.enteredProgress = ""
@@ -426,7 +426,7 @@ export default {
       return STATUSES.includes(status)
     },
     cancelledStepStatuses({ status }) {
-      const STATUSES = [ 'Cancelled', 'Cancelled Halfway' ]
+      const STATUSES = [ 'Cancelled', 'Cancelled Halfway', 'Completed' ]
       return STATUSES.includes(status)
     },
     removeVendorAssignments() {
@@ -1040,7 +1040,6 @@ export default {
     justify-content: center;
     padding: 12px;
     background: $table-list;
-    font-family: Myriad600;
 
     &-text {
       padding-right: 12px;

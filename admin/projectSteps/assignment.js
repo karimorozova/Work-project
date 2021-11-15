@@ -4,6 +4,7 @@ const { rateExchangeVendorOntoProject } = require('../helpers/commonFunctions')
 const { getProject } = require("../projects")
 const { assignmentsEmitter } = require("../events/assignments")
 const { updateProject } = require("../projects/getProjects")
+const { getRelativeQuantity } = require("../helpers/projectMetrics")
 
 async function removeVendorFromStep({ stepId, projectId }) {
 	const project = await Projects.findOne({ _id: projectId })
@@ -22,7 +23,6 @@ async function removeVendorFromStep({ stepId, projectId }) {
 
 
 async function reassignVendor({ projectId, stepId, progress, isStart, isPay, reason, vendor }) {
-
 	const project = await getProject({ "_id": projectId })
 	let { steps, tasks, projectCurrency, crossRate } = project
 
@@ -31,7 +31,7 @@ async function reassignVendor({ projectId, stepId, progress, isStart, isPay, rea
 		const _taskIdx = tasks.findIndex(({ taskId }) => taskId === steps[_stepIdx].taskId)
 		tasks[_taskIdx].status = "In progress"
 
-		const updatedSteps = makeStep({ step: steps[_stepIdx], progress: +progress, vendor, projectCurrency, crossRate, isStart, isPay })
+		const updatedSteps = makeStep({task: tasks[_taskIdx], step: steps[_stepIdx], progress: +progress, vendor, projectCurrency, crossRate, isStart, isPay })
 
 		const oldStep = updatedSteps().getOldStep()
 		const newStep = updatedSteps().getNewStep()
@@ -57,7 +57,7 @@ async function reassignVendor({ projectId, stepId, progress, isStart, isPay, rea
 	}
 }
 
-const makeStep = ({ step, progress, vendor, projectCurrency, crossRate, isStart, isPay }) => {
+const makeStep = ({task, step, progress, vendor, projectCurrency, crossRate, isStart, isPay }) => {
 	const { finance, receivablesUnit: { type }, vendorRate, nativeVendorRate, nativeFinance, status, stepId, progress: oldProgress } = step._doc
 	const { _id: vendorId, nativeRate: comingNativeVendorRate } = Object.values(vendor)[0]
 	const newVendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +comingNativeVendorRate, crossRate)
@@ -78,7 +78,9 @@ const makeStep = ({ step, progress, vendor, projectCurrency, crossRate, isStart,
 			getNewStep: () => ({
 				...rest,
 				stepId: stepId + ' [R]',
+				//TODO: REMOVE
 				status: 'Created',
+				// status: 'In progress',
 				vendor: vendorId,
 				vendorRate: newVendorRate,
 				nativeVendorRate: comingNativeVendorRate,
@@ -124,6 +126,9 @@ const makeStep = ({ step, progress, vendor, projectCurrency, crossRate, isStart,
 		}
 		if (!isStart && !isPay) {
 			finance = mutatedFinanceByPercent(finance, progress)
+		}
+		if(isStart && type === 'CAT Wordcount'){
+			finance.Wordcount.payables = +getRelativeQuantity(task.metrics, 'vendor')
 		}
 
 		return function (rate) {
