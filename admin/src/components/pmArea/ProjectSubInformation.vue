@@ -6,7 +6,6 @@
     .sub-information__project
       .sub-information__project-title(id="id") {{ project.projectId }}
       .sub-information__project-icons
-
         .iconId(class="click-copy" @click="copyId")
           i.far.fa-copy
 

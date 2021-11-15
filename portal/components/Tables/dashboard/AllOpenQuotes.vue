@@ -209,7 +209,7 @@
     &__title {
       position: absolute;
       top: 17px;
-      font-size: 18px;
+      font-size: 16px;
       font-family: 'Myriad600';
     }
     &__modal-wrapper {

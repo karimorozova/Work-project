@@ -35,7 +35,7 @@
               .project__detailsRow-client-subtitle {{ project.clientBillingInfo.name }}
               .project__detailsRow-client-text {{ project.industry.name }}
               .project__detailsRow-client-text Start at {{ customFormatter( project.startDate ) }}
-        
+
 
         .project__detailsRow-finance
           .project__detailsRow-finance-blocks
@@ -108,51 +108,51 @@
             )
 
       //.project__info-row
-        .project__client
-          .input-title
-            .input-title__text Client Name:
-            span.require *
-          .project__input-icons(v-if="project._id")
-            i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
-            input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
-
-          .project__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="project.customer.name"
-              :options="clients"
-              :hasSearch="isSearchClient"
-              placeholder="Name"
-              @chooseOption="setCustomer"
-            )
-        .project__industry
-          .input-title
-            .input-title__text Industry:
-            span.require *
-          input.project__input-text( v-if="project.industry.name"  type="text" :value="project.industry.name" disabled)
-          .project__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="selectedIndustry.name"
-              :options="industriesList"
-              @chooseOption="setIndustry"
-              placeholder="Industry"
-            )
-        .project__number
-          .input-title
-            .input-title__text Billing Information:
-            span.require *
-          input.project__input-text(v-if="(isProjectFinished && project.clientBillingInfo) || (project._id && project.clientBillingInfo) " type="text" :value="(project.clientBillingInfo.name) " disabled)
-          .project__drop-menu(v-else)
-            SelectSingle(
-              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
-              :options="billingInfoList.map(({name}) => name)"
-              @chooseOption="choseBillingInfo"
-              placeholder="Option"
-            )
+      //  .project__client
+      //    .input-title
+      //      .input-title__text Client Name:
+      //      span.require *
+      //    .project__input-icons(v-if="project._id")
+      //      i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
+      //      input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
+      //
+      //    .project__drop-menu(v-else)
+      //      SelectSingle(
+      //        :selectedOption="project.customer.name"
+      //        :options="clients"
+      //        :hasSearch="isSearchClient"
+      //        placeholder="Name"
+      //        @chooseOption="setCustomer"
+      //      )
+      //  .project__industry
+      //    .input-title
+      //      .input-title__text Industry:
+      //      span.require *
+      //    input.project__input-text( v-if="project.industry.name"  type="text" :value="project.industry.name" disabled)
+      //    .project__drop-menu(v-else)
+      //      SelectSingle(
+      //        :selectedOption="selectedIndustry.name"
+      //        :options="industriesList"
+      //        @chooseOption="setIndustry"
+      //        placeholder="Industry"
+      //      )
+      //  .project__number
+      //    .input-title
+      //      .input-title__text Billing Information:
+      //      span.require *
+      //    input.project__input-text(v-if="(isProjectFinished && project.clientBillingInfo) || (project._id && project.clientBillingInfo) " type="text" :value="(project.clientBillingInfo.name) " disabled)
+      //    .project__drop-menu(v-else)
+      //      SelectSingle(
+      //        :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
+      //        :options="billingInfoList.map(({name}) => name)"
+      //        @chooseOption="choseBillingInfo"
+      //        placeholder="Option"
+      //      )
 
 
       .project__block-row.project_no-margin
         .project__block
-          .block__header(@click="toggleBlock('isBrief')" :class="{'block__header-grey': !isBrief}")
+          .block__header(@click="toggleBlock('isBrief')")
             .title Project Brief
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
@@ -161,7 +161,7 @@
           .block__data(v-if="isBrief")
             ckeditor(v-model="project.brief" :config="editorConfig" @blur="updateBrief")
         .project__block
-          .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
+          .block__header(@click="toggleBlock('isNotes')")
             .title Project Notes
             .icon(v-if="!isNotes")
               i.fas.fa-chevron-down
@@ -170,11 +170,11 @@
           .block__data(v-if="isNotes")
             ckeditor(v-model="project.notes" :config="editorConfig" @blur="updateNotes")
 
-      .project__button(v-if="!project.projectId")
-        Button(
-          value="Create Project"
-          @clicked="checkForErrors"
-        )
+      //.project__button(v-if="!project.projectId")
+      //  Button(
+      //    value="Create Project"
+      //    @clicked="checkForErrors"
+      //  )
       ValidationErrors(
         v-if="areErrorsExist"
         :errors="errors"
@@ -226,7 +226,7 @@
           ],
           removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
           uiColor: "#ffffff",
-          height: 220
+          height: 240
         },
         isBilling: false,
 				isTest: false,
@@ -256,6 +256,10 @@
 				"setCurrentProject"
 			]),
       toggleBlock(prop) {
+        if (this[prop]) {
+          this.updateBrief()
+          this.updateNotes()
+        }
         this[prop] = !this[prop]
       },
       notBeforeToday(date) {
@@ -266,11 +270,9 @@
       },
 			async updateBrief() {
         await this.setProjectProp({ prop: 'brief', value: this.project.brief })
-        // return this.$emit('setValue', { prop: 'brief', option: this.project.brief })
 			},
 			async updateNotes() {
         await this.setProjectProp({ prop: 'notes', value: this.project.notes })
-        // return this.$emit('setValue', { prop: 'notes', option: this.project.notes })
 			},
 			async changeProjectName(projectName) {
 				this.errors = []
@@ -643,7 +645,7 @@
         margin-bottom: 20px;
 
         ::-webkit-input-placeholder {
-          opacity: 0.4;
+          opacity: 0.5;
         }
       }
     }
