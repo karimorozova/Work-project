@@ -1,6 +1,12 @@
 <template lang="pug">
   .steps
 
+    .steps__vendorDetails(v-if="isVendorDetailsModal && vendorDetailsId")
+      StepVendorDetails(
+        :vendorId="vendorDetailsId"
+        @close="closeVendorDetailsModal"
+      )
+
     .steps__stepDetails(v-if="isStepInfo")
       StepInfo(
         :step="finalData[infoIndex]"
@@ -86,7 +92,8 @@
         .table__data(v-html="getStepPair(row)")
 
       template(slot="vendor" slot-scope="{ row, index }")
-        .table__data(v-if="row.vendor") {{ vendorName(row.vendor) }}
+        .table__data(v-if="row.vendor")
+          span.vendor__details(@click="openVendorDetailsModal(row.vendor)") {{ vendorName(row.vendor) }}
         .table__data(v-else) -
 
       template(slot="start" slot-scope="{ row, index }")
@@ -197,6 +204,7 @@ import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 import StepInfo from "./StepInfo"
 import ProjectFinanceModal from "../ProjectFinanceModal"
+import StepVendorDetails from './StepVendorDetails'
 
 
 
@@ -218,6 +226,8 @@ export default {
   },
   data() {
     return {
+      vendorDetailsId: null,
+      isVendorDetailsModal: false,
       infoIndex: -1,
       isStepInfo: false,
       isFinanceEdit: false,
@@ -258,7 +268,14 @@ export default {
       // "setProjectStatus",
       // "reopenSteps"
     ]),
-
+    closeVendorDetailsModal(){
+      this.vendorDetailsId = null
+    },
+    openVendorDetailsModal(vendor){
+      const { _id } = vendor
+      this.vendorDetailsId = _id
+      this.isVendorDetailsModal = true
+    },
     closeStepInfo() {
       this.isStepInfo = false
       this.infoIndex = -1
@@ -448,6 +465,7 @@ export default {
     }
   },
   components: {
+    StepVendorDetails,
     ProjectFinanceModal,
     StepInfo,
     DatepickerWithTime,
@@ -481,6 +499,19 @@ export default {
     position: relative;
     width: 220px;
     height: 32px;
+  }
+
+  &__vendorDetails {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    // box-shadow: $box-shadow;
+    // background-color: #fff;
+    // border-radius: 4px;
+    // width: 600px;
+    // padding: 25px;
   }
 
   &__stepDetails {
@@ -637,5 +668,16 @@ input {
 }
 .red-color{
   color: $red;
+}
+.vendor__details{
+    cursor: pointer;
+    color: $text;
+    text-decoration: none;
+    transition: .2s ease-out;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  
 }
 </style>

@@ -90,7 +90,6 @@ export default {
     Files
   }
 }
-1
 </script>
 
 <style lang="scss" scoped>
