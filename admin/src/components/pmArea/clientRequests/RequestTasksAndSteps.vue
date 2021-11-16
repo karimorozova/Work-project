@@ -31,7 +31,7 @@
       ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
 
     .tasks-steps__tables
-      .tasks__tabs
+      //.tasks__tabs
         Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
       .tasks__table(v-if="isTasksShow")
         GeneralTable(
@@ -41,20 +41,19 @@
           template(v-for="field in fields1", :slot="field.headerKey", slot-scope="{ field }")
             .tasks__head-title {{ field.label }}
 
-          template(slot="id" slot-scope="{ row, index }")
-            .tasks__data {{ row.taskId }}
+          //template(slot="id" slot-scope="{ row, index }")
+          //  .tasks__data {{ row.taskId }}
           template(slot="language" slot-scope="{ row, index }")
             .tasks__data {{ row.language }}
           template(slot="service" slot-scope="{ row, index }")
             .tasks__data {{ row.service }}
-          template(slot="start" slot-scope="{ row, index }")
-            .tasks__data {{ row.start }}
-          template(slot="deadline" slot-scope="{ row, index }")
-            .tasks__data {{ row.deadline }}
-          template(slot="source" slot-scope="{ row, index }")
-            .tasks__data {{ row.sourceLength }}
-          template(slot="ref" slot-scope="{ row, index }")
-            .tasks__data {{ row.refLength }}
+          template(slot="steps" slot-scope="{ row, index }")
+            .tasks__data {{ row.steps }}
+          template(slot="tasksCount" slot-scope="{ row, index }")
+            .tasks__data {{ row.tasksLength }} / {{ row.stepsLength }}
+          template(slot="filesCount" slot-scope="{ row, index }")
+            .tasks__data {{row.sourceLength}} / {{row.refLength}}
+
           template(slot="icons" slot-scope="{ row, index }")
             .tasks__icons(v-if="canUpdateRequest")
               .tasks__icon(@click="editTasksData(row.taskId)")
@@ -94,9 +93,9 @@
       //    template(slot="deadline" slot-scope="{ row, index }")
       //      .tasks__data {{ row.deadline }}
 
-    .button(v-if="(!isTaskData && currentTasks.length && canUpdateRequest) && currentProject.clientBillingInfo")
+    .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
       .button__convert
-        Button(value="Convert into Project" :isDisabled="isButtonDisable" @clicked="convertIntoProject")
+        Button(value="Convert into Project" @clicked="convertIntoProject")
 
 </template>
 
@@ -134,25 +133,26 @@ export default {
       selectedTab: 'Tasks and Steps',
       // currentTaskId: '',
       currentTaskIdForUpdate: '',
-      isButtonDisable: false,
+      // isButtonDisable: false,
       fields1: [
-        { label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
-        { label: "Service", headerKey: "headerService", key: "service", style: { width: "15%" } },
-        { label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
-        { label: "# Source", headerKey: "headerSource", key: "source", style: { width: "7%" } },
-        { label: "# Ref.", headerKey: "headerRef", key: "ref", style: { width: "7%" } },
-        { label: "", headerKey: "headerIcons", key: "icons", style: { width: "8%" } }
-      ],
-
-      fields2: [
-        { label: "Step Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
-        { label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
-        { label: "Step", headerKey: "headerStep", key: "step", style: { width: "12%" } },
-        { label: "Unit", headerKey: "headerUnit", key: "unit", style: { width: "12%" } },
-        { label: "", headerKey: "headerSize", key: "quantity", style: { width: "13%" } },
-        { label: "Start", headerKey: "headerStart", key: "start", style: { width: "12%" } },
-        { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { width: "12%" } }
+        // { label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
+        { label: "Service", headerKey: "headerService", key: "service", style: { width: "16%" } },
+        { label: "Service steps", headerKey: "headerSteps", key: "steps", style: { width: "25%" } },
+        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { width: "25%" } },
+        { label: "Tasks / Steps", headerKey: "headerSteps", key: "tasksCount", style: { width: "12%" } },
+        { label: "Source / Ref.", headerKey: "headerSteps", key: "filesCount", style: { width: "12%" } },
+        { label: "", headerKey: "headerIcons", key: "icons", style: { width: "10%" } }
       ]
+
+      // fields2: [
+      //   { label: "Step Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
+      //   { label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
+      //   { label: "Step", headerKey: "headerStep", key: "step", style: { width: "12%" } },
+      //   { label: "Unit", headerKey: "headerUnit", key: "unit", style: { width: "12%" } },
+      //   { label: "", headerKey: "headerSize", key: "quantity", style: { width: "13%" } },
+      //   { label: "Start", headerKey: "headerStart", key: "start", style: { width: "12%" } },
+      //   { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { width: "12%" } }
+      // ]
     }
   },
   methods: {
@@ -177,15 +177,21 @@ export default {
       }
     },
     async convertIntoProject() {
-      this.isButtonDisable = true
+      // this.isButtonDisable = true
       const { requestForm: { service: { title } }, tasksAndSteps } = this.currentProject
       this.checkTranslationSourceFiles(title, tasksAndSteps)
+
+      if (title === 'Translation') {
+        if (tasksAndSteps.some(item => item.taskData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') &&
+            tasksAndSteps.some(item => item.taskData.stepsAndUnits[0].receivables.unit.type !== 'CAT Wordcount')) {
+          this.errors.push('Translation services should exist only one type of unit.')
+        }
+      }
       if (this.errors.length) {
         this.showErrors({ errors: this.errors })
         return
       }
-
-      if (title === 'Translation') {
+      if (title === 'Translation' && tasksAndSteps[0].taskData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
         try {
           const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
           const { creatorUserId: creatorUserForMemoqId } = memoqCreatorUser.data
@@ -202,24 +208,26 @@ export default {
       }
     },
     async convertCustomUnitsProject() {
-      try {
-        const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
-        const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
-        window.open(route.href, "_self")
-        this.isButtonDisable = false
-      } catch (err) {
-        this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
-      }
+      console.log('WORD')
+      // try {
+      //   const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
+      //   const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
+      //   window.open(route.href, "_self")
+      //   this.isButtonDisable = false
+      // } catch (err) {
+      //   this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
+      // }
     },
     async convertCATUnitsProject(creatorUserForMemoqId) {
-      try {
-        const projectId = await this.$http.post('/pm-manage/convert-translation-request-into-project', { projectId: this.currentProject._id, creatorUserForMemoqId })
-        const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
-        window.open(route.href, "_self")
-        this.isButtonDisable = false
-      } catch (err) {
-        this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
-      }
+      console.log('CAT')
+      // try {
+      //   const projectId = await this.$http.post('/pm-manage/convert-translation-request-into-project', { projectId: this.currentProject._id, creatorUserForMemoqId })
+      //   const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
+      //   window.open(route.href, "_self")
+      //   this.isButtonDisable = false
+      // } catch (err) {
+      //   this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
+      // }
     },
     async deleteTask(taskId) {
       try {
@@ -295,6 +303,9 @@ export default {
           taskId,
           language: `${ sourceLanguage.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
           service: service.title,
+          steps: [ ...new Set(stepsAndUnits.map(item => item.step.title)) ].join(', '),
+          tasksLength: targets.length,
+          stepsLength: stepsAndUnits.length * targets.length,
           sourceLength: sourceFiles.length,
           refLength: refFiles.length
         }
@@ -349,7 +360,7 @@ export default {
   &__convert {
     display: flex;
     justify-content: center;
-    padding-top: 20px;
+    padding-top: 25px;
   }
 }
 
