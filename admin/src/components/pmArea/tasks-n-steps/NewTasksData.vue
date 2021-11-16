@@ -122,13 +122,12 @@ export default {
     async saveTasks() {
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (this.tasksData.template && this.tasksData.service.title === 'Translation') {
+        if (this.tasksData.template && this.tasksData.service.title === 'Translation' &&  this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
           try {
             const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
             const { creatorUserId } = memoqCreatorUser.data
             if (!creatorUserId) throw new Error()
             data.append('creatorUserId', creatorUserId)
-            this.isInfo = true
           } catch (err) {
             this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
           }
@@ -136,6 +135,7 @@ export default {
         } else {
           await this.addProjectTasks(data)
         }
+        this.$parent.toggleTaskData()
         this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })

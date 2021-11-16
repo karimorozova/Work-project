@@ -4,17 +4,20 @@
     .finance__close(@click.stop="cancelEditing") &#215;
 
     .info
-      .info__link(@click="openDetailsModal") View details
+      .info__link(@click="openDetailsModal") Go to details
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
-      .info__right(v-if="step.vendor") Discount/Surcharge: {{discounts}}%
+      .info__right(v-if="step.vendor")
+        span Discount/Surcharge:
+        span(style="margin-left: 4px;") {{discounts}}%
+
       .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
 
     .stats
       .multi-graph
-        .graph( :style="{'--percentage' : 100, '--fill': '#d15f45'}")
-        .graph( :style="{'--percentage' : chartMargin, '--fill': '#47A6A6'}")
+        .graph( :style="{'--percentage' : 100, '--fill': '#daeded'}")
+        .graph( :style="{'--percentage' : chartMargin, '--fill': '#f5dfd9'}")
       .stats__details
         .details__row
           .details__row-color1
@@ -262,14 +265,14 @@ export default {
     &-color1 {
       height: 6px;
       min-width: 6px;
-      background: $green;
+      background: $light-green;
       margin-right: 10px;
     }
 
     &-color2 {
       height: 6px;
       min-width: 6px;
-      background: $red;
+      background: $light-red;
       margin-right: 10px;
     }
   }
@@ -278,21 +281,19 @@ export default {
 .stats {
   display: flex;
   justify-content: space-evenly;
-  background: $table-list;
   align-items: center;
-  padding: 15px 0;
+  margin-bottom: 20px;
 
   &__details {
     margin-top: 20px;
-    width: 140px;
+    width: 130px;
   }
 }
 
 .multi-graph {
   margin-right: 25px;
-  margin-left: 10px;
-  width: 140px;
-  height: 70px;
+  width: 130px;
+  height: 65px;
   position: relative;
   color: #fff;
   font-size: 22px;
@@ -304,13 +305,13 @@ export default {
   box-sizing: border-box;
 
   .graph {
-    width: 140px;
-    height: 70px;
-    border: 6px solid var(--fill);
+    width: 130px;
+    height: 65px;
+    border: 7px solid var(--fill);
     border-top: none;
     position: absolute;
     transform-origin: 50% 0% 0;
-    border-radius: 0 0 140px 140px;
+    border-radius: 0 0 130px 130px;
     left: 0;
     top: 100%;
     z-index: 5;
@@ -358,18 +359,17 @@ export default {
   &__right {
     position: absolute;
     right: 12px;
+    bottom: 12px;
   }
 
   &__title {
-    font-size: 24px;
-    font-family: Myriad300;
+    font-size: 20px;
     color: $red;
     margin-bottom: 10px;
   }
 
   &__value {
     font-size: 14px;
-    font-family: Myriad300;
     margin-top: 6px;
   }
 }

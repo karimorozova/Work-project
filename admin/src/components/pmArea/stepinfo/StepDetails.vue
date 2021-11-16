@@ -63,14 +63,14 @@ export default {
 
   &__vendorLinks {
     margin-bottom: 20px;
-    border-left: 2px solid $light-red;
+    border-left: 2px solid $light-border;
     padding: 0 10px;
     width: 200px;
   }
 
   &__memoqLinks {
     margin-bottom: 20px;
-    border-left: 2px solid $light-red;
+    border-left: 2px solid $light-border;
     padding: 0 10px;
     height: max-content;
   }

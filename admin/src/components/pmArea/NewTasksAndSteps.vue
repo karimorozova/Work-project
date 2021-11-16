@@ -63,6 +63,7 @@ import Tabs from "../Tabs"
 import Button from "../Button"
 import VendorManage from "./VendorManage"
 import { mapActions, mapGetters } from "vuex"
+import { clearTasksData } from "../../vuex/pmarea/actions"
 
 export default {
   name: "NewTaskAndSteps",
@@ -74,7 +75,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions([ 'setCurrentProject', 'alertToggle' ]),
+    ...mapActions([ 'setCurrentProject', 'alertToggle', 'clearTasksData' ]),
     async refreshProject() {
       try {
         const { id } = this.$route.params
@@ -85,6 +86,9 @@ export default {
       }
     },
     toggleTaskData() {
+      if(this.isTaskData) {
+        this.clearTasksData()
+      }
       this.isTaskData = !this.isTaskData
     },
     setTab({ index }) {

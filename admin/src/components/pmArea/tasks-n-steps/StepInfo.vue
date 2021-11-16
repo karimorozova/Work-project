@@ -4,7 +4,7 @@
     .step-info__close(@click.stop="closeInfo") &#215;
 
     .info
-      .info__link(@click="openFinanceModal") View finance
+      .info__link(@click="openFinanceModal") Go to finance
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
@@ -115,15 +115,13 @@ export default {
 
 
   &__title {
-    font-size: 24px;
-    font-family: Myriad300;
+    font-size: 20px;
     color: $red;
     margin-bottom: 10px;
   }
 
   &__value {
     font-size: 14px;
-    font-family: Myriad300;
     margin-top: 6px;
   }
 }
