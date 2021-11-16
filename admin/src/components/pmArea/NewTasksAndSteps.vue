@@ -95,6 +95,9 @@ export default {
     },
     toggleVendorManage() {
       this.isModalOpen = !this.isModalOpen
+    },
+    setDefaultIsTaskData() {
+      if (!this.currentProject.tasks.length) this.isTaskData = true
     }
   },
   computed: {
@@ -111,7 +114,9 @@ export default {
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     }
   },
-
+  mounted() {
+    this.setDefaultIsTaskData()
+  },
   components: {
     NewTasksData,
     NewTasks,

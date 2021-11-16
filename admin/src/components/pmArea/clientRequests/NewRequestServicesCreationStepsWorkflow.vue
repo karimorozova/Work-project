@@ -41,8 +41,8 @@
 
           .step__detailsRow
 
-            .step__icons(v-if="currentProject.requestForm.service.title !== 'Translation'")
-              .step__icon(@click="openAcceptModal(index)" style="cursor: pointer;")
+            .step__icons
+              .step__icon(@click="openDeleteAcceptModal(index)" style="cursor: pointer;")
                 i.fas.fa-trash
               .step__icon.handle(style="cursor: grab")
                 i.fas.fa-arrows-alt-v
@@ -53,7 +53,7 @@
                 .step__datepicker-title Start & Deadline:
                 .step__datepicker-input
                   DatePicker.range-with-one-panel(
-                    :value="[item.start, item.deadline]"
+                    :value="[new Date(item.start), new Date(item.deadline)]"
                     @input="(e) => setDates(e, index)"
                     format="DD-MM-YYYY, HH:mm"
                     prefix-class="xmx"
@@ -114,7 +114,7 @@
                 .step__setting-title Quantity:
                 input(type="number" :disabled="isDisabledPayablesEdit" placeholder="Value" min="0" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
 
-    .add(v-if="!isCatUnit" )
+    .add
       .add__row
         .add__add(v-if="currentProject.requestForm.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
           Add(@add="openAddStepModal")
@@ -243,7 +243,7 @@ export default {
     dragAndDropSteps(stepsAndUnits) {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    openAcceptModal(id) {
+    openDeleteAcceptModal(id) {
       this.isDeleteStep = true
       this.deleteStepIndex = id
     },

@@ -1072,8 +1072,8 @@
   .side {
     &__contacts,
     &__pm {
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      padding: 20px;
+      box-shadow: $box-shadow;
+      padding: 25px;
       width: 240px;
       height: fit-content;
       margin-left: 40px;
@@ -1082,9 +1082,9 @@
 
     &__info {
       position: relative;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-      padding: 20px;
-      width: 400px;
+      box-shadow: $box-shadow;
+      padding: 25px;
+      width: 420px;
       box-sizing: border-box;
       margin-left: 40px;
       margin-bottom: 40px;
@@ -1095,11 +1095,11 @@
 
   .form {
     position: relative;
-    padding: 20px;
+    padding: 25px;
     min-width: 1040px;
     max-width: 1040px;
     box-sizing: border-box;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     border-radius: 4px;
     background: white;
 
@@ -1307,15 +1307,15 @@
     }
 
     &__main {
-      padding: 30px 20px 20px 20px;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      padding: 30px 25px 25px 25px;
+      box-shadow: $box-shadow;
       position: absolute;
       z-index: 9999;
       background: white;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 400px;
+      width: 420px;
     }
 
     &__close {

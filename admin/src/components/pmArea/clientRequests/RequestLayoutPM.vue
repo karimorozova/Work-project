@@ -140,9 +140,9 @@ export default {
 .side {
   &__info {
     position: relative;
-    padding: 20px;
+    padding: 25px;
     box-shadow: $box-shadow;
-    width: 400px;
+    width: 420px;
     box-sizing: border-box;
     margin-top: 40px;
     margin-bottom: 40px;
@@ -159,8 +159,7 @@ export default {
 }
 
 .sub-wrapper {
-  margin-left: 40px;
-  padding-right: 40px;
+  margin-left: 50px;
 }
 
 

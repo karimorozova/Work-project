@@ -1,5 +1,5 @@
 <template lang="pug">
-  .tasks-steps
+  .tasks-steps(v-if="user._id && currentProject._id" )
     .tasks-steps__tasks-title Tasks and Steps
 
       .tasks-steps__addTask(v-if="canUpdateRequest && !isTaskData" @click="toggleTaskData")
@@ -13,6 +13,7 @@
           v-if="isTaskData && currentProject._id && allLanguages.length && allSteps.length"
           :allLanguages="allLanguages"
           :currentProject="currentProject"
+          :currentTaskIdForUpdate="currentTaskIdForUpdate"
           :allSteps="allSteps"
         )
         //RequestTasksData(
@@ -36,9 +37,6 @@
         GeneralTable(
           :fields="fields1"
           :tableData="currentTasks"
-          :bodyClass="currentTasks.length < 7 ? 'tbody_visible-overflow' : ''"
-          :tableheadRowClass="currentTasks.length < 7 ? 'tbody_visible-overflow' : ''"
-          bodyRowClass="steps-table-row"
         )
           template(v-for="field in fields1", :slot="field.headerKey", slot-scope="{ field }")
             .tasks__head-title {{ field.label }}
@@ -59,44 +57,42 @@
             .tasks__data {{ row.refLength }}
           template(slot="icons" slot-scope="{ row, index }")
             .tasks__icons(v-if="canUpdateRequest")
-              //.tasks__icon(@click="editTasksData(row.taskId)")
-                img(src="../../../assets/images/Other/edit-icon-qa.png")
+              .tasks__icon(@click="editTasksData(row.taskId)")
+                img(src="../../../assets/images/latest-version/i-edit.png")
               .tasks__icon(@click="deleteTask(row.taskId)")
                 img(src="../../../assets/images/latest-version/i-delete.png")
-
-
             .tasks__icons(v-else)
               .tasks__icon
                 img(src="../../../assets/images/latest-version/lock.png")
 
-      .tasks__table(v-if="isStepsShow")
-        GeneralTable(
-          :fields="fields2"
-          :tableData="currentSteps"
-          :bodyClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
-          :tableheadRowClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
-          bodyRowClass="steps-table-row"
-        )
-          template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
-            .tasks__head-title(v-if="field.headerKey === 'headerSize'")
-              span(v-if="currentProject.requestForm.service.title === 'Compliance'") Quantity / Template
-              span(v-else) Quantity / Size
-            .tasks__head-title {{ field.label }}
-
-          template(slot="id" slot-scope="{ row, index }")
-            .tasks__data {{ row.stepId }}
-          template(slot="language" slot-scope="{ row, index }")
-            .tasks__data {{ row.language }}
-          template(slot="step" slot-scope="{ row, index }")
-            .tasks__data {{ row.step }}
-          template(slot="unit" slot-scope="{ row, index }")
-            .tasks__data {{ row.unit  }}
-          template(slot="quantity" slot-scope="{ row, index }")
-            .tasks__data {{ currentProject.requestForm.service.title === 'Translation' ? '-' : row.quantitySize }}
-          template(slot="start" slot-scope="{ row, index }")
-            .tasks__data {{ row.start }}
-          template(slot="deadline" slot-scope="{ row, index }")
-            .tasks__data {{ row.deadline }}
+      //.tasks__table(v-if="isStepsShow")
+      //  GeneralTable(
+      //    :fields="fields2"
+      //    :tableData="currentSteps"
+      //    :bodyClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
+      //    :tableheadRowClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
+      //    bodyRowClass="steps-table-row"
+      //  )
+      //    template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
+      //      .tasks__head-title(v-if="field.headerKey === 'headerSize'")
+      //        span(v-if="currentProject.requestForm.service.title === 'Compliance'") Quantity / Template
+      //        span(v-else) Quantity / Size
+      //      .tasks__head-title {{ field.label }}
+      //
+      //    template(slot="id" slot-scope="{ row, index }")
+      //      .tasks__data {{ row.stepId }}
+      //    template(slot="language" slot-scope="{ row, index }")
+      //      .tasks__data {{ row.language }}
+      //    template(slot="step" slot-scope="{ row, index }")
+      //      .tasks__data {{ row.step }}
+      //    template(slot="unit" slot-scope="{ row, index }")
+      //      .tasks__data {{ row.unit  }}
+      //    template(slot="quantity" slot-scope="{ row, index }")
+      //      .tasks__data {{ currentProject.requestForm.service.title === 'Translation' ? '-' : row.quantitySize }}
+      //    template(slot="start" slot-scope="{ row, index }")
+      //      .tasks__data {{ row.start }}
+      //    template(slot="deadline" slot-scope="{ row, index }")
+      //      .tasks__data {{ row.deadline }}
 
     .button(v-if="(!isTaskData && currentTasks.length && canUpdateRequest) && currentProject.clientBillingInfo")
       .button__convert
@@ -131,21 +127,18 @@ export default {
       errors: [],
       isTaskData: false,
       areErrorsExist: false,
-      tabs: [ 'Tasks', 'Steps' ],
+      tabs: [ 'Tasks and Steps' ],
       isStepsShow: false,
       isTasksShow: true,
-      isInfo: false,
-      isEditData: false,
-      selectedTab: 'Tasks',
-      currentTaskId: '',
+      // isEditData: false,
+      selectedTab: 'Tasks and Steps',
+      // currentTaskId: '',
       currentTaskIdForUpdate: '',
       isButtonDisable: false,
       fields1: [
         { label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
-        { label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
         { label: "Service", headerKey: "headerService", key: "service", style: { width: "15%" } },
-        { label: "Start", headerKey: "headerStart", key: "start", style: { width: "12%" } },
-        { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { width: "12%" } },
+        { label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
         { label: "# Source", headerKey: "headerSource", key: "source", style: { width: "7%" } },
         { label: "# Ref.", headerKey: "headerRef", key: "ref", style: { width: "7%" } },
         { label: "", headerKey: "headerIcons", key: "icons", style: { width: "8%" } }
@@ -237,15 +230,17 @@ export default {
         this.alertToggle({ message: 'Error on deleting task!', isShow: true, type: "error" })
       }
     },
-    endOfSettingTaskData() {
-      this.currentTaskId = ''
+    editTasksData(taskId) {
+      // this.isEditData = true
+      // this.currentTaskId = taskId
+      this.currentTaskIdForUpdate = taskId
+      this.isTaskData = true
     },
-    // editTasksData(taskId) {
-    // 	this.isEditData = true
-    // 	this.currentTaskId = taskId
-    // 	this.currentTaskIdForUpdate = taskId
-    // 	this.isTaskData = true
-    // },
+    setDefault() {
+      this.isTaskData = false
+      // this.currentTaskId = ''
+      this.currentTaskIdForUpdate = ''
+    },
     closeErrorsBlock() {
       this.areErrorsExist = false
       this.errors = []
@@ -261,10 +256,9 @@ export default {
     },
     toggleTaskData() {
       this.isTaskData = !this.isTaskData
-      this.currentTaskId = ''
+      // this.currentTaskId = ''
       this.currentTaskIdForUpdate = ''
       if (!this.isTaskData) {
-        //TODO: чистить и выбраные таргет языки
         this.clearTasksDataRequest()
       }
     },
@@ -272,62 +266,8 @@ export default {
       this.isTasksShow = index === 0
       this.isStepsShow = !this.isTasksShow
       this.selectedTab = this.tabs[index]
-    },
-
-    getDataForTasks(dataForTasks) {
-      let tasksData = new FormData()
-
-      if (dataForTasks.stepsAndUnits.find(item => item.template)) tasksData.append('template', dataForTasks.stepsAndUnits.find(item => item.template).template.id)
-      tasksData.append('stepsAndUnits', JSON.stringify(dataForTasks.stepsAndUnits))
-      tasksData.append('workflow', dataForTasks.workflow.id)
-      tasksData.append('stepsDates', JSON.stringify(dataForTasks.stepsDates))
-      tasksData.append('service', JSON.stringify(dataForTasks.service))
-      tasksData.append('source', dataForTasks.source ? JSON.stringify(dataForTasks.source) : "")
-      tasksData.append('targets', JSON.stringify(dataForTasks.targets))
-      tasksData.append('requestId', this.currentProject._id)
-      if (dataForTasks.refFilesVault) tasksData.append('refFilesVault', JSON.stringify(dataForTasks.refFilesVault))
-      if (dataForTasks.refFilesVault) tasksData.append('sourceFilesVault', JSON.stringify(dataForTasks.sourceFilesVault))
-
-      return tasksData
-    },
-    async addTasks(dataForTasks) {
-      let tasksData = this.getDataForTasks(dataForTasks)
-      // const calculationUnit = [ ...new Set(dataForTasks.stepsAndUnits.map(item => item.unit)) ]
-
-      const { sourceFiles, refFiles } = dataForTasks
-      if (sourceFiles && sourceFiles.length) {
-        for (let file of sourceFiles) {
-          tasksData.append('sourceFiles', file)
-        }
-      }
-      if (refFiles && refFiles.length) {
-        for (let file of refFiles) {
-          tasksData.append('refFiles', file)
-        }
-      }
-
-      await this.saveProjectTasks(tasksData)
-    },
-    async saveProjectTasks(tasksData) {
-      try {
-        !!this.currentTaskIdForUpdate && tasksData.append('taskIdForUpdate', this.currentTaskIdForUpdate)
-
-        const updatedProject = !!this.currentTaskIdForUpdate ?
-            await this.$http.post('/pm-manage/update-request-tasks', tasksData) :
-            await this.$http.post('/pm-manage/request-tasks', tasksData)
-
-        await this.setCurrentClientRequest(updatedProject.data)
-        this.isTaskData = false
-        this.clearTasksDataRequest()
-        !!this.currentTaskIdForUpdate && this.alertToggle({ message: 'Task updated!', isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: 'Error on creating/updating task', isShow: true, type: "error" })
-      } finally {
-        this.isInfo = false
-        this.currentTaskId = ''
-        this.currentTaskIdForUpdate = ''
-      }
     }
+
   },
   computed: {
     ...mapGetters({
@@ -338,31 +278,30 @@ export default {
       allSteps: "getAllSteps"
     }),
     currentTasks() {
-      return []
-      // return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
-      // 	const { source, targets, service, stepsDates } = taskData
-      //
-      // 	let start, deadline
-      // 	if (stepsDates.length === 1) {
-      // 		[ start, deadline ] = Object.values(stepsDates[0])
-      // 	} else {
-      // 		start = stepsDates[0].start
-      // 		deadline = stepsDates[1].deadline
-      // 	}
-      //
-      // 	return {
-      // 		taskId,
-      // 		language: `${ source.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
-      // 		service: service.title,
-      // 		start: moment(start).format('MMM D, HH:mm'),
-      // 		deadline: moment(deadline).format('MMM D, HH:mm'),
-      // 		sourceLength: sourceFiles.length,
-      // 		refLength: refFiles.length
-      // 	}
-      // })
+      return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
+        const { targets, stepsAndUnits } = taskData
+        const { requestForm: { sourceLanguage, service } } = this.currentProject
+
+        // let start, deadline
+        // if (stepsDates.length === 1) {
+        // 	[ start, deadline ] = Object.values(stepsDates[0])
+        // } else {
+        // 	start = stepsDates[0].start
+        // 	deadline = stepsDates[1].deadline
+        // }
+
+        return {
+          // taskId: taskId + ` (Task count: ${ targets.length })`,
+          taskId,
+          language: `${ sourceLanguage.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
+          service: service.title,
+          sourceLength: sourceFiles.length,
+          refLength: refFiles.length
+        }
+      })
     },
     currentSteps() {
-      return []
+      // return []
       // let a = this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
       // 	let result = []
       // 	const { source, targets, service, stepsDates, stepsAndUnits } = taskData
@@ -418,7 +357,7 @@ export default {
   box-sizing: border-box;
   padding: 25px;
   width: 1040px;
-  margin-top: 40px;
+  margin-top: 50px;
   box-shadow: $box-shadow;
   position: relative;
   background: white;

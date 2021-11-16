@@ -1,5 +1,5 @@
 <template lang="pug">
-  .sub-information
+  .sub-information(v-if="user._id" )
     .sub-information__preview(v-if="isEditAndSend")
       WYSIWYG(@closePreview="closeWYSIWYG", :message="message", @send="sendMessage")
 

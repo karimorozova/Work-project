@@ -50,7 +50,7 @@
 
       .tasks-files__items
         .tasks-files__button
-          Button(@clicked="addFileToAllTypes" value="Add")
+          Button(@clicked="addFileToAllTypes" :isDisabled="!filesVaultAll.length || filesVaultAll.every(i => !i.isCheck)" value="Add")
 
       .tasks-files__browse
         Button(@clicked="openUploadModal()" value="Browse my computer" :outline="true" )

@@ -74,6 +74,13 @@ export default {
   methods: {
     saveTasksChecks() {
       this.errors = []
+
+      const { service } = this.tasksData
+      if(service.title === 'Translation'){
+        if(!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation'){
+          this.errors.push("Translation job should be the first step.")
+        }
+      }
       if (!this.tasksData.targets || !this.tasksData.targets.length) this.errors.push("Please, select Target language(s).")
       if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation")) {
         if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
@@ -86,24 +93,26 @@ export default {
       if (!this.tasksData.stepsAndUnits.length) {
         this.errors.push("Please, select minimum one Step")
       } else {
-        if(this.isStepsWithCATWordcount && !this.isStepsTemplateSet ) {
+        if (this.isStepsWithCATWordcount && !this.isStepsTemplateSet) {
           this.errors.push("Please, select Memoq field")
         }
 
-        if( !this.isStepsWithCATWordcount && !this.isStepsQuantitySet) {
-          this.errors.push("Please, write correct quantity (min: 1 | max: 1000)  ")
+        if (!this.isStepsWithCATWordcount && !this.isStepsQuantitySet) {
+          this.errors.push("Please, write correct quantity")
         }
       }
-
-      for(const stepAndUnit of this.tasksData.stepsAndUnits) {
-        if( !stepAndUnit.start && stepAndUnit.start === '' || !stepAndUnit.deadline && stepAndUnit.deadline === '' ) {
-          this.errors.push(`Please, check dates for ${stepAndUnit.step.title}`)
+      for (const stepAndUnit of this.tasksData.stepsAndUnits) {
+        if (!stepAndUnit.start && stepAndUnit.start === '' || !stepAndUnit.deadline && stepAndUnit.deadline === '') {
+          this.errors.push(`Please, check dates for ${ stepAndUnit.step.title }`)
         }
-        // if(!stepAndUnit.deadline && stepAndUnit.deadline === '') {
-        //   this.errors.push(`Please select deadline for step ${stepAndUnit.step.title}`)
-        // }
       }
-
+      if ((this.tasksData.refFiles && this.tasksData.refFiles.length) && (this.tasksData.sourceFiles && this.tasksData.sourceFiles.length)) {
+        if (
+            new Set([ ...this.tasksData.sourceFiles, ...this.tasksData.refFiles ]
+                .map(({ name }) => name)).size !== [ ...this.tasksData.sourceFiles, ...this.tasksData.refFiles ]
+                .length
+        ) this.errors.push("Reference file cannot be the same as Source.")
+      }
       if (this.errors.length) {
         this.IsErrorModal = true
         return
@@ -271,10 +280,10 @@ export default {
       tasksData: "getTasksData"
     }),
     isStepsWithCATWordcount() {
-      return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount" )
+      return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount")
     },
     isStepsQuantitySet() {
-      return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({payables, receivables}) =>  +payables.quantity > 0 && +receivables.quantity > 0)
+      return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ payables, receivables }) => +payables.quantity > 0 && +receivables.quantity > 0)
     },
     isStepsTemplateSet() {
       return this.tasksData.template && this.tasksData.template.hasOwnProperty('name')

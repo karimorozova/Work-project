@@ -1,5 +1,5 @@
 <template lang="pug">
-  .project-action
+  .project-action(v-if="user._id" )
     .project-action__title(:style="{'padding-bottom': '8px'}")
       .project-action__title-text Managers
 
@@ -123,10 +123,10 @@ export default {
       return result
     },
     selectedAccManager() {
-      return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : ""
+      return this.project.accountManager ? this.project.accountManager.firstName + " " + this.project.accountManager.lastName : "-"
     },
     selectedProjManager() {
-      return this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : ""
+      return this.project.projectManager ? this.project.projectManager.firstName + " " + this.project.projectManager.lastName : "-"
     }
   },
   components: {
@@ -154,7 +154,7 @@ export default {
 }
 
 .project-action {
-  padding: 20px;
+  padding: 25px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
   width: 420px;

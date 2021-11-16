@@ -1,5 +1,5 @@
 <template lang="pug">
-  .project
+  .project(v-if="user._id && project._id" )
     .project__all-info
       .project__info-row
         input.project__name(type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name" :disabled="!canUpdateRequest")

@@ -28,7 +28,7 @@
 
       .language
         NewTasksLangsDuoRequest
-    //
+
     .taskData__row(v-if="tasksData && tasksData.stepsAndUnits" )
       NewRequestServicesCreationStepsWorkflow(
         :templates="templates"
@@ -67,6 +67,9 @@ import Button from "../../Button"
 
 export default {
   props: {
+    currentTaskIdForUpdate: {
+      type: String
+    },
     allLanguages: {
       type: Array
     },
@@ -89,16 +92,25 @@ export default {
   methods: {
     saveTasksChecks() {
       this.errors = []
+      const { service } = this.currentProject.requestForm
+
+      if(service.title === 'Translation'){
+        if(!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation'){
+          this.errors.push("Translation job should be the first step.")
+        }
+      }
+
       if (!this.tasksData.targets || !this.tasksData.targets.length) this.errors.push("Please, select Target language(s).")
 
-      if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation")) {
-        if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
+      if (!this.currentTaskIdForUpdate && this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation")) {
+        if ((!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) && (!this.tasksData.sourceFilesVault || !this.tasksData.sourceFilesVault.length)) {
           this.errors.push("Please, upload Source file(s).")
         }
-        if (this.tasksData.targets.map((i) => i.lang).includes(this.tasksData.source.lang)) {
+        if (this.tasksData.targets && this.tasksData.targets.map(i => i.lang).includes(this.currentProject.requestForm.sourceLanguage.lang)) {
           this.errors.push('Target and Source Languages cannot be a same if a step "Translation" is selected')
         }
       }
+
       if (!this.tasksData.stepsAndUnits.length) {
         this.errors.push("Please, select minimum one Step")
       } else {
@@ -109,72 +121,68 @@ export default {
           this.errors.push("Please, write correct quantity")
         }
       }
-
       for (const stepAndUnit of this.tasksData.stepsAndUnits) {
         if (!stepAndUnit.start && stepAndUnit.start === '' || !stepAndUnit.deadline && stepAndUnit.deadline === '') {
           this.errors.push(`Please, check dates for ${ stepAndUnit.step.title }`)
         }
-        // if(!stepAndUnit.deadline && stepAndUnit.deadline === '') {
-        //   this.errors.push(`Please select deadline for step ${stepAndUnit.step.title}`)
-        // }
       }
-
+      // if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
+      //   if ((!this.tasksData.sourceFilesVault || !this.tasksData.sourceFilesVault.length) && (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length)) {
+      //     this.errors.push("Please, upload Source file(s).")
+      //   }
+      // }
+      if ((this.tasksData.refFiles && this.tasksData.refFiles.length) && (this.tasksData.sourceFiles && this.tasksData.sourceFiles.length)) {
+        if (
+            new Set([ ...this.tasksData.sourceFiles, ...this.tasksData.refFiles ]
+                .map(({ name }) => name)).size !== [ ...this.tasksData.sourceFiles, ...this.tasksData.refFiles ]
+                .length
+        ) this.errors.push("Reference file cannot be the same as Source.")
+      }
       if (this.errors.length) {
         this.IsErrorModal = true
         return
       }
-      // this.saveTasks()
+      this.addTasks()
     },
-    // async saveTasks() {
-    //   const data = this.getDataForTasks(this.tasksData)
-    //   try {
-    //     if (this.tasksData.template && this.tasksData.service.title === 'Translation') {
-    //       try {
-    //         const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
-    //         const { creatorUserId } = memoqCreatorUser.data
-    //         if (!creatorUserId) throw new Error()
-    //         data.append('creatorUserId', creatorUserId)
-    //         this.isInfo = true
-    //       } catch (err) {
-    //         this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
-    //       }
-    //       await this.addProjectWordsTasks(data)
-    //     } else {
-    //       await this.addProjectTasks(data)
-    //     }
-    //     this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
-    //   } catch (err) {
-    //     this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
-    //   }
-    // },
-    // getDataForTasks(tasksData) {
-    //   let data = new FormData()
-    //   if (tasksData.sourceFiles && tasksData.sourceFiles.length) {
-    //     for (let file of tasksData.sourceFiles) data.append('sourceFiles', file)
-    //   }
-    //   if (tasksData.refFiles && tasksData.refFiles.length) {
-    //     for (let file of tasksData.refFiles) data.append('refFiles', file)
-    //   }
-    //   if (tasksData.source) {
-    //     data.append('source', JSON.stringify(tasksData.source))
-    //   }
-    //   if (tasksData.template) {
-    //     data.append('template', JSON.stringify(tasksData.template))
-    //   }
-    //   data.append('targets', JSON.stringify(tasksData.targets))
-    //   data.append('service', JSON.stringify(tasksData.service))
-    //   data.append('stepsAdditions', JSON.stringify(tasksData.stepsAdditions || []))
-    //   data.append('stepsAndUnits', JSON.stringify(tasksData.stepsAndUnits))
-    //
-    //   data.append('industry', JSON.stringify(this.currentProject.industry))
-    //   data.append('projectId', this.currentProject._id)
-    //   data.append('internalProjectId', this.currentProject.projectId)
-    //   data.append('nativeProjectName', this.currentProject.projectName)
-    //   data.append('projectManager', this.currentProject.projectManager._id)
-    //   data.append('customerName', this.currentProject.customer.name)
-    //
-    //   return data
-    // },
+    async addTasks() {
+      let tasksData = new FormData()
+
+      if (this.tasksData.template) {
+        tasksData.append('template', JSON.stringify(this.tasksData.template))
+      }
+      tasksData.append('stepsAndUnits', JSON.stringify(this.tasksData.stepsAndUnits))
+      tasksData.append('targets', JSON.stringify(this.tasksData.targets))
+      tasksData.append('requestId', this.currentProject._id)
+
+      if (this.tasksData.refFilesVault) tasksData.append('refFilesVault', JSON.stringify(this.tasksData.refFilesVault))
+      if (this.tasksData.sourceFilesVault) tasksData.append('sourceFilesVault', JSON.stringify(this.tasksData.sourceFilesVault))
+
+      if (this.tasksData.sourceFiles && this.tasksData.sourceFiles.length) {
+        for (let file of this.tasksData.sourceFiles) tasksData.append('sourceFiles', file)
+      }
+      if (this.tasksData.refFiles && this.tasksData.refFiles.length) {
+        for (let file of this.tasksData.refFiles) tasksData.append('refFiles', file)
+      }
+      await this.saveProjectTasks(tasksData)
+    },
+    async saveProjectTasks(tasksData) {
+      try {
+        !!this.currentTaskIdForUpdate && tasksData.append('taskIdForUpdate', this.currentTaskIdForUpdate)
+
+        const updatedProject = !!this.currentTaskIdForUpdate ?
+            await this.$http.post('/pm-manage/update-request-tasks', tasksData) :
+            await this.$http.post('/pm-manage/request-tasks', tasksData)
+
+        await this.setCurrentClientRequest(updatedProject.data)
+        this.$parent.setDefault()
+        this.clearTasksDataRequest()
+        !!this.currentTaskIdForUpdate && this.alertToggle({ message: 'Task updated!', isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: 'Error on creating/updating task', isShow: true, type: "error" })
+      } finally {
+
+      }
+    },
     closeErrors() {
       this.errors = []
       this.IsErrorModal = false
@@ -187,6 +195,18 @@ export default {
     // },
     async buildAutoData() {
       if (this.currentProject.requestForm.service.title === 'Translation') await this.getMemoqTemplates()
+
+      if (this.currentTaskIdForUpdate) {
+        const { tasksAndSteps } = this.currentProject
+        const { taskData } = tasksAndSteps.find(item => item.taskId === this.currentTaskIdForUpdate)
+        if (taskData.stepsAndUnits[0].payables.unit.type === 'CAT Wordcount') {
+          this.setDataValue({ prop: "template", value: taskData.template })
+        }
+        this.setDataValue({ prop: "targets", value: taskData.targets })
+        this.setDataValue({ prop: "stepsAndUnits", value: taskData.stepsAndUnits })
+        return
+      }
+
       this.setStepsAndUnitByService()
     },
     setStepsAndUnitByService() {
@@ -246,16 +266,11 @@ export default {
         this.templates = [ { name: 'No Templates' } ]
       }
     },
-    // ...mapActions({
-    //   alertToggle: 'alertToggle',
-    //   setDataValue: "setTasksDataValue",
-    //   addProjectTasks: "addProjectTasks",
-    //   addProjectWordsTasks: "addProjectWordsTasks",
-    //   setCurrentProject: "setCurrentProject"
-    // })
     ...mapActions({
+      clearTasksDataRequest: "clearTasksDataRequest",
       alertToggle: 'alertToggle',
-      setDataValue: "setTasksDataValueRequest"
+      setDataValue: "setTasksDataValueRequest",
+      setCurrentClientRequest: "setCurrentClientRequest"
     })
   },
   computed: {

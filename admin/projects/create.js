@@ -129,14 +129,21 @@ const createProjectFromRequest = async (requestId) => {
 
 const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) => {
 	const { requestId: _id, taskIdForUpdate } = tasksInfo
-	const { projectId, tasksAndSteps } = await getClientRequestById(_id)
-	for (let key of [ 'stepsAndUnits', 'stepsDates', 'service', 'source', 'targets' ]) {
+	const { tasksAndSteps, requestForm } = await getClientRequestById(_id)
+	const { service, source } = requestForm
+
+	for (let key of [ 'stepsAndUnits', 'targets' ]) {
 		tasksInfo[key] = JSON.parse(tasksInfo[key])
 	}
+
+	if (tasksInfo.template) {
+		tasksInfo['template'] = JSON.parse(tasksInfo['template'])
+	}
+
 	const currIdx = tasksAndSteps.findIndex(item => item.taskId === taskIdForUpdate)
 	let { refFiles, sourceFiles } = tasksAndSteps[currIdx]
 
-	const { targets, source, template, stepsAndUnits, workflow, stepsDates, service } = tasksInfo
+	const { targets, stepsAndUnits} = tasksInfo
 
 	await setFiles(sourceUploadFiles, sourceFiles)
 	await setFiles(refUploadFiles, refFiles)
@@ -146,7 +153,7 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 	delete tasksInfo.refFilesVault
 	delete tasksInfo.sourceFilesVault
 	delete tasksInfo.requestId
-	delete tasksInfo.taskIdForUpdate
+	// delete tasksInfo.taskIdForUpdate
 
 	const tasksAndStepsForSave = {
 		taskId: taskIdForUpdate,
@@ -154,10 +161,8 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 		sourceFiles,
 		taskData: {
 			targets,
-			template,
+			template: tasksInfo.template || null,
 			stepsAndUnits,
-			workflow,
-			stepsDates,
 			service,
 			source
 		}
@@ -178,12 +183,18 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 
 const createRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, refFiles: refUploadFiles }) => {
 	const { requestId: _id } = tasksInfo
-	const { projectId, tasksAndSteps } = await getClientRequestById(_id)
-	for (let key of [ 'stepsAndUnits', 'stepsDates', 'service', 'source', 'targets' ]) {
+	const { projectId, tasksAndSteps, requestForm } = await getClientRequestById(_id)
+	const { service, source } = requestForm
+
+	for (let key of [ 'stepsAndUnits', 'targets' ]) {
 		tasksInfo[key] = JSON.parse(tasksInfo[key])
 	}
 
-	const { targets, source, template, stepsAndUnits, workflow, stepsDates, service } = tasksInfo
+	if (tasksInfo.template) {
+		tasksInfo['template'] = JSON.parse(tasksInfo['template'])
+	}
+
+	const { targets, stepsAndUnits } = tasksInfo
 
 	let [ refFiles, sourceFiles ] = [ [], [] ]
 	copyFiles(tasksInfo.sourceFilesVault, sourceFiles)
@@ -208,10 +219,8 @@ const createRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 		sourceFiles,
 		taskData: {
 			targets,
-			template,
+			template: tasksInfo.template || null,
 			stepsAndUnits,
-			workflow,
-			stepsDates,
 			service,
 			source
 		}
