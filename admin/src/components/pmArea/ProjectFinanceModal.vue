@@ -8,7 +8,7 @@
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
-      .info__right(v-if="step.vendor")
+      .info__right
         span Discount/Surcharge:
         span(style="margin-left: 4px;") {{discounts}}%
 
@@ -52,7 +52,7 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" v-model="row.receivables")
+              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables")
               span(v-else) -
 
           template(slot="payables" slot-scope="{ row, index }")
@@ -126,6 +126,7 @@ export default {
       }
       const updatedProject = await this.$http.post(`/pm-manage/step-finance-edit/${ this.$route.params.id }`, data)
       this.setCurrentProject(updatedProject.data)
+      this.cancelEditing()
     },
     cancelEditing() {
       return this.$emit('closeFinanceEditing')
@@ -147,38 +148,64 @@ export default {
       this.totalReceivables = +finance.Price.receivables || 0
       this.totalPayables = +finance.Price.payables || 0
     },
+    totalRecWithDiscount(total) {
+      return this.isMinimumChargeUsed ? total : total +total/100* this.discounts
+    },
     setReceivables(event, title) {
       let value = isNaN(parseFloat(event.target.value)) ? 0 : parseFloat(event.target.value)
       this.isEdited = false
       this[title.toLowerCase() + 'Receivables'] = value
+      switch (title.toLowerCase()) {
+        case 'quantity':
+          this.totalReceivables = +(this.totalRecWithDiscount(+this.rateReceivables * +value)).toFixed(2)
+          break
+        case 'rate':
+          this.totalReceivables = +(this.totalRecWithDiscount(+this.quantityReceivables * +value)).toFixed(2)
+          break
+        case 'total' :
+          this.rateReceivables = +(+(+(+value/(this.discounts+100)) * 100)/ +this.quantityReceivables).toFixed(4)
+          break
+      }
     },
     setPayables(event, title) {
       let value = isNaN(parseFloat(event.target.value)) ? 0 : parseFloat(event.target.value)
       this.isEdited = false
       this[title.toLowerCase() + 'Payables'] = value
+
+      switch (title.toLowerCase()) {
+        case 'quantity':
+          this.totalPayables = +(+this.ratePayables * +value).toFixed(2)
+          break
+        case 'rate':
+          this.totalPayables = +(+this.quantityPayables * +value).toFixed(2)
+          break
+        case 'total' :
+          this.ratePayables = +(+value / +this.quantityPayables).toFixed(4)
+          break
+      }
     }
   },
   watch: {
-    quantityReceivables: function (val) {
-      this.totalReceivables = +(+this.rateReceivables * +val).toFixed(2)
-    },
-    rateReceivables: function (val) {
-      this.totalReceivables = +(+this.quantityReceivables * +val).toFixed(2)
-    },
-    totalReceivables: function (val) {
-      if (this.quantityReceivables === 0 ) return
-      this.rateReceivables = +(+val / +this.quantityReceivables).toFixed(4)
-    },
-    quantityPayables: function (val) {
-      this.totalPayables = +(+this.ratePayables * +val).toFixed(2)
-    },
-    ratePayables: function (val) {
-      this.totalPayables = +(+this.quantityPayables * +val).toFixed(2)
-    },
-    totalPayables: function (val) {
-      if (this.quantityPayables === 0 ) return
-      this.ratePayables = +(+val / +this.quantityPayables).toFixed(4)
-    }
+    // quantityReceivables: function (val) {
+    //   this.totalReceivables = +(+this.rateReceivables * +val).toFixed(2)
+    // },
+    // rateReceivables: function (val) {
+    //   this.totalReceivables = +(+this.quantityReceivables * +val).toFixed(2)
+    // },
+    // totalReceivables: function (val) {
+    //   if (this.quantityReceivables === 0 ) return
+    //   this.rateReceivables = +(+val / +this.quantityReceivables).toFixed(4)
+    // },
+    // quantityPayables: function (val) {
+    //   this.totalPayables = +(+this.ratePayables * +val).toFixed(2)
+    // },
+    // ratePayables: function (val) {
+    //   this.totalPayables = +(+this.quantityPayables * +val).toFixed(2)
+    // },
+    // totalPayables: function (val) {
+    //   if (this.quantityPayables === 0 ) return
+    //   this.ratePayables = +(+val / +this.quantityPayables).toFixed(4)
+    // }
   },
   computed: {
     ...mapGetters({
@@ -192,9 +219,6 @@ export default {
     discounts() {
       return this.currentProject.discounts.reduce((acc, {value})=> acc += value, 0)
     },
-    // totalRecWithDiscount() {
-    //   return this.isMinimumChargeUsed ? this.totalReceivables : this.totalReceivables +this.totalReceivables/100* this.discounts
-    // },
     getProfit() {
       return +(this.totalReceivables - this.totalPayables).toFixed(2)
     },

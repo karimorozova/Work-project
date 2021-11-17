@@ -158,6 +158,13 @@
     font-size: 20px;
     color: $border;
   }
+  .drop-select.disabled {
+    background-color: $light-border;
+    .arrow-button,
+    .select{
+      cursor: default;
+    }
+  }
   .content {
     display: flex;
     justify-content: space-between;

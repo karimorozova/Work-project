@@ -1,7 +1,7 @@
 <template lang="pug">
   .drop-select(
     v-click-outside="outOptions"
-    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu, 'disableOverFlow': isSelectedWithIcon}, customClass]"
+    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu, 'disableOverFlow': isSelectedWithIcon, 'disabled': isDisabled}, customClass]"
   )
     .select
 
@@ -79,6 +79,10 @@
 				type: Boolean,
 				default: false
 			},
+      isDisabled: {
+			  type: Boolean,
+        default: false
+      },
 			isRemoveOption: {
 				type: Boolean,
 				default: false
@@ -106,6 +110,7 @@
 				this.$nextTick(() => this.$refs.search.focus())
 			},
 			toggleOptions() {
+			  if(this.isDisabled) return
 				this.isDropped = !this.isDropped
 				this.searchValue = ""
 				if (this.isDropped && this.hasSearch) {
@@ -159,6 +164,13 @@
 
   .disableOverFlow {
     overflow: unset !important;
+  }
+  .drop-select.disabled {
+    background-color: $light-border;
+    .arrow-button,
+    .select{
+      cursor: default;
+    }
   }
 
   .controlOptions {

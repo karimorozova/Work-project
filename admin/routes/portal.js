@@ -60,7 +60,7 @@ router.post('/new-client-service-request', checkClientContact, upload.fields([ {
 		const request = await newClientServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
 		notifyAMsRequestCreated(request)
-		res.send('Done')
+		res.send({ id: request._id})
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Server Error on incoming request")

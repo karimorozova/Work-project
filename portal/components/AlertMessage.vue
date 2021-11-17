@@ -1,78 +1,59 @@
 <template lang="pug">
-.alert-message
-    .alert-message__text(:class="[type === 'error' ? 'alert-message_error' : 'alert-message_success']") {{ text }}
+  .alert-message
+    .alert-message__success(v-if="type !== 'error'")
+      i.icon.fa.fa-check(aria-hidden='true')
+      .alert-message__text {{ text }}
+    .alert-message__error(v-else)
+      i.icon.fa.fa-exclamation(aria-hidden='true')
+      .alert-message__text {{ text }}
 </template>
 
 <script>
 export default {
-    props: {
-        text: {
-            type: String
-        },
-        type: {
-            type: String
-        }
+  props: {
+    text: {
+      type: String
+    },
+    type: {
+      type: String
     }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/scss/colors.scss';
+@import '../assets/scss/colors';
+
+%messageBox {
+  border-radius: 4px;
+  padding: 15px 25px;
+  display: flex;
+}
 
 .alert-message {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    z-index: 1000;
-    right: 20px;
-    top: 70px;
-    width: 230px;
-    padding: 30px 20px 30px 40px;
-    box-shadow: 0 0 10px #67573e9d;
-    background-color: $white;
-    color: $green-approve;
-    &_error {
-        position: relative;
-        color: $orange;
-        &:before {
-            position: absolute;
-            content: "+";
-            border: 1px solid #d15f45;
-            border-radius: 50%;
-            background-color: #d15f45;
-            color: #fff;
-            left: -21px;
-            transform: rotate(45deg);
-            width: 12px;
-            height: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    }
-    &_success {
-        position: relative;
-        &:before {
-            position: absolute;
-            content: "";
-            border: 1px solid $green-approve;
-            height: 11px;
-            transform: rotate(-45deg);
-            left: -20px;
-            top: 5px;
-            height: 6px;
-        }
-        &:after {
-            position: absolute;
-            content: "";
-            border: 1px solid $green-approve;
-            height: 11px;
-            transform: rotate(30deg);
-            left: -14px;
-            top: 0;
-            height: 12px;
-        }
-    }
+  position: fixed;
+  z-index: 70000;
+  right: 50px;
+  top: 70px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  min-width: 150px;
+  font-family: MYRIAD300;
+
+  &__success {
+    color: $green;
+    @extend %messageBox;
+  }
+
+  &__error {
+    color: $red;
+    @extend %messageBox;
+  }
+}
+
+.icon {
+  font-size: 14px;
+  margin-right: 10px;
 }
 </style>

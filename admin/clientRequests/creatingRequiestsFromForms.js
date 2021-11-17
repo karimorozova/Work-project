@@ -51,7 +51,7 @@ const newClientServiceRequest = async (formData, client) => {
 	const sourceLanguage = JSON.parse(formData.sourceLanguage)
 	const targetLanguages = JSON.parse(formData.targetLanguages)
 	const industry = JSON.parse(formData.industry)
-	const instructions = JSON.parse(formData.instructions)
+	const instructions = formData.instructions.length ? JSON.parse(formData.instructions) : []
 	// const complianceTemplate = JSON.parse(formData.complianceTemplate)
 	const clientContacts = JSON.parse(formData.clientContacts)
 	const createdBy = JSON.parse(formData.createdBy)
@@ -73,8 +73,8 @@ const newClientServiceRequest = async (formData, client) => {
 		instructions: instructions,
 		createdBy,
 		requestForm: {
-			sourceLanguage,
-			targetLanguages: [ targetLanguages ],
+			sourceLanguage: sourceLanguage.hasOwnProperty('lang') ? sourceLanguage : null,
+			targetLanguages: targetLanguages,
 			startOption,
 			service: await Services.findOne({ title: service }),
 		}

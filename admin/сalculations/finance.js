@@ -1,4 +1,4 @@
-const { CurrencyRatio, Pricelist, Projects } = require('../models')
+const { CurrencyRatio, Pricelist, Projects, Discounts } = require('../models')
 const { multiplyPrices } = require('../multipliers')
 const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject, rateExchangeProjectOntoVendor } = require('../helpers/commonFunctions')
@@ -37,7 +37,7 @@ const setUpdatedFinanceData = async (data) => {
 	}
 
 	await Projects.updateOne({ "_id": projectId }, { steps })
-	await recalculateStepFinance(projectId)
+	// await recalculateStepFinance(projectId)
 	return await calculateProjectTotal(projectId)
 }
 
@@ -60,20 +60,27 @@ const calculateProjectTotal = async (projectId) => {
 	return await updateProject({ '_id': projectId }, { finance })
 }
 
+const getClientDiscount = async (clientDiscountsIds) => {
+	const allDiscounts = await Discounts.find().lean()
+	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
+}
+
 const recalculateStepFinance = async (projectId) => {
 	const { steps, discounts, minimumCharge, customer} = await getProject({ _id: projectId })
-	// let newDiscounts = !discounts.length ? customer.discounts : discounts
-	// console.log({disco: customer.discounts })
-	const newSteps = updateStepsFinanceWithDiscounts(steps, discounts)
+	// let newDiscounts = !discounts.length ? await getClientDiscount( customer.discounts ) : discounts
+	let newDiscounts =  discounts
+	// console.log({disco: await getClientDiscount( customer.discounts )})
+	const newSteps = updateStepsFinanceWithDiscounts(steps, newDiscounts)
 	let queryToUpdateSteps = { steps: newSteps }
 	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
 
 	const isUsedMinimumCharge = !minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2))
 	if (isUsedMinimumCharge) {
+		newDiscounts = []
 		queryToUpdateSteps = await updateStepsWithMinimal(steps, minimumCharge)
 	}
 
-	await Projects.updateOne({ _id: projectId }, { "minimumCharge.isUsed": isUsedMinimumCharge,...queryToUpdateSteps })
+	await Projects.updateOne({ _id: projectId }, {"discounts": newDiscounts, "minimumCharge.isUsed": isUsedMinimumCharge,...queryToUpdateSteps })
 }
 
 const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
@@ -94,7 +101,7 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 }
 
 const updateStepsWithMinimal = async (steps, minimumCharge) => {
-	return {'discounts': [], '$set': {  'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
+	return { '$set': {  'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {

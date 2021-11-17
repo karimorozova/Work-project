@@ -18,18 +18,18 @@
             .form__col
               .form__select
                 .form__input-title Project Deadline:
-                span(@click="openCalendar")
-                  i.calendar.far.fa-calendar-alt
-                DatepickerWithTime(
+                DatePicker(
                   placeholder="Suggested Deadline"
-                  v-model="currentDeadline"
-                  @selected="(e) => updateDeadline(e)"
-                  monday-first=true
-                  :format="customFormatter"
-                  inputClass="datepicker-custom-project-info"
-                  calendarClass="calendar-custom"
-                  :disabled="disabled"
+                  :value="currentDeadline"
+                  @confirm="(e) => updateDeadline(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  type="datetime"
                   ref="deadline"
+                  :clearable="false"
+                  :confirm="true"
+                  confirm-text="Set date"
+                  :disabled-date="notBeforeToday"
+                  prefix-class="xmx"
                 )
           .form__row
             .form__col
@@ -43,10 +43,11 @@
                     @chooseOption="(e) => setServices(e)"
                   )
             .form__col
-              .form__select(v-if="selectedService !== ''" style="margin-top: 20px;")
+              .form__select( style="margin-top: 20px;")
                 .form__input-title Industry:
                 .width-220
                   SelectSingle(
+                    :isDisabled="selectedService === ''"
                     :selectedOption="currentIndustries.name"
                     :options="mappedIndustries"
                     placeholder="Option"
@@ -57,7 +58,7 @@
         .form__title(v-if="Object.keys(currentIndustries).length") Languages
         .form__part(v-if="Object.keys(currentIndustries).length")
           .form__row
-            .form__col
+            .form__col(v-if="isDuoLangService")
               .form__select
                 .form__input-title Source Language:
                 .width-220
@@ -72,12 +73,13 @@
               .form__select
                 .form__input-title Target Language:
                 .width-220
-                  SelectSingle(
-                    :selectedOption="currentTargetLang.lang"
-                    :options="mappedTargetLanguages"
-                    :hasSearch="true"
-                    placeholder="Option"
-                    @chooseOption="(e) => setSelectedOptionLanguages(e, 'currentTargetLang')"
+                  SelectMulti(
+                    :isDisabled="this.isDuoLangService && !currentSourceLang.hasOwnProperty('lang')"
+                    :selectedOptions="currentTargetLang.map(({lang})=> lang)"
+                   :options="mappedTargetLanguages"
+                   :hasSearch="true"
+                   placeholder="Option"
+                   @chooseOptions="setSelectedTargetLanguages"
                   )
 
         .form__title Files Preparation
@@ -110,7 +112,7 @@
 
             Add(@add="openFileModal" id="add")
 
-        .form__title Project Details
+        .form__title Instructions
         .form__part
 
           .form__row
@@ -140,7 +142,8 @@
         //    @check="(e) => setQuoteDecision('Start')"
         //  )
         .form__submit
-          Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm || isRequestSend")
+          //Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm || isRequestSend")
+          Button(@clicked="checkError" value="Submit" )
 
       div(v-if="!isSent")
         .component__order
@@ -177,21 +180,22 @@
             .order__value {{currentSourceLang.lang}}
           .order__row(v-if="Object.keys(currentTargetLang).length")
             .order__subTitle Target:
-            .order__value {{currentTargetLang.lang}}
+            .order__value {{currentTargetLang.map(({lang}) => lang).join('; ')}}
 
           .order__row(v-if="!!currentDeadline")
             .order__subTitle Deadline:
             .order__value {{ customFormatter(currentDeadline) }}
 
-    client-request-completed(v-else :values="groupAllData()")
+    //client-request-completed(v-else :values="groupAllData()")
 
 
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+  import { mapActions, mapGetters } from "vuex"
 	import SelectSingle from "../../../../components/pangea/SelectSingle"
-	import DatepickerWithTime from "../../../../components/pangea/DatepickerWithTime"
+	import SelectMulti from "../../../../components/pangea/SelectMulti"
+	// import DatepickerWithTime from "../../../../components/pangea/DatepickerWithTime"
 	import moment from "moment"
 	import UploadFileButton from "../../../../components/buttons/UploadFileButton"
 	import TextRadio from "../../../components/forms/TextRadio"
@@ -201,12 +205,17 @@ import { mapActions, mapGetters } from "vuex"
 	import ClientTable from "../../../../components/ClientTable"
 	import Button from "../../../../components/buttons/Button"
 	import ClientRequestCompleted from "../../../../components/completedOrder/clientRequestCompleted"
-	import ValidationErrors from "../../../../components/ValidationErrors"
+	// import ValidationErrors from "../../../../components/ValidationErrors"
 	import GeneralTable from "../../../../components/pangea/GeneralTable"
-
+  import ValidationErrors from "../../../../components/pangea/ValidationErrors"
   import CheckBox from "../../../../components/CheckBox"
   import { instructions } from "../../../../../admin/enums"
   import { getUser } from "../../../../store/actions"
+
+  import DatePicker from 'vue2-datepicker'
+  // import 'vue2-datepicker/index.css';
+  import '../../../../assets/scss/datepicker.scss'
+  // import '../../../../assets/scss/datepicker.scss'
 
 
 	export default {
@@ -218,7 +227,7 @@ import { mapActions, mapGetters } from "vuex"
 				currentDeadline: '',
 				currentProjectName: '',
 				currentSourceLang: {},
-				currentTargetLang: {},
+				currentTargetLang: [],
 				currentIndustries: {},
 				refFiles: [],
 				sourceFiles: [],
@@ -226,6 +235,7 @@ import { mapActions, mapGetters } from "vuex"
 				startOption: 'Send',
 				currentComplianceTemplate: '',
 				currentContacts: [],
+        servicesRequireFile: ['Translation', 'Compliance'],
 
 				isSent: false,
 
@@ -250,6 +260,9 @@ import { mapActions, mapGetters } from "vuex"
         getLanguages: "getLanguages",
         getUser: "getUser"
       }),
+      notBeforeToday(date) {
+        return date < new Date();
+      },
       selectOnlyExisted(){
 		    if (!this.selectedService) return []
         const allIds = document.querySelectorAll('#instructions > p')
@@ -297,8 +310,14 @@ import { mapActions, mapGetters } from "vuex"
 			checkError() {
 				this.closeErrors()
 
-				if (!this.currentProjectName) this.errors.push("Please, enter valid Project name.")
+        if (!this.currentProjectName) this.errors.push("Please, enter valid Project name.")
+				if (!this.currentDeadline) this.errors.push("Please, enter valid Deadline.")
+				if (!this.selectedService) this.errors.push("Please, select valid Service.")
+				if (!this.currentIndustries.hasOwnProperty('name')) this.errors.push("Please, select valid Industry.")
+				if (this.isDuoLangService && !this.currentSourceLang.hasOwnProperty('lang')) this.errors.push("Please, select valid Source language.")
+				if (!this.currentTargetLang.length) this.errors.push("Please, select valid Target language.")
 				if (new Set(this.files.map(({ name }) => name)).size !== this.files.length) this.errors.push("Please, do not select the same files.")
+				if (this.selectedService && this.getServiceInfo.steps.some(({step}) => this.servicesRequireFile.includes(step.title)) && !this.sourceFiles.length ) this.errors.push("Please, select Source files.")
 
 				if (this.errors.length > 0) {
 					this.showError = true
@@ -309,6 +328,7 @@ import { mapActions, mapGetters } from "vuex"
 			async addService() {
         this.isRequestSend = true
 				let formData = new FormData()
+
 				formData.append('service', this.selectedService)
 				formData.append('deadline', this.currentDeadline)
 				formData.append('projectName', this.currentProjectName)
@@ -316,7 +336,7 @@ import { mapActions, mapGetters } from "vuex"
 				formData.append('targetLanguages', JSON.stringify(this.currentTargetLang))
 				formData.append('industry', JSON.stringify(this.currentIndustries))
 				formData.append('instructions', this.selectedInstructions )
-				formData.append('notes', JSON.parse(this.selectedInstructions).map(({description, title}) => `<b>${title}</b> ${description}`).join('') )
+				formData.append('notes', this.selectedInstructions.length ? JSON.parse(this.selectedInstructions).map(({description, title}) => `<b>${title}</b> ${description}`).join('') : '' )
 				// formData.append('brief', this.currentBrief)
 				formData.append('startOption', this.startOption)
 				formData.append('complianceTemplate', JSON.stringify(this.currentComplianceTemplate))
@@ -327,9 +347,10 @@ import { mapActions, mapGetters } from "vuex"
 				if (this.sourceFiles.length) for (let file of this.sourceFiles) formData.append('sourceFiles', file)
 
 				try {
-					await this.$axios.post('/portal/new-client-service-request', formData)
+					const response =  await this.$axios.post('/portal/new-client-service-request', formData)
 					this.isSent = true
 					this.isRequestSend = false
+          this.$router.push('/client-request/details/' + response.data.id)
 				} catch (err) {
 					this.isRequestSend = false
 				}
@@ -338,7 +359,7 @@ import { mapActions, mapGetters } from "vuex"
 				this.currentContacts.splice(index, 1)
 			},
 			setContact(index, { option }) {
-				this.currentContacts.splice(index, 1, this.clientInfo.contacts.find(item => `${ item.firstName } ${ item.surname }` === option))
+				this.currentContacts.splice(index,1, this.clientInfo.contacts.find(item => `${ item.firstName } ${ item.surname }` === option))
 			},
 			addContact(data) {
 				this.currentContacts.push(data)
@@ -382,7 +403,7 @@ import { mapActions, mapGetters } from "vuex"
 				]
         this.currentIndustries = servicesIndustries.find(({ name }) => name === option)
 				this.currentSourceLang = {}
-				this.currentTargetLang = {}
+				this.currentTargetLang = []
 			},
 			customFormatter(date) {
 				return moment(date).format('DD-MM-YYYY, HH:mm')
@@ -392,7 +413,17 @@ import { mapActions, mapGetters } from "vuex"
 			},
 			setSelectedOptionLanguages({ option }, value) {
 				this[value] = this.allLanguages.find(({ lang }) => lang === option)
+        this.currentTargetLang = []
 			},
+      setSelectedTargetLanguages({option}) {
+        const clickedLang = this.allLanguages.find(({ lang }) => lang === option)
+        const position = this.currentTargetLang.findIndex(({ lang }) => lang === clickedLang.lang)
+        if (position !== -1) {
+          this.currentTargetLang.splice(position, 1)
+        } else {
+          this.currentTargetLang.push(clickedLang)
+        }
+      },
 			setSourceFiles({ files }) {
 				const filteredFiles = Array.from(files).filter(item => item.size < 50000000).filter(item => !this.sourceFiles.map(item => item.name).includes(item.name))
 				this.sourceFiles.push(...filteredFiles)
@@ -422,6 +453,9 @@ import { mapActions, mapGetters } from "vuex"
       },
       setServices({option}){
         this.selectedService = option
+        this.currentTargetLang = []
+        this.currentSourceLang = {}
+        this.currentIndustries = {}
       }
 		},
 		computed: {
@@ -429,8 +463,17 @@ import { mapActions, mapGetters } from "vuex"
 				user: "getUserInfo",
 				allLanguages: 'allLanguages',
 				getClientIndustries: "getClientIndustries",
-				clientInfo: "getClientInfo"
+				clientInfo: "getClientInfo",
+        services: "getAllServices"
 			}),
+      getServiceInfo() {
+        if (this.selectedService === '') return ''
+        return this.services.find(({title}) => title === this.selectedService)
+      },
+      isDuoLangService() {
+        if (this.selectedService === '') return ''
+        return this.getServiceInfo.languageForm === 'Duo'
+      },
 			isCompleteForm() {
 				return this.currentContacts.length &&
 						// !!this.currentComplianceTemplate &&
@@ -468,7 +511,7 @@ import { mapActions, mapGetters } from "vuex"
 								this.clientInfo.services
 										.filter(i => i.industries[0].name === this.currentIndustries.name)
 										.filter(i => i.services[0].title === this.selectedService)
-                    .filter(i => i.sourceLanguage.lang === this.currentSourceLang.lang)
+                    .filter(i =>  !this.isDuoLangService || (i.sourceLanguage.lang === this.currentSourceLang.lang))
 										.map(i => i.targetLanguages[0].lang)
 										.filter(i => i !== "English" && i !== "English (United States)")
 						)
@@ -513,11 +556,13 @@ import { mapActions, mapGetters } from "vuex"
 			DataTable,
 			TextRadio,
 			UploadFileButton,
-			DatepickerWithTime,
+			// DatepickerWithTime,
 			SelectSingle,
 			ClientTable,
       CheckBox,
       Instructions,
+      SelectMulti,
+      DatePicker,
 		}
 
 	}
@@ -552,7 +597,9 @@ import { mapActions, mapGetters } from "vuex"
   }
 
   .fileModal {
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: rgba(99, 99, 99, .3) 0px 1px 2px 0px, rgba(99, 99, 99, .15) 0px 1px 3px 1px;
+    border-radius: 4px;
+    //box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     position: absolute;
     z-index: 9999;
     top: 50%;

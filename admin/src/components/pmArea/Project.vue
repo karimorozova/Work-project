@@ -18,15 +18,15 @@
         .project__detailsRow-client
           .client
             .client__pie
-              .pie-chart(:style="{'--percentage' : 45 + '%'}")
+              .pie-chart(:style="{'--percentage' : getPayables + '%'}")
                 .inner
                   .pieText
                     .pieDescription
                       .pieDescription__icon(style="background: #f5dfd9;")
-                      .pieDescription__text 46%
+                      .pieDescription__text {{getPayables}}%
                     .pieDescription
                       .pieDescription__icon(style="background: #daeded;")
-                      .pieDescription__text 54%
+                      .pieDescription__text {{getMargin}}%
 
             .client__details
               .project__detailsRow-client-title
@@ -41,19 +41,19 @@
           .project__detailsRow-finance-blocks
             .block
               .block__value
-                .block__value-title 333
+                .block__value-title {{getPayables}}
                 .block__value-icon %
               .block__key Payables
             .block
               .block__value
-                .block__value-title 22
-                .block__value-icon %
+                .block__value-title {{getProfit}}
+                .block__value-icon cur
               .block__key Profit
 
           .project__detailsRow-finance-blocks
             .block
               .block__value
-                .block__value-title 333
+                .block__value-title {{getMargin}}
                 .block__value-icon %
               .block__key Margin
             .block
@@ -107,49 +107,6 @@
               prefix-class="xmx"
             )
 
-      //.project__info-row
-      //  .project__client
-      //    .input-title
-      //      .input-title__text Client Name:
-      //      span.require *
-      //    .project__input-icons(v-if="project._id")
-      //      i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo")
-      //      input.project__input-text2.project__input-client(@click="goToClientInfo" type="text" :value="project.customer.name" readonly)
-      //
-      //    .project__drop-menu(v-else)
-      //      SelectSingle(
-      //        :selectedOption="project.customer.name"
-      //        :options="clients"
-      //        :hasSearch="isSearchClient"
-      //        placeholder="Name"
-      //        @chooseOption="setCustomer"
-      //      )
-      //  .project__industry
-      //    .input-title
-      //      .input-title__text Industry:
-      //      span.require *
-      //    input.project__input-text( v-if="project.industry.name"  type="text" :value="project.industry.name" disabled)
-      //    .project__drop-menu(v-else)
-      //      SelectSingle(
-      //        :selectedOption="selectedIndustry.name"
-      //        :options="industriesList"
-      //        @chooseOption="setIndustry"
-      //        placeholder="Industry"
-      //      )
-      //  .project__number
-      //    .input-title
-      //      .input-title__text Billing Information:
-      //      span.require *
-      //    input.project__input-text(v-if="(isProjectFinished && project.clientBillingInfo) || (project._id && project.clientBillingInfo) " type="text" :value="(project.clientBillingInfo.name) " disabled)
-      //    .project__drop-menu(v-else)
-      //      SelectSingle(
-      //        :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
-      //        :options="billingInfoList.map(({name}) => name)"
-      //        @chooseOption="choseBillingInfo"
-      //        placeholder="Option"
-      //      )
-
-
       .project__block-row.project_no-margin
         .project__block
           .block__header(@click="toggleBlock('isBrief')")
@@ -169,12 +126,6 @@
               i.fas.fa-chevron-right
           .block__data(v-if="isNotes")
             ckeditor(v-model="project.notes" :config="editorConfig" @blur="updateNotes")
-
-      //.project__button(v-if="!project.projectId")
-      //  Button(
-      //    value="Create Project"
-      //    @clicked="checkForErrors"
-      //  )
       ValidationErrors(
         v-if="areErrorsExist"
         :errors="errors"
@@ -262,9 +213,9 @@
         }
         this[prop] = !this[prop]
       },
-      notBeforeToday(date) {
-        return date < new Date(new Date().setHours(0, 0, 0, 0));
-      },
+      // notBeforeToday(date) {
+      //   return date < new Date(new Date().setHours(0, 0, 0, 0));
+      // },
       notBeforeStartDate(date) {
         return date < new Date(this.project.startDate);
       },
@@ -332,33 +283,34 @@
 					this.selectedIndustry = ""
 				}
 			},
-			setCustomer({ option }) {
-				if (option.billingInfo.length === 1) {
-					this.setBillingInfo(option.billingInfo[0])
-				} else {
-					this.setBillingInfo('')
-				}
-				this.$emit('setValue', { option, prop: 'customer' })
-			},
-			async choseBillingInfo({ option }) {
-				const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-        await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
-        await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
-			},
-			setBillingInfo(billingInfo) {
-				this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
-			},
-			setIndustry({ option }) {
-				this.selectedIndustry = option
-			},
+			// setCustomer({ option }) {
+			// 	if (option.billingInfo.length === 1) {
+			// 		this.setBillingInfo(option.billingInfo[0])
+			// 	} else {
+			// 		this.setBillingInfo('')
+			// 	}
+			// 	this.$emit('setValue', { option, prop: 'customer' })
+			// },
+			// async choseBillingInfo({ option }) {
+			// 	const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+      //   await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
+      //   await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
+			// },
+			// setBillingInfo(billingInfo) {
+			// 	this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
+			// },
+			// setIndustry({ option }) {
+			// 	this.selectedIndustry = option
+			// },
 			closeErrors() {
 				this.areErrorsExist = false
 			},
-			checkProjectName() {
-				const regex = /^([^\d\W]|[A-z])[\w \.]*$/
-				return regex.test(this.project.projectName)
-			},
+			// checkProjectName() {
+			// 	const regex = /^([^\d\W]|[A-z])[\w \.]*$/
+			// 	return regex.test(this.project.projectName)
+			// },
 			async checkForErrors() {
+			  debugger
 				this.errors = []
 				// if (!this.project.projectName || (this.project.projectName && !this.checkProjectName())) {
 				if (!this.project.projectName) {
@@ -381,61 +333,61 @@
 					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
 				}
 			},
-			async clientCreateProjectDate() {
-				const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY')
-				await this.$http.post('/clientsapi/client-project-date', {
-					date: formatDate,
-					clientId: this.project.customer
-				})
-			},
-			async createProject() {
-				this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD')
-				this.project.industry = this.selectedIndustry._id
-				const customer = { ...this.project.customer }
-				this.project.customer = customer._id
-				this.project.isTest = this.isTest
-				try {
-					const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
-					this.$emit('projectCreated', { project: newProject.data, customer: customer })
-					this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
-				}
-			},
-			startOpen() {
-				this.$refs.start.showCalendar()
-			},
-			deadlineOpen() {
-				this.$refs.deadline.showCalendar()
-			},
-			billingOpen() {
-				this.$refs.billingDate.showCalendar()
-			},
+			// async clientCreateProjectDate() {
+			// 	const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY')
+			// 	await this.$http.post('/clientsapi/client-project-date', {
+			// 		date: formatDate,
+			// 		clientId: this.project.customer
+			// 	})
+			// },
+			// async createProject() {
+			// 	this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD')
+			// 	this.project.industry = this.selectedIndustry._id
+			// 	const customer = { ...this.project.customer }
+			// 	this.project.customer = customer._id
+			// 	this.project.isTest = this.isTest
+			// 	try {
+			// 		const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
+			// 		this.$emit('projectCreated', { project: newProject.data, customer: customer })
+			// 		this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
+			// 	}
+			// },
+			// startOpen() {
+			// 	this.$refs.start.showCalendar()
+			// },
+			// deadlineOpen() {
+			// 	this.$refs.deadline.showCalendar()
+			// },
+			// billingOpen() {
+			// 	this.$refs.billingDate.showCalendar()
+			// },
 			// goToClientInfo() {
 			// 	const route = this.$router.resolve({ path: `/pangea-clients/all/details/${ this.project.customer._id }` })
 			// 	window.open(route.href, "_blank")
 			// },
-			async getCustomers() {
-				try {
-					if (!this.project._id) {
-						if (!this.clients.length) {
-							let result = await this.$http.get(`/active-clients`)
-							this.clients = [ ...result.body ].sort((a, b) => {
-								return a.name.localeCompare(b.name)
-							})
-						}
-					}
-				} catch (err) {
-					this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" })
-				}
-			},
-			async getProjectData() {
-				const { id } = this.$route.params
-				if (id !== undefined) {
-					const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
-					await this.setCurrentProject(curProject.body)
-				}
-			},
+			// async getCustomers() {
+			// 	try {
+			// 		if (!this.project._id) {
+			// 			if (!this.clients.length) {
+			// 				let result = await this.$http.get(`/active-clients`)
+			// 				this.clients = [ ...result.body ].sort((a, b) => {
+			// 					return a.name.localeCompare(b.name)
+			// 				})
+			// 			}
+			// 		}
+			// 	} catch (err) {
+			// 		this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" })
+			// 	}
+			// },
+			// async getProjectData() {
+			// 	const { id } = this.$route.params
+			// 	if (id !== undefined) {
+			// 		const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
+			// 		await this.setCurrentProject(curProject.body)
+			// 	}
+			// },
 			isBillingDate() {
 				if (this.$refs.deadline.value === "") {
 					this.isBilling = false
@@ -452,23 +404,34 @@
 				industries: "getAllIndustries",
 				user: "getUser"
 			}),
+      getMargin() {
+        // console.log(this.project.finance)
+        // return 0
+        return Math.round(100 - (this.project.finance.Price.payables / this.project.finance.Price.receivables) * 100)
+      },
+      getPayables() {
+        return Math.round((this.project.finance.Price.payables / this.project.finance.Price.receivables) * 100)
+      },
+      getProfit() {
+        return +(this.project.finance.Price.receivables - this.project.finance.Price.payables).toFixed(2)
+      },
 			existProjectAccessChangeName() {
 				if (this.project) {
 					const { status } = this.project
 					return status === 'Draft' || status === 'Quote sent' || status === 'Cost Quote'
 				}
 			},
-			industriesList() {
-				let res = []
-				if (this.project.customer.name) {
-					const { customer: { services } } = this.project
-					for (let industry of services.map(i => i.industries[0])) {
-						if (!res.length) res.push(industry)
-						if (!res.map(i => i.name).includes(industry.name)) res.push(industry)
-					}
-					return res
-				}
-			},
+			// industriesList() {
+			// 	let res = []
+			// 	if (this.project.customer.name) {
+			// 		const { customer: { services } } = this.project
+			// 		for (let industry of services.map(i => i.industries[0])) {
+			// 			if (!res.length) res.push(industry)
+			// 			if (!res.map(i => i.name).includes(industry.name)) res.push(industry)
+			// 		}
+			// 		return res
+			// 	}
+			// },
 			billingInfoList() {
 				if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
 					const billingInfo = this.project.customer.billingInfo
@@ -479,9 +442,9 @@
 			// nameOfProject() {
 			// 	return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName
 			// },
-			disabledPicker() {
-				return !!(this.project._id && this.project.tasks && this.project.tasks.length)
-			},
+			// disabledPicker() {
+			// 	return !!(this.project._id && this.project.tasks && this.project.tasks.length)
+			// },
 			isProjectFinished() {
 				const { status } = this.project
 				return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
@@ -500,7 +463,7 @@
       ckeditor: CKEditor.component,
 		},
 		async created() {
-			await this.getProjectData()
+			// await this.getProjectData()
 			// this.getCustomers()
 			this.isBillingDate()
 			!this.project._id && this.setIsBillingTrue()

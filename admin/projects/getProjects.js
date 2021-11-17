@@ -100,7 +100,6 @@ async function getProject(obj) {
 			.populate('industry')
 			.populate('service')
 			.populate('customer')
-			.populate('customer.discounts')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])

@@ -1,9 +1,9 @@
 <template lang="pug">
   .test
     .details(v-if="clientRequest.hasOwnProperty('requestForm')")
-      ClientRequestTranslationCompleted(v-if="clientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
       //ClientRequestTranslationCompleted(v-if="clientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
-      ClientRequestCompleted(v-else :isStartOption="false" :values="groupAllData()")
+      //ClientRequestTranslationCompleted(v-if="clientRequest.requestForm.service.title === 'Translation'" :isStartOption="false" :values="groupAllData()")
+      ClientRequestCompleted(:isStartOption="false" :values="groupAllData()")
 </template>
 
 <script>
@@ -25,6 +25,7 @@
         return moment(date).format('DD-MM-YYYY, HH:mm')
       },
       groupAllData() {
+        console.log({ currentService: this.clientRequest.requestForm.service.title })
         return {
           currentProjectName: this.clientRequest.projectName,
           currentDeadline: this.customFormatter(this.clientRequest.deadline),
@@ -32,7 +33,7 @@
           currentSourceLang: this.clientRequest.requestForm.sourceLanguage,
           currentTargetLang: this.clientRequest.requestForm.targetLanguages,
           currentService: this.clientRequest.requestForm.service.title,
-          selectedInstructions: this.clientRequest.notes,
+          selectedInstructions: this.clientRequest.instructions,
           files: this.files,
           // currentComplianceTemplate: this.clientRequest.?requestForm.complianceOptions,
           // currentBrief: this.clientRequest.brief,
@@ -42,21 +43,20 @@
       async currentClientRequest() {
         const { id } = this.$route.params
         const { requests } = (await this.$axios.get('/portal/client-requests/' + id + '?token=' + this.token)).data
-        console.log({requests: JSON.parse(window.atob(requests))})
         this.clientRequest = JSON.parse(window.atob(requests))
       },
 		},
 		computed: {
 			...mapGetters({
-        clientRequests: "getClientRequests",
+        // clientRequests: "getClientRequests",
         token: "getToken"
 			}),
       files() {
         const sourceFiles = this.clientRequest.requestForm.sourceFiles
         const refFiles = this.clientRequest.requestForm.refFiles
         return [
-          ...Array.from(sourceFiles).map(item => ({ type: 'Source', name: item.filename })),
-          ...Array.from(refFiles).map(item => ({ type: 'Reference', name: item.filename }))
+          ...Array.from(sourceFiles).map(item => ({ type: 'Source', name: item.filename, path: item.path })),
+          ...Array.from(refFiles).map(item => ({ type: 'Reference', name: item.filename, path: item.path  }))
         ]
       },
 			// ...mapGetters({

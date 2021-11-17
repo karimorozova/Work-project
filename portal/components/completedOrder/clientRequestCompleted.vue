@@ -28,20 +28,20 @@
                 .form__input-title Service:
                 .width-220 {{ values.currentService}}
 
-        .form__title languages
+        .form__title Languages
         .form__part
           .form__row
-            .form__col
+            .form__col(v-if="values.currentSourceLang && values.currentSourceLang.hasOwnProperty('lang')")
               .form__select
                 .form__input-title Source Language:
-                .width-220 {{ values.currentSourceLang.lang}}
+                .width-220 {{values.currentSourceLang.lang}}
             .form__col
               .form__select
                 .form__input-title Target Language:
-                .width-220 {{ Array.isArray( values.currentTargetLang) ?  values.currentTargetLang[0].lang : values.currentTargetLang.lang}}
+                .width-220 {{ Array.isArray( values.currentTargetLang) ?  values.currentTargetLang.map(({lang}) => lang).join(', ') : values.currentTargetLang.lang}}
 
-        .form__title Files
-        .form__part
+        .form__title(v-if="values.files.length") Files
+        .form__part(v-if="values.files.length")
           .form__row
             .table
               GeneralTable(
@@ -50,15 +50,19 @@
               )
                 .table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
                 .table__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
+                .table__header(slot="headerDownload" slot-scope="{ field }") {{ field.label }}
 
                 .table__data(slot="file" slot-scope="{ row }") {{row.name}}
                 .table__data(slot="type" slot-scope="{ row }") {{row.type}}
+                .table__data-center(slot="download" slot-scope="{ row }")
+                  a(class="link" :href="domain + row.path" target="_blank")
+                    i(class="fas fa-download")
 
 
-        .form__title Project Details
-        .form__part
+        .form__title(v-if="values.selectedInstructions.length") Instructions
+        .form__part(v-if="values.selectedInstructions.length")
           .form__select
-            Instructions(:instructions="instructions" :isEditable="false" :selectedStartInstructions="values.selectedInstructions")
+            InstructionsShowSelected(:instructions="values.selectedInstructions")
 
           //.form__row
           //  .form__col
@@ -92,11 +96,11 @@
 	import TextRadio from "../../pages/components/forms/TextRadio"
 	import { mapActions } from "vuex"
 	import GeneralTable from "../pangea/GeneralTable"
-	import Instructions from "../../pages/components/forms/Instructions"
-  import { instructions } from "../../../admin/enums"
+  // import { instructions } from "../../../admin/enums"
+  import InstructionsShowSelected from "../../pages/components/forms/InstructionsShowSelected"
 
 	export default {
-		components: { GeneralTable, TextRadio, DataTable, Button, Instructions },
+		components: { GeneralTable, TextRadio, DataTable, Button, InstructionsShowSelected },
 		props: {
 			values: {},
 			isStartOption: {
@@ -107,10 +111,11 @@
 		data() {
 			return {
 				fields: [
-					{ label: "File Name", headerKey: "headerFile", key: "file", style: { width: "70%" } },
-					{ label: "File Type", headerKey: "headerType", key: "type", style: { width: "30%" } }
+					{ label: "File Name", headerKey: "headerFile", key: "file", style: { width: "60%" } },
+					{ label: "File Type", headerKey: "headerType", key: "type", style: { width: "30%" } },
+					{ label: "", headerKey: "headerDownload", key: "download", style: { width: "10%" } }
 				],
-        instructions: instructions,
+        // instructions: instructions,
 			}
 		},
 		methods: {
@@ -121,7 +126,12 @@
 				// this.getProjectsAndRequests()
 				this.$router.push('/')
 			}
-		}
+		},
+    computed: {
+      domain() {
+        return window.location.origin === 'http://localhost:3000' ? 'http://localhost:3001' : 'admin.pangea.global/'
+      }
+    }
 	}
 </script>
 
@@ -140,6 +150,11 @@
       width: 100%;
       display: flex;
       justify-content: space-between;
+      &-center {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     &__dataIcon {
@@ -430,6 +445,11 @@
     font-size: 18px;
     top: 6px;
     cursor: pointer;
+  }
+
+  .link {
+    text-decoration: none;
+    color: $text;
   }
 
 

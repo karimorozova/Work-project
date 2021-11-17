@@ -44,8 +44,8 @@
         .instructions__cards
 
           .card(v-for="({id, title, description, isOpen = false}, index) of unselectedInstructions")
-            .card__header
-              .card__toggle_drop-down(@click="() => toggleDescriptionAll(index)")
+            .card__header(@click.stop="() => toggleDescriptionAll(index)")
+              .card__toggle_drop-down
                 .icon(:class="{'icon__close': isOpen}")
                   i.fas.fa-chevron-right
                 span {{title}}
@@ -59,8 +59,8 @@
         .instructions__cards
 
           .card(v-for="({ title, description, isOpen = false}, index) of selectedInstructions")
-            .card__header
-              .card__toggle_drop-down(@click="() =>toggleDescriptionSelect(index)")
+            .card__header(@click="() => toggleDescriptionSelect(index)")
+              .card__toggle_drop-down
                 .icon(:class="{'icon__close': isOpen}")
                   i.fas.fa-chevron-right
                 span {{title}}
@@ -192,15 +192,19 @@ export default {
     },
     openAddingModal() {
       if (!this.isEditable) return
+      this.closeEditModal()
+      this.closeDeleteModal()
       this.isAddingModalOpen = true
     },
     closeAddingModal() {
-      this.isAddingModalOpen = false
       this.newInstructionTitle = ''
       this.newInstructionDescription = ''
+      this.isAddingModalOpen = false
     },
     openEditModal(index) {
       if (!this.isEditable) return
+      this.closeAddingModal()
+      this.closeDeleteModal()
       this.editableIndex = index
       this.editableInstruction = {...this.selectedInstructions[index]}
 
@@ -213,6 +217,9 @@ export default {
       this.errors = []
     },
     openRemoveModal(removeIndex) {
+      if (!this.isEditable) return
+      this.closeEditModal()
+      this.closeAddingModal()
       this.isDeleting = true
       this.removeIndex = removeIndex
     },
@@ -224,6 +231,9 @@ export default {
     unselectedInstructions() {
       const selectedIds = this.selectedInstructions.map((instruction) => instruction.hasOwnProperty('id') ? instruction.id : '')
       return this.instructions.filter(({id}) => !selectedIds.includes(id))
+    },
+    isSomeModalOpen() {
+      return this.isDeleting || this.isAddingModalOpen || this.editableIndex !== ''
     }
   },
   watch: {
@@ -246,6 +256,7 @@ export default {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      z-index: 1;
     }
     &__title{
       font-size: 14px;
@@ -302,6 +313,8 @@ export default {
       justify-content: space-between;
       align-items: center;
       gap: 5px;
+      cursor: pointer;
+      height: 27px;
     }
     &__toggle_drop-down {
       display: flex;

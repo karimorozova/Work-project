@@ -1,5 +1,5 @@
 <template lang="pug">
-  .button(@click="click")
+  .button(@click.stop="click")
     .button__icon
       slot
 </template>
