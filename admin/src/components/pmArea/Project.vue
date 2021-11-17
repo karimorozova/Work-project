@@ -17,13 +17,13 @@
       .project__detailsRow
         .project__detailsRow-client
           .client
-            .client__pie
-              .pie-chart(:style="{'--percentage' : getPayables + '%'}")
+            .client__pie(v-if="hasSomeStepsVendor")
+              .pie-chart(:style="{'--percentage' : getPayablesPercent + '%'}")
                 .inner
                   .pieText
                     .pieDescription
                       .pieDescription__icon(style="background: #f5dfd9;")
-                      .pieDescription__text {{getPayables}}%
+                      .pieDescription__text {{getPayablesPercent}}%
                     .pieDescription
                       .pieDescription__icon(style="background: #daeded;")
                       .pieDescription__text {{getMargin}}%
@@ -42,12 +42,12 @@
             .block
               .block__value
                 .block__value-title {{getPayables}}
-                .block__value-icon %
+                .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Payables
             .block
               .block__value
                 .block__value-title {{getProfit}}
-                .block__value-icon cur
+                .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Profit
 
           .project__detailsRow-finance-blocks
@@ -58,20 +58,20 @@
               .block__key Margin
             .block
               .block__value
-                .block__value-title 22
+                .block__value-title {{getROI}}
                 .block__value-icon %
               .block__key Roi
 
           .project__detailsRow-finance-blocks
             .block
               .block__value
-                .block__value-title 777
-                .block__value-icon %
+                .block__value-title {{getReceivables}}
+                .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Receivables
             .block
               .block__value
-                .block__value-title 1232
-                .block__value-icon %
+                .block__value-title {{getTotalClient}}
+                .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Total
 
         .project__detailsRow-dates
@@ -145,6 +145,7 @@
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
 	import DatepickerWithTime from "../DatepickerWithTime"
+  import currencyIconDetected from "../../mixins/currencyIconDetected"
   import CKEditor from "ckeditor4-vue"
   import '../../assets/scss/ckeditor.scss'
 
@@ -152,6 +153,7 @@
   import '../../assets/scss/datepicker.scss';
 
 	export default {
+    mixins: [ currencyIconDetected ],
 		props: {
 			project: {
 				type: Object
@@ -405,15 +407,38 @@
 				user: "getUser"
 			}),
       getMargin() {
-        // console.log(this.project.finance)
-        // return 0
-        return Math.round(100 - (this.project.finance.Price.payables / this.project.finance.Price.receivables) * 100)
+			  const {payables, receivables} = this.project.finance.Price
+        const margin = Math.round(100 - (payables / receivables) * 100)
+        return isNaN(margin) || !isFinite(margin) ? '-' : margin
+      },
+      getROI() {
+        const {payables, receivables} = this.project.finance.Price
+        const roi = Math.round(((receivables - payables) / payables) * 100)
+        return isNaN(roi) || !isFinite(roi) ? '-' : roi
+      },
+      getReceivables() {
+        const { receivables} = this.project.finance.Price
+        return +(receivables.toFixed(2))
       },
       getPayables() {
-        return Math.round((this.project.finance.Price.payables / this.project.finance.Price.receivables) * 100)
+        const { payables } = this.project.finance.Price
+        return +(payables.toFixed(2))
+      },
+      getPayablesPercent() {
+        const {payables, receivables} = this.project.finance.Price
+        return Math.round((payables / receivables) * 100)
       },
       getProfit() {
-        return +(this.project.finance.Price.receivables - this.project.finance.Price.payables).toFixed(2)
+        const {payables, receivables} = this.project.finance.Price
+        return +(receivables - payables).toFixed(2)
+      },
+      getTotalClient() {
+        const { receivables} = this.project.finance.Price
+        const additionsStepsSum = this.project.additionsSteps.reduce((acc, {finance}) => acc += finance.Price.receivables , 0)
+        return +(+receivables + +additionsStepsSum).toFixed(2)
+      },
+      hasSomeStepsVendor() {
+			  return this.project.steps.some((step) => step.hasOwnProperty('vendor') && !!step.vendor)
       },
 			existProjectAccessChangeName() {
 				if (this.project) {
