@@ -1,6 +1,6 @@
 <template lang="pug">
   .formLayout
-    .form
+    .form(v-if="user" )
       .form__approve
         ApproveModal(
           v-if="selected"
@@ -12,204 +12,178 @@
           @close="setDefault"
         )
       .form__wrapper(v-if="!canUpdateRequest()")
-      .form__title General Information
-      .form__group
-        .form__inputsGroup
-          .form__inputs
-            .form__projectName
-              .input__title Project Name:
-              input(type="text" :disabled="currentClientRequest.checkedForm.isCheckProjectName" v-model="currentClientRequest.projectName" @change="changeProjectName('projectName', currentClientRequest.projectName)" placeholder="Project Name")
-              Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
-            .form__projectDeadline
-              .input__title Suggested Deadline:
-              DatepickerWithTime(
-                placeholder="Suggested Deadline"
-                v-model="currentClientRequest.deadline"
-                @selected="(e) => updateProjectDate(e)"
-                monday-first=true
-                inputClass="datepicker-custom-compliance"
-                calendarClass="calendar-custom"
-                :format="customFormatter"
-                :disabledPicker="currentClientRequest.checkedForm.isCheckDeadline"
-                :disabled="disabled"
-                ref="deadline"
-              )
-              span(id="calendar" @click="deadlineOpen")
-                i.calendar.far.fa-calendar-alt
-              Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
-
-
-          .form__inputs
-            .form__assignedPm
-              .input__title Assign to Project Manager:
-              .drop-white
-                SelectSingle(
-                  :hasSearch="true"
-                  :options="managers",
-                  placeholder="Option",
-                  :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
-                  @chooseOption="setPM"
+      .parts
+        .parts__left
+          .form__title General Information
+          .form__inputsGroup
+            .form__inputs
+              .form__projectName
+                .input__title Project Name:
+                input(type="text" :disabled="currentClientRequest.checkedForm.isCheckProjectName" v-model="currentClientRequest.projectName" @change="changeProjectName('projectName', currentClientRequest.projectName)" placeholder="Project Name")
+                Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
+              .form__projectDeadline
+                .input__title Suggested Deadline:
+                DatepickerWithTime(
+                  placeholder="Suggested Deadline"
+                  v-model="currentClientRequest.deadline"
+                  @selected="(e) => updateProjectDate(e)"
+                  monday-first=true
+                  inputClass="datepicker-custom-compliance"
+                  calendarClass="calendar-custom"
+                  :format="customFormatter"
+                  :disabledPicker="currentClientRequest.checkedForm.isCheckDeadline"
+                  :disabled="disabled"
+                  ref="deadline"
                 )
+                span(id="calendar" @click="deadlineOpen")
+                  i.calendar.far.fa-calendar-alt
+                Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
 
-            .form__assignedPm
-              .input__title Assign to Account Manager:
-              .drop-white
-                SelectSingle(
-                  :hasSearch="true"
-                  :options="accountManagers",
-                  placeholder="Option",
-                  :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
-                  @chooseOption="approveChangeAM"
-                )
 
-        .form__contacts
-          .table
-            GeneralTable(
-              :fields="fields3"
-              :tableData="currentClientRequest.clientContacts"
-            )
-              .table__header(slot="headerName" slot-scope="{ field }") {{ field.label }}
-
-              .table__col(slot="name" slot-scope="{ row, index }")
-                .table__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
-                .table__dataDrop(v-else)
+            .form__inputs
+              .form__assignedPm
+                .input__title Assign to Project Manager:
+                .drop-white
                   SelectSingle(
                     :hasSearch="true"
-                    :isTableDropMenu="true"
-                    :options="availableContacts"
-                    @chooseOption="setContact"
+                    :options="managers",
+                    placeholder="Option",
+                    :selectedOption="currentClientRequest.projectManager ? `${currentClientRequest.projectManager.firstName} ${currentClientRequest.projectManager.lastName}` : ''",
+                    @chooseOption="setPM"
                   )
 
-              .table__dataIcon(slot="icon" slot-scope="{ row, index }")
-                span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
-                  i.fas.fa-trash
-
-          Add(v-if="canUpdateRequest()" @add="addContact")
-
-      .form__title Files Preparation & Options
-      .form__table-box
-        .form__table
-          .approveModal(v-if="isDeleteModal")
-            ApproveModal(
-              text="Delete file?"
-              approveValue="Yes"
-              notApproveValue="Cancel"
-              @approve="deleteFile"
-              @notApprove="closeDeleteFileApprovalModal"
-              @close="closeDeleteFileApprovalModal"
-            )
-          .table
-            GeneralTable(
-              :fields="fields"
-              :tableData="files"
-            )
-              .table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
-              .table__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
-              .table__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
-
-              .table__data(slot="file" slot-scope="{ row }") {{row.filename}}
-              .table__data(slot="type" slot-scope="{ row }") {{row.type}}
-              .table__dataIcons(slot="icon" slot-scope="{ row }")
-                img(src="../../../assets/images/latest-version/download-file.png" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}" @click="downloadFile(row.path, row.isCheck)")
-                span(@click="(e) => openDeleteFileApprovalModal(row.type, row.path, row.isCheck)" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}")
-                  i.fas.fa-trash
-                Check(@click="(e) => checkFile(e, row)", :isApproved="row.isCheck")
-
-            .tasks-files__add(id="add")
-              Add(v-if="canUpdateRequest()" @add="openUploadModal")
-
-            .tasks-files__main(v-if="isUploadModal" id="modal")
-              .tasks-files__items
-                span.tasks-files__close(@click="closeUploadModal") &#215;
-                .tasks-files__item
-                  span Source file:
-                  span.tasks-files__label-red
-                  .tasks-files__upload-file
-                    FilesUpload(
-                      inputClass="files-upload__source-file"
-                      :files="sourceFiles"
-                      @uploadFiles="uploadSourceFiles"
-                      @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
-                    )
-                .tasks-files__item
-                  span Reference file:
-                  span.tasks-files__label-red
-                  .tasks-files__upload-file
-                    FilesUpload(
-                      inputClass="files-upload__ref-file"
-                      :files="refFiles"
-                      @uploadFiles="uploadRefFiles"
-                      @deleteFile="(e) => deleteFile(e, 'refFiles')"
-                    )
-              .tasks-files__tooltip
-                div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
-                div Reference: each file can be <= 50Mb
-
-        //.form__table
-          .table(style="margin-top: 20px;")
-            GeneralTable(
-              //:fields="fields2"
-              //:tableData="[currentClientRequest.requestForm.complianceOptions]"
-              //:bodyClass="['form-table-body', {'tbody_visible-overflow': [currentClientRequest.requestForm.complianceOptions].length < 10}]"
-              //:tableheadRowClass="[currentClientRequest.requestForm.complianceOptions].length < 10 ? 'tbody_visible-overflow' : ''"
-            )
-              .table__header(slot="headerTemplate" slot-scope="{ field }") {{ field.label }}
-              .table__header(slot="headerDescriptions" slot-scope="{ field }") {{ field.label }}
-              .table__header(slot="headerIcons" slot-scope="{ field }") {{ field.label }}
-
-              .table__col(slot="template" slot-scope="{ row, index }")
-                .table__data(v-if="currentActive !== index") {{row.title}}
-                .table__dataDrop(v-else)
+              .form__assignedPm
+                .input__title Assign to Account Manager:
+                .drop-white
                   SelectSingle(
-                    //:isTableDropMenu="true",
-                    //placeholder="Select",
-                    //:selectedOption="currentTemplate.title",
-                    //:options="complianceTemplates.map(({title}) => title)",
-                    //@chooseOption="setTemplate"
+                    :hasSearch="true"
+                    :options="accountManagers",
+                    placeholder="Option",
+                    :selectedOption="currentClientRequest.accountManager ? `${currentClientRequest.accountManager.firstName} ${currentClientRequest.accountManager.lastName}` : ''",
+                    @chooseOption="approveChangeAM"
                   )
 
-              template(slot="description" slot-scope="{ row, index }")
-                .table__dataDescription(v-if="currentActive !== index") {{ replaceDescription(row.description) }}
-                .table__dataDescription(v-else) {{ replaceDescription(currentTemplate.description) }}
+            .form__inputs
+              .form__assignedPm
+                .input__title Client Billing Info:
+                .drop-white
+                  SelectSingle(
+                    :hasSearch="true"
+                    placeholder="Option"
+                    :options="billingInfoList.map(({name}) => name)"
+                    :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
+                    @chooseOption="choseBillingInfo"
+                  )
 
-              template(slot="icons" slot-scope="{ row, index }")
-                .form__icons
-                  img.form__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeAction(index, key)" :class="[{'opacity-1': isActive(key, index)}, {'opacity-04': currentClientRequest.checkedForm.isCheckComplianceTemplate}]")
-                  Check(@click="(e) => checkTemplate(e)", :isApproved="currentClientRequest.checkedForm.isCheckComplianceTemplate" :isDisabled="currentActive === index")
+          .form__title Files Preparation & Options
+          .form__table-box
+            .form__table
+              .approveModal(v-if="isDeleteModal")
+                ApproveModal(
+                  text="Delete file?"
+                  approveValue="Yes"
+                  notApproveValue="Cancel"
+                  @approve="deleteFile"
+                  @notApprove="closeDeleteFileApprovalModal"
+                  @close="closeDeleteFileApprovalModal"
+                )
+              .table
+                GeneralTable(
+                  :fields="fields"
+                  :tableData="files"
+                )
+                  .table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
+                  .table__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
+                  .table__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
 
-      //.form__comments
-        .form__commentsBlock
-          Check(id="checkBrief" @click="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
-          .input__title Project Brief:
-          textarea(type="text" rows="9" :disabled="currentClientRequest.checkedForm.isCheckBrief" v-model="currentClientRequest.brief" @change="changeBrief(currentClientRequest.brief)")
-        .form__commentsBlock
-          .input__title Notes:
-          textarea(type="text" rows="9" v-model="currentClientRequest.notes" @change="changeNotes(currentClientRequest.notes)")
-      .form__block-row.form_no-margin
-        .form__block
-          .block__header(@click="toggleBlock('isBrief')" :class="{'block__header-grey': !isBrief}")
-            .title Project Brief
-            .icon(v-if="!isBrief && canUpdateRequest()")
+                  .table__data(slot="file" slot-scope="{ row }") {{row.filename}}
+                  .table__data(slot="type" slot-scope="{ row }") {{row.type}}
+                  .table__dataIcons(slot="icon" slot-scope="{ row }")
+                    img(src="../../../assets/images/latest-version/download-file.png" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}" @click="downloadFile(row.path, row.isCheck)")
+                    span(@click="(e) => openDeleteFileApprovalModal(row.type, row.path, row.isCheck)" style="cursor: pointer;" :class="{'opacity-04': row.isCheck}")
+                      i.fas.fa-trash
+                    Check(@click="(e) => checkFile(e, row)", :isApproved="row.isCheck")
+
+                .tasks-files__add(id="add")
+                  Add(v-if="canUpdateRequest()" @add="openUploadModal")
+
+                .tasks-files__main(v-if="isUploadModal" id="modal")
+                  .tasks-files__items
+                    span.tasks-files__close(@click="closeUploadModal") &#215;
+                    .tasks-files__item
+                      span Source file:
+                      span.tasks-files__label-red
+                      .tasks-files__upload-file
+                        FilesUpload(
+                          inputClass="files-upload__source-file"
+                          :files="sourceFiles"
+                          @uploadFiles="uploadSourceFiles"
+                          @deleteFile="(e) => deleteFile(e, 'sourceFiles')"
+                        )
+                    .tasks-files__item
+                      span Reference file:
+                      span.tasks-files__label-red
+                      .tasks-files__upload-file
+                        FilesUpload(
+                          inputClass="files-upload__ref-file"
+                          :files="refFiles"
+                          @uploadFiles="uploadRefFiles"
+                          @deleteFile="(e) => deleteFile(e, 'refFiles')"
+                        )
+                  .tasks-files__tooltip
+                    div Source: each file can be <= 2Mb for Translation service, other can be <= 50Mb
+                    div Reference: each file can be <= 50Mb
+
+        .parts__right
+          .form__title Options
+          .form__comments
+            Instructions(:instructions="currentClientRequest.instructions")
+
+      .project__block-row.project_no-margin
+        .project__block
+          .block__header(@click="toggleBlock('isBrief')" )
+            .title(style="display: flex;")
+              Check(id="checkBrief" @click.stop="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
+              span Project Brief
+
+            .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
             .icon(v-else)
               i.fas.fa-chevron-right
           .block__data(v-if="isBrief && canUpdateRequest()")
-            ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief(currentClientRequest.brief)")
-        .form__block
-          .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
-            IconButton(class="copy-to-brief" @clicked="copyNotesToBrief")
-              i.fas.fa-copy
+            ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief")
+        .project__block
+          .block__header(@click="toggleBlock('isNotes')" )
             .title Project Notes
-            .icon(v-if="!isNotes && canUpdateRequest()")
+            .icon(v-if="!isNotes")
               i.fas.fa-chevron-down
             .icon(v-else)
               i.fas.fa-chevron-right
           .block__data(v-if="isNotes && canUpdateRequest()")
+            ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes")
 
+      //.form__block-row.form_no-margin
+      //  .form__block
+      //    .block__header(@click="toggleBlock('isBrief')" :class="{'block__header-grey': !isBrief}")
+      //      .title Project Brief
+      //      .icon(v-if="!isBrief && canUpdateRequest()")
+      //        i.fas.fa-chevron-down
+      //      .icon(v-else)
+      //        i.fas.fa-chevron-right
+      //    .block__data(v-if="isBrief && canUpdateRequest()")
+      //      ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief(currentClientRequest.brief)")
+      //  .form__block
+      //    .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
+      //      IconButton(class="copy-to-brief" @clicked="copyNotesToBrief")
+      //        i.fas.fa-copy
+      //      .title Project Notes
+      //      .icon(v-if="!isNotes && canUpdateRequest()")
+      //        i.fas.fa-chevron-down
+      //      .icon(v-else)
+      //        i.fas.fa-chevron-right
+      //    .block__data(v-if="isNotes && canUpdateRequest()")
+      //      ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes(currentClientRequest.notes)")
 
-            ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes(currentClientRequest.notes)")
-      .form__comments
-        Instructions(:instructions="currentClientRequest.instructions")
 
       .form__button
         Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
@@ -230,9 +204,8 @@
           .form__project-title
             span(id="id") {{ currentClientRequest.projectId }}
           .form__project-icons
-            .icon
-              span(class="click-copy" @click="copyId")
-                i.far.fa-copy(aria-hidden="true")
+            .iconId(class="click-copy" @click="copyId")
+              i.far.fa-copy
         //.order__title
         //  span {{ currentClientRequest.projectId }}
         //  span {{ currentClientRequest.startOption === 'Send' ? 'Send a Quote' : 'Start Immediately' }}
@@ -261,26 +234,35 @@
           .order__subTitle Created By:
           .order__value {{ currentClientRequest.createdBy.firstName }} {{ currentClientRequest.createdBy.surname || '' }}
 
-        .order__buttons
-          Button(v-if="(isAdmin || isAm()) && !isAmSet()" customClass="middle"  class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
-          Button(v-if="isAdmin || isAm()" customClass="middle" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
+        .form__contacts
+          .table
+            GeneralTable(
+              :fields="fields3"
+              :tableData="currentClientRequest.clientContacts"
+            )
+              .table__header(slot="headerName" slot-scope="{ field }") {{ field.label }}
 
-      .side__info
-        .form__wrapper(v-if="!canUpdateRequest()")
-        .form__project
-          .form__project-title Billing Info
-        .order__row
-          .order__subTitle Client Billing:
-          .order__value
-            .drop
-              SelectSingle(
-                :hasSearch="true"
-                placeholder="Option"
-                :options="billingInfoList.map(({name}) => name)"
-                :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
-                @chooseOption="choseBillingInfo"
-              )
-      .side__info
+              .table__col(slot="name" slot-scope="{ row, index }")
+                .table__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
+                .table__dataDrop(v-else)
+                  SelectSingle(
+                    :hasSearch="true"
+                    :isTableDropMenu="true"
+                    :options="availableContacts"
+                    @chooseOption="setContact"
+                  )
+
+              .table__dataIcon(slot="icon" slot-scope="{ row, index }")
+                span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
+                  i.fas.fa-trash
+
+          Add(v-if="canUpdateRequest()" @add="addContact")
+
+        .order__buttons
+          Button(v-if="(isAdmin || isAm()) && !isAmSet()" class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
+          Button(v-if="isAdmin || isAm()" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
+
+      .side__info()
         .form__wrapper(v-if="!canUpdateRequest()")
         .form__project
           .form__project-title Languages control
@@ -306,32 +288,6 @@
                 :selectedOptions="currentClientRequest.requestForm.targetLanguages.length ? currentClientRequest.requestForm.targetLanguages.map(i => i.lang) : []"
                 @chooseOptions="setTargetLanguages"
               )
-
-      //.side__contacts
-      //  .form__contacts
-      //    DataTable(
-      //      :fields="fields3"
-      //      :tableData="currentClientRequest.clientContacts"
-      //      :bodyClass="['form-table-body', {'tbody_visible-overflow': currentClientRequest.clientContacts.length < 10}]"
-      //      :tableheadRowClass="currentClientRequest.clientContacts.length < 10 ? 'tbody_visible-overflow' : ''"
-      //      :headCellClass="'padding-with-check-box'"
-      //      :tableheadClass="'hideHead'"
-      //    )
-      //      div(slot="name" slot-scope="{ row, index }")
-      //        .contacts__data(v-if="!!row.firstName") {{row.firstName}} {{row.surname || ''}}
-      //        .contacts__dataDrop(v-else)
-      //          SelectSingle(
-      //            :isTableDropMenu="true"
-      //            :options="availableContacts"
-      //            @chooseOption="setContact"
-      //          )
-      //
-      //      .contacts__dataIcon(slot="icon" slot-scope="{ row, index }")
-      //        span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
-      //          i.fas.fa-trash
-      //
-      //    Add(@add="addContact")
-      ////.side__pm
 
 </template>
 
@@ -371,8 +327,8 @@ export default {
       files: [],
       fields: [
         { label: "File Name", headerKey: "headerFile", key: "file", style: { width: "55%" } },
-        { label: "File Type", headerKey: "headerType", key: "type", style: { width: "30%" } },
-        { label: "", headerKey: "headerIcon", key: "icon", style: { width: "15%" } }
+        { label: "File Type", headerKey: "headerType", key: "type", style: { width: "25%" } },
+        { label: "", headerKey: "headerIcon", key: "icon", style: { width: "20%" } }
       ],
       fields2: [
         { label: "Template", headerKey: "headerTemplate", key: "template", style: { width: "55%" } },
@@ -402,7 +358,7 @@ export default {
         ],
         removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
         uiColor: "#ffffff",
-        height: 80
+        height: 240
       },
       // forbiddenExtensions: [
       // 	'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
@@ -433,6 +389,10 @@ export default {
       this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.notes, 'notes': this.currentClientRequest.notes } })
     },
     toggleBlock(prop) {
+      if (this[prop]) {
+        this.changeBrief()
+        this.changeNotes()
+      }
       this[prop] = !this[prop]
     },
     getTargets({ requestForm }) {
@@ -569,19 +529,20 @@ export default {
         this.alertToggle({ message: "Project name not saved!", isShow: true, type: "error" })
       }
     },
-    changeBrief(data) {
+    changeBrief() {
       if (!this.canUpdateRequest()) return
       try {
-        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': data } })
+        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.brief } })
         this.alertToggle({ message: "Project brief saved!", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Project brief not saved!", isShow: true, type: "error" })
       }
     },
-    changeNotes(data) {
+    changeNotes() {
+
       if (!this.canUpdateRequest()) return
       try {
-        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'notes': data } })
+        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'notes': this.currentClientRequest.notes } })
         this.alertToggle({ message: "Project notes saved!", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Project notes not saved!", isShow: true, type: "error" })
@@ -918,7 +879,7 @@ export default {
         const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
         const neededServices = [ ...new Set(services
             .filter(item => item.industries[0].toString() === industry._id.toString()
-                && item.services[0].toString() === service._id.toString()
+                    && item.services[0].toString() === service._id.toString()
                 // && (service.languageForm === 'Mono' ? true : item.sourceLanguage.toString() === this.mainSourceLanguageId.toString())
             )
             .map(item => item.targetLanguages[0])) ]
@@ -986,6 +947,75 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/styles/settingsTable";
 @import "../../../assets/scss/colors";
+
+.block {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px;
+    cursor: pointer;
+    -webkit-box-align: center;
+    transition: .2s ease;
+    align-items: center;
+    letter-spacing: .2px;
+    border-radius: 4px;
+    height: 36px;
+
+    &-grey {
+      background-color: white;
+    }
+
+    .title {
+      font-size: 14px;
+    }
+
+    .icon {
+      font-size: 13px;
+      color: $text;
+      margin-top: 2px;
+    }
+  }
+
+  &__data {
+    border-top: 1px solid $light-border;
+  }
+}
+
+.project {
+  &__block {
+    box-sizing: border-box;
+    border: 1px solid $light-border;
+    position: relative;
+    border-radius: 4px;
+    background-color: white;
+    width: 482px;
+
+    &-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+
+      ::-webkit-input-placeholder {
+        opacity: 0.5;
+      }
+    }
+  }
+}
+
+.parts {
+  display: flex;
+  justify-content: space-between;
+
+  &__left {
+    width: 57%;
+  }
+
+  &__right {
+    width: 40%;
+  }
+}
 
 .drop {
   height: 32px;
@@ -1089,10 +1119,10 @@ input[type="text"]:disabled {
     padding: 25px;
     width: 420px;
     box-sizing: border-box;
-    margin-left: 40px;
-    margin-bottom: 40px;
+    margin-left: 50px;
     border-radius: 4px;
     background: white;
+    margin-bottom: 25px;
   }
 }
 
@@ -1105,6 +1135,7 @@ input[type="text"]:disabled {
   box-shadow: $box-shadow;
   border-radius: 4px;
   background: white;
+  height: fit-content;
 
   &__block {
     box-sizing: border-box;
@@ -1136,7 +1167,6 @@ input[type="text"]:disabled {
   }
 
   &__project-icons {
-    color: #66563d;
     font-size: 16px;
     cursor: pointer;
   }
@@ -1186,21 +1216,16 @@ input[type="text"]:disabled {
     display: flex;
     justify-content: space-between;
     margin-bottom: 30px;
-  }
-
-  &__commentsBlock {
-    border: 1px solid $light-border;
-    position: relative;
+    padding: 25px;
+    border: 2px solid $light-border;
     border-radius: 4px;
-    background-color: white;
-    width: 48.5%;
   }
 
   &__table-box {
     border: 2px solid $light-border;
     border-radius: 4px;
-    padding: 30px;
-    margin-bottom: 25px;
+    padding: 25px;
+    margin-bottom: 30px;
   }
 
   &__table {
@@ -1208,8 +1233,8 @@ input[type="text"]:disabled {
   }
 
   &__contacts {
-    width: 340px;
-    margin-left: 90px;
+    margin-top: 20px;
+    margin-bottom: 10px;
   }
 
   &__dataIcons {
@@ -1223,6 +1248,7 @@ input[type="text"]:disabled {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    min-height: 50px;
   }
 
   &__group {
@@ -1232,7 +1258,7 @@ input[type="text"]:disabled {
   &__inputsGroup {
     flex-grow: 1;
     position: relative;
-    padding: 20px 30px;
+    padding: 25px 25px 5px 25px;
     border: 2px solid $light-border;
     border-radius: 4px;
     height: fit-content;
@@ -1264,9 +1290,9 @@ input[type="text"]:disabled {
 
   &__project {
     margin-bottom: 20px;
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid $light-border;
     width: 100%;
-    padding-bottom: 5px;
+    padding-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1476,42 +1502,6 @@ input {
   }
 }
 
-.block {
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 7px;
-    cursor: pointer;
-    -webkit-box-align: center;
-    transition: .2s ease;
-    align-items: center;
-    letter-spacing: .2px;
-    border-radius: 4px;
-    height: 32px;
-
-    &-grey {
-      background-color: white;
-    }
-
-    .title {
-      font-size: 14px;
-    }
-
-    .icon {
-      font-size: 13px;
-      color: $text;
-      margin-top: 2px;
-    }
-  }
-
-  &__data {
-    position: absolute;
-    z-index: 300;
-    box-shadow: $box-shadow;
-    margin-top: 15px;
-  }
-}
-
 .copy-to-brief {
   position: absolute;
   left: -32px;
@@ -1532,8 +1522,25 @@ input {
 }
 
 #checkBrief {
-  position: absolute;
-  right: 7px;
-  top: 27px;
+  margin-right: 5px;
+}
+
+.iconId {
+  font-size: 15px;
+  border-radius: 4px;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: .2s ease-out;
+  justify-content: center;
+  border: 1px solid $border;
+  color: $dark-border;
+  margin-left: 10px;
+
+  &:hover {
+    color: $text;
+  }
 }
 </style>

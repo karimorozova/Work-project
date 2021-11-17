@@ -386,14 +386,14 @@ export default {
   &__header {
     display: flex;
     justify-content: space-between;
-    padding: 0px 7px;
+    padding: 0px 10px;
     cursor: pointer;
     -webkit-box-align: center;
     transition: .2s ease;
     align-items: center;
     letter-spacing: .2px;
     border-radius: 4px;
-    height: 32px;
+    height: 36px;
 
     &-grey {
       background-color: white;

@@ -43,13 +43,14 @@
       //.instructions__title Options
       .instructions__cards
         .card(v-for="({id, title, description,isChanged ,  isOpen = false}, index) of selectedInstructions")
-          .card__header
-            .card__toggle_drop-down(@click="() => toggleDescriptionAll(index)")
+          .card__header(@click="() => toggleDescriptionAll(index)")
+            .card__toggle_drop-down
               .icon(:class="{'icon__close': isOpen}")
                 i.fas.fa-chevron-right
               span {{title}}
             //IconButton(v-if="isChanged" @clicked="() => openEditModal(index)")
-            i(class="fas fa-pen gray-icon" v-if="isChanged")
+            .custom(v-if="isChanged") Custom
+
           transition(name="slide-fade")
             .card__desctiption.animated(v-if="isOpen" v-html="description")
 
@@ -94,7 +95,7 @@ export default {
     Button,
     IconButton,
     ApproveModal,
-    ValidationErrors,
+    ValidationErrors
   },
   props: {
     isEditable: {
@@ -104,7 +105,7 @@ export default {
     instructions: {
       type: Array,
       default: () => []
-    },
+    }
     // selectedStartInstructions: {
     //   type: String,
     //   default: ''
@@ -191,22 +192,22 @@ export default {
     changeInstruction() {
       if (!this.isEditable) return
 
-      if (this.editableInstruction.title.trim() === '' ) {
+      if (this.editableInstruction.title.trim() === '') {
         this.errors.push('Please, enter Title')
       }
-      if ( this.editableInstruction.description.trim() === '') {
+      if (this.editableInstruction.description.trim() === '') {
         this.errors.push('Please, enter Description')
       }
-      if(this.errors.length) return
+      if (this.errors.length) return
 
       if (this.editableInstruction.hasOwnProperty('id')) {
 
         const editedId = this.editableInstruction.id
-        const {description} = this.instructions.find(({id}) => id === editedId)
+        const { description } = this.instructions.find(({ id }) => id === editedId)
         this.editableInstruction.isCahnged = this.hasChangedDescription(description)
       }
 
-      this.selectedInstructions.splice(this.editableIndex,1, this.editableInstruction )
+      this.selectedInstructions.splice(this.editableIndex, 1, this.editableInstruction)
 
       this.editableInstruction = []
       this.editableIndex = ''
@@ -226,7 +227,7 @@ export default {
     openEditModal(index) {
       if (!this.isEditable) return
       this.editableIndex = index
-      this.editableInstruction = {...this.selectedInstructions[index]}
+      this.editableInstruction = { ...this.selectedInstructions[index] }
 
     },
     closeEditModal() {
@@ -260,152 +261,180 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  @import "../../../assets/scss/colors";
-  .instructions {
-    position: relative;
+@import "../../../assets/scss/colors";
+
+.instructions {
+  position: relative;
+  width: 100%;
+
+  &__modals {
+    z-index: 300;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &__title {
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-family: 'Myriad600';
+  }
+
+  &__cards {
     width: 100%;
-    &__modals {
-      z-index: 300;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+  }
+
+  .modal {
+    &__edit-instruction {
+      width: 550px;
+      margin-bottom: 20px;
+
     }
-    &__title{
-      font-size: 14px;
+
+    &__title {
+      font-size: 16px;
       margin-bottom: 8px;
       font-family: 'Myriad600';
     }
-    &__cards {
-      width: 100%;
-    }
-    .modal {
-      &__edit-instruction{
-        width: 550px;
-        margin-bottom: 20px;
 
-      }
-      &__title {
-        font-size: 16px;
-        margin-bottom: 8px;
-        font-family: 'Myriad600';
-      }
-      &__footer {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-        gap: 10px
-      }
-      &__input {
-        margin: 10px 0;
-      }
-    }
-    &__body {
+    &__footer {
       display: flex;
-      width: 100%;
-      gap: 1rem;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 10px
     }
-  }
-  .input {
-    &__title {
-      margin-bottom: 3px;
-    }
-  }
-  .card {
-    box-sizing: border-box;
-    border-radius: 4px;
-    background-color: $white;
-    margin-bottom: 10px;
-    &__header {
-      height: 27px;
-      border: 1px solid $light-border;
-      border-radius: 4px;
-      padding: 7px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 5px;
-    }
-    &__toggle_drop-down {
-      display: flex;
-      gap: 10px;
-      align-content: center;
-      align-items: center;
-    }
-    &__desctiption {
-      padding: 5px 10px 0px;
-      transform-origin: top;
-      border: 1px solid $light-border;
-      border-radius: 0 0 4px 4px;
-      border-top: none;
-      margin-top: -5px;
-    }
-    &__buttons {
-      display: flex;
-      gap: 5px;
+
+    &__input {
+      margin: 10px 0;
     }
   }
 
-  .card__add {
-    color: #999999;
-    height: 100px;
+  &__body {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
+    width: 100%;
+    gap: 1rem;
+  }
+}
+
+.input {
+  &__title {
+    margin-bottom: 3px;
+  }
+}
+
+.card {
+  box-sizing: border-box;
+  border-radius: 4px;
+  background-color: $white;
+  margin-bottom: 10px;
+
+  &__header {
     border: 1px solid $light-border;
+    border-radius: 4px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
     cursor: pointer;
-    svg {
-      font-size: 16px;
-      padding: 10px;
-      border: 1px solid $light-border;
-      border-radius: 4px;
-      margin-bottom: 4px;
-    }
-  }
-  .modal__border {
-    padding: 20px;
-    box-shadow: $box-shadow;
-    background-color: $white;
-    border-radius: 4px;
   }
 
-  input {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    width: 220px;
-    height: 32px;
-    transition: .1s ease-out;
+  &__toggle_drop-down {
+    display: flex;
+    gap: 10px;
+    align-content: center;
+    align-items: center;
+  }
 
-    &:focus {
-      border: 1px solid $border-focus;
-    }
+  &__desctiption {
+    padding: 5px 10px 0px;
+    transform-origin: top;
+    border: 1px solid $light-border;
+    border-radius: 0 0 4px 4px;
+    border-top: none;
+    margin-top: -5px;
   }
-  .icon {
-    transition: transform .2s ease;
+
+  &__buttons {
+    display: flex;
+    gap: 5px;
   }
-  .icon__close {
-    transform: rotate(90deg);
+}
+
+.card__add {
+  color: #999999;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  border: 1px solid $light-border;
+  cursor: pointer;
+
+  svg {
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid $light-border;
+    border-radius: 4px;
+    margin-bottom: 4px;
   }
-  .slide-fade-enter-active {
-    transition: all .2s ease-out;
+}
+
+.modal__border {
+  padding: 20px;
+  box-shadow: $box-shadow;
+  background-color: $white;
+  border-radius: 4px;
+}
+
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  width: 220px;
+  height: 32px;
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
   }
-  .slide-fade-leave-active {
-    transition: all .2s ease-out;
-  }
-  .slide-fade-enter, .slide-fade-leave-to
-    /* .slide-fade-leave-active до версии 2.1.8 */ {
-    //transform: translateY(-30px);
-    transform: scaleY(0);
-    opacity: 0;
-  }
-  .gray-icon {
-    color: $dark-border;
-  }
+}
+
+.icon {
+  transition: transform .2s ease;
+}
+
+.icon__close {
+  transform: rotate(90deg);
+}
+
+.slide-fade-enter-active {
+  transition: all .2s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all .2s ease-out;
+}
+
+.slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active до версии 2.1.8 */
+{
+  //transform: translateY(-30px);
+  transform: scaleY(0);
+  opacity: 0;
+}
+
+.gray-icon {
+  color: $dark-border;
+}
+
+.custom {
+  color: $red;
+}
 </style>
