@@ -4,6 +4,7 @@
 </template>
 
 <script>
+  let CKEditor
 	if (process.client || !!CKEditor) CKEditor = require('ckeditor4-vue')
 	else CKEditor = { component: { template: '<div></div>' } }
 	export default {
