@@ -4,9 +4,9 @@
     .files__close(@click.stop="close") &#215;
     .files__descriptions
       div {{ task.taskId }}
-      .split /
+      .split |
       div {{ task.service.title }}
-      .split /
+      .split |
       div {{ task.sourceLanguage === task.targetLanguage ? task.fullTargetLanguage.lang : task.fullSourceLanguage.lang + ' to ' + task.fullTargetLanguage.lang }}
 
     .files__table
@@ -107,6 +107,7 @@ export default {
 
 .split {
   margin: 0px 10px;
+  color: $dark-border;
 }
 
 .files {
@@ -116,7 +117,7 @@ export default {
     padding: 15px 10px 13px 10px;
     background: $table-list;
     display: flex;
-    font-family: 'Myriad300';
+    justify-content: center;
   }
 
   &__title {

@@ -169,7 +169,7 @@
   }
 
   .fileModal {
-    box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
+    box-shadow: $box-shadow;
     position: absolute;
     z-index: 9999;
     top: 50%;
@@ -363,7 +363,7 @@
 
     &__part {
       padding: 30px 20px;
-      border: 2px solid $light-border;
+      border: 1px solid $light-border;
       border-radius: 4px;
       position: relative;
     }
@@ -392,7 +392,7 @@
     &__form {
       border-radius: 4px;
       box-shadow: $box-shadow;
-      padding: 0 20px 20px 20px;
+      padding: 0 25px 25px 25px;
       width: 800px;
       background-color: white;
       position: relative;

@@ -158,7 +158,7 @@
               @removeContact="removeContact"
             )
 
-        .component__order
+        .component__order(v-if="Object.keys(selectedService).length")
           .form__title--order Your Order
 
           .order__row(v-if="!!currentProjectName")
@@ -169,7 +169,6 @@
           .order__row
             .order__subTitle Service:
             .order__value {{selectedService}}
-              .order__details(v-if="!!currentComplianceTemplate") {{currentComplianceTemplate.title}}
 
           .order__row(v-if="Object.keys(currentIndustries).length")
             .order__subTitle Industry:
@@ -597,9 +596,8 @@
   }
 
   .fileModal {
-    box-shadow: rgba(99, 99, 99, .3) 0px 1px 2px 0px, rgba(99, 99, 99, .15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     border-radius: 4px;
-    //box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
     position: absolute;
     z-index: 9999;
     top: 50%;
@@ -820,7 +818,7 @@
 
     &__part {
       padding: 30px 20px;
-      border: 2px solid $light-border;
+      border: 1px solid $light-border;
       border-radius: 4px;
       position: relative;
     }
@@ -847,7 +845,7 @@
     &__form {
       border-radius: 4px;
       box-shadow: $box-shadow;
-      padding: 0 20px 20px 20px;
+      padding: 0 25px 25px 25px;
       width: 800px;
       background-color: white;
       position: relative;

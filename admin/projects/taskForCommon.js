@@ -8,7 +8,6 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 	const {
 		refFiles,
 		sourceFiles,
-		industry,
 		stepsAndUnits,
 		stepsAdditions,
 		service,
@@ -16,6 +15,7 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 		source,
 		projectId: _id,
 		internalProjectId: projectId,
+		industry,
 		nativeProjectName,
 		projectManager,
 		customerName

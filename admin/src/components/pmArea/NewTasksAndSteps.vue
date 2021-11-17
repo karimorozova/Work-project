@@ -4,7 +4,7 @@
       .TS__title Tasks and Steps
       .TS__buttons
         .TS__button
-          .TS__addTask(style="font-size: 14px;" v-if="!isProjectFinished && !isTaskData" @click="toggleVendorManage")
+          .TS__addTask(style="font-size: 14px;" v-if="!isProjectFinished && !isTaskData && currentProject.steps.length" @click="toggleVendorManage")
             i.fas.fa-user(style="margin-right: 6px;")
             span(style="margin-top: 2px;") Manage Vendors
 

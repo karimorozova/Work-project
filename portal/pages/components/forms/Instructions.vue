@@ -26,7 +26,7 @@
           WYSIWYG(:editorData="newInstructionDescription" @editorBlur="setNewDescription")
         .modal__footer
           Button(value="Add" @clicked="addCustomInstruction")
-          Button(value="Cancel" @clicked="closeAddingModal")
+          Button(value="Cancel" :outline="true" @clicked="closeAddingModal")
       .modal__edit-instruction.modal__border(v-if="editableIndex !== ''")
         .modal__title Editing
         .modal__input
@@ -37,7 +37,7 @@
           WYSIWYG(:editorData="editableInstruction.description" @editorBlur="serEditDescription")
         .modal__footer
           Button(value="Edit" @clicked="changeInstruction")
-          Button(value="Cancel" @clicked="closeEditModal")
+          Button(value="Cancel" :outline="true" @clicked="closeEditModal")
     .instructions__body
       .col
         .instructions__title Options
@@ -266,8 +266,8 @@ export default {
     .modal {
       &__edit-instruction,
       &__add-instruction {
-        width: 550px;
-        margin-bottom: 20px;
+        width: 600px;
+        margin-bottom: 60px;
 
       }
       &__title {
@@ -346,6 +346,12 @@ export default {
     border-radius: 4px;
     border: 1px solid $light-border;
     cursor: pointer;
+    transition: transform .1s;
+
+    &:hover{
+      transform: scale(1.05);
+    }
+
     svg {
       font-size: 16px;
       padding: 10px;

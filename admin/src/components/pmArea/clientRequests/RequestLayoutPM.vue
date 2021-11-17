@@ -17,7 +17,7 @@
           .form__project
             .form__project-title Languages control
 
-          .order__row
+          .order__row(v-if="currentClientRequest.requestForm.service.languageForm !== 'Mono'" )
             .order__subTitle Source:
             .order__value
               .drop
@@ -116,19 +116,21 @@ export default {
       }
     },
     getTargetLanguages() {
-      if (this.originallyLanguages.length && this.mainSourceLanguageId) {
+      if (this.originallyLanguages.length) {
         const { customer: { services }, requestForm: { service }, industry } = this.currentClientRequest
         const neededServices = [ ...new Set(services
             .filter(item => item.industries[0].toString() === industry._id.toString()
                 && item.services[0].toString() === service._id.toString()
-                && item.sourceLanguage.toString() === this.mainSourceLanguageId.toString())
+                && (service.languageForm === 'Mono' ? true : item.sourceLanguage.toString() === this.mainSourceLanguageId.toString()))
             .map(item => item.targetLanguages[0])) ]
         return neededServices.map(item => this.originallyLanguages.find(item2 => item2._id.toString() === item))
       }
     }
   },
   mounted() {
-    this.mainSourceLanguageId = this.currentClientRequest.requestForm.sourceLanguage._id.toString()
+    this.mainSourceLanguageId = this.currentClientRequest.requestForm.service.languageForm === 'Mono'
+        ? null
+        : this.currentClientRequest.requestForm.sourceLanguage._id.toString()
   },
   components: { SelectSingle, SelectMulti, RequestAction, RequestTasksAndSteps, RequestSubInformation, Request }
 }

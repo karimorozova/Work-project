@@ -15,14 +15,15 @@ const fs = require('fs')
 const { createMemoqProjectWithTemplate, getProjectTranslationDocs } = require('../services/memoqs/projects')
 const { addProjectFile } = require('../services/memoqs/files')
 const { assignProjectManagers } = require('./updates')
-const { createTasksForWordcount } = require('./taskForWordcount')
-const { updateProjectMetricsAndCreateSteps } = require('./metrics')
-const { updateProjectCosts } = require('../сalculations/wordcount')
+// const { updateProjectMetricsAndCreateSteps } = require('./metrics')
+// const { updateProjectCosts } = require('../сalculations/wordcount')
 
 const moment = require('moment')
+const { createTasksForWordcount } = require("./taskForWordcount")
+
 
 async function createProject(project, user) {
-	const { group: { name: role }, _id: roleId } = user
+	const { group: { name: role }, _id: userId } = user
 	let todayStart = new Date()
 	todayStart.setUTCHours(0, 0, 0, 0)
 	let todayEnd = new Date(todayStart)
@@ -38,7 +39,7 @@ async function createProject(project, user) {
 
 		project.status = project.status || "Draft"
 		project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber
-		project.projectManager = (role === 'Project Managers') ? roleId : projectManager._id
+		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id
 		project.accountManager = accountManager._id
 		project.paymentProfile = project.clientBillingInfo.paymentType
 		project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
@@ -49,7 +50,8 @@ async function createProject(project, user) {
 
 		const createdProject = await Projects.create({
 			...project,
-			startDate: new Date()
+			startDate: new Date(),
+			billingDate: new Date()
 		})
 
 		await createProjectFolder(createdProject.id)
@@ -79,13 +81,12 @@ const createProjectFromRequest = async (requestId) => {
 		brief,
 		notes,
 		deadline,
-		billingDate,
 		industry,
 		customer,
 		createdBy
 	} = request
 	const { _id, minPrice, currency } = customer
-	const { discounts } = await Clients.findOne({ '_id': _id }).populate('discounts')
+	const { discounts, accountManager: { _id: AMId }, projectManager: { _id: PMId } } = await Clients.findOne({ '_id': _id }).populate('discounts')
 
 	const { USD, GBP } = await CurrencyRatio.findOne()
 	const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
@@ -98,16 +99,14 @@ const createProjectFromRequest = async (requestId) => {
 		projectName,
 		industry,
 		customer,
-		startDate: new Date(),
 		deadline,
-		billingDate,
 		notes,
 		brief,
 		isUrgent,
 		status: "Draft",
 		projectId: "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber,
-		projectManager,
-		accountManager,
+		projectManager: projectManager || PMId,
+		accountManager: accountManager || AMId,
 		clientBillingInfo,
 		paymentProfile,
 		clientContacts,
@@ -115,7 +114,9 @@ const createProjectFromRequest = async (requestId) => {
 		minimumCharge: { value: minPrice, toIgnore: false },
 		crossRate: calculateCrossRate(USD, GBP),
 		projectCurrency: currency,
-		createdBy
+		createdBy,
+		startDate: new Date(),
+		billingDate: new Date()
 	}
 
 	const createdProject = await Projects.create({
@@ -143,7 +144,7 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 	const currIdx = tasksAndSteps.findIndex(item => item.taskId === taskIdForUpdate)
 	let { refFiles, sourceFiles } = tasksAndSteps[currIdx]
 
-	const { targets, stepsAndUnits} = tasksInfo
+	const { targets, stepsAndUnits } = tasksInfo
 
 	await setFiles(sourceUploadFiles, sourceFiles)
 	await setFiles(refUploadFiles, refFiles)
@@ -153,7 +154,6 @@ const updateRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 	delete tasksInfo.refFilesVault
 	delete tasksInfo.sourceFilesVault
 	delete tasksInfo.requestId
-	// delete tasksInfo.taskIdForUpdate
 
 	const tasksAndStepsForSave = {
 		taskId: taskIdForUpdate,
@@ -267,35 +267,26 @@ async function createTasks({ sourceFiles, refFiles, tasksInfo }) {
 
 const autoCreatingTaskInProject = async (project, requestId) => {
 	try {
-		const { tasksAndSteps, industry, customer } = await getClientRequestById(requestId)
-		let iterator = 0
+		const { tasksAndSteps, requestForm } = await getClientRequestById(requestId)
+		const { service, sourceLanguage } = requestForm
+		const { _id, projectId } = project
+
 		for await (let { refFiles, sourceFiles, taskData } of tasksAndSteps) {
-			const { stepsAndUnits, stepsDates, workflow, service, source, targets: allTargets } = taskData
+			const { stepsAndUnits, targets } = taskData
 
-			for (let targets of allTargets) {
-				const taskRefFiles = [
-					...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, sourceFiles),
-					...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, refFiles)
-				]
-				const allInfo = {
-					taskRefFiles,
-					stepsAndUnits,
-					stepsDates,
-					workflow,
-					service,
-					source,
-					targets: [ targets ],
-					customerName: customer.name,
-					projectName: project.projectName,
-					projectId: project._id,
-					industry: industry.name,
-					projectManager: (project.projectManager._id).toString(),
-					project
-				}
-
-				await createTasksAndStepsForCustomUnits(allInfo, iterator)
-				iterator++
+			const tasksInfo = {
+				sourceFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, sourceFiles) ],
+				refFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, refFiles) ],
+				stepsAndUnits,
+				stepsAdditions: [],
+				service,
+				targets,
+				source: sourceLanguage,
+				projectId: _id,
+				internalProjectId: projectId
 			}
+
+			await createTasksAndStepsForCustomUnits(tasksInfo)
 		}
 
 		return await getProject({ _id: project._id })
@@ -325,17 +316,20 @@ const manageMemoqProjectName = (projectId, projectName) => {
 
 const autoCreatingTranslationTaskInProject = async (project, requestId, creatorUserForMemoqId) => {
 	const { projectName, projectId, _id } = project
-	const { tasksAndSteps, industry, customer, projectManager } = await getClientRequestById(requestId)
+	const { tasksAndSteps, industry, customer, requestForm, projectManager } = await getClientRequestById(requestId)
+	const { sourceLanguage, service } = requestForm
 
-	for await (let { refFiles, sourceFiles, taskData: { source, targets, template, service, stepsAndUnits, stepsDates } } of tasksAndSteps) {
+
+	for await (let { refFiles, sourceFiles, taskData: { targets, template, stepsAndUnits } } of tasksAndSteps) {
 		const tasksInfo = {
 			projectId: _id,
+			internalProjectId: projectId,
 			memoqFiles: [],
+			stepsAdditions: [],
 			targets,
-			source,
+			source: sourceLanguage,
 			service,
 			stepsAndUnits,
-			stepsDates,
 			translateFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, sourceFiles) ],
 			referenceFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, refFiles) ],
 			memoqProjectId: await createMemoqProjectWithTemplate({
@@ -343,12 +337,11 @@ const autoCreatingTranslationTaskInProject = async (project, requestId, creatorU
 				creatorUserId: creatorUserForMemoqId,
 				industry: industry.name.replace('&', 'and'),
 				projectName: manageMemoqProjectName(projectId, projectName),
-				source,
+				source: sourceLanguage,
 				targets,
 				template
 			})
 		}
-
 		await assignProjectManagers({ manager: projectManager, memoqProjectId: tasksInfo.memoqProjectId })
 
 		for await (let filePath of tasksInfo.translateFiles) {
@@ -357,12 +350,11 @@ const autoCreatingTranslationTaskInProject = async (project, requestId, creatorU
 		}
 
 		const listProjectTranslationDocuments = await getProjectTranslationDocs(tasksInfo.memoqProjectId)
+		await createTasksForWordcount({ ...tasksInfo, docs: listProjectTranslationDocuments })
 
-		const tasks = await createTasksForWordcount(tasksInfo, listProjectTranslationDocuments)
-
-		let updatedProject = await updateProjectMetricsAndCreateSteps(_id, tasks)
-
-		updatedProject = await updateProjectCosts(updatedProject)
+		// const tasks = await createTasksForWordcount(tasksInfo, listProjectTranslationDocuments)
+		// let updatedProject = await updateProjectMetricsAndCreateSteps(_id, tasks)
+		// updatedProject = await updateProjectCosts(updatedProject)
 	}
 
 }

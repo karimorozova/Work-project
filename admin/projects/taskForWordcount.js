@@ -7,24 +7,24 @@ const { getNewStepFinanceData, calculateProjectTotal, recalculateStepFinance } =
 async function createTasksForWordcount(tasksInfo) {
 	const {
 		source,
-		template,
 		targets,
 		service,
 		stepsAdditions,
 		stepsAndUnits,
-		industry,
 		projectId: _id,
 		internalProjectId: projectId,
-		nativeProjectName,
-		projectManager,
-		customerName,
-		creatorUserId,
 		refFiles,
 		translateFiles,
-		projectName,
 		memoqProjectId,
 		memoqFiles,
 		docs
+		// industry,
+		// template,
+		// nativeProjectName,
+		// projectManager,
+		// customerName,
+		// creatorUserId,
+		// projectName,
 	} = tasksInfo
 
 	const { tasks: projectsTasks, customer: { matrix } } = await getProject({ _id })
@@ -237,4 +237,4 @@ function setStepsProgress(service, memoqDocs) {
 	return { ...stepProgress, ...totalProgress }
 }
 
-module.exports = { createTasksForWordcount, getTaskMetrics}
+module.exports = { createTasksForWordcount, getTaskMetrics }

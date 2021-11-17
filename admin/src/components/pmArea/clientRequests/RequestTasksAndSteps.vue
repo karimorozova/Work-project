@@ -16,18 +16,6 @@
           :currentTaskIdForUpdate="currentTaskIdForUpdate"
           :allSteps="allSteps"
         )
-        //RequestTasksData(
-        //  v-if="isTaskData"
-        //  :originallyLanguages="originallyLanguages"
-        //  :originallyUnits="originallyUnits"
-        //  :originallySteps="originallySteps"
-        //  :originallyServices="originallyServices"
-        //  :currentTaskId="currentTaskId"
-        //  :currentTaskIdForUpdate="currentTaskIdForUpdate"
-        //  @endOfSettingTaskData="endOfSettingTaskData"
-        //  @addTasks="addTasks"
-        //  @showErrors="showErrors"
-        //)
       ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
 
     .tasks-steps__tables
@@ -95,7 +83,7 @@
 
     .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
       .button__convert
-        Button(value="Convert into Project" @clicked="convertIntoProject")
+        Button(value="Convert into Project" :isDisabled="isButtonDisable" @clicked="convertIntoProject")
 
 </template>
 
@@ -129,11 +117,9 @@ export default {
       tabs: [ 'Tasks and Steps' ],
       isStepsShow: false,
       isTasksShow: true,
-      // isEditData: false,
       selectedTab: 'Tasks and Steps',
-      // currentTaskId: '',
       currentTaskIdForUpdate: '',
-      // isButtonDisable: false,
+      isButtonDisable: false,
       fields1: [
         // { label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
         { label: "Service", headerKey: "headerService", key: "service", style: { width: "16%" } },
@@ -177,7 +163,7 @@ export default {
       }
     },
     async convertIntoProject() {
-      // this.isButtonDisable = true
+      this.isButtonDisable = true
       const { requestForm: { service: { title } }, tasksAndSteps } = this.currentProject
       this.checkTranslationSourceFiles(title, tasksAndSteps)
 
@@ -196,7 +182,7 @@ export default {
           const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
           const { creatorUserId: creatorUserForMemoqId } = memoqCreatorUser.data
           if (!creatorUserForMemoqId) {
-            this.alertToggle({ message: 'Error on converting project! Not such user on Memoq', isShow: true, type: "error" })
+            this.alertToggle({ message: 'Error on converting project! Not such user [PM] on Memoq', isShow: true, type: "error" })
             return
           }
           await this.convertCATUnitsProject(creatorUserForMemoqId)
@@ -208,26 +194,36 @@ export default {
       }
     },
     async convertCustomUnitsProject() {
-      console.log('WORD')
-      // try {
-      //   const projectId = await this.$http.post('/pm-manage/convert-request-into-project', { projectId: this.currentProject._id })
-      //   const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
-      //   window.open(route.href, "_self")
-      //   this.isButtonDisable = false
-      // } catch (err) {
-      //   this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
-      // }
+      try {
+        const projectId = await this.$http.post('/pm-manage/convert-request-into-project', {
+          projectId: this.currentProject._id
+        })
+        const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
+        window.open(route.href, "_self")
+        this.isButtonDisable = false
+      } catch (err) {
+        this.isButtonDisable = false
+        this.alertToggle({ message: 'Error on converting project!', isShow: true, type: "error" })
+      }
     },
     async convertCATUnitsProject(creatorUserForMemoqId) {
-      console.log('CAT')
-      // try {
-      //   const projectId = await this.$http.post('/pm-manage/convert-translation-request-into-project', { projectId: this.currentProject._id, creatorUserForMemoqId })
-      //   const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
-      //   window.open(route.href, "_self")
-      //   this.isButtonDisable = false
-      // } catch (err) {
-      //   this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
-      // }
+      try {
+        const projectId = await this.$http.post('/pm-manage/convert-translation-request-into-project', {
+          projectId: this.currentProject._id,
+          creatorUserForMemoqId
+        })
+        const route = this.$router.resolve({ path: `/pangea-projects/draft-projects/Draft/details/${ projectId.data }` })
+        window.open(route.href, "_self")
+        this.isButtonDisable = false
+      } catch (err) {
+        console.log(err)
+        if (err.body) {
+          this.alertToggle({ message: err.body, isShow: true, type: "error" })
+        } else {
+          this.alertToggle({ message: 'Error on converting translation project!', isShow: true, type: "error" })
+        }
+        this.isButtonDisable = false
+      }
     },
     async deleteTask(taskId) {
       try {
@@ -239,14 +235,11 @@ export default {
       }
     },
     editTasksData(taskId) {
-      // this.isEditData = true
-      // this.currentTaskId = taskId
       this.currentTaskIdForUpdate = taskId
       this.isTaskData = true
     },
     setDefault() {
       this.isTaskData = false
-      // this.currentTaskId = ''
       this.currentTaskIdForUpdate = ''
     },
     closeErrorsBlock() {
@@ -264,7 +257,6 @@ export default {
     },
     toggleTaskData() {
       this.isTaskData = !this.isTaskData
-      // this.currentTaskId = ''
       this.currentTaskIdForUpdate = ''
       if (!this.isTaskData) {
         this.clearTasksDataRequest()
@@ -289,19 +281,12 @@ export default {
       return this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
         const { targets, stepsAndUnits } = taskData
         const { requestForm: { sourceLanguage, service } } = this.currentProject
-
-        // let start, deadline
-        // if (stepsDates.length === 1) {
-        // 	[ start, deadline ] = Object.values(stepsDates[0])
-        // } else {
-        // 	start = stepsDates[0].start
-        // 	deadline = stepsDates[1].deadline
-        // }
-
         return {
           // taskId: taskId + ` (Task count: ${ targets.length })`,
           taskId,
-          language: `${ sourceLanguage.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
+          language: service.languageForm === 'Mono'
+              ? `${ targets.map(i => i.symbol).join(', ') }`
+              : `${ sourceLanguage.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
           service: service.title,
           steps: [ ...new Set(stepsAndUnits.map(item => item.step.title)) ].join(', '),
           tasksLength: targets.length,

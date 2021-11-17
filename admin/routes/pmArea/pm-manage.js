@@ -145,16 +145,16 @@ router.get('/project', async (req, res) => {
 	}
 })
 
-router.get('/request', async (req, res) => {
-	const { id } = req.query
-	try {
-		const request = await getClientRequest({ '_id': id })
-		res.send(request)
-	} catch (err) {
-		console.log(err)
-		console.log('Error on getting Request')
-	}
-})
+// router.get('/request', async (req, res) => {
+// 	const { id } = req.query
+// 	try {
+// 		const request = await getClientRequest({ '_id': id })
+// 		res.send(request)
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log('Error on getting Request')
+// 	}
+// })
 
 router.post('/new-project', async (req, res) => {
 	let { project, user } = req.body
@@ -215,7 +215,13 @@ router.post('/convert-request-into-project', async (req, res) => {
 	try {
 		const { projectId: requestId } = req.body
 		const project = await createProjectFromRequest(requestId)
-		await autoCreatingTaskInProject(project, requestId)
+		try {
+			await autoCreatingTaskInProject(project, requestId)
+		} catch (err) {
+			const { ObjectId } = require("mongoose/lib/types")
+			await Projects.deleteOne({ "_id": ObjectId(project._id) })
+			res.status(500).send('Error on converting tasks')
+		}
 		res.send(project._id)
 	} catch (err) {
 		console.log(err)
@@ -227,7 +233,13 @@ router.post('/convert-translation-request-into-project', async (req, res) => {
 	try {
 		const { projectId: requestId, creatorUserForMemoqId } = req.body
 		const project = await createProjectFromRequest(requestId)
-		await autoCreatingTranslationTaskInProject(project, requestId, creatorUserForMemoqId)
+		try {
+			await autoCreatingTranslationTaskInProject(project, requestId, creatorUserForMemoqId)
+		} catch (err) {
+			const { ObjectId } = require("mongoose/lib/types")
+			await Projects.deleteOne({ "_id": ObjectId(project._id) })
+			res.status(500).send('Error on converting tasks')
+		}
 		res.send(project._id)
 	} catch (err) {
 		console.log(err)
@@ -1039,6 +1051,7 @@ router.post('/step-finance-edit/:projectId', async (req, res) => {
 // XTRF API ==================================================================
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
+const { ObjectId } = require("mongoose/lib/types")
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params

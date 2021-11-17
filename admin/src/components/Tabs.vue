@@ -39,12 +39,12 @@
       border-right: 1px solid $border;
       min-width: 120px;
       border-bottom: none;
-      background-color: $table-list;
+      background-color: $body;
       padding: 1px 15px 0 8px;
       height: 31px;
       display: flex;
       align-items: center;
-      color: #33333370;
+      color: #6666;
 
       &:first-child {
         border-left: 1px solid $border !important;

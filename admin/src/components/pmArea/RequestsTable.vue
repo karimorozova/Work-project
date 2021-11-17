@@ -87,7 +87,10 @@
 				return elem.name
 			},
 			getRequestLangs(row) {
-				return row.requestForm.targetLanguages.reduce((prev, cur) => {
+        const { service } =  row.requestForm
+        return service.languageForm === 'Mono'
+            ? `${ row.requestForm.targetLanguages.map(i => i.symbol).join(', ') }`
+            : row.requestForm.targetLanguages.reduce((prev, cur) => {
 					return prev + `${ row.requestForm.sourceLanguage.symbol } >> ${ cur.symbol }; `
 				}, "")
 			},
