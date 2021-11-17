@@ -28,7 +28,7 @@ export default {
     instructions: {
       type: Array,
       default: () => []
-    },
+    }
   },
   data() {
     return {
@@ -73,9 +73,11 @@ export default {
 
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
+
 .instructions {
   position: relative;
   width: 100%;
+
   &__modals {
     z-index: 300;
     position: absolute;
@@ -83,68 +85,80 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
   }
-  &__title{
+
+  &__title {
     font-size: 14px;
     margin-bottom: 8px;
     font-family: 'Myriad600';
   }
+
   &__cards {
     width: 100%;
   }
+
   .modal {
-    &__edit-instruction{
-      width: 550px;
+    &__edit-instruction {
+      width: 600px;
       margin-bottom: 20px;
 
     }
+
     &__title {
       font-size: 16px;
       margin-bottom: 8px;
       font-family: 'Myriad600';
     }
+
     &__footer {
       display: flex;
       justify-content: center;
       margin-top: 20px;
       gap: 10px
     }
+
     &__input {
       margin: 10px 0;
     }
   }
+
   &__body {
     display: flex;
     width: 100%;
     gap: 1rem;
   }
 }
+
 .input {
   &__title {
     margin-bottom: 3px;
   }
 }
+
 .card {
   box-sizing: border-box;
   border-radius: 4px;
   background-color: $white;
   margin-bottom: 10px;
+
   &__header {
-    height: 27px;
+
     border: 1px solid $light-border;
     border-radius: 4px;
-    padding: 7px 10px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 5px;
+    gap: 7px;
     cursor: pointer;
   }
+
   &__toggle_drop-down {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     align-content: center;
     align-items: center;
   }
+
   &__desctiption {
     padding: 5px 10px 0px;
     transform-origin: top;
@@ -153,6 +167,7 @@ export default {
     border-top: none;
     margin-top: -5px;
   }
+
   &__buttons {
     display: flex;
     gap: 5px;
@@ -169,6 +184,7 @@ export default {
   border-radius: 4px;
   border: 1px solid $light-border;
   cursor: pointer;
+
   svg {
     font-size: 16px;
     padding: 10px;
@@ -177,6 +193,7 @@ export default {
     margin-bottom: 4px;
   }
 }
+
 .modal__border {
   padding: 20px;
   box-shadow: $box-shadow;
@@ -200,24 +217,31 @@ input {
     border: 1px solid $border-focus;
   }
 }
+
 .icon {
   transition: transform .2s ease;
 }
+
 .icon__close {
   transform: rotate(90deg);
 }
+
 .slide-fade-enter-active {
   transition: all .2s ease-out;
 }
+
 .slide-fade-leave-active {
   transition: all .2s ease-out;
 }
+
 .slide-fade-enter, .slide-fade-leave-to
-  /* .slide-fade-leave-active до версии 2.1.8 */ {
+  /* .slide-fade-leave-active до версии 2.1.8 */
+{
   //transform: translateY(-30px);
   transform: scaleY(0);
   opacity: 0;
 }
+
 .gray-icon {
   color: $dark-border;
 }

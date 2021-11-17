@@ -314,11 +314,11 @@ export default {
       align-items: center;
       gap: 5px;
       cursor: pointer;
-      height: 27px;
+      //height: 27px;
     }
     &__toggle_drop-down {
       display: flex;
-      gap: 10px;
+      gap: 15px;
       align-content: center;
       align-items: center;
     }
@@ -349,7 +349,7 @@ export default {
     transition: transform .1s;
 
     &:hover{
-      transform: scale(1.05);
+      transform: scale(1.04);
     }
 
     svg {
