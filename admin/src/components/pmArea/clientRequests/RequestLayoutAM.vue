@@ -141,9 +141,9 @@
 
       .project__block-row.project_no-margin
         .project__block
+          Check(id="checkBrief" @click="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
-              Check(id="checkBrief" @click.stop="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
               span Project Brief
 
             .icon(v-if="!isBrief")
@@ -161,29 +161,6 @@
               i.fas.fa-chevron-right
           .block__data(v-if="isNotes && canUpdateRequest()")
             ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes")
-
-      //.form__block-row.form_no-margin
-      //  .form__block
-      //    .block__header(@click="toggleBlock('isBrief')" :class="{'block__header-grey': !isBrief}")
-      //      .title Project Brief
-      //      .icon(v-if="!isBrief && canUpdateRequest()")
-      //        i.fas.fa-chevron-down
-      //      .icon(v-else)
-      //        i.fas.fa-chevron-right
-      //    .block__data(v-if="isBrief && canUpdateRequest()")
-      //      ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief(currentClientRequest.brief)")
-      //  .form__block
-      //    .block__header(@click="toggleBlock('isNotes')" :class="{'block__header-grey': !isNotes}")
-      //      IconButton(class="copy-to-brief" @clicked="copyNotesToBrief")
-      //        i.fas.fa-copy
-      //      .title Project Notes
-      //      .icon(v-if="!isNotes && canUpdateRequest()")
-      //        i.fas.fa-chevron-down
-      //      .icon(v-else)
-      //        i.fas.fa-chevron-right
-      //    .block__data(v-if="isNotes && canUpdateRequest()")
-      //      ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes(currentClientRequest.notes)")
-
 
       .form__button
         Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
@@ -318,8 +295,8 @@ export default {
   data() {
     return {
       instructions: instructions,
-      isBrief: true,
-      isNotes: true,
+      isBrief: false,
+      isNotes: false,
       clientRequest: {},
       disabled: {
         to: moment().add(-1, 'day').endOf('day').toDate()
@@ -1522,7 +1499,9 @@ input {
 }
 
 #checkBrief {
-  margin-right: 5px;
+  position: absolute;
+  right: -23px;
+  top: 10px;
 }
 
 .iconId {
