@@ -100,8 +100,6 @@ async function updateStepProp({ jobId, prop, value }) {
 		if (prop === "status") {
 			await manageStatuses({ project, steps, jobId, status: value })
 		}
-
-		// await Projects.updateOne({ 'steps._id': jobId }, { steps })
 	} catch (err) {
 		console.log(err)
 		console.log("Error in updateStepProp")
@@ -288,4 +286,4 @@ function isAllStepsCompleted({ steps, task }) {
 	return !taskSteps.length ? false : taskSteps.every(item => item.status === 'Completed')
 }
 
-module.exports = { getJobs, updateStepProp, setRejectedStatus }
+module.exports = { getJobs, updateStepProp, setRejectedStatus, manageStatuses }

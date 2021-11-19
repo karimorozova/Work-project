@@ -56,9 +56,8 @@ export const addProjectWordsTasks = async ({ dispatch }, payload) => {
 
 export const updateProgress = async ({ dispatch }, payload) => {
 	dispatch('incrementRequestCounter')
-	const { projectId, isCatTool } = payload
 	try {
-		const updatedProject = await Vue.http.post('/pm-manage/update-progress', { projectId, isCatTool })
+		const updatedProject = await Vue.http.post('/pm-manage/update-progress', payload)
 		await dispatch('setCurrentProject', updatedProject.data)
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" })

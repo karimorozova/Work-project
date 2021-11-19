@@ -48,7 +48,7 @@ export default {
     width: 100%;
     opacity: 0;
     transition: all 0.2s;
-    top: -1px;
+    top: -10px;
     display: flex;
     justify-content: center;
   }

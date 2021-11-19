@@ -141,17 +141,13 @@
 
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
-          //span(v-if="isShowValue(row, 'receivables')")
           span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span(v-if="row.finance.Price.receivables !== ''") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.receivables).toFixed(2) : '-' }}
-            //span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.halfReceivables).toFixed(2) : '-' }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance
-          //span(v-if="isShowValue(row, 'payables')")
           span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
           span(v-if="row.finance.Price.payables !== ''") {{ (row.finance.Price.payables).toFixed(2) }}
-            //span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__finance(:id="'margin'+index")
@@ -188,12 +184,11 @@ import ProjectFinanceModal from "../ProjectFinanceModal"
 import StepVendorDetails from './StepVendorDetails'
 
 
-
-import DatePicker from 'vue2-datepicker';
-import '../../../assets/scss/datepicker.scss';
+import DatePicker from 'vue2-datepicker'
+import '../../../assets/scss/datepicker.scss'
 
 export default {
-  mixins: [ scrollDrop, currencyIconDetected, tableSortAndFilter],
+  mixins: [ scrollDrop, currencyIconDetected, tableSortAndFilter ],
   name: "NewSteps",
   props: {
     steps: {
@@ -217,23 +212,31 @@ export default {
       selectedAction: '',
       isApproveActionShow: false,
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
-    // {
-    //   label: "Services",
-    //       headerKey: "headerService",
-    //     key: "services",
-    //     dataKey: "title",
-    //     sortInfo: { isSort: true, order: 'default' },
-    //   filterInfo: { isFilter: true },
-    //   style: {width: "20%"},
-    // },
+      // {
+      //   label: "Services",
+      //       headerKey: "headerService",
+      //     key: "services",
+      //     dataKey: "title",
+      //     sortInfo: { isSort: true, order: 'default' },
+      //   filterInfo: { isFilter: true },
+      //   style: {width: "20%"},
+      // },
       fields: [
         { label: "Check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
-        { label: "Step", headerKey: "headerName", key: "step", dataKey: "title", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
+        {
+          label: "Step",
+          headerKey: "headerName",
+          key: "step",
+          dataKey: "title",
+          sortInfo: { isSort: true, order: 'default' },
+          filterInfo: { isFilter: true },
+          style: { "width": "11%" }
+        },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
         { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "11%" } },
         { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
-        { label: "Start", headerKey: "headerStart", key: "start",  sortInfo: { isSort: true, order: 'default' },  style: { "width": "10%" } },
-        { label: "Deadline", headerKey: "headerDeadline", key: "deadline",  sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
+        { label: "Start", headerKey: "headerStart", key: "start", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
+        { label: "Deadline", headerKey: "headerDeadline", key: "deadline", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "10%" } },
@@ -250,10 +253,10 @@ export default {
       // "setProjectStatus",
       // "reopenSteps"
     ]),
-    closeVendorDetailsModal(){
+    closeVendorDetailsModal() {
       this.vendorDetailsId = null
     },
-    openVendorDetailsModal(vendor, step){
+    openVendorDetailsModal(vendor, step) {
       const { _id } = vendor
       this.vendorDetailsId = _id
       this.currentStep = step
@@ -283,24 +286,14 @@ export default {
     marginCalc(step) {
       const { Price } = step.finance
       let margin = 0
-      if (Price.halfReceivables >= 0) margin = +Price.halfReceivables - +Price.halfPayables
-      else margin = +Price.receivables - +Price.payables
+      margin = +Price.receivables - +Price.payables
       return margin.toFixed(2)
     },
     marginCalcPercent(step) {
       const { Price } = step.finance
       let percent = NaN
-      if (Price.halfReceivables >= 0) percent = 100 - (+Price.halfPayables / +Price.halfReceivables) * 100
       percent = 100 - (Price.payables / Price.receivables) * 100
-      return Number.isNaN(percent) ? 0 : percent.toFixed(0)
-    },
-    isShowValue(step, prop) {
-      if (step.status === "Cancelled Halfway") {
-        const halfProp = prop === "receivables" ? "halfReceivables" : "halfPayables"
-        const val = step.finance.Price[halfProp]
-        return val === 0 ? true : step.finance.Price[halfProp]
-      }
-      return step.finance.Price[prop] === 0 ? true : step.finance.Price[prop]
+      return Number.isNaN(percent) || !isFinite(percent) ? 0 : percent.toFixed(0)
     },
     closeErrorsDeadline() {
       this.deadlineModal = false
@@ -319,10 +312,12 @@ export default {
       return prog.hasOwnProperty('totalWordCount') ? +((prog.wordsDone / prog.totalWordCount) * 100).toFixed(2) : +prog
     },
     lastProgress(step, index) {
-      if (step.stepId.includes('R')) {
+      if (step.stepId.includes('[R]')) {
         const prevStep = this.currentProject.steps[index - 1]
-        if (prevStep.finance.Price.hasOwnProperty('halfReceivables') && prevStep.finance.Price.halfReceivables > 0) {
+        if (typeof prevStep.progress === 'object') {
           return ((prevStep.progress.wordsDone / prevStep.progress.totalWordCount) * 100).toFixed(2)
+        } else {
+          prevStep.progress
         }
       }
       return 0
@@ -335,7 +330,7 @@ export default {
     },
     async setAction({ option }) {
       this.selectedAction = option
-      if (option === 'Set Deadline' || option === 'Set Start') {
+      if (option === 'Set Deadline' || option === 'Set Start time') {
         this.deadlineModal = true
       } else {
         this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
@@ -371,10 +366,91 @@ export default {
         case "Mark as Rejected" :
           await this.decideOnSteps('Rejected', this.getStepByStatus([ 'Created', 'Rejected', 'Request Sent', 'Approved', 'Ready to Start', 'Waiting to Start' ]))
           break
+        case "Start a Job" :
+          await this.startJobs()
+          break
+        case "Complete a Job" :
+          await this.completeJobs()
+          break
+      }
+    },
+    async completeJobs() {
+      const steps = this.checkedSteps.filter(({ status }) => status === 'In progress')
+      if (steps.length) for (const step of steps) {
+        await this.completeJob(step)
+      }
+    },
+    async completeJob(step) {
+      const isCat = step.memoqDocIds.length
+      try {
+        const updatedProject = await this.$http.post('/vendorsapi/manage-step-status', {
+          projectId: this.currentProject._id,
+          status: 'Completed',
+          stepId: step.stepId,
+          _stepId: step._id,
+          isCat
+        })
+        await this.setCurrentProject(updatedProject.data)
+        this.closeApproveModal()
+      } catch (err) {
+        this.alertToggle({ message: `Error at completing job`, isShow: true, type: 'error' })
+      }
+    },
+    async startJobs() {
+      const steps = this.checkedSteps.filter(({ status }) => status === 'Ready to Start')
+      if (steps.length) for (const step of steps) {
+        await this.startJob(step)
+      }
+      this.closeApproveModal()
+    },
+    async startJob(step) {
+      const { receivablesUnit: { type }, vendor, stepId } = step
+      if (type === 'CAT Wordcount') {
+        const memoqUsers = await this.$http.get(`/memoqapi/users`)
+        const memoqUsersData = memoqUsers.data
+        const memoqUserGuids = memoqUsersData.map(({ id }) => id)
+        const memoqUserMails = memoqUsersData.map(({ email }) => email)
+        const noUserGuidInMemoq = !memoqUserGuids.includes(vendor.guid)
+        const includesEmailInMemoq = memoqUserMails.includes(vendor.email)
+
+        switch (true) {
+          case (vendor.guid === null || vendor.guid === '') && !includesEmailInMemoq:
+          case !!vendor.guid && noUserGuidInMemoq && !includesEmailInMemoq:
+            try {
+              await this.$http.get(`/vendorsapi/create-memoq-vendor/${ vendor._id }`)
+            } catch (err) {
+              this.alertToggle({ message: `Error on creating Vendor`, isShow: true, type: 'error' })
+            }
+            break
+          case vendor.guid === null && includesEmailInMemoq:
+          case !!vendor.guid && noUserGuidInMemoq && includesEmailInMemoq:
+            try {
+              await this.$http.post('/vendorsapi/rewrite-quid-for-translator', { memoqUsers: memoqUsers.data, vendorId: vendor._id })
+            } catch (err) {
+              this.alertToggle({ message: `Error on rewriting Vendor Guid`, isShow: true, type: 'error' })
+            }
+            break
+        }
+        try {
+          await this.$http.post('/vendorsapi/assign-translator', { stepId, _stepId: step._id, vendorId: vendor._id, projectId: this.currentProject._id, stepAction: 'Start' })
+        } catch (err) {
+          this.alertToggle({ message: `Error at appointment Vendor on Memoq`, isShow: true, type: 'error' })
+        }
+      }
+      try {
+        const updatedProject = await this.$http.post('/vendorsapi/manage-step-status', {
+          projectId: this.currentProject._id,
+          status: 'In progress',
+          stepId: stepId,
+          _stepId: step._id
+        })
+        await this.setCurrentProject(updatedProject.data)
+      } catch (err) {
+        this.alertToggle({ message: `Error at appointment Vendor on Memoq`, isShow: true, type: 'error' })
       }
     },
     async setMassDeadline(date) {
-      const prop = this.selectedAction === 'Set Start' ? 'start' : 'deadline'
+      const prop = this.selectedAction === 'Set Start time' ? 'start' : 'deadline'
       for await (const step of this.checkedSteps) {
         await this.setDate(date, prop, step._id)
       }
@@ -432,7 +508,7 @@ export default {
     },
     stepActions() {
       if (this.checkedSteps.length < 1) return []
-      return [ "Request Confirmation", "Mark as Approved", "Mark as Rejected", "Set Start", "Set Deadline" ]
+      return [ "Request Confirmation", "Mark as Approved", "Mark as Rejected", "Start a Job", "Complete a Job", "Set Start time", "Set Deadline" ]
     },
     checkedSteps() {
       return this.finalData.filter(({ isCheck }) => isCheck)
@@ -459,7 +535,7 @@ export default {
     Tabs,
     SelectSingle,
     ApproveModal,
-    DatePicker,
+    DatePicker
   }
 }
 </script>
@@ -601,6 +677,7 @@ export default {
     justify-content: center;
     width: 100%;
     gap: 10px;
+
     img {
       height: 18px;
     }
@@ -650,22 +727,25 @@ input {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
+
 .currency {
   margin-right: 4px;
   color: $dark-border;
 }
-.red-color{
+
+.red-color {
   color: $red;
 }
-.vendor__details{
-    cursor: pointer;
-    color: $text;
-    text-decoration: none;
-    transition: .2s ease-out;
 
-    &:hover {
-      text-decoration: underline;
-    }
-  
+.vendor__details {
+  cursor: pointer;
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
 }
 </style>

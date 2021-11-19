@@ -206,7 +206,7 @@ export default {
       const [ receivables, payables ] = [ this.getReceivables(task), this.getPayables(task) ]
       let percent = NaN
       percent = 100 - (payables / receivables) * 100
-      return Number.isNaN(percent) ? 0 : percent.toFixed(0)
+      return Number.isNaN(percent) || !isFinite(percent) ? 0 : percent.toFixed(0)
     },
     getPayables(task) {
       return this.getCalculationByProp(task, 'vendor')
@@ -218,12 +218,8 @@ export default {
       const { steps } = this.currentProject
       const neededSteps = steps.filter(item => item.taskId === task.taskId && item.status !== 'Cancelled')
 
-      const key = prop === 'client' ? 'receivables' : 'payables'
-      const key2 = prop === 'client' ? 'halfReceivables' : 'halfPayables'
-
       return +(neededSteps.reduce((acc, cur) => {
-        if (cur.status === 'Cancelled Halfway') acc = acc + cur.finance.Price[key2]
-        else acc = acc + cur.finance.Price[key]
+        acc = acc + cur.finance.Price[prop === 'client' ? 'receivables' : 'payables']
         return acc
       }, 0).toFixed(2))
     },

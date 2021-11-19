@@ -9,7 +9,7 @@ async function getProjectsForVendorPortal(obj) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -28,7 +28,7 @@ async function getProjects(obj) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -63,30 +63,30 @@ async function getProjectsForPortal(obj) {
 	)
 			.populate('industry')
 			.populate('service')
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
 }
 
 async function getProjectsForPortalList(obj) {
 	return (await Projects.find(
-			obj,
-			{
-				projectId: 1,
-				projectName: 1,
-				status: 1,
-				clientContacts: 1,
-				"tasks.progress": 1,
-				"steps.progress": 1,
-				startDate: 1,
-				deadline: 1,
-				finance: 1,
-				createdBy: 1,
-				// tasksDeliverables: 1,
-				// tasksDR2: 1,
-				// projectCurrency: 1
-			}
-		)
+					obj,
+					{
+						projectId: 1,
+						projectName: 1,
+						status: 1,
+						clientContacts: 1,
+						"tasks.progress": 1,
+						"steps.progress": 1,
+						startDate: 1,
+						deadline: 1,
+						finance: 1,
+						createdBy: 1
+						// tasksDeliverables: 1,
+						// tasksDR2: 1,
+						// projectCurrency: 1
+					}
+			)
 			// .populate('industry')
 			// .populate('service')
 			// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
@@ -102,7 +102,7 @@ async function getProject(obj) {
 			.populate('customer')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -128,7 +128,7 @@ async function updateProject(query, update) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -154,7 +154,7 @@ async function getProjectAfterUpdate(query, update) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -261,7 +261,7 @@ async function getFilteredProjects(filters) {
 			'service',
 			{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'accountManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
-			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email' ] },
+			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email', 'guid' ] },
 			{ path: 'requestId', select: [ 'projectId' ] }
 		])
 	} catch (err) {

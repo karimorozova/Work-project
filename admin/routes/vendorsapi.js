@@ -3,7 +3,10 @@ const { upload, stepEmailToVendor } = require('../utils')
 const mv = require('mv')
 const fse = require('fs-extra')
 const { getRatePricelist, changeMainRatePricelist } = require('../pricelist')
-const { updateProject, getProject } = require('../projects')
+const { updateProject, getProject, assignMemoqTranslator, regainWorkFlowStatusByStepId, downloadCompletedFiles, updateNonWordsTaskTargetFiles } = require('../projects')
+const { setMemoqDocumentWorkFlowStatus } = require('../services/memoqs/projects')
+// const { , getProject, updateProjectProgress, regainWorkFlowStatusByStepId } = require('../../projects')
+
 const {
 	getVendor,
 	getVendorAfterUpdate,
@@ -36,8 +39,11 @@ const {
 	deletePendingCompetence,
 	saveNotPassedTest,
 	updateClientRatesFromSettings,
-	managePaymentMethods
+	managePaymentMethods,
+	updateStepProp
 } = require('../vendors')
+
+const { manageStatuses } = require('../vendors/jobs')
 
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
@@ -613,6 +619,68 @@ router.get('/get-vendor-wordcount-from-reports/:id', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on getting quote message')
+	}
+})
+
+router.post("/rewrite-quid-for-translator", async (req, res) => {
+	const { vendorId, memoqUsers } = req.body
+	try {
+		const vendor = await Vendors.findOne({ "_id": vendorId })
+		const { id } = memoqUsers.find(item => item.email === vendor.email)
+		vendor.guid = id
+		await Vendors.updateOne({ _id: vendorId }, vendor)
+		res.status(200).send('Updated!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on assigning vendor as translator')
+	}
+})
+
+router.post("/assign-translator", async (req, res) => {
+	const { vendorId, stepId, projectId, stepAction } = req.body
+	try {
+		await assignMemoqTranslator(vendorId, stepId, projectId)
+
+		const { memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
+
+		for (let documentGuid of memoqDocIds) {
+			await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
+		}
+		res.send('Assigned')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on assigning vendor as translator')
+	}
+})
+
+router.post('/manage-step-status', async (req, res) => {
+	let { status, projectId, stepId, _stepId, isCat } = req.body
+	try {
+		if (status === 'In progress') {
+			await updateProject({ "steps._id": _stepId }, { $set: { "steps.$.isVendorRead": true } }, { arrayFilters: [ { 'i._id': stepId } ] })
+			await updateStepProp({ jobId: stepId, prop: 'status', value: status })
+			const project = await getProject({ _id: projectId })
+			res.send(project)
+
+		} else if (status === 'Completed') {
+			if (isCat) {
+				await downloadCompletedFiles(_stepId)
+				const stepAction = 'Finish'
+				const { memoqProjectId: projectGuid, memoqDocIds, workFlowStatus } = await regainWorkFlowStatusByStepId(stepId, stepAction)
+				for (let documentGuid of memoqDocIds) {
+					await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
+				}
+			} else {
+				await updateNonWordsTaskTargetFiles({ project, paths: [], jobId: _stepId })
+			}
+			const project = await getProject({ _id: projectId })
+			await updateStepProp({ jobId: _stepId, prop: 'status', value: status })
+			const updatedProject = await getProject({ _id: projectId })
+			res.send(updatedProject)
+		}
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting filtered Vendors")
 	}
 })
 

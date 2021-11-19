@@ -346,7 +346,6 @@ const setApprovedStepStatus = ({ project, step, steps }) => {
 			if (brotherlySteps.length > 1) {
 				const { stepNumber } = step
 				const prevStep = brotherlySteps.find(item => item.stepNumber === stepNumber - 1 && item.status !== 'Cancelled Halfway' && item.status !== 'Cancelled')
-				console.log(prevStep)
 				if (prevStep && isProjectApprovedStatus) {
 					item.status = prevStep.status === 'Completed' ? 'Ready to Start' : 'Waiting to Start'
 					return item

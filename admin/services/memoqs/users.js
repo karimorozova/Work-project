@@ -62,7 +62,7 @@ const getMemoqUser = async (guid) => {
   }
 };
 
-const createMemoqUser = async ({ firstName, surname, email }, isTranslator = false) => {
+const createMemoqUser = async ({ firstName, surname = '', email }, isTranslator = false) => {
   const groupGuid = isTranslator ? '00000000-0000-0000-0000-000000000003' : '00000000-0000-0000-0000-000000000002';
   const xml = `${xmlHeader}
      <soapenv:Body>
@@ -71,7 +71,7 @@ const createMemoqUser = async ({ firstName, surname, email }, isTranslator = fal
             <ns:EmailAddress>${email}</ns:EmailAddress>
             <ns:FullName>${firstName} ${surname}</ns:FullName>
             <ns:LTFullName>${firstName} ${surname}</ns:LTFullName>
-            <ns:LTUsername>${email}</ns:LTUsername>
+            <ns:LTUsername>${firstName} ${surname}</ns:LTUsername>
             <ns:Password>4ED9A0F14F05572F2241D51ACD66455E14B68BEA</ns:Password>
             <ns:UserName>${email}</ns:UserName>
          </ns:userInfo>

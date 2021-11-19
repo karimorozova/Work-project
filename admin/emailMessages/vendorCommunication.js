@@ -349,7 +349,7 @@ function sendMemoqCredentials(obj) {
 										<p style="font-weight: 400;">Your account on Memoq has been created.</p>
 										<p style="font-weight: 400;">
 											<div>Your credentials:</div>
-											<div>Login: ${ obj.email }</div>
+											<div>Login: ${ obj.firstName } ${ obj.surname || '' }</div>
 											<div>Password: 1234</div>
                     </p>
                 </div>

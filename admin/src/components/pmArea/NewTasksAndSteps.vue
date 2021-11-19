@@ -63,7 +63,7 @@ import Tabs from "../Tabs"
 import Button from "../Button"
 import VendorManage from "./VendorManage"
 import { mapActions, mapGetters } from "vuex"
-import { clearTasksData } from "../../vuex/pmarea/actions"
+import { clearTasksData, foo, updateProgress } from "../../vuex/pmarea/actions"
 
 export default {
   name: "NewTaskAndSteps",
@@ -75,18 +75,22 @@ export default {
     }
   },
   methods: {
-    ...mapActions([ 'setCurrentProject', 'alertToggle', 'clearTasksData' ]),
+    ...mapActions([ 'setCurrentProject', 'alertToggle', 'clearTasksData', 'updateProgress' ]),
     async refreshProject() {
-      try {
-        const { id } = this.$route.params
-        const curProject = await this.$http.get(`/pm-manage/project?id=${ id }`)
-        this.setCurrentProject(curProject.data)
-        this.alertToggle({ message: "Project refreshed", isShow: true, type: "success" })
-      } catch (err) {
+      if (this.currentProject.tasks.length) {
+        const isCatTool = this.currentProject.tasks.some(item => item.memoqDocs.length)
+        await this.updateProgress({ projectId: this.currentProject._id, isCatTool })
+      } else {
+        try {
+          const updatedProject = await this.$http.get(`/pm-manage/project?id=${ this.currentProject._id }`)
+          this.setCurrentProject(updatedProject.data)
+          this.alertToggle({ message: "Project refreshed", isShow: true, type: "success" })
+        } catch (err) {
+        }
       }
     },
     toggleTaskData() {
-      if(this.isTaskData) {
+      if (this.isTaskData) {
         this.clearTasksData()
       }
       this.isTaskData = !this.isTaskData
@@ -99,7 +103,7 @@ export default {
     },
     toggleVendorManage() {
       this.isModalOpen = !this.isModalOpen
-    },
+    }
     // setDefaultIsTaskData() {
     //   if (!this.currentProject.tasks.length) this.isTaskData = true
     // }
