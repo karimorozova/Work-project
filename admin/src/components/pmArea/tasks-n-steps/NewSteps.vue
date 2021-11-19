@@ -6,6 +6,7 @@
         :vendorId="vendorDetailsId"
         :currentStep="currentStep"
         :currentIndustry="currentProject.industry"
+        :projectCurrency="currentProject.projectCurrency"
         @close="closeVendorDetailsModal"
       )
 

@@ -112,7 +112,9 @@ function getBenchmarkAdditions(item, basicPricesTable, stepMultipliersTable, ind
 		return (euroBasicPrice.euroBasicPrice * (stepMultiplier.multiplier / 100)) * (industryMultiplier.multiplier / 100) / 2
 	}
 }
-async function getVendorStepDetails (id, query) {
+async function getVendorStepDetails (id, stepInfo) {
+	const groupStepInfo = `${stepInfo.source}-${ stepInfo.target}-${stepInfo.step}-${ stepInfo.unit}-${stepInfo.industry}`
+	const groupStepInfoWithoutUnit = `${stepInfo.source}-${ stepInfo.target}-${stepInfo.step}-${stepInfo.industry}`
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	let vendor = await Vendors.findOne(
 			{ status: "Active", _id: id},
@@ -132,18 +134,54 @@ async function getVendorStepDetails (id, query) {
 			.populate('rates.pricelistTable.industry', [ 'name' ]).lean()
 
 
-	// console.log({ vendor })
 	const priceListTable = vendor.rates.pricelistTable.find(({sourceLanguage, targetLanguage,step ,unit, industry}) => {
-		const test = `${sourceLanguage._id}-${targetLanguage._id}-${step._id}-${unit._id}-${industry._id}`
-		console.log({ query, test })
-		return query === test
+		const currentInfo = `${sourceLanguage._id}-${targetLanguage._id}-${step._id}-${unit._id}-${industry._id}`
+		return groupStepInfo === currentInfo
 	} )
-	console.log({ priceListTable })
-	// const test = vendor.rates.pricelistTable.map(item => {
-	// 	console.log(item)
-	const test =getBenchmarkAdditions(priceListTable, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
-	// })
-	console.log(test)
+
+	if(!priceListTable) return {
+		name: vendor.firstName,
+		email: vendor.email,
+		price: '-',
+		tqi: '-',
+		benchmark: '-',
+		benchmarkMargin: '-',
+		lqa1: '-',
+		lqa2: '-',
+		lqa3: '-',
+	}
+
+	const vendorAssessments = vendor.assessments.find(item => {
+		for (industry of item.industries) {
+			for (step of industry.steps) {
+				const current = `${ item.sourceLanguage.toString() }-${ item.targetLanguage.toString() }-${ step.step.toString() }-${ industry.industry.toString() }`
+				// if (current === groupStepInfoWithoutUnit) console.log(item)
+				return current === groupStepInfoWithoutUnit
+			}
+		}
+	})
+	// console.log({ vendorAssessments })
+	// console.log({ vendorAssessments: vendorAssessments.industries[0].steps[0] })
+	const vendorQualifications = vendor.qualifications.find(item => {
+		for (industry of item.industries) {
+			for(step of item.steps) {
+				const current = `${ item.source }-${ item.target }-${ step }-${ industry }`
+				return current === groupStepInfoWithoutUnit
+			}
+		}
+	})
+	const {lqa1: {grade: lqa1 = 0}= 0,lqa2: {grade: lqa2 = 0} = 0,lqa3: {grade: lqa3 = 0} = 0 } = vendorAssessments ? vendorAssessments.industries[0].steps[0] : {  }
+	const { tqi = 0 } = vendorQualifications ? vendorQualifications : {}
+	return {
+		name: vendor.firstName,
+		email: vendor.email,
+		price: priceListTable.price,
+		tqi: tqi || 0,
+		lqa1,
+		lqa2,
+		lqa3,
+		...getBenchmarkAdditions(priceListTable, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
+	}
 }
 
 async function getVendor(query) {

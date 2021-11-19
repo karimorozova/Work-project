@@ -1019,10 +1019,22 @@ router.get('/vendors-for-steps', async (req, res) => {
 	}
 })
 router.post('/vendors-for-steps-details', async (req, res) => {
-	const {vendorId, query} = req.body
+	const {vendorId, stepInfo} = req.body
 	try {
-		const result = await getVendorStepDetails(vendorId,query)
+		const result = await getVendorStepDetails(vendorId,stepInfo)
 		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-for-steps!')
+	}
+})
+router.post('/step-vendor-brief', async (req, res) => {
+	const {projectId, stepId, vendorBrief} = req.body
+	try {
+		await Projects.updateOne({_id: projectId, "steps._id": stepId}, {$set: {"steps.$.vendorBrief": vendorBrief}})
+
+		const updatedProject = await getProject({_id: projectId })
+		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on vendor-for-steps!')
