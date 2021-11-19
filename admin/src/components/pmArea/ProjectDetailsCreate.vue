@@ -64,8 +64,7 @@
           :clearable="false"
           :confirm="true"
           confirm-text="Set date"
-          :disabled-date="notBeforeStartDate"
-          :disabled="isBilling && isProjectFinished"
+          :disabled-date="notBeforeNow"
           prefix-class="xmx"
         )
 
@@ -89,21 +88,20 @@ import Button from "../Button"
 import CheckBox from "../CheckBox"
 import ValidationErrors from "../ValidationErrors"
 
-import DatePicker from 'vue2-datepicker';
-import '../../assets/scss/datepicker.scss';
+import DatePicker from 'vue2-datepicker'
+import '../../assets/scss/datepicker.scss'
 import { mapActions, mapGetters } from "vuex"
 import moment from "moment"
+
 export default {
   components: {
     SelectSingle,
     Button,
     CheckBox,
     DatePicker,
-    ValidationErrors,
+    ValidationErrors
   },
-  props: {
-
-  },
+  props: {},
   data() {
     return {
       project: {
@@ -114,11 +112,11 @@ export default {
         deadline: "",
         selectedIndustry: {},
         isTest: false,
-        billingInfo: {},
+        billingInfo: {}
       },
       clients: [],
       areErrorsExist: false,
-      errors: [],
+      errors: []
     }
   },
   methods: {
@@ -127,37 +125,42 @@ export default {
       "setProjectDate",
       "setCurrentProject"
     ]),
-    setTest(isCheck) {
-      this.setValue('isTest',isCheck)
+    notBeforeNow(date) {
+      let d = new Date()
+      d.setDate(d.getDate() - 1)
+      return date < d
     },
-    setCustomer({option}) {
-      this.setValue('customer',option)
+    setTest(isCheck) {
+      this.setValue('isTest', isCheck)
+    },
+    setCustomer({ option }) {
+      this.setValue('customer', option)
 
       if (this.billingInfoList.length === 1) {
-        this.choseBillingInfo({ option: this.billingInfoList[0].name})
+        this.choseBillingInfo({ option: this.billingInfoList[0].name })
       } else {
         this.setValue('clientBillingInfo', {})
       }
 
       const industry = this.industriesList.length === 1
-        ? this.industriesList[0]
-        : {}
+          ? this.industriesList[0]
+          : {}
 
-      this.setValue('selectedIndustry',industry)
+      this.setValue('selectedIndustry', industry)
 
     },
-    setIndustry({option}) {
+    setIndustry({ option }) {
       console.log(option)
-      this.setValue('selectedIndustry',option)
+      this.setValue('selectedIndustry', option)
     },
-    choseBillingInfo({option}) {
+    choseBillingInfo({ option }) {
       const billingInfo = this.billingInfoList.find(({ name }) => name === option)
       this.setValue('clientBillingInfo', billingInfo)
     },
     updateProjectDate(date) {
       this.setValue('deadline', date)
     },
-    setValue( prop, option ) {
+    setValue(prop, option) {
       this.project = { ...this.project, [prop]: option }
     },
     async getCustomers() {
@@ -211,7 +214,7 @@ export default {
         this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
       }
     },
-    closeErrors () {
+    closeErrors() {
       this.areErrorsExist = false
       this.errors = []
     }
@@ -239,7 +242,7 @@ export default {
       const billingInfo = this.project.customer.billingInfo
       return billingInfo.map(({ _id, paymentType, name }) => ({ _id, paymentType, name }))
 
-    },
+    }
   },
   async created() {
     await this.getCustomers()
@@ -248,78 +251,84 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  @import "../../assets/scss/colors";
-  .project-cd {
-    padding: 25px;
-    width: 1040px;
-    box-shadow: $box-shadow;
-    position: relative;
-    background: white;
-    border-radius: 4px;
-    box-sizing: border-box;
+@import "../../assets/scss/colors";
 
-    &__row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    &__input {
-      width: 220px;
-    }
-    &__select-input {
-      position: relative;
-      height: 32px;
-    }
-    &__name {
-      font-size: 19px;
-      padding: 0 10px;
-      height: 44px;
-      width: 880px;
-      border-radius: 4px;
-      border: 1px solid $light-border;
-      outline: none;
-      color: $text;
-      transition: .1s ease-out;
-      font-family: 'Myriad600';
-      display: flex;
-      align-items: center;
-    }
-  }
-  .input-title {
+.project-cd {
+  padding: 25px;
+  width: 1040px;
+  box-shadow: $box-shadow;
+  position: relative;
+  background: white;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  &__row {
     display: flex;
-
-    &__text {
-      margin-bottom: 3px;
-    }
-
-    .require {
-      color: $red;
-      padding-left: 2px;
-    }
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
   }
 
-  .textCheckbox{
-    padding: 0 8px;
-    // border: 1px solid $light-border;
+  &__input {
+    width: 220px;
+  }
+
+  &__select-input {
+    position: relative;
+    height: 32px;
+  }
+
+  &__name {
+    font-size: 19px;
+    padding: 0 10px;
+    height: 44px;
+    width: 880px;
     border-radius: 4px;
-    height: 42px;
-    transition: .2s ease-out;
-    justify-content: center;
-    color: $dark-border;
-    cursor: default;
+    border: 1px solid $light-border;
+    outline: none;
+    color: $text;
+    transition: .1s ease-out;
+    font-family: 'Myriad600';
     display: flex;
     align-items: center;
-
-    &__label {
-      display: flex;
-      align-items: center;
-      margin-left: 6px;
-    }
-
-    &:hover{
-      color: $text;
-    }
   }
+}
+
+.input-title {
+  display: flex;
+
+  &__text {
+    margin-bottom: 3px;
+  }
+
+  .require {
+    color: $red;
+    padding-left: 2px;
+  }
+}
+
+.textCheckbox {
+  padding: 0 8px;
+  // border: 1px solid $light-border;
+  border-radius: 4px;
+  height: 42px;
+  transition: .2s ease-out;
+  justify-content: center;
+  color: $dark-border;
+  cursor: default;
+  display: flex;
+  align-items: center;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    margin-left: 6px;
+    margin-bottom: 2px;
+  }
+
+  &:hover {
+    color: $text;
+  }
+}
 
 </style>

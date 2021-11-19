@@ -103,7 +103,6 @@
               :clearable="false"
               :confirm="true"
               confirm-text="Set date"
-              :disabled-date="notBeforeStartDate"
               prefix-class="xmx"
             )
 
@@ -828,6 +827,7 @@
       display: flex;
       align-items: center;
       margin-left: 6px;
+      margin-bottom: 2px;
     }
 
     &:hover{

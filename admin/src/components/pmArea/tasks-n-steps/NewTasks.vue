@@ -45,13 +45,12 @@
         @notApprove="closeApproveModal"
         @close="closeApproveModal"
       )
-    .tasks__action(v-if="!isProjectFinished")
-      .tasks__title Tasks Actions:
+    .tasks__action(v-if="!isProjectFinished && !$parent.isTaskData && checkedTasks.length")
       .tasks__drop-menu
         SelectSingle(
           selectedOption=""
           :options="availableActionsOptions"
-          placeholder="Select Action"
+          placeholder="Tasks Action"
           @chooseOption="setAction"
         )
 
@@ -178,9 +177,17 @@ export default {
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       validCancelStatuses: [ "Created", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
       fields: [
-        { label: "check", headerKey: "headerCheck", key: "check",  style: { "width": "3%" } },
+        { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
         { label: "ID", headerKey: "headerTaskId", key: "taskId", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "17%" } },
-        { label: "Service", headerKey: "headerService", key: "service", dataKey: "title", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "13%" } },
+        {
+          label: "Service",
+          headerKey: "headerService",
+          key: "service",
+          dataKey: "title",
+          sortInfo: { isSort: true, order: 'default' },
+          filterInfo: { isFilter: true },
+          style: { "width": "13%" }
+        },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
         { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "17%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "9%" } },
@@ -334,7 +341,7 @@ export default {
       this.selectedManager = option
     },
     deleteTask() {
-      const tasksCanDeletedIds = this.checkedTasks.filter(({status}) => status === 'Cancelled').map(({taskId}) => taskId)
+      const tasksCanDeletedIds = this.checkedTasks.filter(({ status }) => status === 'Cancelled').map(({ taskId }) => taskId)
       if (tasksCanDeletedIds.length < 1) return
       this.deleteTaskModal = true
       this.tasksReadyToDelete = tasksCanDeletedIds
@@ -451,9 +458,9 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
-      const isDeleteStatus = this.checkedTasks.some(({status}) => status === 'Cancelled') ? ['Delete']  : []
+      const isDeleteStatus = this.checkedTasks.some(({ status }) => status === 'Cancelled') ? [ 'Delete' ] : []
 
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', ...isDeleteStatus]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', ...isDeleteStatus ]
 
     },
     // finalData() {
@@ -485,7 +492,7 @@ export default {
     Tabs,
     SelectSingle,
     PreviewQuote,
-    ApproveModal,
+    ApproveModal
   }
 }
 </script>
@@ -568,7 +575,9 @@ export default {
 
 
   &__action {
-    align-self: flex-end;
+    position: absolute;
+    top: -52px;
+    right: 232px;
   }
 
   &__title {
@@ -628,6 +637,7 @@ export default {
     justify-content: center;
     width: 100%;
     gap: 10px;
+
     img {
       height: 18px;
     }
@@ -665,6 +675,7 @@ input {
     border: 1px solid $border-focus;
   }
 }
+
 .modal {
   position: absolute;
   top: 50%;
@@ -672,6 +683,7 @@ input {
   transform: translate(-50%, -50%);
   z-index: 10;
 }
+
 .currency {
   margin-right: 4px;
   color: $dark-border;

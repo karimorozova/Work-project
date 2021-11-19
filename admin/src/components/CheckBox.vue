@@ -31,13 +31,15 @@ export default {
 <style lang="scss" scoped>
 
 .checkbox {
-  height: 19px;
-  width: 19px;
 
   &__image {
     background-color: white;
     height: 18px;
     width: 18px;
+
+    //img {
+    //  width: 100%;
+    //}
   }
 }
 

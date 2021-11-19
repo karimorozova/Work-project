@@ -50,13 +50,12 @@
         prefix-class="xmx"
       )
 
-    .steps__action(v-if="!isProjectFinished")
-      .steps__title Steps Actions:
+    .steps__action(v-if="!isProjectFinished && !$parent.isTaskData && checkedSteps.length")
       .steps__drop-menu
         SelectSingle(
           :selectedOption="selectedAction"
           :options="stepActions"
-          placeholder="Select Action"
+          placeholder="Steps Action"
           @chooseOption="setAction"
         )
 
@@ -114,16 +113,6 @@
             :disabled-date="notBeforeStartDate"
             prefix-class="xmx"
           )
-          //DatepickerWithTime(
-          //  @selected="(e) => setDate(e, 'start', row._id)"
-          //  v-model="row.start"
-          //  inputClass="steps__custom-input"
-          //  calendarClass="steps__calendar-custom"
-          //  :format="customFormatter"
-          //  monday-first=true
-          //  :disabledPicker="isDatePickDisabled"
-          //  :highlighted="highlighted"
-          //)
 
       template(slot="deadline" slot-scope="{ row, index }")
         .table__data
@@ -141,17 +130,6 @@
             :disabled-date="notBeforeStartDate"
             prefix-class="xmx"
           )
-          //DatepickerWithTime(
-          //  @selected="(e) => setDate(e, 'deadline', row._id)"
-          //  v-model="row.deadline"
-          //  inputClass="steps__custom-input"
-          //  calendarClass="steps__calendar-custom"
-          //  :format="customFormatter"
-          //  monday-first=true
-          //  :disabled="disabled"
-          //  :disabledPicker="isDatePickDisabled"
-          //  :highlighted="highlighted"
-          //)
 
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
@@ -492,7 +470,9 @@ export default {
   position: relative;
 
   &__action {
-    align-self: flex-end;
+    position: absolute;
+    top: -52px;
+    right: 232px;
   }
 
   &__title {
