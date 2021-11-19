@@ -56,7 +56,7 @@ const getVendorsForSteps = async () => {
 		const pricelistTable = vendor.rates.pricelistTable.map(item => {
 			return {
 				...item._doc,
-				...getBenchmarkAdditions(item),
+				...getBenchmarkAdditions(item, basicPricesTable, stepMultipliersTable, industryMultipliersTable),
 				...getTQI(vendorQualifications, item),
 				...getLQA(vendorAssessments, item)
 			}
@@ -91,26 +91,59 @@ const getVendorsForSteps = async () => {
 			tqi: tqi ? Object.values(tqi)[0] : 0
 		}
 	}
+}
 
-	function getBenchmarkAdditions(item) {
-		const L = basicPricesTable.find(({ sourceLanguage, targetLanguage }) =>
-				`${ sourceLanguage }-${ targetLanguage }` === `${ item.sourceLanguage._id }-${ item.targetLanguage._id }`)
-		const S = stepMultipliersTable.find(({ step, unit }) =>
-				`${ step }-${ unit }` === `${ item.step._id }-${ item.unit._id }`)
-		const I = industryMultipliersTable.find(({ industry }) =>
-				`${ industry }` === `${ item.industry._id }`)
+function getBenchmarkAdditions(item, basicPricesTable, stepMultipliersTable, industryMultipliersTable) {
+	const L = basicPricesTable.find(({ sourceLanguage, targetLanguage }) =>
+			`${ sourceLanguage }-${ targetLanguage }` === `${ item.sourceLanguage._id }-${ item.targetLanguage._id }`)
+	const S = stepMultipliersTable.find(({ step, unit }) =>
+			`${ step }-${ unit }` === `${ item.step._id }-${ item.unit._id }`)
+	const I = industryMultipliersTable.find(({ industry }) =>
+			`${ industry }` === `${ item.industry._id }`)
 
-		const benchmark = L && S && I ? +(calculateBenchmark(L, S, I)).toFixed(4) : 0
+	const benchmark = L && S && I ? +(calculateBenchmark(L, S, I)).toFixed(4) : 0
 
-		return {
-			benchmark,
-			benchmarkMargin: benchmark ? +(benchmark - item.price).toFixed(4) : 0
-		}
-
-		function calculateBenchmark(euroBasicPrice, stepMultiplier, industryMultiplier) {
-			return (euroBasicPrice.euroBasicPrice * (stepMultiplier.multiplier / 100)) * (industryMultiplier.multiplier / 100) / 2
-		}
+	return {
+		benchmark,
+		benchmarkMargin: benchmark ? +(benchmark - item.price).toFixed(4) : 0
 	}
+
+	function calculateBenchmark(euroBasicPrice, stepMultiplier, industryMultiplier) {
+		return (euroBasicPrice.euroBasicPrice * (stepMultiplier.multiplier / 100)) * (industryMultiplier.multiplier / 100) / 2
+	}
+}
+async function getVendorStepDetails (id, query) {
+	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
+	let vendor = await Vendors.findOne(
+			{ status: "Active", _id: id},
+			{
+				"firstName": 1,
+				"surname": 1,
+				"rates.pricelistTable": 1,
+				"email": 1,
+				"qualifications": 1,
+				"assessments": 1,
+				"photo": 1
+			})
+			.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+			.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+			.populate('rates.pricelistTable.step', [ 'title' ])
+			.populate('rates.pricelistTable.unit', [ 'type' ])
+			.populate('rates.pricelistTable.industry', [ 'name' ]).lean()
+
+
+	// console.log({ vendor })
+	const priceListTable = vendor.rates.pricelistTable.find(({sourceLanguage, targetLanguage,step ,unit, industry}) => {
+		const test = `${sourceLanguage._id}-${targetLanguage._id}-${step._id}-${unit._id}-${industry._id}`
+		console.log({ query, test })
+		return query === test
+	} )
+	console.log({ priceListTable })
+	// const test = vendor.rates.pricelistTable.map(item => {
+	// 	console.log(item)
+	const test =getBenchmarkAdditions(priceListTable, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
+	// })
+	console.log(test)
 }
 
 async function getVendor(query) {
@@ -307,5 +340,7 @@ module.exports = {
 	getFilteredVendorsWithCustomFilters,
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential,
-	getVendorsForSteps
+	getVendorsForSteps,
+	getVendorStepDetails,
+
 }

@@ -42,7 +42,7 @@
             .block
               .block__value
                 .block__value-title {{getPayables}}
-                .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
+                .block__value-icon( v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Payables
             .block
               .block__value
@@ -54,12 +54,12 @@
             .block
               .block__value
                 .block__value-title {{getMargin}}
-                .block__value-icon %
+                .block__value-icon(v-if="getMargin !== '-'") %
               .block__key Margin
             .block
               .block__value
                 .block__value-title {{getROI}}
-                .block__value-icon %
+                .block__value-icon(v-if="getROI !== '-'") %
               .block__key Roi
 
           .project__detailsRow-finance-blocks

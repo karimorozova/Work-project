@@ -428,6 +428,10 @@ const ProjectsSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
+	isXtrfManual: {
+		type: Boolean,
+		default: false
+	},
 	isSendToXtrf: {
 		type: Boolean,
 		default: false

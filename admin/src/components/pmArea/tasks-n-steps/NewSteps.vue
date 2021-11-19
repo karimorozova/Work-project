@@ -4,6 +4,8 @@
     .steps__vendorDetails(v-if="isVendorDetailsModal && vendorDetailsId")
       StepVendorDetails(
         :vendorId="vendorDetailsId"
+        :currentStep="currentStep"
+        :currentIndustry="currentProject.industry"
         @close="closeVendorDetailsModal"
       )
 
@@ -93,7 +95,7 @@
 
       template(slot="vendor" slot-scope="{ row, index }")
         .table__data(v-if="row.vendor")
-          span.vendor__details(@click="openVendorDetailsModal(row.vendor)") {{ vendorName(row.vendor) }}
+          span.vendor__details(@click="openVendorDetailsModal(row.vendor, row)") {{ vendorName(row.vendor) }}
         .table__data(v-else) -
 
       template(slot="start" slot-scope="{ row, index }")
@@ -160,17 +162,17 @@
 
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
-          span(v-if="isShowValue(row, 'receivables')")
-            span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-            span(v-if="row.finance.Price.receivables !== '' && row.status !== 'Cancelled Halfway'") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.receivables).toFixed(2) : '-' }}
-            span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.halfReceivables).toFixed(2) : '-' }}
+          //span(v-if="isShowValue(row, 'receivables')")
+          span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span(v-if="row.finance.Price.receivables !== ''") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.receivables).toFixed(2) : '-' }}
+            //span(v-if="row.finance.Price.hasOwnProperty('halfReceivables')") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.halfReceivables).toFixed(2) : '-' }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance
-          span(v-if="isShowValue(row, 'payables')")
-            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-            span(v-if="row.finance.Price.payables !== '' && row.status !== 'Cancelled Halfway'") {{ (row.finance.Price.payables).toFixed(2) }}
-            span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
+          //span(v-if="isShowValue(row, 'payables')")
+          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+          span(v-if="row.finance.Price.payables !== ''") {{ (row.finance.Price.payables).toFixed(2) }}
+            //span(v-if="row.finance.Price.hasOwnProperty('halfPayables')") {{ (row.finance.Price.halfPayables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__finance(:id="'margin'+index")
@@ -181,11 +183,11 @@
 
       template(slot="info" slot-scope="{row, index}")
         .table__icons(v-if="!isFinanceEdit && !isStepInfo")
-          img(src="../../../assets/images/latest-version/view-details.png" style="cursor: pointer;" @click="showStepDetails(index)")
-          img(src="../../../assets/images/latest-version/money.png" style="cursor: pointer;" @click="showFinanceEditing(index)")
+          img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: pointer;" @click="showStepDetails(index)")
+          img(src="../../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
         .table__icons(v-else)
-          img(src="../../../assets/images/latest-version/view-details.png" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../../assets/images/latest-version/money.png" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../../assets/images/latest-version/money.svg" style="cursor: default; filter: opacity(0.5);")
 </template>
 
 <script>
@@ -227,6 +229,7 @@ export default {
   data() {
     return {
       vendorDetailsId: null,
+      currentStep: null,
       isVendorDetailsModal: false,
       infoIndex: -1,
       isStepInfo: false,
@@ -271,9 +274,10 @@ export default {
     closeVendorDetailsModal(){
       this.vendorDetailsId = null
     },
-    openVendorDetailsModal(vendor){
+    openVendorDetailsModal(vendor, step){
       const { _id } = vendor
       this.vendorDetailsId = _id
+      this.currentStep = step
       this.isVendorDetailsModal = true
     },
     closeStepInfo() {
@@ -616,6 +620,9 @@ export default {
     justify-content: center;
     width: 100%;
     gap: 10px;
+    img {
+      height: 18px;
+    }
   }
 
   &__icon {

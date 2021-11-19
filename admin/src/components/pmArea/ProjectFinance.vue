@@ -6,19 +6,19 @@
 
     .project-finance__header
       .project-finance__titleFinance Finance
-      .actionsButton(v-if="!isProjectFinished")
-        .actionsButton__icon
-          img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
-          img.opacity(v-else :src="icons.edit.icon")
-        .actionsButton__icon
-          img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-          img.opacity(v-else :src="icons.cancel.icon")
+      //.actionsButton(v-if="!isProjectFinished")
+      //  .actionsButton__icon
+      //    img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
+      //    img.opacity(v-else :src="icons.edit.icon")
+      //  .actionsButton__icon
+      //    img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
+      //    img.opacity(v-else :src="icons.cancel.icon")
 
     .project-finance__details
       .project-finance__empty(v-if="!currentProject.tasks.length")
         span No information available.
       .project-finance__noEmpty(v-else)
-        .project-finance__content-displayBlock
+        //.project-finance__content-displayBlock
           .finance-info__bars
             .bar
               .bar__green(:style="{ width: barsStatistic.receivables.width }")
@@ -43,31 +43,28 @@
               .project-finance__dashboardItem-value {{currentProject.roi || '-' }}
 
         .project-finance__content-settingBlock
-          div
-
-            .minPrice
-              .minPrice-item__forIgnore
-                .minPrice-item
-                  .minPrice-item__title Minimum Charge:
-                  .minPrice-item__input
-                    .ratio__input
-                      input(v-if="paramsIsEdit" type="number" ref="minPrice" :value="currentProject.minimumCharge.value" @change="(e) => updateMinPrice('value', e)")
-                      span(v-else) {{ currentProject.minimumCharge.value }}
-                      span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
-                .minPrice-item-check
-                  .minPrice-item-check__title Ignore:
-                  .rates-item__checkbox
-                    .checkbox
-                      input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
-                      label.labelDisabled(v-if="!paramsIsEdit" for="ignoreMinPrice" :style="checkboxStyle")
-                      label(v-else for="ignoreMinPrice")
-
-              .initialReceivables
-                .initialReceivables__title Initial Receivables
-                  span.internal-info (internal information)
-                  span :
-                .initialReceivables__value {{ getStartedReceivables }}
+          .minPrice-item__forIgnore
+            .minPrice-item
+              .minPrice-item__title Minimum Charge:
+              .minPrice-item__input
+                .ratio__input
+                  input( type="number" ref="minPrice" :value="currentProject.minimumCharge.value" @change="(e) => updateMinPrice('value', e)")
+                  //span(v-else) {{ currentProject.minimumCharge.value }}
                   span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
+            .minPrice-item-check
+              .minPrice-item-check__title Ignore:
+              .rates-item__checkbox
+                .checkbox
+                  input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
+                  label.labelDisabled(for="ignoreMinPrice" :style="checkboxStyle")
+                  label( for="ignoreMinPrice")
+
+            //.initialReceivables
+              .initialReceivables__title Initial Receivables
+                span.internal-info (internal information)
+                span :
+              .initialReceivables__value {{ getStartedReceivables }}
+                span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
 
           .discounts
             ProjectDiscounts(
@@ -77,11 +74,11 @@
               :test="currentProject.discounts"
             )
 
-        .project-finance__total
-          .project-finance__total-title Total:
-          .project-finance__total-value
-            span {{ detectedFinalPrice }}
-            span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
+        //.project-finance__total
+        //  .project-finance__total-title Total:
+        //  .project-finance__total-value
+        //    span {{ detectedFinalPrice }}
+        //    span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
 
 </template>
 
@@ -247,14 +244,7 @@ export default {
   }
 }
 
-.minPrice {
-  display: flex;
-  padding: 7px;
-  background: $table-list;
-  border: 1px solid $border;
-  flex-direction: column;
-  margin-bottom: 20px;
-  border-radius: 4px;
+
 
   .minPrice-item-check {
     min-height: 30px;
@@ -275,13 +265,14 @@ export default {
 
     &__forIgnore {
       display: flex;
+      margin-bottom: 10px;
     }
 
     &__title {
       width: 120px;
     }
   }
-}
+
 
 .project-finance {
   box-sizing: border-box;

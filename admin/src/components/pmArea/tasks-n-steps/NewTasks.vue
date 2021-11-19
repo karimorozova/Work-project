@@ -1,5 +1,15 @@
 <template lang="pug">
   .tasks
+    .modal
+      ApproveModal(
+        v-if="deleteTaskModal"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approveDelete"
+        @notApprove="closeModal"
+        @close="closeModal"
+      )
     .tasks__fileDetails(v-if="isFilesDetailsModal && fileDetailsIndex !== null")
       Files(
         @close="hideFileDetails"
@@ -101,8 +111,8 @@
 
       template(slot="icons" slot-scope="{ row, index }")
         .table__icons
-          img(v-if="row.status.indexOf('Pending Approval') !== -1"  style="cursor: pointer;" src="../../../assets/images/latest-version/delivery-list.png" @click="reviewForDelivery(row)")
-          img(src="../../../assets/images/latest-version/files.png"  style="cursor: pointer;" @click="showFileDetails(index)")
+          img(v-if="row.status.indexOf('Pending Approval') !== -1"  style="cursor: pointer;" src="../../../assets/images/latest-version/delivery-list.svg" @click="reviewForDelivery(row)")
+          img(src="../../../assets/images/latest-version/files.svg"  style="cursor: pointer;" @click="showFileDetails(index)")
 
     .tasks__review(v-if="isDeliveryReviewMulti && reviewTasksMulti.length")
       DeliveryOneMulti(
@@ -138,6 +148,7 @@ import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 import ApproveModalPayment from "../../ApproveModalPayment"
 import Button from "../../Button"
+import ApproveModal from "../../ApproveModal"
 
 export default {
   name: "NewTasks",
@@ -162,6 +173,8 @@ export default {
       selectedManager: null,
       selectedAction: "",
       previewMessageQuote: "",
+      deleteTaskModal: false,
+      tasksReadyToDelete: [],
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       validCancelStatuses: [ "Created", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
       fields: [
@@ -320,6 +333,21 @@ export default {
     setManager({ option }) {
       this.selectedManager = option
     },
+    deleteTask() {
+      const tasksCanDeletedIds = this.checkedTasks.filter(({status}) => status === 'Cancelled').map(({taskId}) => taskId)
+      if (tasksCanDeletedIds.length < 1) return
+      this.deleteTaskModal = true
+      this.tasksReadyToDelete = tasksCanDeletedIds
+    },
+    async approveDelete() {
+      const updatedProject = await this.$http.post("/pm-manage/delete-tasks", { tasks: this.tasksReadyToDelete, projectId: this.currentProject._id })
+      await this.setCurrentProject(updatedProject.data)
+    },
+    closeModal() {
+      this.deleteTaskModal = false
+      this.tasksReadyToDelete = []
+    },
+
     async changeManager() {
       const checkedTasksId = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(({ taskId }) => taskId)
       if (!checkedTasksId.length) return
@@ -355,6 +383,9 @@ export default {
           break
         case 'Assign Manager [DR1]':
           await this.manageDR1()
+          break
+        case 'Delete':
+          await this.deleteTask()
           break
       }
 
@@ -420,7 +451,9 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel' ]
+      const isDeleteStatus = this.checkedTasks.some(({status}) => status === 'Cancelled') ? ['Delete']  : []
+
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', ...isDeleteStatus]
 
     },
     // finalData() {
@@ -451,7 +484,8 @@ export default {
     CheckBox,
     Tabs,
     SelectSingle,
-    PreviewQuote
+    PreviewQuote,
+    ApproveModal,
   }
 }
 </script>
@@ -594,6 +628,9 @@ export default {
     justify-content: center;
     width: 100%;
     gap: 10px;
+    img {
+      height: 18px;
+    }
   }
 
   &__icon {
@@ -628,7 +665,13 @@ input {
     border: 1px solid $border-focus;
   }
 }
-
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
 .currency {
   margin-right: 4px;
   color: $dark-border;

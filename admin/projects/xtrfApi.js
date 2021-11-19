@@ -179,7 +179,7 @@ function getServices(tasks, steps) {
 
 		const stepsWithTwoState = [ "Translation", "TransCreation", "Translation Plain" ]
 		if (stepsWithTwoState.includes(currentServices)) {
-			const stepName = steps.map(({ name }) => name)
+			const stepName = steps.map(({ step }) => step.title)
 			currentServices = stepName.includes('Revising') || stepName.includes('Revision Plain') ? currentServices : currentServices + 'Only'
 		}
 
@@ -204,8 +204,8 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, current
 	let stepsSource = new Set()
 	let stepsTarget = new Set()
 	let noFoundVendors = new Set()
-	steps = steps.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
-	for (let { sourceLanguage, targetLanguage, finance, nativeFinance, vendor, serviceStep, _id, memoqSource, memoqTarget } of steps) {
+	steps = steps.filter(({ status }) => status !== 'Cancelled')
+	for (let { sourceLanguage, targetLanguage, finance, nativeFinance, vendor, stepNumber, _id, memoqSource, memoqTarget } of steps) {
 		const sourceLang = findLanguageId(allLanguages, sourceLanguage, memoqSource) || ''
 		const targetLang = findLanguageId(allLanguages, targetLanguage, memoqTarget) || ''
 		const vendorId = vendor ? vendors[vendor.firstName + " " + vendor.surname] : ''
@@ -215,12 +215,12 @@ function getStepInfo(allLanguages, steps, vendorPriceProfileId, vendors, current
 		if (!vendorId) {
 			noFoundVendors.add(vendor.firstName + " " + vendor.surname)
 		}
-		serviceStep = serviceStep.toJSON()
+		// serviceStep = serviceStep.toJSON()
 		// console.log({val: serviceStep, test:serviceStep.hasOwnProperty("memoqAssignmentRole") ? serviceStep.memoqAssignmentRole + 1 : +serviceStep.stepCounter})
 		const subInfo = {
 			payables: nativeFinance.Price.payables,
 			vendor: vendorId ? vendorPriceProfileId[vendorId] : false,
-			memoqAssignmentRole: serviceStep.hasOwnProperty("memoqAssignmentRole") ? serviceStep.memoqAssignmentRole + 1 : +serviceStep.stepCounter
+			memoqAssignmentRole: stepNumber
 		}
 		const stepInfo = {
 			receivables: finance.Price.receivables,

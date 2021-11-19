@@ -1,7 +1,9 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button.margin-bottom(v-if="isShowingSendButton" value="Send tasks to XTRF" color="#47A6A6" :outline="true"  @clicked="sendTo" :isDisabled="isDisable")
+      .margin-bottom
+        Button.button(v-if="isShowingSendButton" value="Send tasks to XTRF" :isFullMainClass="true"  @clicked="sendTo" :isDisabled="isDisable")
+        Button.button(v-if="isShowingSendButton" value="Send manual"  :isFullMainClass="true" :outline="true"  @clicked="check" :isDisabled="isDisable")
       .xtrf-tasks(v-for="xtrfTask of project.xtrfLinks")
         span {{ xtrfTask.taskId}} : &nbsp;
         a( target="_blank" :href="xtrfTask.link")
@@ -11,15 +13,15 @@
           i(class="fas fa-check-circle") &nbsp;
           | Update & Close
 
-    .projectToXtrf__buttons(style="display: flex; align-items: center; margin-top: 10px;")
-      CheckBox(
-        :isChecked="project.xtrfLinks.length"
-        @check="check"
-        @uncheck="uncheck"
-      )
-      span(style="margin-left: 10px;") Marks as Transferred
+    //.projectToXtrf__buttons(style="display: flex; align-items: center; margin-top: 10px;")
+    //  CheckBox(
+    //    :isChecked="project.xtrfLinks.length"
+    //    @check="check"
+    //    @uncheck="uncheck"
+    //  )
+    //  span(style="margin-left: 10px;") Marks as Transferred
 
-    .inputs(style="display: flex; margin-top: 10px;" v-for="xtrfTask of project.xtrfLinks")
+    //.inputs(v-for="xtrfTask of project.xtrfLinks" style="display: flex; margin-top: 10px;" )
       div {{ xtrfTask.taskId}} : &nbsp;
       input(v-model="xtrfTask.link" @change="setUrl")
 
@@ -63,19 +65,19 @@ export default {
       setCurrentProject: "setCurrentProject"
     }),
 
-    async setUrl() {
-      try {
-        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLinks', value: this.project.xtrfLinks })
-        await this.setCurrentProject(result.body)
-        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
-      }
-    },
+    // async setUrl() {
+    //   try {
+    //     const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLinks', value: this.project.xtrfLinks })
+    //     await this.setCurrentProject(result.body)
+    //     this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+    //   } catch (err) {
+    //     this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+    //   }
+    // },
     async check() {
       try {
         const value = this.project.tasks.map(item => ({ taskId: item.taskId, link: '' }))
-        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLinks', value })
+        const result = await this.$http.put("/pm-manage/send-manualy-to-xtrf", { projectId: this.project._id, prop: 'xtrfLinks', value })
         await this.setCurrentProject(result.body)
         this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
       } catch (err) {
@@ -217,6 +219,11 @@ a {
 
   .margin-bottom {
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .button {
+    width: 175px;
   }
 }
 

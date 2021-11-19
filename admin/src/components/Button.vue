@@ -1,9 +1,9 @@
 <template lang="pug">
   .buttons
-    .button(v-if="outline")
+    .button(v-if="outline" :class="{fullWidth: isFullMainClass}")
       .action-buttonOutline(:class="[customClass, {fullWidthButton: isFullWidth}]")
         input.action-buttonOutline__button(:class="[{disabled: isDisabled}]" type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'color': color, 'border': `1px solid ${color}`}")
-    .button(v-else)
+    .button(v-else :class="{fullWidth: isFullMainClass}")
       .action-button(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
         input.action-button__button(:class="[{disabled: isDisabled}]" type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
 </template>
@@ -29,6 +29,10 @@
 				default: "#d15f45"
 			},
 			isFullWidth: {
+				type: Boolean,
+				default: false
+			},
+      isFullMainClass: {
 				type: Boolean,
 				default: false
 			}
@@ -144,6 +148,13 @@
 
   .middle {
     text-align: center;
+  }
+
+  .fullWidth {
+    width: 100%;
+    input {
+      width: 100%;
+    }
   }
 
   .fullWidthButton {

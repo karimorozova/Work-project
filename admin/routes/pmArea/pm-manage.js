@@ -118,7 +118,8 @@ const {
 } = require('../../vendors/jobs')
 
 const {
-	getVendorsForSteps
+	getVendorsForSteps,
+	getVendorStepDetails,
 } = require('../../vendors/getVendors')
 
 const { setUpdatedFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../../сalculations/finance')
@@ -423,6 +424,17 @@ router.put('/project-prop', async (req, res) => {
 	}
 })
 
+router.put('/send-manualy-to-xtrf', async (req, res) => {
+	const { projectId, prop, value } = req.body
+	try {
+		const result = await updateProject({ '_id': projectId }, { [prop]: value, isXtrfManual: true })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Internal server error / Cannot change Project\'s property')
+	}
+})
+
 router.put('/other-project-prop', async (req, res) => {
 	const { projectId, prop, value } = req.body
 	try {
@@ -596,6 +608,24 @@ router.post('/cancel-tasks', async (req, res) => {
 		if (wordsCancelledTasks.length) {
 			await cancelMemoqDocs(wordsCancelledTasks)
 		}
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on cancelling tasks / cancel-tasks')
+	}
+})
+router.post('/delete-tasks', async (req, res) => {
+	const { tasks, projectId } = req.body
+	try {
+
+		// const allProjects = await Projects.findOne(_id: projectId)
+		 await Projects.updateOne(
+				{ _id: projectId },
+			{ $pull: { 'tasks': { "taskId": {$in: tasks},  status: 'Cancelled'}, 'steps': { "taskId": {$in: tasks}, status: 'Cancelled' } } },
+			 { new: true }
+		)
+
+		const updatedProject = await getProject({ '_id': projectId })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -982,6 +1012,16 @@ router.post('/remove-vendor-from-step', async (req, res) => {
 router.get('/vendors-for-steps', async (req, res) => {
 	try {
 		const result = await getVendorsForSteps()
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-for-steps!')
+	}
+})
+router.post('/vendors-for-steps-details', async (req, res) => {
+	const {vendorId, query} = req.body
+	try {
+		const result = await getVendorStepDetails(vendorId,query)
 		res.send(result)
 	} catch (err) {
 		console.log(err)

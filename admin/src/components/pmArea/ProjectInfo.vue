@@ -25,11 +25,18 @@
       Deliverables(v-if="isStageDelivery")
 
     .project-info__rigthSide
-      ImportProjectToXtrf(
-        v-if="canSendToXtrf"
+      ImportedProjectToXtrf(
+        v-if="currentProject.isXtrfManual"
         :project="currentProject"
-        @refreshProject="refreshProject"
+         @refreshProject="refreshProject"
       )
+
+      ImportProjectToXtrf(
+        v-else-if="canSendToXtrf"
+       :project="currentProject"
+       @refreshProject="refreshProject"
+      )
+
       ImportTasksToXtrf(
         v-else-if="canSendTaskToXtrf"
         :project="currentProject"
@@ -51,6 +58,7 @@
 
 <script>
 import ImportProjectToXtrf from "./ImportProjectToXtrf"
+import ImportedProjectToXtrf from "./ImportedProjectToXtrf"
 
 const ValidationErrors = () => import("../ValidationErrors")
 import Project from "./Project"
@@ -270,10 +278,10 @@ export default {
           || tasks.every(({ service }) => service.title === 'Editing')
       )
 
-				return (closedCheck || true) && (status === 'Closed' || status === 'In progress' || status === 'Approved')
-			},
-			canSendTaskToXtrf() {
-				const { status, tasks } = this.currentProject
+				return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
+    },
+    canSendTaskToXtrf() {
+      const { status, tasks } = this.currentProject
 
       const closedCheck = tasks.length && (
           tasks.every(({ service }) => service.title === 'Compliance')
@@ -300,7 +308,8 @@ export default {
     ProjectFinance,
     Preview,
     ProjectSubInformation,
-    Deliverables
+    Deliverables,
+    ImportedProjectToXtrf
   },
   async created() {
     await this.getProject()

@@ -1,22 +1,25 @@
 <template lang="pug">
   .projectToXtrf
     .projectToXtrf__buttons
-      Button.margin-bottom(v-if="!project.isSendToXtrf && !project.xtrfLink" color="#47A6A6" :outline="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
+      .margin-bottom
+        Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink" :isFullMainClass="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
+        Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink" :isFullMainClass="true" :outline="true" value="Send manual" @clicked="check" :isDisabled="isDisable")
       span(v-else) Xtrf : &nbsp;
         a( target="_blank" :href="project.xtrfLink")
           i(class="fas fa-link")
         | &nbsp;&nbsp;
         i(class="fas fa-check-circle cursor-pointer" @click="updateFinance")
 
-    .projectToXtrf__buttons(style="display: flex; align-items: center; margin-top: 10px;")
-      CheckBox(
-        :isChecked="project.isSendToXtrf"
-        @check="check"
-        @uncheck="uncheck"
-      )
-      span(style="margin-left: 10px;") Marks as Transferred
-    div(v-if="project.isSendToXtrf" style="margin-top: 10px;")
-      input(v-model="project.xtrfLink" @change="setUrl")
+    //.projectToXtrf__buttons(style="display: flex; align-items: center; margin-top: 10px;")
+    //  CheckBox(
+    //    :isChecked="project.isSendToXtrf"
+    //    @check="check"
+    //    @uncheck="uncheck"
+    //  )
+    //  span(style="margin-left: 10px;") Marks as Transferred
+
+    //div(v-if="project.isSendToXtrf" style="margin-top: 10px;")
+    //  input(v-model="project.xtrfLink" @change="setUrl")
 
     .projectToXtrf__info
       .red
@@ -34,6 +37,7 @@ import axios from "axios"
 import { mapActions } from "vuex"
 import CheckBox from "../CheckBox"
 import { setCurrentProject } from "../../vuex/general/actions"
+import ProjectDiscounts from "../clients/pricelists/ProjectDiscounts"
 
 export default {
   props: {
@@ -51,18 +55,18 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject"
     }),
-    async setUrl() {
-      try {
-        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLink', value: this.project.xtrfLink })
-        await this.setCurrentProject(result.body)
-        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
-      }
-    },
+    // async setUrl() {
+    //   try {
+    //     const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'xtrfLink', value: this.project.xtrfLink })
+    //     await this.setCurrentProject(result.body)
+    //     this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+    //   } catch (err) {
+    //     this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+    //   }
+    // },
     async check() {
       try {
-        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop: 'isSendToXtrf', value: true })
+        const result = await this.$http.put("/pm-manage/send-manualy-to-xtrf", { projectId: this.project._id, prop: 'isSendToXtrf', value: true })
         await this.setCurrentProject(result.body)
         this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
       } catch (err) {
@@ -119,7 +123,7 @@ export default {
           .finally(() => this.isDisable = false)
     }
   },
-  components: { CheckBox, Button }
+  components: { ProjectDiscounts, CheckBox, Button }
 }
 </script>
 
@@ -160,9 +164,14 @@ export default {
     text-decoration: none;
     color: inherit;
   }
+  .button {
+    width: 175px;
+  }
 
   .margin-bottom {
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
   }
 }
 
