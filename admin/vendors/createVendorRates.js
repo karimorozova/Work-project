@@ -12,7 +12,7 @@ const {
 } = require('../clients')
 
 
-const updateClientRatesFromSettings = async (vendorId) => {
+const updateVendorRatesFromSettings = async (vendorId) => {
 	const { competencies, qualifications, rates } = await Vendors.findOne({ _id: vendorId })
 	const defaultPricelist = await Pricelist.findOne({ isVendorDefault: true })
 	let { basicPricesTable, stepMultipliersTable, industryMultipliersTable, pricelistTable } = rates
@@ -221,6 +221,6 @@ module.exports = {
 	createRateCombinations,
 	createRateRowFromQualification,
 	splitRatesArr,
-	updateClientRatesFromSettings,
+	updateVendorRatesFromSettings,
 	combineVendorRates
 }

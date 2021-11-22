@@ -837,7 +837,7 @@ export default {
 .vendor {
   padding: 10px 15px;
   border: 1px dotted $light-border;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   border-radius: 4px;
   //transition: .2s ease-out;
 
@@ -862,7 +862,6 @@ export default {
     border: 1px solid $light-border;
     height: fit-content;
     margin-left: 10px;
-    border-radius: 8px;
     margin-left: 20px;
   }
 
@@ -887,7 +886,7 @@ export default {
     width: 80px;
     flex-direction: column;
     align-items: center;
-    padding: 6px 0;
+    padding: 6px 0 4px 0;
     text-align: center;
 
     &-bigTitle {
@@ -944,11 +943,11 @@ export default {
 .user {
   display: flex;
   gap: 15px;
-  width: 310px;
+  width: 330px;
   align-items: center;
 
   &__description {
-    width: 230px;
+    width: 250px;
   }
 
   &__rating {
@@ -1093,13 +1092,13 @@ export default {
     margin-left: 20px;
     padding-left: 20px;
     border-left: 1px solid $light-border;
-    padding-bottom: 15px;
-    padding-top: 15px;
+    padding-bottom: 12px;
+    padding-top: 12px;
   }
 
   &__step {
-    margin-bottom: 10px;
-    padding: 7px 10px 6px 15px;
+    margin-bottom: 8px;
+    padding: 4px 10px 3px 15px;
     border: 1px dotted lightgray;
     transition: .1s ease-out;
     display: flex;

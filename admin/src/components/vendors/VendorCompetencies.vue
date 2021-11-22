@@ -375,7 +375,7 @@
 
 			async checkErrors(index) {
 				if (this.currentActive === -1) return
-				const countOfFields = { first: 5, second: 5, third: 5 }
+				const countOfFields = { first: 30, second: 30, third: 30 }
 				this.errors = []
 				if (this.newRow) {
 					if (!this.checkCombinations(this.currentTargets.length, this.currentIndustries.length, this.currentSteps.length, countOfFields))

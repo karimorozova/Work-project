@@ -38,7 +38,7 @@ const {
 	rejectedPendingCompetence,
 	deletePendingCompetence,
 	saveNotPassedTest,
-	updateClientRatesFromSettings,
+	updateVendorRatesFromSettings,
 	managePaymentMethods,
 	updateStepProp
 } = require('../vendors')
@@ -275,7 +275,7 @@ router.post('/filtered-vendors', async (req, res) => {
 router.post('/updated-retest-from-settings', async (req, res) => {
 	const { vendorId } = req.body
 	try {
-		const vendor = await updateClientRatesFromSettings(vendorId)
+		const vendor = await updateVendorRatesFromSettings(vendorId)
 		res.send(vendor)
 	} catch (err) {
 		console.log(err)

@@ -891,8 +891,8 @@
   place-items: center;
 	background: conic-gradient(#f5dfd9 0,	#f5dfd9  var(--percentage),#daeded 0,	#daeded 100%);
 	position: relative;
-	width: 100px;
-	height: 100px;
+	width: 102px;
+	height: 102px;
 	margin: 0;
 	border-radius:50%;
 }

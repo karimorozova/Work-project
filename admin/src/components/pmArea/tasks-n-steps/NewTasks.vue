@@ -343,14 +343,18 @@ export default {
       this.tasksReadyToDelete = tasksCanDeletedIds
     },
     async approveDelete() {
-      const updatedProject = await this.$http.post("/pm-manage/delete-tasks", { tasks: this.tasksReadyToDelete, projectId: this.currentProject._id })
-      await this.setCurrentProject(updatedProject.data)
+      try{
+        const updatedProject = await this.$http.post("/pm-manage/delete-tasks", { tasks: this.tasksReadyToDelete, projectId: this.currentProject._id })
+        await this.setCurrentProject(updatedProject.data)
+        this.closeModal()
+      }catch (err){
+
+      }
     },
     closeModal() {
       this.deleteTaskModal = false
       this.tasksReadyToDelete = []
     },
-
     async changeManager() {
       const checkedTasksId = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(({ taskId }) => taskId)
       if (!checkedTasksId.length) return
