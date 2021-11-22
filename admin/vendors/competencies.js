@@ -105,8 +105,8 @@ async function filterRatesAfterUpdate(rates, vendorId) {
 }
 
 function getPriceListTableUnique(pricelistTable) {
-	return uniqBy(pricelistTable, ({ sourceLanguage, targetLanguage, step, unit, size, industry }) => (
-			sourceLanguage.toString() + targetLanguage.toString() + step.toString() + unit.toString() + size + industry.toString()
+	return uniqBy(pricelistTable, ({ sourceLanguage, targetLanguage, step, unit, industry }) => (
+			sourceLanguage.toString() + targetLanguage.toString() + step.toString() + unit.toString() + industry.toString()
 	))
 }
 

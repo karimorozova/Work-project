@@ -326,12 +326,12 @@ const getProjectFinance = (tasks, minimumCharge) => {
 
 const getPriceFromPricelist = (pricelist, data, currency) => {
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = pricelist;
-	const { sourceLanguage, targetLanguage, step, unit, size, industry } = data;
+	const { sourceLanguage, targetLanguage, step, unit, industry } = data;
 	let row = basicPricesTable.find(langPair => (
 			`${ langPair.sourceLanguage } ${ langPair.targetLanguage }` === `${ sourceLanguage } ${ targetLanguage }`
 	));
 	const stepRow = stepMultipliersTable.find(item => (
-			`${ item.step } ${ item.unit } ${ item.size }` === `${ step } ${ unit } ${ size }`
+			`${ item.step } ${ item.unit }` === `${ step } ${ unit }`
 	));
 	const industryRow = industryMultipliersTable.find(item => (
 			item.industry.toString() === industry.toString()
@@ -340,7 +340,7 @@ const getPriceFromPricelist = (pricelist, data, currency) => {
 		const { multiplier: stepMultiplier } = stepRow;
 		const { multiplier: industryMultiplier } = industryRow;
 		const basicPrice = getCorrectBasicPrice(row, currency);
-		return multiplyPrices(basicPrice, stepMultiplier, size, industryMultiplier);
+		return multiplyPrices(basicPrice, stepMultiplier, industryMultiplier);
 	}
 	return 0;
 };

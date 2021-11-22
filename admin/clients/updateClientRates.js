@@ -125,12 +125,11 @@ const checkUnitDifference = async ({ difference, itemsToAdd, itemsToDelete }, ol
 				let sameCombination
 				for (let { rates } of clients) {
 					const { stepMultipliersTable } = rates
-					sameCombination = stepMultipliersTable.find(item => (`${ item.step } ${ item.unit } ${ item.size }` === `${ _id } ${ oldUnit._id } ${ 1 }`))
+					sameCombination = stepMultipliersTable.find(item => (`${ item.step } ${ item.unit }` === `${ _id } ${ oldUnit._id }`))
 					if (!sameCombination) {
 						newMultiplierCombinations.push({
 							step: _id,
 							unit: neededUnit,
-							size: 1,
 							defaultSize: true
 						})
 					}

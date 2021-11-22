@@ -419,7 +419,8 @@ const generateNewPricelistCombinations = (newBasicPriceRows, newStepMultiplierRo
 }
 
 const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, industryMultipliersTable, oldPricelistTable, fromDelete = false) => {
-	const newPricelistCombinations = []
+	const newPricelistCombinations = [...oldPricelistTable]
+
 	for (let { step, unit, multiplier: stepMultiplierValue } of stepMultipliersTable) {
 		for (let { sourceLanguage, targetLanguage, basicPrice } of basicPricesTable) {
 			for (let { industry, multiplier: industryMultiplierValue } of industryMultipliersTable) {
@@ -434,16 +435,17 @@ const getPricelistCombinations = (basicPricesTable, stepMultipliersTable, indust
 			}
 		}
 	}
-	const newPricelistComboIds = newPricelistCombinations.map(item => `${ item.sourceLanguage } ${ item.targetLanguage } ${ item.step } ${ item.unit } ${ item.unit } ${ item.industry }`)
-	newPricelistCombinations.push(...oldPricelistTable)
-	const unique = oldPricelistTable.filter(item => newPricelistComboIds.includes(`${ item.sourceLanguage } ${ item.targetLanguage } ${ item.step } ${ item.unit } ${ item.unit } ${ item.industry }`))
-	return fromDelete ? unique : _.uniqBy(newPricelistCombinations, (item) => (
-			item.sourceLanguage.toString() +
-			item.targetLanguage.toString() +
-			item.step.toString() +
-			item.unit.toString() +
-			item.industry.toString()
-	))
+
+	const newPricelistComboIds = newPricelistCombinations.map(item => `${ item.sourceLanguage }-${ item.targetLanguage }-${ item.step }-${ item.unit }-${ item.industry }`)
+	return fromDelete
+			? oldPricelistTable.filter(item => newPricelistComboIds.includes(`${ item.sourceLanguage }-${ item.targetLanguage }-${ item.step }-${ item.unit }-${ item.industry }`))
+			: _.uniqBy(newPricelistCombinations, (item) => (
+					item.sourceLanguage.toString() +
+					item.targetLanguage.toString() +
+					item.step.toString() +
+					item.unit.toString() +
+					item.industry.toString()
+			))
 }
 
 Object.fromEntries = l => l.reduce((a, [ k, v ]) => ({ ...a, [k]: v }), {})

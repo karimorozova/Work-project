@@ -128,10 +128,10 @@ const recalculateFromNewMultiplier = (row, syncedMultiplier, rates, key) => {
 					const { basicPrice } = basicPricesTable.find(row => (
 							`${ row.sourceLanguage } ${ row.targetLanguage }` === `${ item.sourceLanguage } ${ item.targetLanguage }`
 					))
-					const { multiplier: stepMultiplier, size } = stepMultipliersTable.find(row => (
+					const { multiplier: stepMultiplier } = stepMultipliersTable.find(row => (
 							`${ row.step } ${ row.unit }` === `${ item.step } ${ item.unit }`
 					))
-					item.price = multiplyPrices(basicPrice, stepMultiplier, size, syncedMultiplier)
+					item.price = multiplyPrices(basicPrice, stepMultiplier, syncedMultiplier)
 				}
 				return item
 			})

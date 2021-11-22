@@ -58,8 +58,7 @@ const postNotifications = async (pricelistId, updatedRow, key) => {
   function updateStepMultiplierRow (arr) {
     return arr.map(row => {
       if (row.step.toString() === updatedRow.step._id.toString() &&
-        row.unit.toString() === updatedRow.unit._id.toString() &&
-        Number(row.size) === Number(updatedRow.size)) {
+        row.unit.toString() === updatedRow.unit._id.toString()) {
         row.altered = true;
         row.notification = notification;
       }
