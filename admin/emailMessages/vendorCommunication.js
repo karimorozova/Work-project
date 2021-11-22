@@ -1,5 +1,5 @@
 let apiUrl = require("../helpers/apiurl")
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+!apiUrl && (apiUrl = 'https://admin2.pangea.global')
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
@@ -71,7 +71,7 @@ function vendorRegistration(obj) {
                       you can access the candidate platform and adjust your profile. 
                       Here is what you need to do:
 										</p>
-										<p style="font-weight: 400;color:#333;">1. Go to: <a href="https://vendor.pangea.global/login" style="color: #D15F46;">Vendor Portal</a></p>
+										<p style="font-weight: 400;color:#333;">1. Go to: <a href="https://vendor2.pangea.global/login" style="color: #D15F46;">Vendor Portal</a></p>
 										<p style="font-weight: 400;color:#333;">2. Log in to the system with the following details:</p>
                     <p style="font-weight: 400;color:#333;margin-left: 10px;">• username: <b>${ obj.email.replace(/@/g, '<span>@</span>').replace(/\./g, '<span>.</span>') }</b> </p>
                     <p style="font-weight: 400;color:#333;margin-left: 10px;">• password: <b>${ obj.pass }</b> </p>
@@ -229,7 +229,7 @@ function vendorCanStartStartedSecondStep(obj) {
                     	You can go to the system at the link below.
 										</p>
                     <p style="font-weight: 400;">
-                    	<a href="https://vendor.pangea.global/dashboard/" target="_blank">Vendor Portal</a>
+                    	<a href="https://vendor2.pangea.global/dashboard/" target="_blank">Vendor Portal</a>
 										</p>
                 </div>
                 <footer>
@@ -329,7 +329,7 @@ function stepReadyToStartMessage(obj) {
                         You can access the system or click on the link below and enter the task directly.
                     </p>
                     <p style="font-weight: 400;">
-                        <a style="color: #D15F46;" href="https://vendor.pangea.global/dashboard/" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
+                        <a style="color: #D15F46;" href="https://vendor2.pangea.global/dashboard/" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
                     </p>
                 </div>
                 <footer>

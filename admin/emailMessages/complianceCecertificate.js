@@ -1,7 +1,7 @@
 let apiUrl = require('../helpers/apiurl')
 const moment = require('moment')
 
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+!apiUrl && (apiUrl = 'https://admin2.pangea.global')
 // apiUrl = 'http://localhost:3001'
 
 // const logo = apiUrl + '/static/certificate-images/logo.png'

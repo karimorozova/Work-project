@@ -1,5 +1,5 @@
 let apiUrl = require("../helpers/apiurl")
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+!apiUrl && (apiUrl = 'https://admin2.pangea.global')
 
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
@@ -249,7 +249,7 @@ function getDeliveryMessage(obj) {
 													</li>
 												</ul>
 			                    <p style="font-weight: 400;">
-			                        The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+			                        The files are available for you in our <a href="https://portal2.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
 		                    	</p>
                         <p style="font-weight: 400;">
                             In case of any questions, please do not hesitate to contact us :-)
@@ -281,7 +281,7 @@ function getNotifyDeliveryMessage(obj) {
 													</li>
 												</ul>
 		                    <p style="font-weight: 400;">
-		                        The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+		                        The files are available for you in our <a href="https://portal2.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
 	                      </p>
                         <p style="font-weight: 400;">
                             In case of any questions, please do not hesitate to contact us :-)
@@ -431,7 +431,7 @@ function projectDeliveryMessage(obj) {
                     </p>
                     <p style="font-weight: 400;">
                         The files are available for you in our
-                        <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a>
+                        <a href="https://portal2.pangea.global/dashboard/details/${ obj.id }">Portal</a>
                         and attached to this email in a zip format.
                     </p>
                      <div style="font-weight: 400;">

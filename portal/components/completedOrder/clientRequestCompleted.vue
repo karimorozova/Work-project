@@ -129,7 +129,7 @@
 		},
     computed: {
       domain() {
-        return window.location.origin === 'http://localhost:3000' ? 'http://localhost:3001' : 'admin.pangea.global/'
+        return window.location.origin === 'http://localhost:3000' ? 'http://localhost:3001' : 'admin2.pangea.global/'
       }
     }
 	}

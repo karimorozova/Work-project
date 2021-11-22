@@ -5,7 +5,7 @@ const zohoCreds = {
     client_secret: '442a81152b6ec35d057d93d11d9efb075f853d6ef1',
     // redirect_uri: 'https://pangea.global'
     // redirect_uri: `${apiUrl}/pangea-zoho-code`
-    redirect_uri: `https://admin.pangea.global/pangea-zoho-code`
+    redirect_uri: `https://admin2.pangea.global/pangea-zoho-code`
 
 }
 
