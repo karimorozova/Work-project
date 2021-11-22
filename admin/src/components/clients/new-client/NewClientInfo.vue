@@ -284,7 +284,7 @@
 					leadContact: true,
 					firstName: this.client.name,
 					surname: "",
-					password: "11111",
+					password: "",
 					email: this.client.email,
 					gender: "",
 					position: "Manager",
@@ -295,7 +295,8 @@
 				} ]
 
         this.client.billingInfo = {
-          officialName: this.client.name,
+          name: this.client.name || '-',
+          officialName: this.client.officialCompanyName || this.client.name,
           paymentType: "PPP",
           paymentTerms: '',
           address: {
@@ -347,7 +348,9 @@
 				if (this.client.timeZone === '') this.client.timeZone = null
 				if (this.client.nativeLanguage === '') this.client.nativeLanguage = null
         this.client.billingInfo = {
-          officialName: this.client.name,
+
+          name: this.client.name || '-',
+          officialName: this.client.officialCompanyName || this.client.name,
           paymentType: this.client.paymentType,
           paymentTerms: '',
           address: {
