@@ -8,7 +8,7 @@ const getVendorsForSteps = async () => {
 
 	let vendors = []
 	let dbVendors = await Vendors.find(
-			{ status: "Active" },
+			{ status: "Active", isTest: false },
 			{
 				"firstName": 1,
 				"surname": 1,

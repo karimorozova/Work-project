@@ -24,10 +24,10 @@
                 .inner
                   .pieText
                     .pieDescription
-                      .pieDescription__icon(style="background: #f5dfd9;")
+                      .pieDescription__icon(style="background: #EAC0BB;")
                       .pieDescription__text {{getPayablesPercent}}%
                     .pieDescription
-                      .pieDescription__icon(style="background: #daeded;")
+                      .pieDescription__icon(style="background: #A9D3D1;")
                       .pieDescription__text {{getMargin}}%
 
             .client__details
@@ -437,9 +437,8 @@ export default {
   }
 
   &__text {
-    color: #3333;
+    color: #9999;
     font-size: 12px;
-    font-family: 'Myriad600';
   }
 }
 

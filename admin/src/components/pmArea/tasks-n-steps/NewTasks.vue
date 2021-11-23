@@ -342,6 +342,9 @@ export default {
         case "Delete" :
           await this.approveDelete()
           break
+        case 'Mark as Approved' :
+          await this.approveTasks()
+          break
       }
       this.closeModal()
     },
@@ -350,6 +353,16 @@ export default {
       if (tasksCanDeletedIds.length < 1) return
       try {
         const updatedProject = await this.$http.post("/pm-manage/delete-tasks", { tasks: tasksCanDeletedIds, projectId: this.currentProject._id })
+        await this.setCurrentProject(updatedProject.data)
+        this.closeModal()
+      } catch (err) {
+      }
+    },
+    async approveTasks() {
+      const tasksCanApprove = this.checkedTasks.filter(({ status }) => status === 'Created' || status === 'Quote Sent').map(({ taskId }) => taskId)
+      if (tasksCanApprove.length < 1) return
+      try {
+        const updatedProject = await this.$http.post("/pm-manage/approve-tasks", { tasks: tasksCanApprove, projectId: this.currentProject._id })
         await this.setCurrentProject(updatedProject.data)
         this.closeModal()
       } catch (err) {
@@ -401,6 +414,7 @@ export default {
           }
           break
         case 'Delete':
+        case 'Mark as Approved':
           this.isApproveTaskModal = true
           break
       }
@@ -465,8 +479,10 @@ export default {
 
       if (!this.checkedTasks.length) return []
 
-      const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
+      const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Mark as Approved', 'Send a Quote',  ] : []
+
+      // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel']
 
     },
     // finalData() {

@@ -44,6 +44,7 @@ function getSteps(project, id, allLanguages) {
 			const { targetLanguage, sourceLanguage } = step._doc
 			assignedSteps.push({
 				...step._doc,
+				currentTask: stepTask,
 				project_Id: project._id,
 				projectId: project.projectId,
 				projectName: project.projectName,

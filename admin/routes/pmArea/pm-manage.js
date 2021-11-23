@@ -56,7 +56,8 @@ const {
 	saveCertificateTODR1Files,
 	setStepDeadlineProjectAndMemoq,
 	autoCreatingTranslationTaskInProject,
-	cancelProjectInMemoq
+	cancelProjectInMemoq,
+	updateWithApprovedTasks
 	// addPaymentAdditions,
 	// deletePaymentAddition
 } = require('../../projects')
@@ -599,6 +600,19 @@ router.post('/vendor-assigment', async (req, res) => {
 	}
 })
 
+router.post('/approve-tasks', async (req, res) => {
+	const { tasks: taskIds, projectId } = req.body
+	try {
+		const project = await getProject({"_id": projectId})
+		const { tasks, steps } = updateWithApprovedTasks({ taskIds, project })
+		const updatedProject = await updateProject({"_id": projectId}, { $set: { tasks, steps } })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on cancelling tasks / cancel-tasks')
+	}
+})
+
 router.post('/cancel-tasks', async (req, res) => {
 	const { tasks, projectId } = req.body
 	try {
@@ -1118,7 +1132,6 @@ router.post('/step-finance-edit/:projectId', async (req, res) => {
 // XTRF API ==================================================================
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
-const { ObjectId } = require("mongoose/lib/types")
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params

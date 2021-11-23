@@ -10,12 +10,14 @@
           MainInfo
         .details__describe
           OtherInfo
-      .details__files
+
+      .details__files(v-if="job.currentTask.status !== 'Created'" )
         FilesAndButtons(
           :deliverables="targetFiles"
           @showModal="showModal"
           @setDeliverables="setDeliverables"
         )
+
       .details__modal(v-if="isApproveModal")
         ApproveModal(
           :isCentered="isApproveModal"

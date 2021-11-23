@@ -606,8 +606,6 @@ export default {
       }
       if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
 
-      console.log('vendor', vendor)
-
       if (vendor && !this.selectedVendors[this.currentStepId]) {
         vendors = vendors.filter(({ name }) => name.toUpperCase() !== (`${ vendor.firstName } ${ vendor.surname || '' }`).toUpperCase())
       } else if (vendor && this.selectedVendors[this.currentStepId]) {
@@ -651,9 +649,7 @@ export default {
         }
       })
 
-      console.log('mapped vendors', vendors)
-
-      return vendors
+      return vendors.sort((a,b) => a.price - b.price)
     }
   },
   async created() {
