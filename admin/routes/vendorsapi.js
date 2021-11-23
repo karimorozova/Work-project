@@ -38,7 +38,7 @@ const {
 	rejectedPendingCompetence,
 	deletePendingCompetence,
 	saveNotPassedTest,
-	updateClientRatesFromSettings,
+	updateVendorRatesFromSettings,
 	managePaymentMethods,
 	updateStepProp
 } = require('../vendors')
@@ -275,7 +275,7 @@ router.post('/filtered-vendors', async (req, res) => {
 router.post('/updated-retest-from-settings', async (req, res) => {
 	const { vendorId } = req.body
 	try {
-		const vendor = await updateClientRatesFromSettings(vendorId)
+		const vendor = await updateVendorRatesFromSettings(vendorId)
 		res.send(vendor)
 	} catch (err) {
 		console.log(err)
@@ -658,7 +658,7 @@ router.post('/manage-step-status', async (req, res) => {
 	try {
 		if (status === 'In progress') {
 			await updateProject({ "steps._id": _stepId }, { $set: { "steps.$.isVendorRead": true } }, { arrayFilters: [ { 'i._id': stepId } ] })
-			await updateStepProp({ jobId: stepId, prop: 'status', value: status })
+			await updateStepProp({ jobId: _stepId, prop: 'status', value: status })
 			const project = await getProject({ _id: projectId })
 			res.send(project)
 
@@ -671,9 +671,10 @@ router.post('/manage-step-status', async (req, res) => {
 					await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
 				}
 			} else {
+				const project = await getProject({ _id: projectId })
 				await updateNonWordsTaskTargetFiles({ project, paths: [], jobId: _stepId })
 			}
-			const project = await getProject({ _id: projectId })
+
 			await updateStepProp({ jobId: _stepId, prop: 'status', value: status })
 			const updatedProject = await getProject({ _id: projectId })
 			res.send(updatedProject)

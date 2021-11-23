@@ -407,7 +407,7 @@
 
 			async checkErrors(index) {
 				const currentIndex = index
-				const countOfFields = { first: 5, second: 5, third: 5 }
+				const countOfFields = { first: 30, second: 30, third: 30 }
 				if (this.currentActive === -1) return
 				this.errors = []
 

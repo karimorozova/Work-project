@@ -30,10 +30,12 @@
               @chooseOption="setDiscount"
             )
         template(slot="icons" slot-scope="{ row, index }")
-          .table__icons
+          .table__icons(v-if="!isProjectFinished" )
             img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': isActive(key, index)}")
+          .table__icons(v-else)
+            img(src="../../../assets/images/latest-version/lock.png")
 
-    .discounts__add(v-if="true")
+    .discounts__add(v-if="!isProjectFinished")
       Add(@add="addData")
 
 </template>
@@ -50,9 +52,6 @@
 		props: {
 			paramsIsEdit: {
 				type: Boolean
-			},
-			enum: {
-				type: String
 			},
       test: {
 			  type: Array,
@@ -204,13 +203,16 @@
 			}
 		},
 		created() {
-			// this.getdiscounts()
 			this.getDiscounts()
 		},
 		computed: {
 		  ...mapGetters({
         currentProject: "getCurrentProject"
       }),
+      isProjectFinished() {
+        const { status } = this.currentProject
+        return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+      },
 			setCurrentRoutes() {
 						return {
 							get: '/pm-manage/get-project-discounts/?id=',

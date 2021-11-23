@@ -1,104 +1,51 @@
 <template lang="pug">
-  .project-finance
-    //.project-finance__title(@click="toggleFinance") Finance
-      //img.project-finance__icon(src="../../assets/images/open-close-arrow-brown.png" :class="{'project-finance_reverse': isFinanceShow}")
-    //.project-finance__content(v-if="isFinanceShow")
-
+  .project-finance(v-if="currentProject.tasks.length")
     .project-finance__header
       .project-finance__titleFinance Finance
-      //.actionsButton(v-if="!isProjectFinished")
-      //  .actionsButton__icon
-      //    img.defaultIcon(v-if="!paramsIsEdit" :src="icons.edit.icon" @click="crudActions('edit')")
-      //    img.opacity(v-else :src="icons.edit.icon")
-      //  .actionsButton__icon
-      //    img.defaultIcon(v-if="paramsIsEdit" :src="icons.cancel.icon" @click="crudActions('cancel')")
-      //    img.opacity(v-else :src="icons.cancel.icon")
 
     .project-finance__details
-      .project-finance__empty(v-if="!currentProject.tasks.length")
-        span No information available.
-      .project-finance__noEmpty(v-else)
-        //.project-finance__content-displayBlock
-          .finance-info__bars
-            .bar
-              .bar__green(:style="{ width: barsStatistic.receivables.width }")
-              .bar__amount
-                span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
-                span {{barsStatistic.receivables.price}}
-            .bar
-              .bar__red(:style="{ width: barsStatistic.payables.width }")
-              .bar__amount
-                span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
-                span {{barsStatistic.payables.price}}
-          .project-finance__dashboard
-            .project-finance__dashboardItem
-              .project-finance__dashboardItem-title Profit:
-              .project-finance__dashboardItem-value {{financeData.profit}}
-                span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
-            .project-finance__dashboardItem
-              .project-finance__dashboardItem-title Margin:
-              .project-finance__dashboardItem-value {{financeData.margin}} %
-            .project-finance__dashboardItem
-              .project-finance__dashboardItem-title ROI:
-              .project-finance__dashboardItem-value {{currentProject.roi || '-' }}
-
+      //.project-finance__empty
+      //  span No information available...
+      .project-finance__noEmpty
         .project-finance__content-settingBlock
           .minPrice-item__forIgnore
             .minPrice-item
               .minPrice-item__title Minimum Charge:
-              .minPrice-item__input
+              .minPrice-item__input(v-if="!isProjectFinished")
                 .ratio__input
                   input( type="number" ref="minPrice" :value="currentProject.minimumCharge.value" @change="(e) => updateMinPrice('value', e)")
-                  //span(v-else) {{ currentProject.minimumCharge.value }}
-                  span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
-            .minPrice-item-check
-              .minPrice-item-check__title Ignore:
-              .rates-item__checkbox
-                .checkbox
-                  input(type="checkbox" id="ignoreMinPrice" :checked="currentProject.minimumCharge.toIgnore" @change="(e) => updateMinPrice('bool', e)")
-                  label.labelDisabled(for="ignoreMinPrice" :style="checkboxStyle")
-                  label( for="ignoreMinPrice")
+                  span.symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
+              .minPrice-item__input(v-else)
+                span {{ currentProject.minimumCharge.value }}
+                span(style="color: #999; margin-left: 5px;" v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
 
-            //.initialReceivables
-              .initialReceivables__title Initial Receivables
-                span.internal-info (internal information)
-                span :
-              .initialReceivables__value {{ getStartedReceivables }}
-                span.ratio__input-symbol(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
+            .minPrice-item
+              .minPrice-item__title Ignore:
+              .minPrice-item__input(v-if="!isProjectFinished")
+                CheckBox(:isChecked="currentProject.minimumCharge.toIgnore" @check="() => updateMinPrice('bool', true)" @uncheck="() => updateMinPrice('bool', false)")
+              .minPrice-item__input(v-else)
+                span {{ currentProject.minimumCharge.toIgnore ? 'Price is ignored' : '-' }}
 
           .discounts
             ProjectDiscounts(
               v-if="!currentProject.minimumCharge.isUsed"
               :paramsIsEdit="paramsIsEdit"
-              :enum="'PngSysProject'"
               :test="currentProject.discounts"
             )
-
-        //.project-finance__total
-        //  .project-finance__total-title Total:
-        //  .project-finance__total-value
-        //    span {{ detectedFinalPrice }}
-        //    span(v-html="returnIconCurrencyByStringCode(currentProject.customer.currency)")
-
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex"
 import ProjectDiscounts from "../clients/pricelists/ProjectDiscounts"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
+import CheckBox from "../CheckBox"
 
 export default {
   mixins: [ currencyIconDetected ],
   props: {},
   data() {
     return {
-      icons: {
-        edit: { icon: require("../../assets/images/Other/edit-icon-qa.png") },
-        cancel: { icon: require("../../assets/images/cancel-icon.png") }
-      },
-      isFinanceShow: true,
-      paramsIsEdit: false,
-      checkboxStyle: { 'pointer-events': 'none', 'filter': 'opacity(0.5)' }
+      paramsIsEdit: false
     }
   },
   methods: {
@@ -107,25 +54,12 @@ export default {
       addFinanceProperty: "addFinanceProperty",
       setCurrentProject: "setCurrentProject"
     }),
-    crudActions(actionType) {
-      switch (actionType) {
-        case 'cancel':
-          this.paramsIsEdit = false
-          break
-        case 'edit':
-          this.paramsIsEdit = true
-          break
-      }
-    },
-    toggleFinance() {
-      this.isFinanceShow = !this.isFinanceShow
-    },
-    async updateMinPrice(prop, e) {
+    async updateMinPrice(prop, bool) {
       try {
         const result = await this.$http.post('/pm-manage/update-minimum-charge', {
           _id: this.currentProject._id,
           value: (+this.$refs.minPrice.value).toFixed(2) || 0,
-          toIgnore: prop === 'value' ? this.currentProject.minimumCharge.toIgnore : e.target.checked
+          toIgnore: prop === 'value' ? this.currentProject.minimumCharge.toIgnore : bool
         })
         this.setCurrentProject(result.data)
         this.alertToggle({ message: "Minimum Price saved!", isShow: true, type: "success" })
@@ -202,6 +136,7 @@ export default {
     }
   },
   components: {
+    CheckBox,
     ProjectDiscounts
   }
 }
@@ -209,6 +144,13 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+
+.symbol {
+  color: $dark-border;
+  position: absolute;
+  right: 10px;
+  top: 9px;
+}
 
 .actionsButton {
   display: flex;
@@ -235,43 +177,28 @@ export default {
     margin-left: 4px;
   }
 
-  &__title {
-
-  }
-
   &__value {
     margin-left: 23px;
   }
 }
 
+.minPrice-item {
+  display: flex;
+  align-items: center;
+  height: 44px;
 
-
-  .minPrice-item-check {
-    min-height: 30px;
-    display: flex;
-    padding-right: 10px;
-    align-items: center;
-
-    &__title {
-      width: 60px;
-    }
+  &__forIgnore {
+    margin-bottom: 10px;
   }
 
-  .minPrice-item {
-    width: 240px;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-
-    &__forIgnore {
-      display: flex;
-      margin-bottom: 10px;
-    }
-
-    &__title {
-      width: 120px;
-    }
+  &__input {
+    position: relative;
   }
+
+  &__title {
+    width: 150px;
+  }
+}
 
 
 .project-finance {
@@ -299,8 +226,6 @@ export default {
   }
 
   &__details {
-    //padding: 0 20px 20px 20px;
-
     &-displayBlock {
       position: relative;
     }
@@ -399,65 +324,6 @@ export default {
   }
 }
 
-.checkbox {
-  display: flex;
-  height: 20px;
-  margin-top: -3px;
-
-  input[type="checkbox"] {
-    opacity: 0;
-    width: 0px;
-
-    + {
-      label {
-        &::after {
-          content: none;
-        }
-      }
-    }
-
-    &:checked {
-      + {
-        label {
-          &::after {
-            content: "";
-          }
-        }
-      }
-    }
-  }
-
-  label {
-    position: relative;
-    display: inline-block;
-
-    &::before {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid $border;
-      left: 0px;
-      top: 3px;
-      background: white;
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
-    }
-  }
-}
-
 input {
   font-size: 14px;
   color: $text;
@@ -466,7 +332,7 @@ input {
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
-  width: 80px;
+  width: 220px;
   height: 32px;
   transition: .1s ease-out;
 

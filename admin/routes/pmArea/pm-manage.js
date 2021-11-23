@@ -119,7 +119,7 @@ const {
 
 const {
 	getVendorsForSteps,
-	getVendorStepDetails,
+	getVendorStepDetails
 } = require('../../vendors/getVendors')
 
 const { setUpdatedFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../../сalculations/finance')
@@ -619,10 +619,10 @@ router.post('/delete-tasks', async (req, res) => {
 	try {
 
 		// const allProjects = await Projects.findOne(_id: projectId)
-		 await Projects.updateOne(
+		await Projects.updateOne(
 				{ _id: projectId },
-			{ $pull: { 'tasks': { "taskId": {$in: tasks},  status: 'Cancelled'}, 'steps': { "taskId": {$in: tasks}, status: 'Cancelled' } } },
-			 { new: true }
+				{ $pull: { 'tasks': { "taskId": { $in: tasks }, status: 'Cancelled' }, 'steps': { "taskId": { $in: tasks }, status: 'Cancelled' } } },
+				{ new: true }
 		)
 
 		const updatedProject = await getProject({ '_id': projectId })
@@ -689,7 +689,19 @@ router.post('/steps-reopen', async (req, res) => {
 router.post('/close-project', async (req, res) => {
 	const { projectId } = req.body
 	try {
-		const updatedProject = await getProjectAfterUpdate({ _id: projectId }, { status: 'Closed' })
+		const project = await getProject({ _id: projectId })
+		let { tasks, steps } = project
+		tasks = tasks.map(i => {
+			const statuses = [ 'Approved', 'In progress', 'Pending Approval [DR1]' ]
+			if (statuses.indexOf(i.status) !== -1) i.status = 'Completed'
+			return i
+		})
+		steps = steps.map(i => {
+			const statuses = [ 'Approved', 'Ready to Start', 'Waiting to Start', 'In progress' ]
+			if (statuses.indexOf(i.status) !== -1) i.status = 'Completed'
+			return i
+		})
+		const updatedProject = await getProjectAfterUpdate({ _id: projectId }, { tasks, steps, status: 'Closed' })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -788,7 +800,10 @@ router.post('/making-tasks-cancel-message', async (req, res) => {
 router.post('/urgent', async (req, res) => {
 	const { projectId, isUrgent } = req.body
 	try {
-		const project = await getProjectAfterUpdate({ _id: projectId }, { isUrgent })
+		let { projectName } = await getProject({ _id: projectId })
+		if (isUrgent) projectName = '[Urgent] ' + projectName
+		else projectName = projectName = projectName.replace('[Urgent] ', '')
+		const project = await getProjectAfterUpdate({ _id: projectId }, { projectName, isUrgent })
 		res.send(project)
 	} catch (err) {
 		console.log(err)
@@ -982,7 +997,7 @@ router.post('/update-project-additions', async (req, res) => {
 router.post('/update-minimum-charge', async (req, res) => {
 	const { _id, value, toIgnore } = req.body
 	try {
-		await Projects.updateOne({ _id }, { minimumCharge: { value, toIgnore } })
+		await Projects.updateOne({ _id }, { minimumCharge: { value: +value, toIgnore } })
 		await recalculateStepFinance(_id)
 		const updatedProject = await calculateProjectTotal(_id)
 		res.send(updatedProject)
@@ -1019,9 +1034,9 @@ router.get('/vendors-for-steps', async (req, res) => {
 	}
 })
 router.post('/vendors-for-steps-details', async (req, res) => {
-	const {vendorId, stepInfo} = req.body
+	const { vendorId, stepInfo } = req.body
 	try {
-		const result = await getVendorStepDetails(vendorId,stepInfo)
+		const result = await getVendorStepDetails(vendorId, stepInfo)
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -1029,11 +1044,11 @@ router.post('/vendors-for-steps-details', async (req, res) => {
 	}
 })
 router.post('/step-vendor-brief', async (req, res) => {
-	const {projectId, stepId, vendorBrief} = req.body
+	const { projectId, stepId, vendorBrief } = req.body
 	try {
-		await Projects.updateOne({_id: projectId, "steps._id": stepId}, {$set: {"steps.$.vendorBrief": vendorBrief}})
+		await Projects.updateOne({ _id: projectId, "steps._id": stepId }, { $set: { "steps.$.vendorBrief": vendorBrief } })
 
-		const updatedProject = await getProject({_id: projectId })
+		const updatedProject = await getProject({ _id: projectId })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

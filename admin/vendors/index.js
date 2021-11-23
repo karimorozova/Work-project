@@ -35,7 +35,7 @@ const { updateVendorMatrix, syncVendorMatrix } = require('./vendorMatrix')
 const { saveQualifications, saveQualificationsAfterUpdateCompetencies } = require('./qualifications')
 const { updateVendorsRatePrices, getVendorAfterCombinationsUpdated } = require('./updateVendorRates')
 const { syncVendorRatesCost } = require('./syncVendorRatesCost')
-const { createRateRowFromQualification, updateClientRatesFromSettings } = require('./createVendorRates')
+const { createRateRowFromQualification, updateVendorRatesFromSettings } = require('./createVendorRates')
 const { getVendorAssessmentsWordCount } = require('./getVendorAssessments')
 
 const {
@@ -91,5 +91,5 @@ module.exports = {
 	deletePendingCompetence,
 	getFilteredVendorsPotential,
 	saveNotPassedTest,
-	updateClientRatesFromSettings
+	updateVendorRatesFromSettings
 }

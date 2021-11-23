@@ -115,7 +115,6 @@ router.post('/memoq-project', upload.fields([ { name: 'sourceFiles' }, { name: '
 
 		tasksInfo = manageProjectName(tasksInfo)
 		tasksInfo.projectName = `${ tasksInfo.internalProjectId } - ${ tasksInfo.nativeProjectName }`
-		console.log({ tasksInfo })
 		tasksInfo.memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo)
 		await assignProjectManagers({ manager: tasksInfo.projectManager, memoqProjectId: tasksInfo.memoqProjectId })
 

@@ -447,7 +447,7 @@ export default {
 
   .row {
     &__title {
-      width: 170px;
+      width: 150px;
     }
 
     &__data {

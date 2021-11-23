@@ -12,7 +12,7 @@
             span.clients-table__header-title {{ field.label }}
         template(slot="headerStatus" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
-        template(slot="headerWeb" slot-scope="{ field }")
+        template(slot="headerType" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
         template(slot="headerIndustry" slot-scope="{ field }")
             span.clients-table__header-title {{ field.label }}
@@ -46,10 +46,10 @@
                 //)
             .clients-table__data-cell
                 img.clients-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
+
         template(slot="web" slot-scope="{ row, index }")
-            .clients-table__active-cell(v-if="currentEditingIndex === index")
-                input.clients-table__input(type="text" v-model="currentWebsite" @click.stop="stopPropagation")
-            .clients-table__data-cell(v-else) {{ row.website }}
+            .clients-table__data-cell {{ row.clientType }}
+
         template(slot="lead" slot-scope="{ row, index }")
             //.clients-table__drop-menu(v-if="currentEditingIndex === index")
                 //ClientLeadsourceSelect(
@@ -106,13 +106,12 @@ export default {
     data() {
         return {
             fields: [
-                {label: "Company Name", headerKey: "headerName", key: "name", width: "16%", padding: "0"},
-                {label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0"},
-                {label: "Website", headerKey: "headerWeb", key: "web", width: "19%", padding: "0"},
-                {label: "Industry", headerKey: "headerIndustry", key: "industry", width: "19%", padding: "0"},
-                {label: "Lead Source", headerKey: "headerLead", key: "lead", width: "16%", padding: "0"},
-                {label: "Test", headerKey: "headerTest", key: "test", width: "4%", padding: "0"},
-                {label: "", headerKey: "headerIcons", key: "icons", width: "14%", padding: "0"}
+                {label: "Company Name", headerKey: "headerName", key: "name", width: "29%", padding: "0"},
+                {label: "Status", headerKey: "headerStatus", key: "status", width: "17%", padding: "0"},
+                {label: "Type", headerKey: "headerType", key: "web", width: "17%", padding: "0"},
+                {label: "Lead Source", headerKey: "headerLead", key: "lead", width: "17%", padding: "0"},
+                {label: "Test", headerKey: "headerTest", key: "test", width: "5%", padding: "0"},
+                {label: "", headerKey: "headerIcons", key: "icons", width: "15%", padding: "0"}
             ],
             icons: {
                 save: {icon: require('../../assets/images/Other/save-icon-qa-form.png')},
@@ -121,7 +120,6 @@ export default {
                 delete: {active: true, icon: require('../../assets/images/Other/delete-icon-qa-form.png')}
             },
             currentEditingIndex: -1,
-            isErrorShow: false,
             selectedIndustry: [],
             selectedStatus: "",
             selectedLeadsource: "",

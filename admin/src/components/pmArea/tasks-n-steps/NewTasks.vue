@@ -2,11 +2,11 @@
   .tasks
     .modal
       ApproveModal(
-        v-if="deleteTaskModal"
+        v-if="isApproveTaskModal"
         text="Are you sure?"
         approveValue="Yes"
         notApproveValue="Cancel"
-        @approve="approveDelete"
+        @approve="approveAction"
         @notApprove="closeModal"
         @close="closeModal"
       )
@@ -172,10 +172,9 @@ export default {
       selectedManager: null,
       selectedAction: "",
       previewMessageQuote: "",
-      deleteTaskModal: false,
-      tasksReadyToDelete: [],
+      isApproveTaskModal: false,
+      // tasksReadyToDelete: [],
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
-      validCancelStatuses: [ "Created", "Quote sent", "In progress", "Approved", "Rejected", "Pending Approval" ],
       fields: [
         { label: "check", headerKey: "headerCheck", key: "check", style: { "width": "3%" } },
         { label: "ID", headerKey: "headerTaskId", key: "taskId", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "17%" } },
@@ -186,9 +185,9 @@ export default {
           dataKey: "title",
           sortInfo: { isSort: true, order: 'default' },
           filterInfo: { isFilter: true },
-          style: { "width": "13%" }
+          style: { "width": "12%" }
         },
-        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
+        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
         { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "17%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "9%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "9%" } },
@@ -268,16 +267,18 @@ export default {
     },
     async approveCancelAction() {
       if (!this.checkedTasks.length) return this.closeApproveModal()
-      const filteredTasks = this.checkedTasks.filter(item => this.validCancelStatuses.indexOf(item.status) !== -1)
-      try {
-        const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
-        await this.setCurrentProject(updatedProject.data)
-
-        this.alertToggle({ message: "Tasks cancelled", isShow: true, type: "success" })
-        this.closeApproveModal()
-      } catch (e) {
-        this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
+      const validCancelStatuses = [ 'Created', 'Approved', 'Rejected', 'Quote Sent', 'In progress' ]
+      const filteredTasks = this.checkedTasks.filter(item => validCancelStatuses.indexOf(item.status) !== -1)
+      if (filteredTasks.length) {
+        try {
+          const updatedProject = await this.$http.post("/pm-manage/cancel-tasks", { tasks: filteredTasks, projectId: this.currentProject._id })
+          await this.setCurrentProject(updatedProject.data)
+          this.alertToggle({ message: "Tasks cancelled", isShow: true, type: "success" })
+        } catch (e) {
+          this.alertToggle({ message: "Server error / Cannot execute action", isShow: true, type: "error" })
+        }
       }
+      this.closeApproveModal()
     },
     closePreview() {
       this.isEditAndSend = false
@@ -336,21 +337,29 @@ export default {
     setManager({ option }) {
       this.selectedManager = option
     },
-    deleteTask() {
-      const tasksCanDeletedIds = this.checkedTasks.filter(({ status }) => status === 'Cancelled').map(({ taskId }) => taskId)
-      if (tasksCanDeletedIds.length < 1) return
-      this.deleteTaskModal = true
-      this.tasksReadyToDelete = tasksCanDeletedIds
+    async approveAction() {
+      switch (this.selectedAction) {
+        case "Delete" :
+          await this.approveDelete()
+          break
+      }
+      this.closeModal()
     },
     async approveDelete() {
-      const updatedProject = await this.$http.post("/pm-manage/delete-tasks", { tasks: this.tasksReadyToDelete, projectId: this.currentProject._id })
-      await this.setCurrentProject(updatedProject.data)
+      const tasksCanDeletedIds = this.checkedTasks.filter(({ status }) => status === 'Cancelled').map(({ taskId }) => taskId)
+      if (tasksCanDeletedIds.length < 1) return
+      try {
+        const updatedProject = await this.$http.post("/pm-manage/delete-tasks", { tasks: tasksCanDeletedIds, projectId: this.currentProject._id })
+        await this.setCurrentProject(updatedProject.data)
+        this.closeModal()
+      } catch (err) {
+      }
     },
     closeModal() {
-      this.deleteTaskModal = false
-      this.tasksReadyToDelete = []
+      this.isApproveTaskModal = false
+      this.selectedAction = ""
+      this.toggleAll(false)
     },
-
     async changeManager() {
       const checkedTasksId = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(({ taskId }) => taskId)
       if (!checkedTasksId.length) return
@@ -375,8 +384,10 @@ export default {
 
       switch (this.selectedAction) {
         case 'Approve [DR1]':
-          this.reviewTasksMulti = this.checkedTasks.map(i => i.taskId)
-          this.isDeliveryReviewMulti = true
+          if (this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').length) {
+            this.reviewTasksMulti = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(i => i.taskId)
+            this.isDeliveryReviewMulti = true
+          }
           break
         case 'Send a Quote':
           await this.getSendQuoteMessage()
@@ -385,15 +396,16 @@ export default {
           this.isCancelApproveModal = true
           break
         case 'Assign Manager [DR1]':
-          await this.manageDR1()
+          if (this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').length) {
+            await this.manageDR1()
+          }
           break
         case 'Delete':
-          await this.deleteTask()
+          this.isApproveTaskModal = true
           break
       }
 
       // switch (option) {
-
       //   case 'Cancel':
       //     this.modalTexts = { main: "Are you sure?", approve: "Yes", notApprove: "No" }
       //     this.isCancelApproveModal = true
@@ -454,9 +466,7 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Send a Quote' ] : []
-      const isDeleteStatus = this.checkedTasks.some(({ status }) => status === 'Cancelled') ? [ 'Delete' ] : []
-
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', ...isDeleteStatus ]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
 
     },
     // finalData() {

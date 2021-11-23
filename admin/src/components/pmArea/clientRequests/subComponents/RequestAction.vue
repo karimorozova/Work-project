@@ -317,7 +317,7 @@ export default {
 
     &__label {
       position: relative;
-      width: 160px;
+      width: 150px;
     }
 
     &__assigned-icon {

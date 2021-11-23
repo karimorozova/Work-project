@@ -102,7 +102,7 @@
 		data() {
 			return {
 				showFilters: false,
-				elementToScroll: this.isBodyShort ? 7 : 13
+				elementToScroll: this.isBodyShort ? 7 : 12
 			}
 		},
 		methods: {
@@ -343,7 +343,7 @@
   }
 
   tbody {
-    max-height: 504px;
+    max-height: 462px;
     display: block;
     color: $text;
   }

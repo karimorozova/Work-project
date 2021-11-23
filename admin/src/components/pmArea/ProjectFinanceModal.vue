@@ -149,7 +149,7 @@ export default {
       this.totalPayables = +finance.Price.payables || 0
     },
     totalRecWithDiscount(total) {
-      return this.isMinimumChargeUsed ? total : total +total/100* this.discounts
+      return this.isMinimumChargeUsed ? total : total + total / 100 * this.discounts
     },
     setReceivables(event, title) {
       let value = isNaN(parseFloat(event.target.value)) ? 0 : parseFloat(event.target.value)
@@ -163,7 +163,7 @@ export default {
           this.totalReceivables = +(this.totalRecWithDiscount(+this.quantityReceivables * +value)).toFixed(2)
           break
         case 'total' :
-          this.rateReceivables = +(+(+(+value/(this.discounts+100)) * 100)/ +this.quantityReceivables).toFixed(4)
+          this.rateReceivables = +(+(+(+value / (this.discounts + 100)) * 100) / +this.quantityReceivables).toFixed(4)
           break
       }
     },
@@ -210,14 +210,14 @@ export default {
   computed: {
     ...mapGetters({
       units: "getAllUnits",
-      currentProject: "getCurrentProject",
+      currentProject: "getCurrentProject"
 
     }),
     isMinimumChargeUsed() {
       return this.currentProject.minimumCharge.isUsed
     },
     discounts() {
-      return this.currentProject.discounts.reduce((acc, {value})=> acc += value, 0)
+      return this.currentProject.discounts.reduce((acc, { value }) => acc += value, 0)
     },
     getProfit() {
       return +(this.totalReceivables - this.totalPayables).toFixed(2)
@@ -229,7 +229,8 @@ export default {
       return Math.round((this.totalPayables / this.totalReceivables) * 100)
     },
     getROI() {
-      return Math.round(((this.totalReceivables - this.totalPayables) / this.totalPayables) * 100)
+      const num = Math.round(((this.totalReceivables - this.totalPayables) / this.totalPayables) * 100)
+      return !isFinite(num) ? 0 : num
     },
     chartMargin() {
       return this.getMargin < 0 ? 0 : this.getMargin > 100 ? 100 : this.getMargin
@@ -380,6 +381,7 @@ export default {
       text-decoration: underline;
     }
   }
+
   &__right {
     position: absolute;
     right: 12px;
