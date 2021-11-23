@@ -822,10 +822,10 @@ a {
   font-size: 14px;
   display: grid;
   place-items: center;
-  background: conic-gradient(#f5dfd9 0, #f5dfd9 var(--percentage), #daeded 0, #daeded 100%);
+  background: conic-gradient(#EAC0BB 0, #EAC0BB var(--percentage), #A9D3D1 0, #A9D3D1 100%);
   position: relative;
-  width: 102px;
-  height: 102px;
+  width: 103px;
+  height: 103px;
   margin: 0;
   border-radius: 50%;
 }

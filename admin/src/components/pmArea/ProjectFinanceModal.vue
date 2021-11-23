@@ -16,8 +16,8 @@
 
     .stats
       .multi-graph
-        .graph( :style="{'--percentage' : 100, '--fill': '#daeded'}")
-        .graph( :style="{'--percentage' : chartMargin, '--fill': '#f5dfd9'}")
+        .graph( :style="{'--percentage' : 100, '--fill': '#A9D3D1'}")
+        .graph( :style="{'--percentage' : chartMargin, '--fill': '#EAC0BB'}")
       .stats__details
         .details__row
           .details__row-color1
