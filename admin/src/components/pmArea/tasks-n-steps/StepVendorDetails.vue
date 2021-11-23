@@ -184,9 +184,8 @@ export default {
   &__stats {
     border: 1px solid $light-border;
     height: fit-content;
-    margin-left: 10px;
     border-radius: 8px;
-    margin-left: 20px;
+    margin-left: 15px;
   }
   &__close {
     position: absolute;

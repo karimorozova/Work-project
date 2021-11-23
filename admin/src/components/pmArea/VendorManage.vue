@@ -96,10 +96,14 @@
 
             .assignedVendor(v-if="currentStepId && ( steps.find(i => i._id.toString() === currentStepId).vendor || selectedVendors[currentStepId])" )
               .assignedVendor__user
-                .assignedVendor__user-image
+                .assignedVendor__user-image(v-if="getAssignedVendorInfo().photo" )
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
-                  img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
+                  img(:src="domain + getAssignedVendorInfo().photo")
+                .user__fakeImage(v-else) {{ getAssignedVendorInfo().name[0] }}
+                  .assignedVendor__user-circle1
+                  .assignedVendor__user-circle2
+
                 .assignedVendor__user-description
                   .assignedVendor__user-name
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
@@ -111,10 +115,14 @@
                     .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
 
               .assignedVendor__user(v-if="Object.keys(selectedReassignedVendor).length")
-                .assignedVendor__user-image
+                .assignedVendor__user-image(v-if="getReAssignedVendorInfo().photo" )
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
-                  img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
+                  img(:src="domain + getReAssignedVendorInfo().photo")
+                .user__fakeImage(v-else) {{ getReAssignedVendorInfo().name[0] }}
+                  .assignedVendor__user-circle1
+                  .assignedVendor__user-circle3
+
                 .assignedVendor__user-description
                   .assignedVendor__user-name
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getReAssignedVendorInfo()._id}`}")
@@ -176,8 +184,11 @@
                 .vendor__row1
                   .vendor__user
                     .user
-                      .user__image
-                        img(src="https://images.pexels.com/photos/6498272/pexels-photo-6498272.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500")
+                      .user__image(v-if="item.photo")
+                        img(:src="domain + item.photo")
+                      .user__fakeImage(v-else) {{ item.name[0] }}
+
+
                       .user__description
                         .user__name
                           router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${item._id}`}")
@@ -271,6 +282,9 @@ import { rateExchangeVendorOntoProject } from "../../../helpers/commonFunctions"
 import ValidationErrors from "../ValidationErrors"
 
 export default {
+  mounted() {
+    this.domain = __WEBPACK__API_URL__
+  },
   mixins: [ currencyIconDetected ],
   props: {
     steps: {
@@ -280,6 +294,7 @@ export default {
   },
   data() {
     return {
+      domain: "http://localhost:3001",
       reasons: [ 'Unresponsive', 'Technical issues', 'Personal issues' ],
       reason: null,
       isStart: { yes: false, no: true },
@@ -392,11 +407,12 @@ export default {
       return 'max-height:' + max + 'px'
     },
     getReAssignedVendorInfo() {
-      const { _id, name, email } = this.selectedReassignedVendor[this.currentStepId]
+      const { _id, name, email, photo } = this.selectedReassignedVendor[this.currentStepId]
       return {
         _id,
         name,
-        email
+        email,
+        photo
       }
     },
     getAssignedVendorInfo() {
@@ -411,8 +427,9 @@ export default {
       return res
 
       function resSetter(dataIn) {
-        const { email, _id } = dataIn
+        const { email, _id, photo } = dataIn
         res._id = _id
+        res.photo = photo
         res.name = dataIn.name || `${ dataIn.firstName } ${ dataIn.surname || '' }`
         res.email = email
       }
@@ -857,8 +874,7 @@ export default {
   &__stats {
     border: 1px solid $light-border;
     height: fit-content;
-    margin-left: 10px;
-    margin-left: 20px;
+    margin-left: 15px;
   }
 
   &__marks {
@@ -958,6 +974,20 @@ export default {
 
   &__email {
     color: #3333;
+  }
+
+  &__fakeImage{
+    height: 65px;
+    width: 65px;
+    min-width: 65px;
+    border-radius: 8px;
+    font-size: 28px;
+    background: #a8cdbd;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
   }
 
   &__image {
