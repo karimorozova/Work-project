@@ -658,7 +658,7 @@ router.post('/manage-step-status', async (req, res) => {
 	try {
 		if (status === 'In progress') {
 			await updateProject({ "steps._id": _stepId }, { $set: { "steps.$.isVendorRead": true } }, { arrayFilters: [ { 'i._id': stepId } ] })
-			await updateStepProp({ jobId: stepId, prop: 'status', value: status })
+			await updateStepProp({ jobId: _stepId, prop: 'status', value: status })
 			const project = await getProject({ _id: projectId })
 			res.send(project)
 
@@ -671,9 +671,10 @@ router.post('/manage-step-status', async (req, res) => {
 					await setMemoqDocumentWorkFlowStatus(projectGuid, documentGuid, workFlowStatus)
 				}
 			} else {
+				const project = await getProject({ _id: projectId })
 				await updateNonWordsTaskTargetFiles({ project, paths: [], jobId: _stepId })
 			}
-			const project = await getProject({ _id: projectId })
+
 			await updateStepProp({ jobId: _stepId, prop: 'status', value: status })
 			const updatedProject = await getProject({ _id: projectId })
 			res.send(updatedProject)

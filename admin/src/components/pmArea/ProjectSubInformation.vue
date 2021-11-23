@@ -65,7 +65,7 @@
             )
 
         template(slot="icons", slot-scope="{ row, index }")
-          .client-table__icons(v-if="true")
+          .client-table__icons(v-if="!isProjectFinished")
             i.client-table__icon.fa.fa-envelope(
               @click="openWYSIWYG(index)",
               :class="{ 'client-table_opacity': true }",
@@ -80,7 +80,7 @@
           .client-table__icons(v-else)
             img(src="../../assets/images/latest-version/lock.png")
 
-    Add(@add="addData" v-if="true")
+    Add(@add="addData" v-if="!isProjectFinished")
 </template>
 
 <script>
@@ -333,21 +333,11 @@ export default {
     // },
     async setUrgentStatus(event) {
       try {
-        const result = await this.$http.post("/pm-manage/urgent", {
-          projectId: this.project._id,
-          isUrgent: event.target.checked
-        })
-        this.alertToggle({
-          message: "Urgent status updated",
-          isShow: true,
-          type: "success"
-        })
+        const result = await this.$http.post("/pm-manage/urgent", { projectId: this.project._id, isUrgent: event.target.checked })
+        this.setCurrentProject(result.data)
+        this.alertToggle({ message: "Urgent status updated", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({
-          message: "Cannot update Urgent status",
-          isShow: true,
-          type: "error"
-        })
+        this.alertToggle({ message: "Cannot update Urgent status", isShow: true, type: "error" })
       }
     },
     getClientContacts() {
@@ -456,7 +446,7 @@ export default {
 
   .row {
     &__title {
-      width: 170px;
+      width: 150px;
     }
 
     &__data {

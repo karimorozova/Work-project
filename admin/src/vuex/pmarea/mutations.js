@@ -19,7 +19,7 @@ export const mutations = {
 	INCREMENT_FILE_COUNTER(state, payload) {
 		state.fileCounter++
 	},
-	SET_SHOW_TASK_AND_DELIVERABLES(state, payload) {
-		state.isShowTasksAndDeliverables = payload
-	}
+	// SET_SHOW_TASK_AND_DELIVERABLES(state, payload) {
+	// 	state.isShowTasksAndDeliverables = payload
+	// }
 }

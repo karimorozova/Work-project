@@ -4,7 +4,7 @@
       .content__DR2(v-if="isDR2Modal")
         DeliveryTwo(:user="user" :users="users" :project="currentProject" :id="currentReviewId" :type="currentReviewType" @close="closeDR2")
 
-    .deliverables(:class="{'no-box-shadow': !isShowTasksAndDeliverables}")
+    .deliverables
       .deliverables__approveModal(v-if="isDeleteModal")
         ApproveModal(
           text="Are you sure?"
@@ -114,7 +114,7 @@
           )
 
 
-      .deliverables__header(v-if="isShowTasksAndDeliverables")
+      .deliverables__header
         .deliverables__title Deliverables
         //.deliverablesActions(v-if="!isProjectFinished")
         .deliverablesActions
@@ -127,7 +127,7 @@
               @chooseOption="setAction"
             )
 
-      .table(v-if="isShowTasksAndDeliverables")
+      .table
         GeneralTable(
           :fields="fields"
           :tableData="deliverables"
@@ -165,7 +165,7 @@
             .table__icons(v-if="row.status !== 'Ready for Delivery'")
               img.table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
 
-      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed' && isShowTasksAndDeliverables" @add="showTasksModal")
+      Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showTasksModal")
 </template>
 
 <script>
@@ -570,7 +570,6 @@
 		},
 		computed: {
 			...mapGetters({
-				isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
 				currentProject: 'getCurrentProject',
 				allLang: 'getAllLanguages',
 				users: 'getUsers',
@@ -887,7 +886,7 @@
   .content {
     &__DR2 {
       position: absolute;
-      top: 475px;
+      top: 351px;
       left: 0px;
       bottom: 0;
       z-index: 50;

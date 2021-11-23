@@ -230,9 +230,9 @@ export default {
           dataKey: "title",
           sortInfo: { isSort: true, order: 'default' },
           filterInfo: { isFilter: true },
-          style: { "width": "11%" }
+          style: { "width": "10%" }
         },
-        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "11%" } },
+        { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
         { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "11%" } },
         { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
         { label: "Start", headerKey: "headerStart", key: "start", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },

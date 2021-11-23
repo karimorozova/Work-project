@@ -1,5 +1,5 @@
 <template lang="pug">
-  .tasks-steps(:class="{'no-box-shadow': !isShowTasksAndDeliverables}")
+  .tasks-steps
     transition(name="slide-fade")
       .tasks-steps__info(v-if="isInfo") {{ selectedInfoMessage }}
         .tasks-steps__file-counter(v-if="fileCounter") {{ fileCounter }} of {{ translateFilesAmount }}
@@ -14,7 +14,7 @@
 
     transition(name="slide-fade")
       TasksData(
-        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length && isShowTasksAndDeliverables"
+        v-if="isTaskData && !isFinishedStatus && originallyLanguages.length"
         :originallyLanguages="originallyLanguages"
         :originallyUnits="originallyUnits"
         :originallySteps="originallySteps"
@@ -222,7 +222,7 @@
 		},
 		computed: {
 			...mapGetters({
-				isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
+				// isShowTasksAndDeliverables: 'isShowTasksAndDeliverables',
 				currentProject: 'getCurrentProject',
 				selectedInfoMessage: 'getMemoqProjectMessage',
 				fileCounter: 'getTranslateFileCounter'

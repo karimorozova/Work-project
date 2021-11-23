@@ -491,18 +491,15 @@ export default {
         result = [ "Cancel" ]
       }
 
-      if (
-          // this.project.finance.Price.receivables &&
-          nonStartedStatuses.indexOf(this.project.status) !== -1) {
+      if (nonStartedStatuses.indexOf(this.project.status) !== -1) {
         result = [ "Send a Quote", "Cost Quote", "Accept/Reject Quote", "Cancel" ]
       }
 
       if (this.project.status === 'Started' || this.project.status === 'In progress') {
-        const { tasks, tasksDR2 } = this.project
-        const isAllTasksCompleted = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({ status }) => status === 'Completed')
-
-        if (isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = [ "Close Project" ]
-        else result = [ "Send Project Details", "Cancel" ]
+        // const { tasks, tasksDR2 } = this.project
+        // const isAllTasksCompleted = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({ status }) => status === 'Completed')
+        // if (isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = [ "Close Project" ]
+         result = [ "Send Project Details", "Cancel", 'Close Project' ]
       }
 
       if (this.project.status === 'Closed') {
@@ -657,7 +654,7 @@ export default {
 
     &__label {
       position: relative;
-      width: 160px;
+      width: 150px;
     }
 
     &__assigned-icon {

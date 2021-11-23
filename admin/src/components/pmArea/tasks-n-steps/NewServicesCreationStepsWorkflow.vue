@@ -65,6 +65,8 @@
                     :disabled-date="notBeforeToday"
                     placeholder="Select datetime range"
                   )
+
+            // CAT ==>
             .step__settings(v-if=" item.step.title === 'Translation' && item.receivables.unit.type === 'CAT Wordcount'" )
               .step__setting
                 .step__setting-title Unit:
@@ -85,14 +87,16 @@
                     placeholder="Option"
                     @chooseOption="setTemplate"
                   )
+            // CAT <==
 
+            // CUSTOM ==>
             .step__settings(v-if="!isCatUnit")
               .step__setting
                 .step__setting-title Unit:
                 .drop
                   SelectSingle(
                     :selectedOption="item.receivables.unit.type || ''"
-                    :options="item.step.calculationUnit.map(i => i.type)"
+                    :options="item.step.calculationUnit.map(i => i.type).filter(i => i !== 'CAT Wordcount')"
                     placeholder="Option"
                     @chooseOption="(e) => setUnit(e, 'receivables', index)"
                   )
@@ -106,7 +110,7 @@
                 .drop
                   SelectSingle(
                     :selectedOption="item.payables.unit.type || ''"
-                    :options="item.step.calculationUnit.map(i => i.type)"
+                    :options="item.step.calculationUnit.map(i => i.type).filter(i => i !== 'CAT Wordcount')"
                     placeholder="Option"
                     @chooseOption="(e) => setUnit(e, 'payables', index)"
                     :isDisabled="isDisabledPayablesEdit"
@@ -114,6 +118,8 @@
               .step__setting
                 .step__setting-title Quantity:
                 input(type="number" :disabled="isDisabledPayablesEdit" placeholder="Value" min="0" max="100000" :value="item.payables.quantity || ''" @change="(e) => setQuantity(e, 'payables', index)")
+            // CUSTOM <==
+
 
     .add
       .add__row
@@ -131,8 +137,8 @@ import { mapActions, mapGetters } from "vuex"
 import DatepickerWithTime from "../../DatepickerWithTime"
 
 
-import DatePicker from 'vue2-datepicker';
-import '../../../assets/scss/datepicker.scss';
+import DatePicker from 'vue2-datepicker'
+import '../../../assets/scss/datepicker.scss'
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
@@ -152,7 +158,7 @@ export default {
   },
   data() {
     return {
-      time: {  },
+      time: {},
       isDisabledPayablesEdit: true,
       isAddModal: false,
       isDeleteStep: false,
@@ -168,7 +174,7 @@ export default {
   },
   methods: {
     notBeforeToday(date) {
-      return date < new Date(this.project.startDate) || new Date(this.project.deadline) < date ;
+      return date < new Date(this.project.startDate) || new Date(this.project.deadline) < date
     },
     addStep() {
       const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
@@ -242,11 +248,11 @@ export default {
     dragAndDropSteps(stepsAndUnits) {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    openDeleteAcceptModal(id){
+    openDeleteAcceptModal(id) {
       this.isDeleteStep = true
       this.deleteStepIndex = id
     },
-    closeAcceptModal(){
+    closeAcceptModal() {
       this.isDeleteStep = false
       this.deleteStepIndex = ''
     },
@@ -262,10 +268,10 @@ export default {
     ...mapGetters({
       tasksData: "getTasksData",
       allUnits: "getAllUnits",
-      project: "getCurrentProject",
+      project: "getCurrentProject"
     }),
     isCatUnit() {
-      if (this.tasksData && this.tasksData.service &&  this.tasksData.stepsAndUnits.length) {
+      if (this.tasksData && this.tasksData.service && this.tasksData.stepsAndUnits.length) {
         return this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
       }
     },
@@ -298,6 +304,7 @@ export default {
     top: 50%;
     transform: translateX(-50%) translateY(-50%);
   }
+
   &__modal-without-border {
     z-index: 12;
     width: fit-content;
@@ -389,6 +396,7 @@ export default {
         margin-left: 15px;
         padding-left: 15px;
       }
+
       &-title-date {
         width: 260px;
         margin-left: 15px;
@@ -415,6 +423,7 @@ export default {
       margin-bottom: 2px;
     }
   }
+
   &__datepicker {
     width: 260px;
   }
@@ -466,9 +475,11 @@ input {
 
 .sortable-ghost {
 }
-.range-with-one-panel{
+
+.range-with-one-panel {
   width: 260px;
 }
+
 .sortable-chosen {
   background: $light-border;
 }

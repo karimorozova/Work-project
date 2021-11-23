@@ -440,11 +440,12 @@
       font-size: 14px;
       visibility: hidden;
       width: 220px;
-      background-color: #66563d;
-      color: #fff;
+      background-color: #fff;
+      color: $text;
+      border: 1px solid $text;
       text-align: center;
       border-radius: 4px;
-      padding: 5px;
+      padding: 6px;
       position: absolute;
       z-index: 1;
       left: 38px;
@@ -461,7 +462,7 @@
         transform: rotate(90deg);
         border-width: 5px;
         border-style: solid;
-        border-color: #66563d transparent transparent;
+        border-color: #333 transparent transparent;
       }
     }
 

@@ -196,13 +196,20 @@ export default {
     },
     setStepsAndUnitByService(service) {
       const stepsAndUnits = []
-      for (const { step } of service.steps) {
+      for (let { step } of service.steps) {
+        if(service.title !== 'Translation') step.calculationUnit = step.calculationUnit.filter(({type}) => type !== 'CAT Wordcount')
         stepsAndUnits.push({
           step,
           start: '',
           deadline: '',
-          receivables: { unit: step.calculationUnit[0], quantity: 0 },
-          payables: { unit: step.calculationUnit[0], quantity: 0 }
+          receivables: {
+            unit: step.calculationUnit[0],
+            quantity: 0
+          },
+          payables: {
+            unit: step.calculationUnit[0],
+            quantity: 0
+          }
         })
       }
       this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
