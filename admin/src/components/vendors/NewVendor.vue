@@ -429,7 +429,7 @@
   }
 
   .title {
-    font-size: 19px;
+    font-size: 18px;
     padding: 30px 0 10px;
     width: 1040px;
   }

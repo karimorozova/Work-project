@@ -103,7 +103,7 @@ export default {
   margin-bottom: 25px;
 
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
     border-bottom: 1px solid $light-border;
     margin-bottom: 20px;

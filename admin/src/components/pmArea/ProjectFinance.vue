@@ -211,7 +211,7 @@ export default {
   border-radius: 4px;
 
   &__titleFinance {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
   }
 
@@ -249,7 +249,7 @@ export default {
 
   &__title {
     padding: 20px;
-    font-size: 19px;
+    font-size: 18px;
     display: flex;
     font-family: Myriad600;
     align-items: center;

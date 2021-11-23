@@ -128,7 +128,7 @@
         padding: 10px;
         display: flex;
         border: 1px solid $border;
-        font-size: 19px;
+        font-size: 18px;
         justify-content: center;
         font-family: 'Myriad600';
         transition: ease 0.2s;

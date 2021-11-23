@@ -103,10 +103,10 @@ export default {
     },
     toggleVendorManage() {
       this.isModalOpen = !this.isModalOpen
+    },
+    setDefaultIsTaskData() {
+      if (!this.currentProject.tasks.length) this.isTaskData = true
     }
-    // setDefaultIsTaskData() {
-    //   if (!this.currentProject.tasks.length) this.isTaskData = true
-    // }
   },
   computed: {
     ...mapGetters({
@@ -123,7 +123,7 @@ export default {
     }
   },
   mounted() {
-    // this.setDefaultIsTaskData()
+    this.setDefaultIsTaskData()
   },
   components: {
     NewTasksData,
@@ -198,7 +198,7 @@ export default {
   }
 
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: 'Myriad600';
   }
 

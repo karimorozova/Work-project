@@ -768,13 +768,13 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       font-family: "Myriad600";
       margin-bottom: 10px;
     }
 
     &__title2 {
-      font-size: 19px;
+      font-size: 18px;
       font-family: "Myriad600";
       margin-bottom: 15px;
     }
@@ -950,14 +950,14 @@
     }
 
     &__titleModal {
-      font-size: 19px;
+      font-size: 18px;
       margin-bottom: 20px;
       text-align: center;
       font-family: Myriad600;
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       display: flex;
       justify-content: space-between;
       font-family: Myriad600;

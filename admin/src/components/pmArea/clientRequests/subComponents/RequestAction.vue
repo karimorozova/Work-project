@@ -167,7 +167,7 @@ export default {
   position: relative;
 
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
     border-bottom: 1px solid $light-border;
     margin-bottom: 20px;
@@ -187,7 +187,7 @@ export default {
     &-span {
       vertical-align: sub;
       display: inline-block;
-      font-size: 19px;
+      font-size: 18px;
     }
   }
 

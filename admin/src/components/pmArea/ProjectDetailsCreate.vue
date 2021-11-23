@@ -169,7 +169,6 @@ export default {
         this.clients = [ ...result.body ].sort((a, b) => {
           return a.name.localeCompare(b.name)
         })
-
       } catch (err) {
         this.alertToggle({ message: "Error on getting customers", isShow: true, type: "error" })
       }
@@ -181,17 +180,12 @@ export default {
       this.project.customer = customer._id
       try {
         const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
-        this.projectCreated({ project: newProject.data, customer: customer })
+        this.setCurrentProject(newProject.data)
+        this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ newProject.data._id }`)
         this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
       }
-    },
-    projectCreated({ project, customer }) {
-      this.project = project
-      this.project.customer = customer
-      this.setCurrentProject(this.project)
-      this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ project._id }`)
     },
     async checkForErrors() {
       this.errors = []
@@ -279,7 +273,7 @@ export default {
   }
 
   &__name {
-    font-size: 19px;
+    font-size: 18px;
     padding: 0 10px;
     height: 44px;
     width: 880px;

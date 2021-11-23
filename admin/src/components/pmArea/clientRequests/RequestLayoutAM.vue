@@ -1275,7 +1275,7 @@ input[type="text"]:disabled {
     align-items: center;
 
     &-title {
-      font-size: 19px;
+      font-size: 18px;
       font-family: 'Myriad600';
     }
 
@@ -1413,7 +1413,7 @@ input[type="text"]:disabled {
   }
 
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
   }
 
@@ -1495,7 +1495,7 @@ input {
   position: absolute;
   right: 30px;
   bottom: 4px;
-  font-size: 19px;
+  font-size: 18px;
 }
 
 #checkBrief {

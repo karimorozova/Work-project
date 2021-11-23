@@ -618,7 +618,7 @@ export default {
   }
 
   &__name {
-    font-size: 19px;
+    font-size: 18px;
     padding: 0 10px;
     height: 44px;
     width: 880px;
@@ -824,8 +824,8 @@ a {
   place-items: center;
   background: conic-gradient(#EAC0BB 0, #EAC0BB var(--percentage), #A9D3D1 0, #A9D3D1 100%);
   position: relative;
-  width: 103px;
-  height: 103px;
+  width: 102px;
+  height: 102px;
   margin: 0;
   border-radius: 50%;
 }

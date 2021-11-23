@@ -402,7 +402,7 @@ export default {
 
 .finance {
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }
@@ -447,7 +447,7 @@ export default {
 //  z-index: 501;
 //
 //  &__title {
-//    font-size: 19px;
+//    font-size: 18px;
 //    font-family: Myriad600;
 //    margin-bottom: 10px;
 //  }

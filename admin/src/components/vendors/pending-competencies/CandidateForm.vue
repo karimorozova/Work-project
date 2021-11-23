@@ -147,7 +147,7 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       width: 100%;
       text-align: center;
       margin-bottom: 20px;

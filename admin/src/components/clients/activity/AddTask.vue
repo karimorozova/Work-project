@@ -288,13 +288,13 @@
       }
 
       input {
-        font-size: 19px;
+        font-size: 18px;
         padding: 10px 0px 10px 0px;
         display: block;
         width: 100%;
         border: none;
         border-bottom: 2px solid #e8e8e8;
-        color: #66563d;
+        color: $text;
       }
 
       input:focus {
@@ -302,7 +302,7 @@
       }
 
       label {
-        font-size: 19px;
+        font-size: 18px;
         font-weight: normal;
         position: absolute;
         pointer-events: none;
