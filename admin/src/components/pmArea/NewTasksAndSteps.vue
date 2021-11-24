@@ -214,6 +214,7 @@ export default {
     box-shadow: $box-shadow;
     background: white;
     border-radius: 4px;
+    z-index: 30000;
   }
 }
 

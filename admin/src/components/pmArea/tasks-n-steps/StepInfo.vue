@@ -5,6 +5,8 @@
 
     .info
       .info__link(@click="openFinanceModal") Go to finance
+      .info__link2(v-if="step.vendor" @click="openVendorModal") Go to vendor
+
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
@@ -56,10 +58,15 @@ export default {
     }
   },
   methods: {
-    openFinanceModal(){
+    openFinanceModal() {
       const { closeStepInfo, showFinanceEditing } = this.$parent
       closeStepInfo()
       showFinanceEditing(this.index)
+    },
+    openVendorModal(){
+      const { closeStepInfo, openVendorDetailsModal } = this.$parent
+      closeStepInfo()
+      openVendorDetailsModal(this.step.vendor, this.step, this.index)
     },
     setTab({ index }) {
       if (!this.step.vendor && index === 1) return
@@ -106,8 +113,25 @@ export default {
     position: absolute;
     right: 12px;
     cursor: pointer;
+    color: $dark-border;
+    transition: .2s ease-out;
 
     &:hover {
+      color: $text;
+      text-decoration: underline;
+    }
+  }
+
+  &__link2 {
+    position: absolute;
+    right: 12px;
+    top: 35px;
+    cursor: pointer;
+    color: $dark-border;
+    transition: .2s ease-out;
+
+    &:hover {
+      color: $text;
       text-decoration: underline;
     }
   }

@@ -100,7 +100,7 @@
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
                   img(:src="domain + getAssignedVendorInfo().photo")
-                .user__fakeImage(v-else) {{ getAssignedVendorInfo().name[0] }}
+                .user__fakeImage(:style="{'--bgColor': getBgColor(getAssignedVendorInfo()._id)}" v-else) {{ getAssignedVendorInfo().name[0] }}
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
 
@@ -119,7 +119,7 @@
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
                   img(:src="domain + getReAssignedVendorInfo().photo")
-                .user__fakeImage(v-else) {{ getReAssignedVendorInfo().name[0] }}
+                .user__fakeImage(:style="{'--bgColor': getBgColor(getReAssignedVendorInfo()._id)}" v-else) {{ getReAssignedVendorInfo().name[0] }}
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
 
@@ -186,7 +186,7 @@
                     .user
                       .user__image(v-if="item.photo")
                         img(:src="domain + item.photo")
-                      .user__fakeImage(v-else) {{ item.name[0] }}
+                      .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)}" v-else) {{ item.name[0] }}
 
 
                       .user__description
@@ -196,8 +196,8 @@
 
                         .user__email {{ item.email }} (клик письмо)
                         .buttons
-                          .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
-                          .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
+                          .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
+                          .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
                           .buttons__btn() Details
 
                   .vendor__stats(v-if="!isReassignment")
@@ -280,12 +280,13 @@ import SelectSingle from "../SelectSingle"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 import { rateExchangeVendorOntoProject } from "../../../helpers/commonFunctions"
 import ValidationErrors from "../ValidationErrors"
+import getBgColor from "../../mixins/getBgColor"
 
 export default {
   mounted() {
     this.domain = __WEBPACK__API_URL__
   },
-  mixins: [ currencyIconDetected ],
+  mixins: [ currencyIconDetected, getBgColor ],
   props: {
     steps: {
       type: Array,
@@ -576,9 +577,8 @@ export default {
       try {
         const allVendors = await this.$http.get('/pm-manage/vendors-for-steps')
         this.allVendors = allVendors.data
-        console.log(allVendors.data)
       } catch (err) {
-        console.log('err get vendors')
+        console.log('Error get vendors')
       }
     },
     ...mapActions({
@@ -613,7 +613,7 @@ export default {
       let vendors = this.allVendors
       const query = `${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
       const { projectCurrency, crossRate } = this.currentProject
-      const { finance, payablesUnit, vendor } = this.currentStep
+      const { finance, payablesUnit, vendor, taskId } = this.currentStep
 
       //searching ==>
       if (!this.isAllVendors) {
@@ -621,7 +621,34 @@ export default {
             .map(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }`)
             .includes(query))
       }
-      if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
+
+      // same Vendor in 2 steps ==>
+      const stepsIds = this.steps.filter(i => i.taskId === taskId).map(i => i._id.toString())
+      if (stepsIds.length > 1) {
+        const selectedVendors = Object.keys(this.selectedVendors).length
+            ? Object.entries(this.selectedVendors)
+                .map(i => {
+                  const [ _id, rest ] = i
+                  return { _id, vendor: rest.name }
+                })
+                .filter(i => stepsIds.includes(i._id.toString()))
+                .map(i => i.vendor)
+            : []
+        const vendorsNames = [
+          ...this.steps
+              .filter(i => stepsIds.includes(i._id.toString()))
+              .map(i => i.vendor && `${ i.vendor.firstName } ${ i.vendor.surname || '' }`)
+              .filter(Boolean),
+          ...selectedVendors
+        ]
+        if (vendorsNames.length) {
+          vendors = vendors.filter(({ name }) => !vendorsNames.includes(name))
+        }
+      }
+      if (this.vendorsSearch.length) {
+        vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
+      }
+      // same Vendor in 2 steps <==
 
       if (vendor && !this.selectedVendors[this.currentStepId]) {
         vendors = vendors.filter(({ name }) => name.toUpperCase() !== (`${ vendor.firstName } ${ vendor.surname || '' }`).toUpperCase())
@@ -666,7 +693,7 @@ export default {
         }
       })
 
-      return vendors.sort((a,b) => a.price - b.price)
+      return vendors.sort((a, b) => a.price - b.price)
     }
   },
   async created() {
@@ -747,7 +774,7 @@ export default {
       height: 10px;
       width: 10px;
       border-radius: 10px;
-      background-color: $green;
+      background-color: $medium-green;
       right: -5px;
       top: 15px;
     }
@@ -757,7 +784,7 @@ export default {
       height: 10px;
       width: 10px;
       border-radius: 10px;
-      background-color: $red;
+      background-color: $medium-red;
       right: -5px;
       top: 15px;
     }
@@ -824,7 +851,6 @@ export default {
       background-color: $light-border;
     }
   }
-
 }
 
 .availability {
@@ -976,13 +1002,13 @@ export default {
     color: #3333;
   }
 
-  &__fakeImage{
+  &__fakeImage {
     height: 65px;
     width: 65px;
     min-width: 65px;
     border-radius: 8px;
     font-size: 28px;
-    background: #a8cdbd;
+    background: var(--bgColor);
     color: white;
     display: flex;
     justify-content: center;

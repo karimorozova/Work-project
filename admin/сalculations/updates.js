@@ -15,6 +15,8 @@ async function assignVendorToStep({ projectId, stepsVendors }) {
 			if (!steps[_idxS].vendor || `${ steps[_idxS].vendor._id }` !== vendorId) {
 				const vendor = await Vendors.findOne({ _id: vendorId })
 				steps[_idxS].vendor = vendor
+				steps[_idxS].vendorBrief = ''
+				steps[_idxS].extraPayables = []
 
 				const { task, step } = await getNewStepPayablesFinanceData({
 					step: steps[_idxS],

@@ -141,7 +141,7 @@
   }
 
   %row {
-    border-bottom: 1px solid #e2e2e2;
+    border-bottom: 1px solid $light-border;
     margin-top: 9px;
   }
 
@@ -160,8 +160,8 @@
     }
 
     &__text {
-      color: #ccc;
-      font-size: 10px;
+      color: #9999;
+      font-size: 11px;
       margin-left: 13px;
       margin-top: 5px;
       position: absolute;

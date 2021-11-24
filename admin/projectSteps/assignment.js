@@ -17,6 +17,8 @@ async function removeVendorFromStep({ stepId, projectId }) {
 		steps[_idx].vendor = null
 		steps[_idx].status = 'Created'
 		steps[_idx].vendorsClickedOffer = []
+		steps[_idx].vendorBrief = ''
+		steps[_idx].extraPayables = []
 		await Projects.updateOne({ _id: projectId }, { steps })
 	}
 }
@@ -31,7 +33,7 @@ async function reassignVendor({ projectId, stepId, progress, isStart, isPay, rea
 		const _taskIdx = tasks.findIndex(({ taskId }) => taskId === steps[_stepIdx].taskId)
 		tasks[_taskIdx].status = "In progress"
 
-		const updatedSteps = makeStep({task: tasks[_taskIdx], step: steps[_stepIdx], progress: +progress, vendor, projectCurrency, crossRate, isStart, isPay })
+		const updatedSteps = makeStep({ task: tasks[_taskIdx], step: steps[_stepIdx], progress: +progress, vendor, projectCurrency, crossRate, isStart, isPay })
 
 		const oldStep = updatedSteps().getOldStep()
 		const newStep = updatedSteps().getNewStep()
@@ -57,7 +59,7 @@ async function reassignVendor({ projectId, stepId, progress, isStart, isPay, rea
 	}
 }
 
-const makeStep = ({task, step, progress, vendor, projectCurrency, crossRate, isStart, isPay }) => {
+const makeStep = ({ task, step, progress, vendor, projectCurrency, crossRate, isStart, isPay }) => {
 	const { finance, receivablesUnit: { type }, vendorRate, nativeVendorRate, nativeFinance, status, stepId, progress: oldProgress } = step._doc
 	const { _id: vendorId, nativeRate: comingNativeVendorRate } = Object.values(vendor)[0]
 	const newVendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +comingNativeVendorRate, crossRate)
@@ -78,9 +80,9 @@ const makeStep = ({task, step, progress, vendor, projectCurrency, crossRate, isS
 			getNewStep: () => ({
 				...rest,
 				stepId: stepId + ' [R]',
-				//TODO: REMOVE
 				status: 'Created',
-				// status: 'In progress',
+				vendorBrief: '',
+				extraPayables: [],
 				vendor: vendorId,
 				vendorRate: newVendorRate,
 				nativeVendorRate: comingNativeVendorRate,
@@ -127,7 +129,7 @@ const makeStep = ({task, step, progress, vendor, projectCurrency, crossRate, isS
 		if (!isStart && !isPay) {
 			finance = mutatedFinanceByPercent(finance, progress)
 		}
-		if(isStart && type === 'CAT Wordcount'){
+		if (isStart && type === 'CAT Wordcount') {
 			finance.Wordcount.payables = +getRelativeQuantity(task.metrics, 'vendor')
 		}
 

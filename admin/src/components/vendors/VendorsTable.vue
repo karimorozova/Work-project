@@ -30,43 +30,36 @@
         .vendors-table__combinations(v-html="formateLanguagesPairs(getLanguagePairs(row).monoLanguagesPairs)")
 
       template(slot="native" slot-scope="{ row, index }")
-        .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          SelectSingle(
-            :selectedOption="selectedNative && selectedNative.lang",
-            :options="filteredLanguages.map(({lang}) => lang)",
-            :hasSearch="true"
-            @chooseOption="setNative"
-          )
-        .vendors-table__no-drop.vendors-table__native(v-if="row.native && currentEditingIndex !== index") {{ row.native.lang }}
-      template(slot="industry" slot-scope="{ row, index }")
-        .vendors-table__drop-menu(v-if="currentEditingIndex === index")
-          //MultiVendorIndustrySelect(
-          //  :selectedInd="industrySelected"
-          //  :filteredIndustries="selectedIndNames"
-          //  :parentInd="index"
-          //  @chosenInd="setIndustry"
-          //  @scrollDrop="scrollDrop"
-          //)
-          SelectMulti(
-            :hasSearch="true"
-            :allOptionsButtons="true"
-            placeholder="Select"
-            :selectedOptions="industrySelected.length ? industrySelected.map(i => i.name) : []"
-            :options="getAllIndustries.map(i => i.name)"
-            @chooseOptions="setIndustries"
-          )
-        .vendors-table__no-drop.vendors-table__industry.vendors-table_flex-wrap(v-else)
-          img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
-      template(slot="basicRate" slot-scope="{ row, index }")
-        .vendors-table__active(v-if="currentEditingIndex === index")
-          input.vendors-table__input(type="text" v-model="currentBasicRate" @click.stop="stopPropagation")
-        .vendors-table__no-drop(v-else)
-          span.vendors-table__data {{ row.basicRate }}
-      template(slot="tqi" slot-scope="{ row, index }")
-        .vendors-table__active(v-if="currentEditingIndex === index")
-          input.vendors-table__input(type="text" v-model="currentTqi" @click.stop="stopPropagation")
-        .vendors-table__no-drop(v-else)
-          span.vendors-table__data {{ row.tqi }}
+        .vendors-table__no-drop.vendors-table__native(v-if="row.native") {{ row.native.lang }}
+      //template(slot="industry" slot-scope="{ row, index }")
+      //  .vendors-table__drop-menu(v-if="currentEditingIndex === index")
+      //    //MultiVendorIndustrySelect(
+      //    //  :selectedInd="industrySelected"
+      //    //  :filteredIndustries="selectedIndNames"
+      //    //  :parentInd="index"
+      //    //  @chosenInd="setIndustry"
+      //    //  @scrollDrop="scrollDrop"
+      //    //)
+      //    SelectMulti(
+      //      :hasSearch="true"
+      //      :allOptionsButtons="true"
+      //      placeholder="Select"
+      //      :selectedOptions="industrySelected.length ? industrySelected.map(i => i.name) : []"
+      //      :options="getAllIndustries.map(i => i.name)"
+      //      @chooseOptions="setIndustries"
+      //    )
+      //  .vendors-table__no-drop.vendors-table__industry.vendors-table_flex-wrap(v-else)
+      //    img.vendors-table__industry-icon(v-for="industry in row.industries" :src="industry.icon")
+      //template(slot="basicRate" slot-scope="{ row, index }")
+      //  .vendors-table__active(v-if="currentEditingIndex === index")
+      //    input.vendors-table__input(type="text" v-model="currentBasicRate" @click.stop="stopPropagation")
+      //  .vendors-table__no-drop(v-else)
+      //    span.vendors-table__data {{ row.basicRate }}
+      //template(slot="tqi" slot-scope="{ row, index }")
+      //  .vendors-table__active(v-if="currentEditingIndex === index")
+      //    input.vendors-table__input(type="text" v-model="currentTqi" @click.stop="stopPropagation")
+      //  .vendors-table__no-drop(v-else)
+      //    span.vendors-table__data {{ row.tqi }}
       template(slot="test" slot-scope="{ row, index }")
         .checkbox(@click.stop="")
           input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
@@ -97,14 +90,13 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "16%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "9%", padding: "0" },
-					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "13%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "13%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "13%", padding: "0" },
-					{ label: "Industry", headerKey: "headerIndustry", key: "industry", width: "20%", padding: "0" },
-					{ label: "Test", headerKey: "headerTest", key: "test", width: "5%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "11%", padding: "3px" },
+					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "27%", padding: "0" },
+					{ label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0" },
+					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "15%", cellClass: "vendors-table_scroll-y" },
+					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "15%", cellClass: "vendors-table_scroll-y" },
+					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "15%", padding: "0" },
+					{ label: "Test", headerKey: "headerTest", key: "test", width: "4%", padding: "0" },
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "3px" },
 				],
 				icons: {
 					save: { icon: require('../../assets/images/Other/save-icon-qa-form.png') },

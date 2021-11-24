@@ -3,6 +3,7 @@
 
     .steps__vendorDetails(v-if="isVendorDetailsModal && vendorDetailsId")
       StepVendorDetails(
+        :index="infoIndex"
         :vendorId="vendorDetailsId"
         :currentStep="currentStep"
         :currentIndustry="currentProject.industry"
@@ -95,7 +96,7 @@
 
       template(slot="vendor" slot-scope="{ row, index }")
         .table__data(v-if="row.vendor")
-          span.vendor__details(@click="openVendorDetailsModal(row.vendor, row)") {{ vendorName(row.vendor) }}
+          span.vendor__details(@click="openVendorDetailsModal(row.vendor, row, index)") {{ vendorName(row.vendor) }}
         .table__data(v-else) -
 
       template(slot="start" slot-scope="{ row, index }")
@@ -157,7 +158,7 @@
           sup(:class="{'red-color': (+marginCalcPercent(row) > 1 && +marginCalcPercent(row) < 50) || +marginCalcPercent(row) < 0  }" v-if="marginCalc(row)") {{ marginCalcPercent(row) }}%
 
       template(slot="info" slot-scope="{row, index}")
-        .table__icons(v-if="!isFinanceEdit && !isStepInfo")
+        .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal")
           img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: pointer;" @click="showStepDetails(index)")
           img(src="../../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
         .table__icons(v-else)
@@ -247,19 +248,20 @@ export default {
   methods: {
     ...mapActions([
       "alertToggle",
-      // "setProjectProp",
       "setCurrentProject",
       "setStepsStatus"
-      // "setProjectStatus",
-      // "reopenSteps"
     ]),
     closeVendorDetailsModal() {
       this.vendorDetailsId = null
+      this.isVendorDetailsModal = false
+      this.infoIndex = -1
     },
-    openVendorDetailsModal(vendor, step) {
+    openVendorDetailsModal(vendor, step, index) {
+      if (this.isStepInfo || this.isFinanceEdit) return
       const { _id } = vendor
       this.vendorDetailsId = _id
       this.currentStep = step
+      this.infoIndex = index
       this.isVendorDetailsModal = true
     },
     closeStepInfo() {

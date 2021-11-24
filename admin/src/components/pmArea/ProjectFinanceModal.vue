@@ -5,12 +5,13 @@
 
     .info
       .info__link(@click="openDetailsModal") Go to details
+      .info__link2(v-if="step.vendor" @click="openVendorModal") Go to vendor
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
       .info__right
         span Discount/Surcharge:
-        span(style="margin-left: 4px;") {{discounts}}%
+        span(style="margin-left: 5px;") {{discounts}}%
 
       .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
 
@@ -113,6 +114,11 @@ export default {
       const { closeFinanceEditing, showStepDetails } = this.$parent
       closeFinanceEditing()
       showStepDetails(this.index)
+    },
+    openVendorModal() {
+      const { closeFinanceEditing, openVendorDetailsModal } = this.$parent
+      closeFinanceEditing()
+      openVendorDetailsModal(this.step.vendor, this.step, this.index)
     },
     async saveFinance() {
       const data = {
@@ -379,8 +385,25 @@ export default {
     position: absolute;
     right: 12px;
     cursor: pointer;
+    color: $dark-border;
+    transition: .2s ease-out;
 
     &:hover {
+      color: $text;
+      text-decoration: underline;
+    }
+  }
+
+  &__link2 {
+    position: absolute;
+    right: 12px;
+    top: 35px;
+    cursor: pointer;
+    color: $dark-border;
+    transition: .2s ease-out;
+
+    &:hover {
+      color: $text;
       text-decoration: underline;
     }
   }

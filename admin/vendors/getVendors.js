@@ -33,9 +33,9 @@ const getVendorsForSteps = async () => {
 				industry.steps.forEach(step => {
 					res.push({
 						[`${ item.sourceLanguage }-${ item.targetLanguage }-${ step.step }-${ industry.industry }`]: {
-							lqa1: step.lqa1.grade ||  0,
-							lqa2: step.lqa2.grade ||  0,
-							lqa3: step.lqa3.grade ||  0
+							lqa1: step.lqa1.grade || 0,
+							lqa2: step.lqa2.grade || 0,
+							lqa3: step.lqa3.grade || 0
 						}
 					})
 				})
@@ -76,11 +76,11 @@ const getVendorsForSteps = async () => {
 
 	return vendors
 
-	function getLQA(assessments, rate){
+	function getLQA(assessments, rate) {
 		const grades = assessments.find(item =>
 				Object.keys(item)[0] === `${ rate.sourceLanguage._id }-${ rate.targetLanguage._id }-${ rate.step._id }-${ rate.industry._id }`
 		)
-		return grades ? Object.values(grades)[0] : {lqa1: 0, lqa2: 0, lqa3: 0}
+		return grades ? Object.values(grades)[0] : { lqa1: 0, lqa2: 0, lqa3: 0 }
 	}
 
 	function getTQI(qualifications, rate) {
@@ -112,12 +112,13 @@ function getBenchmarkAdditions(item, basicPricesTable, stepMultipliersTable, ind
 		return (euroBasicPrice.euroBasicPrice * (stepMultiplier.multiplier / 100)) * (industryMultiplier.multiplier / 100) / 2
 	}
 }
-async function getVendorStepDetails (id, stepInfo) {
-	const groupStepInfo = `${stepInfo.source}-${ stepInfo.target}-${stepInfo.step}-${ stepInfo.unit}-${stepInfo.industry}`
-	const groupStepInfoWithoutUnit = `${stepInfo.source}-${ stepInfo.target}-${stepInfo.step}-${stepInfo.industry}`
+
+async function getVendorStepDetails(id, stepInfo) {
+	const groupStepInfo = `${ stepInfo.source }-${ stepInfo.target }-${ stepInfo.step }-${ stepInfo.unit }-${ stepInfo.industry }`
+	const groupStepInfoWithoutUnit = `${ stepInfo.source }-${ stepInfo.target }-${ stepInfo.step }-${ stepInfo.industry }`
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	let vendor = await Vendors.findOne(
-			{ status: "Active", _id: id},
+			{ status: "Active", _id: id },
 			{
 				"firstName": 1,
 				"surname": 1,
@@ -134,21 +135,22 @@ async function getVendorStepDetails (id, stepInfo) {
 			.populate('rates.pricelistTable.industry', [ 'name' ]).lean()
 
 
-	const priceListTable = vendor.rates.pricelistTable.find(({sourceLanguage, targetLanguage,step ,unit, industry}) => {
-		const currentInfo = `${sourceLanguage._id}-${targetLanguage._id}-${step._id}-${unit._id}-${industry._id}`
+	const priceListTable = vendor.rates.pricelistTable.find(({ sourceLanguage, targetLanguage, step, unit, industry }) => {
+		const currentInfo = `${ sourceLanguage._id }-${ targetLanguage._id }-${ step._id }-${ unit._id }-${ industry._id }`
 		return groupStepInfo === currentInfo
-	} )
+	})
 
-	if(!priceListTable) return {
-		name: vendor.firstName,
+	if (!priceListTable) return {
+		name: vendor.firstName + ' ' + vendor.surname || '',
+		photo: vendor.photo,
 		email: vendor.email,
-		price: '-',
+		// price: 44,
 		tqi: '-',
 		benchmark: '-',
 		benchmarkMargin: '-',
 		lqa1: '-',
 		lqa2: '-',
-		lqa3: '-',
+		lqa3: '-'
 	}
 
 	const vendorAssessments = vendor.assessments.find(item => {
@@ -160,22 +162,22 @@ async function getVendorStepDetails (id, stepInfo) {
 			}
 		}
 	})
-	// console.log({ vendorAssessments })
-	// console.log({ vendorAssessments: vendorAssessments.industries[0].steps[0] })
+
 	const vendorQualifications = vendor.qualifications.find(item => {
 		for (industry of item.industries) {
-			for(step of item.steps) {
+			for (step of item.steps) {
 				const current = `${ item.source }-${ item.target }-${ step }-${ industry }`
 				return current === groupStepInfoWithoutUnit
 			}
 		}
 	})
-	const {lqa1: {grade: lqa1 = 0}= 0,lqa2: {grade: lqa2 = 0} = 0,lqa3: {grade: lqa3 = 0} = 0 } = vendorAssessments ? vendorAssessments.industries[0].steps[0] : {  }
+	const { lqa1: { grade: lqa1 = 0 } = 0, lqa2: { grade: lqa2 = 0 } = 0, lqa3: { grade: lqa3 = 0 } = 0 } = vendorAssessments ? vendorAssessments.industries[0].steps[0] : {}
 	const { tqi = 0 } = vendorQualifications ? vendorQualifications : {}
 	return {
-		name: vendor.firstName,
+		name: vendor.firstName + ' ' + vendor.surname || '',
+		photo: vendor.photo,
 		email: vendor.email,
-		price: priceListTable.price,
+		// price: 33,
 		tqi: tqi || 0,
 		lqa1,
 		lqa2,
@@ -379,6 +381,6 @@ module.exports = {
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential,
 	getVendorsForSteps,
-	getVendorStepDetails,
+	getVendorStepDetails
 
 }

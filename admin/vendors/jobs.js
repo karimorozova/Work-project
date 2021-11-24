@@ -13,7 +13,6 @@ const { Projects, Delivery, Languages } = require('../models')
 const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs')
-const { log } = require("nodemon/lib/utils")
 
 async function getJobs(id) {
 	const allLanguages = await Languages.find()

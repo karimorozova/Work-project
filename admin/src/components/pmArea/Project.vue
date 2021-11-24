@@ -465,7 +465,7 @@ export default {
 
 .block {
   width: 100px;
-  border: 1px dotted $border;
+  border: 1px dotted $light-border;
   flex-direction: column;
   align-items: center;
   padding: 6px 0px 4px 0px;

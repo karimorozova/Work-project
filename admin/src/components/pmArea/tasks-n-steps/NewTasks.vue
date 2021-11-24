@@ -479,7 +479,9 @@ export default {
 
       if (!this.checkedTasks.length) return []
 
-      const isSendStatus = this.currentProject.status === 'In progress' || 'Approved' ? [ 'Mark as Approved', 'Send a Quote',  ] : []
+      const isSendStatus = this.currentProject.status === 'In progress' || this.currentProject.status === 'Approved'
+          ? [ 'Mark as Approved', 'Send a Quote',  ]
+          : []
 
       // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
       return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel']
