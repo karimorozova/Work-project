@@ -16,8 +16,8 @@
 
     .stats
       .multi-graph
-        .graph( :style="{'--percentage' : 100, '--fill': '#daeded'}")
-        .graph( :style="{'--percentage' : chartMargin, '--fill': '#f5dfd9'}")
+        .graph( :style="{'--percentage' : 100, '--fill': '#EAC0BB'}")
+        .graph( :style="{'--percentage' : chartMargin, '--fill': '#A9D3D1'}")
       .stats__details
         .details__row
           .details__row-color1
@@ -52,13 +52,13 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables")
+              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables" :disabled="isProjectFinished")
               span(v-else) -
 
           template(slot="payables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.payables }}
             .table__data(v-else)
-              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor")
+              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor || isProjectFinished")
               span(v-else) -
 
     .finance__buttons
@@ -211,8 +211,11 @@ export default {
     ...mapGetters({
       units: "getAllUnits",
       currentProject: "getCurrentProject"
-
     }),
+    isProjectFinished() {
+      const { status } = this.currentProject
+      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    },
     isMinimumChargeUsed() {
       return this.currentProject.minimumCharge.isUsed
     },
@@ -290,14 +293,14 @@ export default {
     &-color1 {
       height: 6px;
       min-width: 6px;
-      background: $light-green;
+      background: $medium-green;
       margin-right: 10px;
     }
 
     &-color2 {
       height: 6px;
       min-width: 6px;
-      background: $light-red;
+      background: $medium-red;
       margin-right: 10px;
     }
   }
@@ -402,7 +405,7 @@ export default {
 
 .finance {
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }
@@ -447,7 +450,7 @@ export default {
 //  z-index: 501;
 //
 //  &__title {
-//    font-size: 19px;
+//    font-size: 18px;
 //    font-family: Myriad600;
 //    margin-bottom: 10px;
 //  }

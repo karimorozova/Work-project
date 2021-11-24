@@ -550,7 +550,7 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;

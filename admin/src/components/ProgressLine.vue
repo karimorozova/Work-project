@@ -17,7 +17,7 @@
 		},
 		methods: {
 			getProgressColor(status) {
-				return status === 'Pending Approval [DR1]' || status === 'Completed' || status === 'Closed' ? '#47A6A6' : '#f6cb64'
+				return status === 'Pending Approval [DR1]' || status === 'Completed' || status === 'Closed' ? '#A9D3D1' : '#EAC0BB'
 			}
 		},
 		computed: {
@@ -34,7 +34,7 @@
   .progress-line {
     width: 100%;
     height: 7px;
-    border: 1px solid $border;
+    border: 1px solid #ddd;
     position: relative;
     box-sizing: border-box;
 

@@ -127,7 +127,7 @@ export default {
 
 .step-info {
   &__title {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }

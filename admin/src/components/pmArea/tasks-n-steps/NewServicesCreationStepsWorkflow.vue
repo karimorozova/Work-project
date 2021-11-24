@@ -324,7 +324,7 @@ export default {
 
 .modal-title {
   margin-bottom: 15px;
-  font-size: 19px;
+  font-size: 18px;
   font-family: Myriad600;
 }
 

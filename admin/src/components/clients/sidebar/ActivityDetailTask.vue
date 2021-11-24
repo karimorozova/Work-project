@@ -291,7 +291,7 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       margin-left: 15px;
       font-family: 'Myriad300';
     }

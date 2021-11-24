@@ -35,7 +35,7 @@
     border-radius: 4px;
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       border-bottom: 1px solid $light-border;
       padding-bottom: 5px;
       font-family: Myriad600;

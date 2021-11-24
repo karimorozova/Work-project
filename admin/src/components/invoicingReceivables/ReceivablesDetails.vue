@@ -598,7 +598,7 @@
   }
 
   .title-project {
-    font-size: 19px;
+    font-size: 18px;
     font-family: Myriad600;
     display: flex;
     justify-content: space-between;

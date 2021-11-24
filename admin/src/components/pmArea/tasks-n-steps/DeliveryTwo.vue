@@ -492,7 +492,7 @@
     width: 592px;
     height: 32px;
     transition: .1s ease-out;
-    font-size: 19px;
+    font-size: 18px;
     color: $text;
 
     &:focus {
@@ -626,7 +626,7 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       margin-bottom: 20px;
       font-family: 'Myriad600';
       display: flex;
@@ -717,7 +717,7 @@
     }
 
     &_left-align {
-      font-size: 19px;
+      font-size: 18px;
       text-align: left;
       border-bottom: 1px solid #c5bfb5;
       padding-bottom: 3px;

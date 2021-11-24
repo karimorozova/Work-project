@@ -789,7 +789,7 @@
   .vendor-subinfo {
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       border-bottom: 1px solid $light-border;
       padding-bottom: 5px;
       margin-bottom: 25px;
@@ -1061,7 +1061,7 @@
     height: 100%;
 
     &__message {
-      font-size: 19px;
+      font-size: 18px;
       opacity: 0.5;
       width: 50%;
       text-align: center;
@@ -1107,7 +1107,7 @@
     z-index: 20;
 
     p {
-      font-size: 19px;
+      font-size: 18px;
       width: 50%;
       text-align: center;
     }

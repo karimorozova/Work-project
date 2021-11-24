@@ -181,7 +181,7 @@
 
     &__title {
       margin-bottom: 5px;
-      font-size: 19px;
+      font-size: 18px;
     }
 
     &__drop-menu {

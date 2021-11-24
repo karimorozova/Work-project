@@ -407,7 +407,7 @@
 
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       margin-bottom: 20px;
       font-family: 'Myriad600';
     }
@@ -505,7 +505,7 @@
     }
 
     &_left-align {
-      font-size: 19px;
+      font-size: 18px;
       text-align: left;
       border-bottom: 1px solid $border;
       padding-bottom: 3px;

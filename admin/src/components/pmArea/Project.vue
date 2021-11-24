@@ -24,10 +24,10 @@
                 .inner
                   .pieText
                     .pieDescription
-                      .pieDescription__icon(style="background: #f5dfd9;")
+                      .pieDescription__icon(style="background: #EAC0BB;")
                       .pieDescription__text {{getPayablesPercent}}%
                     .pieDescription
-                      .pieDescription__icon(style="background: #daeded;")
+                      .pieDescription__icon(style="background: #A9D3D1;")
                       .pieDescription__text {{getMargin}}%
 
             .client__details
@@ -437,9 +437,8 @@ export default {
   }
 
   &__text {
-    color: #3333;
+    color: #9999;
     font-size: 12px;
-    font-family: 'Myriad600';
   }
 }
 
@@ -618,7 +617,7 @@ export default {
   }
 
   &__name {
-    font-size: 19px;
+    font-size: 18px;
     padding: 0 10px;
     height: 44px;
     width: 880px;
@@ -822,7 +821,7 @@ a {
   font-size: 14px;
   display: grid;
   place-items: center;
-  background: conic-gradient(#f5dfd9 0, #f5dfd9 var(--percentage), #daeded 0, #daeded 100%);
+  background: conic-gradient(#EAC0BB 0, #EAC0BB var(--percentage), #A9D3D1 0, #A9D3D1 100%);
   position: relative;
   width: 102px;
   height: 102px;

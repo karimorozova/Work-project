@@ -24,7 +24,7 @@ export default {
 
 <style lang="scss" scoped>
 .step-info-title {
-    font-size: 19px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;

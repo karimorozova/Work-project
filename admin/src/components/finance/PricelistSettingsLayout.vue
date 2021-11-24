@@ -275,7 +275,7 @@
     &__title {
       display: flex;
       align-items: flex-end;
-      font-size: 19px;
+      font-size: 18px;
       font-family: 'Myriad600';
     }
   }

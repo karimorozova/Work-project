@@ -388,7 +388,7 @@
     }
 
     /*&__block-title {*/
-    /*  font-size: 19px;*/
+    /*  font-size: 18px;*/
     /*  font-family: Myriad600;*/
     /*}*/
 
@@ -442,7 +442,7 @@
     height: 32px;
 
     &__text {
-      font-size: 19px;
+      font-size: 18px;
       font-family: 'Myriad600';
     }
   }
@@ -481,7 +481,7 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       margin-bottom: 20px;
       display: flex;
       justify-content: space-between;

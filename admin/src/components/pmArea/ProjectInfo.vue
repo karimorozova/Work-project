@@ -4,23 +4,7 @@
     .project-info__leftSide
       Project(:project="currentProject")
 
-      NewTasksAndSteps()
-
-        //ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
-
-      //.task-and-steps(v-if="originallyLanguages && originallyUnits && originallySteps && originallyServices")
-      //  TasksAndSteps(
-      //    :originallyLanguages="originallyLanguages"
-      //    :originallyUnits="originallyUnits"
-      //    :originallySteps="originallySteps"
-      //    :originallyServices="originallyServices"
-      //    :isFinishedStatus="isFinishedStatus"
-      //    @getMetrics="getMetrics"
-      //    @setVendor="setVendor"
-      //    @setDate="setDate"
-      //    @showErrors="showErrors"
-      //  )
-      //    ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="isBlockAbsoulte" @closeErrors="closeErrorsBlock")
+      NewTasksAndSteps
 
       Deliverables(v-if="isStageDelivery")
 

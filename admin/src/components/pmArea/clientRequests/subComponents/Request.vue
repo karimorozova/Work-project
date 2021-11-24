@@ -483,7 +483,7 @@ export default {
   }
 
   &__name {
-    font-size: 19px;
+    font-size: 18px;
     padding: 0 10px;
     height: 44px;
     width: 970px;

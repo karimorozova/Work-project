@@ -9,7 +9,7 @@ async function getProjectsForVendorPortal(obj) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -28,7 +28,7 @@ async function getProjects(obj) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -63,7 +63,7 @@ async function getProjectsForPortal(obj) {
 	)
 			.populate('industry')
 			.populate('service')
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
 }
@@ -102,7 +102,7 @@ async function getProject(obj) {
 			.populate('customer')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -128,7 +128,7 @@ async function updateProject(query, update) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -154,7 +154,7 @@ async function getProjectAfterUpdate(query, update) {
 			.populate('service')
 			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid' ])
+			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
 			.populate('steps.step')
 			.populate('steps.service')
 			.populate('steps.receivablesUnit')
@@ -261,7 +261,7 @@ async function getFilteredProjects(filters) {
 			'service',
 			{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'accountManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
-			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email', 'guid' ] },
+			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email', 'guid', 'photo' ] },
 			{ path: 'requestId', select: [ 'projectId' ] }
 		])
 	} catch (err) {

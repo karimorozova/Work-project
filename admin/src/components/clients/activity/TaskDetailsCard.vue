@@ -212,7 +212,7 @@
     padding-bottom: 10px;
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
       margin-left: 10px;
     }
 
@@ -269,7 +269,7 @@
     }
 
     &__title {
-      font-size: 19px;
+      font-size: 18px;
     }
 
     &__date {
