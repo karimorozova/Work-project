@@ -290,7 +290,8 @@ const ProjectsSchema = new mongoose.Schema({
 	} ],
 	steps: [ {
 		projectId: { type: String, trim: true },
-		vendorBrief: {type: String, trim: true},
+		vendorBrief: { type: String, trim: true },
+		extraPayables: { type: Array, default: [] },
 		stepNumber: { type: Number },
 		vendor: { type: Schema.Types.ObjectId, ref: 'Vendors' },
 		stepId: { type: String, trim: true },

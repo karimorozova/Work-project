@@ -1,5 +1,13 @@
 <template lang="pug">
   .vendor-manage
+
+    .vendor-manage__sender(v-if="isSender && toEmail" )
+      MailSender(
+        @close="closeSender"
+        :to="toEmail"
+        :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
+      )
+
     .vendor-manage__errors(v-if="areErrors")
       ValidationErrors(:isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
 
@@ -100,7 +108,7 @@
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
                   img(:src="domain + getAssignedVendorInfo().photo")
-                .user__fakeImage(v-else) {{ getAssignedVendorInfo().name[0] }}
+                .user__fakeImage(:style="{'--bgColor': getBgColor(getAssignedVendorInfo()._id)[0], '--color': getBgColor(getAssignedVendorInfo()._id)[1]}" v-else) {{ getAssignedVendorInfo().name[0] }}
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
 
@@ -109,7 +117,11 @@
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
                       span {{ getAssignedVendorInfo().name }}
                     span.assigned(style="margin-left: 10px;") [Assigned]
-                  .assignedVendor__user-email {{ getAssignedVendorInfo().email }} (клик письмо)
+                  .assignedVendor__user-email(@click="openSender(getAssignedVendorInfo().email)")
+                    span
+                      i(class="far fa-envelope")
+                    span {{ getAssignedVendorInfo().email }}
+
                   .buttons
                     .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
                     .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
@@ -119,7 +131,7 @@
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
                   img(:src="domain + getReAssignedVendorInfo().photo")
-                .user__fakeImage(v-else) {{ getReAssignedVendorInfo().name[0] }}
+                .user__fakeImage(:style="{'--bgColor': getBgColor(getReAssignedVendorInfo()._id)[0], '--color': getBgColor(getReAssignedVendorInfo()._id)[1] }" v-else) {{ getReAssignedVendorInfo().name[0] }}
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
 
@@ -128,7 +140,11 @@
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getReAssignedVendorInfo()._id}`}")
                       span {{ getReAssignedVendorInfo().name }}
                     span.newAssigned(style="margin-left: 10px;") [New assignments]
-                  .assignedVendor__user-email {{ getReAssignedVendorInfo().email }} (клик письмо)
+                  .assignedVendor__user-email(@click="openSender(getReAssignedVendorInfo().email)")
+                    span
+                      i(class="far fa-envelope")
+                    span {{ getReAssignedVendorInfo().email }}
+
                   .buttons
                     .buttons__btn
                       .buttons__btn( @click="removeVendorAssignments()") Remove
@@ -186,24 +202,27 @@
                     .user
                       .user__image(v-if="item.photo")
                         img(:src="domain + item.photo")
-                      .user__fakeImage(v-else) {{ item.name[0] }}
-
+                      .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)[0], '--color': getBgColor(item._id)[1]  }" v-else) {{ item.name[0] }}
 
                       .user__description
                         .user__name
                           router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${item._id}`}")
                             span {{ item.name }}
 
-                        .user__email {{ item.email }} (клик письмо)
+                        .user__email(@click="openSender(item.email)")
+                          span
+                            i(class="far fa-envelope")
+                          span {{ item.email }}
+
                         .buttons
-                          .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
-                          .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, nativeRate: item.nativeRate })") Assign
-                          .buttons__btn() Details
+                          .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
+                          .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
+                          .buttons__btn() Details (soon)
 
                   .vendor__stats(v-if="!isReassignment")
                     .stats__row.border-bottom
                       .stats__colLong
-                        .stats__col-bigTitle PRICE
+                        .stats__col-bigTitle TOTAL PAY.
                         .stats__col-bigValue
                           .stats__col-bigValue-num {{ item.price }}
                           .stats__col-bigValue-currency
@@ -215,10 +234,12 @@
 
                     .stats__row
                       .stats__col.border-right
-                        .stats__col-smallValue {{ item.total }}
-                        .stats__col-smallTitle TOTAL
+                        .stats__col-smallValue {{ item.marginPercent }}
+                          span.currency %
+                        .stats__col-smallTitle MARGIN
                       .stats__col
                         .stats__col-smallValue {{ item.margin }}
+                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
                         .stats__col-smallTitle MARGIN
 
                   .vendor__stats
@@ -237,10 +258,12 @@
                     .stats__row
                       .stats__col.border-right
                         .stats__col-smallValue {{ item.benchmark }}
+                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
                         .stats__col-smallTitle B.MARK
                       .stats__col
                         .stats__col-smallValue {{ item.benchmarkMargin }}
-                        .stats__col-smallTitle MARGIN
+                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                        .stats__col-smallTitle B.MARGIN
 
                   .vendor__marks
                     .marks__row
@@ -280,12 +303,14 @@ import SelectSingle from "../SelectSingle"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 import { rateExchangeVendorOntoProject } from "../../../helpers/commonFunctions"
 import ValidationErrors from "../ValidationErrors"
+import getBgColor from "../../mixins/getBgColor"
+import MailSender from "../MailSender"
 
 export default {
   mounted() {
     this.domain = __WEBPACK__API_URL__
   },
-  mixins: [ currencyIconDetected ],
+  mixins: [ currencyIconDetected, getBgColor ],
   props: {
     steps: {
       type: Array,
@@ -294,6 +319,8 @@ export default {
   },
   data() {
     return {
+      isSender: false,
+      toEmail: null,
       domain: "http://localhost:3001",
       reasons: [ 'Unresponsive', 'Technical issues', 'Personal issues' ],
       reason: null,
@@ -331,6 +358,14 @@ export default {
     }
   },
   methods: {
+    openSender(to) {
+      this.isSender = true
+      this.toEmail = to
+    },
+    closeSender() {
+      this.isSender = false
+      this.toEmail = null
+    },
     closeErrors() {
       this.areErrors = false
     },
@@ -576,10 +611,14 @@ export default {
       try {
         const allVendors = await this.$http.get('/pm-manage/vendors-for-steps')
         this.allVendors = allVendors.data
-        console.log(allVendors.data)
       } catch (err) {
-        console.log('err get vendors')
+        console.log('Error get vendors')
       }
+    },
+    marginCalcPercent(receivables, payables) {
+      let percent = NaN
+      percent = 100 - (payables / receivables) * 100
+      return Number.isNaN(percent) || !isFinite(percent) ? 0 : percent.toFixed(0)
     },
     ...mapActions({
       alertToggle: 'alertToggle',
@@ -613,7 +652,7 @@ export default {
       let vendors = this.allVendors
       const query = `${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
       const { projectCurrency, crossRate } = this.currentProject
-      const { finance, payablesUnit, vendor } = this.currentStep
+      const { finance, payablesUnit, vendor, taskId } = this.currentStep
 
       //searching ==>
       if (!this.isAllVendors) {
@@ -621,7 +660,34 @@ export default {
             .map(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }`)
             .includes(query))
       }
-      if (this.vendorsSearch.length) vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
+
+      // same Vendor in 2 steps ==>
+      const stepsIds = this.steps.filter(i => i.taskId === taskId).map(i => i._id.toString())
+      if (stepsIds.length > 1) {
+        const selectedVendors = Object.keys(this.selectedVendors).length
+            ? Object.entries(this.selectedVendors)
+                .map(i => {
+                  const [ _id, rest ] = i
+                  return { _id, vendor: rest.name }
+                })
+                .filter(i => stepsIds.includes(i._id.toString()))
+                .map(i => i.vendor)
+            : []
+        const vendorsNames = [
+          ...this.steps
+              .filter(i => stepsIds.includes(i._id.toString()))
+              .map(i => i.vendor && `${ i.vendor.firstName } ${ i.vendor.surname || '' }`)
+              .filter(Boolean),
+          ...selectedVendors
+        ]
+        if (vendorsNames.length) {
+          vendors = vendors.filter(({ name }) => !vendorsNames.includes(name))
+        }
+      }
+      if (this.vendorsSearch.length) {
+        vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
+      }
+      // same Vendor in 2 steps <==
 
       if (vendor && !this.selectedVendors[this.currentStepId]) {
         vendors = vendors.filter(({ name }) => name.toUpperCase() !== (`${ vendor.firstName } ${ vendor.surname || '' }`).toUpperCase())
@@ -660,19 +726,20 @@ export default {
           lqa3: rates ? rates.lqa3 : 0,
           name,
           email,
-          total: +(finance.Price.receivables).toFixed(2),
+          marginPercent: rates ? this.marginCalcPercent(finance.Price.receivables, quantity * rate) : 0,
           margin: rates ? +(finance.Price.receivables - (quantity * rate)).toFixed(2) : 0,
           price: rates ? +(quantity * rate).toFixed(2) : 0
         }
       })
 
-      return vendors.sort((a,b) => a.price - b.price)
+      return vendors.sort((a, b) => a.price - b.price)
     }
   },
   async created() {
     await this.getVendorsForSteps()
   },
   components: {
+    MailSender,
     ValidationErrors,
     SelectSingle,
     Toggler,
@@ -747,7 +814,7 @@ export default {
       height: 10px;
       width: 10px;
       border-radius: 10px;
-      background-color: $green;
+      background-color: $medium-green;
       right: -5px;
       top: 15px;
     }
@@ -757,7 +824,7 @@ export default {
       height: 10px;
       width: 10px;
       border-radius: 10px;
-      background-color: $red;
+      background-color: $medium-red;
       right: -5px;
       top: 15px;
     }
@@ -768,7 +835,20 @@ export default {
     }
 
     &-email {
-      color: #3333;
+      color: #9999;
+      width: fit-content;
+      transition: .2s ease-out;
+      display: flex;
+      gap: 5px;
+
+      i {
+        margin-top: 1px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: $text;
+      }
     }
 
     &-image {
@@ -824,7 +904,6 @@ export default {
       background-color: $light-border;
     }
   }
-
 }
 
 .availability {
@@ -937,7 +1016,9 @@ export default {
     }
 
     &-smallValue {
-      color: $dark-border;
+      color: $text;
+      display: flex;
+      gap: 4px;
     }
   }
 
@@ -973,17 +1054,30 @@ export default {
   }
 
   &__email {
-    color: #3333;
+    color: #9999;
+    width: fit-content;
+    transition: .2s ease-out;
+    display: flex;
+    gap: 5px;
+
+    i {
+      margin-top: 1px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: $text;
+    }
   }
 
-  &__fakeImage{
+  &__fakeImage {
     height: 65px;
     width: 65px;
     min-width: 65px;
     border-radius: 8px;
     font-size: 28px;
-    background: #a8cdbd;
-    color: white;
+    background: var(--bgColor);
+    color: var(--color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1172,6 +1266,14 @@ export default {
 }
 
 .vendor-manage {
+  position: relative;
+
+  &__sender {
+    position: absolute;
+    top: 10%;
+    left: 21%;
+    z-index: 2000;
+  }
 
   &__title {
     font-size: 18px;
@@ -1181,8 +1283,8 @@ export default {
 
   &__close {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: -10px;
+    right: -10px;
     font-size: 22px;
     cursor: pointer;
     height: 22px;
@@ -1411,4 +1513,10 @@ a {
 .noVendors {
   opacity: .3;
 }
+
+.currency {
+  font-size: 14px;
+  color: $dark-border !important;
+}
+
 </style>

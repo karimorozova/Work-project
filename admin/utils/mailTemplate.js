@@ -78,7 +78,7 @@ const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 			to: `${ mailSettings.to }`, // pm@pangea.global list of receivers
 			subject: `${ mailSettings.subject }`, // Subject line
 			text: "", // plain text body
-			html: "<b>" + msg + "</b>" // html body
+			html: msg // html body
 		}
 		mailOptions.attachments = mailSettings.attachments || []
 		if (!withoutImage) {

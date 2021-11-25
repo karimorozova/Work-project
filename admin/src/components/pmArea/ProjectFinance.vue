@@ -188,7 +188,7 @@ export default {
   height: 44px;
 
   &__forIgnore {
-    margin-bottom: 10px;
+    //margin-bottom: 10px;
   }
 
   &__input {

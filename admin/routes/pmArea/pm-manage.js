@@ -75,7 +75,8 @@ const {
 	stepReassignedNotification,
 	sendEmail,
 	notifyClientProjectCancelled,
-	notifyClientTasksCancelled
+	notifyClientTasksCancelled,
+	sendFlexibleEmail
 } = require('../../utils')
 
 const {
@@ -124,6 +125,20 @@ const {
 } = require('../../vendors/getVendors')
 
 const { setUpdatedFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../../сalculations/finance')
+const { getEmailBackbone } = require("../../emailMessages/otherCommunication")
+
+
+router.post('/send-email-from-to', async (req, res) => {
+	const { message, to, from, subject } = req.body
+	try {
+		const html = getEmailBackbone(message)
+		await sendFlexibleEmail({ from, to, subject }, html)
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('/send-email-from-to')
+	}
+})
 
 router.post('/allprojects', async (req, res) => {
 	const filters = { ...req.body }
@@ -603,9 +618,9 @@ router.post('/vendor-assigment', async (req, res) => {
 router.post('/approve-tasks', async (req, res) => {
 	const { tasks: taskIds, projectId } = req.body
 	try {
-		const project = await getProject({"_id": projectId})
+		const project = await getProject({ "_id": projectId })
 		const { tasks, steps } = updateWithApprovedTasks({ taskIds, project })
-		const updatedProject = await updateProject({"_id": projectId}, { $set: { tasks, steps } })
+		const updatedProject = await updateProject({ "_id": projectId }, { $set: { tasks, steps } })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
