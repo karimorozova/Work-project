@@ -423,6 +423,7 @@ export default {
   &__value {
     font-size: 14px;
     margin-top: 6px;
+    height: 16px;
   }
 }
 

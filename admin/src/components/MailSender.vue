@@ -202,6 +202,7 @@ export default {
   &__block {
     &-title {
       margin-bottom: 2px;
+      height: 16px;
     }
 
     &-drop {
