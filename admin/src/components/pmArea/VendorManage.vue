@@ -1283,8 +1283,8 @@ export default {
 
   &__close {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: -10px;
+    right: -10px;
     font-size: 22px;
     cursor: pointer;
     height: 22px;
