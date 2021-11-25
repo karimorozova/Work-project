@@ -1,5 +1,12 @@
 <template lang="pug">
   .wrapper(v-if="vendorDetails")
+    .wrapper__sender(v-if="isSender && toEmail" )
+      MailSender(
+        @close="closeSender"
+        :to="toEmail"
+        :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
+      )
+
     .wrapper__title Vendor
     .wrapper__close(@click="close") &#215;
 
@@ -27,7 +34,10 @@
                 router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${vendorId}`}")
                   span {{ vendorDetails.name }}
 
-              .user__email {{ vendorDetails.email }} (клик письмо)
+              .user__email(@click="openSender(vendorDetails.email)")
+                span
+                  i(class="far fa-envelope")
+                span {{ vendorDetails.email }}
               .buttons
                 .buttons__btn(@click="openBriefModal" ) Personal Instructions
                 .buttons__btn() Extra payables (Soon)
@@ -82,6 +92,7 @@ import CKEditor from "ckeditor4-vue"
 import Button from "../../Button"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import getBgColor from "../../../mixins/getBgColor"
+import MailSender from "../../MailSender"
 
 export default {
   mixins: [ currencyIconDetected, getBgColor ],
@@ -124,11 +135,21 @@ export default {
         removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
         uiColor: "#ffffff",
         height: 100
-      }
+      },
+      isSender: false,
+      toEmail: null
 
     }
   },
   methods: {
+    openSender(to) {
+      this.isSender = true
+      this.toEmail = to
+    },
+    closeSender() {
+      this.isSender = false
+      this.toEmail = null
+    },
     openDetailsModal() {
       const { closeVendorDetailsModal, showStepDetails } = this.$parent
       closeVendorDetailsModal()
@@ -194,6 +215,7 @@ export default {
     }
   },
   components: {
+    MailSender,
     ckeditor: CKEditor.component,
     Button
   }
@@ -265,6 +287,14 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   position: relative;
+
+  &__sender {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+  }
 
   &__title {
     font-size: 18px;
@@ -448,7 +478,20 @@ export default {
   }
 
   &__email {
-    color: #3333;
+    color: #9999;
+    width: fit-content;
+    transition: .2s ease-out;
+    display: flex;
+    gap: 5px;
+
+    i {
+      margin-top: 1px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: $text;
+    }
   }
 
   &__fakeImage {

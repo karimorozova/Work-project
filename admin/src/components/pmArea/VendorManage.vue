@@ -1,5 +1,13 @@
 <template lang="pug">
   .vendor-manage
+
+    .vendor-manage__sender(v-if="isSender && toEmail" )
+      MailSender(
+        @close="closeSender"
+        :to="toEmail"
+        :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
+      )
+
     .vendor-manage__errors(v-if="areErrors")
       ValidationErrors(:isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
 
@@ -109,7 +117,11 @@
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
                       span {{ getAssignedVendorInfo().name }}
                     span.assigned(style="margin-left: 10px;") [Assigned]
-                  .assignedVendor__user-email {{ getAssignedVendorInfo().email }} (клик письмо)
+                  .assignedVendor__user-email(@click="openSender(getAssignedVendorInfo().email)")
+                    span
+                      i(class="far fa-envelope")
+                    span {{ getAssignedVendorInfo().email }}
+
                   .buttons
                     .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
                     .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
@@ -128,7 +140,11 @@
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getReAssignedVendorInfo()._id}`}")
                       span {{ getReAssignedVendorInfo().name }}
                     span.newAssigned(style="margin-left: 10px;") [New assignments]
-                  .assignedVendor__user-email {{ getReAssignedVendorInfo().email }} (клик письмо)
+                  .assignedVendor__user-email(@click="openSender(getReAssignedVendorInfo().email)")
+                    span
+                      i(class="far fa-envelope")
+                    span {{ getReAssignedVendorInfo().email }}
+
                   .buttons
                     .buttons__btn
                       .buttons__btn( @click="removeVendorAssignments()") Remove
@@ -188,13 +204,16 @@
                         img(:src="domain + item.photo")
                       .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)[0], '--color': getBgColor(item._id)[1]  }" v-else) {{ item.name[0] }}
 
-
                       .user__description
                         .user__name
                           router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${item._id}`}")
                             span {{ item.name }}
 
-                        .user__email {{ item.email }} (клик письмо)
+                        .user__email(@click="openSender(item.email)")
+                          span
+                            i(class="far fa-envelope")
+                          span {{ item.email }}
+
                         .buttons
                           .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
                           .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
@@ -285,6 +304,7 @@ import currencyIconDetected from "../../mixins/currencyIconDetected"
 import { rateExchangeVendorOntoProject } from "../../../helpers/commonFunctions"
 import ValidationErrors from "../ValidationErrors"
 import getBgColor from "../../mixins/getBgColor"
+import MailSender from "../MailSender"
 
 export default {
   mounted() {
@@ -299,6 +319,8 @@ export default {
   },
   data() {
     return {
+      isSender: false,
+      toEmail: null,
       domain: "http://localhost:3001",
       reasons: [ 'Unresponsive', 'Technical issues', 'Personal issues' ],
       reason: null,
@@ -336,6 +358,14 @@ export default {
     }
   },
   methods: {
+    openSender(to) {
+      this.isSender = true
+      this.toEmail = to
+    },
+    closeSender() {
+      this.isSender = false
+      this.toEmail = null
+    },
     closeErrors() {
       this.areErrors = false
     },
@@ -709,6 +739,7 @@ export default {
     await this.getVendorsForSteps()
   },
   components: {
+    MailSender,
     ValidationErrors,
     SelectSingle,
     Toggler,
@@ -804,7 +835,20 @@ export default {
     }
 
     &-email {
-      color: #3333;
+      color: #9999;
+      width: fit-content;
+      transition: .2s ease-out;
+      display: flex;
+      gap: 5px;
+
+      i {
+        margin-top: 1px;
+      }
+
+      &:hover {
+        cursor: pointer;
+        color: $text;
+      }
     }
 
     &-image {
@@ -1010,7 +1054,20 @@ export default {
   }
 
   &__email {
-    color: #3333;
+    color: #9999;
+    width: fit-content;
+    transition: .2s ease-out;
+    display: flex;
+    gap: 5px;
+
+    i {
+      margin-top: 1px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      color: $text;
+    }
   }
 
   &__fakeImage {
@@ -1209,6 +1266,14 @@ export default {
 }
 
 .vendor-manage {
+  position: relative;
+
+  &__sender {
+    position: absolute;
+    top: 10%;
+    left: 21%;
+    z-index: 2000;
+  }
 
   &__title {
     font-size: 18px;

@@ -12,8 +12,7 @@
             .user__name {{ user.firstName || '' }} {{ user.lastName || '' }}
             .user__image(v-if="user.photo")
               img(:src="user.photo")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(user._id)[0], '--color':getBgColor(user._id)[1]  }" v-else) {{ user.firstName[0] }}
-
+            .user__fakeImage(:style="{'--bgColor': getBgColor(user._id)[0], '--color':getBgColor(user._id)[1]  }" v-else) {{ user.firstName[0].toUpperCase() }}
 
           .header__dropbox(v-if="isDropBox")
             .dropbox__item(@click="useDropBoxListMethod('My Account')")
