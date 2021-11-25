@@ -570,11 +570,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999;
-    // box-shadow: $box-shadow;
-    // background-color: #fff;
-    // border-radius: 4px;
-    // width: 600px;
-    // padding: 25px;
+    width: 730px;
   }
 
   &__stepDetails {

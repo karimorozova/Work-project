@@ -144,13 +144,12 @@ async function getVendorStepDetails(id, stepInfo) {
 		name: vendor.firstName + ' ' + vendor.surname || '',
 		photo: vendor.photo,
 		email: vendor.email,
-		// price: 44,
-		tqi: '-',
-		benchmark: '-',
-		benchmarkMargin: '-',
-		lqa1: '-',
-		lqa2: '-',
-		lqa3: '-'
+		tqi: 0,
+		benchmark: 0,
+		benchmarkMargin: 0,
+		lqa1: 0,
+		lqa2: 0,
+		lqa3: 0
 	}
 
 	const vendorAssessments = vendor.assessments.find(item => {
@@ -177,7 +176,6 @@ async function getVendorStepDetails(id, stepInfo) {
 		name: vendor.firstName + ' ' + vendor.surname || '',
 		photo: vendor.photo,
 		email: vendor.email,
-		// price: 33,
 		tqi: tqi || 0,
 		lqa1,
 		lqa2,
