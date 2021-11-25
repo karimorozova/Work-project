@@ -294,6 +294,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2000;
+    width: 750px;
   }
 
   &__title {
@@ -478,7 +479,7 @@ export default {
   }
 
   &__email {
-    color: #9999;
+    color: #3333;
     width: fit-content;
     transition: .2s ease-out;
     display: flex;

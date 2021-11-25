@@ -835,7 +835,7 @@ export default {
     }
 
     &-email {
-      color: #9999;
+      color: #3333;
       width: fit-content;
       transition: .2s ease-out;
       display: flex;
@@ -1054,7 +1054,7 @@ export default {
   }
 
   &__email {
-    color: #9999;
+    color: #3333;
     width: fit-content;
     transition: .2s ease-out;
     display: flex;
@@ -1270,9 +1270,11 @@ export default {
 
   &__sender {
     position: absolute;
-    top: 10%;
-    left: 21%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 2000;
+    width: 750px;
   }
 
   &__title {
