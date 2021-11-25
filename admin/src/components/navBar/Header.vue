@@ -12,7 +12,7 @@
             .user__name {{ user.firstName || '' }} {{ user.lastName || '' }}
             .user__image(v-if="user.photo")
               img(:src="user.photo")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(user._id)}" v-else) {{ user.firstName[0] }}
+            .user__fakeImage(:style="{'--bgColor': getBgColor(user._id)[0], '--color':getBgColor(user._id)[1]  }" v-else) {{ user.firstName[0] }}
 
 
           .header__dropbox(v-if="isDropBox")
@@ -34,7 +34,7 @@ import ClickOutside from "vue-click-outside"
 import getBgColor from "../../mixins/getBgColor"
 
 export default {
-  mixins: [getBgColor],
+  mixins: [ getBgColor ],
   components: { Button },
   directives: {
     ClickOutside
@@ -143,7 +143,7 @@ export default {
     width: 32px;
     border-radius: 32px;
     background-color: var(--bgColor);
-    color: white;
+    color: var(--color);
     display: flex;
     justify-content: center;
     align-items: center;

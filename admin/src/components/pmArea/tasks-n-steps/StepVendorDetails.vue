@@ -18,7 +18,7 @@
               .circle1
               .circle2
               img(:src="domain + vendorDetails.photo")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(vendorId)}" v-else) {{ vendorDetails.name[0] }}
+            .user__fakeImage(:style="{'--bgColor': getBgColor(vendorId)[0], '--color': getBgColor(vendorId)[1]}" v-else) {{ vendorDetails.name[0] }}
               .circle1
               .circle2
 
@@ -29,7 +29,7 @@
 
               .user__email {{ vendorDetails.email }} (клик письмо)
               .buttons
-                .buttons__btn(@click="openBriefModal" ) Personal brief
+                .buttons__btn(@click="openBriefModal" ) Personal Instructions
                 .buttons__btn() Extra payables (Soon)
 
         .vendor__stats
@@ -47,10 +47,12 @@
           .stats__row
             .stats__col.border-right
               .stats__col-smallValue {{vendorDetails.benchmark }}
+                span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
               .stats__col-smallTitle B.MARK
             .stats__col
               .stats__col-smallValue {{ +(vendorDetails.benchmark - currentStep.vendorRate).toFixed(4) }}
-              .stats__col-smallTitle MARGIN
+                span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+              .stats__col-smallTitle B.MARGIN
 
         .vendor__marks
           .marks__row

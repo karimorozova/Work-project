@@ -100,7 +100,7 @@
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
                   img(:src="domain + getAssignedVendorInfo().photo")
-                .user__fakeImage(:style="{'--bgColor': getBgColor(getAssignedVendorInfo()._id)}" v-else) {{ getAssignedVendorInfo().name[0] }}
+                .user__fakeImage(:style="{'--bgColor': getBgColor(getAssignedVendorInfo()._id)[0], '--color': getBgColor(getAssignedVendorInfo()._id)[1]}" v-else) {{ getAssignedVendorInfo().name[0] }}
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle2
 
@@ -119,7 +119,7 @@
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
                   img(:src="domain + getReAssignedVendorInfo().photo")
-                .user__fakeImage(:style="{'--bgColor': getBgColor(getReAssignedVendorInfo()._id)}" v-else) {{ getReAssignedVendorInfo().name[0] }}
+                .user__fakeImage(:style="{'--bgColor': getBgColor(getReAssignedVendorInfo()._id)[0], '--color': getBgColor(getReAssignedVendorInfo()._id)[1] }" v-else) {{ getReAssignedVendorInfo().name[0] }}
                   .assignedVendor__user-circle1
                   .assignedVendor__user-circle3
 
@@ -186,7 +186,7 @@
                     .user
                       .user__image(v-if="item.photo")
                         img(:src="domain + item.photo")
-                      .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)}" v-else) {{ item.name[0] }}
+                      .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)[0], '--color': getBgColor(item._id)[1]  }" v-else) {{ item.name[0] }}
 
 
                       .user__description
@@ -198,12 +198,12 @@
                         .buttons
                           .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
                           .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
-                          .buttons__btn() Details
+                          .buttons__btn() Details (soon)
 
                   .vendor__stats(v-if="!isReassignment")
                     .stats__row.border-bottom
                       .stats__colLong
-                        .stats__col-bigTitle PRICE
+                        .stats__col-bigTitle TOTAL PAY.
                         .stats__col-bigValue
                           .stats__col-bigValue-num {{ item.price }}
                           .stats__col-bigValue-currency
@@ -215,10 +215,12 @@
 
                     .stats__row
                       .stats__col.border-right
-                        .stats__col-smallValue {{ item.total }}
-                        .stats__col-smallTitle TOTAL
+                        .stats__col-smallValue {{ item.marginPercent }}
+                          span.currency %
+                        .stats__col-smallTitle MARGIN
                       .stats__col
                         .stats__col-smallValue {{ item.margin }}
+                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
                         .stats__col-smallTitle MARGIN
 
                   .vendor__stats
@@ -237,10 +239,12 @@
                     .stats__row
                       .stats__col.border-right
                         .stats__col-smallValue {{ item.benchmark }}
+                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
                         .stats__col-smallTitle B.MARK
                       .stats__col
                         .stats__col-smallValue {{ item.benchmarkMargin }}
-                        .stats__col-smallTitle MARGIN
+                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                        .stats__col-smallTitle B.MARGIN
 
                   .vendor__marks
                     .marks__row
@@ -581,6 +585,11 @@ export default {
         console.log('Error get vendors')
       }
     },
+    marginCalcPercent(receivables, payables) {
+      let percent = NaN
+      percent = 100 - (payables / receivables) * 100
+      return Number.isNaN(percent) || !isFinite(percent) ? 0 : percent.toFixed(0)
+    },
     ...mapActions({
       alertToggle: 'alertToggle',
       setStepVendors: 'setStepVendors',
@@ -687,7 +696,7 @@ export default {
           lqa3: rates ? rates.lqa3 : 0,
           name,
           email,
-          total: +(finance.Price.receivables).toFixed(2),
+          marginPercent: rates ? this.marginCalcPercent(finance.Price.receivables, quantity * rate) : 0,
           margin: rates ? +(finance.Price.receivables - (quantity * rate)).toFixed(2) : 0,
           price: rates ? +(quantity * rate).toFixed(2) : 0
         }
@@ -963,7 +972,9 @@ export default {
     }
 
     &-smallValue {
-      color: $dark-border;
+      color: $text;
+      display: flex;
+      gap: 4px;
     }
   }
 
@@ -1009,7 +1020,7 @@ export default {
     border-radius: 8px;
     font-size: 28px;
     background: var(--bgColor);
-    color: white;
+    color: var(--color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1437,4 +1448,10 @@ a {
 .noVendors {
   opacity: .3;
 }
+
+.currency {
+  font-size: 14px;
+  color: $dark-border !important;
+}
+
 </style>

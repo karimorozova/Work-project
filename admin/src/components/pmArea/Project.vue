@@ -38,7 +38,6 @@
               .project__detailsRow-client-text {{ project.industry.name }}
               .project__detailsRow-client-text Start at {{ customFormatter( project.startDate ) }}
 
-
         .project__detailsRow-finance
           .project__detailsRow-finance-blocks
             .block
@@ -55,26 +54,26 @@
           .project__detailsRow-finance-blocks
             .block
               .block__value
-                .block__value-title {{getMargin}}
-                .block__value-icon(v-if="getMargin !== '-'") %
-              .block__key Margin
-            .block
-              .block__value
-                .block__value-title {{getROI}}
-                .block__value-icon(v-if="getROI !== '-'") %
-              .block__key Roi
-
-          .project__detailsRow-finance-blocks
-            .block
-              .block__value
                 .block__value-title {{getReceivables}}
                 .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Receivables
             .block
               .block__value
+                .block__value-title {{getMargin}}
+                .block__value-icon(v-if="getMargin !== '-'") %
+              .block__key Margin
+
+          .project__detailsRow-finance-blocks
+            .block
+              .block__value
                 .block__value-title {{getTotalClient}}
                 .block__value-icon(v-html="returnIconCurrencyByStringCode(project.projectCurrency)")
               .block__key Total
+            .block
+              .block__value
+                .block__value-title {{getROI}}
+                .block__value-icon(v-if="getROI !== '-'") %
+              .block__key Roi
 
         .project__detailsRow-dates
           .project__date(style="margin-bottom: 12px; margin-top: -6px;")
