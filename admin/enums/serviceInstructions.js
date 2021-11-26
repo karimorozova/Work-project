@@ -1,5 +1,44 @@
 module.exports =  {
-	instructions: [
+	"Translation": [
+		{
+			id: '1',
+			title: 'Terms to keep in English:',
+			description:
+					'<ul>' +
+					'<li>list out the terms that must be kept in English</li>' +
+					'</ul>'
+		},
+		{
+			id: '2',
+			title: 'Terms to translate as follows:',
+			description:
+					'<ul>' +
+					'<li>Please write here any glossary that you wish us to keep as you specify.</li>' +
+					'</ul>'
+		},
+		{
+			id: '2',
+			title: 'Terms to translate as follows:',
+			description:
+					'<ul>' +
+					'<li>Please write here any glossary that you wish us to keep as you specify.</li>' +
+					'</ul>'
+		},
+	],
+	"Complience": [
+		{
+			id: '1',
+			title: '[1] POI (Proof of Identity Documents)',
+			description:
+					'<ul>' +
+					'<li>Full name</li>' +
+					'<li>DOB</li>' +
+					'<li>Issue date</li>' +
+					'<li>Expiry date if there is any</li>' +
+					'</ul>'
+		},
+	],
+	"ComplienceEtoro": [
 		{
 			id: '1',
 			title: '[1] POI (Proof of Identity Documents)',
