@@ -405,16 +405,21 @@ function updateWithApprovedTasks({ taskIds, project }) {
 		return task
 	})
 
-	let steps = []
-	let readySteps = []
-
-	const approvedSteps = project.steps.filter(item => item.status === 'Approved')
-	const notApprovedSteps = project.steps.filter(item => item.status !== 'Approved')
-
-	for (const step of approvedSteps) {
-		readySteps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps: project.steps })
+	let steps = project.steps
+	for (const step of steps) {
+		if(step.status === 'Approved') {
+			steps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps })
+		}
 	}
-	steps.push(...notApprovedSteps, ...readySteps)
+
+	// const approvedSteps = project.steps.filter(item => item.status === 'Approved')
+	// const notApprovedSteps = project.steps.filter(item => item.status !== 'Approved')
+	// for (const step of approvedSteps) {
+	// 	readySteps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps: project.steps })
+	// }
+	// console.log()
+	// throw 'eeerr'
+	// steps.push(...notApprovedSteps, ...readySteps)
 
 	return { tasks, steps }
 }

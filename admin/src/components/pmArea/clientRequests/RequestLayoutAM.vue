@@ -229,7 +229,7 @@
                     @chooseOption="setContact"
                   )
 
-              .table__dataIcon(slot="icon" slot-scope="{ row, index }")
+              .table__dataIcon(v-if="canUpdateRequest()" slot="icon" slot-scope="{ row, index }")
                 span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
                   i.fas.fa-trash
 
