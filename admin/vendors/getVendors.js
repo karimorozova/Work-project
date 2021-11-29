@@ -139,14 +139,20 @@ async function getVendorStepDetails(id, stepInfo) {
 		const currentInfo = `${ sourceLanguage._id }-${ targetLanguage._id }-${ step._id }-${ unit._id }-${ industry._id }`
 		return groupStepInfo === currentInfo
 	})
+	const stepInfoForBenchmark = {
+		sourceLanguage: {_id: stepInfo.source},
+		targetLanguage: {_id: stepInfo.target},
+		step: {_id: stepInfo.step},
+		unit: {_id: stepInfo.unit},
+		industry: {_id: stepInfo.industry }
+	}
 
 	if (!priceListTable) return {
 		name: vendor.firstName + ' ' + vendor.surname || '',
 		photo: vendor.photo,
 		email: vendor.email,
 		tqi: 0,
-		benchmark: 0,
-		benchmarkMargin: 0,
+		...getBenchmarkAdditions(stepInfoForBenchmark, basicPricesTable, stepMultipliersTable, industryMultipliersTable),
 		lqa1: 0,
 		lqa2: 0,
 		lqa3: 0
@@ -180,7 +186,7 @@ async function getVendorStepDetails(id, stepInfo) {
 		lqa1,
 		lqa2,
 		lqa3,
-		...getBenchmarkAdditions(priceListTable, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
+		...getBenchmarkAdditions(stepInfoForBenchmark, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
 	}
 }
 
