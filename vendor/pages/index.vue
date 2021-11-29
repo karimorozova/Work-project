@@ -15,49 +15,6 @@
       .content__body(v-if="unitsLength")
         nuxt-child
 
-    //.vendor-portal__top
-      //.vendor-portal__admin-name
-        h2.vendor-portal__adminPortal VENDOR PORTAL
-        //h2.vendor-portal__adminPortal(v-if="vendorvendor.competencies || vendor.competencies.length") VENDOR PORTAL
-      //.vendor-portal__account(v-click-outside="hideAccountMenu")
-        .vendor-portal__photo-wrapper
-          img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
-          img.vendor-portal__photo(v-else :src="domain+vendor.photo")
-          .vendor-portal__account-menu-wrapper(v-if="isAccountMenu")
-            .vendor-portal__account-block
-              .vendor-portal__info
-                .vendor-portal__icon
-                  img(src="../assets/images/man.png")
-                .vendor-portal__personal
-                  .vendor-portal__personal-data {{ vendor.firstName }}
-                  .vendor-portal__personal-data {{ vendor.email }}
-              //.vendor-portal__item(@click="showAccountInfo")
-                .vendor-portal__icon
-                  img(src="../assets/images/man.png")
-                .vendor-portal__list-label My Account
-              .vendor-portal__item(@click="signOut")
-                .vendor-portal__icon
-                  img(src="../assets/images/sign-out.png")
-                .vendor-portal__list-label Sign Out
-        .vendor-portal__arrow-block
-          .vendor-portal__arrow(@click="showAccountMenu")
-            img(v-if="!this.isAccountMenu" src="../assets/images/down-icon.png")
-            img(v-else src="../assets/images/up-icon.png")
-
-      //.vendor-portal__nav
-        .vendor-portal__sidebar
-          ul.vendor-portal__nav-menu
-            router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
-              li.vendor-portal__nav-item(@click="switchSection(index)" :class="{'vendor-portal_active': note.active}")
-                .vendor-portal__image(v-if="!note.active && note.imgWhite")
-                  img.image.navbar_no-filter(:src="note.imgWhite")
-                .vendor-portal__image(v-else)
-                  img(:src="note.img")
-                .vendor-portal__nav-title
-                  span {{ note.title }}
-          .vendor-portal__balloons
-
-
 </template>
 
 <script>

@@ -1,5 +1,12 @@
 <template lang="pug">
   .dashboard(v-if="Object.keys(client).length && client")
+    //V ==>
+    .swapper
+      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
+      .swapper__button
+        Button(:value="'Archive'")
+    //V <==
+
     .row
       .col
         AllOpenRequests(:client="client" :allRequests="clientRequests")
@@ -27,6 +34,7 @@
 	import { mapActions, mapGetters } from "vuex"
   import moment from "moment"
   import { updateOpenProjects } from "../../../store/actions"
+  import Button from "../../../components/pangea/Button"
 
 	export default {
 		props: {
@@ -136,6 +144,7 @@
       this.setOpenRequests()
     },
     components: {
+      Button,
 			// Table,
       AllOpenRequests,
       MyOpenRequests,
@@ -149,6 +158,19 @@
 </script>
 
 <style lang="scss" scoped>
+.swapper {
+  width: 500px;
+  text-align: center;
+  padding: 20px;
+  border: 1px solid #333;
+  font-size: 18px;
+  margin-bottom: 50px;
+
+  &__button {
+    margin-top: 15px;
+  }
+}
+
 .dashboard {
   width: 1530px;
   //margin: 50px;
