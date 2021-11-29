@@ -85,7 +85,7 @@
         .project__block
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
-              span Project Brief
+              span Project Instructions
 
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down

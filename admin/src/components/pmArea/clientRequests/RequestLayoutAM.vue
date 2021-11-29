@@ -144,7 +144,7 @@
           Check(id="checkBrief" @click="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
-              span Project Brief
+              span Project Instructions
 
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
@@ -510,9 +510,9 @@ export default {
       if (!this.canUpdateRequest()) return
       try {
         this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.brief } })
-        this.alertToggle({ message: "Project brief saved!", isShow: true, type: "success" })
+        this.alertToggle({ message: "Project Instructions saved!", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({ message: "Project brief not saved!", isShow: true, type: "error" })
+        this.alertToggle({ message: "Project Instructions not saved!", isShow: true, type: "error" })
       }
     },
     changeNotes() {
@@ -664,9 +664,9 @@ export default {
         this.changeBrief()
         this.changeNotes()
         this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckBrief": data } })
-        this.alertToggle({ message: "Project brief checked!", isShow: true, type: "success" })
+        this.alertToggle({ message: "Project Instructions checked!", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({ message: "Project brief not checked!", isShow: true, type: "error" })
+        this.alertToggle({ message: "Project Instructions not checked!", isShow: true, type: "error" })
       }
     },
     async checkFile(data, { path, type }) {
