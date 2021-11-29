@@ -82,7 +82,7 @@
       .notes__body
         ckeditor(v-model="vendorBrief" :config="editorConfig")
       .notes__buttons
-        Button(value="Save" @clicked="changeVendorBrief")
+        Button(value="Save" :isDisabled="currentStep.status === 'Completed'" @clicked="changeVendorBrief")
         Button(value="Close" :outline="true" @clicked="closeBriefModal")
 </template>
 
