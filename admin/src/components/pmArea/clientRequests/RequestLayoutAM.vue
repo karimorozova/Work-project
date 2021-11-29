@@ -151,7 +151,7 @@
             .icon(v-else)
               i.fas.fa-chevron-right
           .block__data(v-if="isBrief && canUpdateRequest()")
-            ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief")
+            ckeditor(v-model="currentClientRequest.brief" ref="editor" :config="editorConfig" @blur="changeBrief")
         .project__block
           .block__header(@click="toggleBlock('isNotes')" )
             .title Project Notes
@@ -288,13 +288,13 @@ import IconButton from "../../IconButton"
 
 import CKEditor from "ckeditor4-vue"
 import '../../../assets/scss/ckeditor.scss'
-import { instructions } from "../../../../enums"
+// import { instructions } from "../../../../enums"
 
 export default {
   mixins: [ crudIcons ],
   data() {
     return {
-      instructions: instructions,
+      // instructions: instructions,
       isBrief: false,
       isNotes: false,
       clientRequest: {},
@@ -661,6 +661,8 @@ export default {
     checkBrief(data) {
       if (!this.canUpdateRequest()) return
       try {
+        this.changeBrief()
+        this.changeNotes()
         this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckBrief": data } })
         this.alertToggle({ message: "Project brief checked!", isShow: true, type: "success" })
       } catch (err) {

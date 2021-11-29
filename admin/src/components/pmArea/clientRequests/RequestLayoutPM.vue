@@ -121,7 +121,7 @@ export default {
         const neededServices = [ ...new Set(services
             .filter(item => item.industries[0].toString() === industry._id.toString()
                 && item.services[0].toString() === service._id.toString()
-                && (service.languageForm === 'Mono' ? true : item.sourceLanguage.toString() === this.mainSourceLanguageId.toString()))
+                && (service.languageForm === 'Mono' ? true : this.mainSourceLanguageId && item.sourceLanguage.toString() === this.mainSourceLanguageId.toString()))
             .map(item => item.targetLanguages[0])) ]
         return neededServices.map(item => this.originallyLanguages.find(item2 => item2._id.toString() === item))
       }
