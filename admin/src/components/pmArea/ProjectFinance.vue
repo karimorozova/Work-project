@@ -1,7 +1,7 @@
 <template lang="pug">
   .project-finance(v-if="currentProject.tasks.length")
     .project-finance__header
-      .project-finance__titleFinance Finance
+      .project-finance__titleFinance Discounts & Charge
 
     .project-finance__details
       //.project-finance__empty

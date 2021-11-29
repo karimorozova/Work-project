@@ -85,7 +85,7 @@
         .project__block
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
-              span Project Brief
+              span Project Instructions
 
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
@@ -172,13 +172,13 @@ import IconButton from "../../IconButton"
 
 import CKEditor from "ckeditor4-vue"
 import '../../../assets/scss/ckeditor.scss'
-import { instructions } from "../../../../enums"
+// import { instructions } from "../../../../enums"
 
 export default {
   mixins: [ crudIcons ],
   data() {
     return {
-      instructions: instructions,
+      // instructions: instructions,
       isBrief: false,
       isNotes: false,
       clientRequest: {},

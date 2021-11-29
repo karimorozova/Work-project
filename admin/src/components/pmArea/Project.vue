@@ -111,7 +111,7 @@
       .project__block-row.project_no-margin
         .project__block
           .block__header(@click="toggleBlock('isBrief')")
-            .title Project Brief
+            .title Project Instructions
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
             .icon(v-else)

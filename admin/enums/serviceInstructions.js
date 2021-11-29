@@ -17,15 +17,45 @@ module.exports =  {
 					'</ul>'
 		},
 		{
-			id: '2',
+			id: '3',
 			title: 'Terms to translate as follows:',
 			description:
 					'<ul>' +
 					'<li>Please write here any glossary that you wish us to keep as you specify.</li>' +
 					'</ul>'
 		},
+		{
+			id: '4',
+			title: 'In case  there is some text highlighted in color - shall it be translated?',
+			description:
+					''
+		},
+		{
+			id: '5',
+			title: 'Do you have any character limitation requirements? If yes - please specify next to each sentence.',
+			description:
+					''
+		},
+		{
+			id: '6',
+			title: 'If there are screenshots/images with text - do they need to be translated?',
+			description:
+					''
+		},
+		{
+			id: '7',
+			title: 'Please provide reference links or screenshots, that will help our linguists to understand where those content will appear',
+			description:
+					''
+		},
+		{
+			id: '8',
+			title: 'Shall we localize time, dates, numbers, currencies?',
+			description:
+					''
+		},
 	],
-	"Complience": [
+	"Compliance": [
 		{
 			id: '1',
 			title: '[1] POI (Proof of Identity Documents)',
@@ -38,7 +68,7 @@ module.exports =  {
 					'</ul>'
 		},
 	],
-	"ComplienceEtoro": [
+	"ComplianceEtoro": [
 		{
 			id: '1',
 			title: '[1] POI (Proof of Identity Documents)',

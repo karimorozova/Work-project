@@ -116,7 +116,7 @@
         .form__part
 
           .form__row
-            Instructions(:instructions="instructions" @changedInstructions="setInstructions")
+            Instructions(:instructions="getInstructions" @changedInstructions="setInstructions")
             //.form__col
               .form__select-block
                 .form__input-title-margin9 Enter a short brief:
@@ -465,6 +465,11 @@
 				clientInfo: "getClientInfo",
         services: "getAllServices"
 			}),
+      getInstructions() {
+			  if (!this.selectedService) return []
+        if (this.clientInfo.name === 'eToro (Europe) Limited' && this.selectedService === 'Compliance') return this.instructions['ComplianceEtoro']
+        return this.instructions[this.selectedService]
+      },
       getServiceInfo() {
         if (this.selectedService === '') return ''
         return this.services.find(({title}) => title === this.selectedService)
@@ -491,7 +496,7 @@
 				]
 			},
 			mappedSourceLanguages() {
-				if (this.clientInfo.services) {
+				if (this.clientInfo.services && this.clientInfo.services.length) {
 					return [
 						...new Set(
 								this.clientInfo.services
@@ -521,7 +526,7 @@
         if (!this.clientInfo.services) return []
         const services = [
           ...new Set(
-              this.clientInfo.services.map(({ services })=> services[0].title)
+              this.clientInfo.services.filter(({services}) => services.length ).map(({ services })=> services[0].title)
           )
         ]
         return services
@@ -531,7 +536,7 @@
 					const servicesIndustries = [
 						...new Set(
 								this.clientInfo.services
-										.filter(i => i.services[0].title === this.selectedService)
+										.filter(i => i.services.length ? i.services[0].title === this.selectedService : false)
 										.map(i => i.industries[0].name)
 						)
 					]
