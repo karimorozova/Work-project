@@ -1,10 +1,10 @@
 <template lang="pug">
   .dashboard
     //V ==>
-    //.swapper
-    //  .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
-    //  .swapper__button
-    //    Button(:value="'Archive'" @clicked="goToAnotherPortal")
+    .swapper
+      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
+      .swapper__button
+        Button(:value="'Archive'" @clicked="goToAnotherPortal")
     //V <==
 
     .jobs_block
@@ -66,7 +66,7 @@ export default {
       let [ key, token ] = cookieValue.split('=')
       const today = moment(new Date()).format('DD MMM YYYY')
       document.cookie = `vendor=${token}; path=/; expires=Thu, ${today} 22:00:00 UTC; domain=.pangea.global`
-      window.open(redirectTo)
+      window.location.replace(redirectTo)
     },
     showModal({ index }) {
       this.currentIndex = index
