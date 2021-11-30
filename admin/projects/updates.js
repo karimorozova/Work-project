@@ -27,13 +27,13 @@ const { downloadMemoqFile } = require('../services/memoqs/files')
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users')
 const { notifyManagerProjectStarts } = require('../utils')
 const { sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
-const { calculateProjectTotal } = require("../сalculations/finance")
+const { calculateProjectTotal, recalculateStepFinance } = require("../сalculations/finance")
 
 
 const cancelProjectInMemoq = async (project) => {
 	if (project.status !== 'Cancelled') return
 
-	const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation')
+	const wordsTasks = project.tasks.filter(item => item.service.title === 'Translation' && item.memoqDocs.length)
 	if (wordsTasks.length) {
 		await cancelMemoqDocs(wordsTasks)
 		await setCancelledNameInMemoq(wordsTasks, `${ project.projectId } - ${ project.projectName }`)
@@ -67,6 +67,7 @@ async function getProjectAfterCancelTasks(tasks, project) {
 		await stepCancelNotifyVendor(notifySteps)
 
 		await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps })
+		await recalculateStepFinance(project.id)
 		return await calculateProjectTotal(project.id)
 
 	} catch (err) {
