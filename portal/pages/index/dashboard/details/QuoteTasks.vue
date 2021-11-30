@@ -47,7 +47,8 @@
 				// }
         // const sourceLang = this.getLangInfoBySymbol(row.sourceLanguage)
         // const targetLang = this.getLangInfoBySymbol(row.targetLanguage)
-				return `${row.fullSourceLanguage.lang} >> ${row.fullTargetLanguage.lang}`
+				// return `${row.fullSourceLanguage.lang} >> ${row.fullTargetLanguage.lang}`
+        return 'foo bar'
 				//MAX
 				//   return this.getQuotePairs(row);
 			},

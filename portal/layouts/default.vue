@@ -1,5 +1,4 @@
 <template>
-
   <div>
     <transition name="slide-fade">
       <AlertMessage v-if="isAlert" :text="alertMessage" :type="alertType"></AlertMessage>

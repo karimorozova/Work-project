@@ -14,7 +14,7 @@
         .data-block__item
           LabelValue(v-if="project.finance" title="Total Cost" :isColon="isColon" :value="receivables")
             span.main-info__currency(v-if="project.finance.Price.receivables && project.status !== 'Requested'")
-            span(v-html="currencyIconDetected(project.projectCurrency)")
+            //span(v-html="currencyIconDetected(project.projectCurrency)")
       .data-block(v-if="!isQuote")
         Progress(:percent="getTotalProgress()")
     .main-info__tasks(v-if="isQuote")
@@ -54,11 +54,11 @@
 	import QuoteTasks from "./QuoteTasks"
 	import ProjectTasks from "./ProjectTasks"
 	import { mapGetters, mapActions } from "vuex"
-	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
+	// import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 	import DeliveryTable from "../../../../components/DeliveryTable"
 
 	export default {
-		mixins: [currencyIconDetected],
+		// mixins: [currencyIconDetected],
 		data() {
 			return {
 				isColon: true,
