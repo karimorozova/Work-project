@@ -62,7 +62,7 @@
         let [ cookieValue ] = document.cookie.split(';').filter(i => i.includes('client'))
         let [ key, token ] = cookieValue.split('=')
         const today = moment(new Date()).format('DD MMM YYYY')
-        document.cookie = `client=${token} path=/; expires=Thu, ${today} 22:00:00 UTC; domain=.pangea.global`
+        document.cookie = `client=${token}; path=/; expires=Thu, ${today} 22:00:00 UTC; domain=.pangea.global`
         window.open(redirectTo)
       },
 			filterByStatus(statuses) {
