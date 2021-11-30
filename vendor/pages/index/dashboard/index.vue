@@ -1,10 +1,10 @@
 <template lang="pug">
   .dashboard
     //V ==>
-    .swapper
-      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
-      .swapper__button
-        Button(:value="'Archive'" @clicked="goToAnotherPortal")
+    //.swapper
+    //  .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
+    //  .swapper__button
+    //    Button(:value="'Archive'" @clicked="goToAnotherPortal")
     //V <==
 
     .jobs_block
