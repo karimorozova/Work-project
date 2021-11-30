@@ -23,20 +23,18 @@
                 Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
               .form__projectDeadline
                 .input__title Suggested Deadline:
-                DatepickerWithTime(
-                  placeholder="Suggested Deadline"
-                  v-model="currentClientRequest.deadline"
-                  @selected="(e) => updateProjectDate(e)"
-                  monday-first=true
-                  inputClass="datepicker-custom-compliance"
-                  calendarClass="calendar-custom"
-                  :format="customFormatter"
-                  :disabledPicker="currentClientRequest.checkedForm.isCheckDeadline"
-                  :disabled="disabled"
+                DatePicker(
+                  :value="new Date(currentClientRequest.deadline)"
+                  @confirm="(e) => updateProjectDate(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  type="datetime"
                   ref="deadline"
+                  :clearable="false"
+                  :confirm="true"
+                  :disabled="currentClientRequest.checkedForm.isCheckDeadline"
+                  confirm-text="Set date"
+                  prefix-class="xmx"
                 )
-                span(id="calendar" @click="deadlineOpen")
-                  i.calendar.far.fa-calendar-alt
                 Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
 
 
@@ -284,6 +282,9 @@ import GeneralTable from "../../GeneralTable"
 import SelectMulti from "../../SelectMulti"
 import Instructions from "./Instructions"
 import IconButton from "../../IconButton"
+
+import DatePicker from 'vue2-datepicker'
+import '../../../assets/scss/datepicker.scss'
 
 
 import CKEditor from "ckeditor4-vue"
@@ -918,7 +919,8 @@ export default {
     DatepickerWithTime,
     ckeditor: CKEditor.component,
     Instructions,
-    IconButton
+    IconButton,
+    DatePicker
   }
 }
 </script>

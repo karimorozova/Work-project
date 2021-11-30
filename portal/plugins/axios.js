@@ -26,6 +26,7 @@ export default function ({ store, $axios, route }) {
     }
   })
 
+
   $axios.interceptors.request.use(config => {
     if(route.name !== "request-quote") {
       if(document) {

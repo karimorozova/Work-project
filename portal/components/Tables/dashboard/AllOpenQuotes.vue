@@ -58,9 +58,10 @@
 
         template(slot="createdBy", slot-scope="{ row, index }")
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
-            .tooltip.user
+            .tooltip.user__image
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              i(class="fas fa-user")
+              img(v-if="client.contacts.find(item => item.email === row.createdBy.email).photo" :src="domain+client.contacts.find(item => item.email === row.createdBy.email).photo")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[0], '--color':getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[1]  }" v-else) {{ client.contacts.find(item => item.email === row.createdBy.email).firstName[0].toUpperCase() }}
 
 
         template(slot="icons", slot-scope="{ row, index }")
@@ -84,7 +85,10 @@
       allQuotes: {
 				type: Array,
 				require: true
-			}
+			},
+      client: {
+        type: Object
+      }
 		},
 		data() {
 			return {
@@ -108,18 +112,11 @@
             style: { width: "20%" }
 
           },
-          // {
-          //   label: "Status",
-          //   headerKey: "headerStatus",
-          //   key: "status",
-          //   style: { width: "12%" }
-          // },
           {
             label: "Request On",
             headerKey: "headerRequestDate",
             key: "startDate",
             sortInfo: { isSort: true, order: 'default' },
-            // filterInfo: { isFilter: true },
             style: { width: "18%" }
           },
           {

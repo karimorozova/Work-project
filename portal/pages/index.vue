@@ -13,77 +13,7 @@
     .content
       Header
       .content__body
-        //nuxt-child(:client='client' :user="user" :projects="projects" :requests="requests" @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
         nuxt-child( @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
-
-  //.wrapper
-    .menu
-      .menu__item(v-for="item in navbarList")
-        | {{ item }}
-    .inner
-      Header
-
-
-
-    .clientsTop
-      .clientsTop__clientName
-        .clientsPortal CLIENT PORTAL
-      .clientsTop__searchBlock
-        .dropdownWrapper(v-click-outside="closeRequestsMenu")
-          .sel_project_block(@click="showDropdown")
-            .sel_project_block__proj
-              span New Project
-            .sel_project_block__imgWrapper
-              img(src="../assets/images/open-arrow_white.png" :class="{rotate: dropdownVisible}")
-              .clientsTop__dropdown
-                .additional(v-if="dropdownVisible")
-                  .additional__listItem(v-for='(proj, ind) in newProject' @click='dataForRequest(ind)') {{ proj.title }}
-
-        .account-menu(v-click-outside="hideAccountMenu")
-          .womanWrapper
-            img.womanWrapper__photo(v-if="user.photo" :src="domain+user.photo")
-            img.womanWrapper__photo(v-else src="../assets/images/client-icon_image.png")
-            .accountMenuWrapper(v-if="accountMenuVisible")
-              .accountBlock
-                .accountBlock__info
-                  .icon
-                    img(src="../assets/images/man.png")
-                  .personal__data
-                    .personal__data_name {{ user.firstName }}
-                    .personal__data_email {{ user.email }}
-                //.accountBlock__myaccount__wrapper(@click="showAccountInfo")
-                  router-link.accountBlock__myaccount(to="/account")
-                    .human_icon
-                      img(src="../assets/images/man.png")
-                    .my_account My Account
-                .accountBlock__exit(@click="signOut")
-                  .icon_exit
-                    img(src="../assets/images/sign-out.png")
-                  .sign_out Sign Out
-          .chevronWrapper
-            .chevron(@click="showAccountMenu")
-    .clientsMainWrapper
-      //.clientsNavbar
-        .clientsNavbar__sideBar
-          ul.navbar__ulist
-            router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
-              li.navbar__ulist_item(@click="switchSection(index)" :class="{active: note.active}")
-                .image
-                  img.navbar_no-filter-image(v-if="!note.active && note.imgWhite" :src="note.imgWhite")
-                  img.navbar__image(v-else :src="note.img")
-                .title(:class="{showTitle: true}")
-                  span {{ note.title }}
-          .logoImage(v-if="expander")
-          .balloons(v-else)
-      .clientsMainWrapper__inner
-        //.breadCrumbs
-          span.accountName {{ user.firstName }}
-          span.arrows(v-if="user.firstName")
-            i.fa.fa-angle-double-right(aria-hidden='true')
-          span {{ breadCrumb1.toUpperCase() }}
-          //span.arrows(v-if="breadCrumb2")
-            i.fa.fa-angle-double-right(aria-hidden='true')
-          //span(v-if="clientRequestShow") {{ serviceType }}
 
 </template>
 
@@ -117,19 +47,6 @@
 						img: require("../assets/images/navbar/Profile.png"),
 						active: false
 					}
-					// {
-					// 	title: "INVOICES",
-					// 	path: "/invoices",
-					// 	img: require("../assets/images/CATEGORIES/INVOICES.png"),
-					// 	active: false
-					// },
-					// {
-					// 	title: "DOCUMENTS",
-					// 	path: "/documents",
-					// 	imgWhite: require("../assets/images/CATEGORIES/DOCUMENTS2.png"),
-					// 	img: require("../assets/images/CATEGORIES/DOCUMENTS.png"),
-					// 	active: false
-					// }
 				],
 				openQuotes: true,
 				openProjects: true,
@@ -230,7 +147,6 @@
 		},
 		mounted() {
       this.domain = process.env.domain
-      // this.getProjectsAndRequests()
       this.getClient()
       this.getUser()
       this.mainPageRender()
@@ -244,9 +160,6 @@
 		},
 		computed: {
 			...mapGetters({
-				// projects: "getAllProjects",
-				// requests: "getAllRequests",
-				// user: "getUserInfo",
 				clientInfo: "getClientInfo"
 			})
 		}
@@ -291,7 +204,7 @@
     z-index: 99999;
     box-sizing: border-box;
     background: white;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
 
     &__name {
       text-align: center;

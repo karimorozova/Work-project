@@ -44,12 +44,10 @@
 	import ProgressLine from "~/components/ProgressLine"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
-	import taskPair from "~/mixins/taskPair"
-	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
+  import currencyIconDetected from "../../../../mixins/currencyIconDetected"
 
 	export default {
-		mixins: [taskPair, currencyIconDetected],
-		// mixins: [currencyIconDetected],
+		mixins: [ currencyIconDetected],
 		data() {
 			return {
 				fields: [
@@ -72,6 +70,9 @@
 				alertToggle: "alertToggle",
 				updateTaskStatus: "updateTaskStatus",
 			}),
+      getLanguagePair(){
+        return `foo bar`
+      },
 			// getWordcount(row) {
       //   console.log({ row })
       //   // return row.finance.Wordcount.receivables
