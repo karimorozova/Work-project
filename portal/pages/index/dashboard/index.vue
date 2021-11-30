@@ -14,14 +14,14 @@
         MyOpenRequests(:client="client" :myRequests="myFilteredRequest")
     .row
       .col
-        AllOpenQuotes( :allQuotes="openQuotes" @changeQuoteStatus="makeQuoteAction")
+        AllOpenQuotes(:client="client" :allQuotes="openQuotes" @changeQuoteStatus="makeQuoteAction")
       .col
-        MyOpenQuotes( :myQuotes="myFilteredQuotes")
+        MyOpenQuotes(:client="client" :myQuotes="myFilteredQuotes")
     .row
       .col
-        AllOpenProjects( :allProjects="projects")
+        AllOpenProjects(:client="client" :allProjects="projects")
       .col
-        MyOpenProjects( :myProjects="myFilteredProjects")
+        MyOpenProjects(:client="client" :myProjects="myFilteredProjects")
 </template>
 
 <script>
@@ -33,7 +33,6 @@
 	import MyOpenProjects from "../../../components/Tables/dashboard/MyOpenProjects"
 	import { mapActions, mapGetters } from "vuex"
   import moment from "moment"
-  import { updateOpenProjects } from "../../../store/actions"
   import Button from "../../../components/pangea/Button"
 
 	export default {
@@ -166,6 +165,8 @@
 </script>
 
 <style lang="scss" scoped>
+@import "./assets/scss/colors";
+
 .swapper {
   width: 500px;
   text-align: center;
@@ -193,7 +194,7 @@
   .col {
     width: 750px;
     padding: 10px 20px 20px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     box-sizing: border-box;
     background-color: white;
     border-radius: 4px;

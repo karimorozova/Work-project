@@ -80,7 +80,10 @@
       allProjects: {
 				type: Array,
 				require: true
-			}
+			},
+      client: {
+        type: Object
+      }
 		},
 		data() {
 			return {
