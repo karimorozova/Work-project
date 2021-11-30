@@ -1,10 +1,10 @@
 <template lang="pug">
   .dashboard(v-if="Object.keys(client).length && client")
     //V ==>
-    .swapper
-      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
-      .swapper__button
-        Button(:value="'Archive'" @clicked="goToAnotherPortal")
+    //.swapper
+    //  .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
+    //  .swapper__button
+    //    Button(:value="'Archive'" @clicked="goToAnotherPortal")
     //V <==
 
     .row
