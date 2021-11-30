@@ -8,7 +8,7 @@ export default function ({ res, store, req, redirect, route }) {
     if(!token) {
         if(route.path === "/login") {
         } else {
-            res.setHeader("Set-Cookie", [`previousPath=${route.path}`]);
+            !route.path.includes('robot') && res.setHeader("Set-Cookie", [`previousPath=${route.path}`]);
             return redirect("/login")
         }
     }

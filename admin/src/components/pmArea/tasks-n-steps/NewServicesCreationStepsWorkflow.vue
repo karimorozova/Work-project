@@ -199,6 +199,12 @@ export default {
       this.newStep = ''
     },
     toggleBox() {
+      if (!this.isDisabledPayablesEdit) {
+        for (let i = 0; i < this.tasksData.stepsAndUnits.length; i++) {
+          this.tasksData.stepsAndUnits[i].payables = this.tasksData.stepsAndUnits[i].receivables
+        }
+        this.setDataValue({ prop: 'stepsAndUnits', value: this.tasksData.stepsAndUnits })
+      }
       this.isDisabledPayablesEdit = !this.isDisabledPayablesEdit
     },
     setTemplate({ option }) {

@@ -1015,7 +1015,7 @@ router.post('/update-project-discounts', async (req, res) => {
 router.post('/update-project-additions', async (req, res) => {
 	const { _id, additionsSteps } = req.body
 	try {
-		const updatedProject = await Projects.updateOne({ _id }, { additionsSteps })
+		const updatedProject = await updateProject({ _id }, { additionsSteps })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

@@ -460,6 +460,7 @@ export default {
     },
     async setDate(date, prop, stepId) {
       const step = this.currentProject.steps.find(item => item._id === stepId)
+      if(step.status === 'Completed') return
       step[prop] = new Date(date)
       const { type } = step.receivablesUnit
       await this.sendStepsDates({ _id: this.currentProject._id, step, stepId, type, prop })

@@ -1,14 +1,14 @@
 <template lang="pug">
   .instructions
-    .instructions__titles
-      .instructions__title Project instruction:
+    .instructions__titles(v-if="job.brief" )
+      .instructions__title General instruction:
       .instructions__subtitle  please read carefully
 
-    .instructions__textarea
+    .instructions__textarea(v-if="job.brief" )
       .instructions__text(disabled v-html="job.brief" )
 
     .instructions__titles(v-if="job.vendorBrief")
-      .instructions__title Personal brief:
+      .instructions__title Individual instruction:
 
     .instructions__textarea(v-if="job.vendorBrief")
       .instructions__text(disabled v-html="job.vendorBrief" )

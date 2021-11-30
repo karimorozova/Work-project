@@ -191,7 +191,7 @@
             .vendors__search(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment")
               .vendors__search-title Vendors:
               .vendors__search-serch
-                input(type="text" placeholder="🔎︎  Search" v-model="vendorsSearch")
+                input(type="text" ref="search" placeholder="🔎︎  Search" v-model="vendorsSearch")
                 .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
                   i.fas.fa-backspace
 
@@ -602,6 +602,7 @@ export default {
         this.selectedUnit = step.payablesUnit.type
         this.selectedStep = step.step.title
         this.selectedIndustry = this.currentProject.industry.name
+        this.vendorsSearch = ''
       }
     },
     closeVendorManage() {

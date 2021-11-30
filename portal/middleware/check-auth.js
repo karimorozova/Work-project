@@ -9,7 +9,7 @@ export default function ({ store, req, redirect, route }) {
     if(!token) {
         if(route.path === "/login") {
         } else {
-            setPreviousLink(store, route.path)
+            !route.path.includes('robot') && setPreviousLink(store, route.path)
             return redirect("/login")
         }
     }

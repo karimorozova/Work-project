@@ -37,7 +37,7 @@ import GeneralTable from '../../GeneralTable'
 import Add from '../../Add'
 import crudIcons from "../../../mixins/crudIcons"
 import Tabs from "../../Tabs"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 
 export default {
@@ -70,6 +70,10 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: "alertToggle",
+      setCurrentProject: "setCurrentProject"
+    }),
     makeAction(key, index) {
       if (this.currentActive !== -1 && this.currentActive !== index) {
         return this.isEditing()
@@ -132,7 +136,8 @@ export default {
     },
     async sendData() {
       try {
-        await this.$http.post('/pm-manage/update-project-additions', { _id: this.currentProject._id, additionsSteps: this.additionsSteps })
+        const updatedProject = await this.$http.post('/pm-manage/update-project-additions', { _id: this.currentProject._id, additionsSteps: this.additionsSteps })
+        this.setCurrentProject(updatedProject.data)
       } catch (e) {
         console.log(e)
       }
