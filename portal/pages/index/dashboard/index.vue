@@ -4,7 +4,7 @@
     .swapper
       .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
       .swapper__button
-        Button(:value="'Archive'")
+        Button(:value="'Archive'" @clicked="goToAnotherPortal")
     //V <==
 
     .row
@@ -57,6 +57,14 @@
         setOpenQuotes: "setOpenQuotes",
         getClient: "getClient",
 			}),
+      goToAnotherPortal(){
+        const redirectTo = `https://portal.pangea.global`
+        let [ cookieValue ] = document.cookie.split(';').filter(i => i.includes('client'))
+        let [ key, token ] = cookieValue.split('=')
+        const today = moment(new Date()).format('DD MMM YYYY')
+        document.cookie = `client=${token} path=/; expires=Thu, ${today} 22:00:00 UTC; domain=.pangea.global`
+        window.open(redirectTo)
+      },
 			filterByStatus(statuses) {
 				return this.projects.filter(item => {
 					return statuses.indexOf(item.status) !== -1
