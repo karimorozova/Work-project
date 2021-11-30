@@ -101,7 +101,14 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 }
 
 const updateStepsWithMinimal = async (steps, minimumCharge) => {
-	return { '$set': {  'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
+	const minimumCost = minimumCharge.value / steps.filter(({status}) => status !== 'Cancelled').length
+	const newSteps = steps.map(( step ) => {
+		if (step.status !== "Cancelled") {
+			step.finance.Price.receivables = minimumCost
+		}
+		return step
+	})
+	return { 'steps': newSteps }
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {

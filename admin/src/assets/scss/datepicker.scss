@@ -58,6 +58,13 @@ $primary-color: rgb(209, 95, 69);
     display: none;
   }
 }
+.form__projectDeadline .xmx-datepicker {
+  width: 220px;
+  & .xmx-icon-calendar {
+    right: 27px;
+    //display: none;
+  }
+}
 
 .no-border .xmx-datepicker-main {
   border: none;
