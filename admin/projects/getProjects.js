@@ -69,9 +69,7 @@ async function getProjectsForPortal(obj) {
 }
 
 async function getProjectsForPortalList(obj) {
-	return (await Projects.find(
-					obj,
-					{
+	return (await Projects.find(obj, {
 						projectId: 1,
 						projectName: 1,
 						status: 1,

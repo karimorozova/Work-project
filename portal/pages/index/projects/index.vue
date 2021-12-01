@@ -26,8 +26,7 @@
       },
       async getAllProjects() {
         const { projects } = (await this.$axios.get(`/portal/all-projects?token=${ this.token }`)).data
-        console.log(JSON.parse(window.atob(projects)))
-        this.projects = JSON.parse(window.atob(projects))
+        this.projects = projects
       }
     },
     computed: {
@@ -35,7 +34,6 @@
         user: "getUserInfo",
         client: "getClientInfo",
         token: "getToken",
-        // projects: "getAllProjects"
       })
     },
     created() {

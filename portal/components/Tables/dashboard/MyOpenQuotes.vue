@@ -57,9 +57,10 @@
 
         template(slot="createdBy", slot-scope="{ row, index }")
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
-            .tooltip.user
+            .tooltip.user__image
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              i(class="fas fa-user")
+              img(v-if="client.contacts.find(item => item.email === row.createdBy.email).photo" :src="domain+client.contacts.find(item => item.email === row.createdBy.email).photo")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[0], '--color':getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[1]  }" v-else) {{ client.contacts.find(item => item.email === row.createdBy.email).firstName[0].toUpperCase() }}
 
 
         template(slot="icons", slot-scope="{ row, index }")
@@ -91,7 +92,7 @@
 		},
 		data() {
 			return {
-
+        domain: '',
         fields: [
           {
             label: "Project ID",
@@ -150,6 +151,9 @@
         currentDelete: '',
 			}
 		},
+    created() {
+      this.domain = process.env.domain
+    },
 		computed: {
 			rawData() {
 				return this.myQuotes
@@ -199,6 +203,33 @@
 
 <style scoped lang="scss">
   @import "../../../assets/scss/colors";
+
+  .user {
+    &__fakeImage {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+      background-color: var(--bgColor);
+      color: var(--color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    &__image {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 32px;
+      }
+    }
+  }
 
   .component {
     &__title {
@@ -287,6 +318,7 @@
     display: flex;
     cursor: help;
     color: $dark-border;
+    text-align: center;
 
 
     &.user{
@@ -302,7 +334,7 @@
     &-data{
       visibility: hidden;
       font-size: 14px;
-      width: 240px;
+      max-width: 240px;
       background: white;
       border-radius: 4px;
       right: 15px;

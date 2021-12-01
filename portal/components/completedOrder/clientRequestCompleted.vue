@@ -120,10 +120,8 @@
 		},
 		methods: {
 			...mapActions({
-				// getProjectsAndRequests: "getProjectsAndRequests"
 			}),
 			goToMainPage() {
-				// this.getProjectsAndRequests()
 				this.$router.push('/')
 			}
 		},

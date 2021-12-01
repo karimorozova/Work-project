@@ -74,7 +74,6 @@
         return `foo bar`
       },
 			// getWordcount(row) {
-      //   console.log({ row })
       //   // return row.finance.Wordcount.receivables
       //   return 0
 			// },

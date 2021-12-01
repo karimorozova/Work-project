@@ -92,7 +92,7 @@
 		},
 		data() {
 			return {
-
+        domain: '',
         fields: [
           {
             label: "Project ID",
@@ -152,6 +152,9 @@
 
 			}
 		},
+    created() {
+      this.domain = process.env.domain
+    },
 		computed: {
 			rawData() {
 				return this.allQuotes
@@ -201,6 +204,33 @@
 
 <style scoped lang="scss">
   @import "../../../assets/scss/colors";
+
+  .user {
+    &__fakeImage {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+      background-color: var(--bgColor);
+      color: var(--color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    &__image {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 32px;
+      }
+    }
+  }
 
   .component {
     &__title {
@@ -288,6 +318,7 @@
     display: flex;
     cursor: help;
     color: $dark-border;
+    text-align: center;
 
 
     &.user{
@@ -303,7 +334,7 @@
     &-data{
       visibility: hidden;
       font-size: 14px;
-      width: 240px;
+      max-width: 240px;
       background: white;
       border-radius: 4px;
       right: 15px;

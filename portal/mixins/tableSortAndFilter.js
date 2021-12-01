@@ -8,7 +8,6 @@ export default {
 	},
 	methods: {
 		addSortKey({ sortInfo, key, sortField, order }) {
-			console.log('test')
 			sortInfo.order = order
 			this.sortKeys.push({ sortField, key, sortInfo })
 		},
