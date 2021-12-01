@@ -15,7 +15,6 @@
           .navbar__name-spinner(v-if="!!currentRequests")
             .spinner1.spinner-1
         .navbar__name-title CLIENT PORTAL
-          //.spinner1.spinner-1(v-if="!!currentRequests")
 
 
 
@@ -27,7 +26,6 @@
 </template>
 
 <script>
-import ClickOutside from "vue-click-outside"
 import { mapActions, mapGetters } from "vuex"
 import Header from "../components/pangea/Header"
 
@@ -158,9 +156,6 @@ export default {
     await this.getUser()
     await this.getServices()
   },
-  directives: {
-    ClickOutside
-  },
   computed: {
     ...mapGetters({
       clientInfo: "getClientInfo",
@@ -172,7 +167,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/scss/colors";
-
 
 
 .fade-enter-active,

@@ -1,5 +1,5 @@
 <template lang="pug">
-  .layoutTable(@scroll="bottomScrolled")
+  .layoutTable(@scroll="bottomScrolled"  :style="{ 'max-height': getUserHeight + 'px' }")
     .th__modals
       ApproveModal(
         v-if="isApproveModal"
@@ -46,10 +46,10 @@ export default {
       type: Array,
       default: () => []
     },
-    // customNumberOfFilterRows: {
-    //   type: Number,
-    //   default: 0
-    // },
+    isProjectsFilterShow: {
+      type: Boolean,
+      default: false
+    },
     isApproveModal: {
       type: Boolean,
       default: false
@@ -87,23 +87,18 @@ export default {
     }
   },
   mounted() {
-    // this.innerHeight = window.innerHeight
   },
   computed: {
     ...mapGetters({
       // user: "getUser"
-    })
-    // getUserHeight() {
-    //   if (this.customNumberOfFilterRows > 0) {
-    //     const height = Math.floor(this.innerHeight - (66 * this.customNumberOfFilterRows) - 185)
-    //     return height > 1200 ? 1200 : height
-    //   }
-    //   if (Object.keys(this.user).length) {
-    //     const { layoutsSettings: { project: { filters } } } = this.user
-    //     const height = Math.floor(this.innerHeight - (66 * Math.ceil(filters.length / 6)) - 185)
-    //     return height > 1200 ? 1200 : height
-    //   }
-    // }
+    }),
+    getUserHeight() {
+      if (!this.isProjectsFilterShow) {
+        return 710
+      } else {
+        return 510
+      }
+    }
   },
   components: {
     ApproveModal

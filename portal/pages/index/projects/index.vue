@@ -1,8 +1,16 @@
 <template lang="pug">
   .allProjects
-    .table {{ services }}
+    .table
+      .clear-filter(v-if="isFilterShow" @click="clearFilters")
+        i(class="fas fa-broom")
+
+      .show-filter(@click="toggleFilters")
+        span(v-if="!isFilterShow" ) Show filters
+        span(v-else) Hide filters
+
+
       .table__filters(ref="filter")
-        .filter
+        .filter(v-if="isFilterShow")
           .filter__item
             label Project Id:
             .filter__input
@@ -126,6 +134,7 @@
           :fields="fields"
           :tableData="projects"
           @bottomScrolled="bottomScrolled"
+          :isProjectsFilterShow="isFilterShow"
         )
           template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .table__header {{ field.label }}
@@ -138,7 +147,35 @@
           template(slot="projectName" slot-scope="{ row, index }")
             .table__data
               router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
-                span {{ row.projectName }}
+                .table__projectName
+                  .short {{  row.projectName.substr(0,30) + '...' }}
+                  .tooltip(v-if="row.projectName.length >= 15")
+                    .tooltip-data(v-html="row.projectName")
+                    i(class="fas fa-info")
+
+          template(slot="status" slot-scope="{ row, index }")
+            .table__data
+              span {{row.status}}
+
+          template(slot="start" slot-scope="{ row, index }")
+            .table__data
+              span {{customFormatter(row.startDate)}}
+
+          template(slot="deadline" slot-scope="{ row, index }")
+            .table__data
+              span {{customFormatter(row.deadline)}}
+
+          template(slot="createdBy" slot-scope="{ row, index }")
+            .table__dataImage(v-if="Object.keys(row.createdBy).length" )
+              .tooltip.user__image
+                .tooltip-data.user(v-html="row.createdBy.firstName + ' ' + row.createdBy.surname || ''")
+                img(v-if="getContactPhoto(row.createdBy)" :src="domain+getContactPhoto(row.createdBy)")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(row.createdBy._id)[0], '--color':getBgColor(row.createdBy._id)[1]  }" v-else) {{ row.createdBy.firstName[0].toUpperCase() }}
+            .table__dataImage(v-else)
+              .tooltip.user__image(v-if="row.accountManager && Object.keys(row.accountManager).length" )
+                .tooltip-data.user(v-html="'AM: ' + row.accountManager.firstName + ' ' + row.accountManager.lastName || ''")
+                img(v-if="row.accountManager.photo && !row.accountManager.photo.includes('https://')" :src="domain+row.accountManager.photo")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else) {{ row.accountManager.firstName[0].toUpperCase() }}
 
         .table__empty(v-if="!projects.length") No data...
 
@@ -151,10 +188,15 @@ import SelectSingle from "../../../components/pangea/SelectSingle"
 import LabelValue from "../../../components/LabelValue"
 import '../../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
+import moment from 'moment'
+import getBgColor from "../../../mixins/getBgColor"
 
 export default {
+  mixins: [ getBgColor ],
   data() {
     return {
+      domain: '',
+      isFilterShow: false,
       allStatuses: [ 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'Cancelled', 'Closed' ],
       projects: [],
       isDataRemain: true,
@@ -192,13 +234,43 @@ export default {
           label: "Project ID",
           headerKey: "headerID",
           key: "projectId",
-          style: { "width": "140px" }
+          style: { "width": "135px" }
         },
         {
           label: "Project Name",
           headerKey: "headerProjectName",
           key: "projectName",
-          style: { "width": "170px" }
+          style: { "width": "250px" }
+        },
+        {
+          label: "Status",
+          headerKey: "headerID2",
+          key: "status",
+          style: { "width": "110px" }
+        },
+        {
+          label: "Start",
+          headerKey: "headerID3",
+          key: "start",
+          style: { "width": "110px" }
+        },
+        {
+          label: "Deadline",
+          headerKey: "headerID4",
+          key: "deadline",
+          style: { "width": "110px" }
+        },
+        {
+          label: "Total Cost",
+          headerKey: "headerID5",
+          key: "total",
+          style: { "width": "110px" }
+        },
+        {
+          label: "Created By",
+          headerKey: "headerID6",
+          key: "createdBy",
+          style: { "width": "85px" }
         }
       ]
     }
@@ -209,32 +281,52 @@ export default {
       getLanguages: 'getLanguages',
       getIndustries: 'getIndustries'
     }),
-    projectDetails(data) {
-      // this.project = data.project;
-      // this.jobsById = data.jobs;
-      this.$router.push(`/projects/details/${ id }`)
+    getContactPhoto({ email }) {
+      const { contacts } = this.client
+      return contacts.find(item => item.email === email)
+          ? contacts.find(item => item.email === email).photo
+          : undefined
+    },
+    customFormatter(date) {
+      return moment(date).format('MMM D, HH:mm')
+    },
+    toggleFilters() {
+      if (this.isFilterShow) {
+        this.clearFilters()
+      }
+      this.isFilterShow = !this.isFilterShow
+    },
+    clearFilters() {
+      this.$router.replace({ 'query': null }).catch((err) => err)
+      this.defaultSetter()
     },
     async getAllProjects() {
-      const { projects } = (await this.$axios.get(`/portal/all-projects?token=${ this.token }`)).data
-      this.projects.push(...projects)
-      this.isDataRemain = projects.length === 25
-      this.lastDate = this.getLastDateFromRes(projects)
+      const projects = await this.$axios.post(`/portal/all-projects?token=${ this.token }`, { ...this.filters, lastDate: this.lastDate })
+      this.projects = projects.data
+      this.isDataRemain = projects.data.length === 25
+      this.lastDate = this.getLastDateFromRes(projects.data)
       console.log('created All', this.projects)
     },
     async bottomScrolled() {
       if (this.isDataRemain && this.lastDate) {
-        const { projects } = (await this.$axios.get(`/portal/all-projects?token=${ this.token }`)).data
+        const projects = (await this.$axios.post(`/portal/all-projects?token=${ this.token }`, { ...this.filters, lastDate: this.lastDate })).data
         this.projects.push(...projects)
         this.isDataRemain = projects.length === 25
         this.lastDate = this.getLastDateFromRes(projects)
-
         console.log('bottom next', this.projects)
       }
     },
     getLastDateFromRes(data) {
       return (data && data.length) ? data[data.length - 1].startDate : ""
     },
-    /// filters ======================>>
+    defaultSetter() {
+      for (let variable of this.dataVariables) this[variable] = ''
+    },
+    querySetter(vm, to) {
+      for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
+    },
+
+    // filters ======================>
     removeSelectedInputs(prop) {
       this.replaceRoute(prop, '')
     },
@@ -335,6 +427,7 @@ export default {
       delete query.deadlineTo
       this.$router.replace({ path: this.$route.path, query: { ...query, deadlineFrom: new Date(e[0]).getTime(), deadlineTo: new Date(e[1]).getTime() } })
     }
+    // filters <======================
   },
   computed: {
     ...mapGetters({
@@ -408,9 +501,20 @@ export default {
     }
   },
   async created() {
+    this.domain = process.env.domain
     await this.getIndustries()
     await this.getLanguages()
+    this.defaultSetter()
+    this.querySetter(this, this.$route)
     await this.getAllProjects()
+  },
+  watch: {
+    $route(to, from) {
+      if (to.path === from.path) {
+        this.querySetter(this, to)
+        this.getAllProjects()
+      }
+    }
   },
   components: {
     DatePicker,
@@ -425,6 +529,33 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/scss/colors.scss";
 
+.user {
+  &__fakeImage {
+    height: 32px;
+    width: 32px;
+    border-radius: 32px;
+    background-color: var(--bgColor);
+    color: var(--color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
+
+  &__image {
+    height: 32px;
+    width: 32px;
+    border-radius: 32px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 32px;
+    }
+  }
+}
+
 .allProjects {
   width: 980px;
   box-sizing: border-box;
@@ -432,9 +563,18 @@ export default {
   background-color: #fff;
   box-shadow: $box-shadow;
   padding: 25px;
+  position: relative;
 }
 
 .table {
+  margin-top: 25px;
+
+  &__projectName {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
   &__empty {
     margin-top: 10px;
     color: $dark-border;
@@ -442,6 +582,12 @@ export default {
 
   &__header {
     padding: 0 0 0 7px;
+  }
+
+  &__dataImage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
   &__data {
@@ -462,19 +608,18 @@ a {
 .filter {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
 
   &__item {
     position: relative;
     margin-bottom: 10px;
-    margin-right: 25px;
-    width: 200px;
+    width: 220px;
   }
 
   &__itemLong {
     position: relative;
-    margin-bottom: 10px;
-    margin-right: 25px;
-    width: 330px;
+    margin-bottom: 30px;
+    width: 457px;
   }
 
   &__input {
@@ -485,7 +630,7 @@ a {
 
 label {
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   font-family: 'Myriad600';
 }
 
@@ -499,7 +644,7 @@ input {
   outline: none;
   height: 32px;
   transition: .1s ease-out;
-  width: 200px;
+  width: 220px;
   font-family: 'Myriad400';
 
   &:focus {
@@ -521,5 +666,114 @@ input {
   }
 }
 
+.show-filter {
+  position: absolute;
+  right: 25px;
+  top: 12px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px;
+  transition: .2s ease-out;
+  color: $dark-border;
+  width: 90px;
+  text-align: center;
+
+  &:hover {
+    color: $text !important;
+  }
+}
+
+.clear-icon-picker {
+  position: absolute;
+  right: 25px;
+  top: 19px;
+}
+
+.clear-filter {
+  position: absolute;
+  right: 135px;
+  top: 12px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px;
+  transition: .2s ease-out;
+  color: $dark-border;
+
+  &:hover {
+    color: $text !important;
+  }
+}
+
+.tooltip {
+  position: relative;
+  display: flex;
+  cursor: help;
+  color: $dark-border;
+  text-align: center;
+
+
+  &.user {
+    height: 32px;
+    width: 32px;
+    background: $light-border;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    color: $dark-border;
+  }
+
+  &-data {
+    visibility: hidden;
+    font-size: 14px;
+    max-width: 280px;
+    min-width: 140px;
+    background: white;
+    border-radius: 4px;
+    right: 15px;
+    top: -7px;
+    padding: 8px 8px 6px 8px;
+    position: absolute;
+    z-index: 555;
+    opacity: 0;
+    transition: opacity .3s;
+    border: 1px solid $text;
+    color: $text;
+
+    &.user {
+      right: 40px;
+      top: 1px;
+      color: $text;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      right: -12px;
+      transform: rotate(270deg);
+      border-width: 6px;
+      border-style: solid;
+      border-color: $text transparent transparent;
+    }
+  }
+
+  &:hover {
+    .tooltip-data {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 90%;
+}
 
 </style>

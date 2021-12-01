@@ -1,5 +1,5 @@
 const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
-const { getFilterdProjectsQuery } = require('./filter')
+const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery } = require('./filter')
 
 
 async function getProjectsForVendorPortal(obj) {
@@ -42,21 +42,29 @@ async function getProjects(obj) {
 
 }
 
-async function getProjectsForPortalAll({ verificationResult }) {
+async function getProjectsForPortalAll({ filters, verificationResult }) {
+	const allLanguages = await Languages.find()
+	const allServices = await Services.find()
+	const query = getFilteredPortalProjectsQuery(filters, allLanguages, allServices)
 	return (await Projects.find(
 					{
 						'status': { $ne: 'Draft' },
 						'isTest': 'false',
-						'customer': verificationResult.clientId
+						'customer': verificationResult.clientId,
+						...query
 					}, {
 						projectId: 1,
 						projectName: 1,
 						status: 1,
 						startDate: 1,
 						deadline: 1,
-						createdBy: 1
+						createdBy: 1,
+						accountManager: 1
 					}
-			).sort({ startDate: -1 }).limit(25)
+			)
+					.sort({ startDate: -1 })
+					.limit(25)
+					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
 }
 

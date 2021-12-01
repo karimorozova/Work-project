@@ -341,7 +341,7 @@
 			clearFilters() {
 				this.$router.replace({ 'query': null }).catch((err) => err)
 				this.defaultSetter()
-				this.getData()
+				// this.getData()
 			},
 			async updateFiltersAndFields(data) {
 				await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, { data })

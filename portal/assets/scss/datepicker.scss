@@ -6,6 +6,12 @@ $primary-color: rgb(209, 95, 69);
 @import '~vue2-datepicker/scss/index.scss';
 @import "colors";
 
+.xmx-datepicker-range {
+  width: 457px;
+}
+
+// --- portal ---
+
 .xmx-input {
   color: #333;
   border: 1px solid #bfbfbf;
@@ -13,7 +19,7 @@ $primary-color: rgb(209, 95, 69);
   height: 32px;
   box-shadow: none;
 
-  &:disabled{
+  &:disabled {
     background: #FAFAFA;
     color: #333;
   }
@@ -34,7 +40,7 @@ $primary-color: rgb(209, 95, 69);
   }
 }
 
-.xmx-datepicker-main{
+.xmx-datepicker-main {
   border: none;
   border-radius: 4px;
 }
@@ -58,8 +64,10 @@ $primary-color: rgb(209, 95, 69);
     display: none;
   }
 }
+
 .form__projectDeadline .xmx-datepicker {
   width: 220px;
+
   & .xmx-icon-calendar {
     right: 27px;
     //display: none;
@@ -89,6 +97,7 @@ $primary-color: rgb(209, 95, 69);
 .xmx-calendar-panel-date:nth-child(even) {
   display: none;
 }
-.not-current-month{
+
+.not-current-month {
   color: #333;
 }

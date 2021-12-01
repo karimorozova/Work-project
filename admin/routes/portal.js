@@ -155,12 +155,12 @@ router.post("/reset-pass", async (req, res) => {
 	}
 })
 
-router.get('/all-projects', checkClientContact, async (req, res) => {
+router.post('/all-projects', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const projects = await getProjectsForPortalAll({ verificationResult })
-		res.send({ projects })
+		const projects = await getProjectsForPortalAll({ filters: req.body,  verificationResult })
+		res.send(projects)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
