@@ -27,7 +27,6 @@
 	import DataTable from "~/components/Tables/DataTable";
 	import { mapGetters, mapActions } from "vuex";
 	import currencyIconDetected from "../../../../mixins/currencyIconDetected"
-  import {allLanguages} from "../../../../store/getters";
 
 	export default {
 		mixins: [currencyIconDetected],

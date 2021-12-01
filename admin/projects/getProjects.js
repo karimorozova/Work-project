@@ -42,30 +42,22 @@ async function getProjects(obj) {
 
 }
 
-async function getProjectsForPortal(obj) {
+async function getProjectsForPortalAll({ verificationResult }) {
 	return (await Projects.find(
-			obj,
-			{
-				projectId: 1,
-				projectName: 1,
-				status: 1,
-				clientContacts: 1,
-				tasks: 1,
-				steps: 1,
-				startDate: 1,
-				deadline: 1,
-				finance: 1,
-				createdBy: 1,
-				tasksDeliverables: 1,
-				tasksDR2: 1,
-				projectCurrency: 1
-			}
+					{
+						'status': { $ne: 'Draft' },
+						'isTest': 'false',
+						'customer': verificationResult.clientId
+					}, {
+						projectId: 1,
+						projectName: 1,
+						status: 1,
+						startDate: 1,
+						deadline: 1,
+						createdBy: 1
+					}
+			).sort({ startDate: -1 }).limit(25)
 	)
-			.populate('industry')
-			.populate('service')
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
-			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
 }
 
 async function getProjectsForPortalList(obj) {
@@ -268,4 +260,13 @@ async function getFilteredProjects(filters) {
 	}
 }
 
-module.exports = { getProject, getProjects, getProjectsForPortal, updateProject, getFilteredProjects, getProjectAfterUpdate, getProjectsForVendorPortal, getProjectsForPortalList }
+module.exports = {
+	getProject,
+	getProjects,
+	getProjectsForPortalAll,
+	updateProject,
+	getFilteredProjects,
+	getProjectAfterUpdate,
+	getProjectsForVendorPortal,
+	getProjectsForPortalList
+}

@@ -8,7 +8,7 @@ const { getService } = require('../services')
 const {
 	getProject,
 	getProjects,
-	getProjectsForPortal,
+	getProjectsForPortalAll,
 	updateProjectStatusForClientPortalProject,
 	getProjectsForPortalList
 } = require("../projects/")
@@ -30,7 +30,8 @@ const { getAfterTaskStatusUpdate } = require('../clients')
 const {
 	Clients,
 	Projects,
-	Languages
+	Languages,
+	Industries
 } = require('../models')
 
 const { secretKey } = require('../configs')
@@ -156,10 +157,9 @@ router.post("/reset-pass", async (req, res) => {
 
 router.get('/all-projects', checkClientContact, async (req, res) => {
 	const { token } = req.query
-	const excludedStatuses = [ 'Draft' ]
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const projects = await getProjectsForPortal({ $and: [ { status: { $nin: excludedStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		const projects = await getProjectsForPortalAll({ verificationResult })
 		res.send({ projects })
 	} catch (err) {
 		console.log(err)
@@ -262,6 +262,18 @@ router.get('/all-languages', checkClientContact, async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
+	}
+})
+
+router.get('/all-industries', checkClientContact, async (req, res) => {
+	const { token } = req.query
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		const industries = await Industries.find()
+		res.send(industries)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Industries.")
 	}
 })
 

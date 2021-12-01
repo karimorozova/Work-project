@@ -99,7 +99,7 @@
 import Button from "../buttons/Button";
 import ValidationErrors from "../ValidationErrors";
 import { mapActions, mapGetters } from "vuex"
-import SelectSingle from "../dropdowns/SelectSingle";
+import SelectSingle from "../pangea/SelectSingle";
 
 export default {
   data() {

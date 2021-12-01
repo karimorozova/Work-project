@@ -1,17 +1,20 @@
-export const loadLangs = ({ commit }, payload) => {
-	commit('LANGS', payload)
-}
-
-export const requestInfo = ({ commit }, obj) => {
-	commit('CLIENT_FOR_REQUEST', obj)
-}
-
-export const servicesGetting = ({ commit }, arr) => {
-	commit('SERVICES_FILL', arr)
-}
-
 export const files = ({ commit }, payload) => {
 	commit('DETFILES_TO_DETAILS', payload)
+}
+
+export const getServices = async function ({ commit, dispatch, state }) {
+	try {
+		const result = await this.$axios.get(`/api/services?filter=active`)
+		commit('SERVICES_FILL', result.data)
+	} catch (err) {
+		const redirectErrors = [ "jwt malformed", "jwt expired" ]
+		console.log(err)
+		if (redirectErrors.includes(err.response.data)) {
+			this.dispatch('logout')
+			this.$router.replace({ path: '/login' })
+		}
+		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
+	}
 }
 
 export const setOpenProjects = async function ({ commit, dispatch, state }) {
@@ -84,6 +87,21 @@ export const getLanguages = async function ({ commit, dispatch, state }) {
 		let { languages } = result.data
 
 		commit('SET_LANGUAGES', languages)
+	} catch (err) {
+		const redirectErrors = [ "jwt malformed", "jwt expired" ]
+		console.log(err)
+		if (redirectErrors.includes(err.response.data)) {
+			this.dispatch('logout')
+			this.$router.replace({ path: '/login' })
+		}
+		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
+	}
+}
+
+export const getIndustries = async function ({ commit, dispatch, state }) {
+	try {
+		const result = await this.$axios.get(`/portal/all-industries?token=${ state.token }`)
+		commit('SET_INDUSTRIES', result.data)
 	} catch (err) {
 		const redirectErrors = [ "jwt malformed", "jwt expired" ]
 		console.log(err)

@@ -122,24 +122,17 @@ export default {
       this.$router.push(`/client-request${ this.newProject[ind].path }`)
       this.dropdownVisible = false
     },
-    async getServices() {
-      const result = await this.$axios.$get('/api/services?filter=active')
-      result.sort((a, b) => {
-        return a.sortIndex - b.sortIndex
-      })
-      this.servicesGetting(result)
-    },
     setToken() {
       const clientToken = this.$cookie.get("client")
       this.$store.commit("SET_TOKEN", clientToken)
     },
     ...mapActions({
       logout: "logout",
-      requestInfo: "requestInfo",
-      loadLangs: "loadLangs",
-      servicesGetting: "servicesGetting",
+      // requestInfo: "requestInfo",
+      // loadLangs: "loadLangs",
       getClient: "getClient",
-      getUser: "getUser"
+      getUser: "getUser",
+      getServices: "getServices"
     })
   },
   watch: {
@@ -179,6 +172,8 @@ export default {
 
 <style lang="scss" scoped>
 @import "../assets/scss/colors";
+
+
 
 .fade-enter-active,
 .fade-leave-active {

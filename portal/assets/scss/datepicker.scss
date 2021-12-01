@@ -46,11 +46,49 @@ $primary-color: rgb(209, 95, 69);
   margin-top: 5px;
 }
 
-.xmx-datepicker {
+.project__date .xmx-datepicker,
+.project-cd__input .xmx-datepicker {
   width: 220px;
+}
+
+.table__data .xmx-datepicker {
+  width: auto;
+
+  & .xmx-icon-calendar {
+    display: none;
+  }
+}
+.form__projectDeadline .xmx-datepicker {
+  width: 220px;
+  & .xmx-icon-calendar {
+    right: 27px;
+    //display: none;
+  }
+}
+
+.no-border .xmx-datepicker-main {
+  border: none;
 }
 
 .xmx-datepicker-popup {
   box-shadow: 0 1px 3px rgba(66, 66, 66, .12), 0 1px 2px rgba(66, 66, 66, .24);
 }
 
+.table-input {
+  color: $text;
+  border: none;
+  width: 100%;
+  background-color: transparent;
+  cursor: pointer;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+}
+
+
+.xmx-calendar-panel-date:nth-child(even) {
+  display: none;
+}
+.not-current-month{
+  color: #333;
+}

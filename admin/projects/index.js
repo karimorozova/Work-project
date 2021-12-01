@@ -1,7 +1,7 @@
 const {
 	getProject,
 	getProjects,
-	getProjectsForPortal,
+	getProjectsForPortalAll,
 	updateProject,
 	getFilteredProjects,
 	getProjectAfterUpdate,
@@ -178,7 +178,7 @@ module.exports = {
 	addMultiLangDR2,
 	removeMultiDR2,
 	changeNameLang,
-	getProjectsForPortal,
+	getProjectsForPortalAll,
 	getProjectsForPortalList,
 	// addPaymentAdditions,
 	// deletePaymentAddition,

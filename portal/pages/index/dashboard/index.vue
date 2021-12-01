@@ -132,7 +132,7 @@ export default {
 
   .col {
     width: 750px;
-    padding: 10px 20px 20px;
+    padding: 15px 25px 25px;
     box-shadow: $box-shadow;
     box-sizing: border-box;
     background-color: white;

@@ -87,7 +87,6 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 	if (tasksStatuses) {
 		const tasksStatusesArr = tasksStatuses.split(',')
 		if (tasksStatusesArr.includes('In progress') && !tasksStatusesArr.includes('Started')) tasksStatusesArr.push('Started')
-		console.log(tasksStatusesArr)
 		query["tasks.status"] = { $in: tasksStatusesArr }
 	}
 

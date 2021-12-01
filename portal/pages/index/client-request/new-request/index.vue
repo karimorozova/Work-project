@@ -461,7 +461,6 @@
 			...mapGetters({
 				user: "getUserInfo",
 				allLanguages: 'allLanguages',
-				getClientIndustries: "getClientIndustries",
 				clientInfo: "getClientInfo",
         services: "getAllServices"
 			}),
