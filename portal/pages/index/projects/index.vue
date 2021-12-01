@@ -1,18 +1,13 @@
 <template lang="pug">
   .all-projects
-    Allprojects(:allProjects="projects" :user="user" @projectDetails='projectDetails')
+    //Allprojects(:allProjects="projects" :user="user" @projectDetails='projectDetails')
 </template>
 
 <script>
-  import Allprojects from "../../../components/projects/Allprojects";
+  // import Allprojects from "../../../components/projects/Allprojects";
   import { mapGetters } from "vuex";
 
   export default {
-    props: {
-      jobsById:{
-        type: Array
-      },
-    },
     data() {
       return {
         projects: []
@@ -20,9 +15,9 @@
     },
     methods:{
       projectDetails(data) {
-        this.project = data.project;
-        this.jobsById = data.jobs;
-        this.$router.push('/dashboard/project-info');
+        // this.project = data.project;
+        // this.jobsById = data.jobs;
+        this.$router.push(`/projects/details/${ id }`)
       },
       async getAllProjects() {
         const { projects } = (await this.$axios.get(`/portal/all-projects?token=${ this.token }`)).data
@@ -40,13 +35,12 @@
       this.getAllProjects()
     },
     components: {
-      Allprojects,
+      // Allprojects,
     },
   }
 </script>
 
 <style scoped>
-  .all-projects{
-    color: #67573e;
-  }
+
+
 </style>

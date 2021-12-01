@@ -217,11 +217,7 @@ router.get('/client-requests/:id', checkClientContact, async (req, res) => {
 			// 'clientIdFilter': verificationResult.clientId,
 			// status: { $ne: 'Closed' },
 		})
-		console.log({ requests })
-
-		res.send({
-			requests
-		})
+		res.send({ requests })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
