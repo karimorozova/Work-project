@@ -117,7 +117,8 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			tasks,
 			accountManager,
 			isTest
-		} = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
+
+		} = await getProject({ _id: vendorId })
 
 		const currentServices = getServices(tasks, steps)
 
