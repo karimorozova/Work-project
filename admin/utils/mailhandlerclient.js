@@ -127,7 +127,7 @@ const sendMailClient = function(request) {
 </table>
 <p style="color: #66563D;font-size: 12px">Looking forward to working together.</p>
     <p style="color: #66563D;font-size: 12px">
-        <span style="color: #47A6A6;font-size: 16px">Amarita Sohal</span> <br/>
+        <span style="color: #4ba5a5;font-size: 16px">Amarita Sohal</span> <br/>
         Senior Business Development Manager <br/>
         E: amarita@pangea.global <br/>
         P: +375 25252150 <br/>

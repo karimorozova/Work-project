@@ -443,7 +443,7 @@
     &__text {
       margin-bottom: 5px;
       margin-top: 20px;
-      /*color: #d15f45;*/
+      /*color: #d66f58;*/
     }
 
     &__markdown {
@@ -509,7 +509,7 @@
         color: #fff;
         font-size: 14px;
         border-radius: 4px;
-        background-color: #d15f45;
+        background-color: #d66f58;
         border: none;
         transition: .1s ease;
         outline: none;
@@ -518,7 +518,7 @@
     }
 
     .modal-error {
-      color: #d15f45;
+      color: #d66f58;
       font-family: Myriad600;
       text-align: center;
       font-size: 18px;
@@ -578,7 +578,7 @@
       width: 12px;
       height: 12px;
       border-radius: 100%;
-      background: #d15f45;
+      background: #d66f58;
       opacity: 0;
       pointer-events: none;
     }

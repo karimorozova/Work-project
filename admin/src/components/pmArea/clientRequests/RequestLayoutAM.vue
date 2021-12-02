@@ -235,7 +235,7 @@
 
         .order__buttons
           Button(v-if="(isAdmin || isAm()) && !isAmSet()" class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
-          Button(v-if="isAdmin || isAm()" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
+          Button(v-if="isAdmin || isAm()" color="#d66f58" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
 
       .side__info()
         .form__wrapper(v-if="!canUpdateRequest()")

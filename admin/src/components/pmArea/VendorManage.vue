@@ -1418,7 +1418,7 @@ input {
 .doing {
   padding: 1px 5px;
   background: $table-list;
-  color: $light-yellow;
+  color: $yellow;
   font-size: 11px;
   border-radius: 4px;
 }

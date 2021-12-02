@@ -242,7 +242,7 @@
     color: #fff;
     font-size: 14px;
     border-radius: 4px;
-    background-color: #d15f45;
+    background-color: #d66f58;
     border: none;
     transition: .1s ease;
     outline: none;

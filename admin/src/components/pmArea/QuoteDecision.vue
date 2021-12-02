@@ -50,7 +50,7 @@
       .block__button
         Button(
           :value="this.query.prop === 'accept' ? 'Accept' : 'Reject'"
-          :color="this.query.prop === 'accept' ? '#47A6A6' : '#d15f45'"
+          :color="this.query.prop === 'accept' ? '#4ba5a5' : '#d66f58'"
           :isDisabled="!isCheck && this.query.prop !== 'reject' && this.query.type === 'client' && !this.query.hasOwnProperty('tasksIds')"
           @clicked="makeAction"
         )

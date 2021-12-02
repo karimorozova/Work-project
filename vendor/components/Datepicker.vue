@@ -922,7 +922,7 @@ export default {
 }
 
 .vdp-datepicker__calendar header .up {
-  color: #D15F45;
+  color: #d66f58;
   font-size: 18px;
 }
 
@@ -937,7 +937,7 @@ export default {
 }
 
 .vdp-datepicker__calendar header .prev:after {
-	border-right: 10px solid  #D15F45;
+	border-right: 10px solid  #d66f58;
 	margin-left: -5px;
 }
 
@@ -946,7 +946,7 @@ export default {
 }
 
 .vdp-datepicker__calendar header .next:after {
-	border-left: 10px solid #D15F45;
+	border-left: 10px solid #d66f58;
 	margin-left: 5px;
 }
 
@@ -1020,7 +1020,7 @@ export default {
 }
 
 .vdp-datepicker__calendar .cell.today {
-  background-color: #D15F45;
+  background-color: #d66f58;
   color: #FFF;
   font-weight: bold;
 }

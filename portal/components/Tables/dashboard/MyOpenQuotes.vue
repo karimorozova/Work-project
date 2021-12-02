@@ -314,7 +314,7 @@
       cursor: pointer;
     }
     &.accept {
-      color: #47a6a6;
+      color: #4ba5a5;
     }
     &.reject {
       color: #f5866d;

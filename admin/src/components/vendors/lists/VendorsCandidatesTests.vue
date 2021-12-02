@@ -568,7 +568,7 @@
   @import "../../../assets/styles/settingsTable.scss";
 
   a {
-    color: #d15f45;
+    color: #d66f58;
   }
 
   .vendorTests {

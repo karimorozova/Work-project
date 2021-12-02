@@ -45,7 +45,7 @@
       font-size: 14px;
       border-radius: 4px;
       text-align: center;
-      background-color: #d15f45;
+      background-color: #d66f58;
       display: flex;
       justify-content: center;
       align-items: center;

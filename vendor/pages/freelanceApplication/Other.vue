@@ -164,7 +164,7 @@ export default {
     &__error {
         position: absolute;
         font-size: 14px;
-        color: #D15F45;
+        color: #d66f58;
         top: -19px;
         right: -4px;
         @media (max-width: 450px) {

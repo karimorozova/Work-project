@@ -38,9 +38,9 @@ export default {
         &:before {
             position: absolute;
             content: "+";
-            border: 1px solid #d15f45;
+            border: 1px solid #d66f58;
             border-radius: 50%;
-            background-color: #d15f45;
+            background-color: #d66f58;
             color: #fff;
             left: -21px;
             transform: rotate(45deg);

@@ -41,14 +41,14 @@
       box-shadow: none;
       width: auto;
       left: 0;
-      border: 1px solid #D15F45;
+      border: 1px solid #d66f58;
     }
     @media all and (orientation: landscape) and (max-width: 1000px) {
       box-shadow: none;
       width: auto;
       left: 0;
       top: 40px;
-      border: 1px solid #D15F45;
+      border: 1px solid #d66f58;
     }
     /*@media (max-width: 450px) {*/
     /*  width: 268px;*/
@@ -95,7 +95,7 @@
     }
 
     &__item {
-      color: #D15F45;
+      color: #d66f58;
     }
   }
 

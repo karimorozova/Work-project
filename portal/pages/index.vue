@@ -39,19 +39,19 @@ export default {
         {
           title: "Dashboard",
           path: "/dashboard",
-          img: require("../assets/images/navbar/Dashboard.png"),
+          img: require("../assets/images/navbar/Dashboard.svg"),
           active: true
         },
         {
           title: "Projects",
           path: "/projects",
-          img: require("../assets/images/navbar/Projects.png"),
+          img: require("../assets/images/navbar/Projects.svg"),
           active: false
         },
         {
           title: "Profile",
           path: "/account",
-          img: require("../assets/images/navbar/Profile.png"),
+          img: require("../assets/images/navbar/Profile.svg"),
           active: false
         }
       ],
@@ -180,29 +180,35 @@ export default {
 }
 
 .active__item {
-  color: $green;
+  color: $red;
 }
 
 .item {
   display: flex;
   transition: .1s ease-in-out;
   cursor: pointer;
-  padding: 9px 12px 9px 20px;
+  padding: 10px 10px 10px 25px;
   align-items: center;
+
+  &__image {
+    height: 20px;
+    width: 20px;
+
+    img {
+      width: 100%;
+    }
+  }
 
   &__title {
     font-family: Myriad600;
-    margin-left: 10px;
+    margin-left: 15px;
     font-size: 15px;
+    margin-top: 1px;
   }
 
   &:hover {
     background: $light-border;
   }
-}
-
-.greyColor {
-  color: #ccc;
 }
 
 .wrapper {
@@ -222,19 +228,21 @@ export default {
 
   &__name {
     text-align: center;
-    font-size: 20px;
-    font-family: Myriad900;
+    font-size: 22px;
+    font-family: Myriad300;
     border-top: 1px solid $border;
     padding-top: 22px;
     cursor: default;
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
-    color: #ccc;
+    color: $border;
+    position: relative;
 
     &-spinner {
       position: absolute;
-      left: 42%;
+      left: 114px;
+      top: 15px;
     }
   }
 
@@ -301,15 +309,15 @@ export default {
 
 .spinner1 {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
 
   &:before,
   &:after {
     content: "";
     display: block;
     position: absolute;
-    border-width: 2px;
+    border-width: 3px;
     border-style: solid;
     border-radius: 50%;
   }
@@ -337,8 +345,8 @@ export default {
   }
 
   &:before {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border-bottom-color: $green;
     border-right-color: $green;
     border-top-color: rgba(red, 0);
@@ -349,14 +357,14 @@ export default {
   }
 
   &:after {
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
     border-bottom-color: $red;
     border-right-color: $red;
     border-top-color: rgba(red, 0);
     border-left-color: rgba(red, 0);
-    top: (30px - 15px) / 2;
-    left: (30px - 15px) / 2;
+    top: (32px - 16px) / 2;
+    left: (32px - 16px) / 2;
     animation: anti-rotate-animation 0.85s linear 0s infinite;
   }
 }

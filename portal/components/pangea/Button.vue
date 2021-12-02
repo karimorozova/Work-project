@@ -26,7 +26,7 @@ export default {
     },
     color: {
       type: String,
-      default: "#d15f45"
+      default: "#d66f58"
     },
     isFullWidth: {
       type: Boolean,

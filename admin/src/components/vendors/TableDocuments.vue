@@ -384,6 +384,6 @@
     }
   }
   a{
-    color: #D15F45;
+    color: #d66f58;
   }
 </style>

@@ -156,7 +156,7 @@ export default {
   }
 
   .red {
-    color: #d15f45;
+    color: #d66f58;
     margin-bottom: 3px;
   }
 
