@@ -321,7 +321,7 @@ export default {
 
     &-spinner {
       position: absolute;
-      left: 114px;
+      left: 116px;
       top: 15px;
     }
   }
@@ -360,8 +360,8 @@ export default {
 
 .spinner1 {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
 
   &:before,
   &:after {
