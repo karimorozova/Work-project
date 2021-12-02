@@ -7,6 +7,7 @@ const {
 	getProjectAfterUpdate,
 	getProjectsForVendorPortal,
 	getProjectsForPortalList,
+	getProjectForClientPortal,
 } = require('./getProjects')
 
 const {
@@ -106,6 +107,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	getProjectForClientPortal,
 	setApprovedStepStatus,
 	getProjectsForVendorPortal,
 	generateReceivablesReportsByTemplate,

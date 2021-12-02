@@ -15,13 +15,13 @@
           span(v-if="element.hasOwnProperty('parent')")
             .group__open(style="margin-left: -8px;" v-if="element.isOpen")
               .group__open-image
-                img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
-                div {{element.name}}
+                img(:src="require(`../../assets/images/navbar-icons/${element.name}.svg`)")
+                div(style="margin-top: 2px;") {{element.name}}
               i.fas.fa-chevron-right
             .group__close(style="margin-left: -8px;" v-if="!element.isOpen")
               .group__close-image
-                img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
-                div {{element.name}}
+                img(:src="require(`../../assets/images/navbar-icons/${element.name}.svg`)")
+                div(style="margin-top: 2px;") {{element.name}}
               i.fas.fa-chevron-down
 
           span(v-else)

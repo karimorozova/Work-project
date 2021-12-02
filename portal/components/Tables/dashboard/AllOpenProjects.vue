@@ -154,7 +154,6 @@ export default {
   },
   computed: {
     rawData() {
-      console.log(' this.allProjects', this.allProjects)
       return this.allProjects
     }
   },

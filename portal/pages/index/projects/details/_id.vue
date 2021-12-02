@@ -1,104 +1,183 @@
 <template lang="pug">
-  .details(v-if="project._id")
-    .details__title {{ title }}
-    .details__data
-      .details__info
-        .details__main
-          MainInfo
-        .details__describe
-          OtherInfo
+  .wrapper
+    .sideRight
+
+      .details(v-if="currentProject._id")
+        .details__header
+          .details__name {{ currentProject.projectName }}
+          .details__body
+            .d-col
+              .d-row
+                .d-value Project ID:
+                .d-key {{ currentProject.projectId }}
+              .d-row
+                .d-value Status:
+                .d-key {{ currentProject.status }}
+            .d-col
+              .d-row
+                .d-value  Start:
+                .d-key {{ currentProject.startDate }}
+              .d-row
+                .d-value Industry:
+                .d-key {{ currentProject.industry }}
+            .d-col
+              .d-row
+                .d-value Deadline:
+                .d-key {{ currentProject.deadline }}
+
+
+        .details__progress
+          span progress
+
+      span
+    .sideLeft(v-if="currentProject._id")
+      .user(v-if="currentProject.accountManager" )
+        .user__image
+          img(v-if="currentProject.accountManager.photo && !currentProject.accountManager.photo.includes('https://')" :src="domain+currentProject.accountManager.photo")
+          .user__fakeImage(:style="{'--bgColor': getBgColor(currentProject.accountManager._id)[0], '--color':getBgColor(currentProject.accountManager._id)[1]  }" v-else) {{ currentProject.accountManager.firstName[0].toUpperCase() }}
+        .user__name Account Manager
+        .user__name {{currentProject.accountManager.firstName + ' ' + currentProject.accountManager.lastName || ''}}
+
+
 </template>
 
 <script>
-import MainInfo from "../../dashboard/details/MainInfo"
-import OtherInfo from "../../dashboard/details/OtherInfo"
+// import MainInfo from "../../dashboard/details/MainInfo"
+// import OtherInfo from "../../dashboard/details/OtherInfo"
 import { mapGetters, mapActions } from "vuex"
+import getBgColor from "../../../../mixins/getBgColor"
 
 export default {
+  mixins: [ getBgColor ],
   data() {
-    return {}
+    return {
+      domain: ''
+    }
   },
   methods: {
     ...mapActions({
       selectProject: "selectProject",
-      alertToggle: "alertToggle"
+      alertToggle: "alertToggle",
+      getClient: "getClient"
     }),
-    async getProjectInfo() {
+    async getCurrentProject() {
       const { id } = this.$route.params
       try {
-        // if (!this.allProjects.length) {
-        // 	await this.getProjects()
-        // }
-        // const currentProject = this.allProjects.find(item => item._id === id)
-        const { project } = (await this.$axios.get('/portal/project/' + id + '?token=' + this.token)).data
-        await this.selectProject(project)
+        const res = await this.$axios.get('/portal/project/' + id + '?customer=' + this.client._id)
+        await this.selectProject(res.data)
+        console.log(res.data)
       } catch (err) {
-
       }
     }
   },
   computed: {
     ...mapGetters({
-      project: "getSelectedProject",
-      // allProjects: "getAllProjects",
-      token: "getToken"
-    }),
-    title() {
-      let result = "Quote Details"
-      let statuses = [ 'Quote sent', 'Requested' ]
-      if (statuses.indexOf(this.project.status) === -1) {
-        result = 'Project Details'
-      }
-      return result
-    }
+      client: "getClientInfo",
+      currentProject: "getSelectedProject"
+      // token: "getToken"
+    })
+    // title() {
+    //   let result = "Quote Details"
+    //   let statuses = [ 'Quote sent', 'Requested' ]
+    //   if (statuses.indexOf(this.project.status) === -1) {
+    //     result = 'Project Details'
+    //   }
+    //   return result
+    // }
   },
-  components: {
-    MainInfo,
-    OtherInfo
-  },
-  created() {
-    this.getProjectInfo()
+  components: {},
+
+  async created() {
+    this.domain = process.env.domain
+    await this.getClient()
+    await this.getCurrentProject()
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../assets/scss/colors.scss";
-
+@import "../../../../assets/scss/colors";
 
 .details {
-  color: $main-color;
-  width: 100%;
-  box-sizing: border-box;
-  width: 1040px;
-
-  &__data {
-    box-sizing: border-box;
-    box-shadow: rgba(103, 87, 62, .3) 0px 2px 5px, rgba(103, 87, 62, .15) 0px 2px 6px 2px;
-  }
+  display: flex;
 
   &__header {
-    padding: 20px;
-    border-bottom: 1px solid $light-brown;
+    width: 70%;
+    //background-color: cornsilk;
   }
 
-  &__title {
-    margin: 30px 0 10px;
-    font-size: 20px;
-  }
-
-  &__info {
+  &__body {
     display: flex;
-    height: 100%;
   }
 
-  &__main {
-    width: 72%;
+  &__progress {
+    width: 30%;
+    background-color: chocolate;
   }
 
-  &__describe {
-    width: 28%;
-    background-color: #f4f2f1;
+
+  &__name {
+    font-size: 16px;
+    font-family: Myriad600;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid $border;
+  }
+}
+
+.sideLeft {
+  padding: 25px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  box-sizing: border-box;
+  width: 300px;
+  margin-left: 25px;
+}
+
+.sideRight {
+  padding: 25px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  box-sizing: border-box;
+  width: 670px;
+}
+
+.user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__name {
+    margin-top: 6px;
+  }
+
+  &__fakeImage {
+    cursor: default;
+    height: 32px;
+    width: 32px;
+    border-radius: 32px;
+    background-color: var(--bgColor);
+    color: var(--color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
+
+  &__image {
+    cursor: default;
+    height: 32px;
+    width: 32px;
+    border-radius: 32px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 32px;
+    }
   }
 }
 

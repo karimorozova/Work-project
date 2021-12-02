@@ -95,6 +95,44 @@ async function getProjectsForPortalList(obj) {
 	)
 }
 
+async function getProjectForClientPortal(obj) {
+	const project = await Projects.findOne(obj,
+			{
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				"finance.Price.receivables": 1,
+				industry: 1,
+				startDate: 1,
+				deadline: 1,
+				accountManager: 1
+			}
+	)
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	// .populate('industry')
+	// .populate('service')
+	// .populate('customer')
+	// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	// .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	// .populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
+	// .populate('steps.step')
+	// .populate('steps.service')
+	// .populate('steps.receivablesUnit')
+	// .populate('steps.payablesUnit')
+	// .populate('steps.fullSourceLanguage')
+	// .populate('steps.fullTargetLanguage')
+	// .populate('tasks.service')
+	// .populate('tasks.fullSourceLanguage')
+	// .populate('tasks.fullTargetLanguage')
+	// .populate('requestId', [ 'projectId' ])
+
+	// project._doc.clientBillingInfo = !!project.clientBillingInfo
+	// 		? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
+	// 		: null
+
+	return project
+}
+
 async function getProject(obj) {
 	const project = await Projects.findOne(obj)
 			.populate('industry')
@@ -278,5 +316,6 @@ module.exports = {
 	getFilteredProjects,
 	getProjectAfterUpdate,
 	getProjectsForVendorPortal,
-	getProjectsForPortalList
+	getProjectsForPortalList,
+	getProjectForClientPortal
 }

@@ -10,7 +10,8 @@ const {
 	getProjects,
 	getProjectsForPortalAll,
 	updateProjectStatusForClientPortalProject,
-	getProjectsForPortalList
+	getProjectsForPortalList,
+	getProjectForClientPortal
 } = require("../projects/")
 
 const { getProjectDeliverables } = require('../projects/files')
@@ -160,7 +161,6 @@ router.post('/all-projects', checkClientContact, async (req, res) => {
 	try {
 		// const verificationResult = jwt.verify(token, secretKey)
 		const projects = await getProjectsForPortalAll({ filters: req.body })
-		console.log(projects.length)
 		res.send(projects)
 	} catch (err) {
 		console.log(err)
@@ -182,13 +182,11 @@ router.get('/open-projects', checkClientContact, async (req, res) => {
 })
 
 router.get('/project/:id', checkClientContact, async (req, res) => {
-	const { token } = req.query
+	const { customer } = req.query
 	const { id } = req.params
-	const openStatuses = [ 'Draft' ]
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
-		const project = await getProject({ $and: [ { status: { $nin: openStatuses } }, { _id: id, 'customer': verificationResult.clientId } ] })
-		res.send({ project })
+		const project = await getProjectForClientPortal({ "_id": id, customer })
+		res.send(project)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
