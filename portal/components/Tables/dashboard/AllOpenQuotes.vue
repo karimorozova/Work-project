@@ -60,8 +60,9 @@
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
             .tooltip.user__image
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              img(v-if="client.contacts.find(item => item.email === row.createdBy.email).photo" :src="domain+client.contacts.find(item => item.email === row.createdBy.email).photo")
-              .user__fakeImage(:style="{'--bgColor': getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[0], '--color':getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[1]  }" v-else) {{ client.contacts.find(item => item.email === row.createdBy.email).firstName[0].toUpperCase() }}
+              img(v-if="getContactPhoto(row.createdBy)" :src="domain+getContactPhoto(row.createdBy)")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(row.createdBy._id)[0], '--color':getBgColor(row.createdBy._id)[1]  }" v-else)
+                span {{ row.createdBy.firstName[0].toUpperCase() }}
 
 
         template(slot="icons", slot-scope="{ row, index }")
@@ -78,9 +79,10 @@
 	import moment from "moment"
 	import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 	import ApproveModal from "../../ApproveModal"
+  import getBgColor from "../../../mixins/getBgColor"
 
 	export default {
-		mixins: [ tableSortAndFilter ],
+		mixins: [ tableSortAndFilter, getBgColor ],
 		props: {
       allQuotes: {
 				type: Array,
@@ -92,7 +94,7 @@
 		},
 		data() {
 			return {
-
+        domain: '',
         fields: [
           {
             label: "Project ID",
@@ -152,12 +154,21 @@
 
 			}
 		},
+    created() {
+      this.domain = process.env.domain
+    },
 		computed: {
 			rawData() {
 				return this.allQuotes
 			}
 		},
 		methods: {
+      getContactPhoto({ email }) {
+        const { contacts } = this.client
+        return contacts.find(item => item.email === email)
+            ? contacts.find(item => item.email === email).photo
+            : undefined
+      },
 			customFormatter(date) {
 				return moment(date).format('MMM D, HH:mm')
 			},
@@ -201,6 +212,33 @@
 
 <style scoped lang="scss">
   @import "../../../assets/scss/colors";
+
+  .user {
+    &__fakeImage {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+      background-color: var(--bgColor);
+      color: var(--color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    &__image {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 32px;
+      }
+    }
+  }
 
   .component {
     &__title {
@@ -277,7 +315,7 @@
       cursor: pointer;
     }
     &.accept {
-      color: #47a6a6;
+      color: #4ba5a5;
     }
     &.reject {
       color: #f5866d;
@@ -288,6 +326,7 @@
     display: flex;
     cursor: help;
     color: $dark-border;
+    text-align: center;
 
 
     &.user{
@@ -303,7 +342,8 @@
     &-data{
       visibility: hidden;
       font-size: 14px;
-      width: 240px;
+      max-width: 280px;
+      min-width: 140px;
       background: white;
       border-radius: 4px;
       right: 15px;

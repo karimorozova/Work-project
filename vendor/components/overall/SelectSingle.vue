@@ -143,7 +143,7 @@
   .remove{
     &__icon {
       margin-right: 5px;
-      color: #d15f45;
+      color: #d66f58;
     }
   }
 

@@ -174,7 +174,7 @@
       position: absolute;
       top: 12px;
       font-size: 16px;
-      color: #D15F45;
+      color: #d66f58;
     }
 
     &__main {

@@ -4,6 +4,7 @@ const axios = require("axios")
 
 const { writeFileSync, readFileSync, createReadStream } = require('fs')
 const csv = require('csv-parser')
+const { getProject } = require("./index")
 
 const apiDomain = "https://pangea.s.xtrf.eu/home-api/"
 const token = "YnMTG15t9lCKQWRuv7bZvWMHR9"
@@ -363,7 +364,7 @@ const updateFianceXTRF = async (id) => {
 		xtrfLink,
 		steps,
 		tasks
-	} = await Projects.findOne({ _id: id }).populate('steps.vendor')
+	} = await getProject({ _id: id })
 
 
 	const re = /ProjectId=(.*)#/.exec(xtrfLink)

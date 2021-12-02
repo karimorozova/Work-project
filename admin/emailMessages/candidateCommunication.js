@@ -21,10 +21,10 @@ function testSentMessage(obj) {
                         </span>
                     </p>
                     <p>
-                    	Please sent the completed test to <span style="color: #D15F45">career@pangea.global</span>
+                    	Please sent the completed test to <span style="color: #d66f58">career@pangea.global</span>
                     </p>
                     <p style="font-weight: 400;">
-                        If you have any question, please do not hesitate to contact us in <span style="color: #D15F45">career@pangea.global</span> <br>
+                        If you have any question, please do not hesitate to contact us in <span style="color: #d66f58">career@pangea.global</span> <br>
                         Many thanks,<br>
                         Pangea HR team
                     </p>

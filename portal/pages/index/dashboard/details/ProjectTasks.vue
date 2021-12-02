@@ -20,7 +20,7 @@
           img.tasks-table__time-icon(src="../../../../assets/images/time_icon.png")
           .tasks-table__time-data {{ getDeliveredTime(row.deliveredTime) }}
       .tasks-table__data.tasks-table__progress(slot="progress" slot-scope="{ row, index }")
-        ProgressLine(:progress="getProgress(row, index)")
+        //ProgressLine(:progress="getProgress(row, index)")
       .tasks-table__data(slot="wordcount" slot-scope="{ row }") {{ taskFinance[row.taskId].worldCount}}
       template(slot="cost" slot-scope="{ row }")
         .tasks-table__data(v-if="!isCancelledHalfway(row)") {{ taskFinance[row.taskId].receivables }}
@@ -41,7 +41,7 @@
 
 <script>
 	import DataTable from "~/components/Tables/DataTable"
-	import ProgressLine from "~/components/ProgressLine"
+	// import ProgressLine from "~/components/ProgressLine"
 	import moment from "moment"
 	import { mapGetters, mapActions } from "vuex"
   import currencyIconDetected from "../../../../mixins/currencyIconDetected"
@@ -74,7 +74,6 @@
         return `foo bar`
       },
 			// getWordcount(row) {
-      //   console.log({ row })
       //   // return row.finance.Wordcount.receivables
       //   return 0
 			// },
@@ -156,7 +155,7 @@
 		},
 		components: {
 			DataTable,
-			ProgressLine
+			// ProgressLine
 		}
 	}
 </script>

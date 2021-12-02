@@ -47,8 +47,8 @@ export default {
   justify-content: center;
 }
 .ct-series-a {
-  fill: #d15f45;
-  stroke: #d15f45;
+  fill: #d66f58;
+  stroke: #d66f58;
 }
 .ct-series-b {
   fill: #ff8376;

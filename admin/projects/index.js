@@ -1,12 +1,13 @@
 const {
 	getProject,
 	getProjects,
-	getProjectsForPortal,
+	getProjectsForPortalAll,
 	updateProject,
 	getFilteredProjects,
 	getProjectAfterUpdate,
 	getProjectsForVendorPortal,
 	getProjectsForPortalList,
+	getProjectForClientPortal,
 } = require('./getProjects')
 
 const {
@@ -106,6 +107,7 @@ const {
 } = require('./helpers')
 
 module.exports = {
+	getProjectForClientPortal,
 	setApprovedStepStatus,
 	getProjectsForVendorPortal,
 	generateReceivablesReportsByTemplate,
@@ -178,7 +180,7 @@ module.exports = {
 	addMultiLangDR2,
 	removeMultiDR2,
 	changeNameLang,
-	getProjectsForPortal,
+	getProjectsForPortalAll,
 	getProjectsForPortalList,
 	// addPaymentAdditions,
 	// deletePaymentAddition,

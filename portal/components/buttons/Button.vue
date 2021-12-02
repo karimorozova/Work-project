@@ -1,171 +1,139 @@
 <template lang="pug">
   .buttons
-    .button(v-if="outline")
-      .action-buttonOutline(:class="[customClass, {disabled: isDisabled}]")
-        input.action-buttonOutline__button(type="button" :value="value" @click="clicked" :disabled="isDisabled")
-    .button(v-else)
-      .action-button(:class="[customClass, {disabled: isDisabled}]")
-        input.action-button__button(type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
+    .button(v-if="outline" :class="{fullWidth: isFullMainClass}")
+      .action-buttonOutline(:class="[customClass, {fullWidthButton: isFullWidth}]")
+        input.action-buttonOutline__button(:class="[{disabled: isDisabled}]" type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'color': color, 'border': `1px solid ${color}`}")
+    .button(v-else :class="{fullWidth: isFullMainClass}")
+      .action-button(:class="[customClass, {disabled: isDisabled}, {fullWidthButton: isFullWidth}]")
+        input.action-button__button(:class="[{disabled: isDisabled}]" type="button" :value="value" @click="clicked" :disabled="isDisabled" :style="{'background-color': color}")
 </template>
 
 <script>
-	export default {
-		props: {
-			value: {
-				type: String
-			},
-			isDisabled: {
-				type: Boolean
-			},
-			customClass: {
-				type: String
-			},
-			outline: {
-				type: Boolean,
-				default: false
-			},
-			color: {
-				type: String,
-				default: "#d15f45"
-			}
-		},
-		methods: {
-			clicked() {
-				this.$emit('clicked', { value: this.value })
-			}
-		}
-	}
+export default {
+  props: {
+    value: {
+      type: String
+    },
+    isDisabled: {
+      type: Boolean
+    },
+    customClass: {
+      type: String
+    },
+    outline: {
+      type: Boolean,
+      default: false
+    },
+    color: {
+      type: String,
+      default: "#d66f58"
+    },
+    isFullWidth: {
+      type: Boolean,
+      default: false
+    },
+    isFullMainClass: {
+      type: Boolean,
+      default: false
+    }
+  },
+  methods: {
+    clicked() {
+      this.$emit('clicked', { value: this.value })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors.scss";
+@import "../../assets/scss/colors.scss";
 
-  .action-buttonOutline {
-    &__button {
-      transition: .2s ease-out;
-      text-align: center;
-      border: 2px solid #d15f45;
-      min-width: 120px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      color: #d15f45;
-      font-size: 14px;
-      border-radius: 4px;
-      background-color: white;
-      outline: none;
-      letter-spacing: 0.2px;
+.action-buttonOutline {
 
-      &:hover {
-        cursor: pointer;
-        background: #f4f2f1;
-      }
+  &__button {
+    transition: .2s ease-out;
+    text-align: center;
+    min-width: 110px;
+    padding: 0 24px 0 24px;
+    height: 30px;
+    font-size: 14px;
+    border-radius: 2px;
+    background-color: white;
+    outline: none;
+    letter-spacing: 0.2px;
+    cursor: pointer;
 
-      &:active {
-        transform: scale(.98);
-      }
+    &:hover {
+      box-shadow: $box-shadow;
     }
 
-    .other-choice & {
-      margin: 7px;
-      @media (max-width: 450px) {
-        margin: 5px;
-      }
+    &:active {
+      transform: scale(.98);
     }
   }
 
-  .action-button {
-    &__button {
-      min-width: 120px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      color: $white;
-      font-size: 14px;
-      border-radius: 4px;
-      background-color: $orange;
-      border: none;
-      transition: .1s ease;
-      outline: none;
-      letter-spacing: 0.2px;
+  .other-choice & {
+    margin: 7px;
+    @media (max-width: 450px) {
+      margin: 5px;
+    }
+  }
+}
 
-      &:hover {
-        cursor: pointer;
-        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-      }
+.action-button {
 
-      &:active {
-        transform: scale(.98);
-      }
+  &__button {
+    min-width: 110px;
+    padding: 0 24px 0 24px;
+    height: 30px;
+    color: $white;
+    font-size: 14px;
+    border-radius: 2px;
+    background-color: $red;
+    border: none;
+    transition: .2s ease-out;
+    outline: none;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: $box-shadow;
     }
 
-    .other-choice & {
-      margin: 7px;
-      @media (max-width: 450px) {
-        margin: 5px;
-      }
+    &:active {
+      transform: scale(.97);
     }
   }
 
-  .main-nav_button {
-    .action-button__button {
-      min-width: 120px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      color: $white;
-      font-size: 14px;
-      border-radius: 4px;
-      background-color: $orange;
-      border: none;
-      transition: .1s ease;
-      outline: none;
-      letter-spacing: 0.2px;
-
-      &:hover {
-        cursor: pointer;
-        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
-      }
-
-      &:active {
-        transform: scale(.98);
-      }
+  .other-choice & {
+    margin: 7px;
+    @media (max-width: 450px) {
+      margin: 5px;
     }
   }
+}
 
-  .disabled {
+.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 
-    .action-button__button {
-      cursor: default;
-      opacity: 0.5;
-      min-width: 120px;
-      padding: 0 24px 0 24px;
-      height: 32px;
-      color: $white;
-      font-size: 14px;
-      border-radius: 4px;
-      background-color: $orange;
-      border: none;
-      transition: .1s ease;
-      outline: none;
-      letter-spacing: 0.2px;
+.middle {
+  text-align: center;
+}
 
-      &:hover {
-        box-shadow: none;
-      }
+.fullWidth {
+  width: 100%;
 
-      &:active {
-        box-shadow: none;
-      }
-    }
+  input {
+    width: 100%;
   }
+}
 
-  .width-191 {
-    .action-button__button {
-      width: 191px;
-    }
+.fullWidthButton {
+  input {
+    width: 100%;
   }
-  .width-140 {
-    .action-button__button {
-      width: 140px;
-    }
-  }
+}
 
 </style>

@@ -341,7 +341,7 @@
 			clearFilters() {
 				this.$router.replace({ 'query': null }).catch((err) => err)
 				this.defaultSetter()
-				this.getData()
+				// this.getData()
 			},
 			async updateFiltersAndFields(data) {
 				await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, { data })
@@ -350,17 +350,19 @@
 			async getData() {
 				this.lastDate = new Date()
 				this.lastDate.setDate(this.lastDate.getDate() + 1)
-				this.isDataRemain = true
 				try {
 					const result = await this.$http.post(`/pm-manage/allprojects`, { ...this.filters, lastDate: this.lastDate })
 					this.allProjects = result.data
-					this.lastDate = this.getLastDateFromRes(result)
-				} catch (err) {
+          this.isDataRemain = result.data.length === 25
+          if(this.isDataRemain){
+            this.lastDate = this.getLastDateFromRes(result)
+          }
+        } catch (err) {
 					this.alertToggle({ message: "Error on project getting data", isShow: true, type: "error" })
 				}
 			},
 			async bottomScrolled() {
-				if (this.isDataRemain) {
+				if (this.isDataRemain && this.lastDate) {
 					const result = await this.$http.post(`/pm-manage/allprojects`, { ...this.filters, lastDate: this.lastDate })
 					this.allProjects.push(...result.data)
 					this.isDataRemain = result.data.length === 25
@@ -373,7 +375,6 @@
 			querySetter(vm, to) {
 				for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
 			},
-
 			defaultSetter() {
 				for (let variable of this.dataVariables) this[variable] = ''
 			}

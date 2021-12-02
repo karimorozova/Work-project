@@ -248,7 +248,7 @@
 
     &__iconAlert {
       &-red {
-        color: #d15f45;
+        color: #d66f58;
         width: 100%;
         font-size: 16px;
         text-align: center;

@@ -1,5 +1,5 @@
 const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
-const { getFilterdProjectsQuery } = require('./filter')
+const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery } = require('./filter')
 
 
 async function getProjectsForVendorPortal(obj) {
@@ -42,36 +42,35 @@ async function getProjects(obj) {
 
 }
 
-async function getProjectsForPortal(obj) {
+async function getProjectsForPortalAll({ filters, verificationResult }) {
+	const allLanguages = await Languages.find()
+	const allServices = await Services.find()
+	const query = getFilteredPortalProjectsQuery(filters, allLanguages, allServices)
+
+	console.log(query)
 	return (await Projects.find(
-			obj,
-			{
-				projectId: 1,
-				projectName: 1,
-				status: 1,
-				clientContacts: 1,
-				tasks: 1,
-				steps: 1,
-				startDate: 1,
-				deadline: 1,
-				finance: 1,
-				createdBy: 1,
-				tasksDeliverables: 1,
-				tasksDR2: 1,
-				projectCurrency: 1
-			}
+					{
+						'isTest': 'false',
+						'customer': filters.customer,
+						...query
+					}, {
+						projectId: 1,
+						projectName: 1,
+						status: 1,
+						startDate: 1,
+						deadline: 1,
+						createdBy: 1,
+						accountManager: 1
+					}
+			)
+					.sort({ startDate: -1 })
+					.limit(25)
+					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
-			.populate('industry')
-			.populate('service')
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
-			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
 }
 
 async function getProjectsForPortalList(obj) {
-	return (await Projects.find(
-					obj,
-					{
+	return (await Projects.find(obj, {
 						projectId: 1,
 						projectName: 1,
 						status: 1,
@@ -81,18 +80,57 @@ async function getProjectsForPortalList(obj) {
 						startDate: 1,
 						deadline: 1,
 						finance: 1,
-						createdBy: 1
+						createdBy: 1,
+						accountManager: 1
 						// tasksDeliverables: 1,
 						// tasksDR2: 1,
 						// projectCurrency: 1
 					}
 			)
-			// .populate('industry')
-			// .populate('service')
-			// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
-			// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			// .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+					// .populate('industry')
+					// .populate('service')
+					// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+					// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
+}
+
+async function getProjectForClientPortal(obj) {
+	const project = await Projects.findOne(obj,
+			{
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				"finance.Price.receivables": 1,
+				industry: 1,
+				startDate: 1,
+				deadline: 1,
+				accountManager: 1
+			}
+	)
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	// .populate('industry')
+	// .populate('service')
+	// .populate('customer')
+	// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	// .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	// .populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
+	// .populate('steps.step')
+	// .populate('steps.service')
+	// .populate('steps.receivablesUnit')
+	// .populate('steps.payablesUnit')
+	// .populate('steps.fullSourceLanguage')
+	// .populate('steps.fullTargetLanguage')
+	// .populate('tasks.service')
+	// .populate('tasks.fullSourceLanguage')
+	// .populate('tasks.fullTargetLanguage')
+	// .populate('requestId', [ 'projectId' ])
+
+	// project._doc.clientBillingInfo = !!project.clientBillingInfo
+	// 		? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
+	// 		: null
+
+	return project
 }
 
 async function getProject(obj) {
@@ -270,4 +308,14 @@ async function getFilteredProjects(filters) {
 	}
 }
 
-module.exports = { getProject, getProjects, getProjectsForPortal, updateProject, getFilteredProjects, getProjectAfterUpdate, getProjectsForVendorPortal, getProjectsForPortalList }
+module.exports = {
+	getProject,
+	getProjects,
+	getProjectsForPortalAll,
+	updateProject,
+	getFilteredProjects,
+	getProjectAfterUpdate,
+	getProjectsForVendorPortal,
+	getProjectsForPortalList,
+	getProjectForClientPortal
+}

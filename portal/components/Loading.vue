@@ -1,71 +1,107 @@
 <template lang="pug">
-.loading(v-show="loading || currentRequests > 0")
-    .loading__message
-        span.loading__text Loading 
-        .loading__spinner
+    .loading
+      //transition(name="fade")
+        //.loading__message Loading
+        //.spinner3.spinner-3
+        .spinner1.spinner-1(v-if="currentRequests")
+
+
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from "vuex"
 
 export default {
-    data: () => ({
-        loading: false
-    }),
-    methods: {
-        start() {
-            this.loading = true;
-        },
-        finish() {
-            this.loading = false;
-        }
-    },
-    computed: {
-        ...mapGetters({
-            currentRequests: "getRequestsCount"
-        })
-    }
+  computed: {
+    ...mapGetters({
+      // currentRequests: "getRequestsCount"
+    })
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.loading {
-    position: fixed;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    z-index: 10000;
-    &__message {
-        position: fixed;
-        top: 0;
-        left: 50%;
-        margin-left: -125px;
-        padding: 30px 0;
-        width: 250px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #FFF;
-        box-shadow: 0 0 8px #68573E;
-    }
-    &__text {
-        color: #68573E;
-        font-size: 16px;
-        margin-right: 20px;
-    }
-    &__spinner {
-        border: 7px solid #d8d8d8;
-        border-top: 7px solid #68573E;
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        animation: spin 1.2s linear infinite;    
-    }
-}
+//@import "./assets/scss/colors";
+//
+//.fade-enter-active, .fade-leave-active {
+//  transition: opacity .5s;
+//}
+//
+//.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
+//{
+//  opacity: 0;
+//}
+//
+//.loading {
+//  //position: fixed;
+//  //top: 10px;
+//  //left: 50%;
+//  //margin-left: -125px;
+//  //width: 250px;
+//  ////background-color: palevioletred;
+//  //z-index: 90000;
+//}
+//
+//.spinner1 {
+//  position: relative;
+//  width: 50px;
+//  height: 50px;
+//
+//  &:before,
+//  &:after {
+//    content: "";
+//    display: block;
+//    position: absolute;
+//    border-width: 2px;
+//    border-style: solid;
+//    border-radius: 50%;
+//  }
+//}
+//
+//.spinner1.spinner-1 {
+//  @keyframes rotate-animation {
+//    0% {
+//      transform: rotate(0deg);
+//    }
+//
+//    100% {
+//      transform: rotate(360deg);
+//    }
+//  }
+//
+//  @keyframes anti-rotate-animation {
+//    0% {
+//      transform: rotate(0deg);
+//    }
+//
+//    100% {
+//      transform: rotate(-360deg);
+//    }
+//  }
+//
+//  &:before {
+//    width: 30px;
+//    height: 30px;
+//    border-bottom-color: $green;
+//    border-right-color: $green;
+//    border-top-color: rgba(red, 0);
+//    border-left-color: rgba(red, 0);
+//    top: 0px;
+//    left: 0px;
+//    animation: rotate-animation 1s linear 0s infinite;
+//  }
+//
+//  &:after {
+//    width: 15px;
+//    height: 15px;
+//    border-bottom-color: $red;
+//    border-right-color: $red;
+//    border-top-color: rgba(red, 0);
+//    border-left-color: rgba(red, 0);
+//    top: (30px - 15px) / 2;
+//    left: (30px - 15px) / 2;
+//    animation: anti-rotate-animation 0.85s linear 0s infinite;
+//  }
+//}
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
 </style>

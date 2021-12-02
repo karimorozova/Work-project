@@ -1,7 +1,7 @@
 <template lang='pug'>
   #app
     title {{ title }}
-    Loading(v-if="!!requestCounter")
+    //Loading(v-if="!!requestCounter")
     transition(name="slide-fade")
       AlertMessage(v-if="isAlert" :text="alertMessage" :type="alertType")
     router-view
@@ -24,8 +24,8 @@
 				return str[0].toUpperCase() + str.slice(1)
 			},
 			setTitle(re) {
-				if (re) this.title = `pangea - ${ this.goFirstToUpperCase(re[1]) }`
-				else this.title = 'pangea'
+				if (re) this.title = `Pangea - Admin portal - ${ this.goFirstToUpperCase(re[1]) }`
+				else this.title = 'Pangea - Admin portal'
 			}
 		},
 		computed: {
@@ -35,7 +35,7 @@
 				isAlert: 'isAlert',
 				alertType: 'alertType',
 				alertMessage: 'alertMessage',
-				requestCounter: 'getRequestCounter'
+				// requestCounter: 'getRequestCounter'
 			})
 		},
 		mounted() {

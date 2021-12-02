@@ -25,7 +25,6 @@
         return moment(date).format('DD-MM-YYYY, HH:mm')
       },
       groupAllData() {
-        console.log({ currentService: this.clientRequest.requestForm.service.title })
         return {
           currentProjectName: this.clientRequest.projectName,
           currentDeadline: this.customFormatter(this.clientRequest.deadline),
@@ -43,12 +42,11 @@
       async currentClientRequest() {
         const { id } = this.$route.params
         const { requests } = (await this.$axios.get('/portal/client-requests/' + id + '?token=' + this.token)).data
-        this.clientRequest = JSON.parse(window.atob(requests))
+        this.clientRequest = requests
       },
 		},
 		computed: {
 			...mapGetters({
-        // clientRequests: "getClientRequests",
         token: "getToken"
 			}),
       files() {

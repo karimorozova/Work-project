@@ -318,7 +318,7 @@
     &__priorityBlockHigh {
       display: inline-block;
       padding: 5px 12px;
-      background: #D15F45;
+      background: #d66f58;
       color: white;
       width: fit-content;
     }

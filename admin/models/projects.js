@@ -365,7 +365,7 @@ const ProjectsSchema = new mongoose.Schema({
 
 	status: {
 		type: String,
-		enum: [ 'Draft', 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'In progress', 'Closed' ],
+		enum: [ 'Draft', 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'Cancelled', 'Closed' ],
 		default: 'Draft'
 	},
 	roi: {

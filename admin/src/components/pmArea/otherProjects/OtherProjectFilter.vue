@@ -210,7 +210,7 @@
       font-size: 14px;
       border-radius: 4px;
       box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .12), 0 1px 5px 0 rgba(0, 0, 0, .2);
-      background-color: #D15F45;
+      background-color: #d66f58;
       border: none;
       transition: .1s ease;
       outline: none;

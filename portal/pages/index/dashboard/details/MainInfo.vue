@@ -49,7 +49,6 @@
 	import LabelValue from "~/components/LabelValue"
 	import Button from "~/components/buttons/Button"
 	import ApproveModal from "~/components/ApproveModal"
-	import Progress from "~/components/Progress"
 	import ClickOutside from "vue-click-outside"
 	import QuoteTasks from "./QuoteTasks"
 	import ProjectTasks from "./ProjectTasks"

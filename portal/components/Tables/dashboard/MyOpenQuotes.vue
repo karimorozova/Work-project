@@ -57,10 +57,11 @@
 
         template(slot="createdBy", slot-scope="{ row, index }")
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
-            .tooltip.user
+            .tooltip.user__image
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              i(class="fas fa-user")
-
+              img(v-if="getContactPhoto(row.createdBy)" :src="domain+getContactPhoto(row.createdBy)")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(row.createdBy._id)[0], '--color':getBgColor(row.createdBy._id)[1]  }" v-else)
+                span {{ row.createdBy.firstName[0].toUpperCase() }}
 
         template(slot="icons", slot-scope="{ row, index }")
           //.table__icons
@@ -77,9 +78,10 @@
 	import moment from "moment"
 	import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 	import ApproveModal from "../../ApproveModal"
+  import getBgColor from "../../../mixins/getBgColor"
 
 	export default {
-		mixins: [ tableSortAndFilter ],
+		mixins: [ tableSortAndFilter, getBgColor ],
 		props: {
       myQuotes: {
 				type: Array,
@@ -91,7 +93,7 @@
 		},
 		data() {
 			return {
-
+        domain: '',
         fields: [
           {
             label: "Project ID",
@@ -150,12 +152,21 @@
         currentDelete: '',
 			}
 		},
+    created() {
+      this.domain = process.env.domain
+    },
 		computed: {
 			rawData() {
 				return this.myQuotes
 			}
 		},
 		methods: {
+      getContactPhoto({ email }) {
+        const { contacts } = this.client
+        return contacts.find(item => item.email === email)
+            ? contacts.find(item => item.email === email).photo
+            : undefined
+      },
 			customFormatter(date) {
 				return moment(date).format('MMM D, HH:mm')
 			},
@@ -199,6 +210,33 @@
 
 <style scoped lang="scss">
   @import "../../../assets/scss/colors";
+
+  .user {
+    &__fakeImage {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+      background-color: var(--bgColor);
+      color: var(--color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    &__image {
+      height: 32px;
+      width: 32px;
+      border-radius: 32px;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 32px;
+      }
+    }
+  }
 
   .component {
     &__title {
@@ -276,7 +314,7 @@
       cursor: pointer;
     }
     &.accept {
-      color: #47a6a6;
+      color: #4ba5a5;
     }
     &.reject {
       color: #f5866d;
@@ -287,6 +325,7 @@
     display: flex;
     cursor: help;
     color: $dark-border;
+    text-align: center;
 
 
     &.user{
@@ -302,7 +341,8 @@
     &-data{
       visibility: hidden;
       font-size: 14px;
-      width: 240px;
+      max-width: 280px;
+      min-width: 140px;
       background: white;
       border-radius: 4px;
       right: 15px;

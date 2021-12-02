@@ -676,7 +676,7 @@
     width: 12px;
     height: 12px;
     border-radius: 100%;
-    background: #d15f45;
+    background: #d66f58;
     opacity: 0;
     pointer-events: none;
   }

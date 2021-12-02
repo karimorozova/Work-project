@@ -53,7 +53,7 @@
     }
 
     &__filler {
-      background-color: #47A6A6FF;
+      background-color: #4ba5a5FF;
       height: 100%;
       max-width: 100%;
     }

@@ -220,7 +220,7 @@ export default {
           padding-right: 3px;
           .col2 {
             button {
-              background-color: #D15F45;
+              background-color: #d66f58;
               border-radius: 4px;
               color: #fff;
               width: 120px;

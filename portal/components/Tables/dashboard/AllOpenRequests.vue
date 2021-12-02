@@ -54,9 +54,9 @@
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
             .tooltip.user__image
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              img(v-if="client.contacts.find(item => item.email === row.createdBy.email).photo" :src="domain+client.contacts.find(item => item.email === row.createdBy.email).photo")
-              .user__fakeImage(:style="{'--bgColor': getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[0], '--color':getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[1]  }" v-else) {{ client.contacts.find(item => item.email === row.createdBy.email).firstName[0].toUpperCase() }}
-
+              img(v-if="getContactPhoto(row.createdBy)" :src="domain+getContactPhoto(row.createdBy)")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(row.createdBy._id)[0], '--color':getBgColor(row.createdBy._id)[1]  }" v-else)
+                span {{ row.createdBy.firstName[0].toUpperCase() }}
 </template>
 
 <script>
@@ -142,6 +142,12 @@ export default {
     this.domain = process.env.domain
   },
   methods: {
+    getContactPhoto({ email }) {
+      const { contacts } = this.client
+      return contacts.find(item => item.email === email)
+          ? contacts.find(item => item.email === email).photo
+          : undefined
+    },
     customFormatter(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -298,7 +304,8 @@ a {
   &-data {
     visibility: hidden;
     font-size: 14px;
-    max-width: 240px;
+    max-width: 280px;
+    min-width: 140px;
     background: white;
     border-radius: 4px;
     right: 15px;

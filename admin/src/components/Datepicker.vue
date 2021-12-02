@@ -980,7 +980,7 @@ input:disabled {
 }
 
 .vdp-datepicker__calendar header .up {
-  color: #D15F45;
+  color: #d66f58;
   font-size: 19px;
 }
 
@@ -995,7 +995,7 @@ input:disabled {
 }
 
 .vdp-datepicker__calendar header .prev:after {
-  border-right: 10px solid #D15F45;
+  border-right: 10px solid #d66f58;
   margin-left: -5px;
 }
 
@@ -1004,7 +1004,7 @@ input:disabled {
 }
 
 .vdp-datepicker__calendar header .next:after {
-  border-left: 10px solid #D15F45;
+  border-left: 10px solid #d66f58;
   margin-left: 5px;
 }
 
@@ -1078,7 +1078,7 @@ input:disabled {
 }
 
 .vdp-datepicker__calendar .cell.today {
-  background-color: #D15F45;
+  background-color: #d66f58;
   color: #FFF;
   font-weight: bold;
 }
@@ -1147,13 +1147,13 @@ input:disabled {
   }
 
   .cell.today {
-    color: #d15f45 !important;
+    color: #d66f58 !important;
     background-color: #fff !important;
     font-weight: bold;
   }
 
   .selected {
-    background-color: #D15F45 !important;
+    background-color: #d66f58 !important;
     color: #fff !important;
   }
 }

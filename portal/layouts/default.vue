@@ -34,6 +34,30 @@ body {
   background-color: #fdfbfc;
 }
 
+input::-webkit-input-placeholder {
+  opacity: 0.45;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-file-upload-button {
+  cursor: pointer;
+}
+
+sup {
+  margin-left: 4px;
+  font-size: 11px;
+  color: #999;
+}
+
 .slide-fade-enter-active {
   transition: all .5s ease;
 }

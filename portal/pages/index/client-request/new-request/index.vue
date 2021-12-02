@@ -461,7 +461,6 @@
 			...mapGetters({
 				user: "getUserInfo",
 				allLanguages: 'allLanguages',
-				getClientIndustries: "getClientIndustries",
 				clientInfo: "getClientInfo",
         services: "getAllServices"
 			}),
@@ -662,7 +661,7 @@
       align-items: center;
       position: relative;
       margin-bottom: 7px;
-      color: #d15f45;
+      color: #d66f58;
       display: flex;
     }
 
@@ -688,7 +687,7 @@
 
     &__projectName {
       font-size: 16px;
-      color: #d15f45;
+      color: #d66f58;
       margin-top: 10px;
       font-family: 'Myriad600';
     }

@@ -18,7 +18,7 @@
 
           .sidebarMenu__allActivities
             .sidebarMenu__allActivities-button(@click="openAllActivities") View All Activities
-              //Button( value="" :isFullWidth="true" :outline="true" color="#47a6a6" )
+              //Button( value="" :isFullWidth="true" :outline="true" color="#4ba5a5" )
 
           .sidebarMenu__generalInfo
             SideGeneral(:isSaveClicked="isSaveClicked")

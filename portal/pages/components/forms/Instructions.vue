@@ -129,7 +129,6 @@ export default {
       this.$set(this.selectedInstructions[index], 'isOpen', !this.selectedInstructions[index].isOpen)
     },
     toggleDescriptionAll(index) {
-      console.log(!this.unselectedInstructions[index].isOpen)
       this.$set(this.unselectedInstructions[index], 'isOpen', !this.unselectedInstructions[index].isOpen)
     },
     setNewDescription(e) {
