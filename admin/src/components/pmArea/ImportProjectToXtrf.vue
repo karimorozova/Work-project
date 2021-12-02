@@ -4,7 +4,7 @@
       .margin-bottom
         Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink" :isFullMainClass="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
         Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink" :isFullMainClass="true" :outline="true" value="Send manual" @clicked="check" :isDisabled="isDisable")
-      span(v-else) Xtrf : &nbsp;
+      span(v-if="project.isSendToXtrf && project.xtrfLink" ) Xtrf : &nbsp;
         a( target="_blank" :href="project.xtrfLink")
           i(class="fas fa-link")
         | &nbsp;&nbsp;
