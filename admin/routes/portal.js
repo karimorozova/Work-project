@@ -158,8 +158,9 @@ router.post("/reset-pass", async (req, res) => {
 router.post('/all-projects', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
-		const projects = await getProjectsForPortalAll({ filters: req.body,  verificationResult })
+		// const verificationResult = jwt.verify(token, secretKey)
+		const projects = await getProjectsForPortalAll({ filters: req.body })
+		console.log(projects.length)
 		res.send(projects)
 	} catch (err) {
 		console.log(err)

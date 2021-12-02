@@ -21,14 +21,14 @@ function getFilteredPortalProjectsQuery(filters, allLanguages, allServices) {
 
 	if (projectId) {
 		const filter = projectId.replace(reg, '\\$&')
-		query['projectId'] = { "$regex": new RegExp(filter, 'i') }
+		query['projectId'] = { "$regex": new RegExp(filter, 'g') }
 	}
 	if (projectName) {
 		const filter = projectName.replace(reg, '\\$&')
-		query['projectName'] = { "$regex": new RegExp(filter, 'i') }
+		query['projectName'] = { "$regex": new RegExp(filter, 'g') }
 	}
 	if (lastDate) {
-		query['startDate'] = { $lt: new Date(lastDate) }
+		query['startDate'] = { $lte: new Date(lastDate) }
 	}
 	if (sourceLanguages) {
 		query["tasks.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
@@ -43,7 +43,9 @@ function getFilteredPortalProjectsQuery(filters, allLanguages, allServices) {
 		query["tasks.service.title"] = { $in: services.split(',').map(item => allServices.find(({ _id }) => _id.toString() === item.toString()).title) }
 	}
 	if (status) {
-		query["status"] = status
+		query["status"] = { $in: [status] }
+	} else {
+		query["status"] = { $ne: 'Draft' }
 	}
 	if (startDateFrom && startDateTo) {
 		query["startDate"] = { $gte: new Date(+startDateFrom), $lt: new Date(+startDateTo) }

@@ -46,11 +46,12 @@ async function getProjectsForPortalAll({ filters, verificationResult }) {
 	const allLanguages = await Languages.find()
 	const allServices = await Services.find()
 	const query = getFilteredPortalProjectsQuery(filters, allLanguages, allServices)
+
+	console.log(query)
 	return (await Projects.find(
 					{
-						'status': { $ne: 'Draft' },
 						'isTest': 'false',
-						'customer': verificationResult.clientId,
+						'customer': filters.customer,
 						...query
 					}, {
 						projectId: 1,
@@ -79,17 +80,18 @@ async function getProjectsForPortalList(obj) {
 						startDate: 1,
 						deadline: 1,
 						finance: 1,
-						createdBy: 1
+						createdBy: 1,
+						accountManager: 1
 						// tasksDeliverables: 1,
 						// tasksDR2: 1,
 						// projectCurrency: 1
 					}
 			)
-			// .populate('industry')
-			// .populate('service')
-			// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
-			// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			// .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+					// .populate('industry')
+					// .populate('service')
+					// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
+					// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
 }
 

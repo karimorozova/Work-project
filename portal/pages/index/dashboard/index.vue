@@ -6,7 +6,6 @@
     //  .swapper__button
     //    Button(:value="'Archive'" @clicked="goToAnotherPortal")
     //V <==
-
     .row
       .col
         AllOpenRequests(:client="client" :allRequests="clientRequests")
@@ -84,10 +83,10 @@ export default {
       return this.clientRequests.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     }
   },
-  created() {
-    this.setOpenProjects()
-    this.setOpenQuotes()
-    this.setOpenRequests()
+  async created() {
+    await this.setOpenProjects()
+    await this.setOpenQuotes()
+    await this.setOpenRequests()
   },
   components: {
     Button,

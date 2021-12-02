@@ -200,7 +200,7 @@ export default {
       allStatuses: [ 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'Cancelled', 'Closed' ],
       projects: [],
       isDataRemain: true,
-      lastDate: '',
+      lastDate: new Date(),
 
       projectId: '',
       projectName: '',
@@ -301,19 +301,23 @@ export default {
       this.defaultSetter()
     },
     async getAllProjects() {
-      const projects = await this.$axios.post(`/portal/all-projects?token=${ this.token }`, { ...this.filters, lastDate: this.lastDate })
+      this.lastDate = new Date()
+      this.lastDate.setDate(this.lastDate.getDate() + 1)
+      const projects = await this.$axios.post(`/portal/all-projects?token=${ this.token }`, { ...this.filters, lastDate: this.lastDate, customer: this.client._id })
       this.projects = projects.data
       this.isDataRemain = projects.data.length === 25
-      this.lastDate = this.getLastDateFromRes(projects.data)
-      console.log('created All', this.projects)
+      if (this.isDataRemain) {
+        this.lastDate = this.getLastDateFromRes(projects.data)
+      }
+      // console.log('created All', this.projects)
     },
     async bottomScrolled() {
       if (this.isDataRemain && this.lastDate) {
-        const projects = (await this.$axios.post(`/portal/all-projects?token=${ this.token }`, { ...this.filters, lastDate: this.lastDate })).data
+        const projects = (await this.$axios.post(`/portal/all-projects?token=${ this.token }`, { ...this.filters, lastDate: this.lastDate, customer: this.client._id })).data
         this.projects.push(...projects)
         this.isDataRemain = projects.length === 25
         this.lastDate = this.getLastDateFromRes(projects)
-        console.log('bottom next', this.projects)
+        // console.log('bottom next', this.projects)
       }
     },
     getLastDateFromRes(data) {
@@ -501,6 +505,7 @@ export default {
     }
   },
   async created() {
+    if (Object.keys(this.$route.query).length) this.isFilterShow = true
     this.domain = process.env.domain
     await this.getIndustries()
     await this.getLanguages()

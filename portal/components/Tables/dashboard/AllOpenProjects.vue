@@ -62,8 +62,14 @@
           .table__icons(v-if="getCreatedBy(row.createdBy).isCreatedBy")
             .tooltip.user__image
               .tooltip-data.user(v-html="getCreatedBy(row.createdBy).createdBy")
-              img(v-if="client.contacts.find(item => item.email === row.createdBy.email).photo" :src="domain+client.contacts.find(item => item.email === row.createdBy.email).photo")
-              .user__fakeImage(:style="{'--bgColor': getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[0], '--color':getBgColor(client.contacts.find(item => item.email === row.createdBy.email)._id)[1]  }" v-else) {{ client.contacts.find(item => item.email === row.createdBy.email).firstName[0].toUpperCase() }}
+              img(v-if="getContactPhoto(row.createdBy)" :src="domain+getContactPhoto(row.createdBy)")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(row.createdBy._id)[0], '--color':getBgColor(row.createdBy._id)[1]  }" v-else)
+                span {{ row.createdBy.firstName[0].toUpperCase() }}
+          .table__icons(v-else)
+            .tooltip.user__image(v-if="row.accountManager && Object.keys(row.accountManager).length" )
+              .tooltip-data.user(v-html="'AM: ' + row.accountManager.firstName + ' ' + row.accountManager.lastName || ''")
+              img(v-if="row.accountManager.photo && !row.accountManager.photo.includes('https://')" :src="domain+row.accountManager.photo")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else) {{ row.accountManager.firstName[0].toUpperCase() }}
 
 
 </template>
@@ -148,10 +154,17 @@ export default {
   },
   computed: {
     rawData() {
+      console.log(' this.allProjects', this.allProjects)
       return this.allProjects
     }
   },
   methods: {
+    getContactPhoto({ email }) {
+      const { contacts } = this.client
+      return contacts.find(item => item.email === email)
+          ? contacts.find(item => item.email === email).photo
+          : undefined
+    },
     customFormatter(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -174,19 +187,12 @@ export default {
       }
     },
     progress(steps, project) {
-      if (project.hasOwnProperty('fromXTRF')) {
-        return project.tasks.length ? project.tasks.reduce((acc, curr) => {
-          acc += curr.progress
-          return acc
-        }, 0) / project.tasks.length : 0
-      } else {
-        let total = 0
-        for (let step of steps) {
-          const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress
-          total += progress
-        }
-        return (total / steps.length).toFixed(2)
+      let total = 0
+      for (let step of steps) {
+        const progress = isNaN(step.progress) ? +(step.progress.wordsDone / step.progress.totalWordCount * 100).toFixed(2) : step.progress
+        total += progress
       }
+      return (total / steps.length).toFixed(2)
     }
   },
   components: {
@@ -327,7 +333,8 @@ a {
   &-data {
     visibility: hidden;
     font-size: 14px;
-    max-width: 240px;
+    max-width: 280px;
+    min-width: 140px;
     background: white;
     border-radius: 4px;
     right: 15px;

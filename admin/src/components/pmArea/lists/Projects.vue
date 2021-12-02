@@ -353,8 +353,10 @@
 				try {
 					const result = await this.$http.post(`/pm-manage/allprojects`, { ...this.filters, lastDate: this.lastDate })
 					this.allProjects = result.data
-					this.lastDate = this.getLastDateFromRes(result)
-          this.isDataRemain = true
+          this.isDataRemain = result.data.length === 25
+          if(this.isDataRemain){
+            this.lastDate = this.getLastDateFromRes(result)
+          }
         } catch (err) {
 					this.alertToggle({ message: "Error on project getting data", isShow: true, type: "error" })
 				}
