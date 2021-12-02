@@ -321,7 +321,7 @@ export default {
 
     &-spinner {
       position: absolute;
-      left: 116px;
+      left: 114px;
       top: 15px;
     }
   }
@@ -360,8 +360,8 @@ export default {
 
 .spinner1 {
   position: relative;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
 
   &:before,
   &:after {
@@ -396,8 +396,8 @@ export default {
   }
 
   &:before {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-bottom-color: $green;
     border-right-color: $green;
     border-top-color: rgba(red, 0);
@@ -408,14 +408,14 @@ export default {
   }
 
   &:after {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-bottom-color: $red;
     border-right-color: $red;
     border-top-color: rgba(red, 0);
     border-left-color: rgba(red, 0);
-    top: (32px - 16px) / 2;
-    left: (32px - 16px) / 2;
+    top: (36px - 18px) / 2;
+    left: (36px - 18px) / 2;
     animation: anti-rotate-animation 0.85s linear 0s infinite;
   }
 }

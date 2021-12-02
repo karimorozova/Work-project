@@ -13,12 +13,12 @@
         .group(v-if="isGroup(element)" @click.stop="toggleGroup(element)")
 
           span(v-if="element.hasOwnProperty('parent')")
-            .group__open(style="margin-left: -6px;" v-if="element.isOpen")
+            .group__open(style="margin-left: -8px;" v-if="element.isOpen")
               .group__open-image
                 img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
               i.fas.fa-chevron-right
-            .group__close(style="margin-left: -6px;" v-if="!element.isOpen")
+            .group__close(style="margin-left: -8px;" v-if="!element.isOpen")
               .group__close-image
                 img(:src="require(`../../assets/images/navbar-icons/${element.name}.png`)")
                 div {{element.name}}
@@ -68,7 +68,7 @@ export default {
   },
   data() {
     return {
-      elementPadding: { 'padding-left': 24 * this.menuIterator + 'px' }
+      elementPadding: { 'padding-left': 26 * this.menuIterator + 'px' }
     }
   },
   methods: {
@@ -124,7 +124,7 @@ export default {
 @import "../../assets/scss/colors";
 
 img {
-  margin-right: 10px;
+  margin-right: 14px;
 }
 
 a {
@@ -142,7 +142,7 @@ a {
 
 %row {
   border-bottom: 1px solid $light-border;
-  margin-top: 10px;
+  //margin-top: 10px;
 }
 
 .menu {
