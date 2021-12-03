@@ -21,11 +21,12 @@ export default {
   },
   methods: {
     getProgressColor(status) {
-      return status === 'Completed' ? '#A9D3D1' : '#EAC0BB'
+      return status === 'Completed' || status === 'Closed' ? '#93c9c9' : '#eab7ab'
     }
   },
   computed: {
     currentProgress() {
+      if (this.status === 'Completed' || this.status === 'Closed') return 100
       return !isNaN(this.progress) ? this.progress : 0
     }
   }
@@ -33,7 +34,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/scss/colors.scss";
+@import "../assets/scss/colors";
 
 .progress-line {
   width: 100%;

@@ -340,7 +340,7 @@ export default {
   &__logo {
     margin: 0 auto;
     padding: 20px 0 10px 0;
-    width: 200px;
+    width: 190px;
 
     img {
       width: 100%;

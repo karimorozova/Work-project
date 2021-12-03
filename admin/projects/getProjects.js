@@ -47,7 +47,6 @@ async function getProjectsForPortalAll({ filters, verificationResult }) {
 	const allServices = await Services.find()
 	const query = getFilteredPortalProjectsQuery(filters, allLanguages, allServices)
 
-	console.log(query)
 	return (await Projects.find(
 					{
 						'isTest': 'false',
@@ -60,7 +59,11 @@ async function getProjectsForPortalAll({ filters, verificationResult }) {
 						startDate: 1,
 						deadline: 1,
 						createdBy: 1,
-						accountManager: 1
+						accountManager: 1,
+						additionsSteps: 1,
+						projectCurrency: 1,
+						minimumCharge: 1,
+						"finance.Price.receivables": 1
 					}
 			)
 					.sort({ startDate: -1 })
@@ -105,31 +108,44 @@ async function getProjectForClientPortal(obj) {
 				industry: 1,
 				startDate: 1,
 				deadline: 1,
-				accountManager: 1
+				accountManager: 1,
+				additionsSteps: 1,
+				projectCurrency: 1,
+				minimumCharge: 1,
+				discounts: 1,
+				"steps.finance.Price.receivables": 1,
+				"steps.finance.Wordcount.receivables": 1,
+				"steps.finance.Quantity.receivables": 1,
+				"steps.step": 1,
+				"steps.progress": 1,
+				"steps.receivablesUnit": 1,
+				"steps.sourceLanguage": 1,
+				"steps.targetLanguage": 1,
+				"steps.fullSourceLanguage": 1,
+				"steps.fullTargetLanguage": 1,
+				"steps.clientRate": 1,
+				"steps.status": 1
+
 			}
 	)
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 			.populate('industry')
-	// .populate('industry')
-	// .populate('service')
-	// .populate('customer')
-	// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-	// .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-	// .populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
-	// .populate('steps.step')
-	// .populate('steps.service')
-	// .populate('steps.receivablesUnit')
-	// .populate('steps.payablesUnit')
-	// .populate('steps.fullSourceLanguage')
-	// .populate('steps.fullTargetLanguage')
-	// .populate('tasks.service')
-	// .populate('tasks.fullSourceLanguage')
-	// .populate('tasks.fullTargetLanguage')
-	// .populate('requestId', [ 'projectId' ])
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
+			.populate('steps.receivablesUnit')
 
-	// project._doc.clientBillingInfo = !!project.clientBillingInfo
-	// 		? project.customer.billingInfo.find(({ _id }) => `${ project.clientBillingInfo }` === `${ _id }`)
-	// 		: null
+
+	project._doc.steps = project._doc.steps.length
+			? project._doc.steps.map(item => ({
+				...item._doc,
+				price: item._doc.finance.Price.receivables,
+				quantity: +item._doc.finance.Wordcount.receivables
+						? +item._doc.finance.Wordcount.receivables
+						: +item._doc.finance.Quantity.receivables || 0
+			}))
+			: []
 
 	return project
 }

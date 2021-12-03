@@ -148,8 +148,8 @@
             .table__data
               router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
                 .table__projectName
-                  .short {{  row.projectName.substr(0,30) + '...' }}
-                  .tooltip(v-if="row.projectName.length >= 15")
+                  .short {{  row.projectName.length >= 30 ? row.projectName.substr(0,30) + '...' : row.projectName }}
+                  .tooltip(v-if="row.projectName.length >= 30")
                     .tooltip-data(v-html="row.projectName")
                     i(class="fas fa-info")
 
@@ -164,6 +164,11 @@
           template(slot="deadline" slot-scope="{ row, index }")
             .table__data
               span {{customFormatter(row.deadline)}}
+
+          template(slot="total" slot-scope="{ row, index }")
+            .table__data
+              span.currency(v-html="currencyIconDetected(row.projectCurrency)" )
+              span {{ getTotalCost(row) }}
 
           template(slot="createdBy" slot-scope="{ row, index }")
             .table__dataImage(v-if="Object.keys(row.createdBy).length" )
@@ -190,9 +195,10 @@ import '../../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
 import moment from 'moment'
 import getBgColor from "../../../mixins/getBgColor"
+import currencyIconDetected from '../../../mixins/currencyIconDetected'
 
 export default {
-  mixins: [ getBgColor ],
+  mixins: [ getBgColor, currencyIconDetected ],
   data() {
     return {
       domain: '',
@@ -234,7 +240,7 @@ export default {
           label: "Project ID",
           headerKey: "headerID",
           key: "projectId",
-          style: { "width": "135px" }
+          style: { "width": "145px" }
         },
         {
           label: "Project Name",
@@ -264,7 +270,7 @@ export default {
           label: "Total Cost",
           headerKey: "headerID5",
           key: "total",
-          style: { "width": "110px" }
+          style: { "width": "100px" }
         },
         {
           label: "Created By",
@@ -281,6 +287,15 @@ export default {
       getLanguages: 'getLanguages',
       getIndustries: 'getIndustries'
     }),
+    getTotalCost(project) {
+      const { finance: { Price: { receivables } }, additionsSteps, minimumCharge } = project
+      const total = minimumCharge.isUsed ? minimumCharge.value : receivables
+      if (additionsSteps.length) {
+        const sum = additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+        return +(total + sum).toFixed(2)
+      }
+      return +(total).toFixed(2)
+    },
     getContactPhoto({ email }) {
       const { contacts } = this.client
       return contacts.find(item => item.email === email)
@@ -779,6 +794,11 @@ input {
   white-space: nowrap;
   overflow: hidden;
   max-width: 90%;
+}
+
+.currency {
+  margin-right: 4px;
+  color: $dark-border;
 }
 
 </style>

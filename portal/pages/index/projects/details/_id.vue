@@ -25,11 +25,52 @@
                 .d-key Deadline:
                 .d-val {{ customFormatter(currentProject.deadline) }}
 
+        .details__steps
+          .details__steps-title Jobs:
+          GeneralTable(
+            :fields="fields"
+            :tableData="finalData"
+            :isFilterShow="true"
+            :isBodyShort="true"
 
-        .details__progress
-          span progress
+            @addSortKey="addSortKey"
+            @changeSortKey="changeSortKey"
+            @removeSortKey="removeSortKey"
+            @setFilter="setFilter"
+            @removeFilter="removeFilter"
+            @clearAllFilters="clearAllFilters"
+          )
+            template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+              .table__header {{ field.label }}
 
-      span
+            template(slot="step", slot-scope="{ row, index }")
+              .table__data {{ row.step.title }}
+
+            template(slot="language" slot-scope="{ row }")
+              .table__data(v-html="getStepPair(row)")
+
+            template(slot="status" slot-scope="{ row, index }")
+              .table__statusAndProgress
+                .status {{ row.status }}
+                .progress
+                  ProgressLineStep(:progress="progress(row.progress)" :status="row.status")
+
+            template(slot="quantity", slot-scope="{ row, index }")
+              .table__data {{ row.quantity }}
+
+            template(slot="clientRate", slot-scope="{ row, index }")
+              .table__data(v-if="!currentProject.minimumCharge.isUsed")
+                span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
+                span {{ row.clientRate }}
+              .table__data(v-else) -
+
+            template(slot="price", slot-scope="{ row, index }")
+              .table__data(v-if="!currentProject.minimumCharge.isUsed")
+                span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
+                span {{ row.price }}
+              .table__data(v-else) -
+
+
     .sideLeft(v-if="currentProject._id")
       .user(v-if="currentProject.accountManager" )
         .user__image
@@ -38,21 +79,100 @@
         .user__name {{currentProject.accountManager.firstName + ' ' + currentProject.accountManager.lastName || ''}}
         .user__who Account Manager
 
+      .progress__bar
+        CircleProgress(:percent="12")
 
+      .priceExplanation(v-if="currentProject.additionsSteps.length" )
+        .priceExplanation__title Services:
+        .priceExplanation__row
+          .priceExplanation__key Total
+          .priceExplanation__value
+            span {{ +(currentProject.finance.Price.receivables).toFixed(2) }}
+            span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+      .priceExplanation(v-if="currentProject.discounts.length && !currentProject.minimumCharge.isUsed")
+        .priceExplanation__title Discounts and Surcharges:
+        .priceExplanation__row(v-for="item in currentProject.discounts" )
+          .priceExplanation__key {{item.name}}
+          //.priceExplanation__value {{ calculateDiscountPercent(item.value) }}
+
+      .priceExplanation(v-if="currentProject.additionsSteps.length" )
+        .priceExplanation__title Additional Charges:
+        .priceExplanation__row(v-for="item in currentProject.additionsSteps" )
+          .priceExplanation__key {{item.title}}
+          .priceExplanation__value
+            span {{item.finance.Price.receivables}}
+            span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+      .total
+        .total__row
+          .total__key Total:
+          .total__value
+            span 123123
+            span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 </template>
 
 <script>
-// import MainInfo from "../../dashboard/details/MainInfo"
-// import OtherInfo from "../../dashboard/details/OtherInfo"
 import { mapGetters, mapActions } from "vuex"
 import getBgColor from "../../../../mixins/getBgColor"
 import moment from "moment"
+import GeneralTable from "../../../../components/pangea/GeneralTable"
+import tableSortAndFilter from "../../../../mixins/tableSortAndFilter"
+import ProgressLineStep from "../../../../components/pangea/ProgressLineStep"
+import currencyIconDetected from '../../../../mixins/currencyIconDetected'
+import CircleProgress from "../../../../components/CircleProgress"
 
 export default {
-  mixins: [ getBgColor ],
+  mixins: [ tableSortAndFilter, getBgColor, currencyIconDetected ],
   data() {
     return {
-      domain: ''
+      domain: '',
+      fields: [
+        {
+          label: "Service",
+          headerKey: "header1",
+          key: "step",
+          sortInfo: { isSort: true, order: 'default' },
+          dataKey: "title",
+          filterInfo: { isFilter: true },
+          style: { width: "18%" }
+        },
+        {
+          label: "Languages",
+          headerKey: "header2",
+          key: "language",
+          style: { "width": "18%" }
+        },
+        {
+          label: "Status",
+          headerKey: "header3",
+          key: "status",
+          sortInfo: { isSort: true, order: 'default' },
+          filterInfo: { isFilter: true },
+          style: { "width": "14%" }
+        },
+        {
+          label: "Quantity",
+          headerKey: "header4",
+          key: "quantity",
+          sortInfo: { isSort: true, order: 'default' },
+          style: { "width": "12%" }
+        },
+        {
+          label: "Rate",
+          headerKey: "header5",
+          key: "clientRate",
+          sortInfo: { isSort: true, order: 'default' },
+          style: { "width": "12%" }
+        },
+        {
+          label: "Total",
+          headerKey: "header6",
+          key: "price",
+          sortInfo: { isSort: true, order: 'default' },
+          style: { "width": "12%" }
+        }
+      ]
     }
   },
   methods: {
@@ -61,6 +181,14 @@ export default {
       alertToggle: "alertToggle",
       getClient: "getClient"
     }),
+    getStepPair(step) {
+      return step.sourceLanguage === step.targetLanguage
+          ? `${ step.targetLanguage }`
+          : `<span>${ step.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ step.targetLanguage }</span>`
+    },
+    progress(progress) {
+      return progress.hasOwnProperty('totalWordCount') ? +((progress.wordsDone / progress.totalWordCount) * 100).toFixed(2) : +progress
+    },
     customFormatter(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -74,12 +202,17 @@ export default {
       }
     }
   },
+  async beforeDestroy() {
+    await this.selectProject({})
+  },
   computed: {
     ...mapGetters({
       client: "getClientInfo",
       currentProject: "getSelectedProject"
-      // token: "getToken"
-    })
+    }),
+    rawData() {
+      return this.currentProject.steps.filter(i => i.status !== 'Cancelled')
+    }
     // title() {
     //   let result = "Quote Details"
     //   let statuses = [ 'Quote sent', 'Requested' ]
@@ -89,7 +222,7 @@ export default {
     //   return result
     // }
   },
-  components: {},
+  components: { CircleProgress, ProgressLineStep, GeneralTable },
 
   async created() {
     this.domain = process.env.domain
@@ -102,46 +235,102 @@ export default {
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors";
 
+.priceExplanation {
+  margin-top: 15px;
+
+  &__title {
+    font-family: Myriad600;
+    text-align: center;
+    margin-bottom: 15px;
+    background: $table-list-hover;
+    padding: 5px;
+  }
+
+  &__row {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    margin-top: 10px;
+    gap: 15px;
+    align-items: center;
+  }
+
+  &__key {
+    width: 160px;
+  }
+
+  &__value {
+    width: 55px;
+    display: flex;
+    justify-content: end;
+  }
+}
+
+.total {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid $light-border;
+
+  &__row {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+  }
+
+  &__key {
+    font-family: Myriad600;
+  }
+
+  &__value {
+    margin-left: 15px;
+  }
+}
+
 .d {
   &-row {
-    //display: flex;
+    display: flex;
+    margin-bottom: 20px;
   }
 
   &-key {
     font-family: Myriad600;
-    //width: 70px;
   }
 
   &-val {
-    //margin-left: 10px;
+    margin-left: 15px;
   }
 
 }
 
 .details {
-  display: flex;
+  &__steps {
+    position: relative;
+    padding-top: 10px;
+    border-top: 1px solid $light-border;
 
-  //&__header {
-  //  width: 70%;
-  //  //background-color: cornsilk;
-  //}
+    &-title {
+      font-size: 16px;
+      position: absolute;
+      top: 15px;
+      font-family: Myriad600;
+    }
+  }
+
+  &__header {
+    width: 100%;
+  }
 
   &__body {
     display: flex;
+    justify-content: space-between;
   }
-
-  //&__progress {
-  //  width: 30%;
-  //  background-color: chocolate;
-  //}
-
 
   &__name {
     font-size: 16px;
     font-family: Myriad600;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid $border;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $light-border;
   }
 }
 
@@ -151,8 +340,9 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 270px;
+  width: 290px;
   margin-left: 25px;
+  height: fit-content;
 }
 
 .sideRight {
@@ -161,17 +351,17 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 700px;
+  width: 680px;
+  height: fit-content;
 }
 
 .user {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  &__name {
-    //margin-top: 3px;
-  }
+  border-bottom: 1px solid $light-border;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
 
   &__who {
     margin-top: 3px;
@@ -207,4 +397,46 @@ export default {
   }
 }
 
+.table {
+  &__header {
+    padding: 0 0 0 7px;
+  }
+
+  &__data {
+    padding: 0 7px;
+    width: 100%;
+  }
+
+  &__actions {
+    justify-content: center;
+  }
+
+  &__icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  &__statusAndProgress {
+    width: 100%;
+    padding: 0 7px;
+  }
+}
+
+.currency {
+  margin-right: 4px;
+  color: $dark-border;
+}
+
+.currency2 {
+  margin-left: 4px;
+  color: $dark-border;
+}
+
+.progress__bar {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $light-border;
+}
 </style>
