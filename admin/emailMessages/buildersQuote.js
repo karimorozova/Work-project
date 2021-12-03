@@ -4,7 +4,7 @@ const moment = require('moment')
 function getJobsDetails(project, tasksIds, steps, allUnits) {
 	let allSteps = steps
 	if (tasksIds.length) allSteps = steps.filter(i => tasksIds.includes(i.taskId))
-	const isHideWhenMinimumCharge = project.minimumCharge.value > project.finance.Price.receivables && !project.minimumCharge.toIgnore
+	const isHideWhenMinimumCharge = project.minimumCharge.isUsed
 
 	const data = allSteps.reduce((acc, curr) => {
 		const { type } = curr.receivablesUnit

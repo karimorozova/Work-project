@@ -8,22 +8,22 @@
           .details__body
             .d-col
               .d-row
-                .d-value Project ID:
-                .d-key {{ currentProject.projectId }}
+                .d-key Project ID:
+                .d-val {{ currentProject.projectId }}
               .d-row
-                .d-value Status:
-                .d-key {{ currentProject.status }}
+                .d-key Status:
+                .d-val {{ currentProject.status }}
             .d-col
               .d-row
-                .d-value  Start:
-                .d-key {{ currentProject.startDate }}
+                .d-key Start:
+                .d-val {{ customFormatter(currentProject.startDate) }}
               .d-row
-                .d-value Industry:
-                .d-key {{ currentProject.industry }}
+                .d-key Industry:
+                .d-val {{ currentProject.industry.name }}
             .d-col
               .d-row
-                .d-value Deadline:
-                .d-key {{ currentProject.deadline }}
+                .d-key Deadline:
+                .d-val {{ customFormatter(currentProject.deadline) }}
 
 
         .details__progress
@@ -35,8 +35,8 @@
         .user__image
           img(v-if="currentProject.accountManager.photo && !currentProject.accountManager.photo.includes('https://')" :src="domain+currentProject.accountManager.photo")
           .user__fakeImage(:style="{'--bgColor': getBgColor(currentProject.accountManager._id)[0], '--color':getBgColor(currentProject.accountManager._id)[1]  }" v-else) {{ currentProject.accountManager.firstName[0].toUpperCase() }}
-        .user__name Account Manager
         .user__name {{currentProject.accountManager.firstName + ' ' + currentProject.accountManager.lastName || ''}}
+        .user__who Account Manager
 
 
 </template>
@@ -46,6 +46,7 @@
 // import OtherInfo from "../../dashboard/details/OtherInfo"
 import { mapGetters, mapActions } from "vuex"
 import getBgColor from "../../../../mixins/getBgColor"
+import moment from "moment"
 
 export default {
   mixins: [ getBgColor ],
@@ -60,6 +61,9 @@ export default {
       alertToggle: "alertToggle",
       getClient: "getClient"
     }),
+    customFormatter(date) {
+      return moment(date).format('MMM D, HH:mm')
+    },
     async getCurrentProject() {
       const { id } = this.$route.params
       try {
@@ -98,6 +102,22 @@ export default {
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors";
 
+.d {
+  &-row {
+    //display: flex;
+  }
+
+  &-key {
+    font-family: Myriad600;
+    //width: 70px;
+  }
+
+  &-val {
+    //margin-left: 10px;
+  }
+
+}
+
 .details {
   display: flex;
 
@@ -131,7 +151,7 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 300px;
+  width: 270px;
   margin-left: 25px;
 }
 
@@ -141,7 +161,7 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 670px;
+  width: 700px;
 }
 
 .user {
@@ -150,7 +170,12 @@ export default {
   align-items: center;
 
   &__name {
-    margin-top: 6px;
+    //margin-top: 3px;
+  }
+
+  &__who {
+    margin-top: 3px;
+    color: #3333;
   }
 
   &__fakeImage {
@@ -171,6 +196,7 @@ export default {
     height: 32px;
     width: 32px;
     border-radius: 32px;
+    margin-bottom: 5px;
 
     img {
       width: 100%;
