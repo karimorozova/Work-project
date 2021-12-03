@@ -109,6 +109,7 @@ async function getProjectForClientPortal(obj) {
 			}
 	)
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			.populate('industry')
 	// .populate('industry')
 	// .populate('service')
 	// .populate('customer')

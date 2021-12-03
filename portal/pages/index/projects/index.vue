@@ -146,7 +146,7 @@
 
           template(slot="projectName" slot-scope="{ row, index }")
             .table__data
-              router-link(class="link-to" :to="{path: `/projects/detail/${row._id}`}")
+              router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
                 .table__projectName
                   .short {{  row.projectName.substr(0,30) + '...' }}
                   .tooltip(v-if="row.projectName.length >= 15")
