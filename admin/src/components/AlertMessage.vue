@@ -26,20 +26,20 @@ export default {
 
 %messageBox {
   border-radius: 4px;
-  padding: 15px 25px;
+  padding: 10px 30px;
   display: flex;
+  font-size: 14px;
+  border-right: 3px solid;
 }
 
 .alert-message {
   position: fixed;
-  z-index: 70000;
+  z-index: 90000;
   right: 50px;
   top: 70px;
   background: white;
   border-radius: 4px;
   box-shadow: $box-shadow;
-  min-width: 150px;
-  font-family: MYRIAD300;
 
   &__success {
     color: $green;
