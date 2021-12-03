@@ -167,7 +167,7 @@ export default {
   },
   methods: {
     notBeforeToday(date) {
-      return date < new Date() || new Date(this.currentProject.deadline) < date
+      return date <= new Date() || new Date(this.currentProject.deadline) <= date
     },
     addStep() {
       const { service } = this.currentProject.requestForm

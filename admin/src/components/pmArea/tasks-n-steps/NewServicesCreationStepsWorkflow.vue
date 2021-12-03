@@ -174,7 +174,9 @@ export default {
   },
   methods: {
     notBeforeToday(date) {
-      return date < new Date(this.project.startDate) || new Date(this.project.deadline) < date
+      const start = new Date(this.project.startDate)
+      start.setDate(start.getDate() - 1)
+      return date < start || new Date(this.project.deadline) <= date
     },
     addStep() {
       const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
