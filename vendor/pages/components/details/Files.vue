@@ -118,7 +118,10 @@ export default {
     },
     getMemoqFilesProgress(fileName) {
       if (this.job.status !== 'Completed') {
-        const docId = this.job.memoqDocIds.find(item => this.job.progress[item].fileName === fileName)
+        const docId = this.job.memoqDocIds.find(item => {
+          console.log(this.job.progress[item].fileName, fileName)
+          return this.job.progress[item].fileName === fileName
+        })
         const value = (100 * this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
         return +value
       } else if (this.job.status === 'Completed') {
@@ -131,15 +134,23 @@ export default {
       this.isFilesShown = !this.isFilesShown
     },
     fillJobFiles() {
-      if (this.job.prevStep.hasOwnProperty("status") && this.job.prevStep.status === "Completed" ) {
+      if ((this.job.prevStep.hasOwnProperty("status") && this.job.prevStep.status === "Completed") && !this.job.memoqDocs.length) {
         this.jobFiles.push(...this.jobFilesFiller(this.job.targetFiles.map(({path}) => './dist'+ path), "Source file"))
-      }
-      if (this.job.prevStep === false || this.job.prevStep.status === 'Cancelled Halfway' || this.job.prevStep.status === 'Cancelled') {
+      }else{
         this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
       }
+      // if ((this.job.prevStep === false || this.job.prevStep.status === 'Cancelled Halfway' || this.job.prevStep.status === 'Cancelled') && this.job.memoqDocs.length) {
+      //   this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
+      // }
       if (this.job.refFiles) {
         this.jobFiles.push(...this.jobFilesFiller(this.job.refFiles, "Reference file"))
       }
+      // if (this.job.sourceFiles) {
+      //   this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
+      // }
+      // if (this.job.refFiles) {
+      //   this.jobFiles.push(...this.jobFilesFiller(this.job.refFiles, "Reference file"))
+      // }
     },
     jobFilesFiller(arr, category) {
       let files = []
