@@ -12,17 +12,15 @@
       ImportedProjectToXtrf(
         v-if="currentProject.isXtrfManual"
         :project="currentProject"
-         @refreshProject="refreshProject"
+        @refreshProject="refreshProject"
       )
-
-      ImportProjectToXtrf(
-        v-else-if="canSendToXtrf"
-       :project="currentProject"
-       @refreshProject="refreshProject"
-      )
-
       ImportTasksToXtrf(
         v-else-if="canSendTaskToXtrf"
+        :project="currentProject"
+        @refreshProject="refreshProject"
+      )
+      ImportProjectToXtrf(
+        v-else-if="canSendToXtrf"
         :project="currentProject"
         @refreshProject="refreshProject"
       )
@@ -248,21 +246,10 @@ export default {
       originallyServices: "getAllServices",
       originallyUnits: "getAllUnits"
     }),
-
     canSendToXtrf() {
       const { status, tasks } = this.currentProject
-
-      const closedCheck = tasks.length && (
-          tasks.every(({ service }) => service.title === 'Translation')
-          || tasks.every(({ service }) => service.title === 'TransCreation')
-          || (tasks.every(({ service }) => service.title === 'Copywriting') && tasks.length === 1)
-          || (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2)
-          || tasks.every(({ service }) => service.title === 'Certified Translation')
-          || tasks.every(({ service }) => service.title === 'Translation Plain')
-          || tasks.every(({ service }) => service.title === 'Editing')
-      )
-
-				return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
+      const closedCheck = tasks.length
+      return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
     },
     canSendTaskToXtrf() {
       const { status, tasks } = this.currentProject

@@ -1213,8 +1213,8 @@ export default {
     margin-left: 20px;
     padding-left: 20px;
     border-left: 1px solid $light-border;
-    padding-bottom: 12px;
-    padding-top: 12px;
+    padding-bottom: 10px;
+    padding-top: 10px;
   }
 
   &__step {
@@ -1231,7 +1231,6 @@ export default {
 
     &-status {
       text-align: center;
-      margin-top: 1px;
     }
 
     &-vendor {
@@ -1251,10 +1250,10 @@ export default {
   }
 
   &__language {
-    font-size: 14px;
-    width: 150px;
+    font-size: 12px;
+    width: 135px;
     background: $table-list;
-    padding: 4.5px 10px 1px;
+    padding: 4px 10px 1px;
     box-sizing: border-box;
     display: flex;
     gap: 12px;
@@ -1412,6 +1411,7 @@ input {
   background: $table-list;
   color: $dark-border;
   font-size: 11px;
+  font-family: Myriad300;
   border-radius: 4px;
 }
 
@@ -1420,6 +1420,7 @@ input {
   background: $table-list;
   color: $yellow;
   font-size: 11px;
+  font-family: Myriad300;
   border-radius: 4px;
 }
 
@@ -1428,6 +1429,7 @@ input {
   background: $table-list;
   color: $green;
   font-size: 11px;
+  font-family: Myriad300;
   border-radius: 4px;
 }
 
@@ -1436,6 +1438,7 @@ input {
   background: $table-list;
   color: $red;
   font-size: 11px;
+  font-family: Myriad300;
   border-radius: 4px;
 }
 

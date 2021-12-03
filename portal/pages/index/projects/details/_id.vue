@@ -121,19 +121,19 @@ export default {
 .details {
   display: flex;
 
-  &__header {
-    width: 70%;
-    //background-color: cornsilk;
-  }
+  //&__header {
+  //  width: 70%;
+  //  //background-color: cornsilk;
+  //}
 
   &__body {
     display: flex;
   }
 
-  &__progress {
-    width: 30%;
-    background-color: chocolate;
-  }
+  //&__progress {
+  //  width: 30%;
+  //  background-color: chocolate;
+  //}
 
 
   &__name {
