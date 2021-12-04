@@ -1,7 +1,8 @@
 <template lang="pug">
-  .alert-message
-    .alert-message__loading
-      .alert-message__text Loading ...
+.alert-message
+  .icon__loading
+    i.icon.fas.fa-ellipsis-h(aria-hidden="true")
+  .text Loading
 </template>
 
 <script>
@@ -19,32 +20,32 @@ export default {
 
 <style lang="scss" scoped>
 @import '../assets/scss/colors';
-%messageBox {
-  border-radius: 4px;
-  padding: 10px 30px;
-  display: flex;
-  font-size: 14px;
-  border-right: 3px solid;
-}
-
 .alert-message {
   position: fixed;
   z-index: 90000;
   right: 50px;
-  top: 70px;
+  top: 60px;
   background: white;
   border-radius: 4px;
   box-shadow: $box-shadow;
-
-  &__loading {
-    color: $green;
-    @extend %messageBox;
-  }
-
+  display: flex;
+  padding: 10px 20px 10px 12px;
+  align-items: center;
+  gap: 12px;
 }
 
 .icon {
-  font-size: 14px;
-  margin-right: 10px;
+  font-size: 15px;
+  background: $table-list;
+  height: 25px;
+  width: 25px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__loading {
+    color: $dark-border;
+  }
 }
 </style>

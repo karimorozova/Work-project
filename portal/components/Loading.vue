@@ -1,107 +1,66 @@
 <template lang="pug">
-    .loading
-      //transition(name="fade")
-        //.loading__message Loading
-        //.spinner3.spinner-3
-        .spinner1.spinner-1(v-if="currentRequests")
-
-
+.loading
+  transition(name="slide-fade")
+    .alert-message(v-show="!!currentRequests")
+      .myIcon.myIcon__loading
+        i.fas.fa-ellipsis-h(aria-hidden="true")
+      .text Loading
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapGetters } from "vuex";
 
 export default {
   computed: {
     ...mapGetters({
-      // currentRequests: "getRequestsCount"
-    })
-  }
-}
+      currentRequests: "getRequestsCount",
+    }),
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-//@import "./assets/scss/colors";
-//
-//.fade-enter-active, .fade-leave-active {
-//  transition: opacity .5s;
-//}
-//
-//.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-//{
-//  opacity: 0;
-//}
-//
-//.loading {
-//  //position: fixed;
-//  //top: 10px;
-//  //left: 50%;
-//  //margin-left: -125px;
-//  //width: 250px;
-//  ////background-color: palevioletred;
-//  //z-index: 90000;
-//}
-//
-//.spinner1 {
-//  position: relative;
-//  width: 50px;
-//  height: 50px;
-//
-//  &:before,
-//  &:after {
-//    content: "";
-//    display: block;
-//    position: absolute;
-//    border-width: 2px;
-//    border-style: solid;
-//    border-radius: 50%;
-//  }
-//}
-//
-//.spinner1.spinner-1 {
-//  @keyframes rotate-animation {
-//    0% {
-//      transform: rotate(0deg);
-//    }
-//
-//    100% {
-//      transform: rotate(360deg);
-//    }
-//  }
-//
-//  @keyframes anti-rotate-animation {
-//    0% {
-//      transform: rotate(0deg);
-//    }
-//
-//    100% {
-//      transform: rotate(-360deg);
-//    }
-//  }
-//
-//  &:before {
-//    width: 30px;
-//    height: 30px;
-//    border-bottom-color: $green;
-//    border-right-color: $green;
-//    border-top-color: rgba(red, 0);
-//    border-left-color: rgba(red, 0);
-//    top: 0px;
-//    left: 0px;
-//    animation: rotate-animation 1s linear 0s infinite;
-//  }
-//
-//  &:after {
-//    width: 15px;
-//    height: 15px;
-//    border-bottom-color: $red;
-//    border-right-color: $red;
-//    border-top-color: rgba(red, 0);
-//    border-left-color: rgba(red, 0);
-//    top: (30px - 15px) / 2;
-//    left: (30px - 15px) / 2;
-//    animation: anti-rotate-animation 0.85s linear 0s infinite;
-//  }
-//}
+@import "../assets/scss/colors";
+.alert-message {
+  position: fixed;
+  z-index: 90000;
+  right: 50px;
+  top: 60px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  display: flex;
+  padding: 10px 20px 10px 12px;
+  align-items: center;
+  gap: 12px;
+}
 
+.myIcon {
+  background: $table-list;
+  height: 25px;
+  width: 25px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__loading {
+    color: $dark-border;
+    font-size: 15px !important;
+  }
+}
+
+.slide-fade-enter-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
 </style>

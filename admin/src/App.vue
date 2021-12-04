@@ -2,11 +2,9 @@
   #app
     title {{ title }}
     transition(name="slide-fade")
-      Loading(v-if="!!requestCounter")
-      //Loading(v-if="true")
+      Loading(v-show="!!requestCounter")
     transition(name="slide-fade")
       AlertMessage(v-if="isAlert" :text="alertMessage" :type="alertType")
-      //AlertMessage(v-if="true" :text="'alertMessage ASD'" :type="'success'")
     router-view
 </template>
 
@@ -99,7 +97,6 @@ sup {
   background-color: bisque;
   cursor: pointer;
 }
-
 
 .slide-fade-enter-active {
   transition: all .2s ease;
