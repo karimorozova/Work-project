@@ -37,7 +37,7 @@
       TasksFiles
 
     .taskData__button
-      Button(:value="'Add Tasks & Steps'" @clicked="saveTasksChecks")
+      Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecks")
 
 </template>
 
@@ -68,16 +68,21 @@ export default {
       templates: [],
       isAdditions: false,
       IsErrorModal: false,
-      errors: []
+      errors: [],
+      isDisabledSaveButton: false,
     }
+  },
+  beforeDestroy() {
+    console.log('beforeDestroy')
+    this.setDataValue({})
   },
   methods: {
     saveTasksChecks() {
       this.errors = []
 
       const { service } = this.tasksData
-      if(service.title === 'Translation'){
-        if(!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation'){
+      if (service.title === 'Translation') {
+        if (!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation') {
           this.errors.push("Translation job should be the first step.")
         }
       }
@@ -120,9 +125,10 @@ export default {
       this.saveTasks()
     },
     async saveTasks() {
+      this.isDisabledSaveButton = true
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (this.tasksData.template && this.tasksData.service.title === 'Translation' &&  this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
+        if (this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
           try {
             const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
             const { creatorUserId } = memoqCreatorUser.data
@@ -131,9 +137,19 @@ export default {
           } catch (err) {
             this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
           }
-          await this.addProjectWordsTasks(data)
+          try {
+            await this.addProjectWordsTasks(data)
+          }catch (err){
+            this.isDisabledSaveButton = false
+            this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
+          }
         } else {
-          await this.addProjectTasks(data)
+          try {
+            await this.addProjectTasks(data)
+          }catch (err){
+            this.isDisabledSaveButton = false
+            this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
+          }
         }
         this.$parent.toggleTaskData()
         this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
@@ -197,7 +213,7 @@ export default {
     setStepsAndUnitByService(service) {
       const stepsAndUnits = []
       for (let { step } of service.steps) {
-        if(service.title !== 'Translation') step.calculationUnit = step.calculationUnit.filter(({type}) => type !== 'CAT Wordcount')
+        if (service.title !== 'Translation') step.calculationUnit = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
         stepsAndUnits.push({
           step,
           start: '',
