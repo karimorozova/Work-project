@@ -1051,7 +1051,7 @@ export default {
     }
 
     &_green {
-      color: $green-approve;
+      color: $green;
       transform: rotateY(360deg);
     }
 

@@ -1,8 +1,7 @@
 <template lang="pug">
   .wrapper
-    .sideRight
-
-      .details(v-if="currentProject._id")
+    .sideRight(v-if="currentProject._id")
+      .details
         .details__header
           .details__name {{ currentProject.projectName }}
           .details__body
@@ -51,25 +50,29 @@
 
             template(slot="status" slot-scope="{ row, index }")
               .table__statusAndProgress
-                .status {{ row.status }}
+                .status {{ row.status  }}
                 .progress
                   ProgressLineStep(:progress="progress(row.progress)" :status="row.status")
 
             template(slot="quantity", slot-scope="{ row, index }")
-              .table__data {{ row.quantity }}
+              .table__data {{ +(row.quantity).toFixed(1) }}
 
             template(slot="clientRate", slot-scope="{ row, index }")
               .table__data(v-if="!currentProject.minimumCharge.isUsed")
                 span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
-                span {{ row.clientRate }}
+                span {{ +(row.clientRate).toFixed(4) }}
               .table__data(v-else) -
 
             template(slot="price", slot-scope="{ row, index }")
               .table__data(v-if="!currentProject.minimumCharge.isUsed")
                 span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
-                span {{ row.price }}
+                span {{ +(row.price).toFixed(2) }}
               .table__data(v-else) -
 
+        .details__deliverables(v-if="currentProject.tasksDeliverables")
+          DeliveryTable(
+            :project="currentProject"
+          )
 
     .sideLeft(v-if="currentProject._id")
       .user(v-if="currentProject.accountManager" )
@@ -78,23 +81,37 @@
           .user__fakeImage(:style="{'--bgColor': getBgColor(currentProject.accountManager._id)[0], '--color':getBgColor(currentProject.accountManager._id)[1]  }" v-else) {{ currentProject.accountManager.firstName[0].toUpperCase() }}
         .user__name {{currentProject.accountManager.firstName + ' ' + currentProject.accountManager.lastName || ''}}
         .user__who Account Manager
+        a(:href="'mailto:' + currentProject.accountManager.email")
+          .user__email
+            .email__icon
+              i(class="far fa-envelope")
+            .email__text Send a message
 
       .progress__bar
-        CircleProgress(:percent="12")
+        CircleProgress(:percent="progressProject()")
 
-      .priceExplanation(v-if="currentProject.additionsSteps.length" )
-        .priceExplanation__title Services:
+      .priceExplanation(v-if="currentProject.additionsSteps.length || currentProject.discounts.length || getTMDiscounts" )
+        .priceExplanation__title Services
         .priceExplanation__row
-          .priceExplanation__key Total
+          .priceExplanation__key Sub-total:
           .priceExplanation__value
-            span {{ +(currentProject.finance.Price.receivables).toFixed(2) }}
+            span {{ getProjectSubTotal }}
             span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 
-      .priceExplanation(v-if="currentProject.discounts.length && !currentProject.minimumCharge.isUsed")
-        .priceExplanation__title Discounts and Surcharges:
-        .priceExplanation__row(v-for="item in currentProject.discounts" )
-          .priceExplanation__key {{item.name}}
-          //.priceExplanation__value {{ calculateDiscountPercent(item.value) }}
+      .priceExplanation(v-if="(!currentProject.minimumCharge.isUsed) && (currentProject.discounts.length || true)")
+        .priceExplanation__title Discounts and Surcharges
+
+        div(v-if="getTMDiscounts")
+          .priceExplanation__row
+            .priceExplanation__key TM Discount:
+            .priceExplanation__value -{{getTMDiscounts}}
+              span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+        div(v-if="currentProject.discounts.length")
+          .priceExplanation__row(v-for="item in currentProject.discounts" )
+            .priceExplanation__key {{item.name}}:
+            .priceExplanation__value {{ calculateDiscountPercent(item.value) }}
+              span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 
       .priceExplanation(v-if="currentProject.additionsSteps.length" )
         .priceExplanation__title Additional Charges:
@@ -108,7 +125,7 @@
         .total__row
           .total__key Total:
           .total__value
-            span 123123
+            span {{this.getProjectTotal}}
             span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 </template>
 
@@ -121,6 +138,7 @@ import tableSortAndFilter from "../../../../mixins/tableSortAndFilter"
 import ProgressLineStep from "../../../../components/pangea/ProgressLineStep"
 import currencyIconDetected from '../../../../mixins/currencyIconDetected'
 import CircleProgress from "../../../../components/CircleProgress"
+import DeliveryTable from "../../../../components/DeliveryTable"
 
 export default {
   mixins: [ tableSortAndFilter, getBgColor, currencyIconDetected ],
@@ -135,13 +153,13 @@ export default {
           sortInfo: { isSort: true, order: 'default' },
           dataKey: "title",
           filterInfo: { isFilter: true },
-          style: { width: "18%" }
+          style: { width: "20%" }
         },
         {
           label: "Languages",
           headerKey: "header2",
           key: "language",
-          style: { "width": "18%" }
+          style: { "width": "20%" }
         },
         {
           label: "Status",
@@ -149,38 +167,41 @@ export default {
           key: "status",
           sortInfo: { isSort: true, order: 'default' },
           filterInfo: { isFilter: true },
-          style: { "width": "14%" }
+          style: { "width": "18%" }
         },
         {
-          label: "Quantity",
+          label: "Size",
           headerKey: "header4",
           key: "quantity",
           sortInfo: { isSort: true, order: 'default' },
-          style: { "width": "12%" }
+          style: { "width": "14%" }
         },
         {
           label: "Rate",
           headerKey: "header5",
           key: "clientRate",
           sortInfo: { isSort: true, order: 'default' },
-          style: { "width": "12%" }
+          style: { "width": "14%" }
         },
         {
           label: "Total",
           headerKey: "header6",
           key: "price",
           sortInfo: { isSort: true, order: 'default' },
-          style: { "width": "12%" }
+          style: { "width": "14%" }
         }
-      ]
+      ],
+      currentProject: {}
     }
   },
   methods: {
     ...mapActions({
-      selectProject: "selectProject",
       alertToggle: "alertToggle",
       getClient: "getClient"
     }),
+    calculateDiscountPercent(val) {
+      return +((this.getProjectSubTotal * +val) / 100).toFixed(2)
+    },
     getStepPair(step) {
       return step.sourceLanguage === step.targetLanguage
           ? `${ step.targetLanguage }`
@@ -196,22 +217,62 @@ export default {
       const { id } = this.$route.params
       try {
         const res = await this.$axios.get('/portal/project/' + id + '?customer=' + this.client._id)
-        await this.selectProject(res.data)
+        this.currentProject = res.data
         console.log(res.data)
       } catch (err) {
       }
+    },
+    progressProject() {
+      let progresses = []
+      const isObject = (key) => typeof key === "object"
+      const calculatePercentage = (step) => (+step.progress.wordsDone / +step.progress.totalWordCount) * 100
+      const steps = this.currentProject.steps.filter(({ status }) => status !== 'Cancelled Halfway')
+      if (!steps.length) return 0
+      steps.forEach(step => {
+        isObject(step.progress) ? progresses.push(calculatePercentage(step)) : progresses.push(step.progress)
+      })
+      if (steps.length && progresses.every(item => item === 0)) return 0
+      const progress = progresses.reduce((a, b) => a + b) / steps.length
+      return Math.ceil(progress) > 100 ? 100 : Math.ceil(progress)
     }
-  },
-  async beforeDestroy() {
-    await this.selectProject({})
   },
   computed: {
     ...mapGetters({
-      client: "getClientInfo",
-      currentProject: "getSelectedProject"
+      client: "getClientInfo"
     }),
+
     rawData() {
-      return this.currentProject.steps.filter(i => i.status !== 'Cancelled')
+      return this.currentProject.steps
+    },
+    getProjectSubTotal() {
+      let subTotal = 0
+      for (let curStep of this.currentProject.steps) {
+        const { type } = curStep.receivablesUnit
+        if (type === 'CAT Wordcount') {
+          subTotal += +curStep.totalWords * +curStep.clientRate
+        } else {
+          subTotal += +curStep.quantity * +curStep.clientRate
+        }
+      }
+      return +(subTotal).toFixed(2)
+    },
+    getProjectTotal() {
+      let price = this.currentProject.finance.Price.receivables
+      if (this.currentProject.additionsSteps.length) {
+        price += this.currentProject.additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+      }
+      return +(price).toFixed(2)
+    },
+    getTMDiscounts() {
+      if (!this.currentProject.steps.length) return 0
+      if (this.currentProject.steps.some(({ receivablesUnit }) => receivablesUnit.type === 'CAT Wordcount')) {
+        const CATSteps = this.currentProject.steps.filter(({ receivablesUnit, step }) => receivablesUnit.type === 'CAT Wordcount' && step.title === 'Translation')
+        if (!CATSteps.length) return 0
+        const nativePrice = CATSteps.reduce((acc, curr) => acc += +curr.clientRate * +curr.totalWords, 0)
+        const relativePrice = CATSteps.reduce((acc, curr) => acc += +curr.clientRate * +curr.quantity, 0)
+        return +(nativePrice - relativePrice).toFixed(2)
+      }
+      return 0
     }
     // title() {
     //   let result = "Quote Details"
@@ -222,8 +283,7 @@ export default {
     //   return result
     // }
   },
-  components: { CircleProgress, ProgressLineStep, GeneralTable },
-
+  components: { DeliveryTable, CircleProgress, ProgressLineStep, GeneralTable },
   async created() {
     this.domain = process.env.domain
     await this.getClient()
@@ -236,31 +296,31 @@ export default {
 @import "../../../../assets/scss/colors";
 
 .priceExplanation {
-  margin-top: 15px;
+  margin-top: 20px;
 
   &__title {
     font-family: Myriad600;
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     background: $table-list-hover;
-    padding: 5px;
+    padding: 4px;
   }
 
   &__row {
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
     display: flex;
     margin-top: 10px;
-    gap: 15px;
+    gap: 20px;
     align-items: center;
   }
 
   &__key {
-    width: 160px;
+    width: 155px;
   }
 
   &__value {
-    width: 55px;
+    width: 65px;
     display: flex;
     justify-content: end;
   }
@@ -268,8 +328,8 @@ export default {
 
 .total {
   margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid $light-border;
+  //padding-top: 20px;
+  //border-top: 1px solid $light-border;
 
   &__row {
     width: 100%;
@@ -278,11 +338,12 @@ export default {
   }
 
   &__key {
-    font-family: Myriad600;
+    font-family: Myriad900;
   }
 
   &__value {
     margin-left: 15px;
+    font-family: Myriad900;
   }
 }
 
@@ -309,9 +370,9 @@ export default {
     border-top: 1px solid $light-border;
 
     &-title {
-      font-size: 16px;
+      font-size: 14px;
       position: absolute;
-      top: 15px;
+      top: 16px;
       font-family: Myriad600;
     }
   }
@@ -360,12 +421,18 @@ export default {
   flex-direction: column;
   align-items: center;
   border-bottom: 1px solid $light-border;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
 
   &__who {
-    margin-top: 3px;
+    margin-top: 4px;
     color: #3333;
+  }
+
+  &__email {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
   }
 
   &__fakeImage {
@@ -432,11 +499,22 @@ export default {
 .currency2 {
   margin-left: 4px;
   color: $dark-border;
+  font-family: Myriad400;
 }
 
 .progress__bar {
-  margin-bottom: 15px;
-  padding-bottom: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid $light-border;
+}
+
+a {
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

@@ -307,7 +307,7 @@ function stepDecisionMessage(obj, user) {
                     </p>
      								<ul>
 									     	<li>
-									     		${ obj.step.name }
+									     		${ obj.step.step.title }
 												</li>					
 												<li>
 													${ obj.step.sourceLanguage } >> ${ obj.step.targetLanguage }

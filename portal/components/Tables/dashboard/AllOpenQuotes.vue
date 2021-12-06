@@ -210,7 +210,7 @@
 	}
 </script>
 
-<style scoped lang="scss">
+<style  lang="scss" scoped>
   @import "../../../assets/scss/colors";
 
   .user {
