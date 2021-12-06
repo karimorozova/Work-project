@@ -2,7 +2,7 @@ const router = require('express').Router()
 const fs = require('fs')
 const jwt = require("jsonwebtoken")
 const { checkClientContact } = require('../middleware')
-const { getClient, getClientForPortal } = require('../clients')
+const { getClient, getClientForPortal, getClientServicesGroups } = require('../clients')
 const { getService } = require('../services')
 
 const {
@@ -431,6 +431,17 @@ router.post('/task-status', checkClientContact, async (req, res) => {
 		const project = await getProject({ "tasks.taskId": task.taskId })
 		const updatedProject = await getAfterTaskStatusUpdate({ task, project, status })
 		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on task status update")
+	}
+})
+
+router.get('/service-templates/:clientId', checkClientContact, async (req, res) => {
+	const { clientId } = req.params
+	try {
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on task status update")
