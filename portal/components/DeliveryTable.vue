@@ -1,154 +1,224 @@
 <template lang="pug">
   .delivery
-    DataTable(
-      :fields="fields"
-      :tableData="deliverables"
-      :bodyClass="['review-body', {'tbody_visible-overflow': deliverables.length < 6}]"
-      :tableheadRowClass="deliverables.length < 6 ? 'tbody_visible-overflow' : ''"
-      :headCellClass="'padding-with-check-box'"
-    )
+    .delivery__title Deliverables:
+    .delivery__table
+      GeneralTable(
+        :fields="fields"
+        :tableData="deliverables"
+        :isBodyShort="true"
+      )
 
-      .deliverables-table__header(slot="headerID" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerPair" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
-      .deliverables-table__header(slot="headerAction" slot-scope="{ field }") {{ field.label }}
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .table__header {{ field.label }}
 
 
-      .deliverables-table__data(slot="ID" slot-scope="{ row }") {{row.deliveryInternalId}}
-      .deliverables-table__data(slot="pair" slot-scope="{ row }") {{row.languagePair}}
-      .deliverables-table__data(slot="file" slot-scope="{ row }") {{row.filesLength}}
-      .deliverables-table__dataIcon(slot="icon" slot-scope="{row}")
-        .tooltip
-          span#myTooltip2.tooltiptext-left(v-html="getDeliveryTime(row)")
-          i.far.fa-clock
-        .deliverables-table__downloadIcon(@click="download(row)")
-          i.fas.fa-download
+        .table__data(slot="ID" slot-scope="{ row }") {{row.deliveryInternalId}}
+        .table__data(slot="at" slot-scope="{ row }") {{ getDeliveryTime(row) }}
+        .table__dataTooltip(slot="pair" slot-scope="{ row }")
+          .tooltip
+            .tooltip-data(v-html="row.languagePair")
+            i(class="fas fa-info")
+
+        .table__data(slot="file" slot-scope="{ row }") {{row.filesLength}}
+        .table__dataTooltip(slot="icon" slot-scope="{row}")
+          .table__downloadIcon(@click="download(row)")
+            i.fas.fa-download
 
 
 
-      //.deliverables-table__data(slot="action" slot-scope="{ row, index }")
-        //.deliverables-table__icons(v-if="row.status === 'Ready for Delivery' && canUpdateDr2")
-          .deliverables-table__icon(@click="openContactsModalOne(row)")
-            i.fas.fa-truck-loading
+        //.table__data(slot="action" slot-scope="{ row, index }")
+          //.table__icons(v-if="row.status === 'Ready for Delivery' && canUpdateDr2")
+            .table__icon(@click="openContactsModalOne(row)")
+              i.fas.fa-truck-loading
 
-        //.deliverables-table__icons(v-if="row.status !== 'Ready for Delivery'")
-          img.deliverables-table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
-  
+          //.table__icons(v-if="row.status !== 'Ready for Delivery'")
+            img.table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+
 </template>
 
 <script>
 import moment from "moment"
 import DataTable from "./Tables/DataTable"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
+import GeneralTable from "./pangea/GeneralTable"
+
 export default {
-	props: {
-		project: {
-			type: Object,
-		}
-	},
-	data() {
-		return {
-			fields: [
-				{ label: "ID", headerKey: "headerID", key: "ID", width: "37%" },
-				{ label: "Language pair", headerKey: "headerPair", key: "pair", width: "37%" },
-				{ label: "# Files", headerKey: "headerFile", key: "file", width: "13%" },
-				{ label: "Delivery", headerKey: "headerAction", key: "icon", width: "13%" },
-			],
-		}
-	},
-	methods: {
-		download({path}){
+  props: {
+    project: {
+      type: Object
+    }
+  },
+  data() {
+    return {
+      fields: [
+        { label: "ID", headerKey: "headerID", key: "ID", style: { width: "30%" } },
+        { label: "Delivered", headerKey: "headerAT", key: "at", style: { width: "28%" } },
+        { label: "Files", headerKey: "headerFile", key: "file", style: { width: "14%" } },
+        { label: "Languages", headerKey: "headerPair", key: "pair", style: { width: "14%" } },
+        { label: "", headerKey: "headerAction", key: "icon", style: { width: "14%" } }
+      ]
+    }
+  },
+  methods: {
+    ...mapActions({
+      getLanguages: "getLanguages"
+    }),
+    download({ path }) {
       let link = document.createElement('a')
       link.href = process.env.domain + path
       link.target = "_blank"
       link.click()
     },
-		getDeliveryTime({deliveredAt}) {
-			return `At: ${moment(deliveredAt).format('DD-MM-YYYY, HH:mm')}`
-		},
-	},
-	computed: {
-		...mapGetters({
-        allLanguages: "allLanguages"
+    getDeliveryTime({ deliveredAt }) {
+      return moment(deliveredAt).format('MMM D, HH:mm')
+    }
+  },
+  computed: {
+    ...mapGetters({
+      allLanguages: "allLanguages"
     }),
-		deliverables() {
-			const { tasksDR2: {singleLang, multiLang}, tasksDeliverables } = this.project
-      return tasksDeliverables.map(item => {
-      	const allDR2 = [...singleLang, ...multiLang ]
-	        const currentDelivery = allDR2.find(({_id}) => `${_id}` === `${item.deliverablesId}`)
-          if(!currentDelivery) return false
-          const languagePair = currentDelivery.hasOwnProperty('sourceLanguage') ?
-              `${this.allLanguages.find(({_id}) => `${_id}` === `${currentDelivery.sourceLanguage}`).symbol} >> ${this.allLanguages.find(({_id}) => `${_id}` === `${currentDelivery.targetLanguage}`).symbol}` :
-              'Multilingual'
-          const filesLength = currentDelivery.hasOwnProperty('file') ? '1' : currentDelivery.files.length
+    deliverables() {
+      if (!this.allLanguages.length) return []
+      const { tasksDR2: { singleLang, multiLang }, tasksDeliverables } = this.project
 
-	        return {
-		        deliveredAt: item.deliveredAt,
-            path: item.path,
-		        deliveryInternalId: currentDelivery.deliveryInternalId,
-		        languagePair,
-		        filesLength
-          }
+      return tasksDeliverables.map(item => {
+        const allDR2 = [ ...singleLang, ...multiLang ]
+        const currentDelivery = allDR2.find(({ _id }) => `${ _id }` === `${ item.deliverablesId }`)
+        if (!currentDelivery) return false
+
+        let languagePair = ''
+        if (currentDelivery.hasOwnProperty('sourceLanguage') && currentDelivery.hasOwnProperty('targetLanguage')) {
+          const source = this.allLanguages.find(({ _id }) => `${ _id }` === `${ currentDelivery.sourceLanguage }`)
+          const target = this.allLanguages.find(({ _id }) => `${ _id }` === `${ currentDelivery.targetLanguage }`)
+          languagePair = `<span>${ source.symbol }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;">>></span><span>${ target.symbol }</span>`
+        } else {
+          languagePair = currentDelivery.tasks.reduce((acc, curr) => {
+            const task = this.project.tasks.find(i => i.taskId === curr)
+            if (task) acc = acc + `<span>${ task.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;">>></span><span>${ task.targetLanguage }</span><br>`
+            return acc
+          }, '')
+        }
+        return {
+          deliveredAt: item.deliveredAt,
+          path: item.path,
+          deliveryInternalId: currentDelivery.deliveryInternalId,
+          languagePair,
+          filesLength: currentDelivery.hasOwnProperty('files') ? currentDelivery.files.length : currentDelivery.file.length
+        }
       }).filter(Boolean)
-		}
-	},
-	components: {
-		DataTable
-	}
+
+    }
+  },
+  async created() {
+    await this.getLanguages()
+  },
+  components: {
+    GeneralTable,
+    DataTable
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-  .deliverables-table{
-    &__dataIcon{
-      display: flex;
-      justify-content: space-evenly;
-    }
-    &__downloadIcon{
-      cursor: pointer;
-    }
+@import "../assets/scss/colors";
+
+.delivery {
+  &__title {
+    font-size: 14px;
+    margin: 18px 0;
+    font-family: Myriad600;
   }
-  .tooltip {
-    position: relative;
+}
+
+//.table {
+//  &__dataIcon {
+//    display: flex;
+//    justify-content: space-evenly;
+//  }
+//
+//  &__downloadIcon {
+//    cursor: pointer;
+//  }
+//}
+
+
+.table {
+  &__header {
+    padding: 0 0 0 7px;
+  }
+
+  &__data {
+    padding: 0 7px;
+    width: 100%;
+  }
+
+  &__actions {
+    justify-content: center;
+  }
+
+  &__icons {
     display: flex;
-    font-size: 16px;
-    margin-right: 5px;
-    cursor: help;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
 
-    .tooltiptext-left {
-      font-size: 14px;
-      visibility: hidden;
-      width: 220px;
-      background-color: #67573e;
-      color: #fff;
-      text-align: center;
-      border-radius: 4px;
-      padding: 5px;
+  &__statusAndProgress {
+    width: 100%;
+    padding: 0 7px;
+  }
+
+  &__dataTooltip {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__downloadIcon {
+    cursor: pointer;
+  }
+}
+
+.tooltip {
+  position: relative;
+  display: flex;
+  cursor: help;
+  text-align: center;
+
+  &-data {
+    visibility: hidden;
+    font-size: 14px;
+    max-width: 280px;
+    min-width: 140px;
+    background: white;
+    border-radius: 4px;
+    right: 15px;
+    top: -7px;
+    padding: 8px 8px 6px 8px;
+    position: absolute;
+    z-index: 555;
+    opacity: 0;
+    transition: opacity .3s;
+    border: 1px solid $text;
+    color: $text;
+
+    &::after {
+      content: "";
       position: absolute;
-      z-index: 1;
-      right: 38px;
-      opacity: 0;
-      top: -5px;
-      transition: opacity .3s;
-
-      &::after {
-        content: "";
-        position: absolute;
-        top: 8px;
-        right: -10px;
-        margin-left: -10px;
-        transform: rotate(270deg);
-        border-width: 5px;
-        border-style: solid;
-        border-color: #67573e transparent transparent;
-      }
-    }
-
-    &:hover {
-      .tooltiptext-left {
-        visibility: visible;
-        opacity: 1;
-      }
+      top: 8px;
+      right: -12px;
+      transform: rotate(270deg);
+      border-width: 6px;
+      border-style: solid;
+      border-color: $text transparent transparent;
     }
   }
+
+  &:hover {
+    .tooltip-data {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
 </style>

@@ -113,6 +113,8 @@ async function getProjectForClientPortal(obj) {
 				projectCurrency: 1,
 				minimumCharge: 1,
 				discounts: 1,
+				tasksDeliverables: 1,
+				tasksDR2: 1,
 				"steps.finance.Price.receivables": 1,
 				"steps.finance.Wordcount.receivables": 1,
 				"steps.finance.Quantity.receivables": 1,
@@ -124,7 +126,11 @@ async function getProjectForClientPortal(obj) {
 				"steps.fullSourceLanguage": 1,
 				"steps.fullTargetLanguage": 1,
 				"steps.clientRate": 1,
-				"steps.status": 1
+				"steps.status": 1,
+				"steps.totalWords" : 1,
+				"tasks.sourceLanguage": 1,
+				"tasks.targetLanguage": 1,
+				"tasks.taskId": 1,
 
 			}
 	)
@@ -144,7 +150,7 @@ async function getProjectForClientPortal(obj) {
 				quantity: +item._doc.finance.Wordcount.receivables
 						? +item._doc.finance.Wordcount.receivables
 						: +item._doc.finance.Quantity.receivables || 0
-			}))
+			})).filter(({ status }) => status !== 'Cancelled')
 			: []
 
 	return project

@@ -119,7 +119,7 @@ function getStepsTotal(tasksIds, steps, allUnits) {
 
 function getFinanceDetailsDiscounts(project, subTotal) {
 	return project.discounts.reduce((acc, curr) => {
-		const val = ((subTotal * curr.value) / 100).toFixed(2)
+		const val =
 		acc += `<div class="row" style="border-bottom: 1px solid #ededed;">
 							<div class="key" style="display: inline-block; padding: 8px; min-width: 200px;">${ curr.name }:</div>
 							<div class="value" style="display: inline-block; padding: 8px; min-width: 200px;">${ returnIconCurrencyByStringCode(project.projectCurrency) } ${ val } </div>
