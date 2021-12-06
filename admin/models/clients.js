@@ -213,6 +213,28 @@ const ClientSchema = new mongoose.Schema({
 			{ type: Schema.Types.ObjectId, ref: 'Industries' }
 		]
 	} ],
+	servicesGroups: [{
+		groupName:{
+			type: String,
+			require: [true, 'A service group must have a Name'],
+		},
+		industry: {
+			type: Schema.Types.ObjectId,
+			ref: 'Industries'
+		},
+		service: {
+			type: Schema.Types.ObjectId,
+			ref: 'Services'
+		},
+		source: {
+			type: Schema.Types.ObjectId,
+			ref: 'Language'
+		},
+		target: [{
+			type: Schema.Types.ObjectId,
+			ref: 'Language'
+		}]
+	}],
 	rates: {
 		basicPricesTable: [ {
 			type: {
