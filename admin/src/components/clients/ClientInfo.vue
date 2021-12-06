@@ -150,7 +150,13 @@
               .icon(v-else)
                 i.fas.fa-chevron-right
             .block__data(v-if="isServices")
+              Tabs(
+                :tabs="serviceTabs"
+                :selectedTab="selectedServiceTab"
+                @setTab="setServiceTab"
+              )
               ClientServices(
+                v-if="selectedServiceTab === 'All'"
                 :clientServices="currentClient.services"
                 :defaultPricelist="currentClient.defaultPricelist"
                 :languages="languages"
@@ -158,8 +164,15 @@
                 :industries="industries"
                 :mappedIndustries="industries.map(i => i.name)"
                 :services="services"
+
                 @updateRates="updateRates"
                 @updateRateCombinationFromSettings="setNewStepCombination"
+              )
+              ServiceGroups(
+                v-if="selectedServiceTab === 'Group'"
+                :services="services"
+                :industries="industries"
+                :languages="languages"
               )
 
           .client-info__block(v-if="!isIndividual")
@@ -263,7 +276,7 @@
 	import Tabs from "../Tabs"
 	import Discounts from "./pricelists/Discounts"
 	import ContactsTable from "./ContactsTable"
-
+  import ServiceGroups from "./sidebar/ServiceGroups"
 	export default {
 		data() {
 			return {
@@ -282,6 +295,8 @@
 					cancel: { icon: require("../../assets/images/cancel-icon.png") }
 				},
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount & Surcharge / Discount Chart', 'Overall Prices' ],
+        serviceTabs: [ 'All', 'Group' ],
+        selectedServiceTab: 'All',
 				selectedTab: 'Basic Price',
 				clientTask: {},
 				clientNote: {},
@@ -369,6 +384,9 @@
 			},
 			setTab({ index: i }) {
 				this.selectedTab = this.tabs.find((item, index) => index === i)
+			},
+			setServiceTab({ index: i }) {
+				this.selectedServiceTab = this.serviceTabs.find((item, index) => index === i)
 			},
 			toggleRadio({ value }) {
 			  if (value === 'Company') {
@@ -806,7 +824,8 @@
 			ClientsNotes,
 			AddTask,
 			AddNote,
-			RadioButton
+			RadioButton,
+      ServiceGroups
 		},
 		created() {
 			this.getClientInfo()

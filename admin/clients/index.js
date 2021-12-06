@@ -7,7 +7,7 @@ const {
 	getClientRates,
 	getClientWithActions,
   getSimpleClients,
-	getClientForPortal
+	getClientForPortal,
 } = require('./getClients')
 
 const {
@@ -28,7 +28,7 @@ const {
 
 const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info')
 const { getAfterTaskStatusUpdate, updateClientProjectDate } = require('./projects')
-const { updateClientService, deleteClientService } = require('./clientService')
+const { updateClientService, deleteClientService, getClientServices, createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require('./clientService')
 const { updateRates } = require('./updateClientRates')
 
 const {
@@ -82,6 +82,11 @@ const clients = {
   getSimpleClients,
 	updateClientRatesFromSettings,
 	getClientForPortal,
+	getClientServices,
+	createClientServicesGroup,
+	getClientServicesGroups,
+	deleteClientServiceGroups,
+	editClientServicesGroup,
 }
 
 module.exports = clients

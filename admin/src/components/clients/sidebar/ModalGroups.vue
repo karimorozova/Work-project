@@ -1,0 +1,303 @@
+<template lang="pug">
+  .modal-group
+    .modal__row
+      .input
+        .input__title Group Name:
+        input(v-model="groupName")
+      .input
+        .input__title Industry:
+        .drop
+          SelectSingle(
+            placeholder="Option",
+            :options="mappedIndustries",
+            :selectedOption="selectedIndustry.name",
+            @chooseOption="setIndustry"
+          )
+    .modal__row
+      .input
+        .input__title Service:
+        .drop
+          SelectSingle(
+            placeholder="Option",
+            :options="mappedServices",
+            :selectedOption="selectedService.title",
+            @chooseOption="setService"
+          )
+
+      .input(v-if="selectedService && selectedService.languageForm === 'Duo'")
+        .input__title Source Language:
+        .drop
+          SelectSingle(
+            placeholder="Option",
+            :options="mappedSourceLanguages",
+            :selectedOption="selectedSourceLang.lang",
+            @chooseOption="setSourceLang"
+          )
+    .modal__row
+      .tasks-langs
+        .target
+          .tasks-langs__title-target Target Languages:
+          .select-lang-wrapper
+            ListManagement(
+              :list="clientServices ? mappedTargetLanguages.filter(item => !selectedTargetLang.map(i => i.lang).includes(item)) : mappedTargetLanguages"
+              @moveItem="moveFromAll"
+            )
+            ListManagementButtons(@moveAll="moveAll" @removeAll="removeAll")
+            ListManagement(
+              :list="clientServices ? selectedTargetLang.map(i => i.lang) : []"
+              @moveItem="moveFromChosen"
+            )
+
+          .select-target-count Selected languages: {{ selectedTargetLang ? selectedTargetLang.length : 0 }}
+    .buttons
+      Button(:value="buttonText" @clicked="createClientServiceGroup")
+      Button(value="Cancel" :outline="true" @clicked="closeModal")
+</template>
+
+<script>
+import ListManagementButtons from "../../ListManagementButtons"
+import ListManagement from "../../ListManagement"
+import SelectSingle from "../../SelectSingle"
+import Button from "../../Button"
+import { mapGetters } from "vuex"
+
+export default {
+  name: "ModalGroups",
+  components: {
+    SelectSingle,
+    ListManagement,
+    ListManagementButtons,
+    Button,
+  },
+  props: {
+    buttonText: {
+      type: String,
+      default: 'Create Group',
+    },
+    editGroupName: {
+      type: String,
+      default: '',
+    },
+    editSelectedService: {
+      type: Object,
+      default: () => ({})
+    },
+    editSelectedIndustry: {
+      type: Object,
+      default: () => ({})
+    },
+    editSelectedSourceLang: {
+      type: Object,
+      default: () => ({})
+    },
+    editSelectedTargetLang: {
+      type: Array,
+      default: () => []
+    },
+  },
+  data() {
+    return {
+      groupName: this.editGroupName,
+      selectedService: this.editSelectedService,
+      selectedIndustry: this.editSelectedIndustry,
+      selectedSourceLang: this.editSelectedSourceLang,
+      selectedTargetLang: this.editSelectedTargetLang,
+      clientServices: [],
+
+    }
+  },
+  methods: {
+    moveFromAll(lang) {
+      const targets = this.selectedTargetLang || []
+      targets.push(this.languages.find(item => item.lang === lang))
+      this.selectedTargetLang = targets
+    },
+    moveFromChosen(lang) {
+      const targets = this.selectedTargetLang || []
+      this.selectedTargetLang = targets.filter(item => item.lang !== lang)
+    },
+    moveAll() {
+      this.selectedTargetLang =  this.languages.filter(item => this.mappedTargetLanguages.includes(item.lang))
+    },
+    removeAll() {
+      this.selectedTargetLang = []
+    },
+
+    setSourceLang({ option }) {
+      this.selectedSourceLang = this.languages.find(({lang}) => lang === option)
+
+      this.selectedTargetLang = []
+    },
+    setService({ option }) {
+      this.selectedService = this.services.find(({title}) => title === option)
+
+      this.selectedSourceLang = {}
+      this.selectedTargetLang = []
+    },
+    setIndustry({ option }) {
+      this.selectedIndustry = this.industries.find(({name}) => name === option)
+
+      this.selectedService = {}
+      this.selectedSourceLang = {}
+      this.selectedTargetLang = []
+    },
+    async getClientServices() {
+      const { services } = (await this.$http.get(`/clientsapi/client-services/${ this.$route.params.id }`)).data
+      this.clientServices = services
+    },
+    closeModal() {
+      this.$emit('closeModal')
+    },
+    createClientServiceGroup() {
+      const data = {
+          groupName: this.groupName,
+          industry: this.selectedIndustry._id,
+          service: this.selectedService._id,
+          source: this.selectedSourceLang._id,
+          target: this.selectedTargetLang.map(({_id}) => _id),
+      }
+
+      this.$emit('groupSend', data)
+    }
+  },
+  computed: {
+    ...mapGetters({
+      services: "getAllServices",
+      industries: "getAllIndustries",
+      languages: "getAllLanguages",
+    }),
+    mappedIndustries() {
+      return [...new Set(this.clientServices.map(({industries})=> industries[0].name))]
+    },
+    mappedServices() {
+      return [...new Set(this.clientServices.filter(({industries}) => industries[0].name === this.selectedIndustry.name).map(({services}) => services[0].title))]
+    },
+    mappedSourceLanguages() {
+      return [...new Set(this.clientServices.filter(({industries, services}) => industries[0].name === this.selectedIndustry.name && services[0].title === this.selectedService.title).map(({sourceLanguage})=> sourceLanguage.lang))]
+    },
+    mappedTargetLanguages() {
+      if (!this.selectedSourceLang.hasOwnProperty('lang') && this.selectedService.languageForm === 'Duo') return []
+
+      const filter = this.clientServices
+          .filter(({industries, services, sourceLanguage}) => {
+            return industries[0].name === this.selectedIndustry.name
+                && services[0].title === this.selectedService.title
+                && this.selectedService.languageForm !== 'Duo' || sourceLanguage.lang === this.selectedSourceLang.lang
+          })
+      return [...new Set(filter.map(({targetLanguages})=> targetLanguages[0].lang))]
+    }
+
+  },
+
+  async created() {
+    await this.getClientServices()
+  }
+}
+</script>
+
+<style scoped lang="scss">
+@import "../../../assets/scss/colors";
+.modal {
+  &__row {
+    display: flex;
+    gap: 55px;
+    margin-bottom: 10px;
+  }
+}
+.drop {
+  position: relative;
+  height: 30px;
+  width: 220px;
+}
+.input {
+  &__title {
+    margin-bottom: 3px;
+  }
+}
+.buttons {
+  display: flex;
+  gap: 20px;
+}
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  width: 220px;
+  height: 32px;
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
+%flex-row {
+  display: flex;
+  align-items: center;
+}
+
+%flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tasks-langs {
+  &__title {
+    &-source {
+      margin-bottom: 3px;
+      position: relative;
+    }
+
+    &-target {
+      margin-bottom: 3px;
+      position: relative;
+    }
+  }
+}
+
+.source {
+  @extend %flex-column;
+
+  &__drop-menu {
+    position: relative;
+    width: 220px;
+    height: 32px;
+  }
+}
+
+.target {
+  width: 495px;
+  margin-top: 30px;
+
+  &__arrows {
+  }
+
+  &__from {
+    position: relative;
+  }
+
+  &__search-value {
+    position: absolute;
+    top: -20px;
+    font-size: 14px;
+    left: 100%;
+  }
+}
+
+.select-lang-wrapper {
+  @extend %flex-row;
+  justify-content: space-between;
+}
+
+.select-target-count {
+  margin-top: 6px;
+  opacity: .4;
+  float: right;
+  font-size: 14px;
+}
+
+</style>

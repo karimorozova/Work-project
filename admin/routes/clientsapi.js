@@ -24,12 +24,14 @@ const {
 	updateClientMatrix,
 	syncClientMatrix,
 	updateTaskDataByCondition,
-	updateClientRatesFromSettings
+	updateClientRatesFromSettings,
+	getClientServices
 } = require('../clients')
 
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist')
 const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes } = require('../models')
 const { getProject } = require('../projects')
+const { createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require("../clients/clientService")
 
 router.get('/client', async (req, res) => {
 	let { id } = req.query
@@ -367,6 +369,69 @@ router.post('/updated-retest-from-settings', async (req, res) => {
 	}
 })
 
+
+router.get('/client-services/:id', async (req, res) => {
+	const { id } = req.params
+	try {
+		const services = await getClientServices(id)
+		res.send(services)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+router.get('/client-group/:clientId', async (req, res) => {
+	const { clientId } = req.params
+	try {
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		console.log(servicesGroups)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.delete('/client-group/:clientId/:id', async (req, res) => {
+	const { id, clientId } = req.params
+	try {
+		await deleteClientServiceGroups(clientId, id)
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		console.log(servicesGroups)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/client-group/:clientId', async (req, res) => {
+	const { clientId } = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await createClientServicesGroup({clientId, groupName, industry, service, source, target})
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/client-group/:clientId/:id', async (req, res) => {
+	const { clientId, id} = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await editClientServicesGroup(clientId, id,{ groupName, industry, service, source, target})
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
 
 router.post('/services', async (req, res) => {
 	const { clientId, currentData, oldData } = req.body
