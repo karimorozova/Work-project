@@ -36,14 +36,15 @@ import Button from "../../../components/pangea/Button"
 
 export default {
   data() {
-    return {}
+    return {
+      projects: [],
+      clientRequests: [],
+      openQuotes: []
+    }
   },
   methods: {
     ...mapActions({
-      setOpenProjects: "setOpenProjects",
-      setOpenRequests: "setOpenRequests",
-      setOpenQuotes: "setOpenQuotes",
-      getClient: "getClient"
+      alertToggle: "alertToggle"
     }),
     goToAnotherPortal() {
       const redirectTo = `https://portal.pangea.global`
@@ -63,34 +64,43 @@ export default {
         await this.updateQuoteStatus({ quote, key: status })
       } catch (err) {
       }
+    },
+    async getDashboardProject() {
+      try {
+        this.projects = (await this.$axios.get(`/portal/open-projects?token=${ this.token }`)).data
+        this.clientRequests = (await this.$axios.get(`/portal/open-requests?token=${ this.token }`)).data
+        this.openQuotes = (await this.$axios.get(`/portal/open-quotes?token=${ this.token }`)).data
+
+        console.log( this.projects, this.clientRequests, this.openQuotes)
+      } catch (err) {
+        this.alertToggle({ message: 'Internal Error', isShow: true, type: "error" })
+      }
     }
   },
   computed: {
     ...mapGetters({
-      projects: "getAllOpenProjects",
       user: "getUserInfo",
-      clientRequests: "getAllOpenRequests",
-      openQuotes: "getAllOpenQuotes",
-      client: "getClientInfo"
+      client: "getClientInfo",
+      token: "getToken"
     }),
     myFilteredQuotes() {
+      if (!this.openQuotes) return []
       return this.openQuotes.filter(quote => quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     },
     myFilteredProjects() {
+      if (!this.projects) return []
       return this.projects.filter(project => project.hasOwnProperty('clientContacts') && project.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     },
     myFilteredRequest() {
+      if (!this.clientRequests) return []
       return this.clientRequests.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     }
   },
   async created() {
-    await this.setOpenProjects()
-    await this.setOpenQuotes()
-    await this.setOpenRequests()
+    await this.getDashboardProject()
   },
   components: {
     Button,
-    // Table,
     AllOpenRequests,
     MyOpenRequests,
     AllOpenQuotes,
@@ -120,17 +130,16 @@ export default {
 
 .dashboard {
   width: 1530px;
-  //margin: 50px;
 
   .row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 35px;
+    margin-bottom: 50px;
     flex-wrap: wrap;
   }
 
   .col {
-    width: 750px;
+    width: 755px;
     padding: 15px 25px 25px;
     box-shadow: $box-shadow;
     box-sizing: border-box;

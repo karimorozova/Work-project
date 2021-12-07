@@ -2,7 +2,7 @@ const router = require('express').Router()
 const fs = require('fs')
 const jwt = require("jsonwebtoken")
 const { checkClientContact } = require('../middleware')
-const { getClient, getClientForPortal, getClientServicesGroups, deleteClientServiceGroups, createClientServicesGroup, editClientServicesGroup} = require('../clients')
+const { getClient, getClientForPortal, getClientServicesGroups, deleteClientServiceGroups, createClientServicesGroup, editClientServicesGroup } = require('../clients')
 const { getService } = require('../services')
 
 const {
@@ -174,7 +174,7 @@ router.get('/open-projects', checkClientContact, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		const projects = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
-		res.send({ projects })
+		res.send(projects)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -198,7 +198,7 @@ router.get('/open-requests', checkClientContact, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		const requests = await getClientsRequestsForPortal({ 'clientIdFilter': verificationResult.clientId, status: { $ne: 'Closed' } })
-		res.send({ requests })
+		res.send(requests)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -210,11 +210,8 @@ router.get('/client-requests/:id', checkClientContact, async (req, res) => {
 	const { id } = req.params
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-
 		const requests = await getClientsRequestForPortal({
 			_id: id
-			// 'clientIdFilter': verificationResult.clientId,
-			// status: { $ne: 'Closed' },
 		})
 		res.send({ requests })
 	} catch (err) {
@@ -229,7 +226,7 @@ router.get('/open-quotes', checkClientContact, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
-		res.send({ quotes })
+		res.send(quotes)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -440,7 +437,7 @@ router.post('/task-status', checkClientContact, async (req, res) => {
 router.get('/service-templates/:clientId', checkClientContact, async (req, res) => {
 	const { clientId } = req.params
 	try {
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)
@@ -451,7 +448,7 @@ router.get('/service-templates/:clientId', checkClientContact, async (req, res) 
 router.get('/service-templates/:clientId', checkClientContact, async (req, res) => {
 	const { clientId } = req.params
 	try {
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)
@@ -463,7 +460,7 @@ router.post('/service-template/delete/:clientId/:id', checkClientContact, async 
 	const { id, clientId } = req.params
 	try {
 		await deleteClientServiceGroups(clientId, id)
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		console.log(servicesGroups)
 		res.send(servicesGroups)
 	} catch (err) {
@@ -477,8 +474,8 @@ router.post('/service-template/:clientId', checkClientContact, async (req, res) 
 	const { groupName, industry, service, source, target } = req.body
 
 	try {
-		await createClientServicesGroup({clientId, groupName, industry, service, source, target})
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		await createClientServicesGroup({ clientId, groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)
@@ -487,12 +484,12 @@ router.post('/service-template/:clientId', checkClientContact, async (req, res) 
 })
 
 router.post('/service-template/:clientId/:id', checkClientContact, async (req, res) => {
-	const { clientId, id} = req.params
+	const { clientId, id } = req.params
 	const { groupName, industry, service, source, target } = req.body
 
 	try {
-		await editClientServicesGroup(clientId, id,{ groupName, industry, service, source, target})
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		await editClientServicesGroup(clientId, id, { groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)

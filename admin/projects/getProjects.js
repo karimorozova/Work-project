@@ -82,18 +82,14 @@ async function getProjectsForPortalList(obj) {
 						"steps.progress": 1,
 						startDate: 1,
 						deadline: 1,
-						finance: 1,
+						"finance.Price.receivables": 1,
 						createdBy: 1,
-						accountManager: 1
-						// tasksDeliverables: 1,
-						// tasksDR2: 1,
-						// projectCurrency: 1
+						accountManager: 1,
+						minimumCharge: 1,
+						additionsSteps: 1,
+						projectCurrency: 1
 					}
 			)
-					// .populate('industry')
-					// .populate('service')
-					// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
-					// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
 }
@@ -127,10 +123,10 @@ async function getProjectForClientPortal(obj) {
 				"steps.fullTargetLanguage": 1,
 				"steps.clientRate": 1,
 				"steps.status": 1,
-				"steps.totalWords" : 1,
+				"steps.totalWords": 1,
 				"tasks.sourceLanguage": 1,
 				"tasks.targetLanguage": 1,
-				"tasks.taskId": 1,
+				"tasks.taskId": 1
 
 			}
 	)

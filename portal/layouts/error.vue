@@ -1,13 +1,10 @@
 <template lang="pug">
   .error
     .error__body
-      .error__code
-        span 4
-        span 0
-        span 4
-      h3.error__title Oops! This Page Could Not Be Found
+      .error__code Oops!
+      h3.error__title This Page Could Not Be Found
       p.error__text Sorry but the page you are looking for does not exist, have been removed. name changed or is temporarily unavailable
-      Button(value="Go to home page" custom-class="width-191" @clicked="redirectToMain")
+      Button(value="Go to home page" @clicked="redirectToMain")
 
 </template>
 
@@ -30,46 +27,36 @@ export default {
   &__body {
     color: #333;
     font-family: Myriad400;
-    max-width: 767px;
+    max-width: 600px;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-
+    text-align: center;
   }
 
   &__code {
-    font-size: 186px;
     font-family: Myriad900;
-    margin: 0 0 30px 0;
-    text-transform: uppercase;
-    line-height: 0.85;
-
-    span:nth-child(1) {
-      color: #ebbb46
-    }
-
-    span:nth-child(2) {
-      color: #4ba5a5
-    }
-
-    span:nth-child(3) {
-      color: #cb644a
-    }
+    font-size: 125px;
+    margin-bottom: 15px;
+    color: #ddd;
+    cursor: default;
   }
 
   &__title {
-    font-size: 25px;
+    font-size: 24px;
     font-family: Myriad600;
     margin: 0;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    cursor: default;
   }
 
   &__text {
     margin: 0;
-    margin-bottom: 20px;
-    font-size: 18px;
+    margin-bottom: 15px;
+    font-size: 16px;
     opacity: 0.5;
+    cursor: default;
   }
 }
 </style>

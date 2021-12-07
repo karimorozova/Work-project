@@ -17,53 +17,53 @@ export const getServices = async function ({ commit, dispatch, state }) {
 	}
 }
 
-export const setOpenProjects = async function ({ commit, dispatch, state }) {
-	try {
-		const result = await this.$axios.get(`/portal/open-projects?token=${ state.token }`)
-		let { projects } = result.data
-		commit('SET_OPEN_PROJECTS', projects)
-	} catch (err) {
-		const redirectErrors = [ "jwt malformed", "jwt expired" ]
-		console.log(err)
-		if (redirectErrors.includes(err.response.data)) {
-			this.dispatch('logout')
-			this.$router.replace({ path: '/login' })
-		}
-		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
-	}
-}
+// export const setOpenProjects = async function ({ commit, dispatch, state }) {
+// 	try {
+// 		const result = await this.$axios.get(`/portal/open-projects?token=${ state.token }`)
+// 		let { projects } = result.data
+// 		commit('SET_OPEN_PROJECTS', projects)
+// 	} catch (err) {
+// 		const redirectErrors = [ "jwt malformed", "jwt expired" ]
+// 		console.log(err)
+// 		if (redirectErrors.includes(err.response.data)) {
+// 			this.dispatch('logout')
+// 			this.$router.replace({ path: '/login' })
+// 		}
+// 		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
+// 	}
+// }
 
-export const setOpenRequests = async function ({ commit, dispatch, state }) {
-	try {
-		const result = await this.$axios.get(`/portal/open-requests?token=${ state.token }`)
-		let { requests } = result.data
-		commit('SET_OPEN_REQUESTS', requests)
-	} catch (err) {
-		const redirectErrors = [ "jwt malformed", "jwt expired" ]
-		console.log(err)
-		if (redirectErrors.includes(err.response.data)) {
-			this.dispatch('logout')
-			this.$router.replace({ path: '/login' })
-		}
-		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
-	}
-}
+// export const setOpenRequests = async function ({ commit, dispatch, state }) {
+// 	try {
+// 		const result = await this.$axios.get(`/portal/open-requests?token=${ state.token }`)
+// 		let { requests } = result.data
+// 		commit('SET_OPEN_REQUESTS', requests)
+// 	} catch (err) {
+// 		const redirectErrors = [ "jwt malformed", "jwt expired" ]
+// 		console.log(err)
+// 		if (redirectErrors.includes(err.response.data)) {
+// 			this.dispatch('logout')
+// 			this.$router.replace({ path: '/login' })
+// 		}
+// 		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
+// 	}
+// }
 
-export const setOpenQuotes = async function ({ commit, dispatch, state }) {
-	try {
-		const result = await this.$axios.get(`/portal/open-quotes?token=${ state.token }`)
-		let { quotes } = result.data
-		commit('SET_OPEN_QUOTES', quotes)
-	} catch (err) {
-		const redirectErrors = [ "jwt malformed", "jwt expired" ]
-		console.log(err)
-		if (redirectErrors.includes(err.response.data)) {
-			this.dispatch('logout')
-			this.$router.replace({ path: '/login' })
-		}
-		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
-	}
-}
+// export const setOpenQuotes = async function ({ commit, dispatch, state }) {
+// 	try {
+// 		const result = await this.$axios.get(`/portal/open-quotes?token=${ state.token }`)
+// 		let { quotes } = result.data
+// 		commit('SET_OPEN_QUOTES', quotes)
+// 	} catch (err) {
+// 		const redirectErrors = [ "jwt malformed", "jwt expired" ]
+// 		console.log(err)
+// 		if (redirectErrors.includes(err.response.data)) {
+// 			this.dispatch('logout')
+// 			this.$router.replace({ path: '/login' })
+// 		}
+// 		dispatch("alertToggle", { message: err.response.data, isShow: true, type: "error" })
+// 	}
+// }
 
 export const getClient = async function ({ commit, dispatch, state }) {
 	try {

@@ -80,16 +80,25 @@ async function getClientsRequests(filters) {
 async function getClientsRequestsForPortal(filters) {
 	try {
 		return await ClientRequest
-				.find({ customer: ObjectId(filters.clientIdFilter), "status": { "$ne": "Closed" } })
+				.find(
+						{
+							customer: ObjectId(filters.clientIdFilter),
+							"status": { "$ne": "Closed" }
+						},
+						{
+							requestForm: 1,
+							projectId: 1,
+							projectName: 1,
+							startDate: 1,
+							status: 1,
+							deadline: 1,
+							createdBy: 1,
+							clientContacts: 1,
+							accountManager: 1
+						}
+				)
 				.sort({ startDate: -1 })
-				.populate([
-					"requestForm.sourceLanguage",
-					"requestForm.targetLanguages",
-					"requestForm.service",
-					"industry",
-					"accountManager",
-					"projectManager"
-				])
+				.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	} catch (err) {
 		console.log(err)
 		console.log("Error on getting filtered client requests")
