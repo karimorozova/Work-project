@@ -321,6 +321,7 @@ export default {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
           || this.currentProject.projectManager._id === this.user._id
+          || this.currentProject.accountManager._id === this.user._id
     }
   },
   components: {

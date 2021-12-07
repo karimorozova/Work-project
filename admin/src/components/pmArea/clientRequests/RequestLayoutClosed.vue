@@ -784,13 +784,14 @@ input[type="text"]:disabled {
 
   &__value {
     font-family: 'Myriad400';
+    width: 230px;
   }
 
   &__row {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 40px;
+    min-height: 40px;
   }
 
 }

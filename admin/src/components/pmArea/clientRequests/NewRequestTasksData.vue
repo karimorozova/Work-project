@@ -64,6 +64,7 @@ import NewTasksLangsDuoRequest from "./NewTasksLangsDuoRequest"
 import NewRequestServicesCreationStepsWorkflow from "./NewRequestServicesCreationStepsWorkflow"
 import RequestTasksFiles from "./tasks-n-steps/RequestTasksFiles"
 import Button from "../../Button"
+import { clearTasksDataRequest } from "../../../vuex/clientsRequests/actions"
 
 export default {
   props: {
@@ -289,6 +290,9 @@ export default {
   },
   async created() {
     await this.buildAutoData()
+  },
+  destroyed() {
+    this.clearTasksDataRequest()
   },
   components: {
     Button,

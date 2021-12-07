@@ -71,6 +71,7 @@ export default {
       this.deleteCurrentRequest = true
     },
     async deleteRequest() {
+      if(!this.canUpdateRequest) return
       const { id } = this.$route.params
       await this.$http.post(`/clients-requests/${ id }/delete`)
       if (window.history.length > 2) {
@@ -113,6 +114,7 @@ export default {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
           || this.project.projectManager._id === this.user._id
+          || this.project.accountManager._id === this.user._id
     },
     projManagers() {
       let result = []

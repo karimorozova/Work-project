@@ -340,6 +340,7 @@ export default {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
           || this.project.projectManager._id === this.user._id
+          || this.project.accountManager._id === this.user._id
     }
   },
   components: {

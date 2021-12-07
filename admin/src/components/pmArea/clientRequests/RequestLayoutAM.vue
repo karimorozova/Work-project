@@ -160,8 +160,13 @@
           .block__data(v-if="isNotes && canUpdateRequest()")
             ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes")
 
-      .form__button
-        Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
+
+      .optionsAndButton
+        .options
+          .options__item.border(:class="{'options_brown': isClassicConvert}" @click="(e) => toggleConvert(e, 'isClassicConvert')") Send to PM
+          .options__item(:class="{'options_brown': isPreCreatedProject}" @click="(e) => toggleConvert(e, 'isPreCreatedProject')") Send to PM and generate T&S
+        .form__button
+          Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length || onRequestSending" value="Send to PM")
 
     .side
       .side__info
@@ -295,6 +300,9 @@ export default {
   mixins: [ crudIcons ],
   data() {
     return {
+      isClassicConvert: true,
+      isPreCreatedProject: false,
+      onRequestSending: false,
       // instructions: instructions,
       isBrief: false,
       isNotes: false,
@@ -363,6 +371,14 @@ export default {
       setCurrentClientRequest: "setCurrentClientRequest",
       alertToggle: "alertToggle"
     }),
+    toggleConvert(e, prop) {
+      this[prop] = true
+      if (prop === 'isClassicConvert') {
+        this.isPreCreatedProject = false
+      } else if (prop === 'isPreCreatedProject') {
+        this.isClassicConvert = false
+      }
+    },
     copyNotesToBrief() {
       this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.notes, 'notes': this.currentClientRequest.notes } })
     },
@@ -456,14 +472,65 @@ export default {
 
       return isAdmin || currentAm
     },
-
-    approveRequest() {
+    async approveRequest() {
+      this.onRequestSending = true
       if (!this.canUpdateRequest()) return
       try {
-        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
+        if (this.isClassicConvert) {
+          await this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "tasksAndSteps": [] } })
+          await this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
+          this.onRequestSending = false
+        } else if (this.isPreCreatedProject) {
+          await this.convertWithPreCreation()
+          await this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
+          this.onRequestSending = false
+        }
         this.alertToggle({ message: "Project approved!", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Project not approved!", isShow: true, type: "error" })
+        this.onRequestSending = false
+      }
+    },
+    async convertWithPreCreation() {
+      const { deadline, requestForm: { sourceFiles, refFiles, targetLanguages, service: { title, steps } } } = this.currentClientRequest
+      const stepsAndUnits = []
+      let tasksData = new FormData()
+      tasksData.append('requestId', this.currentClientRequest._id)
+      tasksData.append('targets', JSON.stringify(targetLanguages))
+      if (sourceFiles && sourceFiles.length) tasksData.append('sourceFilesVault', JSON.stringify(sourceFiles))
+      if (refFiles && refFiles.length) tasksData.append('refFilesVault', JSON.stringify(refFiles))
+      if (title === 'Translation') {
+        const templates = await this.getMemoqTemplates()
+        tasksData.append('template', JSON.stringify(templates[0]))
+      } else {
+        tasksData.append('template', null)
+      }
+      for (const { step } of steps) {
+        const settingStep = this.allSteps.find(item => item._id.toString() === step.toString())
+        stepsAndUnits.push({
+          step: settingStep,
+          start: new Date(),
+          deadline,
+          receivables: {
+            unit: settingStep.calculationUnit[0],
+            quantity: title === 'Translation' ? 0 : 1
+          },
+          payables: {
+            unit: settingStep.calculationUnit[0],
+            quantity: title === 'Translation' ? 0 : 1
+          }
+        })
+      }
+      tasksData.append('stepsAndUnits', JSON.stringify(stepsAndUnits))
+      const updatedProject = await this.$http.post('/pm-manage/request-tasks', tasksData)
+      await this.setCurrentClientRequest(updatedProject.data)
+    },
+    async getMemoqTemplates() {
+      try {
+        const result = await this.$http.get("/memoqapi/templates")
+        return result.data
+      } catch (err) {
+        return [ { name: 'No Templates' } ]
       }
     },
     openDeleteFileApprovalModal(type, path, bool) {
@@ -836,6 +903,8 @@ export default {
       user: "getUser",
       users: "getUsers",
       languages: "getAllLanguages",
+      allSteps: "getAllSteps",
+      allUnits: "getAllUnits",
       currentClientRequest: "getCurrentClientRequest"
     }),
     billingInfoList() {
@@ -894,6 +963,7 @@ export default {
     },
     isAllChecked() {
       const {
+        clientBillingInfo,
         requestForm: { sourceFiles, refFiles },
         checkedForm: { isCheckProjectName, isCheckDeadline, isCheckBrief, isCheckComplianceTemplate },
         projectManager
@@ -902,7 +972,7 @@ export default {
       const isSourceFiles = !sourceFiles.length ? true : sourceFiles.every(({ isCheck }) => isCheck)
       const isRefFiles = !refFiles.length ? true : refFiles.every(({ isCheck }) => isCheck)
 
-      return isSourceFiles && isRefFiles && isCheckProjectName && isCheckDeadline && isCheckBrief && !!projectManager
+      return isSourceFiles && isRefFiles && isCheckProjectName && isCheckDeadline && isCheckBrief && !!projectManager && !!clientBillingInfo
     }
   },
 
@@ -928,6 +998,44 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/styles/settingsTable";
 @import "../../../assets/scss/colors";
+
+.border {
+  border-right: 1px solid $border;
+}
+
+.optionsAndButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  border: 1px solid $border;
+  background-color: $table-list;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+  width: fit-content;
+  overflow: hidden;
+  margin: 20px 0;
+
+  &__item {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #3333;
+  }
+
+  &_brown {
+    background-color: white;
+    color: $text;
+  }
+}
 
 .block {
   &__header {
@@ -1423,13 +1531,14 @@ input[type="text"]:disabled {
 
   &__value {
     font-family: 'Myriad400';
+    width: 230px;
   }
 
   &__row {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 40px;
+    min-height: 40px;
   }
 
 }

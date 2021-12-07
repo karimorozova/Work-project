@@ -51,6 +51,7 @@ import Toggler from "../../Toggler"
 import StepsAdditions from "./stepsAdditions"
 import Button from "../../Button"
 import ValidationErrors from "../../ValidationErrors"
+import { clearTasksData } from "../../../vuex/pmarea/actions"
 
 export default {
   name: "NewTasksData",
@@ -69,7 +70,7 @@ export default {
       isAdditions: false,
       IsErrorModal: false,
       errors: [],
-      isDisabledSaveButton: false,
+      isDisabledSaveButton: false
     }
   },
   beforeDestroy() {
@@ -139,14 +140,14 @@ export default {
           }
           try {
             await this.addProjectWordsTasks(data)
-          }catch (err){
+          } catch (err) {
             this.isDisabledSaveButton = false
             this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
           }
         } else {
           try {
             await this.addProjectTasks(data)
-          }catch (err){
+          } catch (err) {
             this.isDisabledSaveButton = false
             this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
           }
@@ -295,7 +296,8 @@ export default {
       setDataValue: "setTasksDataValue",
       addProjectTasks: "addProjectTasks",
       addProjectWordsTasks: "addProjectWordsTasks",
-      setCurrentProject: "setCurrentProject"
+      setCurrentProject: "setCurrentProject",
+      clearTasksData: "clearTasksData"
     })
   },
   computed: {
@@ -319,6 +321,9 @@ export default {
   async created() {
     await this.getAllServices()
     await this.buildAutoData()
+  },
+  destroyed() {
+    this.clearTasksData()
   },
   components: { ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }

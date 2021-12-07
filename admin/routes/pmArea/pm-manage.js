@@ -267,9 +267,10 @@ router.post('/convert-translation-request-into-project', async (req, res) => {
 router.post('/request-tasks', upload.fields([ { name: 'sourceFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
 		let tasksInfo = { ...req.body }
-		const { sourceFiles, refFiles } = req.files
-		const updatedProject = await createRequestTasks({ tasksInfo, sourceFiles, refFiles })
-		res.send(updatedProject)
+		console.log(tasksInfo)
+	// 	const { sourceFiles, refFiles } = req.files
+	// 	const updatedProject = await createRequestTasks({ tasksInfo, sourceFiles, refFiles })
+	// 	res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on adding project tasks')
