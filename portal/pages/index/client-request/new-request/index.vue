@@ -1,191 +1,208 @@
 <template lang="pug">
   .component
-    .title(v-if="!isSent") Request Form
-    .component__body(v-if="!isSent")
-      .component__form
-        Validation-errors(v-if="showError"
-          :errors="errors"
-          :isAbsolute="true"
-          @closeErrors="closeErrors")
-        .form__title General Information
-        .form__part
-          .form__row
-            .form__col
-              .form__select
-                .form__input-title Project Name:
-                .width-220
-                  input(type="text" placeholder="Value" v-model="currentProjectName")
-            .form__col
-              .form__select
-                .form__input-title Project Deadline:
-                DatePicker(
-                  placeholder="Suggested Deadline"
-                  :value="currentDeadline"
-                  @confirm="(e) => updateDeadline(e)"
-                  format="DD-MM-YYYY, HH:mm"
-                  type="datetime"
-                  ref="deadline"
-                  :clearable="false"
-                  :confirm="true"
-                  confirm-text="Set date"
-                  :disabled-date="notBeforeToday"
-                  prefix-class="xmx"
-                )
-          .form__row
-            .form__col
-              .form__select(style="margin-top: 20px;")
-                .form__input-title Service:
-                .width-220
-                  SelectSingle(
-                    :selectedOption="selectedService"
-                    :options="mappedService"
-                    placeholder="Option"
-                    @chooseOption="(e) => setServices(e)"
+    FormTemplate(
+      v-if="isShowTemplateStep && clientInfo.hasOwnProperty('_id')"
+      :clientId="clientInfo._id"
+
+      @selectedTemplate="setTemplateData"
+
+    )
+    .test(v-if="!isShowTemplateStep")
+      .title(v-if="!isSent") Request Form
+      .component__body(v-if="!isSent")
+        .component__form
+          Validation-errors(v-if="showError"
+            :errors="errors"
+            :isAbsolute="true"
+            @closeErrors="closeErrors")
+          .form__title General Information
+          .form__part
+            .form__row
+              .form__col
+                .form__select
+                  .form__input-title Project Name:
+                  .width-220
+                    input(type="text" placeholder="Value" v-model="currentProjectName")
+              .form__col
+                .form__select
+                  .form__input-title Project Deadline:
+                  DatePicker(
+                    placeholder="Suggested Deadline"
+                    :value="currentDeadline"
+                    @confirm="(e) => updateDeadline(e)"
+                    format="DD-MM-YYYY, HH:mm"
+                    type="datetime"
+                    ref="deadline"
+                    :clearable="false"
+                    :confirm="true"
+                    confirm-text="Set date"
+                    :disabled-date="notBeforeToday"
+                    prefix-class="xmx"
                   )
-            .form__col
-              .form__select( style="margin-top: 20px;")
-                .form__input-title Industry:
-                .width-220
-                  SelectSingle(
-                    :isDisabled="selectedService === ''"
-                    :selectedOption="currentIndustries.name"
-                    :options="mappedIndustries"
-                    placeholder="Option"
-                    @chooseOption="(e) => setIndustry(e)"
-                  )
+            .form__row
+              .form__col
+                .form__select(style="margin-top: 20px;")
+                  .form__input-title Service:
+                  .width-220
+                    SelectSingle(
+                      :selectedOption="selectedService"
+                      :options="mappedService"
+                      placeholder="Option"
+                      @chooseOption="(e) => setServices(e)"
+                    )
+              .form__col
+                .form__select( style="margin-top: 20px;")
+                  .form__input-title Industry:
+                  .width-220
+                    SelectSingle(
+                      :isDisabled="selectedService === ''"
+                      :selectedOption="currentIndustries.name"
+                      :options="mappedIndustries"
+                      placeholder="Option"
+                      @chooseOption="(e) => setIndustry(e)"
+                    )
 
 
-        .form__title(v-if="Object.keys(currentIndustries).length") Languages
-        .form__part(v-if="Object.keys(currentIndustries).length")
-          .form__row
-            .form__col(v-if="isDuoLangService")
-              .form__select
-                .form__input-title Source Language:
-                .width-220
-                  SelectSingle(
-                    :selectedOption="currentSourceLang.lang"
-                    :options="mappedSourceLanguages"
-                    :hasSearch="true"
-                    placeholder="Option"
-                    @chooseOption="(e) => setSelectedOptionLanguages(e, 'currentSourceLang')"
-                  )
-            .form__col
-              .form__select
-                .form__input-title Target Language:
-                .width-220
-                  SelectMulti(
-                    :isDisabled="this.isDuoLangService && !currentSourceLang.hasOwnProperty('lang')"
-                    :selectedOptions="currentTargetLang.map(({lang})=> lang)"
-                   :options="mappedTargetLanguages"
-                   :hasSearch="true"
-                   placeholder="Option"
-                   @chooseOptions="setSelectedTargetLanguages"
-                  )
+          .form__title(v-if="Object.keys(currentIndustries).length") Languages
+          .form__part(v-if="Object.keys(currentIndustries).length")
+            TasksLangDuo(
+              :isServiceDuo="isDuoLangService"
+              :mappedSourceLanguages="mappedSourceLanguages"
+              :mappedTargetLanguages="mappedTargetLanguages"
+              :source="currentSourceLang.lang"
+              :targets="currentTargetLang"
 
-        .form__title Files Preparation
-        .form__part
-          .fileModal(v-if="isFileModal" id="modal")
-            span.fileModal__close(@click="closeFileModal") &#215;
-            .fileModal__btns
-              .fileModal__btn
-                UploadFileButton(label="Source File(s)" @uploadedFile="setSourceFiles" inputName="sourceFiles")
-              .fileModal__btn
-                UploadFileButton(label="Reference File(s)" @uploadedFile="setRefFiles" inputName="refFiles")
-
-            .fileModal__tooltip Each uploaded file can be <= 50Mb
-
-          .form__row
-            .table
-              GeneralTable(
-                :fields="fields"
-                :tableData="files"
-              )
-                .table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
-                .table__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
-                .table__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
-
-                .table__data(slot="file" slot-scope="{ row }") {{row.name}}
-                .table__data(slot="type" slot-scope="{ row }") {{row.type}}
-                .table__dataIcon(slot="icon" slot-scope="{ row }")
-                  span(@click="(e) => deleteFile(e, row.name, row.type)")
-                    i.fas.fa-trash
-
-            Add(@add="openFileModal" id="add")
-
-        .form__title Instructions
-        .form__part
-
-          .form__row
-            Instructions(:instructions="getInstructions" @changedInstructions="setInstructions")
-            //.form__col
-              .form__select-block
-                .form__input-title-margin9 Enter a short brief:
-                .form__details(id="instructions" contenteditable="true" @input="selectOnlyExisted" )
-            //.form__col
-              .form__select-block(v-if="selectedService" style="width: 240px")
-                .form__input-title-margin9 Select instructions:
-                .form__checked(v-for=" ( instruction, index) of instructions[selectedService]" style="width: 50%")
-                  CheckBox(:isChecked="instruction.isActive" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
-                  span {{instruction.name}}
-
-        //.form__ckeckbox
-        //  TextRadio(
-        //    :isChecked="startOption === 'Send'"
-        //    title="Send a Quote"
-        //    text="I approve for the project to begin immediately and I'll review the quote later."
-        //    @check="(e) => setQuoteDecision('Send')"
-        //  )
-        //  TextRadio(
-        //    :isChecked="startOption === 'Start'"
-        //    title="Start Immediately"
-        //    text="I approve for the project to begin immediately and to receive the quote just for reference."
-        //    @check="(e) => setQuoteDecision('Start')"
-        //  )
-        .form__submit
-          //Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm || isRequestSend")
-          Button(@clicked="checkError" value="Submit" )
-
-      div(v-if="!isSent")
-        .component__order
-
-          div(v-if="Object.keys(user).length" style="padding-top: 20px;")
-            ClientTable(
-              :currentContacts="currentContacts"
-              :clientInfo="clientInfo"
-              :user="user"
-              @addContact="addContact"
-              @setContact="setContact"
-              @removeContact="removeContact"
+              @selectSourceLang="(e) => setSelectedOptionLanguages(e, 'currentSourceLang')"
+              @selectTargetLang="setSelectedTargetLanguages"
             )
+              //.form__col(v-if="isDuoLangService")
+                .form__select
+                  .form__input-title Source Language:
+                  .width-220
+                    SelectSingle(
+                      //:selectedOption="currentSourceLang.lang"
+                      //:options="mappedSourceLanguages"
+                      //:hasSearch="true"
+                      //placeholder="Option"
+                      //@chooseOption="(e) => setSelectedOptionLanguages(e, 'currentSourceLang')"
+                    )
+              //.form__col
+                .form__select
+                  .form__input-title Target Language:
+                  .width-220
+                    SelectMulti(
+                      //:isDisabled="this.isDuoLangService && !currentSourceLang.hasOwnProperty('lang')"
+                      //:selectedOptions="currentTargetLang.map(({lang})=> lang)"
+                     //:options="mappedTargetLanguages"
+                     //:hasSearch="true"
+                     //placeholder="Option"
+                     //@chooseOptions="setSelectedTargetLanguages"
+                    )
 
-        .component__order(v-if="Object.keys(selectedService).length")
-          .form__title--order Your Order
+          .form__title Files Preparation
+          .form__part
+            .fileModal(v-if="isFileModal" id="modal")
+              span.fileModal__close(@click="closeFileModal") &#215;
+              .fileModal__btns
+                .fileModal__btn
+                  UploadFileButton(label="Source File(s)" @uploadedFile="setSourceFiles" inputName="sourceFiles")
+                .fileModal__btn
+                  UploadFileButton(label="Reference File(s)" @uploadedFile="setRefFiles" inputName="refFiles")
 
-          .order__row(v-if="!!currentProjectName")
-            .order__subTitle Project:
-            .order__value {{currentProjectName}}
-              //.order__details(v-if="!!startOption") {{ startOption === 'Send' && '(Send a Quote)' || startOption === 'Start' && '(Start Immediately)'  }}
+              .fileModal__tooltip Each uploaded file can be <= 50Mb
 
-          .order__row
-            .order__subTitle Service:
-            .order__value {{selectedService}}
+            .form__row
+              .table
+                GeneralTable(
+                  :fields="fields"
+                  :tableData="files"
+                )
+                  .table__header(slot="headerFile" slot-scope="{ field }") {{ field.label }}
+                  .table__header(slot="headerType" slot-scope="{ field }") {{ field.label }}
+                  .table__header(slot="headerIcon" slot-scope="{ field }") {{ field.label }}
 
-          .order__row(v-if="Object.keys(currentIndustries).length")
-            .order__subTitle Industry:
-            .order__value {{currentIndustries.name}}
+                  .table__data(slot="file" slot-scope="{ row }") {{row.name}}
+                  .table__data(slot="type" slot-scope="{ row }") {{row.type}}
+                  .table__dataIcon(slot="icon" slot-scope="{ row }")
+                    span(@click="(e) => deleteFile(e, row.name, row.type)")
+                      i.fas.fa-trash
 
-          .order__row(v-if="Object.keys(currentSourceLang).length")
-            .order__subTitle Source:
-            .order__value {{currentSourceLang.lang}}
-          .order__row(v-if="Object.keys(currentTargetLang).length")
-            .order__subTitle Target:
-            .order__value {{currentTargetLang.map(({lang}) => lang).join('; ')}}
+              Add(@add="openFileModal" id="add")
 
-          .order__row(v-if="!!currentDeadline")
-            .order__subTitle Deadline:
-            .order__value {{ customFormatter(currentDeadline) }}
+          .form__title Instructions
+          .form__part
 
-    //client-request-completed(v-else :values="groupAllData()")
+            .form__row
+              Instructions(:instructions="getInstructions" @changedInstructions="setInstructions")
+              //.form__col
+                .form__select-block
+                  .form__input-title-margin9 Enter a short brief:
+                  .form__details(id="instructions" contenteditable="true" @input="selectOnlyExisted" )
+              //.form__col
+                .form__select-block(v-if="selectedService" style="width: 240px")
+                  .form__input-title-margin9 Select instructions:
+                  .form__checked(v-for=" ( instruction, index) of instructions[selectedService]" style="width: 50%")
+                    CheckBox(:isChecked="instruction.isActive" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+                    span {{instruction.name}}
+
+          //.form__ckeckbox
+          //  TextRadio(
+          //    :isChecked="startOption === 'Send'"
+          //    title="Send a Quote"
+          //    text="I approve for the project to begin immediately and I'll review the quote later."
+          //    @check="(e) => setQuoteDecision('Send')"
+          //  )
+          //  TextRadio(
+          //    :isChecked="startOption === 'Start'"
+          //    title="Start Immediately"
+          //    text="I approve for the project to begin immediately and to receive the quote just for reference."
+          //    @check="(e) => setQuoteDecision('Start')"
+          //  )
+          .form__submit
+            //Button(@clicked="checkError" value="Submit" :isDisabled="!isCompleteForm || isRequestSend")
+            Button(@clicked="checkError" value="Submit" )
+
+        div(v-if="!isSent")
+          .component__order
+
+            div(v-if="Object.keys(user).length" style="padding-top: 20px;")
+              ClientTable(
+                :currentContacts="currentContacts"
+                :clientInfo="clientInfo"
+                :user="user"
+                @addContact="addContact"
+                @setContact="setContact"
+                @removeContact="removeContact"
+              )
+
+          .component__order(v-if="Object.keys(selectedService).length")
+            .form__title--order Your Order
+
+            .order__row(v-if="!!currentProjectName")
+              .order__subTitle Project:
+              .order__value {{currentProjectName}}
+                //.order__details(v-if="!!startOption") {{ startOption === 'Send' && '(Send a Quote)' || startOption === 'Start' && '(Start Immediately)'  }}
+
+            .order__row
+              .order__subTitle Service:
+              .order__value {{selectedService}}
+
+            .order__row(v-if="Object.keys(currentIndustries).length")
+              .order__subTitle Industry:
+              .order__value {{currentIndustries.name}}
+
+            .order__row(v-if="Object.keys(currentSourceLang).length")
+              .order__subTitle Source:
+              .order__value {{currentSourceLang.lang}}
+            .order__row(v-if="Object.keys(currentTargetLang).length")
+              .order__subTitle Target:
+              .order__value {{currentTargetLang.map(({lang}) => lang).join('; ')}}
+
+            .order__row(v-if="!!currentDeadline")
+              .order__subTitle Deadline:
+              .order__value {{ customFormatter(currentDeadline) }}
+
+      //client-request-completed(v-else :values="groupAllData()")
 
 
 </template>
@@ -216,11 +233,15 @@
   import '../../../../assets/scss/datepicker.scss'
   // import '../../../../assets/scss/datepicker.scss'
 
+  import FormTemplate from "../../../components/forms/FormTemplate"
+  import TasksLangDuo from "../../../components/forms/TasksLangDuo"
+
 
 	export default {
 		data() {
 			return {
         editorData: '',
+        isSecondStep: false,
         selectedService: '',
 				isRequestSend: false,
 				currentDeadline: '',
@@ -410,18 +431,19 @@
 			openCalendar() {
 				this.$refs.deadline.showCalendar()
 			},
-			setSelectedOptionLanguages({ option }, value) {
+			setSelectedOptionLanguages(option , value) {
 				this[value] = this.allLanguages.find(({ lang }) => lang === option)
         this.currentTargetLang = []
 			},
-      setSelectedTargetLanguages({option}) {
-        const clickedLang = this.allLanguages.find(({ lang }) => lang === option)
-        const position = this.currentTargetLang.findIndex(({ lang }) => lang === clickedLang.lang)
-        if (position !== -1) {
-          this.currentTargetLang.splice(position, 1)
-        } else {
-          this.currentTargetLang.push(clickedLang)
-        }
+      setSelectedTargetLanguages(targetLang) {
+		    this.currentTargetLang = targetLang
+        // const clickedLang = this.allLanguages.find(({ lang }) => lang === option)
+        // const position = this.currentTargetLang.findIndex(({ lang }) => lang === clickedLang.lang)
+        // if (position !== -1) {
+        //   this.currentTargetLang.splice(position, 1)
+        // } else {
+        //   this.currentTargetLang.push(clickedLang)
+        // }
       },
 			setSourceFiles({ files }) {
 				const filteredFiles = Array.from(files).filter(item => item.size < 50000000).filter(item => !this.sourceFiles.map(item => item.name).includes(item.name))
@@ -455,6 +477,16 @@
         this.currentTargetLang = []
         this.currentSourceLang = {}
         this.currentIndustries = {}
+      },
+      setTemplateData(selectedTemplate) {
+		    this.isSecondStep = true
+
+        if(selectedTemplate.hasOwnProperty('groupName')) {
+          this.selectedService = selectedTemplate.service.title
+          this.currentIndustries = selectedTemplate.industry
+          this.currentSourceLang = selectedTemplate.source
+          this.currentTargetLang = selectedTemplate.target
+        }
       }
 		},
 		computed: {
@@ -464,6 +496,9 @@
 				clientInfo: "getClientInfo",
         services: "getAllServices"
 			}),
+      isShowTemplateStep() {
+			  return this.clientInfo.servicesGroups && this.clientInfo.servicesGroups.length >= 1 && !this.isSecondStep
+      },
       getInstructions() {
 			  if (!this.selectedService) return []
         if (this.clientInfo.name === 'eToro (Europe) Limited' && this.selectedService === 'Compliance') return this.instructions['ComplianceEtoro']
@@ -548,7 +583,7 @@
 			// }
 		},
     created() {
-      this.getLanguages()
+      // this.getLanguages()
     },
     components: {
 			GeneralTable,
@@ -566,6 +601,8 @@
       Instructions,
       SelectMulti,
       DatePicker,
+      FormTemplate,
+      TasksLangDuo,
 		}
 
 	}
