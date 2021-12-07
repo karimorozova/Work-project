@@ -1,34 +1,38 @@
 <template lang="pug">
-  .account
+  .wrapper
+    ValidationErrors(
+      v-if="areErrors"
+      :errors="errors"
+      :isAbsolute="true"
+      @closeErrors="closeErrors"
+    )
+    //.account__buttons
+    //  Button(value="Save" class="account__button" @clicked="checkErrors")
+    //  Button(value="Cancel" @clicked="setDefault")
+
+    .Lside
+      .contact-details__photo
+        .photo(v-if="!user.photo")
+          img.photo__image(v-if="imageExist")
+        .photo(v-else)
+          img.photo__image(:src="domain+user.photo")
+        .upload-button(v-if="true")
+          input.upload-button__input(type="file" @change="previewPhoto")
+          img.upload-button__icon(src="../../assets/images/edit-brown.png")
+        .tip(v-if="!isFileError && !readonly") Maximum file size should be 2Mb (only png/jpg/jpeg types)
+        .file-error(v-if="isFileError && !readonly") Incorrect file type or size
+
+    .Rside
+
+
     .account__item
-      .account__title
-        span Profile
-        .account__buttons
-          Button(value="Save" class="account__button" @clicked="checkErrors")
-          Button(value="Cancel" @clicked="setDefault")
-      .account__body
-        ValidationErrors(
-          v-if="areErrors"
-          :errors="errors"
-          :isAbsolute="true"
-          @closeErrors="closeErrors"
-        )
+
         .contact-details
           .content__form
             .contact-details__title general info
             .contact-details__part
               .contact-details__row
-                .contact-details__photo
-                  .photo(v-if="!user.photo")
-                    img.photo__image(v-if="imageExist")
-                  .photo(v-else)
-                    img.photo__image(:src="domain+user.photo")
-                  //.upload-button(v-if="!readonly")
-                  .upload-button(v-if="true")
-                    input.upload-button__input(type="file" @change="previewPhoto")
-                    img.upload-button__icon(src="../../assets/images/edit-brown.png")
-                  .tip(v-if="!isFileError && !readonly") Maximum file size should be 2Mb (only png/jpg/jpeg types)
-                  .file-error(v-if="isFileError && !readonly") Incorrect file type or size
+
 
 
                 .contact-details__items
@@ -96,17 +100,17 @@
 </template>
 
 <script>
-import Button from "../buttons/Button";
-import ValidationErrors from "../ValidationErrors";
+import Button from "../buttons/Button"
+import ValidationErrors from "../ValidationErrors"
 import { mapActions, mapGetters } from "vuex"
-import SelectSingle from "../pangea/SelectSingle";
+import SelectSingle from "../pangea/SelectSingle"
 
 export default {
   data() {
     return {
       passType1: "password",
       confirmPassType2: "password",
-      genders: ['Female', 'Male'],
+      genders: [ 'Female', 'Male' ],
       errors: [],
       areErrors: false,
       readonly: true,
@@ -123,7 +127,7 @@ export default {
 
       imageExist: false,
       isFileError: false,
-      domain: "",
+      domain: ""
     }
   },
   methods: {
@@ -133,17 +137,17 @@ export default {
     ]),
     async getCountries() {
       try {
-        const result = await this.$axios.get('/api/countries');
-        this.countries = result.data;
-      } catch(err) {
+        const result = await this.$axios.get('/api/countries')
+        this.countries = result.data
+      } catch (err) {
         console.log(err)
       }
     },
     async getTimezones() {
       try {
         const result = await this.$axios.get('/api/timezones')
-        this.timezones = result.data.map(({zone}) => zone );
-      } catch(err) {
+        this.timezones = result.data.map(({ zone }) => zone)
+      } catch (err) {
         console.log(err)
       }
     },
@@ -154,37 +158,37 @@ export default {
     },
     previewPhoto() {
       // if (document.getElementsByClassName('upload-button__input').length < 1) return
-      let input = document.getElementsByClassName('upload-button__input')[0];
+      let input = document.getElementsByClassName('upload-button__input')[0]
       if (this.checkFile(input.files)) {
-        this.showPhoto(input);
+        this.showPhoto(input)
       } else {
-        this.showFileError(input);
+        this.showFileError(input)
       }
     },
     showPhoto(input) {
       // if (document.getElementsByClassName('upload-button__input').length < 1) return
-      this.photoFile = input.files;
-      this.imageExist = true;
-      let reader = new FileReader();
+      this.photoFile = input.files
+      this.imageExist = true
+      let reader = new FileReader()
       reader.onload = (e) => {
-        document.getElementsByClassName('photo__image')[0].src = e.target.result;
+        document.getElementsByClassName('photo__image')[0].src = e.target.result
       }
-      reader.readAsDataURL(input.files[0]);
+      reader.readAsDataURL(input.files[0])
     },
     showFileError(input) {
-      this.isFileError = true;
-      input.value = "";
+      this.isFileError = true
+      input.value = ""
       setTimeout(() => {
-        this.isFileError = false;
+        this.isFileError = false
       }, 5000)
     },
     checkFile(files) {
       if (files && files[0]) {
-        const types = ['jpg', 'jpeg', 'png'];
-        const type = files[0].name.split('.').pop();
-        return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 2000000;
+        const types = [ 'jpg', 'jpeg', 'png' ]
+        const type = files[0].name.split('.').pop()
+        return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 2000000
       }
-      return false;
+      return false
     },
     setDefault() {
       this.newData = {}
@@ -193,50 +197,50 @@ export default {
 
       if (document.getElementsByClassName('photo__image').length > 0)
         document.getElementsByClassName('photo__image')[0].src = this.domain + this.user.photo
-      this.closeErrors();
+      this.closeErrors()
     },
     setValue(value, prop) {
       this.$set(this.newData, prop, value)
     },
     closeErrors() {
-      this.areErrors = false;
+      this.areErrors = false
     },
     async checkErrors() {
-      this.errors = [];
-      const phoneReg = /^[1-9][0-9]*$/;
-      const namesReg = /^[-\sA-z]+$/;
-      if (this.newData.hasOwnProperty("firstName") && (this.newData.firstName.length < 4 || !namesReg.test(this.newData.firstName))) this.errors.push("Enter a valid first name");
-      if (this.newData.hasOwnProperty("surname") && (this.newData.surname.length < 4 || !namesReg.test(this.newData.surname))) this.errors.push("Enter a valid surname");
-      if (this.newData.phone && !phoneReg.test(this.newData.phone)) this.errors.push("Only number are allowed in Phone number field");
-      if (this.newData.password && !this.areEqualPasswords()) this.errors.push("The password and confirm password fields do not match");
-      await this.checkEmail();
+      this.errors = []
+      const phoneReg = /^[1-9][0-9]*$/
+      const namesReg = /^[-\sA-z]+$/
+      if (this.newData.hasOwnProperty("firstName") && (this.newData.firstName.length < 4 || !namesReg.test(this.newData.firstName))) this.errors.push("Enter a valid first name")
+      if (this.newData.hasOwnProperty("surname") && (this.newData.surname.length < 4 || !namesReg.test(this.newData.surname))) this.errors.push("Enter a valid surname")
+      if (this.newData.phone && !phoneReg.test(this.newData.phone)) this.errors.push("Only number are allowed in Phone number field")
+      if (this.newData.password && !this.areEqualPasswords()) this.errors.push("The password and confirm password fields do not match")
+      await this.checkEmail()
       if (this.errors.length) {
-        return this.areErrors = true;
+        return this.areErrors = true
       }
-      await this.saveInfo();
+      await this.saveInfo()
     },
     async checkEmail() {
-      const emailReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-      if (!this.user.email || !emailReg.test(this.user.email)) this.errors.push("Enter a valid email");
+      const emailReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+      if (!this.user.email || !emailReg.test(this.user.email)) this.errors.push("Enter a valid email")
       try {
-        const existingUser = await this.$axios.get(`/portal/unique-email?email=${this.email}`);
+        const existingUser = await this.$axios.get(`/portal/unique-email?email=${ this.email }`)
         if (this.email !== this.user.email && existingUser.data === "exist") this.errors.push("The entered email is already used in our system.")
       } catch (err) {
-        this.alertToggle({message: "Error on checking email uniqueness", isShow: true, type: "error"});
+        this.alertToggle({ message: "Error on checking email uniqueness", isShow: true, type: "error" })
       }
     },
     areEqualPasswords() {
-      return this.newData.password.trim() === this.confirmPassword.trim();
+      return this.newData.password.trim() === this.confirmPassword.trim()
     },
     async saveInfo() {
       try {
         this.newData.photo = this.photoFile[0]
-        await this.saveAccountDetails(this.newData);
-        this.setDefault();
-        this.alertToggle({message: "Updated", isShow: true, type: "success"});
-      }catch (err) {
+        await this.saveAccountDetails(this.newData)
+        this.setDefault()
+        this.alertToggle({ message: "Updated", isShow: true, type: "success" })
+      } catch (err) {
         console.log(err)
-        this.alertToggle({message: "Error on saving changes", isShow: true, type: "error"});
+        this.alertToggle({ message: "Error on saving changes", isShow: true, type: "error" })
       }
     }
   },
@@ -256,7 +260,7 @@ export default {
     ValidationErrors
   },
   mounted() {
-    this.domain = process.env.domain;
+    this.domain = process.env.domain
   },
   created() {
     this.getCountries()
@@ -267,16 +271,28 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+
+.wrapper {
+  padding: 25px;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: $box-shadow;
+  width: 900px;
+}
+
+
 .select_wrapper {
   position: relative;
   width: 191px;
 }
+
 .showPass {
   position: absolute;
   font-size: 18px;
   right: 5px;
   bottom: 4px;
 }
+
 .account {
   width: 100%;
   display: flex;
@@ -300,42 +316,17 @@ export default {
   }
 
   &__buttons {
-      display: flex;
-      justify-content: center;
-      margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
   }
 
   &__button {
-      margin: 0 20px;
+    margin: 0 20px;
   }
 }
 
-//.account {
-//    //position: relative;
-//    //width: 80%;
-//    //color: #67573e;
-//
-//
-//    width: 960px;
-//    padding: 20px;
-//    box-shadow: 0 2px 5px rgba(103,87,62,.3),0 2px 6px 2px rgba(103,87,62,.15);
-//    position: relative;
-//    &__main {
-//        //padding: 20px 40px;
-//        //display: flex;
-//        //flex-direction: column;
-//        //max-width: 100%;
-//    }
-//}
-
 .contact-details {
-  //position: relative;
-  //&__info {
-  //    display: flex;
-  //    flex-direction: column;
-  //    padding-top: 30px;
-  //    padding-right: 20px;
-  //}
   display: flex;
   color: #67573e;
 
@@ -416,32 +407,6 @@ export default {
       font-size: 14px;
     }
   }
-
-  //&__data {
-  //    padding-left: 20px;
-  //    margin-bottom: 40px;
-  //    width: 100%;
-  //    max-height: 250px;
-  //    display: flex;
-  //    justify-content: space-around;
-  //}
-  //&__data-item {
-  //    width: 270px;
-  //}
-  //&__name {
-  //    display: flex;
-  //    justify-content: space-between;
-  //    width: 100%;
-  //    box-sizing: border-box;
-  //}
-  //&__buttons {
-  //    display: flex;
-  //    justify-content: center;
-  //    margin-top: 50px;
-  //}
-  //&__button {
-  //    margin: 0 20px;
-  //}
 }
 
 .photo {
@@ -451,9 +416,7 @@ export default {
   border-radius: 50%;
   box-shadow: rgba(103, 87, 62, .3) 0px 2px 5px, rgba(103, 87, 62, .15) 0px 2px 6px 2px;
   overflow: hidden;
-  //display: flex;
-  //align-items: center;
-  //justify-content: center;
+
   &__image {
     height: 100%;
     object-fit: cover;
@@ -485,30 +448,5 @@ export default {
     width: 30px;
   }
 }
-
-//.title {
-//    box-sizing: border-box;
-//    padding: 0 20px;
-//    font-size: 20px;
-//    border-bottom: 2px solid rgba(153, 142, 126, 0.5);
-//    padding-bottom: 10px;
-//    display: flex;
-//    justify-content: space-between;
-//    align-items: center;
-//    &__icon {
-//        cursor: pointer;
-//    }
-//}
-//
-//.tip, .file-error {
-//    position: absolute;
-//    left: 100px;
-//    width: 200px;
-//    font-size: 14px;
-//}
-//
-//.file-error {
-//    color: $red;
-//}
 
 </style>

@@ -55,8 +55,8 @@ async function messageForClientSendQuote(project, tasksIds, allUnits, allSetting
 		declineHref += `&tasksIds=${ tasks }`
 	}
 
-	let acceptQuote = `<a href="${ acceptHref }" style="background: #4ba5a5;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I accept ${ total } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
-	let declineQuote = `<a href="${ declineHref }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I reject ${ total } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
+	let acceptQuote = `<a href="${ acceptHref }" style="background: #4ba5a5;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I accept ${ +(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
+	let declineQuote = `<a href="${ declineHref }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I reject ${ +(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
 
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
                 <header style="background-color:#efefef;text-align:center;" >

@@ -36,7 +36,7 @@
 
           .block__details-row.grey
             .block__details-key Amount:
-            .block__details-value {{ dataToDisplay.amount }}
+            .block__details-value {{ +(dataToDisplay.amount).toFixed(2) }}
               span(v-html="returnIconCurrencyByStringCode(dataToDisplay.projectCurrency)")
 
       .block__checks(v-if="this.query.prop === 'accept' && this.query.type === 'client' && !this.query.hasOwnProperty('tasksIds')")

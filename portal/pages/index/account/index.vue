@@ -1,32 +1,20 @@
 <template lang="pug">
-  //Accountinfo(:client="client" :user="user" :projects="projects" :quotes="quotes")
-  Accountinfo
+  .account
+    //Accountinfo(:client="client" :user="user" :projects="projects" :quotes="quotes")
+    Accountinfo
 </template>
 
 <script>
-  import Accountinfo from "../../../components/account/Accountinfo";
-  export default {
-    props: {
-      // client: {
-      //   type: Object
-      // },
-      // user: {
-      //   type: Object
-      // },
-      // projects : {
-      //   type: Array
-      // },
-      // quotes: {
-      //   type: Array
-      // }
-    },
-    components: {
-      Accountinfo
-    },
+import Accountinfo from "../../../components/account/Accountinfo"
+
+export default {
+  components: {
+    Accountinfo
   }
+}
 </script>
 
-<style >
+<style>
 
 </style>
 

@@ -47,7 +47,9 @@ async function reassignVendor({ projectId, stepId, progress, isStart, isPay, rea
 			if (_idx !== -1) steps[_idx].stepNumber = i + 1
 		}
 
-		await assignedDefaultTranslator(tasks[_taskIdx].memoqProjectId, newStep)
+		if(steps[_stepIdx].receivablesUnit.type === 'CAT Wordcount'){
+			await assignedDefaultTranslator(tasks[_taskIdx].memoqProjectId, newStep)
+		}
 
 		assignmentsEmitter.emit('client-decide-tasks', oldStep, reason, isPay, newStep, isStart)
 
