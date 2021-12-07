@@ -58,10 +58,10 @@
 </template>
 
 <script>
-import ListManagementButtons from "../../ListManagementButtons"
-import ListManagement from "../../ListManagement"
-import SelectSingle from "../../SelectSingle"
-import Button from "../../Button"
+import ListManagementButtons from "../../pages/components/forms/ListManagementButtons"
+import ListManagement from "../../pages/components/forms/ListManagement"
+import SelectSingle from "../pangea/SelectSingle"
+import Button from "../pangea/Button"
 import { mapGetters } from "vuex"
 
 export default {
@@ -149,7 +149,7 @@ export default {
       this.selectedTargetLang = []
     },
     async getClientServices() {
-      const { services } = (await this.$http.get(`/clientsapi/client-services/${ this.$route.params.id }`)).data
+      const { services } = (await this.$axios.get(`/clientsapi/client-services/${ this.$route.params.id }`)).data
       this.clientServices = services
     },
     closeModal() {
@@ -170,9 +170,13 @@ export default {
   },
   computed: {
     ...mapGetters({
-      services: "getAllServices",
-      industries: "getAllIndustries",
-      languages: "getAllLanguages",
+      languages: 'allLanguages',
+      industries: 'getAllIndustries',
+      services: 'getAllServices',
+      client: 'getClientInfo'
+      // services: "getAllServices",
+      // industries: "getIndustries",
+      // languages: "getAllLanguages",
     }),
     isTargetsDisabled() {
       return (!this.selectedService.hasOwnProperty('title') && this.selectedService.languageForm !== 'Duo' ) || (!(!!this.selectedSourceLang && this.selectedSourceLang.hasOwnProperty('lang')) && this.selectedService.languageForm === 'Duo')
@@ -202,13 +206,14 @@ export default {
   },
 
   async created() {
-    await this.getClientServices()
+    this.clientServices =  this.client.services
+    // await this.getClientServices()
   }
 }
 </script>
 
 <style scoped lang="scss">
-@import "../../../assets/scss/colors";
+@import "../../assets/scss/colors";
 .modal {
   &__row {
     display: flex;

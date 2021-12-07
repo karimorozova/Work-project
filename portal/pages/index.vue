@@ -21,7 +21,7 @@
     .content
       Header
       .content__body
-        nuxt-child( @thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
+        nuxt-child(@thankYou="thankYou" @thankProof='thankYou' @thankCopy="thankYou" @thankMark="thankYou" :thanksService="thanksService")
 
 </template>
 
@@ -53,7 +53,13 @@ export default {
           path: "/account",
           img: require("../assets/images/navbar/Profile.svg"),
           active: false
-        }
+        },
+        {
+          title: "Template",
+          path: "/service-templates",
+          img: require("../assets/images/navbar/Profile.svg"),
+          active: false
+        },
       ],
       openQuotes: true,
       openProjects: true,

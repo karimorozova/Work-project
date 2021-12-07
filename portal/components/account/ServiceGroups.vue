@@ -54,11 +54,11 @@
 </template>
 
 <script>
-import Add from "../../Add"
 import ModalGroups from "./ModalGroups"
-import ApproveModal from "../../ApproveModal"
-import IconButton from "../../IconButton"
-import ValidationErrors from "../../ValidationErrors"
+import ApproveModal from "../ApproveModal"
+import IconButton from "../pangea/IconButton"
+import ValidationErrors from "../ValidationErrors"
+import Add from "../pangea/Add"
 
 export default {
   name: "ServiceGroups",
@@ -70,12 +70,9 @@ export default {
     ValidationErrors,
   },
   props: {
-    services: {
-      type: Array
-    },
-    industries: {
-      type: Array
-    },
+    client: {
+      type: Object
+    }
   },
   data() {
     return {
@@ -101,7 +98,7 @@ export default {
       this.deleteId = null
     },
     async getClientServicesGroups() {
-      const servicesGroups = (await this.$http.get(`/clientsapi/client-group/${ this.$route.params.id }`)).data
+      const servicesGroups = (await this.$axios.get(`/portal/service-templates/${ this.client._id }`)).data
       this.clientServicesGroups = servicesGroups
     },
     editGroup(id) {
@@ -116,7 +113,7 @@ export default {
       this.deleteId = id
     },
     async deleteGroup() {
-      this.clientServicesGroups = (await this.$http.delete(`/clientsapi/client-group/${this.$route.params.id}/${this.deleteId}`)).data
+      this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/delete/${this.client._id}/${this.deleteId}`)).data
       this.deleteId = null
     },
     checkError(data) {
@@ -131,14 +128,14 @@ export default {
       this.checkError(data)
       if(this.errors.length) return
 
-      this.clientServicesGroups = (await this.$http.post(`/clientsapi/client-group/${ this.$route.params.id }`, data)).data
+      this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/${ this.client._id }`, data)).data
       this.closeAddingGroup()
     },
     async editClientServiceGroup (data) {
       this.checkError(data)
       if(this.errors.length) return
 
-      this.clientServicesGroups = (await this.$http.post(`/clientsapi/client-group/${ this.$route.params.id }/${ this.editedId }`, data)).data
+      this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/${ this.client._id }/${ this.editedId }`, data)).data
 
       this.closeEditingGroup()
 
@@ -151,7 +148,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../../assets/scss/colors";
+@import "../../assets/scss/colors";
 
 .service-group {
   position: relative;
@@ -159,20 +156,21 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    //box-shadow: $box-shadow;
+    box-shadow: $box-shadow;
     border-radius: 4px;
     background-color: white;
     z-index: 5;
-    padding: 25px;
-    transform: translate(-50%, -50%);
+    padding: 20px;
+    transform: translate(-50%, 0);
   }
 }
 
 .service-group {
   border: 1px solid #bfbfbf;
   padding: 20px;
-}
 
+
+}
 .group__cards {
   display: flex;
   gap: 20px;
@@ -183,7 +181,7 @@ export default {
   border: 1px solid #bfbfbf;
   border-radius: 4px;
   padding: 15px;
-  width: 274px;
+  width: 250px;
 }
 .buttons {
   position: absolute;

@@ -2,7 +2,7 @@ const router = require('express').Router()
 const fs = require('fs')
 const jwt = require("jsonwebtoken")
 const { checkClientContact } = require('../middleware')
-const { getClient, getClientForPortal, getClientServicesGroups } = require('../clients')
+const { getClient, getClientForPortal, getClientServicesGroups, deleteClientServiceGroups, createClientServicesGroup, editClientServicesGroup} = require('../clients')
 const { getService } = require('../services')
 
 const {
@@ -445,6 +445,58 @@ router.get('/service-templates/:clientId', checkClientContact, async (req, res) 
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on task status update")
+	}
+})
+
+router.get('/service-templates/:clientId', checkClientContact, async (req, res) => {
+	const { clientId } = req.params
+	try {
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on task status update")
+	}
+})
+
+router.post('/service-template/delete/:clientId/:id', checkClientContact, async (req, res) => {
+	const { id, clientId } = req.params
+	try {
+		await deleteClientServiceGroups(clientId, id)
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		console.log(servicesGroups)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/service-template/:clientId', checkClientContact, async (req, res) => {
+	const { clientId } = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await createClientServicesGroup({clientId, groupName, industry, service, source, target})
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/service-template/:clientId/:id', checkClientContact, async (req, res) => {
+	const { clientId, id} = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await editClientServicesGroup(clientId, id,{ groupName, industry, service, source, target})
+		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
 	}
 })
 
