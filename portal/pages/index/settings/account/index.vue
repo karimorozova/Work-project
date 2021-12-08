@@ -97,11 +97,11 @@
 </template>
 
 <script>
-import Button from "../../../components/pangea/Button"
-import ValidationErrors from "../../../components/pangea/ValidationErrors"
+import Button from "../../../../components/pangea/Button"
+import ValidationErrors from "../../../../components/pangea/ValidationErrors"
 import { mapActions, mapGetters } from "vuex"
-import SelectSingle from "../../../components/pangea/SelectSingle"
-import getBgColor from "../../../mixins/getBgColor"
+import SelectSingle from "../../../../components/pangea/SelectSingle"
+import getBgColor from "../../../../mixins/getBgColor"
 
 export default {
   mixins: [ getBgColor ],
@@ -284,7 +284,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors";
+@import "../../../../assets/scss/colors";
 
 label {
   margin-bottom: 2px;

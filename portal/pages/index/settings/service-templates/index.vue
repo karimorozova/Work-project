@@ -5,7 +5,7 @@
 
 <script>
 // import ModalGroups from "../../../components/account/ModalGroups"
-import ServiceGroups from "../../../components/account/ServiceGroups"
+import ServiceGroups from "../../../../components/account/ServiceGroups"
 import { mapActions, mapGetters } from "vuex"
 export default {
   components: {
@@ -33,7 +33,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../../assets/scss/colors";
+@import "../../../../assets/scss/colors";
 
 .services-template {
   width: 980px;

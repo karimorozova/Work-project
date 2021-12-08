@@ -4,12 +4,22 @@
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
       .navbar__menu
-        .item(v-for="(item, index) in navbarList" :key="index" @click="switchSection(index)" :class="{'active__item': item.active}")
-          .item__image
-            img(:src="item.img")
-          .item__title {{ item.title }}
-
-
+        //.item(v-for="(item, index) in navbarList" :key="index" @click="switchSection(index)" :class="{'active__item': item.active}")
+        .menu(v-for="(item, index) in navbarList" :key="index" )
+          router-link(v-if="!item.isGroup" class="item" tag="div" :to="item.path" )
+            .item__image
+              img(:src="item.img")
+            .item__title {{ item.title }}
+          .item__group(v-else )
+            .item__drop-down( @click="() => toggleDropDown(item)")
+              .item__icon(:class="{'open': item.active}")
+                i(class="fas fa-chevron-right")
+              .drop-down__title {{ item.title }}
+            template(v-if="item.active")
+              router-link(class="drop-down__item" tag="div" :to="subItem.path" v-for="subItem in item.children")
+                .item__image
+                  img(:src="subItem.img")
+                .item__title {{ subItem.title }}
       .navbar__name
         transition(name="fade")
           .navbar__name-spinner(v-if="!!currentRequests")
@@ -49,16 +59,24 @@ export default {
           active: false
         },
         {
-          title: "Profile",
-          path: "/account",
-          img: require("../assets/images/navbar/Profile.svg"),
-          active: false
-        },
-        {
-          title: "Template",
-          path: "/service-templates",
-          img: require("../assets/images/navbar/Profile.svg"),
-          active: false
+          title: "Settings",
+          path: "/settings",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Template",
+              path: "/settings/service-templates",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            },
+            {
+              title: "Profile",
+              path: "/settings/account",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            },
+          ]
         },
       ],
       openQuotes: true,
@@ -78,6 +96,9 @@ export default {
   methods: {
     mainPageRender() {
       this.toggleSideBar(true)
+    },
+    toggleDropDown(item) {
+      item.active = !item.active
     },
     toggleSideBar(isFirstRender) {
       for (let elem of this.navbarList) {
@@ -185,10 +206,9 @@ export default {
   opacity: 0;
 }
 
-.active__item {
+.nuxt-link-active {
   color: $red;
 }
-
 .item {
   display: flex;
   transition: .1s ease-in-out;
@@ -212,9 +232,46 @@ export default {
     margin-top: 1px;
   }
 
+  &__drop-down {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 10px 10px 30px;
+
+    &:hover {
+      background: $light-border;
+    }
+  }
+
+  &__icon {
+    transition: transform .2s ease;
+  }
+
+
+
   &:hover {
     background: $light-border;
   }
+
+}
+.drop-down {
+  &__title {
+    font-family: Myriad600;
+    margin-left: 23px;
+    font-size: 15px;
+    margin-top: 1px;
+  }
+
+  &__item {
+    display: flex;
+    transition: .1s ease-in-out;
+    cursor: pointer;
+    padding: 10px 10px 10px 55px;
+    align-items: center;
+  }
+}
+.open {
+  transform: rotate(90deg);
 }
 
 .wrapper {

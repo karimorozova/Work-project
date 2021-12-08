@@ -165,12 +165,6 @@ export default {
   }
 }
 
-.service-group {
-  border: 1px solid #bfbfbf;
-  padding: 20px;
-
-
-}
 .group__cards {
   display: flex;
   gap: 20px;
