@@ -7,12 +7,12 @@ module.exports = {
   ],
 
   env: {
-    domain: process.env.API_URL
+    domain: 'https://admin2.pangea.global'
   },
 
   axios: {
     // API url
-    baseURL: process.env.API_URL
+    baseURL: 'https://admin2.pangea.global'
   },
   head: {
     title: 'Pangea - Client portal',
