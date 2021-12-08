@@ -260,7 +260,7 @@ export default {
 .drop-down {
   &__title {
     font-family: Myriad600;
-    margin-left: 23px;
+    margin-left: 20px;
     font-size: 15px;
     margin-top: 1px;
   }

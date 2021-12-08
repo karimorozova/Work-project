@@ -248,7 +248,7 @@ router.get('/vendor-data-to-display', getProjectManageToken, async (req, res) =>
 			projectId,
 			industry,
 			deadline: currStep.deadline,
-			amount: (currStep.nativeFinance.Price.payables).toFixed(2),
+			amount: +(currStep.nativeFinance.Price.payables).toFixed(2),
 			services: currStep.step.title,
 			languages: currStep.sourceLanguage === currStep.targetLanguage ? currStep.targetLanguage : currStep.sourceLanguage + ' >> ' + currStep.targetLanguage,
 			projectCurrency: 'EUR'
@@ -271,7 +271,7 @@ router.get('/client-data-to-display', getProjectManageToken, async (req, res) =>
 			projectName,
 			projectId,
 			industry,
-			amount: finance.Price.receivables,
+			amount: +(finance.Price.receivables).toFixed(2),
 			services,
 			languages,
 			projectCurrency,

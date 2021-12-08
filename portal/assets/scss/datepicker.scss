@@ -65,12 +65,11 @@ $primary-color: rgb(209, 95, 69);
   }
 }
 
-.form__projectDeadline .xmx-datepicker {
+.form__projectDeadline .xmx-datepicker, xmx-input-wrapper {
   width: 220px;
 
   & .xmx-icon-calendar {
     right: 27px;
-    //display: none;
   }
 }
 
