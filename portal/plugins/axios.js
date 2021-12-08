@@ -30,9 +30,9 @@ export default function ({ store, $axios, route }) {
 
 	 $axios.interceptors.request.use(config => {
 		if(document) {
-			// const token = Vue.cookie.get("client");
+			const token = Vue.cookie.get("client");
 			// config.headers.common['token-header'] = token;
-			const token = cookie.get('client')  
+			// const token = cookie.get('client')  
 			config.headers.common['token-header'] = token
 		  }
 		return config
