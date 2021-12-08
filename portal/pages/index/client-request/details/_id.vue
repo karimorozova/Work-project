@@ -77,8 +77,10 @@
 			// MainInfo,
 			// OtherInfo
 		},
-		created() {
-			this.currentClientRequest()
+    mounted() {
+      this.currentClientRequest()
+    },
+    created() {
 		}
 	}
 </script>
