@@ -205,7 +205,7 @@ export default {
 
   },
 
-  async created() {
+   created() {
     this.clientServices =  this.client.services
     // await this.getClientServices()
   }

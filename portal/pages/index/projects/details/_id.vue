@@ -283,11 +283,11 @@ export default {
     // }
   },
   components: { DeliveryTable, CircleProgress, ProgressLineStep, GeneralTable },
-  async created() {
-    this.domain = process.env.domain
-    await this.getClient()
-    await this.getCurrentProject()
-  }
+  // async created() {
+  //   this.domain = process.env.domain
+  //   await this.getClient()
+  //   await this.getCurrentProject()
+  // }
 }
 </script>
 

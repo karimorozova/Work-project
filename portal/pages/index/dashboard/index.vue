@@ -98,9 +98,6 @@ export default {
   mounted() {
     this.getDashboardProject()
   },
-  async created() {
-
-  },
   components: {
     Button,
     AllOpenRequests,

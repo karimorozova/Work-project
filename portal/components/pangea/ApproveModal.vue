@@ -54,7 +54,7 @@
 		beforeDestroy() {
 			document.removeEventListener('keydown', this.onKeyDown)
 		},
-		async created() {
+		 created() {
 			document.addEventListener('keydown', this.onKeyDown)
 		}
 	}
