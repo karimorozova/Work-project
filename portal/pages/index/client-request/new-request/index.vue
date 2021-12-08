@@ -3,12 +3,9 @@
     FormTemplate(
       v-if="isShowTemplateStep && clientInfo.hasOwnProperty('_id')"
       :clientId="clientInfo._id"
-
       @selectedTemplate="setTemplateData"
-
     )
     .test(v-if="!isShowTemplateStep")
-      .title(v-if="!isSent") Request Form
       .component__body(v-if="!isSent")
         .component__form
           Validation-errors(v-if="showError"
@@ -819,13 +816,13 @@
     }
 
     &__title {
-      font-size: 14px;
+      font-size: 16px;
       padding-top: 30px;
       padding-bottom: 8px;
       font-family: 'Myriad600';
 
       &--order {
-        font-size: 14px;
+        font-size: 16px;
         padding-top: 20px;
         padding-bottom: 15px;
         font-family: 'Myriad600';
@@ -887,7 +884,7 @@
       border-radius: 4px;
       box-shadow: $box-shadow;
       padding: 0 25px 25px 25px;
-      width: 800px;
+      width: 790px;
       background-color: white;
       position: relative;
     }

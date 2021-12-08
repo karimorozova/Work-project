@@ -50,8 +50,11 @@ export default {
     ...mapActions([
       "logout"
     ]),
-    dataForRequest() {
-      this.$router.push(`/client-request/new-request`)
+    async dataForRequest() {
+      if(this.$route.path === '/client-request/new-request'){
+        location.reload()
+      }
+      await this.$router.push(`/client-request/new-request`)
     },
     signOut() {
       this.logout()

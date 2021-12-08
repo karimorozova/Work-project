@@ -355,7 +355,7 @@
       border-radius: 4px;
       box-shadow: $box-shadow;
       padding: 0 20px 20px 20px;
-      width: 800px;
+      width: 790px;
       background-color: white;
       position: relative;
     }

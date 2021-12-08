@@ -6,10 +6,6 @@ $primary-color: rgb(209, 95, 69);
 @import '~vue2-datepicker/scss/index.scss';
 @import "colors";
 
-.xmx-datepicker-range {
-  width: 457px;
-}
-
 // --- portal ---
 
 .xmx-input {
@@ -52,8 +48,10 @@ $primary-color: rgb(209, 95, 69);
   margin-top: 5px;
 }
 
-.project__date .xmx-datepicker,
-.project-cd__input .xmx-datepicker {
+.project__date,
+.xmx-datepicker,
+.project-cd__input,
+.xmx-datepicker {
   width: 220px;
 }
 
@@ -99,4 +97,8 @@ $primary-color: rgb(209, 95, 69);
 
 .not-current-month {
   color: #333;
+}
+
+.xmx-datepicker-range {
+  width: 457px;
 }

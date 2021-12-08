@@ -70,8 +70,6 @@ export default {
         this.projects = (await this.$axios.get(`/portal/open-projects?token=${ this.token }`)).data
         this.clientRequests = (await this.$axios.get(`/portal/open-requests?token=${ this.token }`)).data
         this.openQuotes = (await this.$axios.get(`/portal/open-quotes?token=${ this.token }`)).data
-
-        console.log( this.projects, this.clientRequests, this.openQuotes)
       } catch (err) {
         this.alertToggle({ message: 'Internal Error', isShow: true, type: "error" })
       }

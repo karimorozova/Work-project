@@ -25,7 +25,6 @@
         this.$emit('loginVisible', {forgotLink: true});
       },
       sendForm() {
-        console.log('data:',this.notice);
       },
     },
     computed: {

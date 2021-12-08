@@ -68,7 +68,7 @@ export default {
     ModalGroups,
     ApproveModal,
     IconButton,
-    ValidationErrors,
+    ValidationErrors
   },
   props: {
     client: {
@@ -82,7 +82,7 @@ export default {
       deleteId: null,
       clientServicesGroups: [],
       currentService: {},
-      errors: [],
+      errors: []
     }
   },
   methods: {
@@ -118,30 +118,30 @@ export default {
       this.deleteId = id
     },
     async deleteGroup() {
-      this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/delete/${this.client._id}/${this.deleteId}`)).data
+      this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/delete/${ this.client._id }/${ this.deleteId }`)).data
       await this.getClient()
       this.deleteId = null
     },
     checkError(data) {
       this.errors = []
-      if(data.groupName.trim().length <=0) this.errors.push('Please write Template name')
-      if(!data.service) this.errors.push('Please select Services')
-      if(!data.industry) this.errors.push('Please select Industry')
-      if(!data.source && data.languageForm === 'Duo') this.errors.push('Please select Source Language')
-      if(data.target.length <= 0) this.errors.push('Please select Target Languages')
+      if (data.groupName.trim().length <= 0) this.errors.push('Please write Template name')
+      if (!data.service) this.errors.push('Please select Services')
+      if (!data.industry) this.errors.push('Please select Industry')
+      if (!data.source && data.languageForm === 'Duo') this.errors.push('Please select Source Language')
+      if (data.target.length <= 0) this.errors.push('Please select Target Languages')
     },
-    async createClientServiceGroup (data) {
+    async createClientServiceGroup(data) {
       this.checkError(data)
-      if(this.errors.length) return
+      if (this.errors.length) return
 
 
       this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/${ this.client._id }`, data)).data
       await this.getClient()
       this.closeAddingGroup()
     },
-    async editClientServiceGroup (data) {
+    async editClientServiceGroup(data) {
       this.checkError(data)
-      if(this.errors.length) return
+      if (this.errors.length) return
 
       this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/${ this.client._id }/${ this.editedId }`, data)).data
       await this.getClient()
@@ -160,6 +160,7 @@ export default {
 
 .service-group {
   position: relative;
+
   .modal {
     position: absolute;
     top: 50%;
@@ -168,7 +169,9 @@ export default {
     border-radius: 4px;
     background-color: white;
     z-index: 5;
-    padding: 20px;
+    padding: 25px;
+    width: 546px;
+    box-sizing: border-box;
     transform: translate(-50%, 0);
   }
 }
@@ -178,6 +181,7 @@ export default {
   gap: 20px;
   flex-wrap: wrap;
 }
+
 .group__card {
   position: relative;
   border: 1px solid #bfbfbf;
@@ -185,6 +189,7 @@ export default {
   padding: 15px;
   width: 250px;
 }
+
 .buttons {
   position: absolute;
   display: flex;
@@ -193,6 +198,7 @@ export default {
   top: 10px;
 
 }
+
 .card {
   &__header {
     font-family: Myriad600;
@@ -205,6 +211,7 @@ export default {
       margin-right: 55px;
     }
   }
+
   &__lang-pair {
     display: flex;
     align-items: center;

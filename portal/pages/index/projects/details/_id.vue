@@ -218,7 +218,6 @@ export default {
       try {
         const res = await this.$axios.get('/portal/project/' + id + '?customer=' + this.client._id)
         this.currentProject = res.data
-        console.log(res.data)
       } catch (err) {
       }
     },
