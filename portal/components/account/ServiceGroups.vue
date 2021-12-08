@@ -5,7 +5,7 @@
       ModalGroups.modal(
         v-else-if="currentService.hasOwnProperty('groupName')"
 
-        buttonText="Edit Group"
+        buttonText="Edit Template"
         :editGroupName="currentService.groupName"
         :editSelectedService="currentService.service"
         :editSelectedIndustry="currentService.industry"
