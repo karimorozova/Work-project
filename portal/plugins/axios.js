@@ -36,7 +36,7 @@ export default function ({ store, $axios, route }) {
 			// const token = Vue.cookie.get("client");
 			// config.headers.common['token-header'] = token;
 		//   }
-		// config.headers.common['token-header'] = store.getters.getToken
+		config.headers.common['token-header'] = token
 		return config
 	}, error => {
 		return Promise.reject(error)
