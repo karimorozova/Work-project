@@ -175,10 +175,9 @@ export default {
     this.domain = process.env.domain
     this.breadCrumb1 = this.$route.path.split('/')[1]
     this.breadCrumb2 = this.$route.path.split('/')[2]
-
+    this.setToken()
   },
   async created() {
-    await this.setToken()
     await this.getClient()
     await this.getUser()
     await this.getServices()
