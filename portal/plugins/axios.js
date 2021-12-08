@@ -2,7 +2,7 @@ import state from '../store/state'
 import Vue from 'vue'
 import cookie from "./vue-cookie"
 
-export default function ({ store, $axios, route }) {
+export default async function ({ store, $axios, route }) {
 	$axios.onRequest(config => {
 		store.dispatch('addRequest')
 		if (config && config.progress === false) {
@@ -29,11 +29,14 @@ export default function ({ store, $axios, route }) {
 
 
 	$axios.interceptors.request.use(config => {
+
+		const token = await this.$cookies.get('client')  
+		console.log('CLI', token)
 		// if(document) {
-		// 	const token = Vue.cookie.get("client");
-		// 	config.headers.common['token-header'] = token;
+			// const token = Vue.cookie.get("client");
+			// config.headers.common['token-header'] = token;
 		//   }
-		config.headers.common['token-header'] = store.getters.getToken
+		// config.headers.common['token-header'] = store.getters.getToken
 		return config
 	}, error => {
 		return Promise.reject(error)
