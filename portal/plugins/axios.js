@@ -29,8 +29,7 @@ export default function ({ store, $axios, route }) {
 
 
 	$axios.interceptors.request.use(config => {
-		console.log(config)
-		config.baseURL = config.baseURL || 'https://admin2.pangea.global'
+		console.log('1qw', store.getters.getToken)
 		config.headers.common['token-header'] = store.getters.getToken
 		return config
 	}, error => {
