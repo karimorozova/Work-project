@@ -234,6 +234,7 @@ export default {
 .buttons {
   display: flex;
   gap: 20px;
+  justify-content: center;
 }
 input {
   font-size: 14px;

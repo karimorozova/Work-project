@@ -59,6 +59,7 @@ import ApproveModal from "../ApproveModal"
 import IconButton from "../pangea/IconButton"
 import ValidationErrors from "../ValidationErrors"
 import Add from "../pangea/Add"
+import { mapActions } from "vuex"
 
 export default {
   name: "ServiceGroups",
@@ -85,6 +86,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      getClient: 'getClient'
+    }),
     closeErrors() {
       this.errors = []
     },
@@ -99,6 +103,7 @@ export default {
     },
     async getClientServicesGroups() {
       const servicesGroups = (await this.$axios.get(`/portal/service-templates/${ this.client._id }`)).data
+      await this.getClient()
       this.clientServicesGroups = servicesGroups
     },
     editGroup(id) {
@@ -114,6 +119,7 @@ export default {
     },
     async deleteGroup() {
       this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/delete/${this.client._id}/${this.deleteId}`)).data
+      await this.getClient()
       this.deleteId = null
     },
     checkError(data) {
@@ -128,7 +134,9 @@ export default {
       this.checkError(data)
       if(this.errors.length) return
 
+
       this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/${ this.client._id }`, data)).data
+      await this.getClient()
       this.closeAddingGroup()
     },
     async editClientServiceGroup (data) {
@@ -136,7 +144,7 @@ export default {
       if(this.errors.length) return
 
       this.clientServicesGroups = (await this.$axios.post(`/portal/service-template/${ this.client._id }/${ this.editedId }`, data)).data
-
+      await this.getClient()
       this.closeEditingGroup()
 
     }
