@@ -30,9 +30,8 @@
 
         template(slot="projectId", slot-scope="{ row, index }")
           .table__data
-            router-link(class="link-to" :to="{path: `/dashboard/details/${row._id}`}")
+            router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
               span {{ row.projectId }}
-
 
         template(slot="projectName", slot-scope="{ row, index }")
           .table__data
@@ -52,8 +51,6 @@
 
         template(slot="deadline", slot-scope="{ row, index }")
           .table__data {{ customFormatter(row.deadline) }}
-
-
 
 
         template(slot="totalCost", slot-scope="{ row, index }")

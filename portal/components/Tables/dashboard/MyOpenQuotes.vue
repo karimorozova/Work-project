@@ -30,7 +30,7 @@
 
         template(slot="projectId", slot-scope="{ row, index }")
           .table__data
-            router-link(class="link-to" :to="{path: `/dashboard/details/${row._id}`}")
+            router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
               span {{ row.projectId }}
 
 

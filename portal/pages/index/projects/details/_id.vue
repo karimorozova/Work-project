@@ -69,7 +69,7 @@
                 span {{ +(row.price).toFixed(2) }}
               .table__data(v-else) -
 
-        .details__deliverables(v-if="currentProject.tasksDeliverables")
+        .details__deliverables(v-if="currentProject.tasksDeliverables.length")
           DeliveryTable(
             :project="currentProject"
           )
