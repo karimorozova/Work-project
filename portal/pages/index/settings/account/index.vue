@@ -275,9 +275,11 @@ export default {
   },
   mounted() {
     this.domain = process.env.domain
+  },
+  created() {
     this.getCountries()
     this.getTimezones()
-  },
+  }
 }
 </script>
 
