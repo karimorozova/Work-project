@@ -27,7 +27,6 @@
         .navbar__name-title CLIENT PORTAL
 
 
-
     .content
       Header
       .content__body
@@ -65,9 +64,9 @@ export default {
           isGroup: true,
           children: [
             {
-              title: "Template",
+              title: "Templates",
               path: "/settings/service-templates",
-              img: require("../assets/images/navbar/Profile.svg"),
+              img: require("../assets/images/navbar/Templates.svg"),
               active: false
             },
             {
@@ -75,9 +74,9 @@ export default {
               path: "/settings/account",
               img: require("../assets/images/navbar/Profile.svg"),
               active: false
-            },
+            }
           ]
-        },
+        }
       ],
       openQuotes: true,
       openProjects: true,
@@ -195,6 +194,9 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/scss/colors";
 
+.fa-chevron-right {
+  font-size: 17px;
+}
 
 .fade-enter-active,
 .fade-leave-active {
@@ -209,6 +211,7 @@ export default {
 .nuxt-link-active {
   color: $red;
 }
+
 .item {
   display: flex;
   transition: .1s ease-in-out;
@@ -248,12 +251,12 @@ export default {
   }
 
 
-
   &:hover {
     background: $light-border;
   }
 
 }
+
 .drop-down {
   &__title {
     font-family: Myriad600;
@@ -270,6 +273,7 @@ export default {
     align-items: center;
   }
 }
+
 .open {
   transform: rotate(90deg);
 }
