@@ -512,7 +512,7 @@ module.exports = {
 			description: ''
 		}
 	],
-	"Copywriting": [
+	"Subtitling": [
 		{
 			id: '1',
 			title: 'Source',
