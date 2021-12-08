@@ -70,7 +70,6 @@ export default {
         this.projects = (await this.$axios.get(`/portal/open-projects?token=${ this.token }`)).data
         this.clientRequests = (await this.$axios.get(`/portal/open-requests?token=${ this.token }`)).data
         this.openQuotes = (await this.$axios.get(`/portal/open-quotes?token=${ this.token }`)).data
-        console.log(this.projects, this.clientRequests, this.openQuotes)
       } catch (err) {
         this.alertToggle({ message: 'Internal Error', isShow: true, type: "error" })
       }
@@ -95,11 +94,8 @@ export default {
       return this.clientRequests.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     }
   },
-  mounted() {
-    this.getDashboardProject()
-  },
   async created() {
-
+    await this.getDashboardProject()
   },
   components: {
     Button,

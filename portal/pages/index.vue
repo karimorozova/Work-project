@@ -171,19 +171,16 @@ export default {
     }
   },
   mounted() {
-    console.log('mounted',this.$cookie)
-
-    this.setToken()
     this.mainPageRender()
     this.domain = process.env.domain
     this.breadCrumb1 = this.$route.path.split('/')[1]
     this.breadCrumb2 = this.$route.path.split('/')[2]
+    this.setToken()
     this.getClient()
     this.getUser()
     this.getServices()
   },
   async created() {
-    console.log('created',this.$cookie)
   },
   computed: {
     ...mapGetters({
