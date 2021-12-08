@@ -149,9 +149,12 @@ export default {
 
     }
   },
-  created() {
+  mounted() {
     this.getClientServicesGroups()
-  }
+  },
+  // created() {
+    
+  // }
 }
 </script>
 
