@@ -519,23 +519,23 @@ export default {
           : [ null, null ]
     }
   },
-  // async created() {
-  //   if (Object.keys(this.$route.query).length) this.isFilterShow = true
-  //   this.domain = process.env.domain
-  //   await this.getIndustries()
-  //   await this.getLanguages()
-  //   this.defaultSetter()
-  //   this.querySetter(this, this.$route)
-  //   await this.getAllProjects()
-  // },
-  // watch: {
-  //   $route(to, from) {
-  //     if (to.path === from.path) {
-  //       this.querySetter(this, to)
-  //       this.getAllProjects()
-  //     }
-  //   }
-  // },
+  async created() {
+    if (Object.keys(this.$route.query).length) this.isFilterShow = true
+    this.domain = process.env.domain
+    await this.getIndustries()
+    await this.getLanguages()
+    this.defaultSetter()
+    this.querySetter(this, this.$route)
+    await this.getAllProjects()
+  },
+  watch: {
+    $route(to, from) {
+      if (to.path === from.path) {
+        this.querySetter(this, to)
+        this.getAllProjects()
+      }
+    }
+  },
   components: {
     DatePicker,
     LabelValue,

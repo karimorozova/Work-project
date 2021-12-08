@@ -171,7 +171,7 @@ export default {
     }
   },
   mounted() {
-    console.log('mounted',this.$cookie.get("client"))
+    console.log('mounted',this.$cookie)
 
     this.setToken()
     this.mainPageRender()
@@ -183,7 +183,7 @@ export default {
     this.getServices()
   },
   async created() {
-    console.log('created',this.$cookie.get("client"))
+    console.log('created',this.$cookie)
   },
   computed: {
     ...mapGetters({

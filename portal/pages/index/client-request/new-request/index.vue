@@ -579,6 +579,9 @@
 			// 	return this.complianceTemplates.map(i => i.title)
 			// }
 		},
+    created() {
+      // this.getLanguages()
+    },
     components: {
 			GeneralTable,
 			ValidationErrors,

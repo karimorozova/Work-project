@@ -80,6 +80,8 @@
     mounted() {
       this.currentClientRequest()
     },
+    created() {
+		}
 	}
 </script>
 

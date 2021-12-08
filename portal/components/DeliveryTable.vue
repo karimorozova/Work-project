@@ -109,8 +109,8 @@ export default {
 
     }
   },
-  mounted() {
-    this.getLanguages()
+  async created() {
+    await this.getLanguages()
   },
   components: {
     GeneralTable,
