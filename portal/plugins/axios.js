@@ -2,7 +2,7 @@ import state from '../store/state'
 import Vue from 'vue'
 import cookie from "./vue-cookie"
 
-export default async function ({ store, $axios, route }) {
+export default function ({ store, $axios, route }) {
 	$axios.onRequest(config => {
 		store.dispatch('addRequest')
 		if (config && config.progress === false) {
@@ -28,9 +28,9 @@ export default async function ({ store, $axios, route }) {
 	})
 
 
-	$axios.interceptors.request.use(config => {
+	 $axios.interceptors.request.use(config => {
 
-		const token = await this.$cookies.get('client')  
+		const token = this.$cookies.get('client')  
 		console.log('CLI', token)
 		// if(document) {
 			// const token = Vue.cookie.get("client");
