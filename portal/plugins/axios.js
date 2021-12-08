@@ -29,14 +29,12 @@ export default function ({ store, $axios, route }) {
 
 
 	 $axios.interceptors.request.use(config => {
-
-		const token = cookie.get('client')  
-		console.log('CLI', token)
-		// if(document) {
+		if(document) {
 			// const token = Vue.cookie.get("client");
 			// config.headers.common['token-header'] = token;
-		//   }
-		config.headers.common['token-header'] = token
+			const token = cookie.get('client')  
+			config.headers.common['token-header'] = token
+		  }
 		return config
 	}, error => {
 		return Promise.reject(error)
