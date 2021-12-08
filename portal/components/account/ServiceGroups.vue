@@ -149,8 +149,8 @@ export default {
 
     }
   },
-  async created() {
-    await this.getClientServicesGroups()
+  created() {
+    this.getClientServicesGroups()
   }
 }
 </script>
