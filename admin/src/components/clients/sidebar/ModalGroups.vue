@@ -75,7 +75,7 @@ export default {
   props: {
     buttonText: {
       type: String,
-      default: 'Create Group',
+      default: 'Create Template',
     },
     editGroupName: {
       type: String,

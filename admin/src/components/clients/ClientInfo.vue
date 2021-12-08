@@ -169,7 +169,7 @@
                 @updateRateCombinationFromSettings="setNewStepCombination"
               )
               ServiceGroups(
-                v-if="selectedServiceTab === 'Group'"
+                v-if="selectedServiceTab === 'Templates'"
                 :services="services"
                 :industries="industries"
                 :languages="languages"
@@ -295,7 +295,7 @@
 					cancel: { icon: require("../../assets/images/cancel-icon.png") }
 				},
 				tabs: [ 'Basic Price', 'Steps / Units', 'Industries', 'Discount & Surcharge / Discount Chart', 'Overall Prices' ],
-        serviceTabs: [ 'All', 'Group' ],
+        serviceTabs: [ 'All', 'Templates' ],
         selectedServiceTab: 'All',
 				selectedTab: 'Basic Price',
 				clientTask: {},
