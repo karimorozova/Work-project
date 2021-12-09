@@ -1,6 +1,6 @@
 <template lang="pug">
   .wrapper(v-if="isLoad")
-    .navbar
+    .navbar {{ currentRequests }}
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
       .navbar__menu
@@ -128,10 +128,6 @@ export default {
     },
     ...mapActions({
       logout: "logout",
-
-      // requestInfo: "requestInfo",
-      // loadLangs: "loadLangs",
-
       getClient: "getClient",
       getUser: "getUser",
       getServices: "getServices"
@@ -149,7 +145,6 @@ export default {
     }
   },
   async mounted() {
-    console.log('START')
     this.mainPageRender()
     this.domain = process.env.domain
     this.breadCrumb1 = this.$route.path.split('/')[1]

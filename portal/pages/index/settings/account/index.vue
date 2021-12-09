@@ -30,18 +30,18 @@
         .Rside__row
           .Rside__col
             label First Name:
-            input(type="text" :value="getActualField('firstName')" placeholder="Value" @change="(e) => setValue(e.target.value, 'firstName')")
+            input(type="text" autocomplete="off" :value="getActualField('firstName')" placeholder="Value" @change="(e) => setValue(e.target.value, 'firstName')")
           .Rside__col
             label Last Name:
-            input(type="text" :value="getActualField('surname')" placeholder="Value" @change="(e) => setValue(e.target.value, 'surname')")
+            input(type="text" autocomplete="off" :value="getActualField('surname')" placeholder="Value" @change="(e) => setValue(e.target.value, 'surname')")
 
         .Rside__row
           .Rside__col
             label Email:
-            input(type="text" :value="getActualField('email')" disabled="true" readonly="true" placeholder="Value" @change="(e) => setValue(e.target.value, 'email')")
+            input(type="text" autocomplete="off" :value="getActualField('email')" disabled="true" readonly="true" placeholder="Value" @change="(e) => setValue(e.target.value, 'email')")
           .Rside__col
             label Phone:
-            input(type="text" :value="getActualField('phone')" placeholder="Your Phone" @change="(e) => setValue(e.target.value, 'phone')")
+            input(type="text" autocomplete="off" :value="getActualField('phone')" placeholder="Your Phone" @change="(e) => setValue(e.target.value, 'phone')")
 
         .Rside__row
           .Rside__col
@@ -79,13 +79,13 @@
         .Rside__row
           .Rside__col
             label Password:
-            input(:type="passType1" placeholder="New Password"  v-model="newData.password" )
+            input(:type="passType1" autocomplete="off" placeholder="New Password"  v-model="newData.password" )
             span.showPass(v-if="newData.hasOwnProperty('password') && newData.password.length" @mousemove="passType1 = 'text'" @mouseleave="passType1 = 'password'")
               i.far.fa-eye
 
           .Rside__col
             label Retype password:
-            input(:type="confirmPassType2" placeholder="Confirm New Password" v-model="confirmPassword")
+            input(:type="confirmPassType2" autocomplete="off" placeholder="Confirm New Password" v-model="confirmPassword")
             span.showPass(v-if="confirmPassword.length" @mousemove="confirmPassType2 = 'text'" @mouseleave="confirmPassType2 = 'password'")
               i.far.fa-eye
 
@@ -276,9 +276,9 @@ export default {
   mounted() {
     this.domain = process.env.domain
   },
-  created() {
-    this.getCountries()
-    this.getTimezones()
+  async created() {
+    await this.getCountries()
+    await this.getTimezones()
   }
 }
 </script>

@@ -24,10 +24,10 @@ export default {
       client: 'getClientInfo'
     })
   },
-  created() {
-    this.getIndustry()
-    this.getService()
-    this.getLang()
+  async created() {
+    await this.getIndustry()
+    await this.getService()
+    await this.getLang()
   }
 }
 </script>

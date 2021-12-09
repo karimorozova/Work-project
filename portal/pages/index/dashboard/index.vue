@@ -54,10 +54,6 @@ export default {
       document.cookie = `client=${ token }; path=/; expires=Thu, ${ today } 22:00:00 UTC; domain=.pangea.global`
       window.location.replace(redirectTo)
     },
-    getDetails({ index }, prop) {
-      const id = this[prop][index]._id
-      this.$router.push(`/dashboard/details/${ id }`)
-    },
     async makeQuoteAction({ _id, status }) {
       const quote = this.openQuotes.find((quote) => quote._id === _id)
       try {
@@ -70,6 +66,8 @@ export default {
         this.projects = (await this.$axios.get(`/portal/open-projects?token=${ this.token }`)).data
         this.clientRequests = (await this.$axios.get(`/portal/open-requests?token=${ this.token }`)).data
         this.openQuotes = (await this.$axios.get(`/portal/open-quotes?token=${ this.token }`)).data
+
+        console.log('PRJ', this.projects, this.clientRequests, this.openQuotes)
       } catch (err) {
         this.alertToggle({ message: 'Internal Error', isShow: true, type: "error" })
       }
@@ -94,9 +92,8 @@ export default {
       return this.clientRequests.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     }
   },
-  created() {
-    console.log('asd')
-    this.getDashboardProject()
+  async created() {
+    await this.getDashboardProject()
   },
   components: {
     Button,
