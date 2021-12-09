@@ -81,6 +81,7 @@ import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 import ApproveModal from "../../ApproveModal"
 import getBgColor from "../../../mixins/getBgColor"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import { mapGetters } from "vuex"
 
 export default {
   mixins: [ tableSortAndFilter, getBgColor, currencyIconDetected ],
@@ -158,6 +159,9 @@ export default {
     this.domain = process.env.domain
   },
   computed: {
+    ...mapGetters({
+      user: "getUserInfo",
+    }),
     rawData() {
       return this.myQuotes
     }

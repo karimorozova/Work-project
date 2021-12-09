@@ -9,7 +9,7 @@ const {
 	getProject,
 	getProjects,
 	getProjectsForPortalAll,
-	updateProjectStatusForClientPortalProject,
+	// updateProjectStatusForClientPortalProject,
 	getProjectsForPortalList,
 	getProjectForClientPortal
 } = require("../projects/")
@@ -368,16 +368,16 @@ router.get('/clientinfo', checkClientContact, async (req, res) => {
 //     }
 // });
 
-router.post('/approve-reject', checkClientContact, async (req, res) => {
-	const { quote, key } = req.body
-	try {
-		const updatedQuote = await updateProjectStatusForClientPortalProject(quote._id, key)
-		res.send(updatedQuote)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving')
-	}
-})
+// router.post('/approve-reject', checkClientContact, async (req, res) => {
+// 	const { quote, key } = req.body
+// 	try {
+// 		const updatedQuote = await updateProjectStatusForClientPortalProject(quote._id, key)
+// 		res.send(updatedQuote)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on approving')
+// 	}
+// })
 
 router.get('/reject', checkClientContact, async (req, res) => {
 	const id = req.query.quoteId

@@ -116,7 +116,7 @@
 
       .deliverables__header
         .deliverables__title Deliverables
-        .deliverablesActions(v-if="!isProjectFinished")
+        .deliverablesActions
           .deliverablesActions__drop-menu
             SelectSingle(
               :selectedOption="selectedAction"

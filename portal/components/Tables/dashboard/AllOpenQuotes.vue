@@ -66,11 +66,12 @@
 
 
         template(slot="icons", slot-scope="{ row, index }")
-          //.table__icons
-            .icon.accept(@click="() => quotesAction(row._id, 'approve')")
-              i(class="fas fa-check icon-elem ")
-            .icon.reject(@click="() => quotesAction(row._id, 'reject')")
-              i(class="fas fa-times icon-elem ")
+          .table__icons
+
+            //.icon.accept(@click="() => quotesAction(row._id, 'approve')")
+            //  i(class="fas fa-check icon-elem ")
+            //.icon.reject(@click="() => quotesAction(row._id, 'reject')")
+            //  i(class="fas fa-times icon-elem ")
 
 </template>
 
@@ -81,6 +82,7 @@ import tableSortAndFilter from "../../../mixins/tableSortAndFilter"
 import ApproveModal from "../../ApproveModal"
 import getBgColor from "../../../mixins/getBgColor"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import { mapGetters } from "vuex"
 
 export default {
   mixins: [ tableSortAndFilter, getBgColor, currencyIconDetected ],
@@ -159,6 +161,9 @@ export default {
     this.domain = process.env.domain
   },
   computed: {
+    ...mapGetters({
+      user: "getUserInfo",
+    }),
     rawData() {
       return this.allQuotes
     }

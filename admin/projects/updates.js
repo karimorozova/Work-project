@@ -283,25 +283,25 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 }
 
 async function updateProjectStatusForClientPortalProject(projectId, action) {
-	const project = await getProject({ "_id": projectId })
-
-	if (action === 'approve') {
-		project.status = 'Approved'
-		project.tasks = changeTasksStatus(project.tasks, 'Approved')
-	} else {
-		project.status = 'Rejected'
-		project.tasks = changeTasksStatus(project.tasks, 'Rejected')
-	}
-
-	function changeTasksStatus(tasks, statusTask) {
-		return tasks.map(task => {
-			task.status = statusTask
-			return task
-		})
-	}
-
-	return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, isClientOfferClicked: true }
-	)
+	// const project = await getProject({ "_id": projectId })
+	//
+	// if (action === 'approve') {
+	// 	project.status = 'Approved'
+	// 	project.tasks = changeTasksStatus(project.tasks, 'Approved')
+	// } else {
+	// 	project.status = 'Rejected'
+	// 	project.tasks = changeTasksStatus(project.tasks, 'Rejected')
+	// }
+	//
+	// function changeTasksStatus(tasks, statusTask) {
+	// 	return tasks.map(task => {
+	// 		task.status = statusTask
+	// 		return task
+	// 	})
+	// }
+	//
+	// return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, isClientOfferClicked: true }
+	// )
 }
 
 async function updateProjectStatus(id, status, reason) {

@@ -37,6 +37,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import Header from "../components/pangea/Header"
+import cookie from "../plugins/vue-cookie"
 
 export default {
   components: { Header },
@@ -152,11 +153,7 @@ export default {
 
     this.isLoad = await new Promise(async (res) => {
       if (document) {
-        let [ cookieValue ] = document.cookie.split(';').filter(i => i.includes('client'))
-        if (cookieValue) {
-          let [ , token ] = cookieValue.split('=')
-          this.$store.commit("SET_TOKEN", token)
-        }
+        this.$store.commit("SET_TOKEN", this.$cookie.get('client'))
         res(true)
       }
     })
