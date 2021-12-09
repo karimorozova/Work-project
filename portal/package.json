@@ -1,8 +1,8 @@
 {
   "name": "translate-poject-nuxt",
   "version": "1.0.0",
-  "description": "pangea-client",
-  "author": "wellyes.ru",
+  "description": "Client portal",
+  "author": "pangea",
   "private": true,
   "config": {
     "nuxt": {

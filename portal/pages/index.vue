@@ -1,5 +1,5 @@
 <template lang="pug">
-  .wrapper
+  .wrapper(v-show="isLoad")
     .navbar
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
@@ -16,7 +16,7 @@
                 i(class="fas fa-chevron-right")
               .drop-down__title {{ item.title }}
             template(v-if="item.active")
-              router-link(class="drop-down__item" tag="div" :to="subItem.path" v-for="subItem in item.children")
+              router-link(class="drop-down__item" tag="div" :to="subItem.path" v-for="subItem in item.children" :key="item.children.path")
                 .item__image
                   img(:src="subItem.img")
                 .item__title {{ subItem.title }}
@@ -42,6 +42,7 @@ export default {
   components: { Header },
   data() {
     return {
+      isLoad: false,
       companyName: "",
       clientPortal: "CLIENT PORTAL",
       navbarList: [
@@ -152,15 +153,17 @@ export default {
     },
     ...mapActions({
       logout: "logout",
+
       // requestInfo: "requestInfo",
       // loadLangs: "loadLangs",
+
       getClient: "getClient",
       getUser: "getUser",
       getServices: "getServices"
     })
   },
   watch: {
-    '$route'(to, from) {
+    $route(to, from) {
       this.breadCrumb1 = to.path.split('/')[1]
       this.breadCrumb2 = to.path.split('/')[2]
       if (!this.breadCrumb2) {
@@ -170,14 +173,22 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     this.mainPageRender()
     this.domain = process.env.domain
     this.breadCrumb1 = this.$route.path.split('/')[1]
     this.breadCrumb2 = this.$route.path.split('/')[2]
-    this.setToken()
-  },
-  async created() {
+
+    this.isLoad = await new Promise(async (res) => {
+      if (document) {
+        let [ cookieValue ] = document.cookie.split(';').filter(i => i.includes('client'))
+        if (cookieValue) {
+          let [ , token ] = cookieValue.split('=')
+          this.$store.commit("SET_TOKEN", token)
+        }
+        res(true)
+      }
+    })
     await this.getClient()
     await this.getUser()
     await this.getServices()

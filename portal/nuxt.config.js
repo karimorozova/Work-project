@@ -24,9 +24,9 @@ module.exports = {
     ],
     script: [
       { src: 'https://use.fontawesome.com/releases/v5.1.0/js/all.js' },
-      // { src:"https://code.jquery.com/jquery-3.3.1.min.js",
-      // integrity: "sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=",
-      // crossorigin: "anonymous"},
+      { src:"https://code.jquery.com/jquery-3.3.1.min.js",
+      integrity: "sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=",
+      crossorigin: "anonymous"},
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
