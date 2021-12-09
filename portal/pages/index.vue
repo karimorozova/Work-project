@@ -1,6 +1,6 @@
 <template lang="pug">
   .wrapper(v-if="isLoad")
-    .navbar {{ currentRequests }}
+    .navbar
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
       .navbar__menu
@@ -16,7 +16,7 @@
                 i(class="fas fa-chevron-right")
               .drop-down__title {{ item.title }}
             template(v-if="item.active")
-              router-link(class="drop-down__item" tag="div" :to="subItem.path" v-for="subItem in item.children" :key="item.children.path")
+              router-link(class="drop-down__item item" tag="div" :to="subItem.path" v-for="subItem in item.children" :key="item.children.path")
                 .item__image
                   img(:src="subItem.img")
                 .item__title {{ subItem.title }}
