@@ -1,5 +1,5 @@
 <template lang="pug">
-  .wrapper(v-show="isLoad")
+  .wrapper(v-if="isLoad")
     .navbar
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
@@ -100,7 +100,7 @@ export default {
     toggleDropDown(item) {
       item.active = !item.active
     },
-    toggleSideBar(isFirstRender) {
+    toggleSideBar() {
       for (let elem of this.navbarList) {
         elem.active = window.location.toString().indexOf(elem.path) !== -1
       }
@@ -110,43 +110,18 @@ export default {
       this.thanksService = data
       this.$router.push('/confirm-order')
     },
-    hideAccountMenu() {
-      this.accountMenuVisible = false
-    },
-    closeRequestsMenu() {
-      this.dropdownVisible = false
-    },
     signOut() {
       this.logout()
       this.$router.push('/login')
     },
-    switchSection(index) {
-      this.navbarList.forEach((item, i) => {
-        item.active = i === index
-      })
-      this.$router.push(this.navbarList[index].path)
-    },
-    showAccountMenu() {
-      this.accountMenuVisible = !this.accountMenuVisible
-    },
-    showAccountInfo() {
-      this.accountMenuVisible = !this.accountMenuVisible
-      this.clientRequestShow = false
-      this.navbarList.forEach(item => {
-        item.active = false
-      })
-    },
-    showDropdown() {
-      this.dropdownVisible = !this.dropdownVisible
-    },
-    dataForRequest(ind) {
-      this.serviceType = this.newProject[ind].title
-      this.navbarList.forEach((item, i) => {
-        item.active = i === 0
-      })
-      this.$router.push(`/client-request${ this.newProject[ind].path }`)
-      this.dropdownVisible = false
-    },
+    // dataForRequest(ind) {
+    //   this.serviceType = this.newProject[ind].title
+    //   this.navbarList.forEach((item, i) => {
+    //     item.active = i === 0
+    //   })
+    //   this.$router.push(`/client-request${ this.newProject[ind].path }`)
+    //   this.dropdownVisible = false
+    // },
     setToken() {
       const clientToken = this.$cookie.get("client")
       this.$store.commit("SET_TOKEN", clientToken)
@@ -163,7 +138,7 @@ export default {
     })
   },
   watch: {
-    $route(to, from) {
+    $route(to) {
       this.breadCrumb1 = to.path.split('/')[1]
       this.breadCrumb2 = to.path.split('/')[2]
       if (!this.breadCrumb2) {
@@ -174,6 +149,7 @@ export default {
     }
   },
   async mounted() {
+    console.log('START')
     this.mainPageRender()
     this.domain = process.env.domain
     this.breadCrumb1 = this.$route.path.split('/')[1]

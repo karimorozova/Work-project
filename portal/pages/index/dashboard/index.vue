@@ -94,8 +94,9 @@ export default {
       return this.clientRequests.filter(request => request.hasOwnProperty('clientContacts') && request.clientContacts.map(({ _id }) => _id).includes(this.user._id))
     }
   },
-  async created() {
-    await this.getDashboardProject()
+  created() {
+    console.log('asd')
+    this.getDashboardProject()
   },
   components: {
     Button,
