@@ -34,7 +34,20 @@
               .project__detailsRow-client-title
                 router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${ project.customer._id }`}" target="_blank")
                   span {{ project.customer.name }}
-              .project__detailsRow-client-subtitle {{ project.clientBillingInfo.name }}
+
+              .project__detailsRow-client-subtitle(v-if="project.clientBillingInfo" ) {{ project.clientBillingInfo.name }}
+              div(v-else)
+                .input-title
+                  .input-title__text Billing Information:
+                  span.require *
+                .drop
+                  SelectSingle(
+                    placeholder="Choose BillingInfo"
+                    :selectedOption="''"
+                    :options="billingInfoList.map(({name}) => name)"
+                    @chooseOption="choseBillingInfo"
+                  )
+
               .project__detailsRow-client-text {{ project.industry.name }}
               .project__detailsRow-client-text Start at {{ customFormatter( project.startDate ) }}
 
@@ -282,11 +295,11 @@ export default {
     // 	}
     // 	this.$emit('setValue', { option, prop: 'customer' })
     // },
-    // async choseBillingInfo({ option }) {
-    // 	const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-    //   await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
-    //   await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
-    // },
+    async choseBillingInfo({ option }) {
+    	const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+      await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
+      await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
+    },
     // setBillingInfo(billingInfo) {
     // 	this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
     // },
@@ -820,6 +833,12 @@ a {
   width: 90px;
   height: 90px;
   border-radius: 50%;
+}
+
+.drop{
+  height: 32px;
+  width: 220px;
+  position: relative;
 }
 
 </style>
