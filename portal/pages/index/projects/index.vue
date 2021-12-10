@@ -327,7 +327,6 @@ export default {
       if (this.isDataRemain) {
         this.lastDate = this.getLastDateFromRes(projects.data)
       }
-      // console.log('created All', this.projects)
     },
     async bottomScrolled() {
       if (this.isDataRemain && this.lastDate) {
@@ -335,7 +334,6 @@ export default {
         this.projects.push(...projects)
         this.isDataRemain = projects.length === 25
         this.lastDate = this.getLastDateFromRes(projects)
-        // console.log('bottom next', this.projects)
       }
     },
     getLastDateFromRes(data) {

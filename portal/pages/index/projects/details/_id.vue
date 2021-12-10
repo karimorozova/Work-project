@@ -351,11 +351,9 @@ export default {
     }),
 
     getQuoteLink(prop, date) {
-      // this.adminUrl
-      let href = `${ 'http://localhost:3001' }/quote-decision?projectId=${ this.currentProject._id }&from=${ date }&t=${ this.token }&prop=${ prop }&type=client`
+      let href = `${ this.adminUrl }/quote-decision?projectId=${ this.currentProject._id }&from=${ date }&t=${ this.token }&prop=${ prop }&type=client`
       return href
     },
-
     approveQuoteExtra() {
       if (this.currentProject.incomingSteps.length) {
         let link = this.getQuoteLink('accept', new Date().getTime())
@@ -402,7 +400,6 @@ export default {
       try {
         const res = await this.$axios.get('/portal/project/' + id + '?customer=' + this.client._id)
         this.currentProject = res.data
-        console.log(res.data)
       } catch (err) {
       }
     },

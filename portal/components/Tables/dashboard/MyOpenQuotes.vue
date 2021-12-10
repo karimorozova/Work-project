@@ -169,22 +169,7 @@ export default {
     }
   },
   methods: {
-
-    // getTotalCost(project) {
-    //   const { additionsSteps, minimumCharge, steps } = project
-    //   const total = minimumCharge.isUsed
-    //       ? minimumCharge.value
-    //       : steps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
-    //
-    //   if (additionsSteps.length) {
-    //     const sum = additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
-    //     return +(total + sum).toFixed(2)
-    //   }
-    //   return +(total).toFixed(2)
-    // },
-
     getProjectTotal(project) {
-      console.log(project)
       const { steps, tasks, additionsSteps, minimumCharge, status } = project
       const quotesStatus = status === 'Quote sent' || status === 'Cost Quote'
       let total = 0
