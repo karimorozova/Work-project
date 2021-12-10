@@ -126,7 +126,7 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 		query["industry"] = ObjectId(industry)
 	}
 	if (services) {
-		query["tasks.service.title"] = { $in: services.split(',').map(item => allServices.find(({ _id }) => _id.toString() === item.toString()).title) }
+		query["tasks.service"] = { $in: services.split(',').map(i => ObjectId(i)) }
 	}
 	if (vendors) {
 		query["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }

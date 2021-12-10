@@ -342,6 +342,7 @@ async function getFilteredProjects(filters) {
 			{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'accountManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email', 'guid', 'photo' ] },
+			{ path: 'tasks.service', select: [ 'title' ] },
 			{ path: 'requestId', select: [ 'projectId' ] }
 		])
 	} catch (err) {
