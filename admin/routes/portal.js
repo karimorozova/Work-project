@@ -233,6 +233,20 @@ router.get('/open-quotes', checkClientContact, async (req, res) => {
 	}
 })
 
+router.get('/extra-quotes', checkClientContact, async (req, res) => {
+	const { token } = req.query
+	const activeStatuses = [ 'Approved', 'In progress' ]
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		// const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: activeStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		const quotes = await getProjectsForPortalList({ $and: [ { "tasks.status": 'Quote sent', status: { $in: activeStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		res.send(quotes)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Projects.")
+	}
+})
+
 
 router.get('/client', checkClientContact, async (req, res) => {
 	const { token } = req.query

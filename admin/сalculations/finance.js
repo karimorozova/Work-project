@@ -41,6 +41,7 @@ const setUpdatedFinanceData = async (data) => {
 	return await calculateProjectTotal(projectId)
 }
 
+//FINANCE 2 FOR PROJECT ==>
 const calculateProjectTotal = async (projectId) => {
 	const { steps } = await Projects.findOne({ "_id": projectId })
 
@@ -60,11 +61,7 @@ const calculateProjectTotal = async (projectId) => {
 	return await updateProject({ '_id': projectId }, { finance })
 }
 
-const getClientDiscount = async (clientDiscountsIds) => {
-	const allDiscounts = await Discounts.find().lean()
-	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
-}
-
+//FINANCE 1 FOR STEPS  ==>
 const recalculateStepFinance = async (projectId) => {
 	const { steps, discounts, minimumCharge, customer} = await getProject({ _id: projectId })
 	// let newDiscounts = !discounts.length ? await getClientDiscount( customer.discounts ) : discounts
@@ -109,6 +106,11 @@ const updateStepsWithMinimal = async (steps, minimumCharge) => {
 		return step
 	})
 	return { 'steps': newSteps }
+}
+
+const getClientDiscount = async (clientDiscountsIds) => {
+	const allDiscounts = await Discounts.find().lean()
+	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {

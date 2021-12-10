@@ -66,8 +66,9 @@
 
 
         template(slot="icons", slot-scope="{ row, index }")
-          .table__icons
-
+          .table__icons(v-if="row.clientContacts && row.clientContacts.length && row.clientContacts.map(i => i._id).includes(user._id)" )
+            router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
+              i.fas.fa-chalkboard-teacher
             //.icon.accept(@click="() => quotesAction(row._id, 'approve')")
             //  i(class="fas fa-check icon-elem ")
             //.icon.reject(@click="() => quotesAction(row._id, 'reject')")
@@ -162,7 +163,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "getUserInfo",
+      user: "getUserInfo"
     }),
     rawData() {
       return this.allQuotes
@@ -304,7 +305,7 @@ a {
     justify-content: center;
     width: 100%;
     gap: 10px;
-    //font-size: 16px;
+    font-size: 16px;
   }
 
   &__actions {

@@ -142,14 +142,13 @@ import '../../../assets/scss/datepicker.scss'
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
-import JobDescriptors from "../JobDescriptors"
 import Add from "../../Add"
 import CheckBox from "../../CheckBox"
 import Button from "../../Button"
 import ApproveModal from "../../ApproveModal"
 
 export default {
-  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable, DatePicker, ApproveModal },
+  components: { Button, CheckBox, Add, SelectSingle, DatepickerWithTime, draggable, DatePicker, ApproveModal },
   props: {
     templates: {
       type: Array,

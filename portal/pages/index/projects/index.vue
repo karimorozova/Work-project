@@ -288,8 +288,11 @@ export default {
       getIndustries: 'getIndustries'
     }),
     getTotalCost(project) {
-      const { finance: { Price: { receivables } }, additionsSteps, minimumCharge } = project
-      const total = minimumCharge.isUsed ? minimumCharge.value : receivables
+      const { additionsSteps, minimumCharge, steps } = project
+      const total = minimumCharge.isUsed
+          ? minimumCharge.value
+          : steps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+
       if (additionsSteps.length) {
         const sum = additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
         return +(total + sum).toFixed(2)

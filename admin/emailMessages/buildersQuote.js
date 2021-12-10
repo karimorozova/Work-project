@@ -32,7 +32,7 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 	}, '')
 
 	let additionsSteps = ''
-	if (project.additionsSteps) {
+	if (project.additionsSteps && !tasksIds.length) {
 		additionsSteps = project.additionsSteps.reduce((acc, curr) => {
 			acc = acc + `<div style="border-bottom: 1px solid #ededed;">
 			        <div style="display: inline-block; padding: 8px; width: 130px;">${ curr.title }</div>

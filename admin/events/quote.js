@@ -34,7 +34,6 @@ emitter.on('client-decide', async (project, prop) => {
 	if (prop === 'reject') {
 		await notifyManagerProjectRejected(project)
 	}
-	//
 	// if(project.paymentProfile === 'PPP' && !project.isTest) {
 	// 	const steps = await getAllSteps(0, 0, { _id: project._id })
 	// 	await createReports({checkedSteps: steps, createdBy: null})

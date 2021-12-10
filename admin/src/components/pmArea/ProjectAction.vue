@@ -499,7 +499,7 @@ export default {
         // const { tasks, tasksDR2 } = this.project
         // const isAllTasksCompleted = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({ status }) => status === 'Completed')
         // if (isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = [ "Close Project" ]
-         result = [ "Send Project Details", "Cancel", 'Close Project' ]
+        result = [ "Send Project Details", "Cancel", 'Close Project' ]
       }
 
       if (this.project.status === 'Closed') {
@@ -539,6 +539,10 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+
+.project-actions {
+  position: relative;
+}
 
 .project-action {
   padding: 25px;
@@ -673,7 +677,9 @@ export default {
 
 .approve-action {
   position: absolute;
-  margin-top: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .project-details {

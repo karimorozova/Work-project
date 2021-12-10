@@ -55,8 +55,8 @@ async function messageForClientSendQuote(project, tasksIds, allUnits, allSetting
 		declineHref += `&tasksIds=${ tasks }`
 	}
 
-	let acceptQuote = `<a href="${ acceptHref }" style="background: #4ba5a5;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I accept ${ +(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
-	let declineQuote = `<a href="${ declineHref }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I reject ${ +(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
+	let acceptQuote = `<a href="${ acceptHref }" style="background: #4ba5a5;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I accept ${ +parseFloat(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
+	let declineQuote = `<a href="${ declineHref }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 3px 10px 10px 0;display: inline-block;">I reject ${ +parseFloat(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</a>`
 
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
                 <header style="background-color:#efefef;text-align:center;" >
@@ -75,7 +75,7 @@ async function messageForClientSendQuote(project, tasksIds, allUnits, allSetting
                     ${ getJobsDetails(project, tasksIds, steps, allUnits) }
 										${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 										${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
-										<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Total: ${ +(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
+										<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Total: ${ +parseFloat(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
 										 <p>By clicking on one of the link below, you can accept or reject our offer.
 										 <br>Clicking "I accept" will also approve and accept our <a style="color:#333;" href="https://www.pangea.global/wp-content/uploads/2019/11/Pangea-Terms-Conditions.pdf" class="link">terms and conditions</a>
                     </p>
@@ -156,7 +156,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 		
 			<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 						<div style="display: inline-block; min-width: 110px; text-align: left;">Total:</div>
-						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${ +(total).toFixed(2) } </div>
+						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${+parseFloat(total).toFixed(2) } </div>
 			</div>
 			</div>
 			<div class="footer" style="position: absolute; width: 754px; border-top: 3px solid #c8e4e4;bottom: 0;padding: 15px 0 12px;">
@@ -214,7 +214,7 @@ async function messageForClientSendCostQuote(project, allUnits, allSettingsSteps
                     ${ getJobsDetails(project, tasksIds, steps, allUnits) }
 										${ isHideWhenMinimumCharge ? '' : displaySubTotal }
 										${ isHideWhenMinimumCharge ? '' : displayFinanceDetails }
-										<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Total: ${ +(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
+										<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Total: ${ +parseFloat(total).toFixed(2) } ${ returnIconCurrencyByStringCode(projectCurrency) }</p>
 										
 										<p>This is a Cost Quote and provides only estimation.</p>
 										<p>Should anything change in the files or instructions, so will the deadline and charges.</p>

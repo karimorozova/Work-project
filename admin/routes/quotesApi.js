@@ -11,6 +11,7 @@ const {
 const {
 	quoteEmitter
 } = require('../events/quote')
+const { recalculateStepFinance, calculateProjectTotal } = require("../сalculations/finance")
 
 router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 	let project = null
@@ -49,10 +50,20 @@ router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 	}
 	if (prop === 'reject') {
 		const tasks = allTasks.map(task => {
-			if (task.status === 'Quote sent') task.status = 'Rejected'
+			if (task.status === 'Quote sent') task.status = 'Cancelled'
 			return task
 		})
-		await Projects.updateOne({ _id }, { $set: { tasks } })
+		const steps = project.steps.map(step => {
+			if (tasksIds.includes(step.taskId)) {
+				step.status = 'Cancelled'
+				step.finance.Price.receivables = step.finance.Quantity.receivables = step.finance.Wordcount.receivables = 0
+				step.finance.Price.payables = step.finance.Quantity.payables = step.finance.Wordcount = 0
+			}
+			return step
+		})
+		await Projects.updateOne({ _id }, { $set: { tasks, steps } })
+		await recalculateStepFinance(_id)
+		await calculateProjectTotal(_id)
 	}
 
 	quoteEmitter.emit('client-decide-tasks', project, prop, neededSteps)
@@ -92,7 +103,7 @@ router.get('/vendor-decide', getProjectManageToken, async (req, res) => {
 	}
 
 	quoteEmitter.emit('vendor-decide', prop, project, vendorId, stepId)
-	prop === 'accept' ? res.send({ code: -3 }) : res.send({ code: -2 })
+	prop === 'accept' ? res.send({ code: -3 }) : res.send({ code: -4 })
 })
 
 router.get('/client-decide', getProjectManageToken, async (req, res) => {
@@ -131,10 +142,19 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 			item.deadline = new Date(newDeadline).toISOString()
 			return item
 		})
-		await Projects.updateOne({ _id }, { $set: { startDate: new Date(), tasks, steps, deadline: new Date(newDeadline).toISOString(), status: "Approved", isClientOfferClicked: true } })
+		await Projects.updateOne({ _id }, {
+			$set: {
+				startDate: new Date(),
+				tasks,
+				steps,
+				deadline: new Date(newDeadline).toISOString(),
+				status: "Approved",
+				isClientOfferClicked: true
+			}
+		})
 	}
 	if (prop === 'reject') {
-		const tasks = tasks.map(task => {
+		const tasks = allProjectTasks.map(task => {
 			if (task.status === 'Quote sent') task.status = 'Rejected'
 			return task
 		})
@@ -162,9 +182,15 @@ router.get('/get-success-message', async (req, res) => {
 			case '-2':
 				title = 'Quote rejected'
 				message = ''
+				footer = 'Go to <a style="margin-left: 3px;" href="https://portal2.pangea.global/dashboard"> portal.pangea</a>'
 				break
 			case '-3':
 				title = 'Thank you'
+				message = ''
+				footer = 'Go to <a style="margin-left: 3px;" href="https://vendor2.pangea.global/dashboard"> vendor.pangea</a>'
+				break
+			case '-4':
+				title = 'Quote rejected'
 				message = ''
 				footer = 'Go to <a style="margin-left: 3px;" href="https://vendor2.pangea.global/dashboard"> vendor.pangea</a>'
 				break

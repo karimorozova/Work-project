@@ -246,21 +246,7 @@ export default {
       return moment(date).format('DD-MM-YYYY, HH:mm')
     },
     async updateProjectDate(e, prop) {
-      if (this.project._id) {
-        if (prop === 'deadline') {
-          const date = { ['billingDate']: e }
-          await this.setDate('billingDate', date)
-        }
-        const date = { [prop]: e }
-        await this.setDate(prop, date)
-      } else {
-        if (prop === 'deadline') {
-          this.project.billingDate = e
-        }
-      }
-    },
-    async setDate(prop, date) {
-      if (prop === 'startDate' && this.project.tasks.length) return
+      const date = { [prop]: e }
       await this.setProjectDate({ date, projectId: this.project._id })
     },
     async setTest(bool) {
@@ -464,7 +450,7 @@ export default {
 
 .block {
   width: 100px;
-  border: 1px dotted $light-border;
+  border: 1px dotted $border;
   flex-direction: column;
   align-items: center;
   padding: 6px 0px 4px 0px;

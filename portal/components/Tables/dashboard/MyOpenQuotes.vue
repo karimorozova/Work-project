@@ -65,11 +65,13 @@
                 span {{ row.createdBy.firstName[0].toUpperCase() }}
 
         template(slot="icons", slot-scope="{ row, index }")
-          //.table__icons
-            .icon.accept(@click="() => quotesAction(row._id, 'approve')")
-              i(class="fas fa-check icon-elem ")
-            .icon.reject(@click="() => quotesAction(row._id, 'reject')")
-              i(class="fas fa-times icon-elem ")
+          .table__icons
+            router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
+              i.fas.fa-chalkboard-teacher
+            //.icon.accept(@click="() => quotesAction(row._id, 'approve')")
+            //  i(class="fas fa-check icon-elem ")
+            //.icon.reject(@click="() => quotesAction(row._id, 'reject')")
+            //  i(class="fas fa-times icon-elem ")
 
 
 </template>
@@ -160,17 +162,43 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "getUserInfo",
+      user: "getUserInfo"
     }),
     rawData() {
       return this.myQuotes
     }
   },
   methods: {
+
+    // getTotalCost(project) {
+    //   const { additionsSteps, minimumCharge, steps } = project
+    //   const total = minimumCharge.isUsed
+    //       ? minimumCharge.value
+    //       : steps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+    //
+    //   if (additionsSteps.length) {
+    //     const sum = additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+    //     return +(total + sum).toFixed(2)
+    //   }
+    //   return +(total).toFixed(2)
+    // },
+
     getProjectTotal(project) {
-      const { finance: { Price: { receivables } }, additionsSteps, minimumCharge } = project
-      const total = minimumCharge.isUsed ? minimumCharge.value : receivables
-      if (additionsSteps.length) {
+      console.log(project)
+      const { steps, tasks, additionsSteps, minimumCharge, status } = project
+      const quotesStatus = status === 'Quote sent' || status === 'Cost Quote'
+      let total = 0
+      if (minimumCharge.isUsed) {
+        total = minimumCharge.value
+      } else {
+        if (quotesStatus) {
+          total = steps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+        } else {
+          const tasksIds = tasks.filter(i => i.status === 'Quote sent').map(i => i.taskId)
+          total = steps.filter(i => tasksIds.includes(i.taskId)).reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
+        }
+      }
+      if (additionsSteps.length && quotesStatus) {
         const sum = additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
         return +(total + sum).toFixed(2)
       }
@@ -302,7 +330,7 @@ a {
     justify-content: center;
     width: 100%;
     gap: 10px;
-    //font-size: 16px;
+    font-size: 16px;
   }
 
   &__actions {

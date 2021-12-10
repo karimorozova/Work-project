@@ -1,5 +1,6 @@
 const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
 const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery } = require('./filter')
+const { filterNotQuoteStepsInStartedProjectForClientPortal, filterQuoteStepsInStartedProjectForClientPortal } = require('./helpers')
 
 
 async function getProjectsForVendorPortal(obj) {
@@ -42,34 +43,44 @@ async function getProjects(obj) {
 
 }
 
-async function getProjectsForPortalAll({ filters, verificationResult }) {
+async function getProjectsForPortalAll({ filters }) {
 	const allLanguages = await Languages.find()
 	const allServices = await Services.find()
 	const query = getFilteredPortalProjectsQuery(filters, allLanguages, allServices)
 
-	return (await Projects.find(
-					{
-						'isTest': 'false',
-						'customer': filters.customer,
-						...query
-					}, {
-						projectId: 1,
-						projectName: 1,
-						status: 1,
-						startDate: 1,
-						deadline: 1,
-						createdBy: 1,
-						accountManager: 1,
-						additionsSteps: 1,
-						projectCurrency: 1,
-						minimumCharge: 1,
-						"finance.Price.receivables": 1
-					}
-			)
-					.sort({ startDate: -1 })
-					.limit(25)
-					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+	const projects = await Projects.find(
+			{
+				'isTest': 'false',
+				'customer': filters.customer,
+				...query
+			}, {
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				startDate: 1,
+				deadline: 1,
+				createdBy: 1,
+				accountManager: 1,
+				additionsSteps: 1,
+				projectCurrency: 1,
+				minimumCharge: 1,
+				"steps.taskId": 1,
+				"steps.finance.Price.receivables": 1,
+				"finance.Price.receivables": 1,
+				"tasks.taskId": 1,
+				"tasks.status": 1
+			}
 	)
+			.sort({ startDate: -1 })
+			.limit(25)
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+
+	for (let i = 0; i < projects.length; i++) {
+		projects[i].steps = filterNotQuoteStepsInStartedProjectForClientPortal(projects[i])
+		projects[i].steps = projects[i].steps.filter(({ status }) => status !== 'Cancelled')
+	}
+
+	return projects
 }
 
 async function getProjectsForPortalList(obj) {
@@ -87,7 +98,11 @@ async function getProjectsForPortalList(obj) {
 						accountManager: 1,
 						minimumCharge: 1,
 						additionsSteps: 1,
-						projectCurrency: 1
+						projectCurrency: 1,
+						"tasks.taskId": 1,
+						"tasks.status": 1,
+						"steps.taskId": 1,
+						"steps.finance.Price.receivables": 1,
 					}
 			)
 					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
@@ -111,10 +126,12 @@ async function getProjectForClientPortal(obj) {
 				discounts: 1,
 				tasksDeliverables: 1,
 				tasksDR2: 1,
+				clientContacts: 1,
 				"steps.finance.Price.receivables": 1,
 				"steps.finance.Wordcount.receivables": 1,
 				"steps.finance.Quantity.receivables": 1,
 				"steps.step": 1,
+				"steps.taskId": 1,
 				"steps.progress": 1,
 				"steps.receivablesUnit": 1,
 				"steps.sourceLanguage": 1,
@@ -126,7 +143,8 @@ async function getProjectForClientPortal(obj) {
 				"steps.totalWords": 1,
 				"tasks.sourceLanguage": 1,
 				"tasks.targetLanguage": 1,
-				"tasks.taskId": 1
+				"tasks.taskId": 1,
+				"tasks.status": 1
 
 			}
 	)
@@ -138,16 +156,21 @@ async function getProjectForClientPortal(obj) {
 			.populate('steps.fullTargetLanguage')
 			.populate('steps.receivablesUnit')
 
-
 	project._doc.steps = project._doc.steps.length
-			? project._doc.steps.map(item => ({
-				...item._doc,
-				price: item._doc.finance.Price.receivables,
-				quantity: +item._doc.finance.Wordcount.receivables
-						? +item._doc.finance.Wordcount.receivables
-						: +item._doc.finance.Quantity.receivables || 0
-			})).filter(({ status }) => status !== 'Cancelled')
+			? project._doc.steps.map(item => {
+						return {
+							...item._doc,
+							price: item._doc.finance.Price.receivables,
+							quantity: +item._doc.finance.Wordcount.receivables
+									? +item._doc.finance.Wordcount.receivables
+									: +item._doc.finance.Quantity.receivables || 0
+						}
+					}
+			).filter(({ status }) => status !== 'Cancelled')
 			: []
+
+	project._doc.incomingSteps = filterQuoteStepsInStartedProjectForClientPortal(project, false)
+	project._doc.steps = filterNotQuoteStepsInStartedProjectForClientPortal(project)
 
 	return project
 }

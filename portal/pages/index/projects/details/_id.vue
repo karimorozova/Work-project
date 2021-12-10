@@ -1,132 +1,242 @@
 <template lang="pug">
-  .wrapper
-    .sideRight(v-if="currentProject._id")
-      .details
-        .details__header
-          .details__name {{ currentProject.projectName }}
-          .details__body
-            .d-col
-              .d-row
-                .d-key Project ID:
-                .d-val {{ currentProject.projectId }}
-              .d-row
-                .d-key Status:
-                .d-val {{ currentProject.status }}
-            .d-col
-              .d-row
-                .d-key Start:
-                .d-val {{ customFormatter(currentProject.startDate) }}
-              .d-row
-                .d-key Industry:
-                .d-val {{ currentProject.industry.name }}
-            .d-col
-              .d-row
-                .d-key Deadline:
-                .d-val {{ customFormatter(currentProject.deadline) }}
+  .manWrapper
+    // PROJECT =================================================================================================================================================>
+    .mainSides
+      .sideRight(v-if="currentProject._id")
+        .details
+          .details__header
+            .details__name {{ currentProject.projectName }}
+            .details__body
+              .d-col
+                .d-row
+                  .d-key Project ID:
+                  .d-val {{ currentProject.projectId }}
+                .d-row
+                  .d-key Status:
+                  .d-val {{ currentProject.status }}
+              .d-col
+                .d-row
+                  .d-key Start:
+                  .d-val {{ customFormatter(currentProject.startDate) }}
+                .d-row
+                  .d-key Industry:
+                  .d-val {{ currentProject.industry.name }}
+              .d-col
+                .d-row
+                  .d-key Deadline:
+                  .d-val {{ customFormatter(currentProject.deadline) }}
 
-        .details__steps
-          .details__steps-title Jobs:
-          GeneralTable(
-            :fields="fields"
-            :tableData="finalData"
-            :isFilterShow="true"
-            :isBodyShort="true"
+          .details__steps
+            .details__steps-title Jobs:
+            GeneralTable(
+              :fields="fields"
+              :tableData="finalData"
+              :isFilterShow="true"
+              :isBodyShort="true"
 
-            @addSortKey="addSortKey"
-            @changeSortKey="changeSortKey"
-            @removeSortKey="removeSortKey"
-            @setFilter="setFilter"
-            @removeFilter="removeFilter"
-            @clearAllFilters="clearAllFilters"
-          )
-            template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-              .table__header {{ field.label }}
+              @addSortKey="addSortKey"
+              @changeSortKey="changeSortKey"
+              @removeSortKey="removeSortKey"
+              @setFilter="setFilter"
+              @removeFilter="removeFilter"
+              @clearAllFilters="clearAllFilters"
+            )
+              template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+                .table__header {{ field.label }}
 
-            template(slot="step", slot-scope="{ row, index }")
-              .table__data {{ row.step.title }}
+              template(slot="step", slot-scope="{ row, index }")
+                .table__data {{ row.step.title }}
 
-            template(slot="language" slot-scope="{ row }")
-              .table__data(v-html="getStepPair(row)")
+              template(slot="language" slot-scope="{ row }")
+                .table__data(v-html="getStepPair(row)")
 
-            template(slot="status" slot-scope="{ row, index }")
-              .table__statusAndProgress
-                .status {{ row.status  }}
-                .progress
-                  ProgressLineStep(:progress="progress(row.progress)" :status="row.status")
+              template(slot="status" slot-scope="{ row, index }")
+                .table__statusAndProgress(v-if="isNowQuoteStatus") {{ currentProject.status }}
+                .table__statusAndProgress(v-else)
+                  .status {{ row.status }}
+                  .progress
+                    ProgressLineStep(:progress="progress(row.progress)" :status="row.status")
 
-            template(slot="quantity", slot-scope="{ row, index }")
-              .table__data {{ +(row.quantity).toFixed(1) }}
+              template(slot="quantity", slot-scope="{ row, index }")
+                .table__data {{ +(row.quantity).toFixed(1) }}
 
-            template(slot="clientRate", slot-scope="{ row, index }")
-              .table__data(v-if="!currentProject.minimumCharge.isUsed")
-                span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
-                span {{ +(row.clientRate).toFixed(4) }}
-              .table__data(v-else) -
+              template(slot="clientRate", slot-scope="{ row, index }")
+                .table__data(v-if="!currentProject.minimumCharge.isUsed")
+                  span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
+                  span {{ +(row.clientRate).toFixed(4) }}
+                .table__data(v-else) -
 
-            template(slot="price", slot-scope="{ row, index }")
-              .table__data(v-if="!currentProject.minimumCharge.isUsed")
-                span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
-                span {{ +(row.price).toFixed(2) }}
-              .table__data(v-else) -
+              template(slot="price", slot-scope="{ row, index }")
+                .table__data(v-if="!currentProject.minimumCharge.isUsed")
+                  span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
+                  span {{ +(row.price).toFixed(2) }}
+                .table__data(v-else) -
 
-        .details__deliverables(v-if="currentProject.tasksDeliverables.length")
-          DeliveryTable(
-            :project="currentProject"
-          )
+          .details__deliverables(v-if="currentProject.tasksDeliverables.length")
+            DeliveryTable(
+              :project="currentProject"
+            )
+      .sideLeft(v-if="currentProject._id")
+        .user(v-if="currentProject.accountManager" )
+          .user__image
+            img(v-if="currentProject.accountManager.photo && !currentProject.accountManager.photo.includes('https://')" :src="domain+currentProject.accountManager.photo")
+            .user__fakeImage(:style="{'--bgColor': getBgColor(currentProject.accountManager._id)[0], '--color':getBgColor(currentProject.accountManager._id)[1]  }" v-else) {{ currentProject.accountManager.firstName[0].toUpperCase() }}
+          .user__name {{currentProject.accountManager.firstName + ' ' + currentProject.accountManager.lastName || ''}}
+          .user__who Account Manager
+          a(:href="'mailto:' + currentProject.accountManager.email")
+            .user__email
+              .email__icon
+                i(class="far fa-envelope")
+              .email__text Send a message
 
-    .sideLeft(v-if="currentProject._id")
-      .user(v-if="currentProject.accountManager" )
-        .user__image
-          img(v-if="currentProject.accountManager.photo && !currentProject.accountManager.photo.includes('https://')" :src="domain+currentProject.accountManager.photo")
-          .user__fakeImage(:style="{'--bgColor': getBgColor(currentProject.accountManager._id)[0], '--color':getBgColor(currentProject.accountManager._id)[1]  }" v-else) {{ currentProject.accountManager.firstName[0].toUpperCase() }}
-        .user__name {{currentProject.accountManager.firstName + ' ' + currentProject.accountManager.lastName || ''}}
-        .user__who Account Manager
-        a(:href="'mailto:' + currentProject.accountManager.email")
-          .user__email
-            .email__icon
-              i(class="far fa-envelope")
-            .email__text Send a message
+        .progress__bar(v-if="currentProject.status === 'In progress' || currentProject.status === 'Approved' || currentProject.status === 'Rejected' || currentProject.status === 'Closed' " )
+          CircleProgress(:percent="progressProject()")
 
-      .progress__bar
-        CircleProgress(:percent="progressProject()")
-
-      .priceExplanation(v-if="currentProject.additionsSteps.length || currentProject.discounts.length || getTMDiscounts" )
-        .priceExplanation__title Services
-        .priceExplanation__row
-          .priceExplanation__key Sub-total:
-          .priceExplanation__value
-            span {{ getProjectSubTotal }}
-            span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
-
-      .priceExplanation(v-if="(!currentProject.minimumCharge.isUsed) && (currentProject.discounts.length || true)")
-        .priceExplanation__title Discounts and Surcharges
-
-        div(v-if="getTMDiscounts")
+        .priceExplanation(v-if="currentProject.additionsSteps.length || currentProject.discounts.length || getTMDiscounts" )
+          .priceExplanation__title Services
           .priceExplanation__row
-            .priceExplanation__key TM Discount:
-            .priceExplanation__value -{{getTMDiscounts}}
+            .priceExplanation__key Sub-total:
+            .priceExplanation__value
+              span {{ getProjectSubTotal }}
               span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 
-        div(v-if="currentProject.discounts.length")
-          .priceExplanation__row(v-for="item in currentProject.discounts" )
-            .priceExplanation__key {{item.name}}:
-            .priceExplanation__value {{ calculateDiscountPercent(item.value) }}
+        .priceExplanation(v-if="(!currentProject.minimumCharge.isUsed) && (currentProject.discounts.length || getTMDiscounts)")
+          .priceExplanation__title Discounts and Surcharges
+
+          div(v-if="getTMDiscounts")
+            .priceExplanation__row
+              .priceExplanation__key TM Discount:
+              .priceExplanation__value -{{getTMDiscounts}}
+                span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+          div(v-if="currentProject.discounts.length")
+            .priceExplanation__row(v-for="item in currentProject.discounts" )
+              .priceExplanation__key {{item.name}}:
+              .priceExplanation__value {{ calculateDiscountPercent(item.value) }}
+                span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+        .priceExplanation(v-if="currentProject.additionsSteps.length" )
+          .priceExplanation__title Additional Charges:
+          .priceExplanation__row(v-for="item in currentProject.additionsSteps" )
+            .priceExplanation__key {{item.title}}
+            .priceExplanation__value
+              span {{item.finance.Price.receivables}}
               span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 
-      .priceExplanation(v-if="currentProject.additionsSteps.length" )
-        .priceExplanation__title Additional Charges:
-        .priceExplanation__row(v-for="item in currentProject.additionsSteps" )
-          .priceExplanation__key {{item.title}}
-          .priceExplanation__value
-            span {{item.finance.Price.receivables}}
-            span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+        .total
+          .total__row
+            .total__key Total:
+            .total__value
+              span {{this.getProjectTotal}}
+              span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
 
-      .total
-        .total__row
-          .total__key Total:
-          .total__value
-            span {{this.getProjectTotal}}
-            span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+        .quote(v-if="currentProject.status === 'Quote sent' && isHaveAccessForQuote" )
+          Button(:value="'I accept'" :color="'#4ba5a5'" @clicked="approveQuote")
+          Button(:value="'I reject'"  @clicked="rejectQuote")
+    // PROJECT <================================================================================================================================================
+
+
+    // QUOTES =================================================================================================================================================>
+    .mainSides(v-if="isExtraQuoteJobs && isHaveAccessForQuote" style="margin-top: 50px; padding-top: 50px; border-top: 1px solid #BFBFBF;")
+      .sideRight(v-if="currentProject._id")
+        .details
+          .details__header
+            .details__name
+              span Decide on a Quote:
+              span(style="margin-left: 6px;") {{ currentProject.projectName }}
+            .details__body
+              .d-col
+                .d-row
+                  .d-key Project ID:
+                  .d-val {{ currentProject.projectId }}
+                .d-row
+                  .d-key Status:
+                  .d-val Quote sent
+              .d-col
+                .d-row
+                  .d-key Start:
+                  .d-val {{ customFormatter(currentProject.startDate) }}
+                .d-row
+                  .d-key Industry:
+                  .d-val {{ currentProject.industry.name }}
+              .d-col
+                .d-row
+                  .d-key Deadline:
+                  .d-val {{ customFormatter(currentProject.deadline) }}
+
+          .details__steps
+            .details__title Incoming Jobs:
+            GeneralTable(
+              :fields="fields2"
+              :tableData="currentProject.incomingSteps"
+              :isBodyShort="true"
+            )
+              template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+                .table__header {{ field.label }}
+
+              template(slot="step", slot-scope="{ row, index }")
+                .table__data {{ row.step.title }}
+
+              template(slot="language" slot-scope="{ row }")
+                .table__data(v-html="getStepPair(row)")
+
+              template(slot="status" slot-scope="{ row, index }")
+                .table__statusAndProgress -
+
+              template(slot="quantity", slot-scope="{ row, index }")
+                .table__data {{ +(row.quantity).toFixed(1) }}
+
+              template(slot="clientRate", slot-scope="{ row, index }")
+                .table__data(v-if="!currentProject.minimumCharge.isUsed")
+                  span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
+                  span {{ +(row.clientRate).toFixed(4) }}
+                .table__data(v-else) Quote sent
+
+              template(slot="price", slot-scope="{ row, index }")
+                .table__data(v-if="!currentProject.minimumCharge.isUsed")
+                  span.currency(v-html="currencyIconDetected(currentProject.projectCurrency)" )
+                  span {{ +(row.price).toFixed(2) }}
+                .table__data(v-else) -
+
+      .sideLeft(v-if="currentProject._id")
+        .priceExplanation(v-if="currentProject.discounts.length || getTMDiscountsExtraQuote")
+          .priceExplanation__title Services
+          .priceExplanation__row
+            .priceExplanation__key Sub-total:
+            .priceExplanation__value
+              span {{ getProjectSubTotalExtraQuote }}
+              span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+        .priceExplanation(v-if="(!currentProject.minimumCharge.isUsed) && (currentProject.discounts.length || getTMDiscountsExtraQuote)")
+          .priceExplanation__title Discounts and Surcharges
+
+          div(v-if="getTMDiscountsExtraQuote")
+            .priceExplanation__row
+              .priceExplanation__key TM Discount:
+              .priceExplanation__value -{{getTMDiscountsExtraQuote}}
+                span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+          div(v-if="currentProject.discounts.length")
+            .priceExplanation__row(v-for="item in currentProject.discounts" )
+              .priceExplanation__key {{item.name}}:
+              .priceExplanation__value {{ calculateDiscountPercentQuote(item.value) }}
+                span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+        .total
+          .total__row
+            .total__key Total:
+            .total__value
+              span {{this.getProjectTotalExtraQuote}}
+              span.currency2(v-html="currencyIconDetected(currentProject.projectCurrency)")
+
+        .quote
+          Button(:value="'I accept'" :color="'#4ba5a5'" @clicked="approveQuoteExtra")
+          Button(:value="'I reject'"  @clicked="rejectQuoteExtra")
+
+    // QUOTES <=================================================================================================================================================
+
+
 </template>
 
 <script>
@@ -139,12 +249,52 @@ import ProgressLineStep from "../../../../components/pangea/ProgressLineStep"
 import currencyIconDetected from '../../../../mixins/currencyIconDetected'
 import CircleProgress from "../../../../components/CircleProgress"
 import DeliveryTable from "../../../../components/DeliveryTable"
+import Button from "../../../../components/pangea/Button"
 
 export default {
   mixins: [ tableSortAndFilter, getBgColor, currencyIconDetected ],
   data() {
     return {
       domain: '',
+      adminUrl: '',
+      fields2: [
+        {
+          label: "Service",
+          headerKey: "header1",
+          key: "step",
+          style: { width: "20%" }
+        },
+        {
+          label: "Languages",
+          headerKey: "header2",
+          key: "language",
+          style: { "width": "20%" }
+        },
+        {
+          label: "Status",
+          headerKey: "header3",
+          key: "status",
+          style: { "width": "18%" }
+        },
+        {
+          label: "Size",
+          headerKey: "header4",
+          key: "quantity",
+          style: { "width": "14%" }
+        },
+        {
+          label: "Rate",
+          headerKey: "header5",
+          key: "clientRate",
+          style: { "width": "14%" }
+        },
+        {
+          label: "Total",
+          headerKey: "header6",
+          key: "price",
+          style: { "width": "14%" }
+        }
+      ],
       fields: [
         {
           label: "Service",
@@ -199,8 +349,42 @@ export default {
       alertToggle: "alertToggle",
       getClient: "getClient"
     }),
+
+    getQuoteLink(prop, date) {
+      // this.adminUrl
+      let href = `${ 'http://localhost:3001' }/quote-decision?projectId=${ this.currentProject._id }&from=${ date }&t=${ this.token }&prop=${ prop }&type=client`
+      return href
+    },
+
+    approveQuoteExtra() {
+      if (this.currentProject.incomingSteps.length) {
+        let link = this.getQuoteLink('accept', new Date().getTime())
+        const tasks = this.currentProject.incomingSteps.map(i => i.taskId).join('*').replace(/[' ']/g, '_')
+        link += `&tasksIds=${ tasks }`
+        window.location.replace(link)
+      }
+    },
+    rejectQuoteExtra() {
+      if (this.currentProject.incomingSteps.length) {
+        let link = this.getQuoteLink('reject', new Date().getTime())
+        const tasks = this.currentProject.incomingSteps.map(i => i.taskId).join('*').replace(/[' ']/g, '_')
+        link += `&tasksIds=${ tasks }`
+        window.location.replace(link)
+      }
+    },
+    approveQuote() {
+      let link = this.getQuoteLink('accept', new Date(this.currentProject.startDate).getTime())
+      window.location.replace(link)
+    },
+    rejectQuote() {
+      let link = this.getQuoteLink('reject', new Date(this.currentProject.startDate).getTime())
+      window.location.replace(link)
+    },
     calculateDiscountPercent(val) {
-      return +((this.getProjectSubTotal * +val) / 100).toFixed(2)
+      return +(((this.getProjectSubTotal - this.getTMDiscounts) * +val) / 100).toFixed(2)
+    },
+    calculateDiscountPercentQuote(val) {
+      return +(((this.getProjectSubTotalExtraQuote - this.getTMDiscountsExtraQuote) * +val) / 100).toFixed(2)
     },
     getStepPair(step) {
       return step.sourceLanguage === step.targetLanguage
@@ -218,6 +402,7 @@ export default {
       try {
         const res = await this.$axios.get('/portal/project/' + id + '?customer=' + this.client._id)
         this.currentProject = res.data
+        console.log(res.data)
       } catch (err) {
       }
     },
@@ -237,9 +422,19 @@ export default {
   },
   computed: {
     ...mapGetters({
-      client: "getClientInfo"
+      client: "getClientInfo",
+      user: "getUserInfo",
+      token: "getToken"
     }),
-
+    isExtraQuoteJobs() {
+      return this.currentProject._id && this.currentProject.incomingSteps && this.currentProject.incomingSteps.length
+    },
+    isHaveAccessForQuote() {
+      return this.currentProject.clientContacts && this.currentProject.clientContacts.length && this.currentProject.clientContacts.map(i => i._id).includes(this.user._id)
+    },
+    isNowQuoteStatus() {
+      return this.currentProject.status === 'Quote sent' || this.currentProject.status === 'Cost Quote'
+    },
     rawData() {
       return this.currentProject.steps
     },
@@ -255,17 +450,44 @@ export default {
       }
       return +(subTotal).toFixed(2)
     },
+    getProjectSubTotalExtraQuote() {
+      let subTotal = 0
+      for (let curStep of this.currentProject.incomingSteps) {
+        const { type } = curStep.receivablesUnit
+        if (type === 'CAT Wordcount') {
+          subTotal += +curStep.totalWords * +curStep.clientRate
+        } else {
+          subTotal += +curStep.quantity * +curStep.clientRate
+        }
+      }
+      return +(subTotal).toFixed(2)
+    },
     getProjectTotal() {
-      let price = this.currentProject.finance.Price.receivables
+      let price = this.currentProject.steps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
       if (this.currentProject.additionsSteps.length) {
         price += this.currentProject.additionsSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
       }
+      return +(price).toFixed(2)
+    },
+    getProjectTotalExtraQuote() {
+      let price = this.currentProject.incomingSteps.reduce((acc, curr) => acc += +curr.finance.Price.receivables, 0)
       return +(price).toFixed(2)
     },
     getTMDiscounts() {
       if (!this.currentProject.steps.length) return 0
       if (this.currentProject.steps.some(({ receivablesUnit }) => receivablesUnit.type === 'CAT Wordcount')) {
         const CATSteps = this.currentProject.steps.filter(({ receivablesUnit, step }) => receivablesUnit.type === 'CAT Wordcount' && step.title === 'Translation')
+        if (!CATSteps.length) return 0
+        const nativePrice = CATSteps.reduce((acc, curr) => acc += +curr.clientRate * +curr.totalWords, 0)
+        const relativePrice = CATSteps.reduce((acc, curr) => acc += +curr.clientRate * +curr.quantity, 0)
+        return +(nativePrice - relativePrice).toFixed(2)
+      }
+      return 0
+    },
+    getTMDiscountsExtraQuote() {
+      if (!this.currentProject.incomingSteps.length) return 0
+      if (this.currentProject.incomingSteps.some(({ receivablesUnit }) => receivablesUnit.type === 'CAT Wordcount')) {
+        const CATSteps = this.currentProject.incomingSteps.filter(({ receivablesUnit, step }) => receivablesUnit.type === 'CAT Wordcount' && step.title === 'Translation')
         if (!CATSteps.length) return 0
         const nativePrice = CATSteps.reduce((acc, curr) => acc += +curr.clientRate * +curr.totalWords, 0)
         const relativePrice = CATSteps.reduce((acc, curr) => acc += +curr.clientRate * +curr.quantity, 0)
@@ -282,9 +504,10 @@ export default {
     //   return result
     // }
   },
-  components: { DeliveryTable, CircleProgress, ProgressLineStep, GeneralTable },
+  components: { Button, DeliveryTable, CircleProgress, ProgressLineStep, GeneralTable },
   async created() {
     this.domain = process.env.domain
+    this.adminUrl = process.env.adminUrl
     await this.getClient()
     await this.getCurrentProject()
   }
@@ -293,6 +516,17 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors";
+
+.mainSides {
+  display: flex;
+  width: fit-content;
+}
+
+.quote {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 
 .priceExplanation {
   margin-top: 20px;
@@ -363,6 +597,12 @@ export default {
 }
 
 .details {
+  &__title {
+    font-size: 14px;
+    font-family: Myriad600;
+    margin: 6px 0 14px;
+  }
+
   &__steps {
     position: relative;
     padding-top: 10px;

@@ -7,7 +7,8 @@ module.exports = {
   ],
 
   env: {
-    domain: process.env.API_URL
+    domain: process.env.API_URL,
+    adminUrl: 'https://admin2.pangea.global'
   },
 
   axios: {

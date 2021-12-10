@@ -39,7 +39,8 @@ export default {
     return {
       projects: [],
       clientRequests: [],
-      openQuotes: []
+      openQuotes: [],
+      extraQuotes: []
     }
   },
   methods: {
@@ -54,18 +55,19 @@ export default {
       document.cookie = `client=${ token }; path=/; expires=Thu, ${ today } 22:00:00 UTC; domain=.pangea.global`
       window.location.replace(redirectTo)
     },
-    async makeQuoteAction({ _id, status }) {
-      const quote = this.openQuotes.find((quote) => quote._id === _id)
-      try {
-        await this.updateQuoteStatus({ quote, key: status })
-      } catch (err) {
-      }
-    },
+    // async makeQuoteAction({ _id, status }) {
+    //   const quote = this.openQuotes.find((quote) => quote._id === _id)
+    //   try {
+    //     await this.updateQuoteStatus({ quote, key: status })
+    //   } catch (err) {
+    //   }
+    // },
     async getDashboardProject() {
       try {
         this.projects = (await this.$axios.get(`/portal/open-projects?token=${ this.token }`)).data
         this.clientRequests = (await this.$axios.get(`/portal/open-requests?token=${ this.token }`)).data
         this.openQuotes = (await this.$axios.get(`/portal/open-quotes?token=${ this.token }`)).data
+        this.extraQuotes = (await this.$axios.get(`/portal/extra-quotes?token=${ this.token }`)).data.filter(item => !item.minimumCharge.isUsed)
       } catch (err) {
         this.alertToggle({ message: 'Internal Error', isShow: true, type: "error" })
       }
@@ -78,8 +80,9 @@ export default {
       token: "getToken"
     }),
     myFilteredQuotes() {
-      if (!this.openQuotes) return []
-      return this.openQuotes.filter(quote => quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ _id }) => _id).includes(this.user._id))
+      if (!this.openQuotes && !this.extraQuotes) return []
+      const quotes = this.openQuotes.filter(quote => quote.hasOwnProperty('clientContacts') && quote.clientContacts.map(({ _id }) => _id).includes(this.user._id))
+      return [ ...this.extraQuotes, ...quotes ]
     },
     myFilteredProjects() {
       if (!this.projects) return []
