@@ -12,22 +12,16 @@
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
+
     .sub-information__row
-      .row__title Payment Profile:
-      //.row__data(v-if="!isProjectFinished")
-        //SelectSingle.drop(
-        //  placeholder="Select",
-        //  :selectedOption="project.paymentProfile",
-        //  :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
-        //  @chooseOption="setPayment"
-        //)
-      .row__data {{ project.paymentProfile || 'Not assigned' }}
+      .row__title Test:
+      .row__data
+        CheckBox(:isChecked="project.isTest", :isDisabled="isProjectFinished" @check="() => setTest(true)",  @uncheck="() => setTest(false)")
+
     .sub-information__row
       .row__title Urgent:
       .row__data
-        .checkbox
-          input#urgent(type="checkbox", :disabled="isProjectFinished" :checked="project.isUrgent", @change="setUrgentStatus")
-          label(for="urgent")
+        CheckBox(:isChecked="project.isUrgent", :isDisabled="isProjectFinished" @check="() => setUrgentStatus(true)", @uncheck="() => setUrgentStatus(false)")
 
     .sub-information__row(v-if="project.requestId")
       .row__title Request:
@@ -36,6 +30,9 @@
           router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${project.requestId._id}`}")
             span {{ project.requestId.projectId }}
 
+    .sub-information__row
+      .row__title Payment Profile:
+      .row__data {{ project.paymentProfile || 'Not assigned' }}
 
     .client-table
       GeneralTable(
@@ -91,6 +88,7 @@ import crudIcons from "@/mixins/crudIcons"
 import SelectSingle from "@/components/SelectSingle"
 import WYSIWYG from "../vendors/WYSIWYG"
 import GeneralTable from "../GeneralTable"
+import CheckBox from "../CheckBox"
 
 export default {
   mixins: [ scrollDrop, crudIcons ],
@@ -132,23 +130,27 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject"
     }),
+    async setTest(bool) {
+      await this.setProjectProp({ prop: 'isTest', value: bool })
+    },
+    async setProjectProp({ prop, value }) {
+      try {
+        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
     copyId() {
       let id = document.getElementById('id')
       let elementText = id.textContent
       navigator.clipboard.writeText(elementText)
       try {
         document.execCommand('copy')
-        this.alertToggle({
-          message: "Text copied successfully",
-          isShow: true,
-          type: "success"
-        })
+        this.alertToggle({ message: "Text copied successfully", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({
-          message: "Text not copied",
-          isShow: true,
-          type: "error"
-        })
+        this.alertToggle({ message: "Text not copied", isShow: true, type: "error" })
       }
     },
     openWYSIWYG(index) {
@@ -311,29 +313,9 @@ export default {
     setClientContact({ option }) {
       this.currentClientContact = this.project.customer.contacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === option)
     },
-    // async setPayment({ option }) {
-    // 	try {
-    // 		const result = await this.$http.post("/pm-manage/payment-profile", {
-    // 			projectId: this.project._id,
-    // 			paymentProfile: option
-    // 		})
-    // 		this.project.paymentProfile = result.data.paymentProfile
-    // 		this.alertToggle({
-    // 			message: "Project payment profile updated",
-    // 			isShow: true,
-    // 			type: "success"
-    // 		})
-    // 	} catch (err) {
-    // 		this.alertToggle({
-    // 			message: "Cannot update project payment profile",
-    // 			isShow: true,
-    // 			type: "error"
-    // 		})
-    // 	}
-    // },
-    async setUrgentStatus(event) {
+    async setUrgentStatus(bool) {
       try {
-        const result = await this.$http.post("/pm-manage/urgent", { projectId: this.project._id, isUrgent: event.target.checked })
+        const result = await this.$http.post("/pm-manage/urgent", { projectId: this.project._id, isUrgent: bool })
         this.setCurrentProject(result.data)
         this.alertToggle({ message: "Urgent status updated", isShow: true, type: "success" })
       } catch (err) {
@@ -359,6 +341,7 @@ export default {
     this.project && this.getClientContacts()
   },
   components: {
+    CheckBox,
     GeneralTable,
     Add,
     SelectSingle,
@@ -441,7 +424,9 @@ export default {
   &__row {
     width: 100%;
     display: flex;
-    height: 40px;
+    height: 20px;
+    align-items: center;
+    margin-bottom: 20px;
   }
 
   .row {
@@ -488,63 +473,63 @@ export default {
   width: 0;
 }
 
-.checkbox {
-  display: flex;
-  height: 30px;
-
-  input[type="checkbox"] {
-    opacity: 0;
-
-    + {
-      label {
-        &::after {
-          content: none;
-        }
-      }
-    }
-
-    &:checked {
-      + {
-        label {
-          &::after {
-            content: "";
-          }
-        }
-      }
-    }
-  }
-
-  label {
-    position: relative;
-    display: inline-block;
-    padding-left: 22px;
-    padding-top: 4px;
-
-    &::before {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid $border;
-      left: 0px;
-      top: 3px;
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
-    }
-  }
-}
+//.checkbox {
+//  display: flex;
+//  height: 30px;
+//
+//  input[type="checkbox"] {
+//    opacity: 0;
+//
+//    + {
+//      label {
+//        &::after {
+//          content: none;
+//        }
+//      }
+//    }
+//
+//    &:checked {
+//      + {
+//        label {
+//          &::after {
+//            content: "";
+//          }
+//        }
+//      }
+//    }
+//  }
+//
+//  label {
+//    position: relative;
+//    display: inline-block;
+//    padding-left: 22px;
+//    padding-top: 4px;
+//
+//    &::before {
+//      position: absolute;
+//      content: "";
+//      display: inline-block;
+//      height: 16px;
+//      width: 16px;
+//      border: 1px solid $border;
+//      left: 0px;
+//      top: 3px;
+//    }
+//
+//    &::after {
+//      position: absolute;
+//      content: "";
+//      display: inline-block;
+//      height: 5px;
+//      width: 9px;
+//      border-left: 2px solid;
+//      border-bottom: 2px solid;
+//      transform: rotate(-45deg);
+//      left: 4px;
+//      top: 7px;
+//    }
+//  }
+//}
 
 .icon {
   display: flex;

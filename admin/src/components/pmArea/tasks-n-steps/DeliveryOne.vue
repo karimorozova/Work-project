@@ -304,6 +304,7 @@
 				if (!this.deliveryTask) return false
 				return this.isAdmin
 						|| this.user._id.toString() === this.deliveryTask.dr1Manager.toString()
+            || this.user._id.toString() === this.project.accountManager._id.toString()
 			}
 		},
 		components: {

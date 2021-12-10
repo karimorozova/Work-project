@@ -444,6 +444,7 @@
 				if (Object.keys(this.user).length && Object.keys(this.dr1Manager).length) {
 					return this.isAdmin
 							|| this.user._id.toString() === this.dr1Manager._id.toString()
+              || this.user._id.toString() === this.project.accountManager._id.toString()
 				}
 			}
 		},

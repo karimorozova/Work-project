@@ -5,16 +5,16 @@
         input.project__name(v-if="existProjectAccessChangeName" type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
         .project__name(style="border: 1px solid white;" v-else) {{ project.projectName }}
 
-        .textCheckbox(v-if="!isProjectFinished")
-          CheckBox(
-            :isChecked="project.isTest"
-            :isWhite="true"
-            @check="() => setTest(true)"
-            @uncheck="() => setTest(false)"
-          )
-          .textCheckbox__label Test
-        .textCheckbox(v-else)
-          .textCheckbox__label {{ project.isTest  ? 'Test project' : '' }}
+        //.textCheckbox(v-if="!isProjectFinished")
+        //  CheckBox(
+        //    :isChecked="project.isTest"
+        //    :isWhite="true"
+        //    @check="() => setTest(true)"
+        //    @uncheck="() => setTest(false)"
+        //  )
+        //  .textCheckbox__label Test
+        //.textCheckbox(v-else)
+        //  .textCheckbox__label {{ project.isTest  ? 'Test project' : '' }}
 
       .project__detailsRow
         .project__detailsRow-client
@@ -261,9 +261,6 @@ export default {
     async updateProjectDate(e, prop) {
       const date = { [prop]: e }
       await this.setProjectDate({ date, projectId: this.project._id })
-    },
-    async setTest(bool) {
-      await this.setProjectProp({ prop: 'isTest', value: bool })
     },
     // async setSameDate(e) {
     // 	this.isBilling = e.target.checked

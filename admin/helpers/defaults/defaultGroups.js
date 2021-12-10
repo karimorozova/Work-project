@@ -1,4 +1,5 @@
 const defaultGroups = [
+  'Super User',
   'Administrators',
   'Account Managers',
   'Developers',
