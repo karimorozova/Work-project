@@ -50,10 +50,12 @@ export default {
     getServiceTargetLanguages() {
       const { customer: { services }, industry } = this.currentProject
       const { service, source } = this.tasksData
-      const neededServices = services
-          .filter(item => item.services[0] === service._id && item.industries[0] === industry._id && item.sourceLanguage === source._id)
-          .map(item => item.targetLanguages[0])
-      return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
+
+      const mappedTargetLanguages = service.languageForm === 'Duo'
+          ? services.filter(item => item.services[0].toString() === service._id.toString() && item.industries[0].toString() === industry._id.toString() && item.sourceLanguage.toString() === source._id.toString()).map(item => item.targetLanguages[0])
+          : services.filter(item => item.services[0].toString() === service._id.toString() && item.industries[0].toString() === industry._id.toString()).map(item => item.targetLanguages[0])
+
+      return this.allLanguages.filter(a => [ ...new Set(mappedTargetLanguages) ].some(b => a._id.toString() === b.toString()))
     },
     moveFromAll(lang) {
       const targets = this.tasksData.targets || []
