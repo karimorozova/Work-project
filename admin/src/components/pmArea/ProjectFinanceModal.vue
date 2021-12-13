@@ -215,7 +215,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      units: "getAllUnits",
+      // units: "getAllUnits",
       currentProject: "getCurrentProject"
     }),
     isProjectFinished() {

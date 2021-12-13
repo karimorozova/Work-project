@@ -29,6 +29,7 @@ import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
+import StepsDashboard from '@/components/dashboard/StepsDashboard'
 // import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import Activity from '@/components/dashboard/Activity'
@@ -135,6 +136,11 @@ const router = new Router({
 							path: 'overall-view',
 							name: 'overall-view',
 							component: OverallView
+						},
+						{
+							path: 'pipeline',
+							name: 'pipeline',
+							component: StepsDashboard
 						},
 						{
 							path: 'sales-perfomance',

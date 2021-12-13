@@ -84,9 +84,9 @@ export default {
 
   },
   computed: {
-    ...mapGetters({
-      currentProject: "getCurrentProject"
-    })
+    // ...mapGetters({
+    //   currentProject: "getCurrentProject"
+    // })
   },
   components: {
     TableMatrix,

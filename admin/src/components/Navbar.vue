@@ -46,6 +46,11 @@ export default {
             },
             {
               type: 'link',
+              name: 'Pipeline',
+              path: `/pangea-dashboard/pipeline`
+            },
+            {
+              type: 'link',
               name: 'Activities',
               path: '/pangea-dashboard/activities'
             }

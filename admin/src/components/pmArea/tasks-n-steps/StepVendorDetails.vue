@@ -57,11 +57,11 @@
           .stats__row
             .stats__col.border-right
               .stats__col-smallValue {{vendorDetails.benchmark }}
-                span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                span.currency(v-html="returnIconCurrencyByStringCode(projectCurrency)")
               .stats__col-smallTitle B.MARK
             .stats__col
               .stats__col-smallValue {{ +(vendorDetails.benchmark - currentStep.vendorRate).toFixed(4) }}
-                span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                span.currency(v-html="returnIconCurrencyByStringCode(projectCurrency)")
               .stats__col-smallTitle B.MARGIN
 
         .vendor__marks

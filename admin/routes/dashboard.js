@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { getProjectsFinanceInfo } = require('../dashboard/overallView/projectFinance')
 const { getProjectsForDashboard } = require('../dashboard/pmAmOrAdmin')
+const { getProjectsForPipeline } = require('../dashboard/pipeline')
 const { getClientsRequestsForDashboard } = require('../dashboard/incomingRequests')
 const { sendRequest } = require("../projects/xtrfApi")
 const axios = require("axios")
@@ -155,6 +156,19 @@ router.delete("/activity/task/:id/delete", async (req, res) => {
 		await ClientsTasks.deleteOne({ _id: id })
 		res.send('success')
 	} catch (e) {
+		res.status(500).send('Error on client delete')
+	}
+
+})
+
+router.post("/pipeline", async (req, res) => {
+	try {
+		const {page, limit} = req.query
+		const {filters} = req.body
+		const pipeline = await getProjectsForPipeline(page, limit,filters)
+		res.json(pipeline)
+	} catch (e) {
+		console.log(e)
 		res.status(500).send('Error on client delete')
 	}
 
