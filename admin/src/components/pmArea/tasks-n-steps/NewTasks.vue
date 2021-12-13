@@ -89,8 +89,11 @@
         .table__data(v-html="getPair(row)")
 
       template(slot="status" slot-scope="{ row }")
-        .table__data
+        .table__dataIcons
           .status {{ row.status }}
+          .tooltip(v-if="row.reason" )
+            .tooltipData(v-html="row.reason")
+            i.fas.fa-info-circle
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
@@ -480,11 +483,11 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || this.currentProject.status === 'Approved'
-          ? [ 'Mark as Approved', 'Send a Quote',  ]
+          ? [ 'Mark as Approved', 'Send a Quote' ]
           : []
 
       // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel']
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel' ]
 
     },
     // finalData() {
@@ -637,6 +640,25 @@ export default {
 .table {
   width: 100%;
 
+  &__dataIcons {
+    padding: 0 7px;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    i {
+      color: $dark-border;
+      cursor: help;
+      transition: .2s ease-out;
+      font-size: 15px;
+    }
+
+    i:hover {
+      color: $text;
+    }
+  }
+
   &__data {
     padding: 0 7px;
   }
@@ -715,5 +737,44 @@ input {
 
 .red-color {
   color: $red;
+}
+
+.tooltip {
+  position: relative;
+  display: flex;
+
+  .tooltipData {
+    visibility: hidden;
+    font-size: 14px;
+    width: max-content;
+    background: white;
+    border-radius: 4px;
+    right: 25px;
+    padding: 7px 7px 5px 7px;
+    position: absolute;
+    z-index: 555;
+    opacity: 0;
+    transition: opacity .3s;
+    border: 1px solid $text;
+    top: -2px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      right: -12px;
+      transform: rotate(270deg);
+      border-width: 6px;
+      border-style: solid;
+      border-color: $text transparent transparent;
+    }
+  }
+
+  &:hover {
+    .tooltipData {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
 }
 </style>

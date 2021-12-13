@@ -286,7 +286,8 @@ const ProjectsSchema = new mongoose.Schema({
 		refFiles: [],
 		targetFiles: [],
 		targetFilesStages: [],
-		metrics: {}
+		metrics: {},
+		reason: "",
 	} ],
 	steps: [ {
 		projectId: { type: String, trim: true },

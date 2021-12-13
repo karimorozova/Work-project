@@ -1,67 +1,68 @@
 <template lang="pug">
   .step-dashboard
-    StepsDashboardFilters(
-      v-if="userGroup && user"
-      :userId="user._id"
-      :userGroup="userGroup"
-    )
-    LayoutsTable(
-      :fields="fields"
-      :tableData="steps"
-      @bottomScrolled="bottomScrolled"
-    )
-      template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .table__header {{ field.label }}
-
-      template(slot="projectId" slot-scope="{ row, index }")
-        .table__data
-          router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-            span {{row.projectId}}
-
-      template(slot="projectName" slot-scope="{ row, index }")
-        .table__data
-          router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-            span {{ getProjectName( row.projectName ) }}
-
-      template(slot="clientName" slot-scope="{ row, index }")
-        .table__data {{row.customer.name}}
-
-      template(slot="status" slot-scope="{ row, index }")
-        .table__data {{row.steps.status}}
-
-      template(slot="langPair" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.sourceLanguage}} &ensp;
-          span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
-            i(class="fas fa-angle-double-right")
-          span {{row.steps.targetLanguage}} &ensp;
-
-      template(slot="langPair" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.sourceLanguage+' '}}
-          span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
-            i(class="fas fa-angle-double-right")
-          span {{' ' + row.steps.targetLanguage}}
-
-      template(slot="step" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.stepAndUnit.step.title}}
-
-      template(slot="vendor" slot-scope="{ row, index }")
-        .table__data(v-if="row.steps.vendor")
-          span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
-        .table__data(v-else) -
-      template(slot="startDate" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.startDate) }}
-
-      template(slot="deadline" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.deadline) }}
-
-      template(slot="projectManager" slot-scope="{ row, index }")
-        .table__data {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
-
-      template(slot="accountManager" slot-scope="{ row, index }")
-        .table__data {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
+    | Soon ...
+    //StepsDashboardFilters(
+    //  v-if="userGroup && user"
+    //  :userId="user._id"
+    //  :userGroup="userGroup"
+    //)
+    //LayoutsTable(
+    //  :fields="fields"
+    //  :tableData="steps"
+    //  @bottomScrolled="bottomScrolled"
+    //)
+    //  template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+    //    .table__header {{ field.label }}
+    //
+    //  template(slot="projectId" slot-scope="{ row, index }")
+    //    .table__data
+    //      router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+    //        span {{row.projectId}}
+    //
+    //  template(slot="projectName" slot-scope="{ row, index }")
+    //    .table__data
+    //      router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+    //        span {{ getProjectName( row.projectName ) }}
+    //
+    //  template(slot="clientName" slot-scope="{ row, index }")
+    //    .table__data {{row.customer.name}}
+    //
+    //  template(slot="status" slot-scope="{ row, index }")
+    //    .table__data {{row.steps.status}}
+    //
+    //  template(slot="langPair" slot-scope="{ row, index }")
+    //    .table__data
+    //      span {{row.steps.sourceLanguage}} &ensp;
+    //      span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+    //        i(class="fas fa-angle-double-right")
+    //      span {{row.steps.targetLanguage}} &ensp;
+    //
+    //  template(slot="langPair" slot-scope="{ row, index }")
+    //    .table__data
+    //      span {{row.steps.sourceLanguage+' '}}
+    //      span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+    //        i(class="fas fa-angle-double-right")
+    //      span {{' ' + row.steps.targetLanguage}}
+    //
+    //  template(slot="step" slot-scope="{ row, index }")
+    //    .table__data
+    //      span {{row.steps.stepAndUnit.step.title}}
+    //
+    //  template(slot="vendor" slot-scope="{ row, index }")
+    //    .table__data(v-if="row.steps.vendor")
+    //      span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
+    //    .table__data(v-else) -
+    //  template(slot="startDate" slot-scope="{ row, index }")
+    //    .table__data {{ customFormatter(row.startDate) }}
+    //
+    //  template(slot="deadline" slot-scope="{ row, index }")
+    //    .table__data {{ customFormatter(row.deadline) }}
+    //
+    //  template(slot="projectManager" slot-scope="{ row, index }")
+    //    .table__data {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+    //
+    //  template(slot="accountManager" slot-scope="{ row, index }")
+    //    .table__data {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
 
 </template>
 

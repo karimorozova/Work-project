@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const moment = require('moment')
 const { Projects } = require('../models')
 const { getProject, updateWithApprovedTasks } = require('../projects')
 const { getProjectManageToken } = require("../middleware")
@@ -50,7 +51,10 @@ router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 	}
 	if (prop === 'reject') {
 		const tasks = allTasks.map(task => {
-			if (task.status === 'Quote sent') task.status = 'Cancelled'
+			if (task.status === 'Quote sent') {
+				task.status = 'Cancelled'
+				task.reason = `Rejected by Client. At: ${ moment(new Date()).format('MMM D, HH:mm') } `
+			}
 			return task
 		})
 		const steps = project.steps.map(step => {

@@ -136,7 +136,7 @@
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
           .status {{ row.status }}
-          .progress
+          .progress(v-if="row.status !== 'Cancelled'" )
             ProgressLineStep(:progress="progress(row.progress)" :status="row.status" :lastProgress="lastProgress(row, index)")
 
 
@@ -460,7 +460,7 @@ export default {
     },
     async setDate(date, prop, stepId) {
       const step = this.currentProject.steps.find(item => item._id === stepId)
-      if(step.status === 'Completed') return
+      if (step.status === 'Completed') return
       step[prop] = new Date(date)
       const { type } = step.receivablesUnit
       await this.sendStepsDates({ _id: this.currentProject._id, step, stepId, type, prop })
@@ -745,6 +745,6 @@ input {
   &:hover {
     text-decoration: underline;
   }
-
 }
+
 </style>

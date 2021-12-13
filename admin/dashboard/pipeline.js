@@ -38,7 +38,6 @@ exports.getProjectsForPipeline  = async (queryPage , queryLimit, filters) => {
 		tasksStatuses,
 		// requestId
 	} = filters
-	console.log(filters)
 	if (projectId) {
 		const filter = projectId.replace(reg, '\\$&')
 		query['projectId'] = { "$regex": new RegExp(filter, 'i') }
