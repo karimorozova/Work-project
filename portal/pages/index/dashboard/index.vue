@@ -1,11 +1,9 @@
 <template lang="pug">
   .dashboard(v-if="Object.keys(client).length && client")
-    //V ==>
-    //.swapper
-    //  .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
-    //  .swapper__button
-    //    Button(:value="'Archive'" @clicked="goToAnotherPortal")
-    //V <==
+    .swapper
+      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
+      .swapper__button
+        Button(:value="'Archive'" @clicked="goToAnotherPortal")
     .row
       .col
         AllOpenRequests(:client="client" :allRequests="clientRequests")
@@ -48,7 +46,7 @@ export default {
       alertToggle: "alertToggle"
     }),
     goToAnotherPortal() {
-      const redirectTo = `https://portal.pangea.global`
+      const redirectTo = `https://archive-portal.pangea.global`
       let [ cookieValue ] = document.cookie.split(';').filter(i => i.includes('client'))
       let [ key, token ] = cookieValue.split('=')
       const today = moment(new Date()).format('DD MMM YYYY')

@@ -61,7 +61,7 @@ export default {
       setOriginallyUnits: "setOriginallyUnits"
     }),
     goToAnotherPortal(){
-      const redirectTo = `https://vendor.pangea.global`
+      const redirectTo = `https://archive-vendor.pangea.global`
       let [ cookieValue ] = document.cookie.split(';').filter(i => i.includes('vendor'))
       let [ key, token ] = cookieValue.split('=')
       const today = moment(new Date()).format('DD MMM YYYY')

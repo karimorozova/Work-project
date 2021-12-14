@@ -20,9 +20,9 @@ require('./schedule');
 
 
 const allowedOrigins = [
-	"https://admin2.pangea.global",
-	"https://vendor2.pangea.global",
-	"https://portal2.pangea.global",
+	"https://admin.pangea.global",
+	"https://vendor.pangea.global",
+	"https://portal.pangea.global",
 	"http://localhost:3000",
 	"http://localhost:3002",
 	"http://localhost:8081",
@@ -82,7 +82,7 @@ const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "https://admin2.pangea.global:*, http://localhost:*",
+    origin: "https://admin.pangea.global:*, http://localhost:*",
     methods: ["GET", "POST"]
   },
   secure: true,
