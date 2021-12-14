@@ -76,7 +76,8 @@ const {
 	sendEmail,
 	notifyClientProjectCancelled,
 	notifyClientTasksCancelled,
-	sendFlexibleEmail
+	sendFlexibleEmail,
+	sendQuoteToVendorsAfterProjectAccepted
 } = require('../../utils')
 
 const {
@@ -126,7 +127,6 @@ const {
 
 const { setUpdatedFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../../сalculations/finance')
 const { getEmailBackbone } = require("../../emailMessages/otherCommunication")
-
 
 router.post('/send-email-from-to', async (req, res) => {
 	const { message, to, from, subject } = req.body
@@ -426,6 +426,19 @@ router.get('/all-managers', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on getting managers ')
+	}
+})
+
+router.post('/mark-project-paid', async (req, res) => {
+	const { projectId } = req.body
+	try {
+		const project = await getProject({ "_id": projectId })
+		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
+		const updatedProject = await updateProject({ "_id": projectId }, { steps, isPaid: true, inPause: false })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Internal server error / Cannot mark Project "Is Paid"')
 	}
 })
 

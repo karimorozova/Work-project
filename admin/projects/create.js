@@ -41,7 +41,7 @@ async function createProject(project, user) {
 		project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id
 		project.accountManager = accountManager._id
-		project.paymentProfile = project.clientBillingInfo.paymentType
+		// project.paymentProfile = project.clientBillingInfo.paymentType
 		project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
 		project.discounts = discounts
 		project.minimumCharge = { value: minPrice, toIgnore: false }

@@ -58,25 +58,25 @@
           .table__data(v-else) -
 
         template(slot="payables" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price.payables")
+          .table__data(v-if="row.finance.Price && row.finance.Price.payables")
             span.currency(v-html="currency(row.projectCurrency)")
             span {{ price(row.finance.Price.payables) }}
           .table__data(v-else) -
 
         template(slot="receivables" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price.receivables")
+          .table__data(v-if="row.finance.Price && row.finance.Price.receivables")
             span.currency(v-html="currency(row.projectCurrency)")
             span {{ price(row.finance.Price.receivables) }}
           .table__data(v-else) -
 
         template(slot="margin" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price.receivables && row.finance.Price.payables")
+          .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
             span.currency(v-html="currency(row.projectCurrency)")
             span {{ price(row.finance.Price.receivables - row.finance.Price.payables) }}
           .table__data(v-else) -
 
         template(slot="marginPercentage" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price.receivables && row.finance.Price.payables")
+          .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
             span {{ price( (1 - (row.finance.Price.payables / row.finance.Price.receivables)) * 100 ) }}
             span.symbol %
           .table__data(v-else) -

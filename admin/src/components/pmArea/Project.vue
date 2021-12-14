@@ -615,7 +615,7 @@ export default {
     font-size: 18px;
     padding: 0 10px;
     height: 44px;
-    width: 880px;
+    width: 100%;
     border-radius: 4px;
     border: 1px solid $light-border;
     outline: none;

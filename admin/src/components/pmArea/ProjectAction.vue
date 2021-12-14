@@ -18,6 +18,7 @@
       .project-action__drop-menuSend
         .project-action__dropBody
           SelectSingle(
+            :isDisabled="!isAm && !isPm && !isAdmin"
             :selectedOption="selectedAction"
             :options="filteredActions"
             placeholder="Select Action"
@@ -86,6 +87,7 @@
           .drops__label Account Manager:
           .drops__menu(v-if="!isProjectFinished")
             SelectSingle(
+              :isDisabled="!isAm && !isPm && !isAdmin"
               :options="accManagers"
               :selectedOption="selectedAccManager"
               @chooseOption="(e) => setManager(e, 'accountManager')"
@@ -95,6 +97,7 @@
           .drops__label Project Manager:
           .drops__menu(v-if="!isProjectFinished")
             SelectSingle(
+              :isDisabled="!isAm && !isPm && !isAdmin"
               :options="projManagers"
               :selectedOption="selectedProjManager"
               @chooseOption="(e) => setManager(e, 'projectManager')"
@@ -442,6 +445,18 @@ export default {
       currentClient: 'getCurrentClient',
       user: 'getUser'
     }),
+    isPm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.projectManager._id === this.user._id
+    },
+    isAm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.accountManager._id === this.user._id
+    },
+    isAdmin() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
+    },
     isProjectFinished() {
       const { status } = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'

@@ -28,8 +28,10 @@ emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
 emitter.on('client-decide', async (project, prop) => {
 	if (prop === 'accept') {
 		await notifyManagerProjectStarts(project)
-		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
-		await Projects.updateOne({ "_id": project._id }, { steps })
+		if(!project.inPause){
+			const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
+			await Projects.updateOne({ "_id": project._id }, { steps })
+		}
 	}
 	if (prop === 'reject') {
 		await notifyManagerProjectRejected(project)

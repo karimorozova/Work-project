@@ -46,12 +46,20 @@ const ProjectsSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-	clientContacts: [],
-	paymentProfile: {
-		type: String,
-		default: '',
-		trim: true
+	inPause: {
+		type: Boolean,
+		default: false
 	},
+	isPaid: {
+		type: Boolean,
+		default: false
+	},
+	clientContacts: [],
+	// paymentProfile: {
+	// 	type: String,
+	// 	default: '',
+	// 	trim: true
+	// },
 	clientBillingInfo: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients.billingInfo',
@@ -287,7 +295,7 @@ const ProjectsSchema = new mongoose.Schema({
 		targetFiles: [],
 		targetFilesStages: [],
 		metrics: {},
-		reason: "",
+		reason: ""
 	} ],
 	steps: [ {
 		projectId: { type: String, trim: true },

@@ -1,84 +1,97 @@
 <template lang="pug">
-  .project-cd
-    .project-cd__row
-      input.project-cd__name( type="text" v-model="project.projectName" placeholder="Project Name")
+  .creationProjectArea
+    .project-cd
+      .project-cd__row
+        input.project-cd__name( type="text" v-model="project.projectName" placeholder="Project Name")
 
-      .textCheckbox
-        CheckBox(
-          :isChecked="project.isTest"
-          :isWhite="true"
-          @check="() => setTest(true)"
-          @uncheck="() => setTest(false)"
+      .project-cd__row
+        .project-cd__input
+          .input-title
+            .input-title__text Client Name:
+            span.require *
+          .project-cd__select-input
+            SelectSingle(
+              :selectedOption="project.customer.name"
+              :options="clients"
+              :hasSearch="true"
+              placeholder="Name"
+              @chooseOption="setCustomer"
+            )
+
+        .project-cd__input
+          .input-title
+            .input-title__text Industry:
+            span.require *
+          .project-cd__select-input
+            SelectSingle(
+              placeholder="Industry"
+              :selectedOption="project.selectedIndustry.name"
+              :options="industriesList"
+              :isDisabled="!project.customer.name"
+              @chooseOption="setIndustry"
+            )
+        .project-cd__input
+          .input-title
+            .input-title__text Billing Information:
+            span.require *
+          .project-cd__select-input
+            SelectSingle(
+              placeholder="Option"
+              :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
+              :options="billingInfoList.map(({name}) => name)"
+              :isDisabled="!project.customer.name"
+              @chooseOption="choseBillingInfo"
+            )
+
+        .project-cd__input
+          .input-title
+            .input-title__text Deadline:
+            span.require *
+          DatePicker(
+            :value="new Date(project.deadline)"
+            @confirm="updateProjectDate"
+            format="DD-MM-YYYY, HH:mm"
+            type="datetime"
+            ref="deadline"
+            :clearable="false"
+            :confirm="true"
+            confirm-text="Set date"
+            :disabled-date="notBeforeNow"
+            prefix-class="xmx"
+          )
+
+      .project-cd__rowButton
+        Button(
+          value="Create Project"
+          @clicked="checkForErrors"
         )
-        .textCheckbox__label Test
-
-    .project-cd__row
-      .project-cd__input
-        .input-title
-          .input-title__text Client Name:
-          span.require *
-        .project-cd__select-input
-          SelectSingle(
-            :selectedOption="project.customer.name"
-            :options="clients"
-            :hasSearch="true"
-            placeholder="Name"
-            @chooseOption="setCustomer"
-          )
-
-      .project-cd__input
-        .input-title
-          .input-title__text Industry:
-          span.require *
-        .project-cd__select-input
-          SelectSingle(
-            placeholder="Industry"
-            :selectedOption="project.selectedIndustry.name"
-            :options="industriesList"
-            :isDisabled="!project.customer.name"
-            @chooseOption="setIndustry"
-          )
-      .project-cd__input
-        .input-title
-          .input-title__text Billing Information:
-          span.require *
-        .project-cd__select-input
-          SelectSingle(
-            placeholder="Option"
-            :selectedOption="(project.clientBillingInfo && project.clientBillingInfo.name) || ''"
-            :options="billingInfoList.map(({name}) => name)"
-            :isDisabled="!project.customer.name"
-            @chooseOption="choseBillingInfo"
-          )
-
-      .project-cd__input
-        .input-title
-          .input-title__text Deadline:
-          span.require *
-        DatePicker(
-          :value="new Date(project.deadline)"
-          @confirm="updateProjectDate"
-          format="DD-MM-YYYY, HH:mm"
-          type="datetime"
-          ref="deadline"
-          :clearable="false"
-          :confirm="true"
-          confirm-text="Set date"
-          :disabled-date="notBeforeNow"
-          prefix-class="xmx"
-        )
-
-    .project-cd__rowButton
-      Button(
-        value="Create Project"
-        @clicked="checkForErrors"
+      ValidationErrors(
+        v-if="areErrorsExist"
+        :errors="errors"
+        :isAbsolute="true"
+        @closeErrors="closeErrors"
       )
-    ValidationErrors(
-      v-if="areErrorsExist"
-      :errors="errors"
-      :isAbsolute="true"
-      @closeErrors="closeErrors"
-    )
+
+    .sub-information
+      .sub-information__row
+        .row__title Test:
+        .row__data
+          CheckBox(:isChecked="project.isTest", @check="() => setTest(true)",  @uncheck="() => setTest(false)")
+
+      .sub-information__row
+        .row__title Urgent:
+        .row__data
+          CheckBox(:isChecked="project.isUrgent", @check="() => setUrgentStatus(true)", @uncheck="() => setUrgentStatus(false)")
+
+      .sub-information__row
+        .row__title Pause:
+        .row__data
+          CheckBox(:isChecked="project.inPause", @check="() => setPause(true)",  @uncheck="() => setPause(false)")
+
+
+      .sub-information__row
+        .row__title Payment Profile:
+        .row__data {{ project.clientBillingInfo.hasOwnProperty('name') ? project.clientBillingInfo.paymentType : '-'  }}
 
 </template>
 
@@ -112,7 +125,9 @@ export default {
         deadline: "",
         selectedIndustry: {},
         isTest: false,
-        billingInfo: {}
+        inPause: false,
+        isUrgent: false,
+        clientBillingInfo: {}
       },
       clients: [],
       areErrorsExist: false,
@@ -133,11 +148,18 @@ export default {
     setTest(isCheck) {
       this.setValue('isTest', isCheck)
     },
+    setUrgentStatus(bool) {
+      this.setValue('isUrgent', bool)
+    },
+    setPause(bool) {
+      this.setValue('inPause', bool)
+    },
     setCustomer({ option }) {
       this.setValue('customer', option)
 
       if (this.billingInfoList.length === 1) {
         this.choseBillingInfo({ option: this.billingInfoList[0].name })
+        if (this.billingInfoList[0].paymentType === 'PPP') this.project.inPause = true
       } else {
         this.setValue('clientBillingInfo', {})
       }
@@ -156,6 +178,7 @@ export default {
     choseBillingInfo({ option }) {
       const billingInfo = this.billingInfoList.find(({ name }) => name === option)
       this.setValue('clientBillingInfo', billingInfo)
+      if (billingInfo.paymentType === 'PPP') this.project.inPause = true
     },
     updateProjectDate(date) {
       this.setValue('deadline', date)
@@ -247,6 +270,46 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
+.creationProjectArea {
+  display: flex;
+}
+
+.sub-information {
+  box-sizing: border-box;
+  padding: 25px 25px 5px 25px;
+  box-shadow: $box-shadow;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 420px;
+  width: 420px;
+  background: white;
+  border-radius: 4px;
+  background: white;
+  margin-left: 50px;
+  height: fit-content;
+
+  &__row {
+    width: 100%;
+    display: flex;
+    height: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .row {
+    &__title {
+      width: 150px;
+    }
+
+    &__data {
+      width: 220px;
+      position: relative;
+    }
+  }
+}
+
+
 .project-cd {
   padding: 25px;
   width: 1040px;
@@ -276,7 +339,7 @@ export default {
     font-size: 18px;
     padding: 0 10px;
     height: 44px;
-    width: 880px;
+    width: 100%;
     border-radius: 4px;
     border: 1px solid $light-border;
     outline: none;
@@ -303,7 +366,6 @@ export default {
 
 .textCheckbox {
   padding: 0 8px;
-  // border: 1px solid $light-border;
   border-radius: 4px;
   height: 42px;
   transition: .2s ease-out;

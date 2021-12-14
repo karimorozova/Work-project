@@ -13,6 +13,13 @@
       .row__title Project Status:
       .row__data {{ project.status }}
 
+    .sub-information__row(v-if="project.requestId")
+      .row__title Request:
+      .row__data
+        .link
+          router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${project.requestId._id}`}")
+            span {{ project.requestId.projectId }}
+
     .sub-information__row
       .row__title Test:
       .row__data
@@ -23,16 +30,25 @@
       .row__data
         CheckBox(:isChecked="project.isUrgent", :isDisabled="isProjectFinished" @check="() => setUrgentStatus(true)", @uncheck="() => setUrgentStatus(false)")
 
-    .sub-information__row(v-if="project.requestId")
-      .row__title Request:
-      .row__data
-        .link
-          router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${project.requestId._id}`}")
-            span {{ project.requestId.projectId }}
+    .sub-information__row
+      .row__title Pause:
+      .row__dataFlex
+        CheckBox(:isChecked="project.inPause", :isDisabled="isProjectFinished || projectInProgress" @check="() => setPause(true)",  @uncheck="() => setPause(false)")
+        span(v-if="!isHideForLoading" )
+          Button(v-if="projectInProgress && project.inPause && !project.isPaid" value="Paid" :isDisabled="!isAm && !isPm && !isAdmin" @clicked="markAsPaid" :outline="true")
 
     .sub-information__row
       .row__title Payment Profile:
-      .row__data {{ project.paymentProfile || 'Not assigned' }}
+      .row__data {{ (project.clientBillingInfo && project.clientBillingInfo.paymentType) || '' }}
+
+    .sub-information__row
+      .row__title Payment Status:
+      .row__data(v-if="project.isPaid") Paid
+      .row__data(v-else) Soon ...
+
+    .sub-information__row
+      .row__title Invoicing Report:
+      .row__data Soon ...
 
     .client-table
       GeneralTable(
@@ -81,7 +97,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import Add from "../Add"
 import scrollDrop from "@/mixins/scrollDrop"
 import crudIcons from "@/mixins/crudIcons"
@@ -89,6 +105,8 @@ import SelectSingle from "@/components/SelectSingle"
 import WYSIWYG from "../vendors/WYSIWYG"
 import GeneralTable from "../GeneralTable"
 import CheckBox from "../CheckBox"
+import Button from "../Button"
+import { getUser } from "../../vuex/general/getters"
 
 export default {
   mixins: [ scrollDrop, crudIcons ],
@@ -122,7 +140,8 @@ export default {
       errors: [],
       isDeleting: false,
       currentActive: -1,
-      isEditAndSend: false
+      isEditAndSend: false,
+      isHideForLoading: false
     }
   },
   methods: {
@@ -130,6 +149,21 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject"
     }),
+    async markAsPaid() {
+      try {
+        this.isHideForLoading = true
+        const result = await this.$http.post("/pm-manage/mark-project-paid", { projectId: this.project._id })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project paid", isShow: true, type: "success" })
+        this.isHideForLoading = false
+      } catch (err) {
+        this.isHideForLoading = false
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
+    async setPause(bool) {
+      await this.setProjectProp({ prop: 'inPause', value: bool })
+    },
     async setTest(bool) {
       await this.setProjectProp({ prop: 'isTest', value: bool })
     },
@@ -327,6 +361,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      user: "getUser"
+    }),
     clientData() {
       if (this.project) {
         return this.project.customer.contacts.map((i) => `${ i.firstName } ${ i.surname || '' }`)
@@ -335,12 +372,29 @@ export default {
     isProjectFinished() {
       const { status } = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    },
+    projectInProgress() {
+      const { status } = this.project
+      return status === 'Approved' || status === 'In progress'
+    },
+    isPm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.projectManager._id === this.user._id
+    },
+    isAm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.accountManager._id === this.user._id
+    },
+    isAdmin() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
     }
   },
   created() {
     this.project && this.getClientContacts()
   },
   components: {
+    Button,
     CheckBox,
     GeneralTable,
     Add,
@@ -424,9 +478,9 @@ export default {
   &__row {
     width: 100%;
     display: flex;
-    height: 20px;
+    height: 30px;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   .row {
@@ -437,6 +491,14 @@ export default {
     &__data {
       width: 220px;
       position: relative;
+    }
+
+    &__dataFlex {
+      width: 220px;
+      position: relative;
+      display: flex;
+      gap: 20px;
+      align-items: center;
     }
   }
 

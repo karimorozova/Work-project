@@ -1,293 +1,303 @@
 <template lang="pug">
-  .vendor-manage
+  .vendorsWrapper
+    .isLoading(v-if="isLoading")
+      .isLoading__text Searching for Vendors...
+    .vendor-manage
+      .vendor-manage__sender(v-if="isSender && toEmail" )
+        MailSender(
+          @close="closeSender"
+          :to="toEmail"
+          :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
+        )
 
-    .vendor-manage__sender(v-if="isSender && toEmail" )
-      MailSender(
-        @close="closeSender"
-        :to="toEmail"
-        :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
-      )
+      .vendor-manage__errors(v-if="areErrors")
+        ValidationErrors(:isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
 
-    .vendor-manage__errors(v-if="areErrors")
-      ValidationErrors(:isAbsolute="true" :errors="errors" @closeErrors="closeErrors")
+      .vendor-manage__title
+        span Vendor management
+        .vendor-manage__close(@click.stop="closeVendorManage") &#215;
 
-    .vendor-manage__title
-      span Vendor management
-      .vendor-manage__close(@click.stop="closeVendorManage") &#215;
-
-    .vendor-manage__body
-
-      .vendor-manage__steps
+      .vendor-manage__header
         .tabs
           .tabs__option(v-for="(tab, index) in listOfStepsTitles" @click="setTab(index)" :class="{'tabs_active': tab === selectedTab}") {{ tab }}
 
-        .blocks
-          .block(v-for="stepsGroup of groupedByTaskId")
-            .block__language
-              .taskId {{ stepsGroup[0].taskId.substring(stepsGroup[0].taskId.length - 3) }}
-              span(v-html="getLanguage( stepsGroup[0].sourceLanguage,  stepsGroup[0].targetLanguage)" )
+        .header__togglers(v-if="currentStep")
+          .header__toggler(v-if="!isAllVendors" style="top: 8px; right: 130px;")
+            Toggler(:isDisabled="false" :isActive="isEditable" @toggle="toggleEditable")
+            .header__toggler-text Editable
 
-            .block__steps
-              .block__step(v-for="step of stepsGroup" @click="chooseStep(step)" :class="{'activeStep': currentStepId === step._id.toString()}")
-                .block__name
-                  .block__step-title {{ step.step.title }}
-                  .block__step-status
-                    span(:class="getStatusClass(step.status)") {{ step.status }}
+          .header__toggler(style="top: 8px;")
+            Toggler(:isDisabled="false" :isActive="isAllVendors" @toggle="toggleAllVendors")
+            .header__toggler-text All vendors
 
-                .block__step-vendor(v-if="step.vendor && !selectedVendors[step._id]") {{ step.vendor.firstName }} {{ step.vendor.surname || '' }}
-                .block__step-vendor(v-else-if="selectedVendors[step._id]") {{ selectedVendors[step._id].name }}
-                .block__step-vendor.empty(v-else) No vendor...
+      .vendor-manage__body
+        .vendor-manage__steps
+          .vendors__search(style="margin-right: 23px;")
+            .vendors__search-title Steps:
+            .vendors__search-serch
+              input(type="text" ref="search" placeholder="🔎︎  Search" v-model="stepSearch")
+              .clear-icon(v-if="stepSearch" @click="removeStepSearch")
+                i.fas.fa-backspace
+
+          .blocks
+            .block(v-for="step of groupedByTaskId" @click="chooseStep(step)" :class="{'activeStep': currentStepId === step._id.toString()}")
+              .block__taskId {{ step.taskId.substring(step.taskId.length - 3) }}
+              .block__vendor(v-if="step.vendor && !selectedVendors[step._id]") {{ step.vendor.firstName }} {{ step.vendor.surname || '' }}
+              .block__vendor(v-else-if="selectedVendors[step._id]") {{ selectedVendors[step._id].name }}
+              .block__vendor.empty(v-else) No vendor...
+              .block__language
+                span(v-html="getLanguage( step.sourceLanguage,  step.targetLanguage)" )
+
+              .block__step {{ step.step.title }}
+
+              .block__status {{ step.status }}
+
                 //.block__step-vendorDelete(v-if="(step.vendor || selectedVendors[step._id]) && deleteVendorStatuses(step.status)" @click.stop="removeVendor(step._id)")
                   i(class="fas fa-times-circle")
 
-      transition(name="fade")
-        .vendor-manage__vendors(v-if="currentStep")
-          .vendors__body
-            .header
-              .header__togglers
-                .header__toggler(v-if="isEditable")
-                  Toggler(:isDisabled="false" :isActive="isAllVendors" @toggle="toggleAllVendors")
-                  .header__toggler-text All vendors
+        transition(name="fade")
+          .vendor-manage__vendors(v-if="currentStep")
+            .vendors__body
+              .header
+                transition(name="fade")
+                  div(v-if="isEditable && !isAllVendors")
+                    //.header__description
+                    //  .header__description-text {{ selectedStep }}
+                    //  .header__description-text {{ selectedUnit }}
+                    //  .header__description-text {{ selectedIndustry }}
+                    //  .header__description-langs {{ currentStep.fullSourceLanguage.lang === selectedTarget ? selectedTarget : currentStep.fullSourceLanguage.lang + ' to ' + selectedTarget }}
 
-                .header__toggler(v-if="!isAllVendors" )
-                  Toggler(:isDisabled="false" :isActive="isEditable" @toggle="toggleEditable")
-                  .header__toggler-text Editable
+                    .header__options
+                      .header__option
+                        .header__option-title Target:
+                        .drop
+                          SelectSingle(
+                            :hasSearch="true"
+                            placeholder="Option"
+                            :selectedOption="selectedTarget"
+                            :options="allLanguages.map(i => i.lang)"
+                            @chooseOption="setFakeTarget"
+                          )
+                      .header__option
+                        .header__option-title Industry:
+                        .drop
+                          SelectSingle(
+                            :hasSearch="true"
+                            placeholder="Option"
+                            :selectedOption="selectedIndustry"
+                            :options="allIndustries.map(i => i.name)"
+                            @chooseOption="setFakeIndustry"
+                          )
+                      .header__option
+                        .header__option-title Step:
+                        .drop
+                          SelectSingle(
+                            :hasSearch="true"
+                            placeholder="Option"
+                            :selectedOption="selectedStep"
+                            :options="allSteps.map(i => i.title)"
+                            @chooseOption="setFakeStep"
+                          )
+                      .header__option
+                        .header__option-title Unit:
+                        .drop
+                          SelectSingle(
+                            :hasSearch="true"
+                            placeholder="Option"
+                            :selectedOption="selectedUnit"
+                            :options="allUnits.map(i => i.type)"
+                            @chooseOption="setFakeUnit"
+                          )
 
-              .header__description
-                .header__description-text {{ selectedStep }}
-                .header__description-text {{ selectedUnit }}
-                .header__description-text {{ selectedIndustry }}
-                .header__description-langs {{ currentStep.fullSourceLanguage.lang === selectedTarget ? selectedTarget : currentStep.fullSourceLanguage.lang + ' to ' + selectedTarget }}
+              //.vendors__search(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment")
+              .vendors__search
+                .vendors__search-title Vendors:
+                .vendors__search-serch
+                  input(type="text" ref="search" placeholder="🔎︎  Search" v-model="vendorsSearch")
+                  .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
+                    i.fas.fa-backspace
 
-              transition(name="fade")
-                .header__options(v-if="isEditable && !isAllVendors")
-                  .header__option
-                    .header__option-title Target:
-                    .drop
-                      SelectSingle(
-                        :hasSearch="true"
-                        placeholder="Option"
-                        :selectedOption="selectedTarget"
-                        :options="allLanguages.map(i => i.lang)"
-                        @chooseOption="setFakeTarget"
-                      )
-                  .header__option
-                    .header__option-title Industry:
-                    .drop
-                      SelectSingle(
-                        :hasSearch="true"
-                        placeholder="Option"
-                        :selectedOption="selectedIndustry"
-                        :options="allIndustries.map(i => i.name)"
-                        @chooseOption="setFakeIndustry"
-                      )
-                  .header__option
-                    .header__option-title Step:
-                    .drop
-                      SelectSingle(
-                        :hasSearch="true"
-                        placeholder="Option"
-                        :selectedOption="selectedStep"
-                        :options="allSteps.map(i => i.title)"
-                        @chooseOption="setFakeStep"
-                      )
-                  .header__option
-                    .header__option-title Unit:
-                    .drop
-                      SelectSingle(
-                        :hasSearch="true"
-                        placeholder="Option"
-                        :selectedOption="selectedUnit"
-                        :options="allUnits.map(i => i.type)"
-                        @chooseOption="setFakeUnit"
-                      )
+              .assignedVendor(v-if="currentStepId && ( steps.find(i => i._id.toString() === currentStepId).vendor || selectedVendors[currentStepId])" )
+                .assignedVendor__user
+                  .assignedVendor__user-image(v-if="getAssignedVendorInfo().photo" )
+                    .assignedVendor__user-circle1
+                    .assignedVendor__user-circle2
+                    img(:src="domain + getAssignedVendorInfo().photo")
+                  .user__fakeImage(:style="{'--bgColor': getBgColor(getAssignedVendorInfo()._id)[0], '--color': getBgColor(getAssignedVendorInfo()._id)[1]}" v-else) {{ getAssignedVendorInfo().name[0] }}
+                    .assignedVendor__user-circle1
+                    .assignedVendor__user-circle2
 
-            .assignedVendor(v-if="currentStepId && ( steps.find(i => i._id.toString() === currentStepId).vendor || selectedVendors[currentStepId])" )
-              .assignedVendor__user
-                .assignedVendor__user-image(v-if="getAssignedVendorInfo().photo" )
-                  .assignedVendor__user-circle1
-                  .assignedVendor__user-circle2
-                  img(:src="domain + getAssignedVendorInfo().photo")
-                .user__fakeImage(:style="{'--bgColor': getBgColor(getAssignedVendorInfo()._id)[0], '--color': getBgColor(getAssignedVendorInfo()._id)[1]}" v-else) {{ getAssignedVendorInfo().name[0] }}
-                  .assignedVendor__user-circle1
-                  .assignedVendor__user-circle2
+                  .assignedVendor__user-description
+                    .assignedVendor__user-name
+                      router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
+                        span {{ getAssignedVendorInfo().name }}
+                      span.assigned(style="margin-left: 10px;") [Assigned]
+                    .assignedVendor__user-email(@click="openSender(getAssignedVendorInfo().email)")
+                      span
+                        i(class="far fa-envelope")
+                      span {{ getAssignedVendorInfo().email }}
 
-                .assignedVendor__user-description
-                  .assignedVendor__user-name
-                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getAssignedVendorInfo()._id}`}")
-                      span {{ getAssignedVendorInfo().name }}
-                    span.assigned(style="margin-left: 10px;") [Assigned]
-                  .assignedVendor__user-email(@click="openSender(getAssignedVendorInfo().email)")
-                    span
-                      i(class="far fa-envelope")
-                    span {{ getAssignedVendorInfo().email }}
+                    .buttons
+                      .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
+                      .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
 
-                  .buttons
-                    .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
-                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
+                .assignedVendor__user(v-if="Object.keys(selectedReassignedVendor).length")
+                  .assignedVendor__user-image(v-if="getReAssignedVendorInfo().photo" )
+                    .assignedVendor__user-circle1
+                    .assignedVendor__user-circle3
+                    img(:src="domain + getReAssignedVendorInfo().photo")
+                  .user__fakeImage(:style="{'--bgColor': getBgColor(getReAssignedVendorInfo()._id)[0], '--color': getBgColor(getReAssignedVendorInfo()._id)[1] }" v-else) {{ getReAssignedVendorInfo().name[0] }}
+                    .assignedVendor__user-circle1
+                    .assignedVendor__user-circle3
 
-              .assignedVendor__user(v-if="Object.keys(selectedReassignedVendor).length")
-                .assignedVendor__user-image(v-if="getReAssignedVendorInfo().photo" )
-                  .assignedVendor__user-circle1
-                  .assignedVendor__user-circle3
-                  img(:src="domain + getReAssignedVendorInfo().photo")
-                .user__fakeImage(:style="{'--bgColor': getBgColor(getReAssignedVendorInfo()._id)[0], '--color': getBgColor(getReAssignedVendorInfo()._id)[1] }" v-else) {{ getReAssignedVendorInfo().name[0] }}
-                  .assignedVendor__user-circle1
-                  .assignedVendor__user-circle3
+                  .assignedVendor__user-description
+                    .assignedVendor__user-name
+                      router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getReAssignedVendorInfo()._id}`}")
+                        span {{ getReAssignedVendorInfo().name }}
+                      span.newAssigned(style="margin-left: 10px;") [New assignments]
+                    .assignedVendor__user-email(@click="openSender(getReAssignedVendorInfo().email)")
+                      span
+                        i(class="far fa-envelope")
+                      span {{ getReAssignedVendorInfo().email }}
 
-                .assignedVendor__user-description
-                  .assignedVendor__user-name
-                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${ getReAssignedVendorInfo()._id}`}")
-                      span {{ getReAssignedVendorInfo().name }}
-                    span.newAssigned(style="margin-left: 10px;") [New assignments]
-                  .assignedVendor__user-email(@click="openSender(getReAssignedVendorInfo().email)")
-                    span
-                      i(class="far fa-envelope")
-                    span {{ getReAssignedVendorInfo().email }}
+                    .buttons
+                      .buttons__btn
+                        .buttons__btn( @click="removeVendorAssignments()") Remove
+                    //.buttons
+                      .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
+                      .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
 
-                  .buttons
-                    .buttons__btn
-                      .buttons__btn( @click="removeVendorAssignments()") Remove
-                  //.buttons
-                    .buttons__btn(v-if="deleteVendorStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="removeVendor(currentStepId)") Remove
-                    .buttons__btn(v-if="progressStepStatuses(steps.find(i => i._id.toString() === currentStepId))" @click="toggleAssignments") Reassign
+              .assignmentsOptions(v-if="isReassignment")
+                div
+                  .assignmentsOptions__text Reason:
+                  .drop2
+                    SelectSingle(
+                      placeholder="Option"
+                      :options="reasons"
+                      @chooseOption="setReason"
+                      :selectedOption="reason"
+                    )
 
-            .assignmentsOptions(v-if="isReassignment")
-              div
-                .assignmentsOptions__text Reason:
-                .drop2
-                  SelectSingle(
-                    placeholder="Option"
-                    :options="reasons"
-                    @chooseOption="setReason"
-                    :selectedOption="reason"
-                  )
+                .assignmentsOptions__row
+                  .assignmentsOptions__text Start from the beginning?
+                  .assignmentsOptions__checks
+                    .assignmentsOptions__check
+                      CheckBox(@check="(e)=>toggle(e, 'isStart', 'yes')" @uncheck="(e)=>toggle(e, 'isStart', 'yes')" :isChecked="isStart.yes")
+                      .assignmentsOptions__check-label Yes
+                    .assignmentsOptions__check
+                      CheckBox(@check="(e)=>toggle(e, 'isStart', 'no')" @uncheck="(e)=>toggle(e, 'isStart', 'no')" :isChecked="isStart.no")
+                      .assignmentsOptions__check-label No
 
-              .assignmentsOptions__row
-                .assignmentsOptions__text Start from the beginning?
-                .assignmentsOptions__checks
-                  .assignmentsOptions__check
-                    CheckBox(@check="(e)=>toggle(e, 'isStart', 'yes')" @uncheck="(e)=>toggle(e, 'isStart', 'yes')" :isChecked="isStart.yes")
-                    .assignmentsOptions__check-label Yes
-                  .assignmentsOptions__check
-                    CheckBox(@check="(e)=>toggle(e, 'isStart', 'no')" @uncheck="(e)=>toggle(e, 'isStart', 'no')" :isChecked="isStart.no")
-                    .assignmentsOptions__check-label No
+                .assignmentsOptions__row
+                  .assignmentsOptions__text Does this part have to be paid for?
+                  .assignmentsOptions__checks
+                    .assignmentsOptions__check
+                      CheckBox(@check="(e)=>toggle(e, 'isPay', 'yes')" @uncheck="(e)=>toggle(e, 'isPay', 'yes')" :isChecked="isPay.yes")
+                      .assignmentsOptions__check-label Yes
+                    .assignmentsOptions__check
+                      CheckBox(@check="(e)=>toggle(e, 'isPay', 'no')" @uncheck="(e)=>toggle(e, 'isPay', 'no')" :isChecked="isPay.no")
+                      .assignmentsOptions__check-label No
+                    .assignmentsOptions__work
+                      input.assignmentsOptions__percent(type="text" :value="progress" @input="setProgress" @click.stop="selectInputVal" ref="progress")
+                      span.assignmentsOptions__check-label %  is done
 
-              .assignmentsOptions__row
-                .assignmentsOptions__text Does this part have to be paid for?
-                .assignmentsOptions__checks
-                  .assignmentsOptions__check
-                    CheckBox(@check="(e)=>toggle(e, 'isPay', 'yes')" @uncheck="(e)=>toggle(e, 'isPay', 'yes')" :isChecked="isPay.yes")
-                    .assignmentsOptions__check-label Yes
-                  .assignmentsOptions__check
-                    CheckBox(@check="(e)=>toggle(e, 'isPay', 'no')" @uncheck="(e)=>toggle(e, 'isPay', 'no')" :isChecked="isPay.no")
-                    .assignmentsOptions__check-label No
-                  .assignmentsOptions__work
-                    input.assignmentsOptions__percent(type="text" :value="progress" @input="setProgress" @click.stop="selectInputVal" ref="progress")
-                    span.assignmentsOptions__check-label %  is done
+                Button(value="Approve" @clicked="checkAssignmentsErrors"  :isDisabled="!reason || !Object.keys(selectedReassignedVendor).length" :outline="true")
 
-              Button(value="Approve" @clicked="checkAssignmentsErrors"  :isDisabled="!reason || !Object.keys(selectedReassignedVendor).length" :outline="true")
+              .vendors(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment" :style="getMaxHeight()")
+                .vendor(v-if="listOfVendors.length" v-for="item in listOfVendors")
+                  .vendor__row1
+                    .vendor__user
+                      .user
+                        .user__image(v-if="item.photo")
+                          img(:src="domain + item.photo")
+                        .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)[0], '--color': getBgColor(item._id)[1]  }" v-else) {{ item.name[0] }}
 
-            .vendors__search(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment")
-              .vendors__search-title Vendors:
-              .vendors__search-serch
-                input(type="text" ref="search" placeholder="🔎︎  Search" v-model="vendorsSearch")
-                .clear-icon(v-if="vendorsSearch" @click="removeVendorsSearch")
-                  i.fas.fa-backspace
+                        .user__description
+                          .user__name
+                            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${item._id}`}")
+                              span {{ item.name }}
 
-            .vendors(v-if="(!cancelledStepStatuses(currentStep) && !progressStepStatuses(currentStep)) || isReassignment" :style="getMaxHeight()")
-              .vendor(v-if="listOfVendors.length" v-for="item in listOfVendors")
-                .vendor__row1
-                  .vendor__user
-                    .user
-                      .user__image(v-if="item.photo")
-                        img(:src="domain + item.photo")
-                      .user__fakeImage(:style="{'--bgColor': getBgColor(item._id)[0], '--color': getBgColor(item._id)[1]  }" v-else) {{ item.name[0] }}
+                          .user__email(@click="openSender(item.email)")
+                            span
+                              i(class="far fa-envelope")
+                            span {{ item.email }}
 
-                      .user__description
-                        .user__name
-                          router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${item._id}`}")
-                            span {{ item.name }}
+                          .buttons
+                            .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
+                            .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
+                            .buttons__btn() Details (soon)
 
-                        .user__email(@click="openSender(item.email)")
-                          span
-                            i(class="far fa-envelope")
-                          span {{ item.email }}
+                    .vendor__stats(v-if="!isReassignment")
+                      .stats__row.border-bottom
+                        .stats__colLong
+                          .stats__col-bigTitle TOTAL PAY.
+                          .stats__col-bigValue
+                            .stats__col-bigValue-num {{ item.price }}
+                            .stats__col-bigValue-currency
+                              span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                            .stats__col-bigValue-image(v-if="(item.total / 2) < item.price" )
+                              img(:src="icons.down")
+                            .stats__col-bigValue-image(v-if="item.price > 0 && (item.total / 2) > item.price" )
+                              img(:src="icons.up")
 
-                        .buttons
-                          .buttons__btn(v-if="!isReassignment" @click="setVendorToStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
-                          .buttons__btn(v-if="isReassignment" @click="setVendorToReassignStep({_id: item._id, name: item.name, email: item.email, photo: item.photo, nativeRate: item.nativeRate })") Assign
-                          .buttons__btn() Details (soon)
-
-                  .vendor__stats(v-if="!isReassignment")
-                    .stats__row.border-bottom
-                      .stats__colLong
-                        .stats__col-bigTitle TOTAL PAY.
-                        .stats__col-bigValue
-                          .stats__col-bigValue-num {{ item.price }}
-                          .stats__col-bigValue-currency
+                      .stats__row
+                        .stats__col.border-right
+                          .stats__col-smallValue {{ item.marginPercent }}
+                            span.currency %
+                          .stats__col-smallTitle MARGIN
+                        .stats__col
+                          .stats__col-smallValue {{ item.margin }}
                             span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-                          .stats__col-bigValue-image(v-if="(item.total / 2) < item.price" )
-                            img(:src="icons.down")
-                          .stats__col-bigValue-image(v-if="item.price > 0 && (item.total / 2) > item.price" )
-                            img(:src="icons.up")
+                          .stats__col-smallTitle MARGIN
 
-                    .stats__row
-                      .stats__col.border-right
-                        .stats__col-smallValue {{ item.marginPercent }}
-                          span.currency %
-                        .stats__col-smallTitle MARGIN
-                      .stats__col
-                        .stats__col-smallValue {{ item.margin }}
-                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-                        .stats__col-smallTitle MARGIN
+                    .vendor__stats
+                      .stats__row.border-bottom
+                        .stats__colLong
+                          .stats__col-bigTitle RATE
+                          .stats__col-bigValue
+                            .stats__col-bigValue-num {{ item.rate }}
+                            .stats__col-bigValue-currency
+                              span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                            .stats__col-bigValue-image(v-if="item.benchmarkMargin < 0" )
+                              img(:src="icons.down")
+                            .stats__col-bigValue-image(v-if="item.benchmarkMargin > 0" )
+                              img(:src="icons.up")
 
-                  .vendor__stats
-                    .stats__row.border-bottom
-                      .stats__colLong
-                        .stats__col-bigTitle RATE
-                        .stats__col-bigValue
-                          .stats__col-bigValue-num {{ item.rate }}
-                          .stats__col-bigValue-currency
+                      .stats__row
+                        .stats__col.border-right
+                          .stats__col-smallValue {{ item.benchmark }}
                             span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-                          .stats__col-bigValue-image(v-if="item.benchmarkMargin < 0" )
-                            img(:src="icons.down")
-                          .stats__col-bigValue-image(v-if="item.benchmarkMargin > 0" )
-                            img(:src="icons.up")
+                          .stats__col-smallTitle B.MARK
+                        .stats__col
+                          .stats__col-smallValue {{ item.benchmarkMargin }}
+                            span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                          .stats__col-smallTitle B.MARGIN
 
-                    .stats__row
-                      .stats__col.border-right
-                        .stats__col-smallValue {{ item.benchmark }}
-                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-                        .stats__col-smallTitle B.MARK
-                      .stats__col
-                        .stats__col-smallValue {{ item.benchmarkMargin }}
-                          span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-                        .stats__col-smallTitle B.MARGIN
+                    .vendor__marks
+                      .marks__row
+                        .marks__title TQI
+                        .marks__value {{ item.tqi }}
+                      .marks__row
+                        .marks__title LQA1
+                        .marks__value {{ item.lqa1 }}
+                      .marks__row
+                        .marks__title LQA2
+                        .marks__value {{ item.lqa2 }}
+                      .marks__row
+                        .marks__title LQA3
+                        .marks__value {{ item.lqa3 }}
 
-                  .vendor__marks
-                    .marks__row
-                      .marks__title TQI
-                      .marks__value {{ item.tqi }}
-                    .marks__row
-                      .marks__title LQA1
-                      .marks__value {{ item.lqa1 }}
-                    .marks__row
-                      .marks__title LQA2
-                      .marks__value {{ item.lqa2 }}
-                    .marks__row
-                      .marks__title LQA3
-                      .marks__value {{ item.lqa3 }}
+                .getMoreVendors(v-if="isPossibleToGiveNextPortion" @click="limitForVendorsFrom = limitForVendorsFrom + 20") Get more Vendors...
 
-              .noVendors(v-if="!listOfVendors.length" ) No vendors...
+                //.noVendors(v-if="!listOfVendors.length" ) No vendors...
 
-        .vendor-manage__vendors(v-else)
-          .logo
+          .vendor-manage__vendors(v-else)
+            .logo
 
 
-    .vendor-manage__footer
-      Button(@clicked="saveVendors" :isDisabled="isReassignment" :value="'Approve assignments'")
-      Button(:value="'Cancel'" @clicked="closeVendorManage" :outline="true")
+      .vendor-manage__footer
+        Button(@clicked="saveVendors" :isDisabled="isReassignment" :value="'Approve assignments'")
+        Button(:value="'Cancel'" @clicked="closeVendorManage" :outline="true")
 
 </template>
 
@@ -319,7 +329,12 @@ export default {
   },
   data() {
     return {
+      limitForVendorsFrom: 20,
+      isPossibleToGiveNextPortion: false,
+
+      isLoading: true,
       isSender: false,
+
       toEmail: null,
       domain: "http://localhost:3001",
       reasons: [ 'Unresponsive', 'Technical issues', 'Personal issues' ],
@@ -351,6 +366,7 @@ export default {
       selectedVendors: {},
       selectedReassignedVendor: {},
       vendorsSearch: '',
+      stepSearch: '',
       icons: {
         up: require("../../assets/images/latest-version/up.png"),
         down: require("../../assets/images/latest-version/down.png")
@@ -435,8 +451,8 @@ export default {
       this.isReassignment = !this.isReassignment
     },
     getMaxHeight() {
-      let max = 510
-      if (this.isEditable && !this.isAllVendors) max = max - 118
+      let max = 560
+      if (this.isEditable) max = max - 94
       if (this.currentStepId && (this.steps.find(i => i._id.toString() === this.currentStepId).vendor || this.selectedVendors[this.currentStepId])) max = max - 110
       if (this.isReassignment) max = max - 119
       return 'max-height:' + max + 'px'
@@ -508,6 +524,9 @@ export default {
     removeVendorsSearch() {
       this.vendorsSearch = ''
     },
+    removeStepSearch() {
+      this.stepSearch = ''
+    },
     setFakeTarget({ option }) {
       this.selectedTarget = option
     },
@@ -534,30 +553,12 @@ export default {
       this.selectedIndustry = this.currentProject.industry.name
 
       this.isAllVendors = !this.isAllVendors
+
+      this.limitForVendorsFrom = 20
+      this.isPossibleToGiveNextPortion = false
     },
     getLanguage(s, t) {
       return `<span>${ s }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ t }</span>`
-    },
-    getStatusClass(status) {
-      switch (status) {
-        case 'Created':
-        case 'Request Sent':
-          return 'todo'
-
-        case 'Approved':
-        case 'Ready to Start':
-        case 'Waiting to Start':
-        case 'In progress':
-          return 'doing'
-
-        case 'Completed':
-          return 'done'
-
-        case 'Cancelled':
-        case 'Cancelled Halfway':
-        case 'Rejected':
-          return 'stop'
-      }
     },
     async saveVendors() {
       try {
@@ -586,6 +587,8 @@ export default {
       this.isAllVendors = false
       this.isEditable = false
       this.isReassignment = false
+      this.limitForVendorsFrom = 20
+      this.isPossibleToGiveNextPortion = false
       this.removeVendorAssignments()
 
       if (this.currentStepId === step._id.toString()) {
@@ -614,6 +617,8 @@ export default {
         this.allVendors = allVendors.data
       } catch (err) {
         console.log('Error get vendors')
+      } finally {
+        this.isLoading = false
       }
     },
     marginCalcPercent(receivables, payables) {
@@ -640,8 +645,28 @@ export default {
       return this.enteredProgress || this.getCurrentProgress()
     },
     groupedByTaskId() {
-      const steps = this.selectedTab === 'All Steps' ? this.steps : this.steps.filter(({ step }) => step.title === this.selectedTab)
-      return Object.values(_.groupBy(steps, ({ taskId }) => taskId))
+      const steps = this.selectedTab === 'All Steps' ?
+          this.steps :
+          this.steps.filter(({ step }) => step.title === this.selectedTab)
+
+      if (this.stepSearch) {
+        const search = this.stepSearch.toLowerCase()
+        return steps.filter(item => {
+          const vendor = !!item.vendor && Object.keys(item.vendor).length
+              ? item.vendor.firstName.toLowerCase().includes(search) || item.vendor.surname.toLowerCase().includes(search)
+              : false
+
+          return vendor
+              || item.step.title.toLowerCase().includes(search)
+              || item.status.toLowerCase().includes(search)
+              || item.fullSourceLanguage.lang.toLowerCase().includes(search)
+              || item.fullTargetLanguage.lang.toLowerCase().includes(search)
+              || item.sourceLanguage.toLowerCase().includes(search)
+              || item.targetLanguage.toLowerCase().includes(search)
+              || item.taskId.toLowerCase().includes(search)
+        })
+      }
+      return steps
     },
     listOfStepsTitles() {
       let list = new Set([ 'All Steps' ])
@@ -661,34 +686,34 @@ export default {
             .map(rate => `${ rate.sourceLanguage.lang }-${ rate.targetLanguage.lang }-${ rate.step.title }-${ rate.unit.type }-${ rate.industry.name }`)
             .includes(query))
       }
-
-      // same Vendor in 2 steps ==>
-      const stepsIds = this.steps.filter(i => i.taskId === taskId).map(i => i._id.toString())
-      if (stepsIds.length > 1) {
-        const selectedVendors = Object.keys(this.selectedVendors).length
-            ? Object.entries(this.selectedVendors)
-                .map(i => {
-                  const [ _id, rest ] = i
-                  return { _id, vendor: rest.name }
-                })
+      if (!this.isAllVendors) {
+        // same Vendor in 2steps
+        const stepsIds = this.steps.filter(i => i.taskId === taskId).map(i => i._id.toString())
+        if (stepsIds.length > 1) {
+          const selectedVendors = Object.keys(this.selectedVendors).length
+              ? Object.entries(this.selectedVendors)
+                  .map(i => {
+                    const [ _id, rest ] = i
+                    return { _id, vendor: rest.name }
+                  })
+                  .filter(i => stepsIds.includes(i._id.toString()))
+                  .map(i => i.vendor)
+              : []
+          const vendorsNames = [
+            ...this.steps
                 .filter(i => stepsIds.includes(i._id.toString()))
-                .map(i => i.vendor)
-            : []
-        const vendorsNames = [
-          ...this.steps
-              .filter(i => stepsIds.includes(i._id.toString()))
-              .map(i => i.vendor && `${ i.vendor.firstName } ${ i.vendor.surname || '' }`)
-              .filter(Boolean),
-          ...selectedVendors
-        ]
-        if (vendorsNames.length) {
-          vendors = vendors.filter(({ name }) => !vendorsNames.includes(name))
+                .map(i => i.vendor && `${ i.vendor.firstName } ${ i.vendor.surname || '' }`)
+                .filter(Boolean),
+            ...selectedVendors
+          ]
+          if (vendorsNames.length) {
+            vendors = vendors.filter(({ name }) => !vendorsNames.includes(name))
+          }
         }
       }
       if (this.vendorsSearch.length) {
         vendors = vendors.filter(({ name }) => name.toUpperCase().includes(this.vendorsSearch.toUpperCase()))
       }
-      // same Vendor in 2 steps <==
 
       if (vendor && !this.selectedVendors[this.currentStepId]) {
         vendors = vendors.filter(({ name }) => name.toUpperCase() !== (`${ vendor.firstName } ${ vendor.surname || '' }`).toUpperCase())
@@ -733,7 +758,11 @@ export default {
         }
       })
 
-      return vendors.sort((a, b) => a.price - b.price)
+      vendors.sort((a, b) => a.price - b.price)
+
+      const vendorsForOutput = vendors.splice(0, this.limitForVendorsFrom)
+      this.isPossibleToGiveNextPortion = vendors.length && vendors.length > vendorsForOutput.length
+      return vendorsForOutput
     }
   },
   async created() {
@@ -754,6 +783,30 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
+.getMoreVendors {
+  padding: 15px 25px;
+  border: 1px dotted lightgrey;
+  cursor: pointer;
+
+  &:hover {
+    border: 1px solid lightgray;
+  }
+}
+
+.vendorsWrapper {
+  position: relative;
+}
+
+.isLoading {
+  background: white;
+  width: 100%;
+  position: absolute;
+  z-index: 2;
+  height: 100%;
+  text-align: center;
+  line-height: 50;
+}
+
 .assignmentsOptions {
   display: flex;
   justify-content: space-between;
@@ -761,6 +814,7 @@ export default {
   padding: 15px;
   align-items: center;
   margin-top: 20px;
+  margin-bottom: 20px;
 
   &__check-label {
     color: $dark-border;
@@ -787,7 +841,7 @@ export default {
 }
 
 .assignedVendor {
-  margin-top: 20px;
+  margin-bottom: 10px;
   padding: 10px 15px;
   border: 1px dotted $light-border;
   display: flex;
@@ -1123,7 +1177,7 @@ export default {
     align-items: center;
     gap: 8px;
     justify-content: end;
-    padding-bottom: 6px;
+    position: absolute;
 
     &-text {
       margin-top: 2px;
@@ -1135,12 +1189,9 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    border: 2px solid $table-list;
-    padding-top: 20px;
-    background-color: #fff;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    padding-bottom: 10px;
+    padding-top: 10px;
+    background-color: $table-list;
+    margin-left: -25px;
   }
 
   &__option {
@@ -1180,11 +1231,9 @@ export default {
     align-items: center;
     justify-content: space-between;
     margin: 20px 0;
-    border-bottom: 1px solid $border;
-    padding-bottom: 20px;
 
     &-title {
-      font-size: 18px;
+      font-size: 16px;
       font-family: 'Myriad600';
     }
 
@@ -1196,73 +1245,98 @@ export default {
 
 .blocks {
   background: white;
+  margin-top: 20px;
+  height: 560px;
+  overflow-y: auto;
 }
 
 .block {
-  &__name {
-    width: 160px;
-    margin-right: 15px;
+  border: 1px dotted lightgray;
+  display: flex;
+  padding: 13px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  gap: 12px;
+  align-items: baseline;
+  width: fit-content;
+
+  &__taskId {
+    margin-right: 5px;
+    font-family: 'Myriad600';
   }
 
-  &__vendorDelete {
-    height: 15px;
-    width: 15px;
+  &:hover {
+    border: 1px solid lightgray;
   }
 
-  &__steps {
-    margin-left: 20px;
-    padding-left: 20px;
-    border-left: 1px solid $light-border;
-    padding-bottom: 10px;
-    padding-top: 10px;
-  }
-
-  &__step {
-    margin-bottom: 8px;
-    padding: 4px 10px 3px 15px;
-    border: 1px dotted lightgray;
-    transition: .1s ease-out;
-    display: flex;
-    align-items: center;
-
-    &-title {
-      text-align: center;
-    }
-
-    &-status {
-      text-align: center;
-    }
-
-    &-vendor {
-      width: 170px;
-      text-align: center;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    &:hover {
-      border: 1px solid lightgray;
-      cursor: pointer;
-    }
-
+  &__vendor {
+    width: 170px;
   }
 
   &__language {
-    font-size: 12px;
-    width: 135px;
-    background: $table-list;
-    padding: 4px 10px 1px;
-    box-sizing: border-box;
-    display: flex;
-    gap: 12px;
-    border-bottom: 2px solid $light-border;
-
-    .taskId {
-      color: $border;
-    }
+    width: 100px;
   }
+
+  &__step {
+    width: 90px;
+  }
+
+  &__status {
+    color: $border;
+    width: 100px;
+  }
+
+  //&__name {
+  //  width: 160px;
+  //  margin-right: 15px;
+  //}
+  //&__steps {
+  //  margin-left: 20px;
+  //  padding-left: 20px;
+  //  border-left: 1px solid $light-border;
+  //  padding-bottom: 10px;
+  //  padding-top: 10px;
+  //}
+
+  //&__step {
+  //  margin-bottom: 8px;
+  //  padding: 4px 10px 3px 15px;
+  //  border: 1px dotted lightgray;
+  //  transition: .1s ease-out;
+  //  display: flex;
+  //  align-items: center;
+  //
+  //  &-title {
+  //    text-align: center;
+  //  }
+  //
+  //  &-status {
+  //    text-align: center;
+  //  }
+  //
+
+  //
+  //  &:last-child {
+  //    margin-bottom: 0;
+  //  }
+  //
+
+  //}
+
+  //&__language {
+  //  font-size: 12px;
+  //  width: 135px;
+  //  background: $table-list;
+  //  padding: 4px 10px 1px;
+  //  box-sizing: border-box;
+  //  display: flex;
+  //  gap: 12px;
+  //  border-bottom: 2px solid $light-border;
+  //
+  //  .taskId {
+  //    color: $border;
+  //  }
+  //}
 }
 
 .vendor-manage {
@@ -1285,8 +1359,8 @@ export default {
 
   &__close {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: -6px;
+    right: -5px;
     font-size: 22px;
     cursor: pointer;
     height: 22px;
@@ -1303,19 +1377,22 @@ export default {
     }
   }
 
+  &__header {
+    width: 100%;
+    border-bottom: 1px solid $border;
+    position: relative;
+  }
+
   &__body {
     display: flex;
   }
 
   &__steps {
-    width: 43%;
-    height: 667px;
-    overflow-y: auto;
-    display: flex;
+    width: 41%;
   }
 
   &__vendors {
-    width: 57%;
+    width: 61%;
     border-left: 1px solid $border;
   }
 
@@ -1339,46 +1416,81 @@ export default {
   &__footer {
     display: flex;
     gap: 20px;
-    margin-top: 15px;
+    margin-top: 25px;
+    justify-content: center;
   }
 }
 
 .tabs {
-  width: 160px;
-  margin-right: 25px;
+  display: flex;
+  max-width: 1200px;
 
   &__option {
     cursor: pointer;
     border-left: none;
     border-top: 1px solid $border;
     border-right: 1px solid $border;
-    border-left: 1px solid $border;
+    min-width: 100px;
     border-bottom: none;
-    background-color: $white;
-    padding: 11px 10px 10px 15px;
+    background-color: $body;
+    padding: 1px 15px 0 8px;
+    height: 31px;
     display: flex;
     align-items: center;
-    transition: .1s ease-out;
+    color: #6666;
 
-    &:hover {
-      color: $text;
-      background-color: $table-list-hover;
+    &:first-child {
+      border-left: 1px solid $border !important;
+      border-top-left-radius: 4px;
     }
 
     &:last-child {
-      border: 1px solid $border;
+      border-top-right-radius: 4px;
     }
   }
 
   &_active {
-    background-color: $border;
+    background-color: $white;
     color: $text;
-
-    &:hover {
-      background-color: $border;
-    }
   }
 }
+
+//.tabs {
+//  width: 160px;
+//  margin-right: 25px;
+//
+//  &__option {
+//    cursor: pointer;
+//    border-left: none;
+//    border-top: 1px solid $border;
+//    border-right: 1px solid $border;
+//    border-left: 1px solid $border;
+//    border-bottom: none;
+//    background-color: $white;
+//    padding: 11px 10px 10px 15px;
+//    display: flex;
+//    align-items: center;
+//    transition: .1s ease-out;
+//
+//    &:hover {
+//      color: $text;
+//      background-color: $table-list-hover;
+//    }
+//
+//    &:last-child {
+//      border: 1px solid $border;
+//    }
+//  }
+//
+//  &_active {
+//    background-color: $border;
+//    color: $text;
+//
+//    &:hover {
+//      background-color: $border;
+//    }
+//  }
+//}
 
 input {
   font-size: 14px;
@@ -1404,42 +1516,6 @@ input {
   &:hover {
     border: 1px solid $border-focus;
   }
-}
-
-.todo {
-  padding: 1px 5px;
-  background: $table-list;
-  color: $dark-border;
-  font-size: 11px;
-  font-family: Myriad300;
-  border-radius: 4px;
-}
-
-.doing {
-  padding: 1px 5px;
-  background: $table-list;
-  color: $yellow;
-  font-size: 11px;
-  font-family: Myriad300;
-  border-radius: 4px;
-}
-
-.done {
-  padding: 1px 5px;
-  background: $table-list;
-  color: $green;
-  font-size: 11px;
-  font-family: Myriad300;
-  border-radius: 4px;
-}
-
-.stop {
-  padding: 1px 5px;
-  background: $table-list;
-  color: $red;
-  font-size: 11px;
-  font-family: Myriad300;
-  border-radius: 4px;
 }
 
 .empty {
