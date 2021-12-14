@@ -53,8 +53,9 @@ export default {
     async dataForRequest() {
       if(this.$route.path === '/client-request/new-request'){
         location.reload()
+      }else{
+        await this.$router.push(`/client-request/new-request`)
       }
-      await this.$router.push(`/client-request/new-request`)
     },
     signOut() {
       this.logout()

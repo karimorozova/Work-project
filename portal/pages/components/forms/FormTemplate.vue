@@ -72,7 +72,8 @@ export default {
       this.selectedTemplate = this.clientServicesTemplates.find(({ groupName }) => groupName === option)
     },
     setTemplate() {
-      this.$emit('selectedTemplate', this.selectedTemplate)
+
+      this.$emit('selectedTemplate', this.isFromTemplate ? this.selectedTemplate : {})
     },
     clearSelected() {
       this.selectedTemplate = {}

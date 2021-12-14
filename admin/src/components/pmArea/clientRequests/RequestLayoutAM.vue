@@ -140,16 +140,18 @@
       .project__block-row.project_no-margin
         .project__block
           Check(id="checkBrief" @click="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
+          #swapBrief(@click="copyNotesToBrief" v-if="!currentClientRequest.checkedForm.isCheckBrief" )
+            i(class="fas fa-arrow-circle-left")
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
               span Project Instructions
-
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
             .icon(v-else)
               i.fas.fa-chevron-right
           .block__data(v-if="isBrief && canUpdateRequest()")
             ckeditor(v-model="currentClientRequest.brief" ref="editor" :config="editorConfig" @blur="changeBrief")
+
         .project__block
           .block__header(@click="toggleBlock('isNotes')" )
             .title Project Notes
@@ -164,9 +166,9 @@
       .optionsAndButton
         .options
           .options__item.border(:class="{'options_brown': isClassicConvert}" @click="(e) => toggleConvert(e, 'isClassicConvert')") Send to PM
-          .options__item(:class="{'options_brown': isPreCreatedProject}" @click="(e) => toggleConvert(e, 'isPreCreatedProject')") Send to PM and generate T&S
+          .options__item(:class="{'options_brown': isPreCreatedProject}" @click="(e) => toggleConvert(e, 'isPreCreatedProject')") Generate T&S
         .form__button
-          Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length || onRequestSending" value="Send to PM")
+          Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length || onRequestSending" value="Proceed")
 
     .side
       .side__info
@@ -304,8 +306,8 @@ export default {
       isPreCreatedProject: false,
       onRequestSending: false,
       // instructions: instructions,
-      isBrief: false,
-      isNotes: false,
+      isBrief: true,
+      isNotes: true,
       clientRequest: {},
       disabled: {
         to: moment().add(-1, 'day').endOf('day').toDate()
@@ -344,7 +346,7 @@ export default {
         ],
         removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
         uiColor: "#ffffff",
-        height: 240
+        height: 280
       },
       // forbiddenExtensions: [
       // 	'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
@@ -492,38 +494,78 @@ export default {
       }
     },
     async convertWithPreCreation() {
-      const { deadline, requestForm: { sourceFiles, refFiles, targetLanguages, service: { title, steps } } } = this.currentClientRequest
-      const stepsAndUnits = []
+      const { instructions, deadline, requestForm: { sourceFiles, refFiles, targetLanguages, service: { title, steps } } } = this.currentClientRequest
+
+      let quantity = 0
       let tasksData = new FormData()
       tasksData.append('requestId', this.currentClientRequest._id)
       tasksData.append('targets', JSON.stringify(targetLanguages))
       if (sourceFiles && sourceFiles.length) tasksData.append('sourceFilesVault', JSON.stringify(sourceFiles))
       if (refFiles && refFiles.length) tasksData.append('refFilesVault', JSON.stringify(refFiles))
+
       if (title === 'Translation') {
         const templates = await this.getMemoqTemplates()
         tasksData.append('template', JSON.stringify(templates[0]))
+      } else if (title === 'Compliance') {
+        quantity = sourceFiles && sourceFiles.length ? sourceFiles.length : 0
+        tasksData.append('template', null)
       } else {
         tasksData.append('template', null)
+        quantity = 1
       }
-      for (const { step } of steps) {
-        const settingStep = this.allSteps.find(item => item._id.toString() === step.toString())
-        stepsAndUnits.push({
-          step: settingStep,
-          start: new Date(),
-          deadline,
-          receivables: {
-            unit: settingStep.calculationUnit[0],
-            quantity: title === 'Translation' ? 0 : 1
-          },
-          payables: {
-            unit: settingStep.calculationUnit[0],
-            quantity: title === 'Translation' ? 0 : 1
+
+      if (title === 'Compliance' && instructions.length) {
+        for await (const complianceTemplate of instructions) {
+          const stepsAndUnits = []
+          tasksData.delete('stepsAndUnits')
+          for (const { step } of steps) {
+            const settingStep = this.allSteps.find(item => item._id.toString() === step.toString())
+            if (!settingStep) throw 'NO STEPS IN SERVICE'
+            const unit = settingStep.calculationUnit.find(item => item.type === hardcodeDetectComplianceUnit(complianceTemplate))
+            if (!unit) throw 'NO UNITS IN STEP'
+
+            stepsAndUnits.push({
+              step: settingStep,
+              start: new Date(),
+              deadline,
+              receivables: { unit, quantity },
+              payables: { unit, quantity }
+            })
           }
-        })
+          tasksData.append('stepsAndUnits', JSON.stringify(stepsAndUnits))
+          await this.$http.post('/pm-manage/request-tasks', tasksData)
+        }
+      } else {
+        const stepsAndUnits = []
+        for (const { step } of steps) {
+          const settingStep = this.allSteps.find(item => item._id.toString() === step.toString())
+          if (!settingStep) throw 'NO STEPS IN SERVICE'
+          const unit = settingStep.calculationUnit[0]
+          if (!unit) throw 'NO UNITS IN STEP'
+
+          stepsAndUnits.push({
+            step: settingStep,
+            start: new Date(),
+            deadline,
+            receivables: { unit, quantity },
+            payables: { unit, quantity }
+          })
+        }
+        tasksData.append('stepsAndUnits', JSON.stringify(stepsAndUnits))
+        await this.$http.post('/pm-manage/request-tasks', tasksData)
       }
-      tasksData.append('stepsAndUnits', JSON.stringify(stepsAndUnits))
-      const updatedProject = await this.$http.post('/pm-manage/request-tasks', tasksData)
-      await this.setCurrentClientRequest(updatedProject.data)
+
+      function hardcodeDetectComplianceUnit({ title, isChanged }) {
+        const re = /\[(.*)\]/.exec(title)
+
+        if (isChanged) return 'Compliance Expert'
+        if (!re) return 'Compliance Basic'
+
+        const [ , num ] = re
+        return (num.toString() === '9' || num.toString() === '10')
+            ? 'Compliance Advance'
+            : 'Compliance Basic'
+      }
     },
     async getMemoqTemplates() {
       try {
@@ -1614,7 +1656,21 @@ input {
 #checkBrief {
   position: absolute;
   right: -23px;
-  top: 10px;
+  top: 0px;
+}
+
+#swapBrief {
+  position: absolute;
+  right: -23px;
+  top: 25px;
+  font-size: 16px;
+  color: $dark-border;
+  cursor: pointer;
+  transition: .2s ease-out;
+
+  &:hover {
+    color: $text;
+  }
 }
 
 .iconId {
