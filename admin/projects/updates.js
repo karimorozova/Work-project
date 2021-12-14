@@ -387,12 +387,16 @@ async function getApprovedProject(project) {
 		if (project.isStartAccepted) {
 			await notifyManagerProjectStarts(project, false)
 		}
+		if (!project.inPause) {
+			await notifyVendorStepStart(steps, steps, project)
+		}
+		let updatedProject = await updateProject({ "_id": project.id }, { status: 'Approved', isStartAccepted: true, tasks, steps, isPriceUpdated: false })
 
-		await notifyVendorStepStart(steps, steps, project)
-		const updatedProject = await updateProject({ "_id": project.id }, { status: 'Approved', isStartAccepted: true, tasks, steps, isPriceUpdated: false })
-
-		let updatedSteps = await sendQuoteToVendorsAfterProjectAccepted(updatedProject.steps, updatedProject)
-		return await updateProject({ "_id": project.id }, { steps: updatedSteps })
+		if (!project.inPause) {
+			let updatedSteps = await sendQuoteToVendorsAfterProjectAccepted(updatedProject.steps, updatedProject)
+			updatedProject = await updateProject({ "_id": project.id }, { steps: updatedSteps })
+		}
+		return updatedProject
 	} catch (err) {
 		console.log(err)
 		console.log("Error in getApprovedProject")
@@ -408,7 +412,7 @@ function updateWithApprovedTasks({ taskIds, project }) {
 
 	let steps = project.steps
 	for (const step of steps) {
-		if(step.status === 'Approved') {
+		if (step.status === 'Approved') {
 			steps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps })
 		}
 	}
