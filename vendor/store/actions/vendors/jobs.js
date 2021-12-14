@@ -15,10 +15,11 @@ export const setJobComplianceStatus = async function ({ commit, dispatch, state 
 		if (targetFile) {
 			let fileData = new FormData()
 			fileData.append('jobId', jobId)
+
 			for (let file of targetFile) {
 				fileData.append('targetFile', file)
 			}
-			await this.$axios.post('/vendor/step-target-compliance', fileData)
+			await this.$axios.post('/vendor/step-target', fileData)
 		}
 		await this.$axios.post('/vendor/job', { jobId, status })
 		await dispatch("getJobs")
