@@ -42,10 +42,10 @@ module.exports = {
 		},
 		{
 			id: '6',
-			title: 'Need to be translated? Yes/No',
+			title: 'Reference links/screenshots:',
 			description:
 					'<ul>' +
-					'<li>Need to be translated? Yes/No/li>' +
+					'<li>Help the linguists to understand the context or layout</li>' +
 					'</ul>'
 		},
 		{
@@ -167,7 +167,7 @@ module.exports = {
 					'</ul>'
 		},
 		{
-			id: '8',
+			id: '9',
 			title: '[9] Corporate Documents',
 			description:
 					'<ul>' +
