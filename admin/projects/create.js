@@ -40,7 +40,7 @@ async function createProject(project, user) {
 		project.status = project.status || "Draft"
 		project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id
-		project.accountManager = accountManager._id
+		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id
 		// project.paymentProfile = project.clientBillingInfo.paymentType
 		project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
 		project.discounts = discounts
