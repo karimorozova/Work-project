@@ -47,6 +47,7 @@ async function createProject(project, user) {
 		project.minimumCharge = { value: minPrice, toIgnore: false }
 		project.crossRate = calculateCrossRate(USD, GBP)
 		project.projectCurrency = currency
+		project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
 
 		const createdProject = await Projects.create({
 			...project,

@@ -169,16 +169,14 @@ export default {
           : {}
 
       this.setValue('selectedIndustry', industry)
-
     },
     setIndustry({ option }) {
-      console.log(option)
       this.setValue('selectedIndustry', option)
     },
     choseBillingInfo({ option }) {
       const billingInfo = this.billingInfoList.find(({ name }) => name === option)
       this.setValue('clientBillingInfo', billingInfo)
-      if (billingInfo.paymentType === 'PPP') this.project.inPause = true
+      this.project.inPause = billingInfo.paymentType === 'PPP';
     },
     updateProjectDate(date) {
       this.setValue('deadline', date)
