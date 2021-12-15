@@ -295,7 +295,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2000;
-    width: 750px;
+    width: 755px;
   }
 
   &__title {

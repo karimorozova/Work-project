@@ -147,7 +147,7 @@ export default {
 }
 
 .sender {
-  width: 750px;
+  width: 755px;
   background: white;
   padding: 25px;
   box-sizing: border-box;
