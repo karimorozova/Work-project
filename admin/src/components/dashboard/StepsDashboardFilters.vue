@@ -42,11 +42,11 @@
         )
 
     .filter__item
-      label Tasks Statuses:
+      label Statuses:
       .filter__input
         SelectMulti(
           :selectedOptions="selectedTasksStatuses"
-          :options="allTasksStatuses"
+          :options="stepStatuses"
           :hasSearch="true"
           placeholder="Options"
           @chooseOptions="setTasksStatus"
@@ -122,7 +122,7 @@ export default {
   },
   data() {
     return {
-      allTasksStatuses: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress', 'Completed', 'Cancelled', 'Cancelled Halfway' ],
+      stepStatuses: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ],
       dataVariables: [
         'projectId',
         'projectName',

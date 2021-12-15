@@ -478,7 +478,7 @@ export default {
 
 .table {
   background: white;
-  padding: 15px 20px;
+  padding: 25px;
   box-sizing: border-box;
   border-radius: 4px;
   box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;

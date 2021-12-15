@@ -88,6 +88,10 @@ export default {
     projectCurrency: {
       type: String,
       default: 'EUR'
+    },
+    currentProject: {
+      type: Object,
+      default: {}
     }
   },
   data() {
@@ -109,7 +113,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions([ 'setCurrentProject' ]),
     openDetailsModal() {
       const { closeFinanceEditing, showStepDetails } = this.$parent
       closeFinanceEditing()
@@ -130,8 +133,8 @@ export default {
         totalReceivables: this.totalReceivables,
         totalPayables: this.totalPayables
       }
-      const updatedProject = await this.$http.post(`/pm-manage/step-finance-edit/${ this.$route.params.id }`, data)
-      this.setCurrentProject(updatedProject.data)
+      const updatedProject = await this.$http.post(`/pm-manage/step-finance-edit/${ this.currentProject._id }`, data)
+      this.$emit('approve', updatedProject.data)
       this.cancelEditing()
     },
     cancelEditing() {
@@ -191,33 +194,7 @@ export default {
       }
     }
   },
-  watch: {
-    // quantityReceivables: function (val) {
-    //   this.totalReceivables = +(+this.rateReceivables * +val).toFixed(2)
-    // },
-    // rateReceivables: function (val) {
-    //   this.totalReceivables = +(+this.quantityReceivables * +val).toFixed(2)
-    // },
-    // totalReceivables: function (val) {
-    //   if (this.quantityReceivables === 0 ) return
-    //   this.rateReceivables = +(+val / +this.quantityReceivables).toFixed(4)
-    // },
-    // quantityPayables: function (val) {
-    //   this.totalPayables = +(+this.ratePayables * +val).toFixed(2)
-    // },
-    // ratePayables: function (val) {
-    //   this.totalPayables = +(+this.quantityPayables * +val).toFixed(2)
-    // },
-    // totalPayables: function (val) {
-    //   if (this.quantityPayables === 0 ) return
-    //   this.ratePayables = +(+val / +this.quantityPayables).toFixed(4)
-    // }
-  },
   computed: {
-    ...mapGetters({
-      // units: "getAllUnits",
-      currentProject: "getCurrentProject"
-    }),
     isProjectFinished() {
       const { status } = this.currentProject
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
@@ -428,6 +405,13 @@ export default {
 }
 
 .finance {
+  box-shadow: $box-shadow;
+  background-color: white;
+  border-radius: 4px;
+  width: 560px;
+  padding: 25px;
+  box-sizing: border-box;
+
   &__title {
     font-size: 18px;
     font-family: Myriad600;

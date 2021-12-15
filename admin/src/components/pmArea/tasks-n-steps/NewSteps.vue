@@ -25,7 +25,9 @@
         :step="finalData[infoIndex]"
         :index="infoIndex"
         :projectCurrency="currentProject.projectCurrency"
+        :currentProject="currentProject"
         @closeFinanceEditing="closeFinanceEditing"
+        @approve="approveFinanceModal"
       )
 
     .steps__approve-action(v-if="isApproveActionShow")
@@ -97,7 +99,8 @@
       template(slot="vendor" slot-scope="{ row, index }")
         .table__data(v-if="row.vendor")
           span.vendor__details(@click="openVendorDetailsModal(row.vendor, row, index)") {{ vendorName(row.vendor) }}
-        .table__data(v-else) -
+        .table__data(v-else)
+          .emptyVendor No vendor...
 
       template(slot="start" slot-scope="{ row, index }")
         .table__data
@@ -143,12 +146,12 @@
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
           span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span(v-if="row.finance.Price.receivables !== ''") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.receivables).toFixed(2) : '-' }}
+          span(v-if="row.finance.Price.receivables !== ''") {{ !currentProject.minimumCharge.isUsed ? +(row.finance.Price.receivables).toFixed(2) : '-' }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance
           span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span(v-if="row.finance.Price.payables !== ''") {{ (row.finance.Price.payables).toFixed(2) }}
+          span(v-if="row.finance.Price.payables !== ''") {{ +(row.finance.Price.payables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__finance(:id="'margin'+index")
@@ -251,6 +254,9 @@ export default {
       "setCurrentProject",
       "setStepsStatus"
     ]),
+    approveFinanceModal(data) {
+      this.setCurrentProject(data)
+    },
     closeVendorDetailsModal() {
       this.vendorDetailsId = null
       this.isVendorDetailsModal = false
@@ -289,7 +295,7 @@ export default {
       const { Price } = step.finance
       let margin = 0
       margin = +Price.receivables - +Price.payables
-      return margin.toFixed(2)
+      return +margin.toFixed(2)
     },
     marginCalcPercent(step) {
       const { Price } = step.finance
@@ -593,11 +599,6 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999;
-    box-shadow: $box-shadow;
-    background-color: #fff;
-    border-radius: 4px;
-    width: 560px;
-    padding: 25px;
   }
 
   &__approve-action {
@@ -745,6 +746,10 @@ input {
   &:hover {
     text-decoration: underline;
   }
+}
+
+.emptyVendor {
+  opacity: .3;
 }
 
 </style>
