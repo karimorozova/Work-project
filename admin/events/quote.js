@@ -20,9 +20,9 @@ emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
 		steps[_idx].status = 'Rejected'
 		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'rejected' })
 	}
-	steps[_idx].vendorsClickedOffer.push(vendorId)
 
-	await Projects.updateOne({ "_id": project.id }, { steps })
+	steps[_idx].vendorsClickedOffer.push(vendorId)
+	await Projects.updateOne({ "_id": project._id }, { steps })
 })
 
 emitter.on('client-decide', async (project, prop) => {

@@ -103,6 +103,10 @@
 					const { data } = await this.$http.get(`/quotesApi/vendor-decide?projectId=${ projectId }&vendorId=${ vendorId }&stepId=${ stepId }&from=${ from }&t=${ t }&prop=${ prop }`)
 					code = data.code
 				}
+        if(code === -5){
+          window.location.href = 'https://vendor.pangea.global/dashboard'
+          return
+        }
 				if (code > 0) window.location.href = `/quotesApi/get-error-message?code=${ code }`
 				if (code < 0) window.location.href = `/quotesApi/get-success-message?code=${ code }`
 			},

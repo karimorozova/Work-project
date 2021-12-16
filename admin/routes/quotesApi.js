@@ -107,7 +107,11 @@ router.get('/vendor-decide', getProjectManageToken, async (req, res) => {
 	}
 
 	quoteEmitter.emit('vendor-decide', prop, project, vendorId, stepId)
-	prop === 'accept' ? res.send({ code: -3 }) : res.send({ code: -4 })
+	prop === 'accept'
+			? res.send({ code: -5 })
+			// временно сделан редирект на вендор портал по коду - 5
+			// ? res.send({ code: -3 })
+			: res.send({ code: -4 })
 })
 
 router.get('/client-decide', getProjectManageToken, async (req, res) => {
@@ -141,11 +145,11 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 	if (prop === 'accept') {
 		let { tasks, steps } = updateWithApprovedTasks({ taskIds: allProjectTasks.map(i => i.taskId), project })
 		const newDeadline = +lengthThinkingTime + new Date(deadline).getTime()
-		steps = steps.map(item => {
-			const newDeadline = +lengthThinkingTime + new Date(item.deadline).getTime()
-			item.deadline = new Date(newDeadline).toISOString()
-			return item
-		})
+		// steps = steps.map(item => {
+		// 	const newDeadline = +lengthThinkingTime + new Date(item.deadline).getTime()
+		// 	item.deadline = new Date(newDeadline).toISOString()
+		// 	return item
+		// })
 		await Projects.updateOne({ _id }, {
 			$set: {
 				startDate: new Date(),

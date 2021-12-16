@@ -233,7 +233,9 @@ export default {
     //   return date < new Date(new Date().setHours(0, 0, 0, 0));
     // },
     notBeforeStartDate(date) {
-      return date < new Date(this.project.startDate)
+      let d = new Date()
+      d.setDate(d.getDate() - 1)
+      return date < d
     },
     async updateBrief() {
       if (this.isProjectFinished) return

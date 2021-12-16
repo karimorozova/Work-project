@@ -150,7 +150,9 @@ export default {
       "updateClientsRequestsProps"
     ]),
     notBeforeStartDate(date) {
-      return date < new Date()
+      let d = new Date()
+      d.setDate(d.getDate() - 1)
+      return date < d
     },
     toggleBlock(prop) {
       if (this[prop]) {
