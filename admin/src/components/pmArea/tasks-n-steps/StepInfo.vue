@@ -1,16 +1,18 @@
 <template lang="pug">
   .step-info
-    .step-info__title Details
     .step-info__close(@click.stop="closeInfo") &#215;
 
+    .tabs(style="margin-top: 5px;")
+      Tabs(
+        :tabs="mainTabs"
+        selectedTab="Step Information"
+        @setTab="showMainTab"
+      )
     .info
-      .info__link(@click="openFinanceModal") Go to finance
-      .info__link2(v-if="step.vendor" @click="openVendorModal") Go to vendor
-
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
-      .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
+      .info__value(v-if="step.step.title === 'Translation' && step.totalWords" ) Total Words:  {{ step.totalWords }}
 
     .step-info__block
       StepDetails(
@@ -20,7 +22,7 @@
       )
 
     .step-info__matrix(v-if="step.receivablesUnit.type === 'CAT Wordcount' && step.step.title === 'Translation'")
-      Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
+      Tabs(:tabs="tabs.filter(i => !step.vendor ? i !== 'Payables' : true)" :selectedTab="selectedTab" @setTab="setTab")
       TableMatrix(:step="step" :selectedTab="selectedTab")
 
 </template>
@@ -58,12 +60,22 @@ export default {
     }
   },
   methods: {
+    showMainTab({ index }) {
+      switch (this.mainTabs[index]) {
+        case 'Vendor Details':
+          this.openVendorModal()
+          break
+        case 'Finance':
+          this.openFinanceModal()
+          break
+      }
+    },
     openFinanceModal() {
       const { closeStepInfo, showFinanceEditing } = this.$parent
       closeStepInfo()
       showFinanceEditing(this.index)
     },
-    openVendorModal(){
+    openVendorModal() {
       const { closeStepInfo, openVendorDetailsModal } = this.$parent
       closeStepInfo()
       openVendorDetailsModal(this.step.vendor, this.step, this.index)
@@ -84,9 +96,10 @@ export default {
 
   },
   computed: {
-    // ...mapGetters({
-    //   currentProject: "getCurrentProject"
-    // })
+    mainTabs() {
+      if (!Object.keys(this.step).length) return []
+      return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.step.vendor ? i !== 'Vendor Details' : true)
+    }
   },
   components: {
     TableMatrix,
@@ -103,10 +116,8 @@ export default {
 @import "../../../assets/scss/colors";
 
 .info {
-  border-radius: 4px;
-  padding: 12px 20px;
-  margin-bottom: 20px;
-  border: 1px solid $light-border;
+  padding: 15px;
+  border: 1px solid $border;
   position: relative;
 
   &__link {
@@ -138,9 +149,9 @@ export default {
 
 
   &__title {
-    font-size: 20px;
-    color: $red;
+    font-size: 18px;
     margin-bottom: 10px;
+    font-family: 'Myriad600';
   }
 
   &__value {
@@ -151,6 +162,17 @@ export default {
 }
 
 .step-info {
+  box-sizing: border-box;
+  background-color: white;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  width: 600px;
+  padding: 25px;
+
+  &__matrix {
+    margin-top: 20px;
+  }
+
   &__title {
     font-size: 18px;
     font-family: Myriad600;

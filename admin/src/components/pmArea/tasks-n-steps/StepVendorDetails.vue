@@ -1,5 +1,5 @@
 <template lang="pug">
-  .wrapper(v-if="vendorDetails")
+  .wrapperModal
     .wrapper__sender(v-if="isSender && toEmail" )
       MailSender(
         @close="closeSender"
@@ -7,17 +7,19 @@
         :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
       )
 
-    .wrapper__title Vendor
     .wrapper__close(@click="close") &#215;
-
+    .tabs(style="margin-top: 5px;")
+      Tabs(
+        :tabs="mainTabs"
+        selectedTab="Vendor Details"
+        @setTab="showMainTab"
+      )
     .info
-      .info__link(@click="openFinanceModal") Go to finance
-      .info__link2(@click="openDetailsModal") Go to details
       .info__title {{ currentStep.step.title }}
       .info__value {{ currentStep.stepId }}
       .info__value {{ currentStep.sourceLanguage === currentStep.targetLanguage ? currentStep.fullTargetLanguage.lang : currentStep.fullSourceLanguage.lang + ' to ' + currentStep.fullTargetLanguage.lang }}
 
-    .vendor
+    .vendor(v-if="vendorDetails")
       .vendor__row1
         .vendor__user
           .user
@@ -93,6 +95,7 @@ import Button from "../../Button"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import getBgColor from "../../../mixins/getBgColor"
 import MailSender from "../../MailSender"
+import Tabs from "../../Tabs"
 
 export default {
   mixins: [ currencyIconDetected, getBgColor ],
@@ -150,6 +153,16 @@ export default {
       this.isSender = false
       this.toEmail = null
     },
+    showMainTab({ index }) {
+      switch (this.mainTabs[index]) {
+        case 'Step Information':
+          this.openDetailsModal()
+          break
+        case 'Finance':
+          this.openFinanceModal()
+          break
+      }
+    },
     openDetailsModal() {
       const { closeVendorDetailsModal, showStepDetails } = this.$parent
       closeVendorDetailsModal()
@@ -204,6 +217,10 @@ export default {
     ...mapGetters({
       currentProject: "getCurrentProject"
     }),
+    mainTabs() {
+      if (!Object.keys(this.currentStep).length) return []
+      return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.currentStep.vendor ? i !== 'Vendor Details' : true)
+    },
     stepInfo() {
       return {
         source: this.currentStep.fullSourceLanguage._id,
@@ -215,6 +232,7 @@ export default {
     }
   },
   components: {
+    Tabs,
     MailSender,
     ckeditor: CKEditor.component,
     Button
@@ -235,10 +253,9 @@ export default {
 }
 
 .info {
-  border-radius: 4px;
-  padding: 12px 20px;
+  padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid $light-border;
+  border: 1px solid $border;
   position: relative;
 
   &__link {
@@ -270,9 +287,9 @@ export default {
 
 
   &__title {
-    font-size: 20px;
-    color: $red;
+    font-size: 18px;
     margin-bottom: 10px;
+    font-family: 'Myriad600';
   }
 
   &__value {
@@ -282,13 +299,16 @@ export default {
   }
 }
 
-.wrapper {
-  padding: 25px;
-  background: white;
-  border-radius: 4px;
+.wrapperModal {
+  box-sizing: border-box;
+  background-color: white;
   box-shadow: $box-shadow;
-  position: relative;
+  border-radius: 4px;
+  width: 600px;
+  padding: 25px;
+}
 
+.wrapper {
   &__sender {
     position: absolute;
     top: 50%;

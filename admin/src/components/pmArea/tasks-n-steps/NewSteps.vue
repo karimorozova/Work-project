@@ -1,6 +1,5 @@
 <template lang="pug">
   .steps
-
     .steps__vendorDetails(v-if="isVendorDetailsModal && vendorDetailsId")
       StepVendorDetails(
         :index="infoIndex"
@@ -162,11 +161,11 @@
 
       template(slot="info" slot-scope="{row, index}")
         .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal")
-          img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: pointer;" @click="showStepDetails(index)")
-          img(src="../../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
+          img(src="../../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showStepDetails(index)")
+          //img(src="../../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
         .table__icons(v-else)
-          img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../../assets/images/latest-version/money.svg" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
+          //img(src="../../../assets/images/latest-version/money.svg" style="cursor: default; filter: opacity(0.5);")
 </template>
 
 <script>
@@ -237,14 +236,14 @@ export default {
           style: { "width": "10%" }
         },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
-        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "11%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
+        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "12%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "12%" } },
         { label: "Start", headerKey: "headerStart", key: "start", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
         { label: "Deadline", headerKey: "headerDeadline", key: "deadline", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "10%" } },
-        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "7%" } }
+        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "5%" } }
       ]
     }
   },
@@ -571,35 +570,36 @@ export default {
     height: 32px;
   }
 
-  &__vendorDetails {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    width: 730px;
-  }
-
-  &__stepDetails {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    box-shadow: $box-shadow;
-    background-color: #fff;
-    border-radius: 4px;
-    width: 600px;
-    padding: 25px;
-  }
-
+  &__vendorDetails,
+  &__stepDetails,
   &__stepFinance {
     position: absolute;
-    top: 50%;
+    top: -10px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 0px);
     z-index: 9999;
   }
+
+  //&__stepDetails {
+  //  position: absolute;
+  //  top: 50%;
+  //  left: 50%;
+  //  transform: translate(-50%, -50%);
+  //  z-index: 9999;
+  //  box-shadow: $box-shadow;
+  //  background-color: #fff;
+  //  border-radius: 4px;
+  //  width: 600px;
+  //  padding: 25px;
+  //}
+  //
+  //&__stepFinance {
+  //  position: absolute;
+  //  top: 50%;
+  //  left: 50%;
+  //  transform: translate(-50%, -50%);
+  //  z-index: 9999;
+  //}
 
   &__approve-action {
     position: absolute;
@@ -679,7 +679,7 @@ export default {
     gap: 10px;
 
     img {
-      height: 18px;
+      height: 20px;
     }
   }
 

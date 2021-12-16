@@ -1,21 +1,22 @@
 <template lang="pug">
-  .details
+  .details(v-if="task.hasOwnProperty('memoqDocs') && task.memoqDocs.length")
     .details__links
-      .details__vendorLinks(v-if="!!vendor")
-        .link
-          .link__title Vendor Portal:
-          .link__icon(@click="goToVendor")
-            i.fas.fa-external-link-alt
-        .link
-          .link__title Vendor Page:
-          .link__icon(@click="gotToVendorInfo")
-            i.fas.fa-external-link-alt
+      //.details__vendorLinks(v-if="!!vendor")
+      //  .link
+      //    .link__title Vendor Portal:
+      //    .link__icon(@click="goToVendor")
+      //      i.fas.fa-external-link-alt
+      //  .link
+      //    .link__title Vendor Page:
+      //    .link__icon(@click="gotToVendorInfo")
+      //      i.fas.fa-external-link-alt
 
-      .details__memoqLinks(v-if="task.hasOwnProperty('memoqDocs')")
+      .details__memoqLinks
         .link(v-for="item in task.memoqDocs")
-          .link__title {{ item.DocumentName }}
           .link__icon(@click="goToMemoq(item)")
             i.fas.fa-external-link-alt
+          .link__title {{ item.DocumentName }}
+
 
 </template>
 
@@ -23,9 +24,9 @@
 export default {
   name: "StepDetails",
   props: {
-    vendor: {
-      type: Object
-    },
+    // vendor: {
+    //   type: Object
+    // },
     step: {
       type: Object
     },
@@ -39,9 +40,9 @@ export default {
       // const domainUrl = !WebTransUrl.includes('memoqweb') ? WebTransUrl.replace('/webtrans', 'memoqweb/webtrans') : WebTransUrl
       window.open(`${ 'https://memoq.pangea.global/memoqwebLegacy/webtrans/' + WebTransUrl.split('/webtrans/').pop() }`, '_blank')
     },
-    gotToVendorInfo() {
-      window.open(`/pangea-vendors/all/details/${ this.vendor._id }`, '_blank')
-    },
+    // gotToVendorInfo() {
+    //   window.open(`/pangea-vendors/all/details/${ this.vendor._id }`, '_blank')
+    // },
     async goToVendor() {
       const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendor._id })
       const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
@@ -59,6 +60,9 @@ export default {
 .details {
   &__links {
     display: flex;
+    max-height: 200px;
+    overflow: auto;
+    margin-top: 20px;
   }
 
   &__vendorLinks {
@@ -69,16 +73,9 @@ export default {
   }
 
   &__memoqLinks {
-    margin-bottom: 20px;
     border-left: 2px solid $light-border;
-    padding: 0 10px;
+    padding: 0 12px;
     height: max-content;
-  }
-
-  &__title1 {
-    font-size: 19px;
-    margin-top: 20px;
-    font-family: 'MYRIAD300';
   }
 }
 
@@ -95,7 +92,7 @@ export default {
     transition: .2s ease-out;
     color: $dark-border;
     cursor: pointer;
-    margin-left: 12px;
+    margin-right: 10px;
 
     &:hover {
       color: $text;

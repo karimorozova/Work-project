@@ -1,19 +1,19 @@
 <template lang="pug">
   .finance
-    .finance__title Finance
     .finance__close(@click.stop="cancelEditing") &#215;
-
+    .tabs(style="margin-top: 5px;")
+      Tabs(
+        :tabs="mainTabs"
+        selectedTab="Finance"
+        @setTab="showMainTab"
+      )
     .info
-      .info__link(@click="openDetailsModal") Go to details
-      .info__link2(v-if="step.vendor" @click="openVendorModal") Go to vendor
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
       .info__right
         span Discount/Surcharge:
         span(style="margin-left: 5px;") {{discounts}}%
-
-      .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
 
     .stats
       .multi-graph
@@ -27,13 +27,13 @@
         .details__row
           .details__row-color2
           .details__row-title Payables:
-          .details__row-value {{ getPayables }}%
+          .details__row-value {{ getPayables }} %
       .stats__details
         .details__row
           .details__row-title Profit:
           .details__row-value
             span {{ getProfit }}
-            span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
+            span(style="margin-left: 4px;" v-html="returnIconCurrencyByStringCode(projectCurrency)")
         .details__row
           .details__row-title ROI:
           .details__row-value {{ getROI }} %
@@ -73,6 +73,7 @@ import GeneralTable from "../GeneralTable"
 import Button from "../Button"
 import { mapActions, mapGetters } from "vuex"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
+import Tabs from "../Tabs"
 
 export default {
   name: "ProjectFinanceModal",
@@ -113,6 +114,16 @@ export default {
     }
   },
   methods: {
+    showMainTab({ index }) {
+      switch (this.mainTabs[index]) {
+        case 'Step Information':
+          this.openDetailsModal()
+          break
+        case 'Vendor Details':
+          this.openVendorModal()
+          break
+      }
+    },
     openDetailsModal() {
       const { closeFinanceEditing, showStepDetails } = this.$parent
       closeFinanceEditing()
@@ -195,6 +206,10 @@ export default {
     }
   },
   computed: {
+    mainTabs() {
+      if (!Object.keys(this.step).length) return []
+      return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.step.vendor ? i !== 'Vendor Details' : true)
+    },
     isProjectFinished() {
       const { status } = this.currentProject
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
@@ -250,6 +265,7 @@ export default {
     this.setFinanceData()
   },
   components: {
+    Tabs,
     GeneralTable,
     Button
   }
@@ -266,7 +282,7 @@ export default {
     align-items: center;
 
     &-value {
-      width: 70px;
+      width: 80px;
     }
 
     &-title {
@@ -297,7 +313,7 @@ export default {
 
   &__details {
     margin-top: 20px;
-    width: 130px;
+    width: 140px;
   }
 }
 
@@ -352,10 +368,9 @@ export default {
 }
 
 .info {
-  border-radius: 4px;
-  padding: 12px 20px;
+  padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid $light-border;
+  border: 1px solid $border;
   position: relative;
 
   &__link {
@@ -392,9 +407,9 @@ export default {
   }
 
   &__title {
-    font-size: 20px;
-    color: $red;
+    font-size: 18px;
     margin-bottom: 10px;
+    font-family: 'Myriad600';
   }
 
   &__value {
@@ -405,12 +420,12 @@ export default {
 }
 
 .finance {
-  box-shadow: $box-shadow;
-  background-color: white;
-  border-radius: 4px;
-  width: 560px;
-  padding: 25px;
   box-sizing: border-box;
+  background-color: white;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  width: 600px;
+  padding: 25px;
 
   &__title {
     font-size: 18px;
