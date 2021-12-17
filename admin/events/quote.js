@@ -13,22 +13,20 @@ emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
 	const _idx = steps.findIndex(item => item._id.toString() === stepId.toString())
 
 	if (prop === 'accept') {
-		steps	= setApprovedStepStatus({ project, step: steps[_idx]._doc, steps })
+		steps = setApprovedStepStatus({ project, step: steps[_idx]._doc, steps })
 		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'accept' })
-	}
-	if (prop === 'reject') {
-		steps[_idx].status = 'Rejected'
+	} else {
+		steps[_idx]._doc.status = 'Rejected'
 		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'rejected' })
 	}
-
-	steps[_idx].vendorsClickedOffer.push(vendorId)
+	steps[_idx]._doc.vendorsClickedOffer.push(vendorId)
 	await Projects.updateOne({ "_id": project._id }, { steps })
 })
 
 emitter.on('client-decide', async (project, prop) => {
 	if (prop === 'accept') {
 		await notifyManagerProjectStarts(project)
-		if(!project.inPause){
+		if (!project.inPause) {
 			const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
 			await Projects.updateOne({ "_id": project._id }, { steps })
 		}

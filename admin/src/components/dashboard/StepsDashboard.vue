@@ -1,161 +1,161 @@
 <template lang="pug">
   .step-dashboard
-    .step-dashboard__modal(v-if="isFinanceEdit")
-      ProjectFinanceModal(
-        :step="steps[infoIndex].steps"
-        :index="infoIndex"
-        :projectCurrency="steps[infoIndex].projectCurrency"
-        :currentProject="steps[infoIndex]"
-        @closeFinanceEditing="closeFinanceEditing"
-        @approve="approveFinanceModal"
-      )
-
-    .step-dashboard__modal(v-if="isStepInfo")
-      StepInfo(
-        :step="steps[infoIndex].steps"
-        :index="infoIndex"
-        :projectCurrency="steps[infoIndex].projectCurrency"
-        :task="getTask(infoIndex)"
-        @closeStepInfo="closeStepInfo"
-      )
-
-    .modal(v-if="isModalOpen")
-      VendorManage(
-        :steps="[steps[infoIndex].steps]"
-        :currentProject="steps[infoIndex]"
-        @closeVendorManage="toggleVendorManage"
-        @updateCurrentProject="updateSteps"
-      )
-
-    .step-dashboard__modal(v-if="isVendorDetailsModal && vendorDetailsId")
-      StepVendorDetails(
-        :index="infoIndex"
-        :vendorId="vendorDetailsId"
-        :currentStep="steps[infoIndex].steps"
-        :currentIndustry="steps[infoIndex].industry"
-        :projectCurrency="steps[infoIndex].projectCurrency"
-        :currentProject="steps[infoIndex]"
-        @close="closeVendorDetailsModal"
-      )
-
-    //StepsDashboardFilters(
-    //  v-if="userGroup && user"
-    //  :userId="user._id"
-    //  :userGroup="userGroup"
+    //.step-dashboard__modal(v-if="isFinanceEdit")
+    //  ProjectFinanceModal(
+    //    :step="steps[infoIndex].steps"
+    //    :index="infoIndex"
+    //    :projectCurrency="steps[infoIndex].projectCurrency"
+    //    :currentProject="steps[infoIndex]"
+    //    @closeFinanceEditing="closeFinanceEditing"
+    //    @approve="approveFinanceModal"
+    //  )
+    //
+    //.step-dashboard__modal(v-if="isStepInfo")
+    //  StepInfo(
+    //    :step="steps[infoIndex].steps"
+    //    :index="infoIndex"
+    //    :projectCurrency="steps[infoIndex].projectCurrency"
+    //    :task="getTask(infoIndex)"
+    //    @closeStepInfo="closeStepInfo"
+    //  )
+    //
+    //.modal(v-if="isModalOpen")
+    //  VendorManage(
+    //    :steps="[steps[infoIndex].steps]"
+    //    :currentProject="steps[infoIndex]"
+    //    @closeVendorManage="toggleVendorManage"
+    //    @updateCurrentProject="updateSteps"
+    //  )
+    //
+    //.step-dashboard__modal(v-if="isVendorDetailsModal && vendorDetailsId")
+    //  StepVendorDetails(
+    //    :index="infoIndex"
+    //    :vendorId="vendorDetailsId"
+    //    :currentStep="steps[infoIndex].steps"
+    //    :currentIndustry="steps[infoIndex].industry"
+    //    :projectCurrency="steps[infoIndex].projectCurrency"
+    //    :currentProject="steps[infoIndex]"
+    //    @close="closeVendorDetailsModal"
+    //  )
+    //
+    ////StepsDashboardFilters(
+    ////  v-if="userGroup && user"
+    ////  :userId="user._id"
+    ////  :userGroup="userGroup"
+    ////)
+    //LayoutsTable(
+    //  :fields="fields"
+    //  :tableData="steps"
+    //  @bottomScrolled="bottomScrolled"
+    //  style="margin-top: 15px;"
     //)
-    LayoutsTable(
-      :fields="fields"
-      :tableData="steps"
-      @bottomScrolled="bottomScrolled"
-      style="margin-top: 15px;"
-    )
-      template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .table__header(v-if="field.headerKey === 'headerCheck'")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        .table__header(v-else) {{ field.label }}
-
-      template(slot="check" slot-scope="{ row, index }")
-        .table__data
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
-
-      template(slot="projectId" slot-scope="{ row, index }")
-        .table__projectId
-          router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-            span {{row.projectId}}
-          .short
-            span {{ row.projectName }}
-
-      //template(slot="projectName" slot-scope="{ row, index }")
-      //  .table__data
-      //      router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-
-
-      template(slot="status" slot-scope="{ row, index }")
-        .table__statusAndProgress
-          .status {{ row.steps.status }}
-          .progress
-            ProgressLineStep(:progress="progress(row.steps.progress)" :status="row.steps.status")
-
-      template(slot="langPair" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.sourceLanguage}} &ensp;
-          span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
-            i(class="fas fa-angle-double-right")
-          span {{row.steps.targetLanguage}} &ensp;
-
-      template(slot="langPair" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.sourceLanguage+' '}}
-          span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
-            i(class="fas fa-angle-double-right")
-          span {{' ' + row.steps.targetLanguage}}
-
-      template(slot="step" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.step.title}}
-
-      template(slot="vendor" slot-scope="{ row, index }")
-        .table__data(v-if="row.steps.vendor")
-          .vendor-details(@click="openVendorDetailsModal(row.steps.vendor, row.steps, index)")
-            span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
-        .table__data(v-else)
-          .emptyVendor No vendor...
-
-      template(slot="startDate" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.startDate) }}
-
-      template(slot="deadline" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.deadline) }}
-
-      template(slot="receivables" slot-scope="{ row }")
-        .table__data
-          span.currency(v-if="!row.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span(v-if="row.steps.finance.Price.receivables !== ''") {{ !row.minimumCharge.isUsed ? +(row.steps.finance.Price.receivables).toFixed(2) : '-' }}
-
-      template(slot="payables" slot-scope="{ row }")
-        .table__data
-          span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span(v-if="row.steps.finance.Price.payables !== ''") {{ +(row.steps.finance.Price.payables).toFixed(2) }}
-
-      template(slot="margin" slot-scope="{ row, index }")
-        .table__finance(:id="'margin'+index")
-          span(v-if="marginCalc(row.steps)")
-            span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span(v-if="marginCalc(row.steps)") {{ marginCalc(row.steps) }}
-          sup(:class="{'red-color': (+marginCalcPercent(row.steps) > 1 && +marginCalcPercent(row.steps) < 50) || +marginCalcPercent(row.steps) < 0  }" v-if="marginCalc(row.steps)") {{ marginCalcPercent(row.steps) }}%
-
-      template(slot="icons" slot-scope="{ row, index }")
-        .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen")
-          img(src="../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
-          img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: pointer;" @click="toggleVendorManage(index)")
-          img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: pointer;" @click="() => refreshProgress(index)")
-        .table__icons(v-else)
-          img(src="../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: default; filter: opacity(0.5);")
-
-      template(slot="projectManager" slot-scope="{ row, index }")
-        .table__imageWithHover
-          .tooltip.user__image
-            .tooltip-data.user(v-html="row.projectManager.firstName + ' ' + row.projectManager.lastName")
-            img(v-if="getUserPhoto(row.projectManager)" :src="getUserPhoto(row.projectManager)")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(row.projectManager._id)[0], '--color':getBgColor(row.projectManager._id)[1]  }" v-else)
-              span {{ row.projectManager.firstName[0].toUpperCase() }}
-
-      template(slot="accountManager" slot-scope="{ row, index }")
-        .table__imageWithHover
-          .tooltip.user__image
-            .tooltip-data.user(v-html="row.accountManager.firstName + ' ' + row.accountManager.lastName")
-            img(v-if="getUserPhoto(row.accountManager)" :src="getUserPhoto(row.accountManager)")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else)
-              span {{ row.accountManager.firstName[0].toUpperCase() }}
-
-      template(slot="clientName" slot-scope="{ row, index }")
-        .table__imageWithHover
-          .tooltip.user__image
-            .tooltip-data.user(v-html="row.customer.name")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(row.customer._id)[0], '--color':getBgColor(row.customer._id)[1] }")
-              span {{ row.customer.name[0].toUpperCase() }}
+    //  template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+    //    .table__header(v-if="field.headerKey === 'headerCheck'")
+    //      CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+    //    .table__header(v-else) {{ field.label }}
+    //
+    //  template(slot="check" slot-scope="{ row, index }")
+    //    .table__data
+    //      CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+    //
+    //  template(slot="projectId" slot-scope="{ row, index }")
+    //    .table__projectId
+    //      router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+    //        span {{row.projectId}}
+    //      .short
+    //        span {{ row.projectName }}
+    //
+    //  //template(slot="projectName" slot-scope="{ row, index }")
+    //  //  .table__data
+    //  //      router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+    //
+    //
+    //  template(slot="status" slot-scope="{ row, index }")
+    //    .table__statusAndProgress
+    //      .status {{ row.steps.status }}
+    //      .progress
+    //        ProgressLineStep(:progress="progress(row.steps.progress)" :status="row.steps.status")
+    //
+    //  template(slot="langPair" slot-scope="{ row, index }")
+    //    .table__data
+    //      span {{row.steps.sourceLanguage}} &ensp;
+    //      span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+    //        i(class="fas fa-angle-double-right")
+    //      span {{row.steps.targetLanguage}} &ensp;
+    //
+    //  template(slot="langPair" slot-scope="{ row, index }")
+    //    .table__data
+    //      span {{row.steps.sourceLanguage+' '}}
+    //      span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+    //        i(class="fas fa-angle-double-right")
+    //      span {{' ' + row.steps.targetLanguage}}
+    //
+    //  template(slot="step" slot-scope="{ row, index }")
+    //    .table__data
+    //      span {{row.steps.step.title}}
+    //
+    //  template(slot="vendor" slot-scope="{ row, index }")
+    //    .table__data(v-if="row.steps.vendor")
+    //      .vendor-details(@click="openVendorDetailsModal(row.steps.vendor, row.steps, index)")
+    //        span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
+    //    .table__data(v-else)
+    //      .emptyVendor No vendor...
+    //
+    //  template(slot="startDate" slot-scope="{ row, index }")
+    //    .table__data {{ customFormatter(row.startDate) }}
+    //
+    //  template(slot="deadline" slot-scope="{ row, index }")
+    //    .table__data {{ customFormatter(row.deadline) }}
+    //
+    //  template(slot="receivables" slot-scope="{ row }")
+    //    .table__data
+    //      span.currency(v-if="!row.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+    //      span(v-if="row.steps.finance.Price.receivables !== ''") {{ !row.minimumCharge.isUsed ? +(row.steps.finance.Price.receivables).toFixed(2) : '-' }}
+    //
+    //  template(slot="payables" slot-scope="{ row }")
+    //    .table__data
+    //      span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+    //      span(v-if="row.steps.finance.Price.payables !== ''") {{ +(row.steps.finance.Price.payables).toFixed(2) }}
+    //
+    //  template(slot="margin" slot-scope="{ row, index }")
+    //    .table__finance(:id="'margin'+index")
+    //      span(v-if="marginCalc(row.steps)")
+    //        span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+    //      span(v-if="marginCalc(row.steps)") {{ marginCalc(row.steps) }}
+    //      sup(:class="{'red-color': (+marginCalcPercent(row.steps) > 1 && +marginCalcPercent(row.steps) < 50) || +marginCalcPercent(row.steps) < 0  }" v-if="marginCalc(row.steps)") {{ marginCalcPercent(row.steps) }}%
+    //
+    //  template(slot="icons" slot-scope="{ row, index }")
+    //    .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen")
+    //      img(src="../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
+    //      img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: pointer;" @click="toggleVendorManage(index)")
+    //      img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: pointer;" @click="() => refreshProgress(index)")
+    //    .table__icons(v-else)
+    //      img(src="../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
+    //      img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: default; filter: opacity(0.5);")
+    //      img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: default; filter: opacity(0.5);")
+    //
+    //  template(slot="projectManager" slot-scope="{ row, index }")
+    //    .table__imageWithHover
+    //      .tooltip.user__image
+    //        .tooltip-data.user(v-html="row.projectManager.firstName + ' ' + row.projectManager.lastName")
+    //        img(v-if="getUserPhoto(row.projectManager)" :src="getUserPhoto(row.projectManager)")
+    //        .user__fakeImage(:style="{'--bgColor': getBgColor(row.projectManager._id)[0], '--color':getBgColor(row.projectManager._id)[1]  }" v-else)
+    //          span {{ row.projectManager.firstName[0].toUpperCase() }}
+    //
+    //  template(slot="accountManager" slot-scope="{ row, index }")
+    //    .table__imageWithHover
+    //      .tooltip.user__image
+    //        .tooltip-data.user(v-html="row.accountManager.firstName + ' ' + row.accountManager.lastName")
+    //        img(v-if="getUserPhoto(row.accountManager)" :src="getUserPhoto(row.accountManager)")
+    //        .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else)
+    //          span {{ row.accountManager.firstName[0].toUpperCase() }}
+    //
+    //  template(slot="clientName" slot-scope="{ row, index }")
+    //    .table__imageWithHover
+    //      .tooltip.user__image
+    //        .tooltip-data.user(v-html="row.customer.name")
+    //        .user__fakeImage(:style="{'--bgColor': getBgColor(row.customer._id)[0], '--color':getBgColor(row.customer._id)[1] }")
+    //          span {{ row.customer.name[0].toUpperCase() }}
 </template>
 
 <script>

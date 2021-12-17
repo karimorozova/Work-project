@@ -144,6 +144,7 @@ async function manageStatuses({ project, steps, jobId, status }) {
 }
 
 async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }) {
+	const statusesForNextStepCanUpdateStatus = [ 'Approved', 'Ready to Start', 'Waiting to Start' ]
 	const step = steps.find(item => item.id === jobId)
 	const task = tasks[taskIndex]
 	try {
@@ -159,7 +160,7 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 					.filter(({ status, taskId }) => status !== 'Cancelled' && status !== 'Cancelled Halfway' && taskId === task.taskId)
 					.find(item => item.stepNumber === step.stepNumber + 1)
 
-			if (nextStep) {
+			if (nextStep && statusesForNextStepCanUpdateStatus.includes(nextStep.status)) {
 				tasks[taskIndex].status = 'In progress'
 				const updatedSteps = setApprovedStepStatus({ project, step: nextStep, steps })
 				await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
@@ -283,7 +284,7 @@ function isAllStepsCompleted({ steps, task }) {
 			.filter(item => item.taskId === task.taskId)
 			.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
-	return !taskSteps.length ? false : taskSteps.every(item => item.status === 'Completed')
+	return taskSteps.length ? taskSteps.every(item => item.status === 'Completed') : false
 }
 
 module.exports = { getJobs, updateStepProp, setRejectedStatus, manageStatuses }
