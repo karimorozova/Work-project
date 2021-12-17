@@ -70,11 +70,11 @@
         @close="closeVendorDetailsModal"
       )
 
-    //StepsDashboardFilters(
-    //  v-if="userGroup && user"
-    //  :userId="user._id"
-    //  :userGroup="userGroup"
-    //)
+    StepsDashboardFilters(
+      v-if="userGroup && user"
+      :userId="user._id"
+      :userGroup="userGroup"
+    )
     LayoutsTable(
       :fields="fields"
       :tableData="steps"
@@ -132,7 +132,10 @@
         .table__data {{ customFormatter(row.steps.start) }}
 
       template(slot="deadline" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.steps.deadline) }}
+        .table__data
+          span.deadline-red(v-if="isDueToday(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
+          span.deadline-orange(v-else-if="isDueTomorrow(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
+          span(v-else) {{ customFormatter(row.steps.deadline) }}
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
@@ -350,8 +353,16 @@ export default {
     ...mapActions({
       alertToggle: 'alertToggle'
     }),
-    highlight() {
-      return 'test'
+    isDueToday(date) {
+      const deadline = moment(date).unix()
+      const todayFinish = moment().utcOffset(0).set({ hour: 23, minute: 59, second: 59, millisecond: 59 }).unix()
+      return deadline < todayFinish
+    },
+    isDueTomorrow(date) {
+      const deadline = moment(date).unix()
+      const tomorrowStart = moment().utcOffset(0).add(1, 'd').set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix()
+      const tomorrowFinish = moment().utcOffset(0).add(1, 'd').set({ hour: 23, minute: 59, second: 59, millisecond: 59 }).unix()
+      return tomorrowStart < deadline && deadline < tomorrowFinish
     },
     async setMassDeadline(date) {
       const prop = this.selectedAction === 'Set Start time' ? 'start' : 'deadline'
@@ -462,6 +473,7 @@ export default {
       if (steps.length) for await (const item of steps) {
         await this.completeJob(item.steps, item._id)
       }
+      this.steps = this.steps.filter(item => item.steps.status !== 'Completed')
     },
     async completeJob(step, projectId) {
       const isCat = step.memoqDocIds.length
@@ -996,5 +1008,15 @@ a {
   position: relative;
   width: 220px;
   height: 32px;
+}
+
+.deadline {
+  &-red {
+    color: #F4511E;
+  }
+
+  &-orange {
+    color: coral;
+  }
 }
 </style>

@@ -718,7 +718,8 @@ router.post('/steps-reopen', async (req, res) => {
 	const { steps } = req.body
 	try {
 		const project = await getProject({ 'steps._id': steps[0]._id })
-		const updateProject = await getAfterReopenSteps(steps, project)
+		//SOOn
+		// const updateProject = await getAfterReopenSteps(steps, project)
 		await notifyStepReopened(steps, project.projectId)
 		res.send(updateProject)
 	} catch (err) {

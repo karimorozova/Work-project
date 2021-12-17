@@ -551,6 +551,7 @@ async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
 
 async function getAfterReopenSteps(steps, project) {
 	try {
+		//CRASHED
 		// const updatedSteps = setStepsStatus({ steps, status: 'Started', project })
 		const stepIdentify = steps.map(item => item.taskId + item.name)
 		const chosenSteps = updatedSteps.filter(item => stepIdentify.indexOf(item.taskId + item.name) !== -1)
