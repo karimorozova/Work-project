@@ -100,13 +100,8 @@ module.exports = {
 					'<ul>' +
 					'<li>Name of taxpayer</li>' +
 					'<li>Net annual declared income</li>' +
-					'<li>Dividend’s amount (from which company)</li>' +
-					'<li>Salaries amount</li>' +
-					'<li>Other income amount (specify the source of income in rent, insurances, royalties, sale of property)</li>' +
-					'<li>Net annual declared income</li>' +
 					'<li>Year of declaration</li>' +
 					'<li>Issue date</li>' +
-					"<li>Employer's details</li>" +
 					'<li>Currency</li>' +
 					'</ul>'
 		},
