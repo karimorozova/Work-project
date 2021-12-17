@@ -14,10 +14,10 @@ emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
 
 	if (prop === 'accept') {
 		steps = setApprovedStepStatus({ project, step: steps[_idx]._doc, steps })
-		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'accept' })
+		await notifyStepDecisionMade({ project, step: steps[_idx]._doc, decision: 'accept' })
 	} else {
 		steps[_idx]._doc.status = 'Rejected'
-		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'rejected' })
+		await notifyStepDecisionMade({ project, step: steps[_idx]._doc, decision: 'rejected' })
 	}
 	steps[_idx]._doc.vendorsClickedOffer.push(vendorId)
 	await Projects.updateOne({ "_id": project._id }, { steps })
