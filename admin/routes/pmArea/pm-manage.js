@@ -368,7 +368,7 @@ router.post('/update-progress', async (req, res) => {
 		res.send(result)
 	} catch (err) {
 		console.log(err)
-		res.status(500).send('Error on getting metrics ')
+		res.status(500).send('Error on getting metrics')
 	}
 })
 

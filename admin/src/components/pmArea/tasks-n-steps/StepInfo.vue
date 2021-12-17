@@ -23,7 +23,11 @@
 
     .step-info__matrix(v-if="step.receivablesUnit.type === 'CAT Wordcount' && step.step.title === 'Translation'")
       Tabs(:tabs="tabs.filter(i => !step.vendor ? i !== 'Payables' : true)" :selectedTab="selectedTab" @setTab="setTab")
-      TableMatrix(:step="step" :selectedTab="selectedTab")
+      TableMatrix(
+        :step="step"
+        :task="task"
+        :selectedTab="selectedTab"
+      )
 
 </template>
 
@@ -168,6 +172,7 @@ export default {
   border-radius: 4px;
   width: 600px;
   padding: 25px;
+  position: relative;
 
   &__matrix {
     margin-top: 20px;

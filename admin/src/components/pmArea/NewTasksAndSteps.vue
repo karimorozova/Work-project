@@ -20,7 +20,12 @@
 
 
     .modal(v-if="isModalOpen")
-      VendorManage(:steps="currentProject.steps" :industry="currentProject.industry" @closeVendorManage="toggleVendorManage")
+      VendorManage(
+        :steps="currentProject.steps"
+        :currentProject="currentProject"
+        @closeVendorManage="toggleVendorManage"
+        @updateCurrentProject="saveProject"
+      )
 
 
     transition(name="slide-fade")
@@ -76,6 +81,9 @@ export default {
   },
   methods: {
     ...mapActions([ 'setCurrentProject', 'alertToggle', 'clearTasksData', 'updateProgress' ]),
+    saveProject(data) {
+      this.setCurrentProject(data)
+    },
     async refreshProject() {
       if (this.currentProject.tasks.length) {
         const isCatTool = this.currentProject.tasks.some(item => item.memoqDocs.length)

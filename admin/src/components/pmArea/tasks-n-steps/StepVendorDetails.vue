@@ -106,7 +106,8 @@ export default {
     vendorId: { type: String },
     currentStep: { type: Object },
     currentIndustry: { type: Object },
-    projectCurrency: { type: String }
+    projectCurrency: { type: String },
+    currentProject: { type: Object }
   },
   data() {
     return {
@@ -188,9 +189,9 @@ export default {
     },
     async changeVendorBrief() {
       try {
-        const result = await this.$http.post('/pm-manage/step-vendor-brief', { projectId: this.$route.params.id, stepId: this.currentStep._id, vendorBrief: this.vendorBrief })
+        const result = await this.$http.post('/pm-manage/step-vendor-brief', { projectId: this.currentProject._id, stepId: this.currentStep._id, vendorBrief: this.vendorBrief })
         this.currentStep.vendorBrief = this.vendorBrief
-        this.setCurrentProject(result.data)
+        // this.setCurrentProject(result.data)
         this.closeBriefModal()
         this.alertToggle({ message: "Personal brief updated", isShow: true, type: 'success' })
       } catch (err) {
@@ -214,9 +215,6 @@ export default {
     this.getVendorDetails()
   },
   computed: {
-    ...mapGetters({
-      currentProject: "getCurrentProject"
-    }),
     mainTabs() {
       if (!Object.keys(this.currentStep).length) return []
       return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.currentStep.vendor ? i !== 'Vendor Details' : true)
@@ -313,9 +311,8 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -40%);
     z-index: 2000;
-    width: 755px;
   }
 
   &__title {

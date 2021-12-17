@@ -5,6 +5,7 @@
         :index="infoIndex"
         :vendorId="vendorDetailsId"
         :currentStep="currentStep"
+        :currentProject="currentProject"
         :currentIndustry="currentProject.industry"
         :projectCurrency="currentProject.projectCurrency"
         @close="closeVendorDetailsModal"

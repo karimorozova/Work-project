@@ -108,18 +108,18 @@ export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
 		commit('endRequest')
 	}
 }
-export const setStepVendors = async ({ commit, dispatch, state }, payload) => {
-	commit('startRequest')
-	try {
-		const { projectId, stepsVendors } = payload
-		const updatedProject = await Vue.http.post('/pm-manage/vendor-assigment', { projectId, stepsVendors })
-		await commit('storeCurrentProject', updatedProject.data)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
-	} finally {
-		commit('endRequest')
-	}
-}
+// export const setStepVendors = async ({ commit, dispatch, state }, payload) => {
+// 	commit('startRequest')
+// 	try {
+// 		const { projectId, stepsVendors } = payload
+// 		const updatedProject = await Vue.http.post('/pm-manage/vendor-assigment', { projectId, stepsVendors })
+// 		await commit('storeCurrentProject', updatedProject.data)
+// 	} catch (err) {
+// 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
+// 	} finally {
+// 		commit('endRequest')
+// 	}
+// }
 
 export const updateMatrix = async ({ commit, dispatch }, payload) => {
 	commit('startRequest')

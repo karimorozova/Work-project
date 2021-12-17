@@ -402,8 +402,8 @@ export default {
 
   &__right {
     position: absolute;
-    right: 12px;
-    bottom: 12px;
+    right: 15px;
+    bottom: 15px;
   }
 
   &__title {

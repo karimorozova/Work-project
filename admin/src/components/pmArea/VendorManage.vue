@@ -305,8 +305,6 @@
 import Tabs from '../Tabs'
 import Button from "../Button"
 import { mapActions, mapGetters } from "vuex"
-import _ from "lodash"
-import { setStepVendors } from "../../vuex/general/actions"
 import CheckBox from "../CheckBox"
 import Toggler from "../Toggler"
 import SelectSingle from "../SelectSingle"
@@ -325,6 +323,10 @@ export default {
     steps: {
       type: Array,
       default: []
+    },
+    currentProject: {
+      type: Object,
+      default: {}
     }
   },
   data() {
@@ -514,8 +516,8 @@ export default {
             projectId: this.currentProject._id,
             stepId
           })
-          this.setCurrentProject(updatedProject.data)
           this.currentStep = updatedProject.data.steps.find(item => item._id.toString() === stepId)
+          this.$emit('updateCurrentProject', updatedProject.data)
         } catch (err) {
           this.alertToggle({ message: "Error can't remove Vendor from Step", isShow: true, type: 'success' })
         }
@@ -562,7 +564,12 @@ export default {
     },
     async saveVendors() {
       try {
-        this.setStepVendors({ projectId: this.$route.params.id, stepsVendors: this.selectedVendors })
+        const payload = {
+          projectId: this.currentProject._id,
+          stepsVendors: this.selectedVendors
+        }
+        const updatedProject = await this.$http.post('/pm-manage/vendor-assigment', payload)
+        this.$emit('updateCurrentProject', updatedProject.data)
         this.selectedVendors = {}
       } catch (err) {
         this.alertToggle({ message: 'Error in assigns vendors', isShow: true, type: "error" })
@@ -628,14 +635,11 @@ export default {
     },
     ...mapActions({
       alertToggle: 'alertToggle',
-      setStepVendors: 'setStepVendors',
-      setCurrentProject: 'setCurrentProject',
       reassignVendor: "reassignVendor"
     })
   },
   computed: {
     ...mapGetters({
-      currentProject: 'getCurrentProject',
       allLanguages: "getAllLanguages",
       allUnits: "getAllUnits",
       allSteps: "getAllSteps",

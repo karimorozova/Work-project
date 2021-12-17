@@ -86,6 +86,8 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 		},
 		{
 			$project: {
+				"crossRate": 1,
+				"industry": 1,
 				"projectId": 1,
 				'projectName': 1,
 				'deadline': 1,
@@ -97,7 +99,19 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				'minimumCharge': 1,
 				'status': 1,
 				'discounts': 1,
-				'steps': 1
+				'steps': 1,
+				'tasks': 1
+			}
+		},
+		{
+			$addFields: {
+				"tasks": {
+					$filter: {
+						"input": "$tasks",
+						"as": "item",
+						"cond": { $eq: [ "$$item.taskId", "$steps.taskId" ] }
+					}
+				}
 			}
 		},
 		{ $skip: countToSkip },
@@ -117,6 +131,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 		{ path: 'steps.fullSourceLanguage' },
 		{ path: 'steps.fullTargetLanguage' },
 		{ path: 'steps.receivablesUnit' },
-		{ path: 'steps.payablesUnit' }
+		{ path: 'steps.payablesUnit' },
+		{ path: 'industry' }
 	]))
 }

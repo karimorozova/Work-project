@@ -1,6 +1,6 @@
 <template lang="pug">
   .step-dashboard
-    .step-dashboard__stepFinance(v-if="isFinanceEdit")
+    .step-dashboard__modal(v-if="isFinanceEdit")
       ProjectFinanceModal(
         :step="steps[infoIndex].steps"
         :index="infoIndex"
@@ -10,11 +10,39 @@
         @approve="approveFinanceModal"
       )
 
-    StepsDashboardFilters(
-      v-if="userGroup && user"
-      :userId="user._id"
-      :userGroup="userGroup"
-    )
+    .step-dashboard__modal(v-if="isStepInfo")
+      StepInfo(
+        :step="steps[infoIndex].steps"
+        :index="infoIndex"
+        :projectCurrency="steps[infoIndex].projectCurrency"
+        :task="getTask(infoIndex)"
+        @closeStepInfo="closeStepInfo"
+      )
+
+    .modal(v-if="isModalOpen")
+      VendorManage(
+        :steps="[steps[infoIndex].steps]"
+        :currentProject="steps[infoIndex]"
+        @closeVendorManage="toggleVendorManage"
+        @updateCurrentProject="updateSteps"
+      )
+
+    .step-dashboard__modal(v-if="isVendorDetailsModal && vendorDetailsId")
+      StepVendorDetails(
+        :index="infoIndex"
+        :vendorId="vendorDetailsId"
+        :currentStep="steps[infoIndex].steps"
+        :currentIndustry="steps[infoIndex].industry"
+        :projectCurrency="steps[infoIndex].projectCurrency"
+        :currentProject="steps[infoIndex]"
+        @close="closeVendorDetailsModal"
+      )
+
+    //StepsDashboardFilters(
+    //  v-if="userGroup && user"
+    //  :userId="user._id"
+    //  :userGroup="userGroup"
+    //)
     LayoutsTable(
       :fields="fields"
       :tableData="steps"
@@ -31,15 +59,16 @@
           CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="projectId" slot-scope="{ row, index }")
-        .table__data
+        .table__projectId
           router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
             span {{row.projectId}}
-
-      template(slot="projectName" slot-scope="{ row, index }")
-        .table__data
           .short
-            router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              span {{ row.projectName }}
+            span {{ row.projectName }}
+
+      //template(slot="projectName" slot-scope="{ row, index }")
+      //  .table__data
+      //      router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+
 
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
@@ -67,7 +96,8 @@
 
       template(slot="vendor" slot-scope="{ row, index }")
         .table__data(v-if="row.steps.vendor")
-          span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
+          .vendor-details(@click="openVendorDetailsModal(row.steps.vendor, row.steps, index)")
+            span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
         .table__data(v-else)
           .emptyVendor No vendor...
 
@@ -95,11 +125,14 @@
           sup(:class="{'red-color': (+marginCalcPercent(row.steps) > 1 && +marginCalcPercent(row.steps) < 50) || +marginCalcPercent(row.steps) < 0  }" v-if="marginCalc(row.steps)") {{ marginCalcPercent(row.steps) }}%
 
       template(slot="icons" slot-scope="{ row, index }")
-        .table__icons(v-if="!isFinanceEdit")
-          img(src="../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
+        .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen")
+          img(src="../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
+          img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: pointer;" @click="toggleVendorManage(index)")
+          img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: pointer;" @click="() => refreshProgress(index)")
         .table__icons(v-else)
-          img(src="../../assets/images/latest-version/view-details.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../assets/images/latest-version/money.svg" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: default; filter: opacity(0.5);")
 
       template(slot="projectManager" slot-scope="{ row, index }")
         .table__imageWithHover
@@ -130,12 +163,15 @@ import LayoutsTable from "../LayoutsTable"
 import Tabs from "../Tabs"
 import StepsDashboardFilters from "./StepsDashboardFilters"
 import moment from "moment"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import getBgColor from "../../mixins/getBgColor"
 import ProgressLineStep from "../ProgressLineStep"
 import CheckBox from "../CheckBox"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 import ProjectFinanceModal from "../pmArea/ProjectFinanceModal"
+import StepInfo from "../pmArea/tasks-n-steps/StepInfo"
+import StepVendorDetails from "../pmArea/tasks-n-steps/StepVendorDetails"
+import VendorManage from "../pmArea/VendorManage"
 
 export default {
   mixins: [ getBgColor, currencyIconDetected ],
@@ -143,8 +179,10 @@ export default {
     return {
       infoIndex: -1,
       isFinanceEdit: false,
-      // isVendorDetailsModal: false,
-      // isStepInfo: false,
+      isVendorDetailsModal: false,
+      isStepInfo: false,
+      isModalOpen: false,
+      vendorDetailsId: null,
 
       filteredFields: [],
       steps: [],
@@ -190,14 +228,14 @@ export default {
           label: "Project ID",
           headerKey: "headerID",
           key: "projectId",
-          style: { "width": "130px" }
+          style: { "width": "160px" }
         },
-        {
-          label: "Project Name",
-          headerKey: "headerProjectName",
-          key: "projectName",
-          style: { "width": "150px" }
-        },
+        // {
+        //   label: "Project Name",
+        //   headerKey: "headerProjectName",
+        //   key: "projectName",
+        //   style: { "width": "150px" }
+        // },
         {
           label: "Service",
           headerKey: "headerStep",
@@ -226,25 +264,25 @@ export default {
           label: "Start",
           headerKey: "headerStartDate",
           key: "startDate",
-          style: { "width": "100px" }
+          style: { "width": "105px" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { "width": "100px" }
+          style: { "width": "105px" }
         },
         {
           label: "Rec.",
           headerKey: "headerReceivables",
           key: "receivables",
-          style: { "width": "80px" }
+          style: { "width": "85px" }
         },
         {
           label: "Pay.",
           headerKey: "headerPayables",
           key: "payables",
-          style: { "width": "80px" }
+          style: { "width": "85px" }
         },
         {
           label: "Margin",
@@ -256,32 +294,96 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: { "width": "120px" }
+          style: { "width": "115px" }
         },
         {
           label: "PM",
           headerKey: "headerProjectManager",
           key: "projectManager",
-          style: { "width": "50px" }
+          style: { "width": "55px" }
         },
         {
           label: "AM",
           headerKey: "headerAccountManager",
           key: "accountManager",
-          style: { "width": "50px" }
+          style: { "width": "55px" }
         },
         {
           label: "Client",
           headerKey: "headerClientName",
           key: "clientName",
-          style: { "width": "50px" }
+          style: { "width": "55px" }
         }
       ]
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: 'alertToggle'
+    }),
     highlight() {
       return 'test'
+    },
+    toggleVendorManage(index) {
+      if (!this.isModalOpen && index >= 0) {
+        this.infoIndex = index
+      } else {
+        this.infoIndex = -1
+      }
+      this.isModalOpen = !this.isModalOpen
+    },
+    updateSteps(data) {
+      const { steps } = data
+      console.log('steps', steps)
+      this.mutateCurrentSteps(steps)
+    },
+    async refreshProgress(index) {
+      try {
+        const payload = {
+          projectId: this.steps[index]._id,
+          isCatTool: this.getTask(index).hasOwnProperty('memoqDocs') && !!this.getTask(index).memoqDocs.length
+        }
+        const updatedProject = (await this.$http.post('/pm-manage/update-progress', payload)).data
+        const { steps } = updatedProject
+        this.mutateCurrentSteps(steps)
+        this.alertToggle({ message: "Progress updated!", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Can't updated progress", isShow: true, type: "error" })
+      }
+    },
+    mutateCurrentSteps(steps) {
+      for (const newStep of steps) {
+        const _idx = this.steps.findIndex(item => item.steps._id.toString() === newStep._id.toString())
+        if (_idx > -1) {
+          const updated = this.steps[_idx]
+          updated.steps = newStep
+          this.steps.splice(_idx, 1, updated)
+        }
+      }
+    },
+    closeVendorDetailsModal() {
+      this.vendorDetailsId = null
+      this.isVendorDetailsModal = false
+      this.infoIndex = -1
+    },
+    openVendorDetailsModal(vendor, step, index) {
+      if (this.isStepInfo || this.isFinanceEdit) return
+      const { _id } = vendor
+      this.vendorDetailsId = _id
+      this.currentStep = step
+      this.infoIndex = index
+      this.isVendorDetailsModal = true
+    },
+    getTask(index) {
+      return this.steps[index].tasks[0]
+    },
+    showStepDetails(index) {
+      this.infoIndex = index
+      this.isStepInfo = true
+    },
+    closeStepInfo() {
+      this.isStepInfo = false
+      this.infoIndex = -1
     },
     showFinanceEditing(index) {
       this.infoIndex = index
@@ -357,6 +459,7 @@ export default {
       try {
         const result = (await this.$http.post(`/dashboard-api/pipeline?page=1&limit=25`, { filters: this.filters })).data
         this.steps = result.map(item => ({ ...item, isCheck: false }))
+        console.log('STTETEPPSS', this.steps)
         this.isDataRemain = result.length === 25
       } catch (err) {
         this.alertToggle({ message: "Error on Steps data", isShow: true, type: "error" })
@@ -405,12 +508,15 @@ export default {
     await this.getData()
   },
   components: {
+    StepVendorDetails,
+    StepInfo,
     ProjectFinanceModal,
     CheckBox,
     ProgressLineStep,
     LayoutsTable,
     Tabs,
-    StepsDashboardFilters
+    StepsDashboardFilters,
+    VendorManage
   }
 }
 </script>
@@ -436,7 +542,7 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
 
-  &__stepFinance {
+  &__modal {
     position: absolute;
     top: 100px;
     left: 50%;
@@ -453,7 +559,7 @@ export default {
       gap: 12px;
 
       img {
-        height: 18px;
+        height: 20px;
       }
     }
 
@@ -487,7 +593,8 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 140px;
+  max-width: 160px;
+  color: $border;
 }
 
 
@@ -586,5 +693,31 @@ a {
 .currency {
   margin-right: 4px;
   color: $dark-border;
+}
+
+.vendor-details {
+  cursor: pointer;
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.modal {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 45;
+  box-sizing: border-box;
+  min-width: 1510px;
+  width: 1530px;
+  padding: 25px;
+  box-shadow: $box-shadow;
+  background: white;
+  border-radius: 4px;
+  z-index: 30000;
 }
 </style>
