@@ -144,7 +144,6 @@ async function manageStatuses({ project, steps, jobId, status }) {
 }
 
 async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }) {
-	const statusesForNextStepCanUpdateStatus = [ 'Approved', 'Ready to Start', 'Waiting to Start' ]
 	const step = steps.find(item => item.id === jobId)
 	const task = tasks[taskIndex]
 	try {
@@ -156,14 +155,21 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 			await pushTasksToDR1(project, task, step)
 			await taskCompleteNotifyPM(project, task)
 		} else {
+
 			const nextStep = steps
 					.filter(({ status, taskId }) => status !== 'Cancelled' && status !== 'Cancelled Halfway' && taskId === task.taskId)
 					.find(item => item.stepNumber === step.stepNumber + 1)
 
-			if (nextStep && statusesForNextStepCanUpdateStatus.includes(nextStep.status)) {
+			if (nextStep) {
 				tasks[taskIndex].status = 'In progress'
-				const updatedSteps = setApprovedStepStatus({ project, step: nextStep, steps })
-				await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
+
+				if ([ 'Approved', 'Ready to Start', 'Waiting to Start' ].includes(nextStep.status)) {
+					const updatedSteps = setApprovedStepStatus({ project, step: nextStep, steps })
+					await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
+				} else {
+					await Projects.updateOne({ "steps._id": jobId }, { steps, tasks })
+				}
+
 				await nextVendorCanStartWorkNotification({ nextStep })
 			}
 		}
