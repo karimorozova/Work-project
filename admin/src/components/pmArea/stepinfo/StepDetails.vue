@@ -60,7 +60,7 @@ export default {
 .details {
   &__links {
     display: flex;
-    max-height: 200px;
+    max-height: 160px;
     overflow: auto;
     margin-top: 20px;
   }

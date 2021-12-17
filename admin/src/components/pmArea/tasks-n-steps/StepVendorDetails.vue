@@ -24,12 +24,12 @@
         .vendor__user
           .user
             .user__image(v-if="vendorDetails.photo")
-              .circle1
-              .circle2
+              //.circle1
+              //.circle2
               img(:src="domain + vendorDetails.photo")
             .user__fakeImage(:style="{'--bgColor': getBgColor(vendorId)[0], '--color': getBgColor(vendorId)[1]}" v-else) {{ vendorDetails.name[0] }}
-              .circle1
-              .circle2
+              //.circle1
+              //.circle2
 
             .user__description
               .user__name
@@ -40,9 +40,6 @@
                 span
                   i(class="far fa-envelope")
                 span {{ vendorDetails.email }}
-              .buttons
-                .buttons__btn(@click="openBriefModal" ) Personal Instructions
-                .buttons__btn() Extra payables (Soon)
 
         .vendor__stats
           .stats__row.border-bottom
@@ -79,6 +76,12 @@
           .marks__row
             .marks__title LQA3
             .marks__value {{ vendorDetails.lqa3 }}
+
+      .vendor__row2
+        .buttons
+          .buttons__btn(@click="openBriefModal" ) Personal Instructions
+          .buttons__btn(@click="goToVendor") vendor.portal
+          .buttons__btn() Extra payables (Soon)
 
     .notes__modal(v-if="isShowBriefModal")
       .notes__body
@@ -146,6 +149,13 @@ export default {
     }
   },
   methods: {
+    async goToVendor() {
+      const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendorId })
+      const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+      const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+      document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
+      window.open(redirectTo, '_blank')
+    },
     openSender(to) {
       this.isSender = true
       this.toEmail = to
@@ -343,19 +353,24 @@ export default {
 }
 
 .vendor {
-  padding: 10px 15px;
-  border: 1px dotted $light-border;
-  margin-bottom: 10px;
+  padding: 15px;
+  border: 1px solid $light-border;
   border-radius: 4px;
 
   &__row1 {
     display: flex;
   }
 
+  &__row2 {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid $light-border;
+  }
+
   &__stats {
     border: 1px solid $light-border;
     height: fit-content;
-    margin-left: 15px;
+    margin-left: 10px;
   }
 
   &__marks {
@@ -450,10 +465,9 @@ export default {
 }
 
 .buttons {
-  margin-top: 6px;
   display: flex;
   justify-content: start;
-  gap: 12px;
+  gap: 15px;
 
   &__btn {
     transition: .2s ease-out;
@@ -479,11 +493,11 @@ export default {
 .user {
   display: flex;
   gap: 15px;
-  width: 400px;
+  width: 270px;
   align-items: center;
 
   &__description {
-    width: 320px;
+    width: 190px;
   }
 
   &__rating {
@@ -493,7 +507,7 @@ export default {
 
   &__name {
     font-family: Myriad600;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
 
   &__email {

@@ -575,7 +575,7 @@ export default {
   &__stepDetails,
   &__stepFinance {
     position: absolute;
-    top: -10px;
+    top: -20px;
     left: 50%;
     transform: translate(-50%, 0px);
     z-index: 9999;
