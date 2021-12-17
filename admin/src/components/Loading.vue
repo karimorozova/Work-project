@@ -2,7 +2,7 @@
 .alert-message
   .icon__loading
     i.icon.fas.fa-ellipsis-h(aria-hidden="true")
-  .text Loading
+  .text Loading...
 </template>
 
 <script>

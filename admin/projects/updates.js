@@ -338,9 +338,6 @@ async function updateProjectStatus(id, status, reason) {
 
 
 const setApprovedStepStatus = ({ project, step, steps }) => {
-	// const statusesForNextStepCanUpdateStatus = [ 'Approved', 'Ready to Start', 'Waiting to Start' ]
-	// statusesForNextStepCanUpdateStatus.includes(nextStep.status)
-
 	const { status } = project
 	const isProjectApprovedStatus = status === 'Approved' || status === 'In progress'
 	const brotherlySteps = steps.filter(item => item.taskId === step.taskId)

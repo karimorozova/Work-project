@@ -691,7 +691,6 @@ router.post('/step-status', async (req, res) => {
 	const { id, status, steps } = req.body
 	let project = await getProject({ '_id': id })
 	let allSteps = project.steps
-
 	try {
 		if (status === 'Approved') {
 			for await (const step of steps) {

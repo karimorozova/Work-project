@@ -384,7 +384,8 @@ export default {
     },
     async completeJobs() {
       const steps = this.checkedSteps.filter(({ status }) => status === 'In progress')
-      if (steps.length) for (const step of steps) {
+      this.closeApproveModal()
+      if (steps.length) for await (const step of steps) {
         await this.completeJob(step)
       }
     },
@@ -399,17 +400,16 @@ export default {
           isCat
         })
         await this.setCurrentProject(updatedProject.data)
-        this.closeApproveModal()
       } catch (err) {
         this.alertToggle({ message: `Error at completing job`, isShow: true, type: 'error' })
       }
     },
     async startJobs() {
       const steps = this.checkedSteps.filter(({ status }) => status === 'Ready to Start')
-      if (steps.length) for (const step of steps) {
+      this.closeApproveModal()
+      if (steps.length) for await (const step of steps) {
         await this.startJob(step)
       }
-      this.closeApproveModal()
     },
     async startJob(step) {
       const { receivablesUnit: { type }, vendor, stepId } = step
@@ -477,7 +477,10 @@ export default {
       this.toggleAll(false)
     },
     async decideOnSteps(status, steps) {
-      if (!steps.length) return
+      if (!steps.length) {
+        this.closeApproveModal()
+        return
+      }
       try {
         steps = steps.filter(item => !!item.vendor)
         this.closeApproveModal()
@@ -495,7 +498,10 @@ export default {
       }
     },
     async requestConfirmation(steps) {
-      if (!steps.length) return
+      if (!steps.length) {
+        this.closeApproveModal()
+        return
+      }
       try {
         const checkedSteps = steps.filter(item => !!item.vendor)
         this.closeApproveModal()
@@ -580,27 +586,6 @@ export default {
     transform: translate(-50%, 0px);
     z-index: 9999;
   }
-
-  //&__stepDetails {
-  //  position: absolute;
-  //  top: 50%;
-  //  left: 50%;
-  //  transform: translate(-50%, -50%);
-  //  z-index: 9999;
-  //  box-shadow: $box-shadow;
-  //  background-color: #fff;
-  //  border-radius: 4px;
-  //  width: 600px;
-  //  padding: 25px;
-  //}
-  //
-  //&__stepFinance {
-  //  position: absolute;
-  //  top: 50%;
-  //  left: 50%;
-  //  transform: translate(-50%, -50%);
-  //  z-index: 9999;
-  //}
 
   &__approve-action {
     position: absolute;
