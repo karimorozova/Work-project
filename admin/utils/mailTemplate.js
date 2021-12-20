@@ -215,8 +215,13 @@ const managerNotifyMail = function (obj, msg, subject) {
 			if (error) {
 				rej(error)
 			}
+			if (info) {
+				res(info.messageId)
+			} else {
+				console.log('Error in sendEmail')
+				rej("no message sent")
+			}
 			// console.log('managerNotifyMail', 'To:', obj.email, 'Message sent: %s', info.messageId)
-			res(info.messageId)
 		})
 	})
 }

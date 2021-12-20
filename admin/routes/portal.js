@@ -49,7 +49,7 @@ router.post('/translation-service-request', checkClientContact, upload.fields([ 
 		let client = await getClient({ "_id": verificationResult.clientId })
 		const request = await translationServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
-		notifyAMsRequestCreated(request)
+		// notifyAMsRequestCreated(request)
 		res.send('Done')
 	} catch (err) {
 		console.log(err)
