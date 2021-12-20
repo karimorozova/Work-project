@@ -63,7 +63,7 @@ router.post('/new-client-service-request', checkClientContact, upload.fields([ {
 		let client = await getClient({ "_id": verificationResult.clientId })
 		const request = await newClientServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
-		// notifyAMsRequestCreated(request)
+		notifyAMsRequestCreated(request)
 		res.send({ id: request._id })
 	} catch (err) {
 		console.log(err)
