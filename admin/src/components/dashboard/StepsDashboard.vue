@@ -365,13 +365,13 @@ export default {
     isDueToday(date) {
       const deadline = moment(date).unix()
       const todayFinish = moment().utcOffset(0).set({ hour: 23, minute: 59, second: 59, millisecond: 59 }).unix()
-      return deadline < todayFinish
+      return deadline <= todayFinish
     },
     isDueTomorrow(date) {
       const deadline = moment(date).unix()
       const tomorrowStart = moment().utcOffset(0).add(1, 'd').set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).unix()
       const tomorrowFinish = moment().utcOffset(0).add(1, 'd').set({ hour: 23, minute: 59, second: 59, millisecond: 59 }).unix()
-      return tomorrowStart < deadline && deadline < tomorrowFinish
+      return tomorrowStart <= deadline && deadline <= tomorrowFinish
     },
     async setMassDeadline(date) {
       const prop = this.selectedAction === 'Set Start time' ? 'start' : 'deadline'
