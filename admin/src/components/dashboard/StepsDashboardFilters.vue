@@ -1,6 +1,5 @@
 <template lang="pug">
   .filter
-    //.filter__item(v-if="filter === 'projectId'")
     .filter__item
       label Project Id:
       .filter__input
@@ -55,6 +54,8 @@
           :isRemoveOption="true"
           @removeOption="removeFromRoute('stepsStatuses')"
         )
+
+    .filter__item
 
     .filter__item
       label Source Languages:
@@ -125,18 +126,57 @@
           @removeOption="removeFromRoute('clients')"
         )
 
+    .filter__item
+    .filter__item
+    .filter__itemLong
+      label Start Date Range:
+      .filter__input
+        DatePicker.range-with-one-panel(
+          :value="selectedStartRange"
+          @input="(e) => setStartRange(e)"
+          format="DD-MM-YYYY, HH:mm"
+          prefix-class="xmx"
+          range-separator=" - "
+          :clearable="false"
+          type="datetime"
+          range
+          placeholder="Select datetime range"
+        )
+      .clear-icon-picker(v-if="!!selectedStartRange[0]" @click="removeSelectedStartRange()")
+        i.fas.fa-backspace.backspace-long
+
+    .filter__itemLong
+      label Deadline Range:
+      .filter__input
+        DatePicker.range-with-one-panel(
+          :value="selectedDeadlineRange"
+          @input="(e) => setDeadlineRange(e)"
+          format="DD-MM-YYYY, HH:mm"
+          prefix-class="xmx"
+          range-separator=" - "
+          :clearable="false"
+          type="datetime"
+          range
+          placeholder="Select datetime range"
+        )
+      .clear-icon-picker(v-if="!!selectedDeadlineRange[0]" @click="removeSelectedDeadlineRange()")
+        i.fas.fa-backspace.backspace-long
+
 </template>
 
 <script>
 import { mapGetters } from "vuex"
 import SelectSingle from "../SelectSingle"
 import SelectMulti from "../SelectMulti"
+import '../../assets/scss/datepicker.scss'
+import DatePicker from 'vue2-datepicker'
 
 export default {
   name: "DashboardStepsFilters",
   components: {
     SelectSingle,
     SelectMulti,
+    DatePicker
   },
   props: {
     userGroup: {
@@ -150,26 +190,7 @@ export default {
   },
   data() {
     return {
-      stepStatuses: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ],
-      dataVariables: [
-        'projectId',
-        'projectName',
-        'clients',
-        'projectManager',
-        'accountManager',
-        'startDate',
-        'deadline',
-        'sourceLanguages',
-        'targetLanguages',
-        'industry',
-        'services',
-        'isTest',
-        'projectCurrency',
-        'paymentProfile',
-        'vendors',
-        'stepsStatuses',
-        'requestId'
-      ],
+      stepStatuses: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ]
     }
   },
   methods: {
@@ -201,13 +222,7 @@ export default {
     removeFromRoute(field) {
       this.replaceRoute(field, '')
     },
-    querySetter(vm, to) {
-      for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
-    },
-    defaultSetter() {
-      for (let variable of this.dataVariables) this[variable] = ''
-    },
-    setTasksStatus({ option }){
+    setTasksStatus({ option }) {
       if (!this.$route.query.stepsStatuses) {
         this.replaceRoute('stepsStatuses', option)
         return
@@ -278,13 +293,51 @@ export default {
       this.replaceRoute('targetLanguages', _ids.join(','))
     },
     setCurrentAmOrPm() {
-      if ( this.$route.query.hasOwnProperty('accountManager')) return
-      if( this.userGroup.name === 'Project Managers')
+      if (this.$route.query.hasOwnProperty('accountManager')) return
+      if (this.userGroup.name === 'Project Managers')
         this.replaceRoute('projectManager', this.userId)
-      if(this.userGroup.name === 'Account Managers')
+      if (this.userGroup.name === 'Account Managers')
         this.replaceRoute('accountManager', this.userId)
+    },
+    setStartRange(e) {
+      let query = this.$route.query
+      delete query.startDateFrom
+      delete query.startDateTo
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...query,
+          startDateFrom: new Date(e[0]).getTime(),
+          startDateTo: new Date(e[1]).getTime()
+        }
+      })
+    },
+    setDeadlineRange(e) {
+      let query = this.$route.query
+      delete query.deadlineFrom
+      delete query.deadlineTo
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...query, deadlineFrom: new Date(e[0]).getTime(),
+          deadlineTo: new Date(e[1]).getTime()
+        }
+      })
+    },
+    removeSelectedStartRange() {
+      let query = this.$route.query
+      this.$router.replace({
+        path: this.$route.path,
+        query: { ...query, startDateFrom: '', startDateTo: '' }
+      })
+    },
+    removeSelectedDeadlineRange() {
+      let query = this.$route.query
+      this.$router.replace({
+        path: this.$route.path,
+        query: { ...query, deadlineFrom: '', deadlineTo: '' }
+      })
     }
-
   },
   computed: {
     ...mapGetters({
@@ -294,9 +347,18 @@ export default {
       steps: "getAllSteps",
       // industries: "getAllIndustries",
       vendors: "getAllVendorsForOptions",
-      allClientsNames: "getAllClientsForOptions",
+      allClientsNames: "getAllClientsForOptions"
     }),
-
+    selectedStartRange() {
+      return this.$route.query.startDateFrom
+          ? [ new Date(+this.$route.query.startDateFrom), new Date(+this.$route.query.startDateTo) ]
+          : [ null, null ]
+    },
+    selectedDeadlineRange() {
+      return this.$route.query.deadlineFrom
+          ? [ new Date(+this.$route.query.deadlineFrom), new Date(+this.$route.query.deadlineTo) ]
+          : [ null, null ]
+    },
     allServices() {
       return this.steps.map(({ title }) => title)
     },
@@ -381,7 +443,7 @@ export default {
     },
     isPm() {
       return this.userGroup.name === 'Project Managers'
-    },
+    }
 
   },
   mounted() {
@@ -396,6 +458,13 @@ export default {
 .filter {
   display: flex;
   flex-wrap: wrap;
+
+  &__itemLong {
+    position: relative;
+    margin-bottom: 15px;
+    margin-right: 25px;
+    width: 342.5px;
+  }
 
   &__item {
     position: relative;
@@ -434,6 +503,12 @@ input {
   }
 }
 
+.backspace-long {
+  position: absolute;
+  right: 34px !important;
+  top: 27px !important;
+}
+
 .fa-backspace {
   font-size: 16px;
   transition: .2s ease-out;
@@ -446,5 +521,9 @@ input {
   &:hover {
     color: $text;
   }
+}
+
+.range-with-one-panel {
+  width: 342.5px;
 }
 </style>

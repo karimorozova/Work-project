@@ -1,5 +1,7 @@
 <template lang="pug">
   .step-dashboard
+    .clear-filter(@click="clearFilters")
+      i(class="fas fa-broom")
     .step-dashboard__stepsActions
       .drop__title Step Actions:
       .drop
@@ -237,25 +239,27 @@ export default {
       services: '',
       vendors: '',
       clients: '',
+      startDateFrom: '',
+      startDateTo: '',
+      deadlineFrom: '',
+      deadlineTo: '',
+
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       dataVariables: [
         'projectId',
         'projectName',
-        'clients',
-        'projectManager',
         'accountManager',
-        'startDate',
-        'deadline',
+        'projectManager',
+        'stepsStatuses',
         'sourceLanguages',
         'targetLanguages',
-        'industry',
         'services',
-        'isTest',
-        'projectCurrency',
-        'paymentProfile',
         'vendors',
-        'stepsStatuses',
-        'requestId'
+        'clients',
+        'startDateFrom',
+        'startDateTo',
+        'deadlineFrom',
+        'deadlineTo'
       ],
       fields: [
         {
@@ -355,6 +359,10 @@ export default {
     ...mapActions({
       alertToggle: 'alertToggle'
     }),
+    clearFilters() {
+      this.$router.replace({ 'query': null }).catch((err) => err)
+      this.defaultSetter()
+    },
     isDueToday(date) {
       const deadline = moment(date).unix()
       const todayFinish = moment().utcOffset(0).set({ hour: 23, minute: 59, second: 59, millisecond: 59 }).unix()
@@ -774,10 +782,6 @@ export default {
   color: $red;
 }
 
-.test {
-  background-color: red;
-}
-
 .step-dashboard {
   width: 1530px;
   margin: 50px 50px 0;
@@ -787,6 +791,12 @@ export default {
   box-sizing: border-box;
   border-radius: 4px;
   box-shadow: $box-shadow;
+
+  &__stepsActions {
+    position: absolute;
+    top: 157px;
+    z-index: 22;
+  }
 
   &__modal {
     position: absolute;
@@ -1015,15 +1025,51 @@ a {
   position: relative;
   width: 220px;
   height: 32px;
+
+  &__title {
+    display: block;
+    margin-bottom: 3px;
+    font-family: Myriad600;
+  }
 }
 
 .deadline {
   &-red {
-    color: #F4511E;
+    color: red;
   }
 
   &-orange {
-    color: #f9a825;
+    color: orange;
+  }
+}
+
+.clear-filter {
+  position: absolute;
+  right: 10px;
+  top: 48px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px;
+  transition: .2s ease-out;
+
+  & i {
+    color: #9c9c9c;
+    height: 20px;
+    width: 20px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+  }
+
+  &:hover {
+    & i {
+      color: $text;
+    }
   }
 }
 </style>

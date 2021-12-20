@@ -35,12 +35,15 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 		// projectCurrency,
 		// paymentProfile,
 		vendors,
-		stepsStatuses
-		// requestId
+		stepsStatuses,
+		startDateFrom,
+		startDateTo,
+		deadlineFrom,
+		deadlineTo
 	} = filters
 
-	const stepsStatusesArr = stepsStatuses.split(',').filter(status  => STATUSES.includes(status))
-	query["steps.status"] = { $in:  stepsStatusesArr.length ? stepsStatusesArr : STATUSES}
+	const stepsStatusesArr = stepsStatuses.split(',').filter(status => STATUSES.includes(status))
+	query["steps.status"] = { $in: stepsStatusesArr.length ? stepsStatusesArr : STATUSES }
 
 	if (projectId) {
 		const filter = projectId.replace(reg, '\\$&')
@@ -63,7 +66,6 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 		query["steps.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
 	}
 	if (services) {
-		console.log(services.split(',').map(item => ObjectId(item)))
 		query["steps.step"] = { $in: services.split(',').map(item => ObjectId(item)) }
 	}
 	if (vendors) {
@@ -72,7 +74,13 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 	if (clients) {
 		query["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
-
+	if (startDateFrom && startDateTo) {
+		console.log(new Date(+startDateFrom), new Date(+startDateTo))
+		query["steps.start"] = { $gte: new Date(+startDateFrom), $lte: new Date(+startDateTo) }
+	}
+	if (deadlineFrom && deadlineTo) {
+		query["steps.deadline"] = { $gte: new Date(+deadlineFrom), $lte: new Date(+deadlineTo) }
+	}
 	const PROJECT_STATUSES = [ "In progress", "Approved" ]
 	query['status'] = { $in: PROJECT_STATUSES }
 	query['isTest'] = false

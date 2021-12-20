@@ -318,8 +318,14 @@ const ProjectsSchema = new mongoose.Schema({
 		memoqTarget: "",
 		memoqDocIds: [],
 		totalWords: { type: Number },
-		start: {},
-		deadline: {},
+		start: {
+			type: Date,
+			default: Date.now
+		},
+		deadline: {
+			type: Date,
+			default: Date.now
+		},
 		progress: "",
 		status: {
 			type: String,
