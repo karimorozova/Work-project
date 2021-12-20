@@ -127,8 +127,8 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				}
 			}
 		},
+		{ $sort: { 'steps.deadline': 1 } },
 		{ $skip: countToSkip },
-		{ $sort: { 'steps.deadline': 1 } }
 	]
 	if (countToGet > 0) {
 		queryPipeline.push({ $limit: countToGet })

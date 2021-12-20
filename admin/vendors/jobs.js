@@ -169,9 +169,8 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 				} else {
 					await Projects.updateOne({ "steps._id": jobId }, { steps, tasks })
 				}
-
-				await nextVendorCanStartWorkNotification({ nextStep })
 			}
+			await nextVendorCanStartWorkNotification({ nextStep })
 		}
 	} catch (err) {
 		console.log(err)
