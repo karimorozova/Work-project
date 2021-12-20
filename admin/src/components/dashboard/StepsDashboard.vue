@@ -741,6 +741,8 @@ export default {
     }
   },
   async created() {
+    this.defaultSetter()
+    this.querySetter(this, to)
     await this.getData()
   },
   components: {

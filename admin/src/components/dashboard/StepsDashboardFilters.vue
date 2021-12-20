@@ -8,94 +8,94 @@
         .clear-icon(v-if="projectIdValue.length" @click="removeFromRoute('projectId')")
           i.fas.fa-backspace
 
-    //.filter__item
-    //  label Project Name:
-    //  .filter__input
-    //    input(type="text" placeholder="Value" :value="projectNameValue" @change="(e) => setFilter(e, 'projectName')" @keyup.13="(e) => setFilter(e, 'projectName')")
-    //    .clear-icon(v-if="projectNameValue.length" @click="removeFromRoute('projectName')")
-    //      i.fas.fa-backspace
-    //
-    //.filter__item
-    //  label Project Manager:
-    //  .filter__input
-    //    SelectSingle(
-    //      :hasSearch="true"
-    //      :selectedOption="selectedPM"
-    //      :options="allPMs"
-    //      placeholder="Option"
-    //      @chooseOption="setPM"
-    //      :isRemoveOption="true"
-    //      @removeOption="removeFromRoute('projectManager')"
-    //    )
-    //
-    //.filter__item
-    //  label Account Manager:
-    //  .filter__input
-    //    SelectSingle(
-    //      :hasSearch="true"
-    //      :selectedOption="selectedAM"
-    //      :options="allAMs"
-    //      placeholder="Option"
-    //      @chooseOption="setAM"
-    //      :isRemoveOption="true"
-    //      @removeOption="removeFromRoute('accountManager')"
-    //    )
-    //
-    //.filter__item
-    //  label Statuses:
-    //  .filter__input
-    //    SelectMulti(
-    //      :selectedOptions="selectedTasksStatuses"
-    //      :options="stepStatuses"
-    //      :hasSearch="true"
-    //      placeholder="Options"
-    //      @chooseOptions="setTasksStatus"
-    //      :isSelectedWithIcon="true"
-    //      :isRemoveOption="true"
-    //      @removeOption="removeFromRoute('tasksStatuses')"
-    //    )
-    //
-    //.filter__item
-    //  label Source Languages:
-    //  .filter__input
-    //    SelectMulti(
-    //      :selectedOptions="selectedSourceLanguages"
-    //      :options="mappedLanguages | firstEnglishLanguage"
-    //      :hasSearch="true"
-    //      placeholder="Options"
-    //      @chooseOptions="chooseSourceLanguages"
-    //      :isSelectedWithIcon="true"
-    //      :isRemoveOption="true"
-    //      @removeOption="removeFromRoute('sourceLanguages')"
-    //    )
-    //
-    //.filter__item
-    //  label Target Languages:
-    //  .filter__input
-    //    SelectMulti(
-    //      :selectedOptions="selectedTargetLanguages"
-    //      :options="mappedLanguages"
-    //      :hasSearch="true"
-    //      placeholder="Options"
-    //      @chooseOptions="chooseTargetLanguages"
-    //      :isSelectedWithIcon="true"
-    //      :isRemoveOption="true"
-    //      @removeOption="removeFromRoute('targetLanguages')"
-    //    )
-    //
-    //.filter__item
-    //  label Services:
-    //  .filter__input
-    //    SelectMulti(
-    //      :selectedOptions="selectedServices"
-    //      :options="allServices"
-    //      :hasSearch="true"
-    //      placeholder="Options"
-    //      @chooseOptions="setServices"
-    //      :isSelectedWithIcon="true"
-    //      :isRemoveOption="true"
-    //      @removeOption="removeFromRoute('services')"
-    //    )
+    .filter__item
+      label Project Name:
+      .filter__input
+        input(type="text" placeholder="Value" :value="projectNameValue" @change="(e) => setFilter(e, 'projectName')" @keyup.13="(e) => setFilter(e, 'projectName')")
+        .clear-icon(v-if="projectNameValue.length" @click="removeFromRoute('projectName')")
+          i.fas.fa-backspace
+
+    .filter__item
+      label Project Manager:
+      .filter__input
+        SelectSingle(
+          :hasSearch="true"
+          :selectedOption="selectedPM"
+          :options="allPMs"
+          placeholder="Option"
+          @chooseOption="setPM"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('projectManager')"
+        )
+
+    .filter__item
+      label Account Manager:
+      .filter__input
+        SelectSingle(
+          :hasSearch="true"
+          :selectedOption="selectedAM"
+          :options="allAMs"
+          placeholder="Option"
+          @chooseOption="setAM"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('accountManager')"
+        )
+
+    .filter__item
+      label Statuses:
+      .filter__input
+        SelectMulti(
+          :selectedOptions="selectedTasksStatuses"
+          :options="stepStatuses"
+          :hasSearch="true"
+          placeholder="Options"
+          @chooseOptions="setTasksStatus"
+          :isSelectedWithIcon="true"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('tasksStatuses')"
+        )
+
+    .filter__item
+      label Source Languages:
+      .filter__input
+        SelectMulti(
+          :selectedOptions="selectedSourceLanguages"
+          :options="mappedLanguages | firstEnglishLanguage"
+          :hasSearch="true"
+          placeholder="Options"
+          @chooseOptions="chooseSourceLanguages"
+          :isSelectedWithIcon="true"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('sourceLanguages')"
+        )
+
+    .filter__item
+      label Target Languages:
+      .filter__input
+        SelectMulti(
+          :selectedOptions="selectedTargetLanguages"
+          :options="mappedLanguages"
+          :hasSearch="true"
+          placeholder="Options"
+          @chooseOptions="chooseTargetLanguages"
+          :isSelectedWithIcon="true"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('targetLanguages')"
+        )
+
+    .filter__item
+      label Services:
+      .filter__input
+        SelectMulti(
+          :selectedOptions="selectedServices"
+          :options="allServices"
+          :hasSearch="true"
+          placeholder="Options"
+          @chooseOptions="setServices"
+          :isSelectedWithIcon="true"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('services')"
+        )
 
 </template>
 
