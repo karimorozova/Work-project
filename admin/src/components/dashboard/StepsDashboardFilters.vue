@@ -183,10 +183,6 @@ export default {
       type: Object,
       required: true
     },
-    userId: {
-      type: String,
-      required: true
-    }
   },
   data() {
     return {
@@ -291,13 +287,6 @@ export default {
       if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
       else _ids.push(this.getLanguageIdByLang(option))
       this.replaceRoute('targetLanguages', _ids.join(','))
-    },
-    setCurrentAmOrPm() {
-      if (this.$route.query.hasOwnProperty('accountManager')) return
-      if (this.userGroup.name === 'Project Managers')
-        this.replaceRoute('projectManager', this.userId)
-      if (this.userGroup.name === 'Account Managers')
-        this.replaceRoute('accountManager', this.userId)
     },
     setStartRange(e) {
       let query = this.$route.query
@@ -444,11 +433,11 @@ export default {
     isPm() {
       return this.userGroup.name === 'Project Managers'
     }
-
   },
-  mounted() {
-    this.setCurrentAmOrPm()
-  }
+  // mounted() {
+  //   // console.log('Mount')
+  //   // this.setCurrentAmOrPm()
+  // }
 }
 </script>
 

@@ -11,7 +11,7 @@
             .spinner1.spinner-1
         .navbar__name-title ADMIN PORTAL
 
-    .content
+    .content(v-if="user._id")
       Header
       router-view
 

@@ -1,6 +1,6 @@
 <template lang="pug">
-  .step-dashboard
-    .clear-filter(@click="clearFilters")
+  .step-dashboard(v-if="user._id")
+    //.clear-filter(@click="clearFilters")
       i(class="fas fa-broom")
     .step-dashboard__stepsActions
       .drop__title Step Actions:
@@ -74,7 +74,6 @@
 
     StepsDashboardFilters(
       v-if="userGroup && user"
-      :userId="user._id"
       :userGroup="userGroup"
     )
     LayoutsTable(
@@ -637,24 +636,6 @@ export default {
       prevProjectStep.steps = data.steps.find(item => item._id === prevProjectStep.steps._id)
       this.steps.splice(this.infoIndex, 1, prevProjectStep)
     },
-    // clearFilters() {
-    //   this.$router.replace({ 'query': null }).catch((err) => err)
-    //   this.defaultSetter()
-    //   // this.getData()
-    // },
-    // async updateFiltersAndFields(data) {
-    //   // await this.$http.post('/pm-manage/update-filters-and-fields/' + this.user._id, { data })
-    //   // await this.setUser()
-    // },
-    // getLastDateFromRes({ data }) {
-    //   return (data && data.length) ? data[data.length - 1].startDate : ""
-    // },
-    // getProjectName(str) {
-    //   if (!str.substr(0, 32).includes(' ') && str.length > 32) {
-    //     return str.substr(0, 32) + '...'
-    //   }
-    //   return str
-    // },
     marginCalc(step) {
       const { Price } = step.finance
       let margin = 0
@@ -706,19 +687,29 @@ export default {
     },
     querySetter(vm, to) {
       for (let variable of this.dataVariables) {
-        if (to.query[variable] != null) vm[variable] = to.query[variable]
+        if (to.query[variable] != null) {
+          vm[variable] = to.query[variable]
+        }
       }
     },
     defaultSetter() {
       for (let variable of this.dataVariables) this[variable] = ''
+    },
+    replaceRoute(key, value) {
+      let query = this.$route.query
+      delete query[key]
+      this.$router.replace({ path: this.$route.path, query: { ...query, [key]: value } })
+    },
+    setCurrentAmOrPm() {
+      if (!this.$route.query.hasOwnProperty('accountManager') && this.userGroup.name === 'Account Managers') {
+        this.replaceRoute('accountManager', this.user._id)
+      }
+      if (!this.$route.query.hasOwnProperty('projectManager') && this.userGroup.name === 'Project Managers') {
+        this.replaceRoute('projectManager', this.user._id)
+      } else if (this.$route.query.hasOwnProperty('projectManager') && this.userGroup.name === 'Project Managers' && this.$route.query.projectManager.toString() !== this.user._id.toString()) {
+        this.replaceRoute('projectManager', this.user._id)
+      }
     }
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.defaultSetter()
-      vm.querySetter(vm, to)
-      vm.getData()
-    })
   },
   computed: {
     ...mapGetters({
@@ -737,7 +728,7 @@ export default {
       if (this.steps && this.steps.length) return this.steps.every(i => i.isCheck)
     },
     filters() {
-      const filters = { status: this.status }
+      const filters = {}
       for (let variable of this.dataVariables) filters[variable] = this[variable]
       return filters
     },
@@ -746,17 +737,20 @@ export default {
     }
   },
   watch: {
-    $route(to, from) {
+    async $route(to, from) {
       if (to.path === from.path) {
+        // this.defaultSetter()
+        this.setCurrentAmOrPm()
         this.querySetter(this, to)
-        this.getData()
+        await this.getData()
       }
     }
   },
-  async created() {
+  created() {
     this.defaultSetter()
-    this.querySetter(this, to)
-    await this.getData()
+    this.setCurrentAmOrPm()
+    this.querySetter(this, this.$route)
+    this.getData()
   },
   components: {
     ApproveModal,
@@ -1035,11 +1029,11 @@ a {
 
 .deadline {
   &-red {
-    color: red;
+    color: #f44336;
   }
 
   &-orange {
-    color: orange;
+    color: #ffa726;
   }
 }
 
