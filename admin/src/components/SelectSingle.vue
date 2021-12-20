@@ -10,7 +10,7 @@
         span.selected(v-if="selectedOption") {{ selectedOption }}
         span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
 
-        .remove__icon(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
+        .remove__icon(v-if="isRemoveOption && ( Object.keys(selectedOption).length ) && !isDisabled" @click="removeOption")
           i(class="fas fa-backspace" aria-hidden='true')
       .arrow-button(@click="toggleOptions")
         i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")

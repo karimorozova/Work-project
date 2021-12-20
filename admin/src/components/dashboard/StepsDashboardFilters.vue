@@ -19,6 +19,7 @@
       label Project Manager:
       .filter__input
         SelectSingle(
+          :isDisabled="isPm"
           :hasSearch="true"
           :selectedOption="selectedPM"
           :options="allPMs"
@@ -45,14 +46,14 @@
       label Statuses:
       .filter__input
         SelectMulti(
-          :selectedOptions="selectedTasksStatuses"
+          :selectedOptions="selectedStepsStatuses"
           :options="stepStatuses"
           :hasSearch="true"
           placeholder="Options"
           @chooseOptions="setTasksStatus"
           :isSelectedWithIcon="true"
           :isRemoveOption="true"
-          @removeOption="removeFromRoute('tasksStatuses')"
+          @removeOption="removeFromRoute('stepsStatuses')"
         )
 
     .filter__item
@@ -97,6 +98,33 @@
           @removeOption="removeFromRoute('services')"
         )
 
+    .filter__item
+      label Vendors:
+      .filter__input
+        SelectMulti(
+          :selectedOptions="selectedVendors"
+          :options="allVendors"
+          :hasSearch="true"
+          placeholder="Options"
+          @chooseOptions="setVendors"
+          :isSelectedWithIcon="true"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('vendors')"
+        )
+    .filter__item
+      label Clients:
+      .filter__input
+        SelectMulti(
+          :selectedOptions="selectedClients"
+          :options="allClients"
+          :hasSearch="true"
+          placeholder="Options"
+          @chooseOptions="setClients"
+          :isSelectedWithIcon="true"
+          :isRemoveOption="true"
+          @removeOption="removeFromRoute('clients')"
+        )
+
 </template>
 
 <script>
@@ -126,7 +154,7 @@ export default {
       dataVariables: [
         'projectId',
         'projectName',
-        'clientName',
+        'clients',
         'projectManager',
         'accountManager',
         'startDate',
@@ -139,7 +167,7 @@ export default {
         'projectCurrency',
         'paymentProfile',
         'vendors',
-        'tasksStatuses',
+        'stepsStatuses',
         'requestId'
       ],
     }
@@ -155,7 +183,15 @@ export default {
       return _id
     },
     getServicesIdByTitle(option) {
-      const { _id } = this.services.find(({ title }) => title === option)
+      const { _id } = this.steps.find(({ title }) => title === option)
+      return _id
+    },
+    getVendorsIdByFullName(option) {
+      const { _id } = this.vendors.find(({ firstName, surname }) => `${ firstName } ${ surname }` === option)
+      return _id
+    },
+    getClientsIdByName(option) {
+      const { _id } = this.allClientsNames.find(({ name }) => `${ name }` === option)
       return _id
     },
     setFilter(e, fieldName) {
@@ -172,14 +208,14 @@ export default {
       for (let variable of this.dataVariables) this[variable] = ''
     },
     setTasksStatus({ option }){
-      if (!this.$route.query.tasksStatuses) {
-        this.replaceRoute('tasksStatuses', option)
+      if (!this.$route.query.stepsStatuses) {
+        this.replaceRoute('stepsStatuses', option)
         return
       }
-      let statuses = this.$route.query.tasksStatuses.split(',')
+      let statuses = this.$route.query.stepsStatuses.split(',')
       if (statuses.includes(option)) statuses = statuses.filter(status => status !== option)
       else statuses.push(option)
-      this.replaceRoute('tasksStatuses', statuses.join(','))
+      this.replaceRoute('stepsStatuses', statuses.join(','))
     },
 
     setServices({ option }) {
@@ -200,7 +236,26 @@ export default {
       const { _id } = this.users.find(({ firstName, lastName }) => `${ firstName } ${ lastName }` === option)
       this.replaceRoute('accountManager', _id)
     },
-
+    setVendors({ option }) {
+      if (!this.$route.query.vendors) {
+        this.replaceRoute('vendors', this.getVendorsIdByFullName(option))
+        return
+      }
+      let _ids = this.$route.query.vendors.split(',')
+      if (_ids.includes(this.getVendorsIdByFullName(option))) _ids = _ids.filter(_id => _id !== this.getVendorsIdByFullName(option))
+      else _ids.push(this.getVendorsIdByFullName(option))
+      this.replaceRoute('vendors', _ids.join(','))
+    },
+    setClients({ option }) {
+      if (!this.$route.query.clients) {
+        this.replaceRoute('clients', this.getClientsIdByName(option))
+        return
+      }
+      let _ids = this.$route.query.clients.split(',')
+      if (_ids.includes(this.getClientsIdByName(option))) _ids = _ids.filter(_id => _id !== this.getClientsIdByName(option))
+      else _ids.push(this.getClientsIdByName(option))
+      this.replaceRoute('clients', _ids.join(','))
+    },
 
     chooseSourceLanguages({ option }) {
       if (!this.$route.query.sourceLanguages) {
@@ -223,7 +278,7 @@ export default {
       this.replaceRoute('targetLanguages', _ids.join(','))
     },
     setCurrentAmOrPm() {
-      if (this.$route.query.hasOwnProperty('projectManager') || this.$route.query.hasOwnProperty('accountManager')) return
+      if ( this.$route.query.hasOwnProperty('accountManager')) return
       if( this.userGroup.name === 'Project Managers')
         this.replaceRoute('projectManager', this.userId)
       if(this.userGroup.name === 'Account Managers')
@@ -236,12 +291,14 @@ export default {
       users: "getUsers",
       languages: "getAllLanguages",
       services: "getAllServices",
+      steps: "getAllSteps",
       // industries: "getAllIndustries",
-      // vendors: "getAllVendorsForOptions"
+      vendors: "getAllVendorsForOptions",
+      allClientsNames: "getAllClientsForOptions",
     }),
 
     allServices() {
-      return this.services.map(({ title }) => title)
+      return this.steps.map(({ title }) => title)
     },
     mappedLanguages() {
       return this.languages.map(({ lang }) => lang)
@@ -276,9 +333,15 @@ export default {
           .filter(({ group }) => group.name === 'Account Managers')
           .map(({ firstName, lastName }) => `${ firstName } ${ lastName }`)
     },
-    selectedTasksStatuses() {
-      return this.$route.query.tasksStatuses
-          ? this.$route.query.tasksStatuses.split(',')
+    allVendors() {
+      return this.vendors.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
+    },
+    allClients() {
+      return this.allClientsNames.map(({ name }) => `${ name }`)
+    },
+    selectedStepsStatuses() {
+      return this.$route.query.stepsStatuses
+          ? this.$route.query.stepsStatuses.split(',')
           : []
     },
 
@@ -294,9 +357,30 @@ export default {
     },
 
     selectedServices() {
-      return this.$route.query.services && this.services.length
-          ? this.$route.query.services.split(',').map(_id => this.services.find(service => _id === service._id).title)
+      return this.$route.query.services && this.steps.length
+          ? this.$route.query.services.split(',').map(_id => this.steps.find(step => _id === step._id).title)
           : []
+    },
+    selectedVendors() {
+      return this.$route.query.vendors && this.vendors.length
+          ? this.$route.query.vendors.split(',').map(_id => {
+            const vendor = this.vendors.find(vendor => _id === vendor._id)
+            return vendor ? `${ vendor.firstName } ${ vendor.surname }` : ''
+          })
+          : []
+
+    },
+    selectedClients() {
+      return this.$route.query.clients && this.allClientsNames.length
+          ? this.$route.query.clients.split(',').map(_id => {
+            const client = this.allClientsNames.find(client => _id === client._id)
+            return client ? `${ client.name }` : ''
+          })
+          : []
+
+    },
+    isPm() {
+      return this.userGroup.name === 'Project Managers'
     },
 
   },

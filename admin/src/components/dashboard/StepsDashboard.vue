@@ -83,12 +83,12 @@
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header(v-if="field.headerKey === 'headerCheck'")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+          CheckBox(:isChecked="isAllSelected" :isWhite="true" :isDisabled="isAm" @check="toggleAll(true)" @uncheck="toggleAll(false)")
         .table__header(v-else) {{ field.label }}
 
       template(slot="check" slot-scope="{ row, index }")
         .table__data
-          CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+          CheckBox(:isChecked="row.isCheck" :isDisabled="isAm" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
       template(slot="projectId" slot-scope="{ row, index }")
         .table__projectId
@@ -155,7 +155,7 @@
           sup(:class="{'red-color': (+marginCalcPercent(row.steps) > 1 && +marginCalcPercent(row.steps) < 50) || +marginCalcPercent(row.steps) < 0  }" v-if="marginCalc(row.steps)") {{ marginCalcPercent(row.steps) }}%
 
       template(slot="icons" slot-scope="{ row, index }")
-        .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen")
+        .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen && !isAm")
           img(src="../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
           img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: pointer;" @click="toggleVendorManage(index)")
           img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: pointer;" @click="() => refreshProgress(index)")
@@ -231,15 +231,17 @@ export default {
       projectName: '',
       accountManager: '',
       projectManager: '',
-      tasksStatuses: '',
+      stepsStatuses: '',
       sourceLanguages: '',
       targetLanguages: '',
       services: '',
+      vendors: '',
+      clients: '',
       modalTexts: { main: "Are you sure?", approve: "Yes", notApprove: "No" },
       dataVariables: [
         'projectId',
         'projectName',
-        'clientName',
+        'clients',
         'projectManager',
         'accountManager',
         'startDate',
@@ -252,7 +254,7 @@ export default {
         'projectCurrency',
         'paymentProfile',
         'vendors',
-        'tasksStatuses',
+        'stepsStatuses',
         'requestId'
       ],
       fields: [
@@ -730,6 +732,9 @@ export default {
       const filters = { status: this.status }
       for (let variable of this.dataVariables) filters[variable] = this[variable]
       return filters
+    },
+    isAm() {
+      return this.userGroup.name === 'Account Managers'
     }
   },
   watch: {

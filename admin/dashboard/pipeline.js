@@ -11,6 +11,7 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 	const skip = (page - 1) * limit
 	let query = {}
 
+	const STATUSES = [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ]
 
 	const allLanguages = await Languages.find()
 	const allServices = await Services.find()
@@ -21,7 +22,7 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 		projectId,
 		projectName,
 		// lastDate,
-		// clientName,
+		clients,
 		projectManager,
 		accountManager,
 		// startDate,
@@ -33,10 +34,14 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 		// isTest,
 		// projectCurrency,
 		// paymentProfile,
-		// vendors,
-		tasksStatuses
+		vendors,
+		stepsStatuses
 		// requestId
 	} = filters
+
+	const stepsStatusesArr = stepsStatuses.split(',').filter(status  => STATUSES.includes(status))
+	query["steps.status"] = { $in:  stepsStatusesArr.length ? stepsStatusesArr : STATUSES}
+
 	if (projectId) {
 		const filter = projectId.replace(reg, '\\$&')
 		query['projectId'] = { "$regex": new RegExp(filter, 'i') }
@@ -44,10 +49,6 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 	if (projectName) {
 		const filter = projectName.replace(reg, '\\$&')
 		query['projectName'] = { "$regex": new RegExp(filter, 'i') }
-	}
-	if (tasksStatuses) {
-		const tasksStatusesArr = tasksStatuses.split(',')
-		query["steps.status"] = { $in: tasksStatusesArr }
 	}
 	if (projectManager) {
 		query["projectManager"] = ObjectId(projectManager)
@@ -63,12 +64,16 @@ exports.getProjectsForPipeline = async (queryPage, queryLimit, filters) => {
 	}
 	if (services) {
 		console.log(services.split(',').map(item => ObjectId(item)))
-		query["steps.service"] = { $in: services.split(',').map(item => ObjectId(item)) }
+		query["steps.step"] = { $in: services.split(',').map(item => ObjectId(item)) }
+	}
+	if (vendors) {
+		query["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+	}
+	if (clients) {
+		query["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
 
-	const STATUSES = [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ]
 	const PROJECT_STATUSES = [ "In progress", "Approved" ]
-	query['steps.status'] = { $in: STATUSES }
 	query['status'] = { $in: PROJECT_STATUSES }
 	query['isTest'] = false
 	return await getAllSteps(skip, limit, query)
