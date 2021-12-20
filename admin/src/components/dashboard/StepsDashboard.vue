@@ -1016,7 +1016,7 @@ a {
   }
 
   &-orange {
-    color: coral;
+    color: #f9a825;
   }
 }
 </style>
