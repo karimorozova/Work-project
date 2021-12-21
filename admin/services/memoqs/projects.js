@@ -41,12 +41,11 @@ async function assignedDefaultTranslator(projectId, step) {
 
 	const stepDocuments = step.memoqDocIds.reduce((acc, curr) => {
 
-		console.log(step.deadline)
 		acc = acc + `<ns:ServerProjectTranslationDocumentUserAssignments>
 							  <ns:DocumentGuid>${ curr }</ns:DocumentGuid>
 							  <ns:UserRoleAssignments>
 							    <ns:TranslationDocumentUserRoleAssignment>
-							        <ns:DeadLine>${ step.deadline }</ns:DeadLine>
+							        <ns:DeadLine>${ new Date(step.deadline).toISOString() }</ns:DeadLine>
 							        <ns:DocumentAssignmentRole>${ step.memoqAssignmentRole }</ns:DocumentAssignmentRole>
 							        <ns:UserGuid>5c758a3b-f723-eb11-8d6a-287fcfe08232</ns:UserGuid>
 							    </ns:TranslationDocumentUserRoleAssignment>
@@ -319,7 +318,7 @@ function getDocRoleAssignments(obj) {
 function getRoles(users) {
 	return users.reduce((acc, cur) => {
 		return acc + `<ns:TranslationDocumentUserRoleAssignment>
-                <ns:DeadLine>${ cur.deadline }</ns:DeadLine>
+                <ns:DeadLine>${ new Date(cur.deadline).toISOString() }</ns:DeadLine>
                 <ns:DocumentAssignmentRole>${ cur.memoqRole }</ns:DocumentAssignmentRole>
                 <ns:UserGuid>${ cur.userId }</ns:UserGuid>
             </ns:TranslationDocumentUserRoleAssignment>\n`

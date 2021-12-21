@@ -720,7 +720,7 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 
 			acc = acc + `
 					<ns:TranslationDocumentUserRoleAssignment>
-					<ns:DeadLine>${ deadline }</ns:DeadLine>
+					<ns:DeadLine>${ new Date(deadline).toISOString() }</ns:DeadLine>
 					<ns:DocumentAssignmentRole>${ memoqAssignmentRole }</ns:DocumentAssignmentRole>
 					<ns:UserGuid>${ user.id }</ns:UserGuid>
 					</ns:TranslationDocumentUserRoleAssignment>
