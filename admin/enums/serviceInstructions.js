@@ -70,6 +70,30 @@ module.exports = {
 					'</ul>'
 		}
 	],
+	"Compliance888": [
+		{
+			id: '1',
+			title: '[1] POI (Proof of Identity Documents)',
+			description:
+					'<ul>' +
+					'<li>Full name</li>' +
+					'<li>DOB</li>' +
+					'<li>Issue date</li>' +
+					'<li>Expiry date if there is any</li>' +
+					'</ul>'
+		},
+		{
+			id: '2',
+			title: '[2] POA (Proof of Address Documents)',
+			description:
+					'<ul>' +
+					'<li>Full name</li>' +
+					'<li>Address</li>' +
+					'<li>Issue date</li>' +
+					'<li>Who Issued</li>' +
+					'</ul>'
+		},
+	],
 	"ComplianceEtoro": [
 		{
 			id: '1',

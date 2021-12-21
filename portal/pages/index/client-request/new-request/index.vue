@@ -499,6 +499,7 @@
       getInstructions() {
 			  if (!this.selectedService) return []
         if ((this.clientInfo.name === 'eToro (Europe) Limited' || this.clientInfo.name === 'ADMIN') && this.selectedService === 'Compliance') return this.instructions['ComplianceEtoro']
+        if (this.clientInfo.name === '888' && this.selectedService === 'Compliance') return this.instructions['Compliance888']
         return this.instructions[this.selectedService]
       },
       getServiceInfo() {
