@@ -320,8 +320,8 @@ export default {
     canUpdateRequest() {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
-          || this.currentProject.projectManager._id === this.user._id
-          || this.currentProject.accountManager._id === this.user._id
+          || this.currentProject.projectManager._id.toString() === this.user._id.toString()
+          || this.currentProject.accountManager._id.toString() === this.user._id.toString()
     }
   },
   components: {
