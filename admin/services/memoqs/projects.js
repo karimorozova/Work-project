@@ -40,6 +40,8 @@ async function assignedDefaultTranslator(projectId, step) {
 	await setMemoqProjectUsers(projectId, currentProjectUsers)
 
 	const stepDocuments = step.memoqDocIds.reduce((acc, curr) => {
+
+		console.log(step.deadline)
 		acc = acc + `<ns:ServerProjectTranslationDocumentUserAssignments>
 							  <ns:DocumentGuid>${ curr }</ns:DocumentGuid>
 							  <ns:UserRoleAssignments>
