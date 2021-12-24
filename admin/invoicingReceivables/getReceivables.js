@@ -41,7 +41,7 @@ const getReportByIdFromDb = async (id) => {
 					{ "$addFields": { "steps.projectId": '$projectId' } },
 					{ "$addFields": { "steps.projectName": '$projectName' } },
 					{ "$addFields": { "steps.projectCurrency": '$projectCurrency' } },
-					{ "$addFields": { "steps.paymentAdditions": '$paymentAdditions' } },
+					{ "$addFields": { "steps.paymentAdditions": '$additionsSteps' } },
 					{ "$addFields": { "steps.minimumCharge": '$minimumCharge' } },
 					{ '$replaceRoot': { newRoot: '$steps' } }
 				],
@@ -82,7 +82,7 @@ const getReceivableTotal = (report) => {
 	const uniquePaymentAdditions = getUniquePaymentAdditions(report)
 	const test = getProjectMinimumChargeAndSumReceivables(report)
 	const result =  Object.values(test).reduce((acc, {receivables, minimumCharge}) => acc += minimumCharge > receivables ? minimumCharge : receivables  , 0)
-	return { result, sumPaymentAdditions:  uniquePaymentAdditions.reduce((acc, {value}) => acc += value, 0),  uniquePaymentAdditions}
+	return { result, sumPaymentAdditions:  uniquePaymentAdditions.reduce((acc, {finance}) => acc += finance.Price.receivables, 0),  uniquePaymentAdditions}
 }
 
 const getUniquePaymentAdditions = (report) => {
@@ -147,13 +147,12 @@ const getAllReportsFromDb = async (countToSkip, countToGet, query) => {
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
+	const {status, ...stepsQuery} = queryForStep
 	const queryPipeline = [
-		{ $unwind: "$steps" },
 		{
 			$match: {
 				clientBillingInfo: { $exists: true, $ne: null },
-				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
-				...queryForStep
+				status
 			}
 		},
 		{
@@ -174,9 +173,27 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				'startDate': 1,
 				'billingDate': 1,
 				'projectCurrency': 1,
-				'paymentProfile': 1,
+				// 'paymentProfile': 1,
 				'clientBillingInfo': 1,
-				'customer': { $arrayElemAt: [ "$customer", 0 ] }
+				'customer': { $arrayElemAt: [ "$customer", 0 ] },
+			}
+		},
+		{$addFields: {
+				"selectedBillingInfo": {
+					$arrayElemAt: [
+						{$filter: {
+							input: "$customer.billingInfo",
+							cond: { $eq: ["$$this._id",  "$clientBillingInfo"]}
+						}},
+							0
+					]
+				}
+			}
+		},
+		{ $unwind: "$steps" },
+		{ $match: {
+				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
+				...stepsQuery
 			}
 		},
 		{

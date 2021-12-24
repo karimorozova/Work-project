@@ -113,10 +113,10 @@
                 span {{ row.customer.name }}
 
           template(slot="bn" slot-scope="{ row, index }")
-            .table__data {{ getCompanyNameAndPaymentType(row).getName() }}
+            .table__data {{ row.selectedBillingInfo.officialName }}
 
           template(slot="pt" slot-scope="{ row, index }")
-            .table__data {{ getCompanyNameAndPaymentType(row).getPaymentType() }}
+            .table__data {{ row.selectedBillingInfo.paymentType }}
 
           template(slot="stepId" slot-scope="{ row, index }")
             .table__data {{ row.steps.stepId }}
@@ -131,7 +131,7 @@
             .table__data {{ formattedDate(row.billingDate) }}
 
           template(slot="step" slot-scope="{ row, index }")
-            .table__data {{ row.steps.name }}
+            .table__data {{ row.steps.stepAndUnit.step.title }}
 
           template(slot="jobStatus" slot-scope="{ row, index }")
             .table__data {{ row.steps.status }}
@@ -278,20 +278,20 @@
 			}
 		},
 		methods: {
-			getCompanyNameAndPaymentType({ customer, clientBillingInfo }) {
-				if (!clientBillingInfo) return buildReturn('-', '-')
-				if (!customer.billingInfo) return buildReturn('-', '-')
-
-				const { name, paymentType } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
-				return buildReturn(name, paymentType)
-
-				function buildReturn(name, paymentType) {
-					return {
-						getName: () => name,
-						getPaymentType: () => paymentType
-					}
-				}
-			},
+			// getCompanyNameAndPaymentType({ customer, clientBillingInfo }) {
+			// 	if (!clientBillingInfo) return buildReturn('-', '-')
+			// 	if (!customer.billingInfo) return buildReturn('-', '-')
+      //
+			// 	const { name, paymentType } = customer.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
+			// 	return buildReturn(name, paymentType)
+      //
+			// 	function buildReturn(name, paymentType) {
+			// 		return {
+			// 			getName: () => name,
+			// 			getPaymentType: () => paymentType
+			// 		}
+			// 	}
+			// },
 			replaceRoute(key, value) {
 				let query = this.$route.query
 				delete query[key]

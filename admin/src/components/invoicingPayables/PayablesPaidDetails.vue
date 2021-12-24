@@ -64,7 +64,7 @@
                     span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
 
               template(slot="service" slot-scope="{ row, index }")
-                .table__data {{ row.service.title }}
+                .table__data {{ row.stepAndUnit.step.title }}
 
               template(slot="langPair" slot-scope="{ row, index }")
                 .table__data {{ row.sourceLanguage}}

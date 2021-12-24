@@ -13,10 +13,10 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 	await setUsedStatusToSteps(checkedSteps.map(({ steps }) => steps._id))
 
 	const [ jobsPPP, jobsPrePayment, jobsMonthly, jobsCustom ] = [
-		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'PPP'),
-		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Pre-Payment'),
-		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Monthly'),
-		checkedSteps.filter(({ paymentProfile }) => paymentProfile === 'Custom')
+		checkedSteps.filter(({ selectedBillingInfo }) => selectedBillingInfo.paymentType === 'PPP'),
+		checkedSteps.filter(({ selectedBillingInfo }) => selectedBillingInfo.paymentType === 'Pre-Payment'),
+		checkedSteps.filter(({ selectedBillingInfo }) => selectedBillingInfo.paymentType === 'Monthly'),
+		checkedSteps.filter(({ selectedBillingInfo }) => selectedBillingInfo.paymentType === 'Custom')
 	]
 
 	const { temp: PPP, updatedReports: updatedReports1, lastIntIndex: lastIntIndex1 } = produceReportPerProject(jobsPPP, reportsFromDB, lastIntIndex, createdBy)

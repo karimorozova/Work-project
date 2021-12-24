@@ -125,7 +125,7 @@
             .table__data {{ formattedDate(row.billingDate) }}
 
           template(slot="service" slot-scope="{ row, index }")
-            .table__data {{ row.steps.service.title }}
+            .table__data {{ row.steps.stepAndUnit.step.title }}
 
           template(slot="jobStatus" slot-scope="{ row, index }")
             .table__data {{ row.steps.status }}

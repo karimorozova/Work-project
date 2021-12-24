@@ -26,7 +26,7 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 		q["steps.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
 	}
 	if(step){
-		q["steps.serviceStep.title"] = step
+		q["steps.stepAndUnit.step.title"] = step
 	}
 	if(!to) to = moment().add( 2, 'years').format('YYYY-MM-DD');
 	if(!from) from = '1970-01-01'

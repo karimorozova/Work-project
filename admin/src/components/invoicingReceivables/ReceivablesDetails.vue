@@ -193,12 +193,12 @@
                   //  .table__data {{ row.projectId }}
 
                   template(slot="name" slot-scope="{ row, index }")
-                    .table__data {{ row.name }}
+                    .table__data {{ row.title }}
 
                   template(slot="value" slot-scope="{ row, index }")
                     .table__data
                       span.currency(v-html="getProjectCurrencySymbol(stepsWithProject[0].projectCurrency)")
-                      span {{ row.value }}
+                      span {{ row.finance.Price.receivables }}
 
                 .payment-additions__sub-totoal Sub-Total(2): {{sumPaymentAdditions(stepsWithProject[0].paymentAdditions)}}
 
@@ -516,7 +516,7 @@
 				return currencies[projectCurrency]
 			},
 			sumPaymentAdditions(paymentAdditions) {
-				return paymentAdditions.reduce((acc, { value }) => acc += value, 0)
+				return paymentAdditions.reduce((acc, { finance }) => acc += finance.Price.receivables, 0)
 			},
 			...mapActions([ 'alertToggle' ])
 		},
@@ -536,13 +536,12 @@
 				const groupedByProject = _.groupBy(this.reportDetailsInfo.stepsWithProject, (item) => {
 					return item.projectId
 				})
-				console.log(groupedByProject)
 				return groupedByProject
 			}
 
 		},
 		async created() {
-			await this.updateReportsStateFromZoho(this.$route.params.id)
+			// await this.updateReportsStateFromZoho(this.$route.params.id)
 			await this.getReportDetails(this.$route.params.id)
 			// this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
 		},

@@ -118,7 +118,7 @@
                 .table__data {{ row.stepId }}
 
               template(slot="service" slot-scope="{ row, index }")
-                .table__data {{ row.name }}
+                .table__data {{ row.stepAndUnit.step.title }}
 
               template(slot="langPair" slot-scope="{ row, index }")
                 .table__data {{ row.sourceLanguage}}
