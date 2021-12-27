@@ -160,7 +160,7 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 			const actualSteps = steps
 					.filter(({ status, taskId }) => (status !== 'Cancelled' || status !== 'Cancelled Halfway') && taskId === task.taskId)
 			let nextStep = actualSteps.find(item => item.stepNumber === step.stepNumber + 1)
-			nextStep = nextStep.length < 1 ?  actualSteps.find(item => item.stepNumber === step.stepNumber + 2) : undefined
+			// nextStep = !!nextStep ?  actualSteps.find(item => item.stepNumber === step.stepNumber + 2) : undefined
 
 			if (nextStep) {
 				tasks[taskIndex].status = 'In progress'
@@ -171,8 +171,8 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 				} else {
 					await Projects.updateOne({ "steps._id": jobId }, { steps, tasks })
 				}
+				await nextVendorCanStartWorkNotification({ nextStep })
 			}
-			await nextVendorCanStartWorkNotification({ nextStep })
 		}
 	} catch (err) {
 		console.log(err)
