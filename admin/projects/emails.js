@@ -580,7 +580,7 @@ async function notifyVendorStepStart(steps, allSteps, project) {
 }
 
 const nextVendorCanStartWorkNotification = async ({ nextStep }) => {
-		if (!!nextStep.vendor) {
+		if (!!nextStep && !!nextStep.vendor) {
 			const message = vendorCanStartStartedSecondStep({ vendor: nextStep.vendor, step: nextStep })
 			const subject = `STEP-${ nextStep.step.title } is ready to start (V001.21)`
 			await sendEmail({ to: nextStep.vendor.email, subject }, message)

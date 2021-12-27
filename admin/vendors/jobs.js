@@ -155,10 +155,12 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 			await pushTasksToDR1(project, task, step)
 			await taskCompleteNotifyPM(project, task)
 		} else {
+			//TODO: Need to refactor error translation second step canceled and stepNumber need to be +2
 
-			const nextStep = steps
-					.filter(({ status, taskId }) => status !== 'Cancelled' && status !== 'Cancelled Halfway' && taskId === task.taskId)
-					.find(item => item.stepNumber === step.stepNumber + 1)
+			const actualSteps = steps
+					.filter(({ status, taskId }) => (status !== 'Cancelled' || status !== 'Cancelled Halfway') && taskId === task.taskId)
+			let nextStep = actualSteps.find(item => item.stepNumber === step.stepNumber + 1)
+			nextStep = nextStep.length < 1 ?  actualSteps.find(item => item.stepNumber === step.stepNumber + 2) : undefined
 
 			if (nextStep) {
 				tasks[taskIndex].status = 'In progress'
