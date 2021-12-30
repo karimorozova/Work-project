@@ -90,12 +90,6 @@ const createXtrf = async (projId, taskId) => {
 		customers = { id: 995 }
 	}
 
-	console.log({
-		name: `${ projectId }: ${ projectName }`,
-		clientId: customers.id,
-		serviceId: currentServices.id
-	})
-
 	const xtrfProjectInfo = await sendRequest('post', 'v2/projects', {
 		name: `${ projectId }: ${ projectName }`,
 		clientId: customers.id,
@@ -204,6 +198,7 @@ function findLanguageId(response, field, value) {
 }
 
 async function sendRequest(method, path, data) {
+	console.log(method, apiDomain + path, data)
 	try {
 		return (await axios({
 			headers: { 'X-AUTH-ACCESS-TOKEN': token },
