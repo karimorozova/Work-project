@@ -131,7 +131,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			return { isSuccess: false, message: errorMessages['cannotFindClient'] }
 		}
 
-		const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
+		const xtrfProjectInfo = await sendRequest('post', 'v2/projects', {
 			name: `${ projectId }: ${ projectName }`,
 			clientId: customers.id,
 			serviceId: currentServices.id
