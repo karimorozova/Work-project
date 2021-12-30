@@ -90,19 +90,25 @@ const createXtrf = async (projId, taskId) => {
 		customers = { id: 995 }
 	}
 
-	const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
+	console.log({
+		name: `${ projectId }: ${ projectName }`,
+		clientId: customers.id,
+		serviceId: currentServices.id
+	})
+
+	const xtrfProjectInfo = await sendRequest('post', 'v2/projects', {
 		name: `${ projectId }: ${ projectName }`,
 		clientId: customers.id,
 		serviceId: currentServices.id
 	})
 
 	// IS test true
-	await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: isTest })
+	await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: isTest })
 
 	// Set AM
 	try {
 		if (accountManager.firstName && accountManager.lastName) {
-			await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
+			await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
 		}
 	} catch (e) {
 	}
