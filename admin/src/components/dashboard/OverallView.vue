@@ -107,7 +107,9 @@ export default {
       if (!this.user.hasOwnProperty('group')) return []
       const clientRequest = this.clientRequest.filter(({ status }) => status === "Client Request")
       if (this.isAdmin) return clientRequest
-      if (this.isAm || this.isComplianceCoordinator) return clientRequest.filter(({ accountManager }) => accountManager === this.user._id || accountManager === null)
+      if (this.isAm || this.isComplianceCoordinator) return clientRequest.filter(({ accountManager, projectManager }) => accountManager === this.user._id || accountManager === null
+          || ( this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager === "60b4dee7f2611f5115701566" )
+      )
     },
     acceptedRequest() {
       if (!this.user.hasOwnProperty('group')) return []
