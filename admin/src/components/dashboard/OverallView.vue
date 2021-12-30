@@ -116,8 +116,8 @@ export default {
       const clientRequest = this.clientRequest.filter(({ status }) => status === "Request Approved")
       if (this.isAdmin) return clientRequest
       if (this.isComplianceCoordinator) {
-        return clientRequest.filter(({ accountManager }) => {
-          return accountManager === this.user._id
+        return clientRequest.filter(({ accountManager, projectManager }) => {
+          return accountManager === this.user._id || ( this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager === "60b4dee7f2611f5115701566" )
         })
       }
       if (this.isPm) {
