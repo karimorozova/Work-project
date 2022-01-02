@@ -343,6 +343,7 @@ export default {
           || this.user.group.name === "Developers"
           || this.project.projectManager._id === this.user._id
           || this.project.accountManager._id === this.user._id
+          || (this.user.position === 'Compliance Coordinator' && this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && this.project.projectManager._id.toString() === "60b4dee7f2611f5115701566" )
     }
   },
   components: {

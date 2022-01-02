@@ -472,7 +472,13 @@ export default {
       const isAdmin = group === "Administrators" || group === "Developers"
       const currentAm = group === "Account Managers" && this.currentClientRequest.accountManager._id === this.user._id
 
-      return isAdmin || currentAm
+      const isCurrentClientCC = (
+          !!this.currentClientRequest.projectManager
+          && this.user._id.toString() === "61b359f25c9ee507f4aa7a14"
+          && this.currentClientRequest.projectManager._id === "60b4dee7f2611f5115701566"
+      )
+
+      return isAdmin || currentAm || isCurrentClientCC
     },
     async approveRequest() {
       this.onRequestSending = true

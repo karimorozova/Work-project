@@ -451,7 +451,7 @@ export default {
     },
     isAm() {
       if (!this.user.hasOwnProperty('group')) return false
-      return this.project.accountManager._id === this.user._id
+      return this.project.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" &&  this.project.projectManager._id === "60b4dee7f2611f5115701566")
     },
     isAdmin() {
       if (!this.user.hasOwnProperty('group')) return false

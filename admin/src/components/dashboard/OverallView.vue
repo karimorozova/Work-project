@@ -134,7 +134,7 @@ export default {
       if(this.isComplianceCoordinator){
         return this.projects.filter(item => {
           const DR1Tasks = item.tasks.filter(({ status }) => status === 'Pending Approval [DR1]').length
-          return DR1Tasks && item.accountManager._id === this.user._id
+          return DR1Tasks && (item.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" &&  item.projectManager._id === "60b4dee7f2611f5115701566"))
         })
       }
       if (this.isPm) {
@@ -164,8 +164,8 @@ export default {
       if (!this.user.hasOwnProperty('group')) return []
       if (this.isAdmin) return this.projects
       if (this.isAm || this.isComplianceCoordinator)
-        return this.projects.filter(({ accountManager }) => {
-          return accountManager._id === this.user._id
+        return this.projects.filter(({ accountManager, projectManager }) => {
+          return accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" &&  projectManager._id === "60b4dee7f2611f5115701566")
         })
 
       if (this.isPm)
