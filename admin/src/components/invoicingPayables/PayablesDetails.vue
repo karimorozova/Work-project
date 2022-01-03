@@ -1,5 +1,26 @@
 <template lang="pug">
   .invoicing-details
+    .modal__block
+      ApproveModal(
+        v-if="showDeleteRequestModal"
+        :text='`Confirm deleting`'
+        class="absolute-middle"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="deleteRequest"
+        @close="closeDeleteRequest"
+        @notApprove="closeDeleteRequest"
+      )
+      ApproveModal(
+        v-if="showSendModal"
+        :text='`Confirm Sending invoice `'
+        class="absolute-middle"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="changeReportStatus"
+        @close="closeSendRequest"
+        @notApprove="closeSendRequest"
+      )
     .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
       .invoicing-details__details
         .title
@@ -7,8 +28,11 @@
             router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
               span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
 
-          .title__button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")')
-            Button(value="Add jobs" @clicked="changeToggleAddSteps")
+          .title__button
+            Button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")' value="Add jobs" @clicked="changeToggleAddSteps")
+            Button(v-if='reportDetailsInfo.status === "Created"' value="Send" @clicked="showModalSendRequest")
+            Button(v-if='reportDetailsInfo.status === "Created"' value="Delete" @clicked="showModalDeleteRequest")
+
 
         .invoicing-details__body
           .invoicing-details__text
@@ -227,6 +251,9 @@
 				amount: 0,
 				notes: '',
 
+        showDeleteRequestModal: false,
+        showSendModal: false,
+
 				isFull: false,
 
 				disabled: {
@@ -275,7 +302,7 @@
 			},
 			updatePaidAmount(event) {
 				const value = event.target.value
-				console.log(value, this.amount)
+				// console.log(value, this.amount)
 				if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
 					this.amount = (parseFloat(value)).toFixed(2)
 				}
@@ -304,6 +331,34 @@
 				this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
 				this.isDeletingStep = true
 			},
+      async changeReportStatus() {
+        try {
+          await this.$http.post('/invoicing-payables/manage-report-status', {
+            reportsIds: [this.$route.params.id],
+            nextStatus: 'Sent'
+          })
+          await this.refreshReports()
+          this.closeSendRequest()
+        } catch (error) {
+          this.alertToggle({ message: "Error on Reports sending", isShow: true, type: "error" })
+        }
+      },
+      showModalSendRequest() {
+        this.showSendModal = true
+      },
+      closeSendRequest() {
+			  this.showSendModal = false
+      },
+      showModalDeleteRequest() {
+        this.showDeleteRequestModal = true
+      },
+      closeDeleteRequest() {
+			  this.showDeleteRequestModal = false
+      },
+      async deleteRequest() {
+        await this.$http.get(`/invoicing-payables/report/${ this.$route.params.id }/delete`)
+        await this.$router.push("/pangea-finance/invoicing-payables/reports")
+      },
 			async deleteStep() {
 				const { reportId, stepId } = this.deleteInfo
 				this.closeModalStep()
@@ -499,6 +554,11 @@
     align-items: center;
     margin-bottom: 15px;
     height: 32px;
+
+    &__button{
+      display: flex;
+      gap: 20px;
+    }
 
     &__text {
       font-size: 22px;
