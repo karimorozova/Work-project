@@ -153,6 +153,7 @@
             .table__data {{ getTime( row.updatedAt) }}
 
           template(slot="icon" slot-scope="{ row, index }")
+            //.table__icon(v-if="row.status === 'Created'")
             .table__icon
               i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
@@ -272,17 +273,43 @@
 		methods: {
 			...mapActions(['alertToggle']),
 			async manageReportActions() {
-        if (this.selectedReportAction === "Delete") {
-          await this.deleteChecked()
-        }else {
-          await this.changeTaskStatus()
+
+        switch (this.selectedReportAction) {
+          case "Delete" :
+            await this.deleteChecked()
+            break
+          case 'Send Report' :
+            await this.changeTaskStatus()
+            break
+          case 'Paid':
+            await this.paidChecked()
+            break
         }
+        this.closeApproveActionModal()
 			},
+      async paidChecked() {
+        const data = this.reports.filter(i => i.isCheck).reduce((acc, {_id, stepFinance, paymentDetails}) => {
+          const amount = stepFinance.reduce((acc, { payables }) => acc += payables, 0)
+          acc[_id] = {
+              paidAmount: amount,
+              unpaidAmount: 0,
+              paymentMethod: paymentDetails.paymentMethod,
+              paymentDate: new Date(),
+              notes: ''
+            }
+          return acc
+        }, {})
+
+        await (this.$http.post(`/invoicing-payables/reports-final-status/`, data))
+
+        await this.getReports()
+
+      },
       async deleteChecked() {
         await this.$http.post('/invoicing-payables/delete-reports', {
           reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
         })
-        this.closeApproveActionModal()
+        // this.closeApproveActionModal()
         await this.getReports()
       },
       async changeTaskStatus() {
@@ -292,7 +319,7 @@
 			      reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
 			      nextStatus
 		      })
-		      this.closeApproveActionModal()
+		      // this.closeApproveActionModal()
 		      this.getReports()
 	      } catch (error) {
 		      this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
@@ -431,6 +458,9 @@
 					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
 						return [ 'Send Report', "Delete" ]
 					}
+          if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Invoice Received')) {
+            return [ 'Paid' ]
+          }
 				}
 			},
 			allFilters() {

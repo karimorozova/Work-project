@@ -86,6 +86,20 @@ router.post("/paid-reports", async (req, res) => {
 	}
 });
 
+router.post("/reports-final-status", async (req, res) => {
+	const data = req.body
+
+	try {
+		for (let [key, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes }] of Object.entries(data)) {
+			 await paidOrAddPaymentInfo(key, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+		}
+		res.send('success');
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
 router.post("/report-final-status/:reportId", async (req, res) => {
 	const {reportId} = req.params
 	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body

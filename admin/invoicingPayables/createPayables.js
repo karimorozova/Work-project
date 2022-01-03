@@ -1,4 +1,4 @@
-const { InvoicingPayables, Projects } = require("../models")
+const { InvoicingPayables, InvoicingPayablesArchive, Projects } = require("../models")
 const moment = require("moment")
 const { INVOICING_STATUSES } = require("./enum")
 const { getPayablesProjectsAndSteps, getPayablesDateRange } = require("./getPayables")
@@ -30,7 +30,12 @@ const addStepsToPayables = async (projects, createdBy) => {
 
 
 	const lastIndex = await InvoicingPayables.findOne().sort({ 'reportId': -1 })
-	let lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 100
+	const lastIndexInArchive = await InvoicingPayablesArchive.findOne().sort({ 'reportId': -1 })
+
+	const lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 100
+	const lastIntIndexFromArchive = lastIndexInArchive != null ? parseInt(lastIndexInArchive.reportId.split('_').pop()) : 0
+	let lastMaxIndex = Math.max(lastIntIndexFromArchive,lastIntIndex)
+
 	let allSteps = []
 	for (const project of projects) {
 		const projectVendorId = project.currentVendor._id
@@ -66,7 +71,7 @@ const addStepsToPayables = async (projects, createdBy) => {
 			const lastPaymentDate =  moment.max(moment(foundInDB.lastPaymentDate), moment(report.lastPaymentDate)).toISOString()
 			await  InvoicingPayables.updateOne({_id: foundInDB._id}, {$set: {lastPaymentDate, firstPaymentDate}, $push: {steps: {$each: report.steps}}} )
 		} else {
-			const { _id } = await InvoicingPayables.create({...report, reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0")})
+			const { _id } = await InvoicingPayables.create({...report, reportId: 'RPT_' + (++lastMaxIndex + '').padStart(6, "0")})
 			await createDir(DIR, _id.toString())
 		}
 
