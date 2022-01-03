@@ -313,6 +313,8 @@ async function getFilteredVendors(filters) {
 				.populate("native")
 				.populate('pendingCompetencies.sourceLanguage')
 				.populate('pendingCompetencies.targetLanguage')
+				.populate('competencies.sourceLanguage')
+				.populate('competencies.targetLanguage')
 	} catch (err) {
 		console.log(err)
 		console.log("Error on filtering vendors")
