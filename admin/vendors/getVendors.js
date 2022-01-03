@@ -118,7 +118,7 @@ async function getVendorStepDetails(id, stepInfo) {
 	const groupStepInfoWithoutUnit = `${ stepInfo.source }-${ stepInfo.target }-${ stepInfo.step }-${ stepInfo.industry }`
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	let vendor = await Vendors.findOne(
-			{ status: "Active", _id: id },
+			{_id: id },
 			{
 				"firstName": 1,
 				"surname": 1,
