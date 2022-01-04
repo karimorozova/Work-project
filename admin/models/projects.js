@@ -349,7 +349,7 @@ const ProjectsSchema = new mongoose.Schema({
 		projectId: { type: String, trim: true },
 		taskId: { type: String, trim: true },
 		title: { type: String, trim: true },
-		isInReportPayables: { type: Boolean, default: false },
+		isInReportReceivables: { type: Boolean, default: false },
 		finance: {
 			Price: {
 				receivables: { type: Number }
