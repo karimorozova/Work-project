@@ -182,7 +182,7 @@
       width: 220px;
       height: 32px;
       box-sizing: border-box;
-      z-index: 10;
+      z-index: 15;
     }
   }
 
