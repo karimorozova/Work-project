@@ -35,7 +35,7 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 	return q
 }
 
-const payablesFiltersQuery = ({ reportId, vendors, to, from, status }) => {
+const payablesFiltersQuery = ({ reportId, vendors, billingDateTo, billingDateFrom, status }) => {
 	const q = {}
 	const reg = /[.*+?^${}()|[\]\\]/g
 
@@ -50,11 +50,10 @@ const payablesFiltersQuery = ({ reportId, vendors, to, from, status }) => {
 		q["status"] = status
 	}
 
-	if (!to) to = moment().add(1, 'days').format('YYYY-MM-DD')
-	if (!from) from = '1970-01-01'
-
-	q['firstPaymentDate'] = { $gte: new Date(`${ from }T00:00:00.000Z`) }
-	q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
+	if (!!billingDateTo && !!billingDateFrom) {
+		q['firstPaymentDate'] = { $gte: new Date(+billingDateFrom) }
+		q['lastPaymentDate'] = { $lt: new Date(+billingDateTo) }
+	}
 
 	return q
 }
