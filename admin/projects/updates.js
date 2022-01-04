@@ -155,7 +155,7 @@ async function getTaskTargetFiles({ task, projectId, step }) {
 
 	try {
 		for (let doc of memoqDocs) {
-			const fileName = `${ targetLanguage }-${ stepNumber }-${ Math.floor(Math.random() * 1000000) }-${ doc.ImportPath }`
+			let fileName = `${ targetLanguage }-${ stepNumber }-${ Math.floor(Math.random() * 1000000) }-${ doc.DocumentName }`
 			const path = `/projectFiles/${ projectId }/${ fileName }`
 			await downloadMemoqFile({ memoqProjectId, docId: doc.DocumentGuid, path: `./dist${ path }` })
 			targetFiles.push({ fileName, path })
@@ -442,7 +442,10 @@ function updateWordcountStepsProgress({ steps, task }) {
 	const { memoqDocs: docs } = task
 	return steps.map(item => {
 		if (task.taskId === item.taskId) {
-			item.progress = item.status === 'In progress' ? setStepsProgress(item.step.title, docs) : item.progress
+			item.progress = item.status === 'In progress'
+					? setStepsProgress(item.step.title, docs)
+					: item.progress
+			item.memoqDocIds = docs.map(item => item.DocumentGuid)
 		}
 		return item
 	})
