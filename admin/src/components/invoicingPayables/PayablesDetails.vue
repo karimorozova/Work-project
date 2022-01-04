@@ -31,7 +31,7 @@
           .title__button
             Button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")' value="Add jobs" @clicked="changeToggleAddSteps")
             Button(v-if='reportDetailsInfo.status === "Created"' value="Send" @clicked="showModalSendRequest")
-            Button(v-if='reportDetailsInfo.status === "Created"' value="Delete" @clicked="showModalDeleteRequest")
+            Button(v-if='reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent"' value="Delete" @clicked="showModalDeleteRequest")
 
 
         .invoicing-details__body

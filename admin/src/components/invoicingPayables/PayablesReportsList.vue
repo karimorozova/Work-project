@@ -153,7 +153,7 @@
             .table__data {{ getTime( row.updatedAt) }}
 
           template(slot="icon" slot-scope="{ row, index }")
-            //.table__icon(v-if="row.status === 'Created'")
+            //.table__icon(v-if="row.status === 'Created'|| row.status === 'Send'")
             .table__icon
               i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
@@ -456,7 +456,10 @@
 			availableActionOptions() {
 				if (this.reports && this.reports.length) {
 					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
-						return [ 'Send Report', "Delete" ]
+						return [ 'Send Report' ]
+					}
+					if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created' || i.status === 'Send')) {
+						return [ "Delete" ]
 					}
           if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Invoice Received')) {
             return [ 'Paid' ]
