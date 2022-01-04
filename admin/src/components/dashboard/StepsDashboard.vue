@@ -679,7 +679,6 @@ export default {
       try {
         const result = (await this.$http.post(`/dashboard-api/pipeline?page=1&limit=25`, { filters: this.filters })).data
         this.steps = result.map(item => ({ ...item, isCheck: false }))
-        console.log('STTETEPPSS', this.steps)
         this.isDataRemain = result.length === 25
       } catch (err) {
         this.alertToggle({ message: "Error on Steps data", isShow: true, type: "error" })

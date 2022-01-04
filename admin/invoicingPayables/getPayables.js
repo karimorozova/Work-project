@@ -11,7 +11,7 @@ const getPayablesDateRange = (steps) => {
 	}, { firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20, 'years') })
 }
 
-const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, to, from, step }, allLanguages) => {
+const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, billingDateTo, billingDateFrom, step }, allLanguages) => {
 	const q = {}
 	if (vendors) {
 		q["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
@@ -28,10 +28,9 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 	if (step) {
 		q["steps.stepAndUnit.step.title"] = step
 	}
-	if (!to) to = moment().add(2, 'years').format('YYYY-MM-DD')
-	if (!from) from = '1970-01-01'
-
-	q["billingDate"] = { $gte: new Date(`${ from }T00:00:00.000Z`), $lt: new Date(`${ to }T24:00:00.000Z`) }
+	if (!!billingDateTo && !!billingDateFrom) {
+		q["billingDate"] = { $gte: new Date(+billingDateFrom), $lt: new Date(+billingDateTo) }
+	}
 
 	return q
 }
@@ -189,11 +188,11 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				'deadline': 1,
 				'startDate': 1,
 				'billingDate': 1,
-				'currentVendor': { $arrayElemAt: [ "$steps.vendor", 0 ] },
+				'currentVendor': { $arrayElemAt: [ "$steps.vendor", 0 ] }
 			}
 		},
 		{ $sort: { deadline: 1 } },
-		{ $unset: ['steps.vendor', 'currentVendor.rates'] },
+		{ $unset: [ 'steps.vendor', 'currentVendor.rates' ] },
 		{ $skip: countToSkip }
 	]
 	if (countToGet > 0) {

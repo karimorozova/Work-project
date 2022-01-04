@@ -34,8 +34,10 @@
               i.fas.fa-chevron-down
 
       .element(:style="elementPadding")
-        router-link(v-if="isLink(element)" :to="{ path: element.path}" id="link") {{element.name}}
-          //i.fas.fa-circle
+        router-link(v-if="isLink(element)" :to="{ path: element.path}" id="link")
+          span {{element.name}}
+          span.fontIcon__add(v-if="element.name.includes('Add')" )
+            i.fa-regular.fa-square-plus
 
       Menu(
         v-if="isGroup(element) && openSubMenu(element)"
@@ -201,8 +203,8 @@ a {
       width: 20px;
 
       img {
-        width: 100%;
-        height: 100%;
+        height: 20px;
+        width: 20px;
       }
     }
   }
@@ -218,8 +220,8 @@ a {
       width: 20px;
 
       img {
-        width: 100%;
-        height: 100%;
+        height: 20px;
+        width: 20px;
       }
     }
   }
@@ -245,6 +247,18 @@ a {
 .fa-chevron-right,
 .fa-chevron-down {
   font-size: 13px;
+}
+
+.addIcon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.fontIcon {
+  &__add {
+    font-size: 20px;
+    margin-right: 10px;
+  }
 }
 
 </style>

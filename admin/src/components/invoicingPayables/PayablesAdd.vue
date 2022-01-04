@@ -16,38 +16,6 @@
               @removeOption="removeVendors"
             )
         .filter__item
-          label Billing Date From:
-          .filter__input
-            DatepickerWithTime(
-              :value="fromDateValue"
-              @selected="setFromDate"
-              placeholder="Date"
-              :isTime="false"
-              :highlighted="highlighted"
-              :monday-first="true"
-              inputClass="datepicker-custom-filter"
-              calendarClass="calendar-custom"
-              :format="customFormatter"
-              :isClearIcon="true"
-              @removeSelectedDate="removeFromDate"
-            )
-        .filter__item
-          label Billing Date To:
-          .filter__input
-            DatepickerWithTime(
-              :value="toDateValue"
-              @selected="setToDate"
-              placeholder="Date"
-              :isTime="false"
-              :highlighted="highlighted"
-              :monday-first="true"
-              inputClass="datepicker-custom-filter"
-              calendarClass="calendar-custom"
-              :format="customFormatter"
-              :isClearIcon="true"
-              @removeSelectedDate="removeToDate"
-            )
-        .filter__item
           label Source Languages:
           .filter__input
             SelectMulti(
@@ -84,6 +52,23 @@
               :isRemoveOption="true"
               @removeOption="removeSettingStep"
             )
+        .filter__itemLong
+          label Billing Date Range:
+          .filter__input
+            DatePicker.range-with-one-panel(
+              :value="selectedBillingDateRange"
+              @input="(e) => setBillingDateRange(e)"
+              format="DD-MM-YYYY, HH:mm"
+              prefix-class="xmx"
+              range-separator=" - "
+              :clearable="false"
+              type="datetime"
+              range
+              placeholder="Select datetime range"
+            )
+          .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+            i.fas.fa-backspace.backspace-long
+
       .invoicing-payables-add__table
         LayoutsTable(
           :fields="fields",
@@ -102,9 +87,9 @@
               CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
           template(slot="project" slot-scope="{ row, index }")
-            .table__data(style="word-break: break-word; padding-right: 15px;")
+            .table__data
               router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-                span {{ row.projectName.length > 46 ? (row.projectName.substring(0, 40) + '...') : row.projectName }}
+                .short {{ row.projectName }}
 
           template(slot="stepId" slot-scope="{ row, index }")
             .table__data {{ row.steps.stepId }}
@@ -162,6 +147,9 @@ import SelectSingle from "../SelectSingle"
 import LayoutsTable from "../LayoutsTable"
 import DatepickerWithTime from "../DatepickerWithTime"
 
+import '../../assets/scss/datepicker.scss'
+import DatePicker from 'vue2-datepicker'
+
 export default {
   data() {
     return {
@@ -181,19 +169,19 @@ export default {
           label: "Projects",
           headerKey: "headerProject",
           key: "project",
-          style: { width: "185px" }
+          style: { width: "200px" }
         },
         {
           label: "Vendor",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "190px" }
+          style: { width: "185px" }
         },
         {
           label: "Step Id",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "200px" }
+          style: { width: "190px" }
         },
         {
           label: "Step",
@@ -205,7 +193,7 @@ export default {
           label: "Language Pair",
           headerKey: "headerLangPair",
           key: "langPair",
-          style: { width: "150px" }
+          style: { width: "140px" }
         },
         {
           label: "Start Date",
@@ -229,45 +217,52 @@ export default {
           label: "Status",
           headerKey: "headerJobStatus",
           key: "jobStatus",
-          style: { width: "120px" }
+          style: { width: "125px" }
         },
         {
           label: "Fee ",
           headerKey: "headerPayables",
           key: "payables",
-          style: { width: "140px" }
+          style: { width: "125px" }
         }
       ],
 
       vendors: '',
       sourceLanguages: '',
       targetLanguages: '',
-      to: '',
-      from: '',
+      billingDateFrom: '',
+      billingDateTo: '',
       step: '',
 
       dataVariables: [
         'vendors',
         'sourceLanguages',
         'targetLanguages',
-        'to',
-        'from',
+        'billingDateFrom',
+        'billingDateTo',
         'step'
       ]
     }
   },
   methods: {
-    removeFromDate() {
-      this.replaceRoute('from', '')
+    removeSelectedBillingDateRange() {
+      let query = this.$route.query
+      this.$router.replace({
+        path: this.$route.path,
+        query: { ...query, billingDateFrom: '', billingDateTo: '' }
+      })
     },
-    removeToDate() {
-      this.replaceRoute('to', '')
-    },
-    setFromDate(data) {
-      this.replaceRoute('from', moment(data).format('YYYY-MM-DD'))
-    },
-    setToDate(data) {
-      this.replaceRoute('to', moment(data).format('YYYY-MM-DD'))
+    setBillingDateRange(e) {
+      let query = this.$route.query
+      delete query.billingDateFrom
+      delete query.billingDateTo
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...query, billingDateFrom: new Date(e[0]).getTime(),
+          billingDateTo: new Date(e[1]).getTime()
+        }
+      })
     },
     formattedDate(date) {
       return moment(date).format('MMM D, HH:mm')
@@ -373,7 +368,6 @@ export default {
     querySetter(vm, to) {
       for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
     },
-
     defaultSetter() {
       for (let variable of this.dataVariables) this[variable] = ''
     }
@@ -433,11 +427,10 @@ export default {
     selectedStep() {
       return this.$route.query.step || ''
     },
-    fromDateValue() {
-      return this.$route.query.from || ''
-    },
-    toDateValue() {
-      return this.$route.query.to || ''
+    selectedBillingDateRange() {
+      return this.$route.query.billingDateFrom
+          ? [ new Date(+this.$route.query.billingDateFrom), new Date(+this.$route.query.billingDateTo) ]
+          : [ null, null ]
     },
     isAllSelected() {
       if (this.steps && this.steps.length) return this.steps.every(i => i.isCheck)
@@ -450,7 +443,8 @@ export default {
     SelectMulti,
     GeneralTable,
     CheckBox,
-    Button
+    Button,
+    DatePicker
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -486,6 +480,13 @@ export default {
 .filter {
   display: flex;
   flex-wrap: wrap;
+
+  &__itemLong {
+    position: relative;
+    margin-bottom: 15px;
+    margin-right: 25px;
+    width: 342.5px;
+  }
 
   &__item {
     position: relative;
@@ -598,5 +599,18 @@ a {
 .currency {
   margin-right: 4px;
   color: $dark-border;
+}
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 186px;
+}
+
+.backspace-long {
+  position: absolute;
+  right: 54px !important;
+  top: 27px !important;
 }
 </style>
