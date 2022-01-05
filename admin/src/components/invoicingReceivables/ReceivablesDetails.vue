@@ -20,31 +20,31 @@
               .text__title Customer:
               .text__value {{reportDetailsInfo.client.name}}
             .text__block
-              .text__title Report Id:
+              .text__title Report ID:
               .text__value {{reportDetailsInfo.reportId}}
             .text__block(v-if="reportDetailsInfo.externalIntegration.reportId")
-              .text__title External Report Id:
+              .text__title External Report ID:
               .text__value {{reportDetailsInfo.externalIntegration.reportId}}
             .text__block
               .text__title Status:
               .text__value {{firstBigLatter(reportDetailsInfo.status)}}
             .text__block
-              .text__title Created At:
+              .text__title Created On:
               .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
             .text__block
-              .text__title Date range:
+              .text__title Date Range:
               .text__value
                 span {{  formattedDateRange(reportDetailsInfo.firstPaymentDate) }}
                 span(style="color:#999; margin: 0 4px;") /
                 span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
             .text__block
-              .text__title Billing name:
+              .text__title Billing Name:
               .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
             .text__block
-              .text__title Payment type:
+              .text__title Payment Type:
               .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
             .text__block
-              .text__title Payment terms:
+              .text__title Payment Terms:
               .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
             .text__block
               .text__title Projects:
@@ -53,7 +53,7 @@
               .text__title Jobs:
               .text__value {{ reportDetailsInfo.stepsWithProject.length }}
             .text__block
-              .text__title Total amount:
+              .text__title Total Amount:
               .text__value
                 span(style="margin-right: 4px;") {{ reportDetailsInfo.total | roundTwoDigit }}
                 span(v-html="'&euro;'")
@@ -151,13 +151,13 @@
                 template(slot="projectName" slot-scope="{ row, index }")
                   .table__data
                     router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
-                      span.short {{ row.projectName }}
+                      .short {{ row.projectName }}
 
                 template(slot="stepId" slot-scope="{ row, index }")
                   .table__data {{ row.stepId }}
 
                 template(slot="service" slot-scope="{ row, index }")
-                  .table__data {{ row.name }}
+                  .table__data {{ row.stepAndUnit.step.title }}
 
                 template(slot="langPair" slot-scope="{ row, index }")
                   .table__data {{ row.sourceLanguage}}
@@ -167,6 +167,9 @@
 
                 template(slot="billing" slot-scope="{ row, index }")
                   .table__data {{ formattedDate(row.billingDate) }}
+
+                template(slot="status" slot-scope="{ row, index }")
+                  .table__data {{ row.status }}
 
                 template(slot="payables" slot-scope="{ row, index }")
                   .table__data
@@ -245,31 +248,37 @@ export default {
           label: "Project Name",
           headerKey: "headerStepId",
           key: "projectName",
-          style: { width: "22%" }
+          style: { width: "19%" }
         },
         {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "19%" }
+          style: { width: "20%" }
         },
         {
           label: "Step",
           headerKey: "headerService",
           key: "service",
-          style: { width: "14%" }
+          style: { width: "13%" }
         },
         {
           label: "Billing Date",
           headerKey: "headerBilling",
           key: "billing",
-          style: { width: "14%" }
+          style: { width: "11%" }
         },
         {
           label: "Language Pair",
           headerKey: "headerLangPair",
           key: "langPair",
-          style: { width: "14%" }
+          style: { width: "12%" }
+        },
+        {
+          label: "Status",
+          headerKey: "headerStatus",
+          key: "status",
+          style: { width: "11%" }
         },
         {
           label: "Fee ",
@@ -281,7 +290,7 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: { width: "7%" }
+          style: { width: "5%" }
         }
       ],
       fieldsAdditionalPaid: [
@@ -795,9 +804,8 @@ textarea {
   }
 
   &__text {
-    width: 400px;
+    width: 380px;
     background: $light-background;
-    border: 1px solid $light-border;
     box-sizing: border-box;
     padding: 25px;
     border-radius: 4px;
@@ -816,23 +824,12 @@ textarea {
 
 .text {
   &__block {
-    letter-spacing: 0.1px;
-    margin: 10px 0;
-    width: 310px;
     display: flex;
-    justify-content: space-between;
   }
 
-  //&__address {
-  //  width: 300px;
-  //  padding-bottom: 10px;
-  //  color: $border;
-  //  letter-spacing: 0.2px;
-  //}
-
   &__title {
-    width: 120px;
-    font-family: Myriad600;
+    width: 140px;
+    color: $dark-border;
   }
 
   &__value {
@@ -907,6 +904,6 @@ textarea {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 210px;
+  max-width: 180px;
 }
 </style>

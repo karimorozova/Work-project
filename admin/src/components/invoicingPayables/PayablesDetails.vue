@@ -38,16 +38,16 @@
           .invoicing-details__text
             //.text__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address' }}
             .text__block
-              .text__title Report Id:
+              .text__title Report ID:
               .text__value {{reportDetailsInfo.reportId}}
             .text__block
               .text__title Status:
               .text__value {{reportDetailsInfo.status}}
             .text__block
-              .text__title Created At:
+              .text__title Created On:
               .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
             .text__block
-              .text__title Date range:
+              .text__title Date Range:
               .text__value
                 span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
                 span(style="color:#999; margin: 0 4px;") /
@@ -56,7 +56,7 @@
               .text__title Jobs:
               .text__value {{ reportDetailsInfo.steps.length }}
             .text__block
-              .text__title Total amount:
+              .text__title Total Amount:
               .text__value
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
                 span(v-html="'&euro;'")
@@ -138,7 +138,7 @@
               template(slot="project" slot-scope="{ row, index }")
                 .table__data
                   router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
-                    span.short {{ row.projectName }}
+                    .short {{ row.projectName }}
 
               template(slot="stepId" slot-scope="{ row, index }")
                 .table__data {{ row.stepId }}
@@ -154,6 +154,9 @@
 
               template(slot="billing" slot-scope="{ row, index }")
                 .table__data {{ formattedDate(row.billingDate) }}
+
+              template(slot="status" slot-scope="{ row, index }")
+                .table__data {{ row.status }}
 
               template(slot="payables" slot-scope="{ row, index }")
                 .table__data
@@ -204,34 +207,40 @@ export default {
           label: "Project",
           headerKey: "headerStepId",
           key: "project",
-          style: { width: "22%" }
+          style: { width: "19%" }
         },
         {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "19%" }
+          style: { width: "20%" }
         },
         {
           label: "Step",
           headerKey: "headerService",
           key: "service",
-          style: { width: "14%" }
+          style: { width: "13%" }
         },
         {
           label: "Billing Date",
           headerKey: "headerBilling",
           key: "billing",
-          style: { width: "14%" }
+          style: { width: "11%" }
         },
         {
           label: "Language Pair",
           headerKey: "headerLangPair",
           key: "langPair",
-          style: { width: "14%" }
+          style: { width: "12%" }
         },
         {
-          label: "Fee ",
+          label: "Status",
+          headerKey: "headerStatus",
+          key: "status",
+          style: { width: "11%" }
+        },
+        {
+          label: "Fee",
           headerKey: "headerPayables",
           key: "payables",
           style: { width: "10%" }
@@ -240,7 +249,7 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: { width: "7%" }
+          style: { width: "5%" }
         }
       ],
       toggleAddSteps: false,
@@ -600,9 +609,8 @@ textarea {
   }
 
   &__text {
-    width: 400px;
+    width: 380px;
     background: $light-background;
-    border: 1px solid $light-border;
     box-sizing: border-box;
     padding: 25px;
     height: fit-content;
@@ -621,23 +629,12 @@ textarea {
 
 .text {
   &__block {
-    letter-spacing: 0.1px;
-    margin: 10px 0;
-    width: 310px;
     display: flex;
-    justify-content: space-between;
   }
 
-  //&__address {
-  //  width: 300px;
-  //  padding-bottom: 10px;
-  //  color: $border;
-  //  letter-spacing: 0.2px;
-  //}
-
   &__title {
-    width: 100px;
-    font-family: Myriad600;
+    width: 140px;
+    color: $dark-border;
   }
 
   &__value {
@@ -707,6 +704,6 @@ textarea {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 210px;
+  max-width: 180px;
 }
 </style>

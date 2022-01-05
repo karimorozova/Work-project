@@ -217,7 +217,7 @@ export default {
   &__title {
     font-size: 16px;
     font-family: 'Myriad600';
-    margin-top: 20px;
+    margin-top: 25px;
     margin-bottom: 10px;
   }
 }
@@ -256,7 +256,7 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 186px;
+  max-width: 165px;
 }
 
 a {
