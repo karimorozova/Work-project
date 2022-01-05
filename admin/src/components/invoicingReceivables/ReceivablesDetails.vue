@@ -15,7 +15,7 @@
 
         .invoicing-details__body
           .invoicing-details__text
-            .text__address {{ getBillingDetails(reportDetailsInfo).getAddress1() }}
+            //.text__address {{ getBillingDetails(reportDetailsInfo).getAddress1() }}
             .text__block
               .text__title Customer:
               .text__value {{reportDetailsInfo.client.name}}
@@ -74,8 +74,8 @@
                   i(class="fas fa-download")
 
 
-            .payment-info(v-if="true")
-
+            //TODO PAYMENT CARD ====>
+            .payment-info(v-if="false")
               .payment-info__doublePay
                 .payment-info__payBlock
                   .amount__title Paid Amount:
@@ -784,18 +784,24 @@ textarea {
   }
 
   &__table {
-    width: 70%;
+    width: 1050px;
     position: relative;
-    max-height: 600px;
-    overflow: auto;
-    padding: 25px;
-    border-radius: 4px;
-    border: 2px solid #bfbfbf;
+    //max-height: 600px;
+    //overflow: auto;
+    //padding: 25px;
+    //border-radius: 4px;
+    //border: 2px solid #bfbfbf;
 
   }
 
   &__text {
-    width: 30%;
+    width: 400px;
+    background: $light-background;
+    border: 1px solid $light-border;
+    box-sizing: border-box;
+    padding: 25px;
+    border-radius: 4px;
+    height: fit-content;
   }
 
   &__title {
@@ -817,12 +823,12 @@ textarea {
     justify-content: space-between;
   }
 
-  &__address {
-    width: 300px;
-    padding-bottom: 10px;
-    color: $border;
-    letter-spacing: 0.2px;
-  }
+  //&__address {
+  //  width: 300px;
+  //  padding-bottom: 10px;
+  //  color: $border;
+  //  letter-spacing: 0.2px;
+  //}
 
   &__title {
     width: 120px;

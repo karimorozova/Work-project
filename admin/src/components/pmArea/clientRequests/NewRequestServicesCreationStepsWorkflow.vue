@@ -350,7 +350,7 @@ export default {
 
 .step {
   margin: 20px 0;
-  background: #f7f7f759;
+  background: $light-background;
   border: 1px solid $light-border;
   border-radius: 4px;
   padding: 10px 20px;

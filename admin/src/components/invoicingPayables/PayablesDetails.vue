@@ -36,7 +36,7 @@
 
         .invoicing-details__body
           .invoicing-details__text
-            .text__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address' }}
+            //.text__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address' }}
             .text__block
               .text__title Report Id:
               .text__value {{reportDetailsInfo.reportId}}
@@ -67,8 +67,8 @@
                   i(class="fas fa-download")
 
 
+            //TODO PAYMENT CARD ====>
             .payment-info(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
-
               .payment-info__doublePay
                 .payment-info__payBlock
                   .amount__title Paid Amount:
@@ -595,12 +595,18 @@ textarea {
   }
 
   &__table {
-    width: 70%;
+    width: 1050px;
     position: relative;
   }
 
   &__text {
-    width: 30%;
+    width: 400px;
+    background: $light-background;
+    border: 1px solid $light-border;
+    box-sizing: border-box;
+    padding: 25px;
+    height: fit-content;
+    border-radius: 4px;
   }
 
   &__title {
@@ -622,12 +628,12 @@ textarea {
     justify-content: space-between;
   }
 
-  &__address {
-    width: 300px;
-    padding-bottom: 10px;
-    color: $border;
-    letter-spacing: 0.2px;
-  }
+  //&__address {
+  //  width: 300px;
+  //  padding-bottom: 10px;
+  //  color: $border;
+  //  letter-spacing: 0.2px;
+  //}
 
   &__title {
     width: 100px;

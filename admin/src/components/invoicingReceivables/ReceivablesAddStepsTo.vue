@@ -19,15 +19,13 @@
           .table__data
             CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-        template(slot="projectId" slot-scope="{ row, index }")
-          .table__data(style="word-break: break-word;")
-            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectId }}
+        template(slot="project" slot-scope="{ row, index }")
+          .table__data
+            router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+              .short {{ row.projectName }}
 
-        template(slot="projectName" slot-scope="{ row, index }")
-          .table__data(style="word-break: break-word;")
-            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              span {{ row.projectName.length > 30 ? (row.projectName.substring(0, 30) + '...') : row.projectName }}
+        template(slot="name" slot-scope="{row}" )
+          .table__data {{ row.selectedBillingInfo.officialName }}
 
         template(slot="stepId" slot-scope="{ row, index }")
           .table__data {{ row.steps.stepId }}
@@ -42,7 +40,7 @@
           .table__data {{ formattedDate(row.billingDate) }}
 
         template(slot="service" slot-scope="{ row, index }")
-          .table__data {{ row.steps.name }}
+          .table__data {{ row.steps.stepAndUnit.step.title }}
 
         template(slot="jobStatus" slot-scope="{ row, index }")
           .table__data {{ row.steps.status }}
@@ -91,16 +89,16 @@ export default {
           style: { width: "2.2%" }
         },
         {
-          label: "Project ID",
+          label: "Projects",
           headerKey: "headerProject",
-          key: "projectId",
-          style: { width: "10%" }
+          key: "project",
+          style: { width: "12%" }
         },
         {
-          label: "Project Name",
-          headerKey: "headerProject",
-          key: "projectName",
-          style: { width: "14%" }
+          label: "Billing Name",
+          headerKey: "headerVendorName",
+          key: "name",
+          style: { width: "12%" }
         },
         {
           label: "Step ID",
@@ -115,40 +113,40 @@ export default {
           style: { width: "10%" }
         },
         {
+          label: "Language Pair",
+          headerKey: "headerLangPair",
+          key: "langPair",
+          style: { width: "8%" }
+        },
+        {
           label: "Start Date",
           headerKey: "headerStartDate",
           key: "startDate",
-          style: { width: "10%" }
+          style: { width: "8%" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { width: "10%" }
+          style: { width: "8%" }
         },
         {
           label: "Billing Date",
           headerKey: "headerBillingDate",
           key: "billingDate",
-          style: { width: "10%" }
+          style: { width: "8%" }
         },
         {
-          label: "Job Status",
+          label: "Status",
           headerKey: "headerJobStatus",
           key: "jobStatus",
-          style: { width: "10%" }
+          style: { width: "9%" }
         },
         {
-          label: "Language Pair",
-          headerKey: "headerLangPair",
-          key: "langPair",
-          style: { width: "10%" }
-        },
-        {
-          label: "Fee ",
+          label: "Fee",
           headerKey: "headerPayables",
           key: "payables",
-          style: { width: "9.8%" }
+          style: { width: "8.8%" }
         }
       ]
     }
@@ -252,5 +250,22 @@ export default {
 .currency {
   margin-right: 4px;
   color: $dark-border;
+}
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 186px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

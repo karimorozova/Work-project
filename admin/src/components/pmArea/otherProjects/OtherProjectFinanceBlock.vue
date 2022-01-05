@@ -240,7 +240,7 @@
   .minPrice {
     display: flex;
     padding: 16px 30px;
-    background: #f7f7f7;
+    background: $light-background;
     border: 2px solid #938676;
     flex-direction: column;
     margin-right: 40px;

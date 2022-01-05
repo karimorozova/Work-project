@@ -831,7 +831,7 @@
 
       &:hover {
         cursor: pointer;
-        background: #f7f7f7;
+        background: $light-border;
       }
     }
   }

@@ -74,138 +74,138 @@
 </template>
 
 <script>
-	import { mapGetters } from "vuex"
-	import GeneralTable from "../../../components/pangea/GeneralTable"
-	import moment from "moment"
+import { mapGetters } from "vuex"
+import GeneralTable from "../../../components/pangea/GeneralTable"
+import moment from "moment"
 
-	export default {
-		data() {
-			return {
-				fields: [
-					{
-						label: "Report Id",
-						headerKey: "headerReportId",
-						key: "reportId",
-						style: { width: "15%" }
-					},
-					{
-						label: "Date Range",
-						headerKey: "headerDateRange",
-						key: "dateRange",
-						style: { width: "21%" }
-					},
-					{
-						label: "Status",
-						headerKey: "headerStatus",
-						key: "status",
-						style: { width: "15%" }
-					},
-					{
-						label: "Jobs",
-						headerKey: "headerJobs",
-						key: "jobs",
-						style: { width: "13%" }
-					},
-					{
-						label: "Amount",
-						headerKey: "headerAmount",
-						key: "amount",
-						style: { width: "13%" }
-					},
-					{
-						label: "Created On",
-						headerKey: "headerCreated",
-						key: "created",
-						style: { width: "15%" }
-					},
-					{
-						label: "Details",
-						headerKey: "headerDetails",
-						key: "details",
-						style: { width: "8%" }
-					}
-				]
-			}
-		},
-		methods: {
-			getTime(time) {
-				return moment(time).format('DD-MM-YYYY, HH:mm')
-			},
-			getStepsPayables(steps) {
-				return steps.reduce((sum, finance) => {
-					sum += finance.nativeFinance.Price.payables || 0
-					return sum
-				}, 0)
-			},
-			formattedDate(date) {
-				return moment(date).format("DD-MM-YYYY")
-			},
-			dateRange(row) {
-				return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999; margin: 0 1px;"> / </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
-			},
-      test() {
-        console.log(this.dava)
-      }
-		},
-		computed: {
-			...mapGetters({
-        reportsPaid: "getReportsPaid",
-        reports: "getReports",
-			}),
-		},
-		components: { GeneralTable }
-	}
+export default {
+  data() {
+    return {
+      fields: [
+        {
+          label: "Report Id",
+          headerKey: "headerReportId",
+          key: "reportId",
+          style: { width: "15%" }
+        },
+        {
+          label: "Date Range",
+          headerKey: "headerDateRange",
+          key: "dateRange",
+          style: { width: "21%" }
+        },
+        {
+          label: "Status",
+          headerKey: "headerStatus",
+          key: "status",
+          style: { width: "15%" }
+        },
+        {
+          label: "Jobs",
+          headerKey: "headerJobs",
+          key: "jobs",
+          style: { width: "13%" }
+        },
+        {
+          label: "Amount",
+          headerKey: "headerAmount",
+          key: "amount",
+          style: { width: "13%" }
+        },
+        {
+          label: "Created On",
+          headerKey: "headerCreated",
+          key: "created",
+          style: { width: "15%" }
+        },
+        {
+          label: "Details",
+          headerKey: "headerDetails",
+          key: "details",
+          style: { width: "8%" }
+        }
+      ]
+    }
+  },
+  methods: {
+    getTime(time) {
+      return moment(time).format('DD-MM-YYYY, HH:mm')
+    },
+    getStepsPayables(steps) {
+      return steps.reduce((sum, finance) => {
+        sum += finance.nativeFinance.Price.payables || 0
+        return sum
+      }, 0)
+    },
+    formattedDate(date) {
+      return moment(date).format("DD-MM-YYYY")
+    },
+    dateRange(row) {
+      return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999; margin: 0 1px;"> / </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
+    },
+    test() {
+      console.log(this.dava)
+    }
+  },
+  computed: {
+    ...mapGetters({
+      reportsPaid: "getReportsPaid",
+      reports: "getReports"
+    })
+  },
+  components: { GeneralTable }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/colors";
+@import "../../../assets/scss/colors";
 
-  a {
-    color: $text;
+a {
+  color: $text;
+}
+
+.fa-chalkboard-teacher {
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.currency {
+  margin-right: 4px;
+  color: $dark-border;
+}
+
+.table {
+  &__header {
+    padding: 0 0 0 7px;
   }
 
-  .fa-chalkboard-teacher {
-    font-size: 15px;
-    cursor: pointer;
+  &__icon {
+    display: flex;
+    justify-content: center;
+    width: 100%;
   }
 
-  .currency {
-    margin-right: 4px;
-    color: $dark-border;
+  &__data {
+    padding: 0 7px;
   }
+}
 
-  .table {
-    &__header {
-      padding: 0 0 0 7px;
-    }
+.reports {
+  box-shadow: $box-shadow;
+  padding: 25px;
+  margin-bottom: 50px;
+  border-radius: 4px;
+  width: 1000px;
+  box-sizing: border-box;
+}
 
-    &__icon {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
+.container {
+}
 
-    &__data {
-      padding: 0 7px;
-    }
-  }
-
-  .reports {
-    box-shadow: $box-shadow;
-    padding: 20px;
-    margin-bottom: 50px;
-    border-radius: 4px;
-    width: 1000px;
-    box-sizing: border-box;
-  }
-
-  .container {
-  }
-
-  .title {
-    font-size: 18px;
-    font-family: Myriad600;
-    margin-bottom: 10px;
-  }
+.title {
+  font-size: 18px;
+  font-family: Myriad600;
+  margin-bottom: 10px;
+}
 
 </style>

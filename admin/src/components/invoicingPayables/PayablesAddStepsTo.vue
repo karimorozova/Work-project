@@ -19,6 +19,11 @@
           .table__data
             CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
+        template(slot="project" slot-scope="{ row, index }")
+          .table__data
+            router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+              .short {{ row.projectName }}
+
         template(slot="stepId" slot-scope="{ row, index }")
           .table__data {{ row.steps.stepId }}
 
@@ -99,13 +104,25 @@ export default {
           label: "Vendor",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "13%" }
+          style: { width: "12%" }
         },
         {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "13%" }
+          style: { width: "14%" }
+        },
+        {
+          label: "Step",
+          headerKey: "headerService",
+          key: "service",
+          style: { width: "10%" }
+        },
+        {
+          label: "Language Pair",
+          headerKey: "headerLangPair",
+          key: "langPair",
+          style: { width: "8%" }
         },
         {
           label: "Start Date",
@@ -126,28 +143,16 @@ export default {
           style: { width: "8%" }
         },
         {
-          label: "Step",
-          headerKey: "headerService",
-          key: "service",
-          style: { width: "10%" }
-        },
-        {
-          label: "Job Status",
+          label: "Status",
           headerKey: "headerJobStatus",
           key: "jobStatus",
-          style: { width: "10%" }
+          style: { width: "9%" }
         },
         {
-          label: "Language Pair",
-          headerKey: "headerLangPair",
-          key: "langPair",
-          style: { width: "10%" }
-        },
-        {
-          label: "Fee ",
+          label: "Fee",
           headerKey: "headerPayables",
           key: "payables",
-          style: { width: "9.8%" }
+          style: { width: "8.8%" }
         }
       ]
     }
@@ -245,5 +250,22 @@ export default {
 .currency {
   margin-right: 4px;
   color: $dark-border;
+}
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 186px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>
