@@ -178,7 +178,7 @@ export default {
           style: { width: "185px" }
         },
         {
-          label: "Step Id",
+          label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
           style: { width: "190px" }
@@ -220,7 +220,7 @@ export default {
           style: { width: "125px" }
         },
         {
-          label: "Fee ",
+          label: "Fee",
           headerKey: "headerPayables",
           key: "payables",
           style: { width: "125px" }

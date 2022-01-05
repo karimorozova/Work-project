@@ -56,7 +56,7 @@ const getReportByIdFromDb = async (id) => {
 	])
 
 	return await InvoicingReceivables.populate(queryResult, [
-				{ path: 'client', select: [ 'name', 'billingInfo' ] }
+				{ path: 'client', select: [ 'name', 'billingInfo' ] },
 			]
 	)
 }

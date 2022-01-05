@@ -329,7 +329,7 @@ export default {
       return moment(date).format('MMM D, HH:mm')
     },
     dateRange(row) {
-      return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999;">  /  </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
+      return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999; margin: 0 4px;">/</span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
     },
     removeSelectedInputs(prop) {
       this.replaceRoute(prop, '')
@@ -370,7 +370,7 @@ export default {
       this.$emit('openDetails', id)
     },
     formattedDate(date) {
-      return moment(date).format('MMM D, HH:mm')
+      return moment(date).format('MMM D')
     },
     toggleCheck(index, val) {
       if (this.isActionModal) return

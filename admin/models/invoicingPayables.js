@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const InvoicingPayablesSchema = new mongoose.Schema({
 	reportId: {
@@ -16,10 +16,10 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	steps: [{
+	steps: [ {
 		type: Schema.Types.ObjectId,
 		ref: 'Projects.steps'
-	}],
+	} ],
 	firstPaymentDate: {
 		type: Date,
 		default: new Date()
@@ -39,17 +39,17 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		},
 		expectedPaymentDate: {
 			type: Date
-		},
+		}
 	},
-	paymentInformation: [{
+	paymentInformation: [ {
 		paidAmount: {
-			type: Number,
+			type: Number
 		},
 		unpaidAmount: {
 			type: Number
 		},
 		paymentMethod: {
-			type: String,
+			type: String
 		},
 		paymentDate: {
 			type: Date,
@@ -59,7 +59,7 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 			type: String,
 			default: ""
 		}
-	}],
+	} ],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
@@ -74,8 +74,8 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	}
-});
+})
 
-const InvoicingPayables = mongoose.model('InvoicingPayables', InvoicingPayablesSchema);
+const InvoicingPayables = mongoose.model('InvoicingPayables', InvoicingPayablesSchema)
 
-module.exports = InvoicingPayables;
+module.exports = InvoicingPayables

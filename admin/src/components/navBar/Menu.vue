@@ -37,7 +37,8 @@
         router-link(v-if="isLink(element)" :to="{ path: element.path}" id="link")
           span {{element.name}}
           span.fontIcon__add(v-if="element.name.includes('Add')" )
-            i.fa-regular.fa-square-plus
+            //i.fa-regular.fa-square-plus
+            i.fa-solid.fa-plus
 
       Menu(
         v-if="isGroup(element) && openSubMenu(element)"
@@ -249,14 +250,9 @@ a {
   font-size: 13px;
 }
 
-.addIcon {
-  font-size: 20px;
-  margin-right: 10px;
-}
-
 .fontIcon {
   &__add {
-    font-size: 20px;
+    font-size: 14px;
     margin-right: 10px;
   }
 }

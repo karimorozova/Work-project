@@ -187,13 +187,13 @@ export default {
           style: { width: "157px" }
         },
         {
-          label: "Billing name",
+          label: "Billing Name",
           headerKey: "headerBN",
           key: "bn",
           style: { width: "128px" }
         },
         {
-          label: "Payment type",
+          label: "Payment Type",
           headerKey: "headerPT",
           key: "pt",
           style: { width: "110px" }
@@ -211,13 +211,13 @@ export default {
           style: { width: "110px" }
         },
         {
-          label: "Language pair",
+          label: "Language Pair",
           headerKey: "headerLangPair",
           key: "langPair",
           style: { width: "120px" }
         },
         {
-          label: "Start date",
+          label: "Start Date",
           headerKey: "headerStartDate",
           key: "startDate",
           style: { width: "90px" }
@@ -229,7 +229,7 @@ export default {
           style: { width: "90px" }
         },
         {
-          label: "Billing date",
+          label: "Billing Date",
           headerKey: "headerBillingDate",
           key: "billingDate",
           style: { width: "90px" }
