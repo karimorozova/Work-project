@@ -38,7 +38,7 @@
           span {{element.name}}
           span.fontIcon__add(v-if="element.name.includes('Add')" )
             //i.fa-regular.fa-square-plus
-            i.fa-solid.fa-plus
+            | +
 
       Menu(
         v-if="isGroup(element) && openSubMenu(element)"

@@ -24,7 +24,7 @@ module.exports = {
 
     ],
     script: [
-      { src: 'https://use.fontawesome.com/releases/v5.1.0/js/all.js' },
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js' },
       { src: 'https://www.google.com/recaptcha/api.js', async: true, defer: true}
     ],
     link: [

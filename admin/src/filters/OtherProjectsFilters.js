@@ -40,5 +40,5 @@ Vue.filter("roundWordCount", (str) => {
 });
 
 Vue.filter("roundTwoDigit", (num) => {
-	return (+num).toFixed(2)
+	return +(+num).toFixed(2)
 });

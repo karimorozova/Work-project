@@ -40,16 +40,13 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
                 span(v-html="'&euro;'")
 
-          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Received'")
+          .body__invoiceReceived
             .row
               .row__title Invoice:
               .row__value2
-                input.file-button(type="file" @change="uploadFile")
-                .file-fake-button
-                  i(class="fas fa-upload")
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-                  i(class="fas fa-download")
-                .file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
+                  i(class="fa-solid fa-download")
+                span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
             .row
               .row__title Payment method:
               .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
@@ -57,31 +54,23 @@
             .row
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
-
-            //Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Save new invoice" @clicked="submitFile")
-
-          //.body__approve(v-if="reportDetailsInfo.status === 'Sent'")
-          //  Button(value="Confirm" @clicked="approveReport")
-          //
-          //.body__submission(v-if="reportDetailsInfo.status === 'Approved'")
+          //.body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Received' || reportDetailsInfo.status === 'Partially Paid'")
           //  .row
-          //    .row__title Upload invoice:
-          //    .row__value
-          //      input.file-button(type="file" @change="uploadFile")
-          //      .file-fake-button
+          //    .row__title Invoice:
+          //    .row__value2
+          //      input.file-button(type="file" @change="uploadFile" v-if="reportDetailsInfo.status === 'Invoice Received'")
+          //      .file-fake-button(v-if="reportDetailsInfo.status === 'Invoice Received'")
           //        i(class="fas fa-upload")
-          //      .file-name(v-if="invoiceFile") {{ invoiceFile.name }}
-          //
+          //      .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+          //        i(class="fas fa-download")
+          //      .file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
           //  .row
           //    .row__title Payment method:
-          //    .row__valueDrops
-          //      SelectSingle(
-          //        :options="['test1', 'test2', 'test3']",
-          //        placeholder="Option",
-          //        :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
-          //        @chooseOption="setPaymentMethod"
-          //      )
-          //  Button(style="margin-top: 20px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
+          //    .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
+          //
+          //  .row
+          //    .row__title Expected payment date:
+          //    .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
 
         .body__table
           GeneralTable(
@@ -117,12 +106,14 @@
                 span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
 
 
-    .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation")
-      .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
-        PaymentInformationCard(
-          :cardInfo="cardInfo"
-          :paymentDetails="reportDetailsInfo.paymentDetails"
-        )
+
+    .payments
+      .cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation")
+        .card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
+          PaymentInformationCard(
+            :cardInfo="cardInfo"
+            :paymentDetails="reportDetailsInfo.paymentDetails"
+          )
 
 </template>
 
@@ -305,6 +296,12 @@ export default {
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors";
 
+.cards {
+  display: flex;
+  width: 1035px;
+  flex-wrap: wrap;
+}
+
 .details {
   &__user {
     width: 350px;
@@ -328,10 +325,10 @@ export default {
 
 .file-name {
   position: absolute;
-  width: 130px;
-  top: 5px;
+  width: 170px;
+  top: 7px;
   left: 50px;
-  opacity: 0.5;
+  opacity: 0.6;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -339,10 +336,10 @@ export default {
 
 .file-name2 {
   position: absolute;
-  width: 70px;
-  top: 5px;
-  left: 110px;
-  opacity: 0.5;
+  width: 130px;
+  top: 7px;
+  left: 95px;
+  opacity: 0.6;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -350,21 +347,21 @@ export default {
 
 .file-fake-button {
   height: 30px;
-  width: 40px;
-  background-color: $red;
-  border-radius: 4px;
+  width: 38px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 15px;
-  color: white;
+  border: 1px solid $border;
+  box-sizing: border-box;
 }
 
 .file-button {
-  padding-left: 0;
-  padding-right: 0;
-  width: 40px;
-  height: 30px;
+  left: 0px;
+  top: -6px;
+  width: 38px;
+  height: 36px;
   border: none;
   outline: none;
   opacity: 0;
@@ -377,6 +374,7 @@ export default {
 .row {
   display: flex;
   margin-bottom: 12px;
+  align-items: center;
 
   &:last-child {
     margin-bottom: 0px;
@@ -389,7 +387,7 @@ export default {
 
   &__valueDrops {
     height: 32px;
-    width: 186px;
+    width: 220px;
     position: relative;
   }
 
@@ -399,10 +397,9 @@ export default {
   }
 
   &__value2 {
-    width: 170px;
     position: relative;
     display: flex;
-    gap: 15px;
+    gap: 10px;
   }
 }
 
@@ -411,27 +408,21 @@ export default {
   justify-content: space-between;
 
   &__invoiceReceived {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: 25px;
+    padding-top: 25px;
     border-top: 1px solid $border;
-    margin-right: 20px;
   }
 
   &__submission {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: 25px;
+    padding-top: 25px;
     border-top: 1px solid $border;
-    margin-right: 20px;
   }
 
   &__approve {
     display: flex;
-    -webkit-box-pack: center;
     justify-content: center;
     margin-top: 20px;
-    border-top: 1px solid $border;
-    margin-right: 20px;
-    padding-top: 20px;
   }
 
   &__details {
@@ -445,15 +436,17 @@ export default {
 
 .container {
   position: relative;
+  width: fit-content;
 }
 
 .report {
   box-shadow: $box-shadow;
   padding: 25px;
-  margin-bottom: 50px;
   border-radius: 4px;
   width: 1025px;
   box-sizing: border-box;
+  background-color: white;
+
 }
 
 .table {
@@ -476,50 +469,6 @@ export default {
   margin-right: 4px;
   color: $dark-border;
 }
-
-//.invoicing-details {
-//  position: relative;
-//  width: 1530px;
-//  margin: 50px;
-//
-//
-//  &__cards {
-//    display: flex;
-//    flex-wrap: wrap;
-//    max-width: 1200px;
-//  }
-//
-//  &__body {
-//    display: flex;
-//    justify-content: space-between;
-//  }
-//
-//  &__wrapper {
-//    border-radius: 4px;
-//    padding: 25px;
-//    box-sizing: border-box;
-//    box-shadow: $box-shadow;
-//    background: white;
-//  }
-//
-//  &__table {
-//    width: 70%;
-//    position: relative;
-//  }
-//
-//  &__text {
-//    width: 30%;
-//  }
-//
-//  &__title {
-//    font-size: 21px;
-//    margin-bottom: 20px;
-//    display: flex;
-//    justify-content: space-between;
-//    align-items: center;
-//    font-family: Myriad600;
-//  }
-//}
 
 .user {
   display: flex;
@@ -582,5 +531,11 @@ export default {
   overflow: hidden;
   max-width: 190px;
   opacity: .3;
+}
+
+.download-icon {
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
 }
 </style>
