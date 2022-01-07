@@ -1,32 +1,12 @@
 <template lang="pug">
   .invoicing-details
     .modal__block
-      //ApproveModal(
-      //  v-if="showDeleteRequestModal"
-      //  :text='`Confirm deleting`'
-      //  class="absolute-middle"
-      //  approveValue="Yes"
-      //  notApproveValue="Cancel"
-      //  @approve="deleteRequest"
-      //  @close="closeDeleteRequest"
-      //  @notApprove="closeDeleteRequest"
-      //)
-      //ApproveModal(
-      //  v-if="showSendModal"
-      //  :text="'Are you confirm the action?'"
-      //  class="absolute-middle"
-      //  approveValue="Yes"
-      //  notApproveValue="Cancel"
-      //  @approve="changeReportStatus"
-      //  @close="closeSendRequest"
-      //  @notApprove="closeSendRequest"
-      //)
     .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
       .invoicing-details__details
         .title
-          .title__text
-            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
-              span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+          //.title__text
+          //  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
+          //    span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
 
           .title__button
             Button(v-if='!toggleAddSteps && reportDetailsInfo.status === "Created"' :outline="true" value="Send" @clicked="changeReportStatus")
@@ -34,84 +14,95 @@
             //Button(v-if='reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent"' value="Delete" @clicked="showModalDeleteRequest")
 
 
-        .invoicing-details__body
-          .invoicing-details__text
-            //.text__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address' }}
-            .text__block
-              .text__title Report ID:
-              .text__value {{reportDetailsInfo.reportId}}
-            .text__block
-              .text__title Status:
-              .text__value {{reportDetailsInfo.status}}
-            .text__block
-              .text__title Created On:
-              .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
-            .text__block
-              .text__title Date Range:
-              .text__value
-                span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
-                span(style="color:#999; margin: 0 4px;") /
-                span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
-            .text__block
-              .text__title Jobs:
-              .text__value {{ reportDetailsInfo.steps.length }}
-            .text__block
-              .text__title Total Amount:
-              .text__value
-                span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
-                span(v-html="'&euro;'")
-            .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
-              .text__title Invoice:
-              .text__value
-                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-                  i(class="fas fa-download")
+        .invoicing-details__body(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
+          .invoicing-details__details
+            .invoicing-details__user
+              .user
+                .user__image(v-if="reportDetailsInfo.vendor.photo")
+                  img(:src="domain + reportDetailsInfo.vendor.photo")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(reportDetailsInfo.vendor._id)[0], '--color': getBgColor(reportDetailsInfo.vendor._id)[1]}" v-else) {{ reportDetailsInfo.vendor.firstName[0] }}
+                .user__description
+                  .user__name
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
+                      span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+                  .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
+
+            .invoicing-details__text
+              .text__block
+                .text__title Report ID:
+                .text__value {{reportDetailsInfo.reportId}}
+              .text__block
+                .text__title Status:
+                .text__value {{reportDetailsInfo.status}}
+              .text__block
+                .text__title Created On:
+                .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
+              .text__block
+                .text__title Date Range:
+                .text__value
+                  span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
+                  span(style="color:#999; margin: 0 4px;") /
+                  span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
+              .text__block
+                .text__title Jobs:
+                .text__value {{ reportDetailsInfo.steps.length }}
+              .text__block
+                .text__title Total Amount:
+                .text__value
+                  span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
+                  span(v-html="'&euro;'")
+              .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
+                .text__title Invoice:
+                .text__value
+                  .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                    i(class="fas fa-download")
 
 
-            //TODO PAYMENT CARD ====>
-            .payment-info(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
-              .payment-info__doublePay
-                .payment-info__payBlock
-                  .amount__title Paid Amount:
-                  input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
-                .check-box
-                  CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
-                  span(class="check-box__text") Paid full
+              //TODO PAYMENT CARD ====>
+              .payment-info(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
+                .payment-info__doublePay
+                  .payment-info__payBlock
+                    .amount__title Paid Amount:
+                    input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
+                  .check-box
+                    CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
+                    span(class="check-box__text") Paid full
 
-              .payment-info__amountAndFile
-                .payment-info__amount
-                  .amount__title Unpaid Amount:
-                  .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
+                .payment-info__amountAndFile
+                  .payment-info__amount
+                    .amount__title Unpaid Amount:
+                    .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
 
-              .payment-info__double
-                .payment-info__block
-                  .payment-info__title Payment Method:
-                  .payment-info__select
-                    SelectSingle(
-                      :selectedOption="paymentMethod"
-                      :options="['test1', 'test2', 'test3' ]"
-                      placeholder="Option"
-                      @chooseOption="setPaymentMethod"
+                .payment-info__double
+                  .payment-info__block
+                    .payment-info__title Payment Method:
+                    .payment-info__select
+                      SelectSingle(
+                        :selectedOption="paymentMethod"
+                        :options="['test1', 'test2', 'test3' ]"
+                        placeholder="Option"
+                        @chooseOption="setPaymentMethod"
+                      )
+                  .payment-info__block
+                    .payment-info__title Payment Date:
+                    DatepickerWithTime(
+                      :value="paymentDate"
+                      @selected="setFromDate"
+                      placeholder="Date"
+                      :isTime="true"
+                      :highlighted="highlighted"
+                      :monday-first="true"
+                      inputClass="datepicker-custom-filter-185"
+                      calendarClass="calendar-custom"
+                      :format="customFormatter"
+                      :disabled="disabled"
                     )
-                .payment-info__block
-                  .payment-info__title Payment Date:
-                  DatepickerWithTime(
-                    :value="paymentDate"
-                    @selected="setFromDate"
-                    placeholder="Date"
-                    :isTime="true"
-                    :highlighted="highlighted"
-                    :monday-first="true"
-                    inputClass="datepicker-custom-filter-185"
-                    calendarClass="calendar-custom"
-                    :format="customFormatter"
-                    :disabled="disabled"
-                  )
 
-              .payment-info__notes
-                .payment-info__title Notes:
-                textarea(type="text" rows="3" v-model="notes")
+                .payment-info__notes
+                  .payment-info__title Notes:
+                  textarea(type="text" rows="3" v-model="notes")
 
-              Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
+                Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
 
 
           .invoicing-details__table
@@ -196,11 +187,15 @@ import DatepickerWithTime from "../DatepickerWithTime"
 import CheckBox from "../CheckBox"
 import PayablesPaymentInformationCard from "./PayablesPaymentInformationCard"
 import { mapActions } from "vuex"
+import getBgColor from "../../mixins/getBgColor"
+
 
 export default {
   name: "InvoicingDetails",
+  mixins: [ getBgColor ],
   data() {
     return {
+      domain: '',
       reportDetailsInfo: {},
       fields: [
         {
@@ -402,6 +397,7 @@ export default {
   async created() {
     await this.openDetails(this.$route.params.id)
     this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
+    this.domain = __WEBPACK__API_URL__
   },
   components: {
     Button,
@@ -615,6 +611,17 @@ textarea {
     padding: 25px;
     height: fit-content;
     border-radius: 4px;
+    border-bottom: 1px solid $light-border;
+  }
+
+  &__user {
+    padding: 25px;
+    background: $light-background;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    width: 380px;
+    box-sizing: border-box;
+    border-bottom: 1px solid $light-border;
   }
 
   &__title {
@@ -630,6 +637,11 @@ textarea {
 .text {
   &__block {
     display: flex;
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0px;
+    }
   }
 
   &__title {
@@ -705,5 +717,62 @@ textarea {
   white-space: nowrap;
   overflow: hidden;
   max-width: 180px;
+}
+
+
+.user {
+  display: flex;
+  gap: 20px;
+  width: 330px;
+
+  &__address {
+    color: $dark-border;
+    font-family: 'Myriad300';
+    letter-spacing: 0.2px;
+  }
+
+  &__name {
+    font-family: Myriad600;
+    margin-bottom: 10px;
+    font-size: 16px;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: .2s ease-out;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__fakeImage {
+    height: 55px;
+    width: 55px;
+    min-width: 55px;
+    border-radius: 8px;
+    font-size: 28px;
+    background: var(--bgColor);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  &__image {
+    height: 55px;
+    width: 55px;
+    min-width: 55px;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+  }
 }
 </style>

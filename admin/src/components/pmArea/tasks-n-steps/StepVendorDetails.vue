@@ -528,9 +528,9 @@ export default {
   }
 
   &__fakeImage {
-    height: 65px;
-    width: 65px;
-    min-width: 65px;
+    height: 55px;
+    width: 55px;
+    min-width: 55px;
     border-radius: 8px;
     font-size: 28px;
     background: var(--bgColor);
@@ -542,9 +542,9 @@ export default {
   }
 
   &__image {
-    height: 65px;
-    width: 65px;
-    min-width: 65px;
+    height: 55px;
+    width: 55px;
+    min-width: 55px;
     position: relative;
 
     img {

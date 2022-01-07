@@ -1,7 +1,6 @@
 <template lang="pug">
   .container
     .title Invoices
-
     .reports
       GeneralTable(
         :fields="fields"
@@ -12,7 +11,9 @@
           .table__header {{ field.label }}
 
         template(slot="reportId" slot-scope="{ row, index }" )
-          .table__data {{ row.reportId }}
+          .table__data
+            router-link(:to="'/invoices/details/' + row._id")
+              span {{ row.reportId }}
 
         template(slot="dateRange" slot-scope="{ row, index }")
           .table__data(v-html="dateRange(row)")
@@ -29,14 +30,9 @@
             span {{ getStepsPayables(row.steps).toFixed(2) }}
 
         template(slot="created" slot-scope="{ row, index }")
-          .table__data {{ getTime( row.createdAt) }}
+          .table__data {{ formattedDate( row.createdAt) }}
 
-        template(slot="details" slot-scope="{ row, index }")
-          .table__icon
-            router-link(:to="'/invoices/details/' + row._id" target="_blank")
-              i(class="fas fa-chalkboard-teacher")
-
-    .title Old Invoices
+    .title Paid Invoices
     .reports
       GeneralTable(
         :fields="fields"
@@ -47,7 +43,9 @@
           .table__header {{ field.label }}
 
         template(slot="reportId" slot-scope="{ row, index }" )
-          .table__data {{ row.reportId }}
+          .table__data
+            router-link(:to="'/invoices/details-paid/' + row._id")
+              span {{ row.reportId }}
 
         template(slot="dateRange" slot-scope="{ row, index }")
           .table__data(v-html="dateRange(row)")
@@ -64,12 +62,7 @@
             span {{ getStepsPayables(row.steps).toFixed(2) }}
 
         template(slot="created" slot-scope="{ row, index }")
-          .table__data {{ getTime( row.createdAt) }}
-
-        template(slot="details" slot-scope="{ row, index }")
-          .table__icon
-            router-link(:to="'/invoices/details-paid/' + row._id" target="_blank")
-              i(class="fas fa-chalkboard-teacher")
+          .table__data {{ formattedDate( row.createdAt) }}
 
 </template>
 
@@ -86,13 +79,7 @@ export default {
           label: "Report Id",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "15%" }
-        },
-        {
-          label: "Date Range",
-          headerKey: "headerDateRange",
-          key: "dateRange",
-          style: { width: "21%" }
+          style: { width: "20%" }
         },
         {
           label: "Status",
@@ -104,13 +91,13 @@ export default {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "13%" }
+          style: { width: "15%" }
         },
         {
-          label: "Amount",
-          headerKey: "headerAmount",
-          key: "amount",
-          style: { width: "13%" }
+          label: "Date Range",
+          headerKey: "headerDateRange",
+          key: "dateRange",
+          style: { width: "20%" }
         },
         {
           label: "Created On",
@@ -119,18 +106,15 @@ export default {
           style: { width: "15%" }
         },
         {
-          label: "Details",
-          headerKey: "headerDetails",
-          key: "details",
-          style: { width: "8%" }
+          label: "Amount",
+          headerKey: "headerAmount",
+          key: "amount",
+          style: { width: "15%" }
         }
       ]
     }
   },
   methods: {
-    getTime(time) {
-      return moment(time).format('DD-MM-YYYY, HH:mm')
-    },
     getStepsPayables(steps) {
       return steps.reduce((sum, finance) => {
         sum += finance.nativeFinance.Price.payables || 0
@@ -138,10 +122,13 @@ export default {
       }, 0)
     },
     formattedDate(date) {
-      return moment(date).format("DD-MM-YYYY")
+      return moment(date).format('MMM D, HH:mm')
+    },
+    formattedDateRange(date) {
+      return moment(date).format('MMM D')
     },
     dateRange(row) {
-      return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999; margin: 0 1px;"> / </span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
+      return `${ this.formattedDateRange(row.firstPaymentDate) } <span style="color: #999999; margin: 0 4px;">/</span> ${ this.formattedDateRange(row.lastPaymentDate) || "-" }`
     },
     test() {
       console.log(this.dava)
@@ -159,10 +146,6 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
-
-a {
-  color: $text;
-}
 
 .fa-chalkboard-teacher {
   font-size: 15px;
@@ -195,7 +178,7 @@ a {
   padding: 25px;
   margin-bottom: 50px;
   border-radius: 4px;
-  width: 1000px;
+  width: 1025px;
   box-sizing: border-box;
 }
 
@@ -206,6 +189,16 @@ a {
   font-size: 18px;
   font-family: Myriad600;
   margin-bottom: 10px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 </style>

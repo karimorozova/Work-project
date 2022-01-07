@@ -17,41 +17,41 @@ const getAllPaidPayables = async (countToSkip, countToGet, query) => {
 						as: "stepFinance"
 					}
 				},
-				{ $match: {...query} },
-				{ $sort : { reportId : -1 }},
+				{ $match: { ...query } },
+				{ $sort: { reportId: -1 } },
 				{ $skip: countToSkip },
-				{ $limit: countToGet}
+				{ $limit: countToGet }
 			]
 	)
-	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
+	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
 const getPaidReport = async (id) => {
 	const invoicingReports = await InvoicingPayablesArchive.aggregate([
-		{ $match: {"_id": ObjectId(id)}},
-		{
-			$lookup: {
-				from: "projects",
-				let: { 'steps': '$steps', 'steps2': '$billingDate' },
-				pipeline: [
-					{ "$unwind": "$steps" },
-					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ "$addFields": { "steps.projectNativeId": '$_id' } },
-					{ "$addFields": { "steps.projectName": '$projectName' } },
-					{ "$addFields": {"steps.billingDate": '$billingDate'}},
-					{ '$replaceRoot': { newRoot: '$steps' } },
-				],
-				as: "steps"
-			}
-		}
-		]
+				{ $match: { "_id": ObjectId(id) } },
+				{
+					$lookup: {
+						from: "projects",
+						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						pipeline: [
+							{ "$unwind": "$steps" },
+							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$addFields": { "steps.projectNativeId": '$_id' } },
+							{ "$addFields": { "steps.projectName": '$projectName' } },
+							{ "$addFields": { "steps.billingDate": '$billingDate' } },
+							{ '$replaceRoot': { newRoot: '$steps' } }
+						],
+						as: "steps"
+					}
+				}
+			]
 	)
-	return (await InvoicingPayablesArchive.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname' ] } ))
+	return (await InvoicingPayablesArchive.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
 const getReportPaidByVendorId = async (id) => {
 	return await InvoicingPayablesArchive.aggregate([
-				{ $match: { "vendor": ObjectId(id)},},
+				{ $match: { "vendor": ObjectId(id) } },
 				{
 					$lookup: {
 						from: "projects",
@@ -60,8 +60,8 @@ const getReportPaidByVendorId = async (id) => {
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.projectName": '$projectName' } },
-							{ "$addFields": {"steps.billingDate": '$billingDate'}},
-							{ '$replaceRoot': { newRoot: '$steps' } },
+							{ "$addFields": { "steps.billingDate": '$billingDate' } },
+							{ '$replaceRoot': { newRoot: '$steps' } }
 						],
 						as: "steps"
 					}
@@ -76,7 +76,7 @@ const getReportPaidByVendorId = async (id) => {
 						"steps.targetFile",
 						"steps.vendor",
 						"steps.service",
-						"steps.memoqDocIds",
+						"steps.memoqDocIds"
 					]
 				}
 			]
@@ -86,6 +86,6 @@ const getReportPaidByVendorId = async (id) => {
 module.exports = {
 	getAllPaidPayables,
 	getPaidReport,
-	getPayablePaidByVendorId: getReportPaidByVendorId,
+	getPayablePaidByVendorId: getReportPaidByVendorId
 
 }

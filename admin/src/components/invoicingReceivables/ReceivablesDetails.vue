@@ -3,9 +3,9 @@
     .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
       .invoicing-details__details
         .title
-          .title__text
-            router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
-              span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
+          //.title__text
+          //  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
+          //    span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
           .title__button(v-if='!toggleAddSteps')
             .flex-wrapper
               Button(v-if="reportDetailsInfo.status === 'Invoice Ready'" :outline="true" value="Send" @clicked="sendInvoice")
@@ -14,112 +14,120 @@
               Button(v-if="reportDetailsInfo.status === 'Created'" value="Add jobs" @clicked="changeToggleAddSteps")
 
         .invoicing-details__body
-          .invoicing-details__text
-            //.text__address {{ getBillingDetails(reportDetailsInfo).getAddress1() }}
-            .text__block
-              .text__title Customer:
-              .text__value {{reportDetailsInfo.client.name}}
-            .text__block
-              .text__title Report ID:
-              .text__value {{reportDetailsInfo.reportId}}
-            .text__block(v-if="reportDetailsInfo.externalIntegration.reportId")
-              .text__title External Report ID:
-              .text__value {{reportDetailsInfo.externalIntegration.reportId}}
-            .text__block
-              .text__title Status:
-              .text__value {{firstBigLatter(reportDetailsInfo.status)}}
-            .text__block
-              .text__title Created On:
-              .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
-            .text__block
-              .text__title Date Range:
-              .text__value
-                span {{  formattedDateRange(reportDetailsInfo.firstPaymentDate) }}
-                span(style="color:#999; margin: 0 4px;") /
-                span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
-            .text__block
-              .text__title Billing Name:
-              .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
-            .text__block
-              .text__title Payment Type:
-              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
-            .text__block
-              .text__title Payment Terms:
-              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
-            .text__block
-              .text__title Projects:
-              .text__value {{ getReportProjectsCount(reportDetailsInfo) }}
-            .text__block
-              .text__title Jobs:
-              .text__value {{ reportDetailsInfo.stepsWithProject.length }}
-            .text__block
-              .text__title Total Amount:
-              .text__value
-                span(style="margin-right: 4px;") {{ reportDetailsInfo.total | roundTwoDigit }}
-                span(v-html="'&euro;'")
-            .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
-              .text__title Invoice:
-              .text__value
-                .download-file(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)") {{reportDetailsInfo.invoice.filename}}
-            .text__block(v-if="this.reportDetailsInfo.status !== 'Created' && reportDetailsInfo.reportFiles.length > 0")
-              .text__title Reports:
-              .text__value
-                .download-file(v-for="reportFile in reportDetailsInfo.reportFiles" style="cursor: pointer"  @click="downloadFile(reportFile.path)") {{reportFile.filename}}
-                //.file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)")
-                //  i(class="fas fa-download")
-            //.text__block(v-if="true")
-              .text__title Invoice:
-              .text__value
-                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-                  i(class="fas fa-download")
+          .invoicing-details__details
+            .invoicing-details__user
+              .user
+                .user__description
+                  .user__name
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
+                      span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
+                  .user__address {{ getBillingDetails(reportDetailsInfo).getAddressFull() }}
+
+            .invoicing-details__text
+              .text__block
+                .text__title Customer:
+                .text__value {{reportDetailsInfo.client.name}}
+              .text__block
+                .text__title Report ID:
+                .text__value {{reportDetailsInfo.reportId}}
+              .text__block(v-if="reportDetailsInfo.externalIntegration.reportId")
+                .text__title External Report ID:
+                .text__value {{reportDetailsInfo.externalIntegration.reportId}}
+              .text__block
+                .text__title Status:
+                .text__value {{firstBigLatter(reportDetailsInfo.status)}}
+              .text__block
+                .text__title Created On:
+                .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
+              .text__block
+                .text__title Date Range:
+                .text__value
+                  span {{  formattedDateRange(reportDetailsInfo.firstPaymentDate) }}
+                  span(style="color:#999; margin: 0 4px;") /
+                  span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
+              .text__block
+                .text__title Billing Name:
+                .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
+              .text__block
+                .text__title Payment Type:
+                .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
+              .text__block
+                .text__title Payment Terms:
+                .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
+              .text__block
+                .text__title Projects:
+                .text__value {{ getReportProjectsCount(reportDetailsInfo) }}
+              .text__block
+                .text__title Jobs:
+                .text__value {{ reportDetailsInfo.stepsWithProject.length }}
+              .text__block
+                .text__title Total Amount:
+                .text__value
+                  span(style="margin-right: 4px;") {{ reportDetailsInfo.total | roundTwoDigit }}
+                  span(v-html="'&euro;'")
+              .text__block(v-if="this.reportDetailsInfo.status !== 'Created'")
+                .text__title Invoice:
+                .text__value
+                  .download-file(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)") {{reportDetailsInfo.invoice.filename}}
+              .text__block(v-if="this.reportDetailsInfo.status !== 'Created' && reportDetailsInfo.reportFiles.length > 0")
+                .text__title Reports:
+                .text__value
+                  .download-file(v-for="reportFile in reportDetailsInfo.reportFiles" style="cursor: pointer"  @click="downloadFile(reportFile.path)") {{reportFile.filename}}
+                  //.file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.invoice.path)")
+                  //  i(class="fas fa-download")
+              //.text__block(v-if="true")
+                .text__title Invoice:
+                .text__value
+                  .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                    i(class="fas fa-download")
 
 
-            //TODO PAYMENT CARD ====>
-            .payment-info(v-if="false")
-              .payment-info__doublePay
-                .payment-info__payBlock
-                  .amount__title Paid Amount:
-                  input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
-                .check-box
-                  CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
-                  span(class="check-box__text") Paid full
+              //TODO PAYMENT CARD ====>
+              .payment-info(v-if="false")
+                .payment-info__doublePay
+                  .payment-info__payBlock
+                    .amount__title Paid Amount:
+                    input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
+                  .check-box
+                    CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
+                    span(class="check-box__text") Paid full
 
-              .payment-info__amountAndFile
-                .payment-info__amount
-                  .amount__title Unpaid Amount:
-                  .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
+                .payment-info__amountAndFile
+                  .payment-info__amount
+                    .amount__title Unpaid Amount:
+                    .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
 
-              .payment-info__double
-                .payment-info__block
-                  .payment-info__title Payment Method:
-                  .payment-info__select
-                    SelectSingle(
-                      :selectedOption="paymentMethod"
-                      :options="['test1', 'test2', 'test3' ]"
-                      placeholder="Option"
-                      @chooseOption="setPaymentMethod"
+                .payment-info__double
+                  .payment-info__block
+                    .payment-info__title Payment Method:
+                    .payment-info__select
+                      SelectSingle(
+                        :selectedOption="paymentMethod"
+                        :options="['test1', 'test2', 'test3' ]"
+                        placeholder="Option"
+                        @chooseOption="setPaymentMethod"
+                      )
+                  .payment-info__block
+                    .payment-info__title Payment Date:
+                    DatepickerWithTime(
+                      :value="paymentDate"
+                      @selected="setFromDate"
+                      placeholder="Date"
+                      :isTime="true"
+                      :highlighted="highlighted"
+                      :monday-first="true"
+                      inputClass="datepicker-custom-filter-185"
+                      calendarClass="calendar-custom"
+                      :format="customFormatter"
+                      :disabled="disabled"
                     )
-                .payment-info__block
-                  .payment-info__title Payment Date:
-                  DatepickerWithTime(
-                    :value="paymentDate"
-                    @selected="setFromDate"
-                    placeholder="Date"
-                    :isTime="true"
-                    :highlighted="highlighted"
-                    :monday-first="true"
-                    inputClass="datepicker-custom-filter-185"
-                    calendarClass="calendar-custom"
-                    :format="customFormatter"
-                    :disabled="disabled"
-                  )
 
 
-              .payment-info__notes
-                .payment-info__title Notes:
-                textarea(type="text" rows="3" v-model="notes")
+                .payment-info__notes
+                  .payment-info__title Notes:
+                  textarea(type="text" rows="3" v-model="notes")
 
-              Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
+                Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
 
           .invoicing-details__table
             ApproveModal(
@@ -355,7 +363,7 @@ export default {
         getName: () => name,
         getPaymentTerms: () => paymentTerms,
         getPaymentType: () => paymentType,
-        getAddress1: () => `${ street1 || 'No street' }, ${ city || 'No city' }, ${ country || 'No country' }`
+        getAddressFull: () => `${ street1 || 'No street' }, ${ city || 'No city' }, ${ country || 'No country' }`
       }
     },
     getReportProjectsCount({ stepsAndProjects }) {
@@ -795,12 +803,6 @@ textarea {
   &__table {
     width: 1050px;
     position: relative;
-    //max-height: 600px;
-    //overflow: auto;
-    //padding: 25px;
-    //border-radius: 4px;
-    //border: 2px solid #bfbfbf;
-
   }
 
   &__text {
@@ -808,8 +810,19 @@ textarea {
     background: $light-background;
     box-sizing: border-box;
     padding: 25px;
-    border-radius: 4px;
     height: fit-content;
+    border-radius: 4px;
+    border-bottom: 1px solid $light-border;
+  }
+
+  &__user {
+    padding: 25px;
+    background: $light-background;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    width: 380px;
+    box-sizing: border-box;
+    border-bottom: 1px solid $light-border;
   }
 
   &__title {
@@ -825,6 +838,11 @@ textarea {
 .text {
   &__block {
     display: flex;
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0px;
+    }
   }
 
   &__title {
@@ -898,6 +916,35 @@ textarea {
 .flex-wrapper {
   display: flex;
   gap: 20px;
+}
+
+.user {
+  display: flex;
+  gap: 20px;
+  width: 330px;
+
+  &__address {
+    color: $dark-border;
+    font-family: 'Myriad300';
+    letter-spacing: 0.2px;
+  }
+
+  &__name {
+    font-family: Myriad600;
+    margin-bottom: 10px;
+    font-size: 16px;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: .2s ease-out;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
 }
 
 .short {
