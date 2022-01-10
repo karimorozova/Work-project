@@ -2,15 +2,15 @@
   .other-project__filter
     .filters-other
       .filters-other__col
-        .filters-other__item
+        //.filters-other__item
           LabelValue(label="Project ID")
             input.filters-other__text-input(type="text" id="clientId" @keyup="filterById")
-        .filters-other__item
+        //.filters-other__item
           LabelValue(label="Client Name")
             input.filters-other__text-input(type="text" :v-model="clientName" id="clientName" @keyup="filterByName")
 
       .filters-other__col
-        .filters-other__date
+        //.filters-other__date
           LabelValue(label="Start Date and Time")
             Datepicker(@selected="setStart" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-30" calendarClass="calendar-custom" :format="customFormatter" ref="startDate")
           img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="startOpen")
@@ -22,7 +22,7 @@
                 //@chosenLang="({lang}) => addLang({lang}, 'targetFilter')")
 
       .filters-other__col
-        .filters-other__date
+        //.filters-other__date
           LabelValue(label="Deadline")
             Datepicker(@selected="setDeadline" :highlighted="highlighted" monday-first=true inputClass="datepicker-height-30" calendarClass="calendar-custom" :format="customFormatter" ref="deadline")
           img.filters-other__calendar-icon(src="../../../assets/images/calendar.png" @click="deadlineOpen")
@@ -34,7 +34,7 @@
                 //@chosenLang="({lang}) => addLang({lang}, 'sourceFilter')")
 
       .filters-other__col
-        .filters-other__item
+        //.filters-other__item
           LabelValue(label="Project Manager")
             input.filters-other__text-input(type="text" :v-model="projectManager" id="projectManager" @keyup="filterByName")
 
@@ -50,7 +50,6 @@
 
 <script>
 	import Datepicker from "../../Datepicker"
-	import LabelValue from "../LabelValue"
 	import moment from "moment"
 	import Button from "../../Button"
 	import { mapActions } from "vuex"
@@ -174,7 +173,6 @@
 		components: {
 			Button,
 			Datepicker,
-			LabelValue
 		}
 	}
 </script>

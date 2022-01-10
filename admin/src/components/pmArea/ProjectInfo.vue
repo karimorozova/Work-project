@@ -41,12 +41,10 @@
 <script>
 import ImportProjectToXtrf from "./ImportProjectToXtrf"
 import ImportedProjectToXtrf from "./ImportedProjectToXtrf"
-
 const ValidationErrors = () => import("../ValidationErrors")
 import Project from "./Project"
 import ProjectAction from "./ProjectAction"
 import ProjectFinance from "./ProjectFinance"
-import TasksAndSteps from "./TasksAndSteps"
 import NewTasksAndSteps from "./NewTasksAndSteps"
 
 const Preview = () => import("./Preview")
@@ -274,7 +272,6 @@ export default {
     ValidationErrors,
     Project,
     ProjectAction,
-    TasksAndSteps,
     NewTasksAndSteps,
     ProjectFinance,
     Preview,

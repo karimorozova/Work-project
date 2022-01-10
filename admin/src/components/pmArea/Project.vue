@@ -153,7 +153,6 @@ import SelectSingle from "../SelectSingle"
 import SelectMulti from "../SelectMulti"
 import ValidationErrors from "../ValidationErrors"
 import Datepicker from "../Datepicker"
-import LabelValue from "./LabelValue"
 import Button from "../Button"
 import CheckBox from "../CheckBox"
 import moment from "moment"
@@ -404,7 +403,6 @@ export default {
     SelectSingle,
     SelectMulti,
     Datepicker,
-    LabelValue,
     Button,
     CheckBox,
     ValidationErrors,

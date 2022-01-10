@@ -81,7 +81,6 @@ import SelectSingle from "../../../SelectSingle"
 import SelectMulti from "../../../SelectMulti"
 import ValidationErrors from "../../../ValidationErrors"
 import Datepicker from "../../../Datepicker"
-import LabelValue from "./../../LabelValue"
 import Button from "../../../Button"
 import moment from "moment"
 import { mapGetters, mapActions } from "vuex"
@@ -350,7 +349,6 @@ export default {
     SelectSingle,
     SelectMulti,
     Datepicker,
-    LabelValue,
     Button,
     ValidationErrors,
     DatePicker,

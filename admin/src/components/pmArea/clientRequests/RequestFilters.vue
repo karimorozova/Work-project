@@ -68,7 +68,6 @@
 	import SelectSingle from "../../SelectSingle"
 	import SelectMulti from "../../SelectMulti"
 	import Datepicker from "../../Datepicker"
-	import LabelValue from "../LabelValue"
 	import moment from "moment"
 	import { mapGetters } from "vuex"
 	import DatepickerWithTime from "../../DatepickerWithTime"
@@ -178,7 +177,6 @@
 			SelectSingle,
 			SelectMulti,
 			Datepicker,
-			LabelValue
 		}
 	}
 </script>

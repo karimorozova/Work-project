@@ -10,20 +10,20 @@
           i.fa.fa-lock(aria-hidden='true' @click="toggleLock(project.lockedForRecalculation)")
 
       .project__info-row
-        .project__date
+        //.project__date
           LabelValue(label="Start Date & Time" :isRequired="false" customClass="project_margin")
             input.project__input-text(type="text" :value="formateDate(project.creationTime)" disabled)
           img.project__calendar-icon(src="../../../assets/images/calendar.png")
-        .project__date
+        //.project__date
           LabelValue(label="Deadline" :isRequired="false" customClass="project_margin")
             input.project__input-text(type="text" :value="formateDate(project.deadline)" disabled)
           img.project__calendar-icon(src="../../../assets/images/calendar.png")
-        .project__date
+        //.project__date
           LabelValue(label="Billing Date" :isRequired="false" customClass="project_margin")
             input.project__input-text(type="text" :value="formateDate(project.deadline)" disabled)
           img.project__calendar-icon(src="../../../assets/images/calendar.png")
       .project__info-row
-        .project__client(v-if='project.customer')
+        //.project__client(v-if='project.customer')
           LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
             .tooltip
               span#myTooltip.tooltiptext XTRF: {{ project.client }}
@@ -31,23 +31,22 @@
             .project__input-icons
               i.fas.fa-external-link-alt.icon-link(aria-hidden='true' @click="goToClientInfo(project.customer._id)")
               input.project__input-text2.project__input-client(type="text" :value="project.customer.name" readonly)
-        .project__client(v-else)
+        //.project__client(v-else)
           LabelValue(label="Client Name" :isRequired="false" customClass="project_margin")
             input.project__input-text(type="text" :value="'XTRF: ' + project.client" disabled)
 
-        .project__industry
+        //.project__industry
           LabelValue(label="Industry" :isRequired="false" customClass="project_margin")
             input.project__input-text(type="text" :value="project.domain | otherProjectsIndustryFilter" disabled)
-        .project__number
+        //.project__number
           LabelValue(label="№" customClass="project_margin")
             span.number {{ project.serverProjectGuid }}
-        .project__test.checkbox
+        //.project__test.checkbox
           input(type="checkbox" id="test" :checked="project.isTest" @change="setTest(project._id)")
           label(for="test") Test
 </template>
 
 <script>
-	import LabelValue from "../LabelValue"
 	import moment from "moment"
 	import { mapActions } from "vuex"
 	import '../../../filters/OtherProjectsFilters'
@@ -124,7 +123,6 @@
 			}
 		},
 		components: {
-			LabelValue
 		}
 	}
 </script>

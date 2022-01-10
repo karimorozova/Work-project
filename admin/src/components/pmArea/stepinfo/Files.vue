@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import StepInfoTitle from "./finance/StepInfoTitle"
 import { mapGetters, mapActions } from 'vuex'
 import GeneralTable from "../../GeneralTable"
 
@@ -97,7 +96,6 @@ export default {
   },
   components: {
     GeneralTable,
-    StepInfoTitle
   }
 }
 </script>
