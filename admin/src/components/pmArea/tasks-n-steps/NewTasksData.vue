@@ -1,43 +1,71 @@
 <template lang="pug">
-  .taskData(v-if="allServices.length")
-    .taskData__errorModal
+  .container
+    .container__errorModal
       ValidationErrors(v-if="IsErrorModal" :errors="errors" :isAbsolute="true" @closeErrors="closeErrors")
-
-    .taskData__row-servicesLanguages
-      .service
-        .drop__title Service:
-        .drop
-          SelectSingle(
-            :selectedOption="tasksData.service ? tasksData.service.title : ''"
-            :options="mappedClientServices"
-            placeholder="Option"
-            @chooseOption="setService"
-          )
-
-        .extraServices
-          .extraServices__title Extra Services:
-          Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
-
-        .extraServicesTable(v-if="isAdditions")
-          StepsAdditions(
-            :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
-            @save="setAdditions"
-            @delete="setAdditions"
-          )
-
-      .language
-        TasksLangsDuo
-
-    .taskData__row
-      NewServicesCreationStepsWorkflow(
-        :templates="templates"
+    .tabs
+      Tabs(
+        :tabs="tabs"
+        :selectedTab="selectedTab"
+        @setTab="setTab"
       )
 
-    .taskData__files
-      TasksFiles
+    .option(v-if="selectedTab === 'Memoq'" )
+      .taskData
+        .taskData__memoqLink
+          .taskData__memoqLink-select
+            .drop__title Workflow:
+            .drop
+              SelectSingle(
+                :selectedOption="selectedMemoqWorkflow"
+                :options="['Translation & Revising', 'Translation Only']"
+                placeholder="Option"
+                @chooseOption="setMemoqWorkflow"
+              )
+          .taskData__memoqLink-input
+            .drop__title Memoq Project Name:
+            .drop__input
+              input(v-model="memoqLink" placeholder="Value")
 
-    .taskData__button
-      Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecks")
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksMemoq")
+
+    .option(v-if="selectedTab === 'Classic' && allServices.length" )
+      .taskData
+        .taskData__row-servicesLanguages
+          .service
+            .drop__title Service:
+            .drop
+              SelectSingle(
+                :selectedOption="tasksData.service ? tasksData.service.title : ''"
+                :options="mappedClientServices"
+                placeholder="Option"
+                @chooseOption="setService"
+              )
+
+            .extraServices
+              .extraServices__title Extra Services:
+              Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
+
+            .extraServicesTable(v-if="isAdditions")
+              StepsAdditions(
+                :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
+                @save="setAdditions"
+                @delete="setAdditions"
+              )
+
+          .language
+            TasksLangsDuo
+
+        .taskData__row
+          NewServicesCreationStepsWorkflow(
+            :templates="templates"
+          )
+
+        .taskData__files
+          TasksFiles
+
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecks")
 
 </template>
 
@@ -52,6 +80,7 @@ import StepsAdditions from "./stepsAdditions"
 import Button from "../../Button"
 import ValidationErrors from "../../ValidationErrors"
 import { clearTasksData } from "../../../vuex/pmarea/actions"
+import Tabs from "../../Tabs"
 
 export default {
   name: "NewTasksData",
@@ -65,6 +94,13 @@ export default {
   },
   data() {
     return {
+      // tabs: [ 'Classic', 'Memoq', 'XTM' ],
+      tabs: [ 'Classic', 'Memoq' ],
+      selectedTab: 'Classic',
+
+      memoqLink: '',
+      selectedMemoqWorkflow: '',
+
       allServices: [],
       templates: [],
       isAdditions: false,
@@ -78,6 +114,43 @@ export default {
     this.setDataValue({})
   },
   methods: {
+    setTab({ index }) {
+      this.selectedTab = this.tabs[index]
+    },
+    setMemoqWorkflow({ option }) {
+      this.selectedMemoqWorkflow = option
+    },
+    async saveTasksChecksMemoq() {
+      this.errors = []
+      if (!this.memoqLink) this.errors.push('Please enter a Memoq project name.')
+      if (!this.selectedMemoqWorkflow) this.errors.push('Please enter a Memoq project name.')
+      if (this.errors.length) {
+        this.IsErrorModal = true
+        return
+      }
+      this.isDisabledSaveButton = true
+      const creatorUserId = await this.getCreatorUserId()
+      const { _id: projectId, projectId: internalProjectId, startDate, deadline } = this.currentProject
+      const res = await this.$http.post(`/pm-manage/build-TnS-from-memoq-link`, {
+        projectId,
+        memoqLink: this.memoqLink,
+        memoqWorkFlow: this.selectedMemoqWorkflow,
+        creatorUserId,
+        internalProjectId,
+        startDate,
+        deadline
+      })
+      const { data } = res
+      if (data.status === 'success') {
+        const { data: project } = data
+        await this.setCurrentProject(project)
+        this.$parent.toggleTaskData()
+        this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
+      } else {
+        this.alertToggle({ message: data.message, isShow: true, type: "error" })
+      }
+      this.isDisabledSaveButton = false
+    },
     saveTasksChecks() {
       this.errors = []
 
@@ -125,19 +198,23 @@ export default {
       }
       this.saveTasks()
     },
+    async getCreatorUserId() {
+      try {
+        const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
+        const { creatorUserId } = memoqCreatorUser.data
+        if (!creatorUserId) throw new Error()
+        return creatorUserId
+      } catch (err) {
+        this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
+      }
+    },
     async saveTasks() {
       this.isDisabledSaveButton = true
       const data = this.getDataForTasks(this.tasksData)
       try {
         if (this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
-          try {
-            const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
-            const { creatorUserId } = memoqCreatorUser.data
-            if (!creatorUserId) throw new Error()
-            data.append('creatorUserId', creatorUserId)
-          } catch (err) {
-            this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
-          }
+          const creatorUserId = await this.getCreatorUserId()
+          data.append('creatorUserId', creatorUserId)
           try {
             await this.addProjectWordsTasks(data)
           } catch (err) {
@@ -197,8 +274,8 @@ export default {
       this.isAdditions = !this.isAdditions
     },
     async buildAutoData() {
-      console.log('this.allServices', this.allServices)
-      console.log('this.currentProject', this.currentProject)
+      // console.log('this.allServices', this.allServices)
+      // console.log('this.currentProject', this.currentProject)
 
       const service = this.activeClientServices()[0]
       this.setDataValue({ prop: "service", value: service })
@@ -325,7 +402,7 @@ export default {
   destroyed() {
     this.clearTasksData()
   },
-  components: { ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
+  components: { Tabs, ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }
 
 </script>
@@ -333,15 +410,23 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
 
+.container {
+  position: relative;
+}
+
 .taskData {
   position: relative;
-  border: 2px solid $light-border;
-  border-radius: 4px;
+  border: 1px solid $light-border;
   padding: 25px;
   margin-bottom: 30px;
 
+  &__memoqLink {
+    display: flex;
+    gap: 25px;
+  }
+
   &__button {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     justify-content: center;
   }
@@ -372,6 +457,26 @@ export default {
   width: 220px;
   position: relative;
   height: 32px;
+
+  &__input {
+    input {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      height: 32px;
+      width: 690px;
+      font-family: 'Myriad400';
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
+    }
+  }
 
   &__title {
     margin-bottom: 3px;

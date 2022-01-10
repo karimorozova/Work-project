@@ -12,6 +12,34 @@
         @close="closeModal"
       )
 
+    .job-files__table(v-if="jobFilesFake.length")
+      DataTable(
+        :fields="fields"
+        :tableData="jobFilesFake"
+        :bodyClass="[{ 'tbody_visible-overflow': jobFiles.length < 6 }]",
+        :tableheadRowClass="[{ 'tbody_visible-overflow': jobFiles.length < 6 }]",
+        bodyRowClass="cursor-default"
+      )
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          span.job-files__label {{ field.label }}
+
+        template(slot="fileName" slot-scope="{ row, index }")
+          span.job-files__name(:class="{'job-files_break-word': row.fileName.length > 40}") {{ row.fileName }}
+
+        template(slot="category" slot-scope="{ row, index }")
+          span.job-files__data {{ row.category }}
+        template(slot="progress" slot-scope="{ row, index }")
+          .job-files__progress(v-if="row.category === 'Source file' && isCAT")
+            ProgressLine(:progress="getProgress(row)")
+
+        template(slot="source" slot-scope="{ row, index }")
+          .job-files_flex-centered -
+
+        template(slot="editor" slot-scope="{ row, index }")
+          .job-files__editor(v-if="isEditor && row.category === 'Source file'")
+            span.icon-editor(@click="goToMemoqEditor(row)")
+              i.fas.fa-external-link-alt
+
     .job-files__table(v-if="jobFiles.length")
       DataTable(
         :fields="fields"
@@ -20,18 +48,9 @@
         :tableheadRowClass="[{ 'tbody_visible-overflow': jobFiles.length < 6 }]",
         bodyRowClass="cursor-default"
       )
-        template(slot="headerFileName" slot-scope="{ field }")
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
           span.job-files__label {{ field.label }}
-        template(slot="headerCategory" slot-scope="{ field }")
-          span.job-files__label {{ field.label }}
-        template(slot="headerProgress" slot-scope="{ field }")
-          span.job-files__label {{ field.label }}
-        template(slot="headerSource" slot-scope="{ field }")
-          span.job-files__label {{ field.label }}
-        template(slot="headerTarget" slot-scope="{ field }")
-          span.job-files__label {{ field.label }}
-        template(slot="headerEditor" slot-scope="{ field }")
-          span.job-files__label {{ field.label }}
+
         template(slot="fileName" slot-scope="{ row, index }")
           span.job-files__name(:class="{'job-files_break-word': row.fileName.length > 40}") {{ row.fileName }}
         template(slot="category" slot-scope="{ row, index }")
@@ -54,8 +73,6 @@
           .job-files__editor(v-if="isEditor && row.category === 'Source file'")
             span.icon-editor(@click="goToMemoqEditor(row)")
               i.fas.fa-external-link-alt
-            //img.job-files__icon(src="../../../assets/images/goto-editor.png" @click="goToMemoqEditor(row)")
-
 </template>
 
 <script>
@@ -68,13 +85,12 @@ export default {
   data() {
     return {
       jobFiles: [],
+      jobFilesFake: [],
       fields: [
         { label: "File Name", headerKey: "headerFileName", key: "fileName", width: "45.9%", padding: 0 },
-        // { label: "File Name", headerKey: "headerFileName", key: "fileName", width: "35.8%", padding: 0 },
         { label: "Category", headerKey: "headerCategory", key: "category", width: "17.5%", padding: 0 },
         { label: "Progress", headerKey: "headerProgress", key: "progress", width: "17.5%", padding: 0 },
         { label: "Source", headerKey: "headerSource", key: "source", width: "10.1%", padding: 0 },
-        // { label: "Target", headerKey: "headerTarget", key: "target", width: "10.1%", padding: 0 },
         { label: "Editor", headerKey: "headerEditor", key: "editor", width: "9%", padding: 0 }
       ],
       domain: "",
@@ -118,10 +134,7 @@ export default {
     },
     getMemoqFilesProgress(fileName) {
       if (this.job.status !== 'Completed') {
-        const docId = this.job.memoqDocIds.find(item => {
-          console.log(this.job.progress[item].fileName, fileName)
-          return this.job.progress[item].fileName === fileName
-        })
+        const docId = this.job.memoqDocs.find(item => item.DocumentName === fileName).DocumentGuid
         const value = (100 * this.job.progress[docId].wordsDone / this.job.progress[docId].totalWordCount).toFixed(2)
         return +value
       } else if (this.job.status === 'Completed') {
@@ -135,9 +148,18 @@ export default {
     },
     fillJobFiles() {
       if ((this.job.prevStep.hasOwnProperty("status") && this.job.prevStep.status === "Completed") && !this.job.memoqDocs.length) {
-        this.jobFiles.push(...this.jobFilesFiller(this.job.targetFiles.map(({path}) => './dist'+ path), "Source file"))
-      }else{
-        this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
+        this.jobFiles.push(...this.jobFilesFiller(this.job.targetFiles.map(({ path }) => './dist' + path), "Source file"))
+      } else {
+        if (!this.job.sourceFiles.length) {
+          this.job.memoqDocs.forEach(elem => {
+            this.jobFilesFake.push({
+              fileName: elem.DocumentName,
+              category: 'Source file'
+            })
+          })
+        } else {
+          this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))
+        }
       }
       // if ((this.job.prevStep === false || this.job.prevStep.status === 'Cancelled Halfway' || this.job.prevStep.status === 'Cancelled') && this.job.memoqDocs.length) {
       //   this.jobFiles.push(...this.jobFilesFiller(this.job.sourceFiles, "Source file"))

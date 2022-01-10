@@ -1,4 +1,6 @@
-const { Projects, Clients, CurrencyRatio, ClientRequest } = require('../models')
+const fs = require('fs')
+const moment = require('moment')
+const { Projects, Clients, CurrencyRatio, ClientRequest, Languages, Units, Step, Services } = require('../models')
 const { getProject } = require('./getProjects')
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon')
 const { storeFiles } = require('./files')
@@ -11,15 +13,16 @@ const {
 	getClientRequestAfterUpdate,
 	getClientRequestById
 } = require('../clientRequests')
-const fs = require('fs')
-const { createMemoqProjectWithTemplate, getProjectTranslationDocs } = require('../services/memoqs/projects')
+const {
+	createMemoqProjectWithTemplate,
+	getProjectTranslationDocs,
+	getMemoqAllProjects
+} = require('../services/memoqs/projects')
+
 const { addProjectFile } = require('../services/memoqs/files')
 const { assignProjectManagers } = require('./updates')
-// const { updateProjectMetricsAndCreateSteps } = require('./metrics')
-// const { updateProjectCosts } = require('../сalculations/wordcount')
-
-const moment = require('moment')
 const { createTasksForWordcount } = require("./taskForWordcount")
+const { log } = require("nodemon/lib/utils")
 
 
 async function createProject(project, user) {
@@ -41,7 +44,6 @@ async function createProject(project, user) {
 		project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id
 		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id
-		// project.paymentProfile = project.clientBillingInfo.paymentType
 		project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
 		project.discounts = discounts
 		project.minimumCharge = { value: minPrice, toIgnore: false }
@@ -352,12 +354,95 @@ const autoCreatingTranslationTaskInProject = async (project, requestId, creatorU
 
 		const listProjectTranslationDocuments = await getProjectTranslationDocs(tasksInfo.memoqProjectId)
 		await createTasksForWordcount({ ...tasksInfo, docs: listProjectTranslationDocuments })
-
 		// const tasks = await createTasksForWordcount(tasksInfo, listProjectTranslationDocuments)
 		// let updatedProject = await updateProjectMetricsAndCreateSteps(_id, tasks)
 		// updatedProject = await updateProjectCosts(updatedProject)
 	}
+}
 
+const autoCreatingTranslationTaskInProjectByMemoqLink = async ({ memoqLink, projectId, memoqWorkFlow, creatorUserId, internalProjectId, startDate, deadline }) => {
+	const allLanguages = await Languages.find()
+	const allSteps = await Step.find()
+	const allServices = await Services.find()
+	const allUnits = await Units.find()
+
+	const memoqProjects = await getMemoqAllProjects()
+	const currentProject = memoqProjects.find(item => item.Name === memoqLink)
+
+	if (!memoqProjects.length || !currentProject) return getError('No such project found on Memoq.')
+	const { ServerProjectGuid, SourceLanguageCode: sourceLanguage, TargetLanguageCodes } = currentProject
+	const documents = await getProjectTranslationDocs(ServerProjectGuid)
+
+	const targetLanguages = Array.isArray(documents)
+			? Object.values(TargetLanguageCodes).filter(item => Array.isArray(item))[0]
+			: [ TargetLanguageCodes['a:string'] ]
+
+	const isDocuments = Array.isArray(documents)
+			? !!documents.length
+			: !!Object.keys(documents).length
+
+	if (!isDocuments) return getError('No such files or documents found on Memoq.')
+
+	const tasksInfo = {
+		docs: documents,
+		source: allLanguages.find(item => item.memoq === sourceLanguage),
+		targets: targetLanguages.map(item => allLanguages.find(elem => elem.memoq === item)),
+		service: allServices.find(item => item.title === 'Translation'),
+		stepsAdditions: [],
+		projectId,
+		internalProjectId,
+		refFiles: [],
+		translateFiles: [],
+		memoqFiles: [],
+		stepsAndUnits: generateStepsAndUnits(),
+		memoqProjectId: ServerProjectGuid
+	}
+
+	try {
+		const updatedProject = await createTasksForWordcount(tasksInfo)
+		return {
+			status: 'success',
+			data: updatedProject
+		}
+	} catch (err) {
+		return getError('Error on creation T&S.')
+	}
+
+	function generateStepsAndUnits() {
+		let receivables, payables, basic
+		receivables = payables = {
+			unit: allUnits.find(item => item.type === 'CAT Wordcount'),
+			quantity: 0
+		}
+		basic = {
+			start: startDate,
+			deadline,
+			receivables,
+			payables
+		}
+		switch (memoqWorkFlow) {
+			case 'Translation & Revising':
+				return [ {
+					step: allSteps.find(item => item.title === 'Translation'),
+					...basic
+				}, {
+					step: allSteps.find(item => item.title === 'Revising'),
+					...basic
+				} ]
+			case 'Translation Only':
+				return [ {
+					step: allSteps.find(item => item.title === 'Translation'),
+					...basic
+				} ]
+		}
+	}
+
+	function getError(message) {
+		return {
+			status: 'error',
+			message: message
+		}
+	}
 }
 
 module.exports = {
@@ -367,5 +452,6 @@ module.exports = {
 	createTasks,
 	createRequestTasks,
 	createProjectFromRequest,
-	autoCreatingTaskInProject
+	autoCreatingTaskInProject,
+	autoCreatingTranslationTaskInProjectByMemoqLink
 }

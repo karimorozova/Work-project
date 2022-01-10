@@ -341,7 +341,8 @@ async function getProjectTranslationDocs(memoqProjectId) {
 	} catch (err) {
 		console.log("Error in getProjectTranslationDocs")
 		console.log(err)
-		throw new Error(err.message)
+		return undefined
+		// throw new Error(err.message)
 	}
 }
 

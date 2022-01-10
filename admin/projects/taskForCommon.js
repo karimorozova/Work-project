@@ -1,7 +1,5 @@
 const { updateProject, getProject } = require("./getProjects")
-// const { getFittingVendor, checkIsSameVendor } = require('../сalculations/vendor')
-const { getStepFinanceData, getNewStepFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../сalculations/finance')
-// const { gatherServiceStepInfo } = require('./helpers')
+const { getNewStepFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../сalculations/finance')
 const ObjectId = require('mongodb').ObjectID
 
 async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
@@ -128,62 +126,5 @@ async function generateStepsForCustomUnits({ tasks, stepsAdditions }) {
 	}
 	return { steps, additions }
 }
-
-// async function getStepsForUnits(type, allInfo) {
-// 	const { tasks, stepsAndUnits, stepsDates, industry, customer, discounts, projectId } = allInfo
-// 	const steps = []
-//
-// 	// for (let i = 0; i < tasks.length; i++) {
-// 	// 	const task = tasks.length > 1 ? tasks[i] : tasks[0]
-// 	//
-// 	// 	const firstStepId = `${ task.taskId } ${ i + 1 < 10 ? `S0${ i + 1 }` : `S${ i + 1 }` }`
-// 	// 	const firstStep = await generateStepForCustomTasks(stepsAndUnits[0], task, firstStepId)
-// 	//
-// 	// 	if (type === 'Duo') {
-// 	// 		const secondStepId = `${ task.taskId } ${ i + 2 < 10 ? `S0${ i + 2 }` : `S${ i + 2 }` }`
-// 	// 		const secondStep = await generateStepForCustomTasks(stepsAndUnits[1], task, secondStepId)
-// 	// 		steps.push(firstStep, secondStep)
-// 	// 	} else {
-// 	// 		steps.push(firstStep)
-// 	// 	}
-// 	// }
-//
-// 	return steps
-//
-// 	async function generateStepForCustomTasks(serviceStep, task, stepId) {
-// 		// serviceStep = await gatherServiceStepInfo(serviceStep)
-// 		// const { title, step } = serviceStep
-// 		// const { sourceLanguage, targetLanguage } = task
-// 		// const stepName = title
-// 		// const vendorId = await getFittingVendor({ sourceLanguage, targetLanguage, step, industry })
-//
-// 		// const key = serviceStep.hasOwnProperty('quantity') ? 'quantity' : 'hours'
-// 		const quantity = { receivables: serviceStep[key], payables: serviceStep[key] }
-//
-// 		const { finance, clientRate, vendorRate, vendor, defaultStepPrice, nativeFinance, nativeVendorRate } =
-// 				await getStepFinanceData({ customer, industry, serviceStep, task, vendorId, quantity, discounts, projectId })
-//
-// 		return {
-// 			...task,
-// 			stepId,
-// 			serviceStep,
-// 			name: stepName,
-// 			start: stepsDates[0].start,
-// 			deadline: stepsDates[0].deadline,
-// 			size: serviceStep.size || 1,
-// 			vendor: ObjectId(vendor),
-// 			vendorRate,
-// 			clientRate,
-// 			finance,
-// 			defaultStepPrice,
-// 			progress: 0,
-// 			vendorsClickedOffer: [],
-// 			isVendorRead: false,
-// 			nativeFinance,
-// 			nativeVendorRate,
-// 			stepsAndUnits
-// 		}
-// 	}
-// }
 
 module.exports = { createTasksAndStepsForCustomUnits }

@@ -61,7 +61,8 @@ const {
 	updateRequestTasks,
 	createProjectFromRequest,
 	autoCreatingTaskInProject,
-	autoCreatingTranslationTaskInProject
+	autoCreatingTranslationTaskInProject,
+	autoCreatingTranslationTaskInProjectByMemoqLink
 } = require('./create')
 
 
@@ -69,14 +70,8 @@ const {
 	createTasksForWordcount
 } = require('./taskForWordcount')
 
-// const {
-// 	getProjectWithUpdatedFinance
-// } = require('./metrics')
-
 const {
 	getProjectAfterFinanceUpdated,
-	// addPaymentAdditions,
-	// deletePaymentAddition,
 } = require('./porjectFinance')
 
 const {
@@ -106,7 +101,10 @@ const {
 	manageProjectName
 } = require('./helpers')
 
+
+//EXPORT  =============================>
 module.exports = {
+	autoCreatingTranslationTaskInProjectByMemoqLink,
 	getProjectForClientPortal,
 	setApprovedStepStatus,
 	getProjectsForVendorPortal,
@@ -152,7 +150,6 @@ module.exports = {
 	createProject,
 	createTasks,
 	taskCompleteNotifyPM,
-	// getProjectWithUpdatedFinance,
 	updateProjectProgress,
 	updateWithApprovedTasks,
 	getAfterReopenSteps,
@@ -182,6 +179,4 @@ module.exports = {
 	changeNameLang,
 	getProjectsForPortalAll,
 	getProjectsForPortalList,
-	// addPaymentAdditions,
-	// deletePaymentAddition,
 }
