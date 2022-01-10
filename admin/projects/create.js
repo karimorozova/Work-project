@@ -373,9 +373,11 @@ const autoCreatingTranslationTaskInProjectByMemoqLink = async ({ memoqLink, proj
 	const { ServerProjectGuid, SourceLanguageCode: sourceLanguage, TargetLanguageCodes } = currentProject
 	const documents = await getProjectTranslationDocs(ServerProjectGuid)
 
-	const targetLanguages = Array.isArray(documents)
-			? Object.values(TargetLanguageCodes).filter(item => Array.isArray(item))[0]
+	let targetLanguages = Array.isArray(documents)
+			? Object.values(TargetLanguageCodes)[1]
 			: [ TargetLanguageCodes['a:string'] ]
+
+	if (!Array.isArray(targetLanguages)) targetLanguages = [ targetLanguages ]
 
 	const isDocuments = Array.isArray(documents)
 			? !!documents.length
