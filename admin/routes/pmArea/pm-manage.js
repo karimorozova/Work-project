@@ -46,7 +46,8 @@ const {
 	autoCreatingTranslationTaskInProject,
 	cancelProjectInMemoq,
 	updateWithApprovedTasks,
-	autoCreatingTranslationTaskInProjectByMemoqLink
+	autoCreatingTranslationTaskInProjectByMemoqLink,
+	autoCreatingTranslationTaskInProjectByXTMFile
 } = require('../../projects')
 
 const {
@@ -145,6 +146,26 @@ router.post('/build-TnS-from-memoq-link', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('/build-TnS-from-memoq-link')
+	}
+})
+
+
+router.post('/build-TnS-from-xtm-file', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	const { projectId, internalProjectId, startDate, deadline } = req.body
+	const { file } = req.files
+	try {
+		const result = await autoCreatingTranslationTaskInProjectByXTMFile({ projectId, internalProjectId, startDate, deadline, file: file[0] })
+		fs.access(file[0].path, (error) => {
+			if (!error) {
+				fs.unlink(file[0].path, (err) => {
+					if (err) return console.log(err)
+				})
+			}
+		})
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
 	}
 })
 

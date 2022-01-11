@@ -9,6 +9,21 @@
         @setTab="setTab"
       )
 
+    .option(v-if="selectedTab === 'XTM'")
+      .taskData
+        .taskData__xtm
+          .taskData__xtm-title XTM File:
+          .taskData__xtm-input(v-if="!xtmFile")
+            UploadFileButton
+              input.xtm-file-input(type="file" @change='uploadXTMFile' :multiple='false')
+
+          .taskData__xtm-fileWrapper(v-else)
+            .taskData__xtm-fileName {{ xtmFile }}
+            .taskData__xtm-removeFile( @click="removeXTMFile") &#215;
+
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksXTM")
+
     .option(v-if="selectedTab === 'Memoq'" )
       .taskData
         .taskData__memoqLink
@@ -81,6 +96,7 @@ import Button from "../../Button"
 import ValidationErrors from "../../ValidationErrors"
 import { clearTasksData } from "../../../vuex/pmarea/actions"
 import Tabs from "../../Tabs"
+import UploadFileButton from "../../UploadFileButton"
 
 export default {
   name: "NewTasksData",
@@ -94,12 +110,14 @@ export default {
   },
   data() {
     return {
-      // tabs: [ 'Classic', 'Memoq', 'XTM' ],
-      tabs: [ 'Classic', 'Memoq' ],
+      tabs: [ 'Classic', 'Memoq', 'XTM' ],
       selectedTab: 'Classic',
 
       memoqLink: '',
       selectedMemoqWorkflow: '',
+
+      xtmFile: '',
+      xtmFileData: null,
 
       allServices: [],
       templates: [],
@@ -114,11 +132,50 @@ export default {
     this.setDataValue({})
   },
   methods: {
+    removeXTMFile() {
+      let inputFiles = document.querySelectorAll('.xtm-file-input')
+      for (let elem of inputFiles) elem.value = ''
+      this.xtmFile = ''
+      this.xtmFileData = null
+    },
+    uploadXTMFile(e) {
+      const file = Array.from(e.target.files)[0]
+      this.xtmFile = file.name
+      this.xtmFileData = file
+    },
     setTab({ index }) {
       this.selectedTab = this.tabs[index]
     },
     setMemoqWorkflow({ option }) {
       this.selectedMemoqWorkflow = option
+    },
+    async saveTasksChecksXTM() {
+      this.errors = []
+      if (!this.xtmFile) this.errors.push('Please upload a XTM file.')
+      if (this.errors.length) {
+        this.IsErrorModal = true
+        return
+      }
+      this.isDisabledSaveButton = true
+      const { _id: projectId, projectId: internalProjectId, startDate, deadline } = this.currentProject
+      const formData = new FormData()
+      formData.append('file', this.xtmFileData)
+      formData.append('projectId', projectId)
+      formData.append('internalProjectId', internalProjectId)
+      formData.append('startDate', startDate)
+      formData.append('deadline', deadline)
+
+      const res = await this.$http.post(`/pm-manage/build-TnS-from-xtm-file`, formData)
+      const { data } = res
+      if (data.status === 'success') {
+        const { data: project } = data
+        await this.setCurrentProject(project)
+        this.$parent.toggleTaskData()
+        this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
+      } else {
+        this.alertToggle({ message: data.message, isShow: true, type: "error" })
+      }
+      this.isDisabledSaveButton = false
     },
     async saveTasksChecksMemoq() {
       this.errors = []
@@ -402,7 +459,7 @@ export default {
   destroyed() {
     this.clearTasksData()
   },
-  components: { Tabs, ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
+  components: { UploadFileButton, Tabs, ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }
 
 </script>
@@ -419,6 +476,48 @@ export default {
   border: 1px solid $light-border;
   padding: 25px;
   margin-bottom: 30px;
+
+  &__xtm {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+
+    &-fileWrapper {
+      height: 30px;
+      padding: 0 7px;
+      display: flex;
+      border: 1px solid $border;
+      align-items: center;
+      gap: 5px;
+      border-radius: 4px;
+    }
+
+    &-fileName {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 260px;
+      opacity: 0.5;
+    }
+
+    &-removeFile {
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
 
   &__memoqLink {
     display: flex;

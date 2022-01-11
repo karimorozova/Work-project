@@ -1,11 +1,13 @@
 const fs = require('fs')
 const moment = require('moment')
+const { XTMLanguageReplacer } = require('../enums')
 const { Projects, Clients, CurrencyRatio, ClientRequest, Languages, Units, Step, Services } = require('../models')
 const { getProject } = require('./getProjects')
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon')
 const { storeFiles } = require('./files')
 const { getModifiedFiles, createProjectFolder } = require('./helpers')
 const { calculateCrossRate } = require('../helpers/commonFunctions')
+const readXlsxFile = require('read-excel-file/node')
 const {
 	storeRequestFilesForTasksAndSteps,
 	getTaskCopiedFiles,
@@ -447,6 +449,94 @@ const autoCreatingTranslationTaskInProjectByMemoqLink = async ({ memoqLink, proj
 	}
 }
 
+const autoCreatingTranslationTaskInProjectByXTMFile = async ({ projectId, internalProjectId, startDate, deadline, file }) => {
+	const allLanguages = await Languages.find()
+	const allSteps = await Step.find()
+	const allServices = await Services.find()
+	const allUnits = await Units.find()
+	let fileData
+	try {
+		fileData = await readXlsxFile(file.path)
+	} catch (err) {
+		return getError('Error on parsing file.')
+	}
+
+	let source, targets
+	const metrics = []
+
+	fileData.forEach((element, index, array) => {
+		if (element.includes('Source language')) source = element[3]
+		if (element.includes('Target languages')) targets = element[3].split(',').map(i => i.trim())
+		if (element.includes('Quantity - Words') && element.includes('Rate %')) {
+			const metricsArr = array.slice(index, index + 16)
+			metrics.push({ language: metricsArr[0][0].split(',')[0], langMetrics: metricsArr })
+		}
+	})
+
+	for await (let target of targets) {
+		const tasksInfo = {
+			service: allServices.find(item => item.title === 'Translation'),
+			source: findConcreteLanguage(source),
+			targets: [ findConcreteLanguage(target) ],
+			stepsAndUnits: generateStepsAndUnits(target),
+			sourceFiles: [],
+			refFiles: [],
+			stepsAdditions: [],
+			projectId,
+			internalProjectId
+		}
+		try {
+			await createTasksAndStepsForCustomUnits(tasksInfo)
+		} catch (err) {
+			return getError('Error on creation T&S.')
+		}
+	}
+
+	return {
+		status: 'success',
+		data: await getProject({ _id: projectId })
+	}
+
+	function generateStepsAndUnits(targetLanguage) {
+		let { langMetrics } = metrics.find(item => item.language === targetLanguage)
+		langMetrics = langMetrics.slice(2, 14)
+		const quantity = langMetrics.map(item => (+item[2] * +item[3]) / 100).reduce((acc, curr) => acc + curr, 0)
+
+		let receivables, payables, basic
+		receivables = payables = {
+			unit: allUnits.find(item => item.type === 'Source Word'),
+			quantity
+		}
+		basic = {
+			start: startDate,
+			deadline,
+			receivables,
+			payables
+		}
+		switch (true) {
+			case true:
+				return [ {
+					step: allSteps.find(item => item.title === 'Translation'),
+					...basic
+				} ]
+		}
+	}
+
+	function findConcreteLanguage(xtmLanguage) {
+		let replacer = XTMLanguageReplacer.find(item => item.xtm === xtmLanguage)
+		if (!replacer) replacer = allLanguages.find(item => item.lang === xtmLanguage)
+		if (!replacer) replacer = { lang: 'English (United Kingdom)' }
+		return allLanguages.find(item => item.lang === replacer.lang)
+	}
+
+	function getError(message) {
+		return {
+			status: 'error',
+			message: message
+		}
+	}
+}
+
 module.exports = {
 	autoCreatingTranslationTaskInProject,
 	updateRequestTasks,
@@ -455,5 +545,6 @@ module.exports = {
 	createRequestTasks,
 	createProjectFromRequest,
 	autoCreatingTaskInProject,
-	autoCreatingTranslationTaskInProjectByMemoqLink
+	autoCreatingTranslationTaskInProjectByMemoqLink,
+	autoCreatingTranslationTaskInProjectByXTMFile
 }
