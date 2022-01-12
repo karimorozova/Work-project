@@ -2,16 +2,28 @@
   .files-buttons
     Files
 
-    .files-buttons__upload(v-if="isFileUpload")
-      UploadDeliverable(
-        @setDeliverables="setDeliverables"
-        :job="job"
-      )
+    div(v-if="isFileUpload" )
+      .files-buttons__upload(v-if="!isWithoutFile")
+        UploadDeliverable(
+          @setDeliverables="setDeliverables"
+          :job="job"
+        )
+      .or(v-if="!isWithoutFile && !deliverables.length") OR
+      .other-option(v-if="!deliverables.length")
+        .other-option__splitter
+        .other-option__check
+          CheckBox(
+            :isChecked="isWithoutFile"
+            @check="(e) => toggleFile(e, true)"
+            @unCheck="(e) => toggleFile(e, false)"
+          )
+        span.other-option__text Close without files
+
 
     .files-buttons__terms(v-if="job.status !== 'Completed' && job.status !== 'Request Sent' ")
       TermsAgree(v-if="job._id" :job="job")
 
-    .files-buttons__buttons(v-if="deliverables.length || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
+    .files-buttons__buttons(v-if="deliverables.length || isWithoutFile || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
 
       .files-buttons__button(v-if="isStartButton")
         Button(value="Start" :isDisabled="!job.isVendorRead" @makeAction="startJob")
@@ -32,6 +44,7 @@
 <script>
 import Files from "../../../components/details/Files"
 import { mapActions, mapGetters } from "vuex"
+import CheckBox from "../../../../components/CheckBox"
 
 const TermsAgree = () => import("../../../components/details/TermsAgree")
 const UploadDeliverable = () => import("../../../components/details/UploadDeliverable")
@@ -42,6 +55,19 @@ export default {
     deliverables: {
       type: Array,
       default: () => []
+    },
+    isWithoutFile: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      icons: {
+        Approved: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
+        Rejected: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
+      },
+      emailAlert: false
     }
   },
   methods: {
@@ -51,6 +77,9 @@ export default {
       "alertToggle"
 
     ]),
+    toggleFile(e, bool) {
+      this.$emit("withoutFile", bool)
+    },
     closeEmailAlert() {
       this.emailAlert = false
     },
@@ -144,15 +173,7 @@ export default {
     },
     showModal() {
       this.$emit("showModal")
-    }
-  },
-  data() {
-    return {
-      icons: {
-        Approved: { icon: require("../../../../assets/images/Approve-icon.png"), active: true },
-        Rejected: { icon: require("../../../../assets/images/Reject-icon.png"), active: true }
-      },
-      emailAlert: false
+      this.$emit("withoutFile", this.isWithoutFile)
     }
   },
   computed: {
@@ -190,12 +211,13 @@ export default {
         const statusWord = title === 'Translation' ? 'Translation' : 'Review1'
         const notFinishedStatus = this.job.memoqDocs.find(item => item.WorkflowStatus.indexOf(statusWord) !== -1)
         return this.progress >= 100 && !notFinishedStatus && this.job.status !== 'Ready to Start'
+      } else {
+        return !!this.deliverables.length || this.isWithoutFile
       }
-      return !!this.deliverables.length
-
     }
   },
   components: {
+    CheckBox,
     Files,
     TermsAgree,
     UploadDeliverable,
@@ -206,6 +228,21 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors.scss";
+
+.other-option {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.or {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
 
 .files-buttons {
   display: flex;

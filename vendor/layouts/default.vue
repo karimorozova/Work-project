@@ -40,15 +40,15 @@ input::-webkit-input-placeholder {
   opacity: 0.5;
 }
 
-::-moz-selection { /* Code for Firefox */
-  color: $text;
-  background: #F5C653AA;
-}
-
-::selection {
-  color: $text;
-  background: #F5C653;
-}
+//::-moz-selection { /* Code for Firefox */
+//  color: $text;
+//  background: #F5C653AA;
+//}
+//
+//::selection {
+//  color: $text;
+//  background: #F5C653;
+//}
 
 .slide-fade-enter-active {
   transition: all .5s ease;

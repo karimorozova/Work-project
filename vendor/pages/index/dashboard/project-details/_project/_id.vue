@@ -16,6 +16,8 @@
           :deliverables="targetFiles"
           @showModal="showModal"
           @setDeliverables="setDeliverables"
+          :isWithoutFile="isWithoutFile"
+          @withoutFile="withoutFile"
         )
 
       .details__modal(v-if="isApproveModal")
@@ -50,7 +52,8 @@ export default {
       message: "",
       project: null,
       currentStep: {},
-      currentTask: {}
+      currentTask: {},
+      isWithoutFile: false
     }
   },
   methods: {
@@ -83,6 +86,9 @@ export default {
       } catch (e) {
       }
     },
+    withoutFile(isWithoutFile) {
+      this.isWithoutFile = isWithoutFile
+    },
     showModal() {
       this.isApproveModal = true
     },
@@ -110,6 +116,8 @@ export default {
         this.setCurrentJob()
         this.targetFiles = []
       } catch (err) {
+      } finally {
+        this.isWithoutFile = false
       }
     },
     async refreshProgress() {
