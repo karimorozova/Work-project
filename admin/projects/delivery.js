@@ -605,10 +605,10 @@ const changeManagersDR1 = async ({ projectId, checkedTasksId, manager }) => {
 
 const saveCertificateTODR1Files = async (project, type, deliveryData) => {
 	const additionFileInfo = `${ Math.floor(Math.random() * 1000000) }`
-	const fileName = `${ additionFileInfo }-certificate.pdf`
+	const fileName = `${ additionFileInfo }-alpha-certificate.pdf`
 	const newPath = `/projectFiles/${ project._id }/${ fileName }`
 	try {
-		await moveFile({ path: './dist/uploads/certificatePdf.pdf' }, `./dist${ newPath }`)
+		await moveFile({ path: './dist/uploads/preCertificatePdf.pdf' }, `./dist${ newPath }`)
 
 		if (type === 'single') {
 			const allLanguages = await Languages.find()

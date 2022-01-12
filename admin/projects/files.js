@@ -199,19 +199,19 @@ const generateAndSaveCertificate = async ({ project, tasks, deliveryData }) => {
 		htmlToPdf.create(
 				template,
 				{
-						type: 'pdf',
-						width: '814',
-						height: '1054',
-						orientation: "landscape",
-						base: apiUrl,
-						border: 0
+					type: 'pdf',
+					width: '814',
+					height: '1054',
+					orientation: "landscape",
+					base: apiUrl,
+					border: 0
 				})
-				.toFile('./dist/uploads/certificatePdf.pdf', function (err, res) {
+				.toFile('./dist/uploads/preCertificatePdf.pdf', function (err, res) {
 					if (err) {
 						console.log(err)
 						reject(err)
 					}
-					resolve('./dist/uploads/certificatePdf.pdf')
+					resolve('./dist/uploads/preCertificatePdf.pdf')
 				})
 	})
 }
