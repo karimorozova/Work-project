@@ -25,6 +25,9 @@
                 .d-row
                   .d-key Deadline:
                   .d-val {{ customFormatter(currentProject.deadline) }}
+                .d-row(v-if="currentProject.PO" )
+                  .d-key PO:
+                  .d-val {{ currentProject.PO }}
 
           .details__steps
             .details__steps-title Jobs:
@@ -164,6 +167,9 @@
                 .d-row
                   .d-key Deadline:
                   .d-val {{ customFormatter(currentProject.deadline) }}
+                .d-row(v-if="currentProject.PO" )
+                  .d-key PO:
+                  .d-val {{ currentProject.PO }}
 
           .details__steps
             .details__title Incoming Jobs:

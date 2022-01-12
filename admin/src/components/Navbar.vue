@@ -6,9 +6,6 @@
       .navbar__menu
         Menu(:elements="elements" :path='path')
       .navbar__name
-        transition(name="fade")
-          .navbar__name-spinner(v-if="!!currentRequests")
-            .spinner1.spinner-1
         .navbar__name-title ADMIN PORTAL
 
     .content(v-if="user._id")
@@ -541,22 +538,11 @@ export default {
 
   &__name {
     text-align: center;
-    font-size: 22px;
-    font-family: Myriad300;
+    font-size: 19px;
     border-top: 1px solid $border;
-    padding-top: 22px;
+    padding-top: 26px;
     cursor: default;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    color: $border;
     position: relative;
-
-    &-spinner {
-      position: absolute;
-      left: 114px;
-      top: 15px;
-    }
   }
 
   &__menu {
@@ -596,65 +582,4 @@ export default {
   opacity: 0;
 }
 
-.spinner1 {
-  position: relative;
-  width: 42px;
-  height: 42px;
-
-  &:before,
-  &:after {
-    content: "";
-    display: block;
-    position: absolute;
-    border-width: 3px;
-    border-style: solid;
-    border-radius: 50%;
-  }
-}
-
-.spinner1.spinner-1 {
-  @keyframes rotate-animation {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes anti-rotate-animation {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(-360deg);
-    }
-  }
-
-  &:before {
-    width: 36px;
-    height: 36px;
-    border-bottom-color: $green;
-    border-right-color: $green;
-    border-top-color: rgba(red, 0);
-    border-left-color: rgba(red, 0);
-    top: 0px;
-    left: 0px;
-    animation: rotate-animation 1s linear 0s infinite;
-  }
-
-  &:after {
-    width: 18px;
-    height: 18px;
-    border-bottom-color: $red;
-    border-right-color: $red;
-    border-top-color: rgba(red, 0);
-    border-left-color: rgba(red, 0);
-    top: (36px - 18px) / 2;
-    left: (36px - 18px) / 2;
-    animation: anti-rotate-animation 0.85s linear 0s infinite;
-  }
-}
 </style>

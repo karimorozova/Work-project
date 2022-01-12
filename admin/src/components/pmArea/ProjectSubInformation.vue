@@ -42,13 +42,31 @@
       .row__data {{ (project.clientBillingInfo && project.clientBillingInfo.paymentType) || '' }}
 
     .sub-information__row
-      .row__title Payment Status:
-      .row__data(v-if="project.isPaid") Paid
-      .row__data(v-else) Soon ...
+      .row__title PO:
+      .row__dataFlex
+        CheckBox(
+          :isChecked="isOpenPOInput || !!project.PO",
+          :isDisabled="!!project.PO"
+          @check="() => togglePOInput(true)",
+          @uncheck="() => togglePOInput(false)"
+        )
+        input(
+          v-if="isOpenPOInput || !!project.PO"
+          :value="project.PO || ''"
+          class="PO-input"
+          placeholder="Value"
+          @change="setPO"
+          @keyup.13="setPO"
+        )
 
-    .sub-information__row
-      .row__title Invoicing Report:
-      .row__data Soon ...
+    //.sub-information__row
+    //  .row__title Payment Status:
+    //  .row__data(v-if="project.isPaid") Paid
+    //  .row__data(v-else) Soon ...
+    //
+    //.sub-information__row
+    //  .row__title Invoicing Report:
+    //  .row__data Soon ...
 
     .client-table
       GeneralTable(
@@ -141,7 +159,8 @@ export default {
       isDeleting: false,
       currentActive: -1,
       isEditAndSend: false,
-      isHideForLoading: false
+      isHideForLoading: false,
+      isOpenPOInput: false
     }
   },
   methods: {
@@ -149,6 +168,12 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject"
     }),
+    async setPO(e) {
+      await this.setProjectProp({ prop: 'PO', value: e.target.value })
+    },
+    togglePOInput() {
+      this.isOpenPOInput = !this.isOpenPOInput
+    },
     async markAsPaid() {
       try {
         this.isHideForLoading = true
@@ -535,64 +560,6 @@ export default {
   width: 0;
 }
 
-//.checkbox {
-//  display: flex;
-//  height: 30px;
-//
-//  input[type="checkbox"] {
-//    opacity: 0;
-//
-//    + {
-//      label {
-//        &::after {
-//          content: none;
-//        }
-//      }
-//    }
-//
-//    &:checked {
-//      + {
-//        label {
-//          &::after {
-//            content: "";
-//          }
-//        }
-//      }
-//    }
-//  }
-//
-//  label {
-//    position: relative;
-//    display: inline-block;
-//    padding-left: 22px;
-//    padding-top: 4px;
-//
-//    &::before {
-//      position: absolute;
-//      content: "";
-//      display: inline-block;
-//      height: 16px;
-//      width: 16px;
-//      border: 1px solid $border;
-//      left: 0px;
-//      top: 3px;
-//    }
-//
-//    &::after {
-//      position: absolute;
-//      content: "";
-//      display: inline-block;
-//      height: 5px;
-//      width: 9px;
-//      border-left: 2px solid;
-//      border-bottom: 2px solid;
-//      transform: rotate(-45deg);
-//      left: 4px;
-//      top: 7px;
-//    }
-//  }
-//}
-
 .icon {
   display: flex;
   justify-content: center;
@@ -613,6 +580,23 @@ export default {
     &:hover {
       text-decoration: underline;
     }
+  }
+}
+
+.PO-input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  width: 100%;
+  height: 32px;
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
   }
 }
 </style>

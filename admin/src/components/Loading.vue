@@ -1,8 +1,8 @@
 <template lang="pug">
-.alert-message
-  .icon__loading
-    i.icon.fas.fa-ellipsis-h(aria-hidden="true")
-  .text Loading...
+  .alert-message
+    .icon__loading
+      i.icon(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
+    .text Loading...
 </template>
 
 <script>
@@ -20,6 +20,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '../assets/scss/colors';
+
 .alert-message {
   position: fixed;
   z-index: 90000;
@@ -35,7 +36,7 @@ export default {
 }
 
 .icon {
-  font-size: 15px;
+  font-size: 16px;
   background: $table-list;
   height: 25px;
   width: 25px;

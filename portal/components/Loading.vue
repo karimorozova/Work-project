@@ -1,26 +1,27 @@
 <template lang="pug">
-.loading
-  transition(name="slide-fade")
-    .alert-message(v-show="!!currentRequests")
-      .myIcon.myIcon__loading
-        i.fas.fa-ellipsis-h(aria-hidden="true")
-      .text Loading
+  .loading
+    transition(name="slide-fade")
+      .alert-message(v-show="!!currentRequests")
+        .myIcon.myIcon__loading
+          i(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
+        .text Loading
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from "vuex"
 
 export default {
   computed: {
     ...mapGetters({
-      currentRequests: "getRequestsCount",
-    }),
-  },
-};
+      currentRequests: "getRequestsCount"
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 @import "../assets/scss/colors";
+
 .alert-message {
   position: fixed;
   z-index: 90000;
@@ -46,7 +47,7 @@ export default {
 
   &__loading {
     color: $dark-border;
-    font-size: 15px !important;
+    font-size: 16px !important;
   }
 }
 
@@ -62,5 +63,9 @@ export default {
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+
+.text {
+  letter-spacing: 0.2px;
 }
 </style>

@@ -102,7 +102,7 @@ async function getProjectsForPortalList(obj) {
 						"tasks.taskId": 1,
 						"tasks.status": 1,
 						"steps.taskId": 1,
-						"steps.finance.Price.receivables": 1,
+						"steps.finance.Price.receivables": 1
 					}
 			)
 					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
@@ -115,6 +115,7 @@ async function getProjectForClientPortal(obj) {
 				projectId: 1,
 				projectName: 1,
 				status: 1,
+				PO: 1,
 				"finance.Price.receivables": 1,
 				industry: 1,
 				startDate: 1,

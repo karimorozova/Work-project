@@ -2,7 +2,7 @@ const fs = require('fs')
 const moment = require('moment')
 const { XTMLanguageReplacer } = require('../enums')
 const { Projects, Clients, CurrencyRatio, ClientRequest, Languages, Units, Step, Services } = require('../models')
-const { getProject } = require('./getProjects')
+const { getProject, updateProject } = require('./getProjects')
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon')
 const { storeFiles } = require('./files')
 const { getModifiedFiles, createProjectFolder } = require('./helpers')
@@ -461,10 +461,11 @@ const autoCreatingTranslationTaskInProjectByXTMFile = async ({ projectId, intern
 		return getError('Error on parsing file.')
 	}
 
-	let source, targets
+	let source, targets, PO
 	const metrics = []
 
 	fileData.forEach((element, index, array) => {
+		if (element.includes('PO number')) PO = element[1]
 		if (element.includes('Source language')) source = element[3]
 		if (element.includes('Target languages')) targets = element[3].split(',').map(i => i.trim())
 		if (element.includes('Quantity - Words') && element.includes('Rate %')) {
@@ -494,7 +495,7 @@ const autoCreatingTranslationTaskInProjectByXTMFile = async ({ projectId, intern
 
 	return {
 		status: 'success',
-		data: await getProject({ _id: projectId })
+		data: await updateProject({ _id: projectId }, { PO })
 	}
 
 	function generateStepsAndUnits(targetLanguage) {

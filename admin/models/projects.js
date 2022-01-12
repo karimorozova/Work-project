@@ -42,6 +42,11 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	PO: {
+		type: String,
+		default: '',
+		trim: true
+	},
 	isUrgent: {
 		type: Boolean,
 		default: false

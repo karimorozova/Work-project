@@ -1,6 +1,6 @@
 const defaultLang = "English (United Kingdom)"
-module.exports = XTMLanguageReplacer = [
-	//
+const XTMLanguageReplacer = [
+
 	{ xtm: "Abkhazian", lang: defaultLang },
 
 	{ xtm: "Afar", lang: defaultLang },
@@ -581,3 +581,5 @@ module.exports = XTMLanguageReplacer = [
 
 	{ xtm: "Zulu (South Africa)", lang: "Zulu" }
 ]
+
+module.exports = XTMLanguageReplacer
