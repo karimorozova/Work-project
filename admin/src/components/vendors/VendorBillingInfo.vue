@@ -62,12 +62,20 @@
         .colRow
           .colRow__key Official Name:
           .colRow__value
-            input(:value='currentVendor.billingInfo.officialName' @change="(e) => changeBillingProp('officialName', e.target.value)")
+            input(
+              :value='currentVendor.billingInfo.officialName'
+              @change="(e) => changeBillingProp('officialName', e.target.value)"
+              @mouseleave="(e) => changeBillingProp('officialName', e.target.value)"
+            )
 
         .colRow
           .colRow__key Email:
           .colRow__value
-            input(:value='currentVendor.billingInfo.email' @change="(e) => changeBillingProp('email', e.target.value)")
+            input(
+              :value='currentVendor.billingInfo.email'
+              @change="(e) => changeBillingProp('email', e.target.value)"
+              @mouseleave="(e) => changeBillingProp('email', e.target.value)"
+            )
 
         .colRow
           .colRow__key Payment term:
@@ -84,7 +92,12 @@
         .addressRow
           .addressRow__key Address:
           .addressRow__value
-            textarea(:value="currentVendor.billingInfo.address" @change="(e) => changeBillingProp('address', e.target.value)")
+            textarea(
+              :value="currentVendor.billingInfo.address"
+              @change="(e) => changeBillingProp('address', e.target.value)"
+              @mouseleave="(e) => changeBillingProp('address', e.target.value)"
+              wrap="hard"
+            )
 
     .payment-methods
       .payment-methods__header
@@ -131,340 +144,340 @@
 </template>
 
 <script>
-	import CheckBox from "../CheckBox"
-	import SelectSingle from "../SelectSingle"
-	import { mapActions, mapGetters } from "vuex"
-	import Add from "../Add"
-	import Button from "../Button"
-	import ApproveModal from "../ApproveModal"
+import CheckBox from "../CheckBox"
+import SelectSingle from "../SelectSingle"
+import { mapActions, mapGetters } from "vuex"
+import Add from "../Add"
+import Button from "../Button"
+import ApproveModal from "../ApproveModal"
 
-	export default {
-		data() {
-			return {
-				paymentTerms: [],
-				paymentTypes: [ 'Bank Details', 'PayPal' ],
-				currentPaymentType: '',
-				isModal: false,
+export default {
+  data() {
+    return {
+      paymentTerms: [],
+      paymentTypes: [ 'Bank Details', 'PayPal' ],
+      currentPaymentType: '',
+      isModal: false,
 
-				paypalType: {},
-				bankType: {},
-				editingIndex: null,
-				deletingIndex: null,
-				isDeletingModal: false
-			}
-		},
-		methods: {
-			...mapActions({
-				updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo',
-				alertToggle: 'alertToggle',
-				storeCurrentVendor: "storeCurrentVendor"
-			}),
-			async manageModalState() {
-				const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
-				Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
-				try {
-					const result = await this.$http.post("/vendorsapi/manage-payment-methods", {
-						index: this.editingIndex,
-						vendorId: this.$route.params.id,
-						paymentTypeObj: neededPaymentTypeObj
-					})
-					await this.storeCurrentVendor(result.data)
-				} catch (err) {
-					this.alertToggle({ message: "Error on updating payment methods", isShow: true, type: "error" })
-				} finally {
-					this.closeModal()
-				}
-			},
-			closeApproveModal() {
-				this.deletingIndex = null
-				this.isDeletingModal = false
-			},
-			openApproveModal(index) {
-				this.deletingIndex = index
-				this.isDeletingModal = true
-			},
-			async deletePaymentMethod() {
-				try {
-					const result = await this.$http.delete(`/vendorsapi/manage-payment-methods/${ this.$route.params.id }/${ this.deletingIndex }`)
-					await this.storeCurrentVendor(result.data)
-					this.alertToggle({ message: "Removed", isShow: true, type: "success" })
-				} catch (err) {
-					this.alertToggle({ message: "Error on removing!", isShow: true, type: "error" })
-				} finally {
-					this.closeModal()
-					this.closeApproveModal()
-				}
-			},
-			openModalForEdition(item, index) {
-				this.editingIndex = index
-				this.isModal = true
-				const { type, ...rest } = item
-				this.currentPaymentType = type
+      paypalType: {},
+      bankType: {},
+      editingIndex: null,
+      deletingIndex: null,
+      isDeletingModal: false
+    }
+  },
+  methods: {
+    ...mapActions({
+      updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo',
+      alertToggle: 'alertToggle',
+      storeCurrentVendor: "storeCurrentVendor"
+    }),
+    async manageModalState() {
+      const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
+      Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
+      try {
+        const result = await this.$http.post("/vendorsapi/manage-payment-methods", {
+          index: this.editingIndex,
+          vendorId: this.$route.params.id,
+          paymentTypeObj: neededPaymentTypeObj
+        })
+        await this.storeCurrentVendor(result.data)
+      } catch (err) {
+        this.alertToggle({ message: "Error on updating payment methods", isShow: true, type: "error" })
+      } finally {
+        this.closeModal()
+      }
+    },
+    closeApproveModal() {
+      this.deletingIndex = null
+      this.isDeletingModal = false
+    },
+    openApproveModal(index) {
+      this.deletingIndex = index
+      this.isDeletingModal = true
+    },
+    async deletePaymentMethod() {
+      try {
+        const result = await this.$http.delete(`/vendorsapi/manage-payment-methods/${ this.$route.params.id }/${ this.deletingIndex }`)
+        await this.storeCurrentVendor(result.data)
+        this.alertToggle({ message: "Removed", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Error on removing!", isShow: true, type: "error" })
+      } finally {
+        this.closeModal()
+        this.closeApproveModal()
+      }
+    },
+    openModalForEdition(item, index) {
+      this.editingIndex = index
+      this.isModal = true
+      const { type, ...rest } = item
+      this.currentPaymentType = type
 
-				item.type === 'PayPal'
-						? this.paypalType = { ...rest }
-						: this.bankType = { ...rest }
-			},
-			closeModal() {
-				this.editingIndex = null
-				this.isModal = false
-				this.currentPaymentType = ''
-				this.setDefaultPaymentObjectsState()
-			},
-			setPaymentType({ option }) {
-				this.currentPaymentType = option
-				this.setDefaultPaymentObjectsState()
-			},
-			setDefaultPaymentObjectsState() {
-				this.paypalType = {}
-				this.bankType = {}
-			},
-			changeBillingProp(key, value) {
-				this.updateCurrentVendorGeneralDataBillingInfo({ key, value })
-			},
-			toggleCheck(bool) {
-				if (bool) {
-					const { firstName, surname, email } = this.currentVendor
-					this.updateCurrentVendorGeneralDataBillingInfo({ key: 'officialName', value: `${ firstName } ${ surname || '' }` })
-					this.updateCurrentVendorGeneralDataBillingInfo({ key: 'email', value: `${ email }` })
-				}
-			},
-			async getAndSetPaymentTerms() {
-				try {
-					const result = await this.$http.get("/api-settings/payment-terms")
-					this.paymentTerms = result.data.filter(i => !!i.isActive)
-				} catch (err) {
-					this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
-				}
-			}
-		},
-		computed: {
-			...mapGetters({
-				currentVendor: "getCurrentVendorGeneralData",
-				currentFullVendor: "getCurrentVendor"
-			}),
-			isSameAsInGeneralInformation() {
-				if (this.currentVendor.hasOwnProperty('firstName')) {
-					const { firstName, surname, email, billingInfo } = this.currentVendor
-					const name = `${ firstName } ${ surname || '' }`
-					return name === billingInfo.officialName && email === billingInfo.email
-				}
-			}
-		},
-		created() {
-			this.getAndSetPaymentTerms()
-		},
-		components: { ApproveModal, Button, Add, CheckBox, SelectSingle }
+      item.type === 'PayPal'
+          ? this.paypalType = { ...rest }
+          : this.bankType = { ...rest }
+    },
+    closeModal() {
+      this.editingIndex = null
+      this.isModal = false
+      this.currentPaymentType = ''
+      this.setDefaultPaymentObjectsState()
+    },
+    setPaymentType({ option }) {
+      this.currentPaymentType = option
+      this.setDefaultPaymentObjectsState()
+    },
+    setDefaultPaymentObjectsState() {
+      this.paypalType = {}
+      this.bankType = {}
+    },
+    changeBillingProp(key, value) {
+      this.updateCurrentVendorGeneralDataBillingInfo({ key, value })
+    },
+    toggleCheck(bool) {
+      if (bool) {
+        const { firstName, surname, email } = this.currentVendor
+        this.updateCurrentVendorGeneralDataBillingInfo({ key: 'officialName', value: `${ firstName } ${ surname || '' }` })
+        this.updateCurrentVendorGeneralDataBillingInfo({ key: 'email', value: `${ email }` })
+      }
+    },
+    async getAndSetPaymentTerms() {
+      try {
+        const result = await this.$http.get("/api-settings/payment-terms")
+        this.paymentTerms = result.data.filter(i => !!i.isActive)
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
+      }
+    }
+  },
+  computed: {
+    ...mapGetters({
+      currentVendor: "getCurrentVendorGeneralData",
+      currentFullVendor: "getCurrentVendor"
+    }),
+    isSameAsInGeneralInformation() {
+      if (this.currentVendor.hasOwnProperty('firstName')) {
+        const { firstName, surname, email, billingInfo } = this.currentVendor
+        const name = `${ firstName } ${ surname || '' }`
+        return name === billingInfo.officialName && email === billingInfo.email
+      }
+    }
+  },
+  created() {
+    this.getAndSetPaymentTerms()
+  },
+  components: { ApproveModal, Button, Add, CheckBox, SelectSingle }
 
-	}
+}
 </script>
 
 <style scoped lang="scss">
-  @import "../../assets/scss/colors";
+@import "../../assets/scss/colors";
 
-  .hugeInput {
-    height: 39px;
-    width: 360px;
-    margin-bottom: 15px;
-    font-size: 16px;
+.hugeInput {
+  height: 39px;
+  width: 360px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.approve {
+  &__modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
+}
 
-  .wrapper {
-    position: relative;
-  }
+.item {
+  width: 307px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  margin-top: 20px;
+  border: 1px solid $light-border;
+  height: fit-content;
 
-  .approve {
-    &__modal {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-
-  .item {
-    width: 307px;
-    box-sizing: border-box;
-    border-radius: 4px;
-    margin-top: 20px;
-    border: 1px solid $light-border;
-    height: fit-content;
-
-    &__footer {
-      border-top: 1px solid $light-border;
-      padding: 6px 20px;
-      background: $table-list;
-      text-align: center;
-      color: #666;
-      font-family: 'Myriad300';
-      letter-spacing: 0.3px;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-
-    &__body {
-      padding: 6px 15px;
-      display: flex;
-      gap: 8px;
-    }
-
-    &__header {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid $border;
-      padding: 15px 15px 10px 15px;
-      margin-bottom: 10px;
-      min-height: 18px;
-
-      &--name {
-        font-size: 14px;
-        font-family: 'Myriad600';
-        width: 210px;
-      }
-
-      &--icons {
-        display: flex;
-        gap: 10px;
-      }
-
-      &--icon {
-        color: $border-focus;
-        font-size: 15px;
-        cursor: pointer;
-
-        &:hover {
-          color: $text;
-        }
-      }
-    }
-  }
-
-  .modalRow {
-    display: flex;
-    height: 32px;
-    align-items: center;
-    margin-bottom: 10px;
-
-    &__key {
-      width: 140px;
-    }
-  }
-
-  .payment-methods {
-    margin-top: 15px;
-    padding-top: 25px;
-    border-top: 1px solid $border;
-
-    &__modal {
-      padding: 20px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      box-shadow: $box-shadow;
-      z-index: 20;
-    }
-
-    &__body {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 19px;
-    }
-
-    &__header {
-      display: flex;
-      justify-content: space-between;
-
-      &--title {
-        font-size: 16px;
-        font-family: Myriad600;
-      }
-
-      &--add {
-        margin-top: -17px;
-      }
-    }
-  }
-
-  .billing-info {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .colRow {
-    display: flex;
-    margin-bottom: 15px;
-    align-items: center;
-    height: 32px;
-
-    &__value {
-      width: 220px;
-    }
-
-    &__key {
-      width: 210px;
-    }
-  }
-
-  .addressRow {
-    display: flex;
-    margin-top: 45px;
-
-    &__key {
-      width: 70px;
-      height: 20px;
-      margin-top: 6px;
-    }
-
-    &__value {
-      width: 320px;
-    }
-  }
-
-  .selectSingle {
-    width: 220px;
-    height: 32px;
-    position: relative;
-  }
-
-  input {
+  &__footer {
+    border-top: 1px solid $light-border;
+    padding: 6px 20px;
+    background: $table-list;
+    text-align: center;
+    color: #666;
+    font-family: 'Myriad300';
+    letter-spacing: 0.3px;
     font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    height: 32px;
-    width: 220px;
-    font-family: 'Myriad400';
-    transition: .1s ease-out;
-
-    &:focus {
-      border: 1px solid $border-focus;
-    }
-  }
-
-  textarea {
-    color: $text;
-    height: 80px;
-    width: 310px;
-    border: 1px solid $border;
-    border-radius: 4px;
-    outline: none;
-    transition: .1s ease-out;
-    padding: 5px;
-
-    &:focus {
-      border: 1px solid $border-focus;
-    }
-  }
-
-  .buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
     margin-top: 10px;
   }
+
+  &__body {
+    padding: 6px 15px;
+    display: flex;
+    gap: 8px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid $border;
+    padding: 15px 15px 10px 15px;
+    margin-bottom: 10px;
+    min-height: 18px;
+
+    &--name {
+      font-size: 14px;
+      font-family: 'Myriad600';
+      width: 210px;
+    }
+
+    &--icons {
+      display: flex;
+      gap: 10px;
+    }
+
+    &--icon {
+      color: $border-focus;
+      font-size: 15px;
+      cursor: pointer;
+
+      &:hover {
+        color: $text;
+      }
+    }
+  }
+}
+
+.modalRow {
+  display: flex;
+  height: 32px;
+  align-items: center;
+  margin-bottom: 10px;
+
+  &__key {
+    width: 140px;
+  }
+}
+
+.payment-methods {
+  margin-top: 15px;
+  padding-top: 25px;
+  border-top: 1px solid $light-border;
+
+  &__modal {
+    padding: 25px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    box-shadow: $box-shadow;
+    z-index: 20;
+  }
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 19px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+
+    &--title {
+      font-size: 14px;
+      font-family: Myriad600;
+    }
+
+    &--add {
+      margin-top: -17px;
+    }
+  }
+}
+
+.billing-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.colRow {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+  height: 32px;
+
+  &__value {
+    width: 220px;
+  }
+
+  &__key {
+    width: 210px;
+  }
+}
+
+.addressRow {
+  display: flex;
+  margin-top: 45px;
+
+  &__key {
+    width: 70px;
+    height: 20px;
+    margin-top: 6px;
+  }
+
+  &__value {
+    width: 320px;
+  }
+}
+
+.selectSingle {
+  width: 220px;
+  height: 32px;
+  position: relative;
+}
+
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  height: 32px;
+  width: 220px;
+  font-family: 'Myriad400';
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
+
+textarea {
+  color: $text;
+  height: 80px;
+  width: 310px;
+  border: 1px solid $border;
+  border-radius: 4px;
+  outline: none;
+  transition: .1s ease-out;
+  padding: 5px;
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
 </style>

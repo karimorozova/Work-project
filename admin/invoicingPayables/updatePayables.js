@@ -1,24 +1,24 @@
 const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 const { moveProjectFile } = require('../utils/movingFile')
 const fs = require('fs')
+const { getPayable } = require("./getPayables")
 const ObjectId = require("mongodb").ObjectID
 
-const setPayablesNextStatus = async (reportsIds, nextStatus, paymentMethod) => {
-	await InvoicingPayables.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus, 'paymentDetails.paymentMethod':  paymentMethod})
+const setPayablesNextStatus = async (reportsIds, nextStatus) => {
+	await InvoicingPayables.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus })
 }
 
-const invoiceReloadFile = async ({ reportId,  expectedPaymentDate, invoiceFile, oldPath }) => {
+const invoiceReloadFile = async ({ reportId, expectedPaymentDate, invoiceFile, oldPath }) => {
 	await fs.unlink(`./dist${ oldPath }`, (err) => {
 		if (err) console.log("Error in removeOldInvoiceFile")
 	})
-	return await invoiceSubmission({ reportId,  expectedPaymentDate, invoiceFile })
+	return await invoiceSubmission({ reportId, expectedPaymentDate, invoiceFile })
 }
 
-const invoiceSubmission = async ({ reportId, expectedPaymentDate, invoiceFile }) => {
+const invoiceSubmission = async ({ reportId, invoiceFile }) => {
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-${ invoiceFile[0].filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
 	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
 	await moveProjectFile(invoiceFile[0], `./dist${ newPath }`)
-
 
 	await InvoicingPayables.updateOne({ _id: reportId }, {
 		status: 'Invoice Received',
@@ -26,7 +26,7 @@ const invoiceSubmission = async ({ reportId, expectedPaymentDate, invoiceFile })
 		'paymentDetails.file': {
 			fileName,
 			path: newPath
-		},
+		}
 	})
 	return newPath
 }
@@ -34,21 +34,21 @@ const invoiceSubmission = async ({ reportId, expectedPaymentDate, invoiceFile })
 const paidOrAddPaymentInfo = async (reportId, data) => {
 	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 
-	await InvoicingPayables.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: data } })
+	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: data } })
 
 	if ("Paid" === status) {
 		await InvoicingPayables.aggregate([
-			{	"$match": {"_id" : ObjectId(reportId) } },
+			{ "$match": { "_id": ObjectId(reportId) } },
 			{
-				"$merge" : {
-					"into" : {
-						"db" : "pangea",
-						"coll" : "invoicingpayablesarchives"
+				"$merge": {
+					"into": {
+						"db": "pangea",
+						"coll": "invoicingpayablesarchives"
 					}
 				}
 			}
 		])
-		await InvoicingPayables.remove({_id: reportId})
+		await InvoicingPayables.remove({ _id: reportId })
 		return "Moved"
 	}
 
@@ -56,9 +56,9 @@ const paidOrAddPaymentInfo = async (reportId, data) => {
 
 }
 
-const updateZohoId = async (reportId, zohoBillingId) => {
-	console.log(zohoBillingId)
-	const newInvoicing = await InvoicingPayables.findByIdAndUpdate(reportId, { zohoBillingId })
-	return newInvoicing
+const updatePayable = async (reportId, obj) => {
+	await InvoicingPayables.updateOne({ _id: reportId }, obj)
+	return await getPayable(reportId)
 }
-module.exports = { setPayablesNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile, updateZohoId }
+
+module.exports = { setPayablesNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile, updatePayable }

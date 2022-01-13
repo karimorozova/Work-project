@@ -13,7 +13,7 @@ const {
 	paidOrAddPaymentInfo,
 	invoiceSubmission,
 	invoiceReloadFile,
-	updateZohoId
+	updatePayable
 } = require('./updatePayables')
 
 const {
@@ -63,7 +63,7 @@ module.exports = {
 	getPayablePaidByVendorId,
 	createBill,
 	addFile,
-	updateZohoId,
+	updatePayable,
 	removeFile,
 	createNewPayable
 }

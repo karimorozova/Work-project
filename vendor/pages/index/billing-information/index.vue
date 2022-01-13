@@ -6,40 +6,41 @@
 </template>
 
 <script>
-	import VendorBillingInfo from "../../../components/pangea/VendorBillingInfo"
-	import { mapGetters } from "vuex"
+import VendorBillingInfo from "../../../components/pangea/VendorBillingInfo"
+import { mapGetters } from "vuex"
 
-	export default {
-		name: "index",
-		computed: {
-			...mapGetters({
-				currentVendor: "getVendor"
-			})
-		},
-		components: {
-			VendorBillingInfo
-		}
-	}
+export default {
+  name: "index",
+  computed: {
+    ...mapGetters({
+      currentVendor: "getVendor"
+    })
+  },
+  components: {
+    VendorBillingInfo
+  }
+}
 </script>
 
 <style scoped lang="scss">
-  @import "../../../assets/scss/colors";
+@import "../../../assets/scss/colors";
 
-  .billing-info {
-    &__title {
-      font-size: 18px;
-      font-family: Myriad600;
-      margin-bottom: 10px;
-    }
-
-    &__table {
-      width: 1000px;
-      height: auto;
-      box-shadow: $box-shadow;
-      box-sizing: border-box;
-      padding: 20px 20px 20px 20px;
-      position: relative;
-      border-radius: 4px;
-    }
+.billing-info {
+  &__title {
+    font-size: 18px;
+    font-family: Myriad600;
+    margin-bottom: 10px;
   }
+
+  &__table {
+    width: 1000px;
+    height: auto;
+    box-shadow: $box-shadow;
+    box-sizing: border-box;
+    padding: 25px;
+    position: relative;
+    border-radius: 4px;
+    background-color: white;
+  }
+}
 </style>

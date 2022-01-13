@@ -32,10 +32,11 @@ const {
 	invoiceSubmission,
 	invoiceReloadFile,
 	createBill,
-	updateZohoId,
+	updatePayable,
 	addFile,
-	removeFile,
+	removeFile
 } = require('../../invoicingPayables')
+const moment = require("moment")
 
 
 router.get("/reports", checkVendor, async (req, res) => {
@@ -86,28 +87,11 @@ router.get("/get-report-paid", checkVendor, async (req, res) => {
 	}
 })
 
+
 router.post("/approve-report", checkVendor, async (req, res) => {
 	try {
-		const { reportsIds, nextStatus, paymentMethod } = req.body
-		await setPayablesNextStatus(reportsIds, nextStatus, paymentMethod)
-
-		if (nextStatus === "Approved") {
-			const {_id, vendor, reportId, steps} = (await getPayable(reportsIds[0]))[0]
-			const lineItems = steps.reduce((acc, step) => {
-				acc.push({
-					"name": step.stepId,
-					"account_id": "335260000002330131",
-					"rate": step.vendorRate,
-					"quantity": step.nativeFinance.Quantity.payables
-				})
-				return acc
-			}, [])
-
-			const { bill } = await createBill(vendor.email, reportId, lineItems )
-			///335260000005647001
-			await updateZohoId(_id, bill.bill_id)
-		}
-
+		const { reportsIds, nextStatus } = req.body
+		await setPayablesNextStatus(reportsIds, nextStatus)
 		let reports = await getPayable(reportsIds[0])
 		reports = clearPayablesStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
@@ -117,11 +101,44 @@ router.post("/approve-report", checkVendor, async (req, res) => {
 	}
 })
 
+router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
+	try {
+		const { paymentMethod, reportsIds } = req.body
+		const [ report ] = await getPayable(reportsIds[0])
+		let { _id, vendor, reportId, steps } = report
+
+		if (!vendor.billingInfo.hasOwnProperty('paymentTerm') || !vendor.billingInfo.paymentTerm._id) {
+			const getPaymentTerms = await PaymentTerms.find()
+			const { billingInfo } = vendor
+			billingInfo.paymentTerm = getPaymentTerms.find(item => item.name === '30 Days') || getPaymentTerms[0]
+			vendor = await getVendorAfterUpdate({ _id: vendor._id }, { billingInfo })
+		}
+
+		const lineItems = steps.reduce((acc, step) => {
+			acc.push({
+				"name": step.stepId,
+				"account_id": "335260000002330131",
+				"rate": step.nativeFinance.Price.payables,
+				"quantity": 1
+			})
+			return acc
+		}, [])
+
+		const expectedPaymentDate = moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD')
+		const { bill } = await createBill(expectedPaymentDate, vendor.email, reportId, lineItems)
+		await updatePayable(_id, { zohoBillingId: bill.bill_id, paymentMethod })
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error / Cannot create bill file (invoice-submission)')
+	}
+})
+
 router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
 	try {
 		const { invoiceFile } = req.files
-		const { reportId, expectedPaymentDate, zohoBillingId } = req.body
-		const newPath = await invoiceSubmission({ reportId, expectedPaymentDate, invoiceFile })
+		const { reportId, zohoBillingId } = req.body
+		const newPath = await invoiceSubmission({ reportId, invoiceFile })
 		await addFile(zohoBillingId, newPath)
 		res.send('Done')
 	} catch (err) {
@@ -133,8 +150,8 @@ router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoice
 router.post('/invoice-reload', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
 	try {
 		const { invoiceFile } = req.files
-		const { reportId,  expectedPaymentDate, oldPath, zohoBillingId } = req.body
-		const newPath = await invoiceReloadFile({ reportId,  expectedPaymentDate, invoiceFile, oldPath })
+		const { reportId, expectedPaymentDate, oldPath, zohoBillingId } = req.body
+		const newPath = await invoiceReloadFile({ reportId, expectedPaymentDate, invoiceFile, oldPath })
 		await removeFile(zohoBillingId)
 		await addFile(zohoBillingId, newPath)
 		res.send('Done')

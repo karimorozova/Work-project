@@ -84,7 +84,7 @@
               .text__block
                 .text__title Jobs:
                 .text__value {{ reportDetailsInfo.steps.length }}
-              .text__block(v-if="reportDetailsInfo.paymentDetails")
+              .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
                 .text__title Payment method:
                 .text__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
               .text__block

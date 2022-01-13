@@ -155,7 +155,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors";
+  @import '../assets/scss/colors.scss';
 
   .disableOverFlow {
     overflow: unset !important;
@@ -206,7 +206,7 @@
   }
 
   i {
-    font-size: 20px;
+    font-size: 19px;
     color: $border;
   }
 
@@ -234,8 +234,7 @@
       z-index: 10;
 
       &__item {
-        padding: 0 7px;
-        height: 31px;
+        padding: 7px;
         border-bottom: 1px solid $light-border;
         cursor: pointer;
         font-size: 14px;

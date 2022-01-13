@@ -6,7 +6,7 @@
       :isAbsolute="true"
       @closeErrors="errors = []"
     )
-    .report(v-if="reportDetailsInfo.hasOwnProperty('vendor')" )
+    .report(v-if="reportDetailsInfo.hasOwnProperty('vendor') && vendor._id" )
       .body
         .body__details
           .details__user
@@ -58,8 +58,6 @@
                   i(class="fa-solid fa-download")
                 span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
 
-
-
             .row
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
@@ -67,16 +65,8 @@
             Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
 
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
-            .row
-              .row__title Payment method:
-              .row__valueDrops
-                SelectSingle(
-                  :options="['test1', 'test2', 'test3']",
-                  placeholder="Option",
-                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
-                  @chooseOption="setPaymentMethod"
-                )
-            Button.button-center( value="Confirm" @clicked="approveReport")
+            Button.button-center( value="Approve report" @clicked="approveReport")
+
 
           .body__submission(v-if="reportDetailsInfo.status === 'Approved'")
             .row
@@ -86,8 +76,20 @@
                 .file-fake-button
                   i(class="fas fa-upload")
                 .file-name(v-if="invoiceFile") {{ invoiceFile.name }}
+            .row(v-if="vendor.hasOwnProperty('billingInfo') && vendor.billingInfo.paymentMethod.length"  )
+              .row__title Payment method:
+              .row__valueDrops
+                SelectSingle(
+                  :options="vendor.billingInfo.paymentMethod",
+                  placeholder="Option",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
+                  @chooseOption="setPaymentMethod"
+                )
+            .row(v-if="!vendor.hasOwnProperty('billingInfo') || !vendor.billingInfo.paymentMethod.length" )
+              span Enter your billing information and payment method.
+              router-link(v-bind:to="'/billing-information'" style="margin-left: 8px;") Here
 
-            Button(style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
+            Button(:isDisabled="isRequestNow" style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
 
         .body__table
           GeneralTable(
@@ -147,6 +149,7 @@ export default {
   components: { PaymentInformationCard, ValidationErrors, SelectSingle, Button, GeneralTable },
   data() {
     return {
+      isRequestNow: false,
       domain: '',
       invoiceFile: null,
       errors: [],
@@ -221,7 +224,7 @@ export default {
       const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
-      // fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
       fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
       fileData.append("expectedPaymentDate", expectedPaymentDate)
       fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
@@ -240,15 +243,25 @@ export default {
     async submitReport() {
       this.errors = []
       if (!this.invoiceFile) this.errors.push('Please upload invoice file')
+      if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
       if (this.errors.length) return
+      this.isRequestNow = true
 
+      try {
+        await this.$axios.post(`/vendor/zoho-bill-creation`, {
+          paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
+          reportsIds: [ this.reportDetailsInfo._id.toString() ]
+        })
+        await this.getReport()
+      } catch (err) {
+        console.log(err)
+        this.isRequestNow = false
+        return
+      }
       const fileData = new FormData()
-      const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
       fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
-      fileData.append("expectedPaymentDate", expectedPaymentDate)
-
       try {
         await this.$axios.post(`/vendor/invoice-submission`, fileData)
         this.clearInputFiles(".file-button")
@@ -256,20 +269,13 @@ export default {
         await this.getReport()
       } catch (err) {
         console.log(err)
+        this.isRequestNow = false
       }
+      this.isRequestNow = false
     },
     async approveReport() {
       try {
-
-        this.errors = []
-        if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
-        if (this.errors.length) return
-
-        const result = await this.$axios.post(`/vendor/approve-report`, {
-          paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
-          reportsIds: [ this.reportDetailsInfo._id.toString() ],
-          nextStatus: 'Approved'
-        })
+        const result = await this.$axios.post(`/vendor/approve-report`, { nextStatus: 'Approved' })
         const decode = window.atob(result.data)
         const data = JSON.parse(decode)
         await this.getReport(data)
@@ -294,7 +300,6 @@ export default {
         const decode = window.atob(result.data)
         this.reportDetailsInfo = JSON.parse(decode)[0]
       } catch (e) {
-
       }
     }
   },
@@ -443,6 +448,7 @@ export default {
     //display: flex;
     //justify-content: center;
     margin-top: 20px;
+
     .button-center {
       text-align: center;
     }

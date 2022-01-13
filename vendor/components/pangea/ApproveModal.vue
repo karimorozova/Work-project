@@ -5,7 +5,7 @@
       .approve-modal__button(@click.stop="approve")
         Button(:value="approveValue")
       .approve-modal__button(@click.stop="notApprove")
-        Button(:value="notApproveValue")
+        Button(:value="notApproveValue" :outline="true")
     span.approve-modal__close(v-if="!optionWithoutClosing" @click.stop="close") &#215;
 </template>
 
@@ -24,10 +24,10 @@
 			notApproveValue: {
 				type: String
 			},
-      optionWithoutClosing: {
+			optionWithoutClosing: {
 				type: Boolean,
-        default: false
-      }
+				default: false
+			}
 		},
 		data() {
 			return {}
@@ -61,24 +61,25 @@
 </script>
 
 <style lang="scss">
-  @import "../../assets/scss/colors";
+  @import "../../assets/scss/colors.scss";
 
   .approve-modal {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    padding: 25px;
+    box-shadow: $box-shadow;
     background-color: $white;
     max-width: 300px;
     font-size: 14px;
     border-radius: 4px;
 
-    &__text{
+    &__text {
       text-align: center;
       margin-top: 10px;
-      font-size: 16px;
+      margin-bottom: 5px;
+      font-size: 14px;
     }
 
     &__buttons {

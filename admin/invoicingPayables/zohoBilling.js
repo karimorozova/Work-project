@@ -32,7 +32,7 @@ const setNewTokenFromRefresh = async () => {
 	}
 }
 
-const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}, ) => {
+const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}) => {
 	return (await axios({
 		headers: {
 			'Authorization': `Bearer  ${ token }`,
@@ -46,15 +46,15 @@ const zohoRequest = async (link, data, token, method = "GET", header = {}, addit
 	}))
 }
 
-const sendRequestToZoho = async (link, data, method = "GET", header = {}, additional = {}, ) => {
+const sendRequestToZoho = async (link, data, method = "GET", header = {}, additional = {}) => {
 	let token = await getCurrentToken()
 	try {
-		 return await	zohoRequest(link, data, token, method, header, additional )
+		return await zohoRequest(link, data, token, method, header, additional)
 	} catch (err) {
 		if (err.response.data.code === 57) {
 			token = await setNewTokenFromRefresh()
 			if (!token) return returnMessageAndType('Can`t get access_token', 'error')
-			return await	zohoRequest(link, data, token, method, header, additional )
+			return await zohoRequest(link, data, token, method, header, additional)
 		}
 
 		return returnMessageAndType(err.response.data.message, 'error')
@@ -62,8 +62,10 @@ const sendRequestToZoho = async (link, data, method = "GET", header = {}, additi
 }
 
 const getVendor = async (vendorEmail) => {
-	const customer = await sendRequestToZoho(`contacts?organization_id=${organizationId}&email_startswith=${vendorEmail}&contact_type=vendor`)
-	return customer.data.contacts[0].contact_id
+	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }&email_startswith=${ vendorEmail }&contact_type=vendor`)
+	return customer.data.contacts.length
+			? customer.data.contacts[0].contact_id
+			: null
 }
 const createVendor = async (vendorName, vendorEmail) => {
 	const data = {
@@ -75,34 +77,27 @@ const createVendor = async (vendorName, vendorEmail) => {
 			}
 		]
 	}
-	const customer = await sendRequestToZoho(`contacts?organization_id=${organizationId}`, data, 'Post')
+	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')
 	return customer.data.contact.contact_id
 }
 
 
-const createBill = async (vendorEmail, billNumber, lineItems) => {
-	let vendorId = await getVendor(vendorEmail)
-	vendorId = vendorId ? vendorId : await createVendor('test' , vendorEmail)
-
+const createBill = async (due_date, vendorEmail, billNumber, lineItems) => {
+	let zohoVendorId = await getVendor(vendorEmail)
+	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor('test', vendorEmail)
 	const data = {
-		"vendor_id": vendorId,
+		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
-		// "date": "2022-01-05",
-		// "due_date": "2022-01-08",
+		"due_date": due_date,
 		"line_items": lineItems
-		// "line_items": [{
-		// 	"account_id": "335260000002330131",
-		// 	"rate": rate,
-		// 	"quantity": quantity
-		// }]
 	}
-	const billing = await sendRequestToZoho(`bills?organization_id=${organizationId}`, `JSONString=` + JSON.stringify(data), 'Post')
+	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')
 	return billing.data
 }
 
 const createNewPayable = async (vendorName, vendorEmail, billId, amount) => {
 	let vendorId = await getVendor(vendorEmail)
-	vendorId = vendorId ? vendorId : await createVendor('test' , vendorEmail)
+	vendorId = vendorId ? vendorId : await createVendor('test', vendorEmail)
 
 	const data = {
 		"vendor_id": vendorId,
@@ -115,19 +110,19 @@ const createNewPayable = async (vendorName, vendorEmail, billId, amount) => {
 		"date": moment().format('YYYY-MM-DD'),
 		"amount": amount
 	}
-	await sendRequestToZoho(`vendorpayments?organization_id=${organizationId}`, `JSONString=` + JSON.stringify(data), 'Post')
+	await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')
 }
 
-const addFile = async ( billId, filePath) => {
+const addFile = async (billId, filePath) => {
 	const finalPath = path.join('./dist', filePath)
-	const form = new FormData();
-	form.append('attachment', fs.createReadStream(finalPath));
+	const form = new FormData()
+	form.append('attachment', fs.createReadStream(finalPath))
 
-	const addedFile = await sendRequestToZoho(`bills/${billId}/attachment?organization_id=${organizationId}`, form,'Post', form.getHeaders())
+	const addedFile = await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, form, 'Post', form.getHeaders())
 }
 
-const removeFile = async ( billId) => {
-	await sendRequestToZoho(`bills/${billId}/attachment?organization_id=${organizationId}`, [], 'Delete' )
+const removeFile = async (billId) => {
+	await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, [], 'Delete')
 }
 
 module.exports = {
