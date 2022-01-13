@@ -63,21 +63,22 @@ const calculateProjectTotal = async (projectId) => {
 
 //FINANCE 1 FOR STEPS  ==>
 const recalculateStepFinance = async (projectId) => {
-	const { steps, discounts, minimumCharge, customer} = await getProject({ _id: projectId })
+	const { steps, discounts, minimumCharge, customer } = await getProject({ _id: projectId })
 	// let newDiscounts = !discounts.length ? await getClientDiscount( customer.discounts ) : discounts
-	let newDiscounts =  discounts
+	let newDiscounts = discounts
 	// console.log({disco: await getClientDiscount( customer.discounts )})
 	const newSteps = updateStepsFinanceWithDiscounts(steps, newDiscounts)
 	let queryToUpdateSteps = { steps: newSteps }
 	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
 
-	const isUsedMinimumCharge = !minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2))
+	const isUsedMinimumCharge = !minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2) && minimumCharge.value > 0)
+
 	if (isUsedMinimumCharge) {
 		newDiscounts = []
 		queryToUpdateSteps = await updateStepsWithMinimal(steps, minimumCharge)
 	}
 
-	await Projects.updateOne({ _id: projectId }, {"discounts": newDiscounts, "minimumCharge.isUsed": isUsedMinimumCharge,...queryToUpdateSteps })
+	await Projects.updateOne({ _id: projectId }, { "discounts": newDiscounts, "minimumCharge.isUsed": isUsedMinimumCharge, ...queryToUpdateSteps })
 }
 
 const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
@@ -98,8 +99,8 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 }
 
 const updateStepsWithMinimal = async (steps, minimumCharge) => {
-	const minimumCost = minimumCharge.value / steps.filter(({status}) => status !== 'Cancelled').length
-	const newSteps = steps.map(( step ) => {
+	const minimumCost = minimumCharge.value / steps.filter(({ status }) => status !== 'Cancelled').length
+	const newSteps = steps.map((step) => {
 		if (step.status !== "Cancelled") {
 			step.finance.Price.receivables = minimumCost
 		}
