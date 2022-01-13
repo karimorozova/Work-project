@@ -47,6 +47,9 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		}
 	},
 	paymentInformation: [ {
+		zohoPaymentId: {
+			type: String
+		},
 		paidAmount: {
 			type: Number
 		},
