@@ -208,6 +208,7 @@ export default {
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
       fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
       fileData.append("expectedPaymentDate", expectedPaymentDate)
       fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
 
@@ -233,6 +234,8 @@ export default {
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
       fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
+      fileData.append("vendorName", this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname)
       fileData.append("expectedPaymentDate", expectedPaymentDate)
 
       try {

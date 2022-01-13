@@ -15,6 +15,7 @@ const {
 	paidOrAddPaymentInfo,
 	getAllPaidPayables,
 	getPaidPayables,
+	createNewPayable,
 } = require('../invoicingPayables')
 
 const ObjectId = require("mongodb").ObjectID
@@ -102,10 +103,11 @@ router.post("/reports-final-status", async (req, res) => {
 
 router.post("/report-final-status/:reportId", async (req, res) => {
 	const {reportId} = req.params
-	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body
+	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes, zohoBillingId, vendorName, vendorEmail} = req.body
 
 	try {
 		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
+		await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
 		// const reports = await getAllPayables( countToSkip, countToGet, query )
 		res.send(result);
 	} catch(err) {

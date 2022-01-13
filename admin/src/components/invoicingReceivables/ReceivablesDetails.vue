@@ -397,6 +397,8 @@ export default {
         unpaidAmount: (this.getUnpaidAmount - +this.amount).toFixed(2),
         paymentMethod: this.paymentMethod,
         paymentDate: this.paymentDate,
+        // zohoBillingId: this.reportDetailsInfo.zohoBillingId,
+        // vendorName: this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname,
         notes: this.notes
       }
       const reuslt = (await (this.$http.post(`/invoicing-receivables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data

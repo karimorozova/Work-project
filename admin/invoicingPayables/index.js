@@ -13,6 +13,7 @@ const {
 	paidOrAddPaymentInfo,
 	invoiceSubmission,
 	invoiceReloadFile,
+	updateZohoId
 } = require('./updatePayables')
 
 const {
@@ -34,6 +35,13 @@ const {
 	getPayablePaidByVendorId,
 } = require('./getPaidPayables')
 
+const {
+	createBill,
+	addFile,
+	removeFile,
+	createNewPayable
+} = require('./zohoBilling')
+
 module.exports = {
 	invoiceReloadFile,
 	invoiceSubmission,
@@ -53,4 +61,9 @@ module.exports = {
 	getAllPaidPayables,
 	getPaidPayables: getPaidReport,
 	getPayablePaidByVendorId,
+	createBill,
+	addFile,
+	updateZohoId,
+	removeFile,
+	createNewPayable
 }

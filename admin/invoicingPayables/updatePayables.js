@@ -3,18 +3,18 @@ const { moveProjectFile } = require('../utils/movingFile')
 const fs = require('fs')
 const ObjectId = require("mongodb").ObjectID
 
-const setPayablesNextStatus = async (reportsIds, nextStatus) => {
-	await InvoicingPayables.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus })
+const setPayablesNextStatus = async (reportsIds, nextStatus, paymentMethod) => {
+	await InvoicingPayables.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus, 'paymentDetails.paymentMethod':  paymentMethod})
 }
 
-const invoiceReloadFile = async ({ reportId, paymentMethod, expectedPaymentDate, invoiceFile, oldPath }) => {
+const invoiceReloadFile = async ({ reportId,  expectedPaymentDate, invoiceFile, oldPath }) => {
 	await fs.unlink(`./dist${ oldPath }`, (err) => {
 		if (err) console.log("Error in removeOldInvoiceFile")
 	})
-	await invoiceSubmission({ reportId, paymentMethod, expectedPaymentDate, invoiceFile })
+	return await invoiceSubmission({ reportId,  expectedPaymentDate, invoiceFile })
 }
 
-const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate, invoiceFile }) => {
+const invoiceSubmission = async ({ reportId, expectedPaymentDate, invoiceFile }) => {
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-${ invoiceFile[0].filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
 	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
 	await moveProjectFile(invoiceFile[0], `./dist${ newPath }`)
@@ -22,16 +22,13 @@ const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate,
 
 	await InvoicingPayables.updateOne({ _id: reportId }, {
 		status: 'Invoice Received',
-		paymentDetails: {
-			paymentMethod,
-			//expectedPaymentDate: new Date(expectedPaymentDate),
-			expectedPaymentDate: new Date(),
-			file: {
-				fileName,
-				path: newPath
-			}
-		}
+		'paymentDetails.expectedPaymentDate': new Date(),
+		'paymentDetails.file': {
+			fileName,
+			path: newPath
+		},
 	})
+	return newPath
 }
 
 const paidOrAddPaymentInfo = async (reportId, data) => {
@@ -58,4 +55,10 @@ const paidOrAddPaymentInfo = async (reportId, data) => {
 	return 'Success'
 
 }
-module.exports = { setPayablesNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile }
+
+const updateZohoId = async (reportId, zohoBillingId) => {
+	console.log(zohoBillingId)
+	const newInvoicing = await InvoicingPayables.findByIdAndUpdate(reportId, { zohoBillingId })
+	return newInvoicing
+}
+module.exports = { setPayablesNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile, updateZohoId }

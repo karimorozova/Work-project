@@ -38,4 +38,12 @@ const clearPayablesStepsPrivateKeys = async (reports) => {
 	})
 }
 
-module.exports = { clearPayablesStepsPrivateKeys }
+const returnMessageAndType = (message, type) => {
+	return {
+		type,
+		message: message || 'Internal error'
+	}
+}
+
+
+module.exports = { clearPayablesStepsPrivateKeys, returnMessageAndType }

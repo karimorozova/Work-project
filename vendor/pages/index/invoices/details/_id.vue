@@ -58,9 +58,7 @@
                   i(class="fa-solid fa-download")
                 span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
 
-            .row
-              .row__title Payment method:
-              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
+
 
             .row
               .row__title Expected payment date:
@@ -69,7 +67,16 @@
             Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
 
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
-            Button(value="Confirm" @clicked="approveReport")
+            .row
+              .row__title Payment method:
+              .row__valueDrops
+                SelectSingle(
+                  :options="['test1', 'test2', 'test3']",
+                  placeholder="Option",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
+                  @chooseOption="setPaymentMethod"
+                )
+            Button.button-center( value="Confirm" @clicked="approveReport")
 
           .body__submission(v-if="reportDetailsInfo.status === 'Approved'")
             .row
@@ -80,15 +87,6 @@
                   i(class="fas fa-upload")
                 .file-name(v-if="invoiceFile") {{ invoiceFile.name }}
 
-            .row
-              .row__title Payment method:
-              .row__valueDrops
-                SelectSingle(
-                  :options="['test1', 'test2', 'test3']",
-                  placeholder="Option",
-                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
-                  @chooseOption="setPaymentMethod"
-                )
             Button(style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
 
         .body__table
@@ -223,7 +221,8 @@ export default {
       const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
-      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+      // fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
       fileData.append("expectedPaymentDate", expectedPaymentDate)
       fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
 
@@ -241,14 +240,13 @@ export default {
     async submitReport() {
       this.errors = []
       if (!this.invoiceFile) this.errors.push('Please upload invoice file')
-      if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
       if (this.errors.length) return
 
       const fileData = new FormData()
       const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
-      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
+      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
       fileData.append("expectedPaymentDate", expectedPaymentDate)
 
       try {
@@ -262,7 +260,13 @@ export default {
     },
     async approveReport() {
       try {
+
+        this.errors = []
+        if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
+        if (this.errors.length) return
+
         const result = await this.$axios.post(`/vendor/approve-report`, {
+          paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
           reportsIds: [ this.reportDetailsInfo._id.toString() ],
           nextStatus: 'Approved'
         })
@@ -436,9 +440,12 @@ export default {
   }
 
   &__approve {
-    display: flex;
-    justify-content: center;
+    //display: flex;
+    //justify-content: center;
     margin-top: 20px;
+    .button-center {
+      text-align: center;
+    }
   }
 
   &__details {

@@ -30,7 +30,11 @@ const {
 	getPayable,
 	clearPayablesStepsPrivateKeys,
 	invoiceSubmission,
-	invoiceReloadFile
+	invoiceReloadFile,
+	createBill,
+	updateZohoId,
+	addFile,
+	removeFile,
 } = require('../../invoicingPayables')
 
 
@@ -84,8 +88,26 @@ router.get("/get-report-paid", checkVendor, async (req, res) => {
 
 router.post("/approve-report", checkVendor, async (req, res) => {
 	try {
-		const { reportsIds, nextStatus } = req.body
-		await setPayablesNextStatus(reportsIds, nextStatus)
+		const { reportsIds, nextStatus, paymentMethod } = req.body
+		await setPayablesNextStatus(reportsIds, nextStatus, paymentMethod)
+
+		if (nextStatus === "Approved") {
+			const {_id, vendor, reportId, steps} = (await getPayable(reportsIds[0]))[0]
+			const lineItems = steps.reduce((acc, step) => {
+				acc.push({
+					"name": step.stepId,
+					"account_id": "335260000002330131",
+					"rate": step.vendorRate,
+					"quantity": step.nativeFinance.Quantity.payables
+				})
+				return acc
+			}, [])
+
+			const { bill } = await createBill(vendor.email, reportId, lineItems )
+			///335260000005647001
+			await updateZohoId(_id, bill.bill_id)
+		}
+
 		let reports = await getPayable(reportsIds[0])
 		reports = clearPayablesStepsPrivateKeys(reports)
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
@@ -98,8 +120,9 @@ router.post("/approve-report", checkVendor, async (req, res) => {
 router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
 	try {
 		const { invoiceFile } = req.files
-		const { reportId, paymentMethod, expectedPaymentDate } = req.body
-		await invoiceSubmission({ reportId, paymentMethod, expectedPaymentDate, invoiceFile })
+		const { reportId, expectedPaymentDate, zohoBillingId } = req.body
+		const newPath = await invoiceSubmission({ reportId, expectedPaymentDate, invoiceFile })
+		await addFile(zohoBillingId, newPath)
 		res.send('Done')
 	} catch (err) {
 		console.log(err)
@@ -110,8 +133,10 @@ router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoice
 router.post('/invoice-reload', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
 	try {
 		const { invoiceFile } = req.files
-		const { reportId, paymentMethod, expectedPaymentDate, oldPath } = req.body
-		await invoiceReloadFile({ reportId, paymentMethod, expectedPaymentDate, invoiceFile, oldPath })
+		const { reportId,  expectedPaymentDate, oldPath, zohoBillingId } = req.body
+		const newPath = await invoiceReloadFile({ reportId,  expectedPaymentDate, invoiceFile, oldPath })
+		await removeFile(zohoBillingId)
+		await addFile(zohoBillingId, newPath)
 		res.send('Done')
 	} catch (err) {
 		console.log(err)

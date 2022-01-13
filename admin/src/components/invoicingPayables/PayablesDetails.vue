@@ -312,6 +312,9 @@ export default {
         unpaidAmount: +(this.getUnpaidAmount - amount).toFixed(2),
         paymentMethod: this.paymentMethod,
         paymentDate: this.paymentDate,
+        zohoBillingId: this.reportDetailsInfo.zohoBillingId,
+        vendorName: this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname,
+        vendorEmail: this.reportDetailsInfo.vendor.email,
         notes: this.notes
       }
       this.closePaymentCard()
