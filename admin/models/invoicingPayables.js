@@ -35,8 +35,8 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 	},
 	paymentDetails: {
 		paymentMethod: {
-			type: String,
-			default: ''
+			type: Object,
+			default: null
 		},
 		file: {
 			type: Object,

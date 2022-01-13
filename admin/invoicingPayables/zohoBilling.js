@@ -90,14 +90,15 @@ const createVendor = async (vendorName, vendorEmail) => {
 }
 
 
-const createBill = async (due_date, vendorEmail, billNumber, lineItems) => {
+const createBill = async (due_date, vendorEmail, billNumber, lineItems, notes) => {
 	let zohoVendorId = await getVendor(vendorEmail)
 	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor('test', vendorEmail)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
 		"due_date": due_date,
-		"line_items": lineItems
+		"line_items": lineItems,
+		"notes": notes,
 	}
 	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')
 	return billing.data

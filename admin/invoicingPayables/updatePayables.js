@@ -22,7 +22,6 @@ const invoiceSubmission = async ({ reportId, invoiceFile }) => {
 
 	await InvoicingPayables.updateOne({ _id: reportId }, {
 		status: 'Invoice Received',
-		'paymentDetails.expectedPaymentDate': new Date(),
 		'paymentDetails.file': {
 			fileName,
 			path: newPath
@@ -34,7 +33,7 @@ const invoiceSubmission = async ({ reportId, invoiceFile }) => {
 const paidOrAddPaymentInfo = async (reportId, zohoPaymentId, data) => {
 	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 
-	await InvoicingPayables.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: {...data, zohoPaymentId} } })
+	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data, zohoPaymentId } } })
 
 	if ("Paid" === status) {
 		await InvoicingPayables.aggregate([

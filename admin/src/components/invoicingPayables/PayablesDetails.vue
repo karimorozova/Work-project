@@ -69,32 +69,40 @@
               .text__block
                 .text__title Report ID:
                 .text__value {{reportDetailsInfo.reportId}}
+
               .text__block
                 .text__title Status:
                 .text__value {{reportDetailsInfo.status}}
+
               .text__block
                 .text__title Created On:
                 .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
+
               .text__block
                 .text__title Date Range:
                 .text__value
                   span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
                   span(style="color:#999; margin: 0 4px;") /
                   span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
+
               .text__block
                 .text__title Jobs:
                 .text__value {{ reportDetailsInfo.steps.length }}
+
               .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
                 .text__title Payment method:
-                .text__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
-              .text__block
+                .text__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+
+              .text__block(v-if="reportDetailsInfo.paymentDetails.expectedPaymentDate" )
                 .text__title Expected payment date:
                 .text__value {{ formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate) }}
+
               .text__block
                 .text__title Total Amount:
                 .text__value
                   span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
                   span(v-html="'&euro;'")
+
               .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
                 .text__title Invoice:
                 .text__value

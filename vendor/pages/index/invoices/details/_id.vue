@@ -59,6 +59,9 @@
                 span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
 
             .row
+              .row__title Payment Method:
+              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+            .row
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
 
@@ -82,7 +85,7 @@
                 SelectSingle(
                   :options="vendor.billingInfo.paymentMethod",
                   placeholder="Option",
-                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod || ''",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod ? reportDetailsInfo.paymentDetails.paymentMethod.name : ''",
                   @chooseOption="setPaymentMethod"
                 )
             .row(v-if="!vendor.hasOwnProperty('billingInfo') || !vendor.billingInfo.paymentMethod.length" )
@@ -248,9 +251,17 @@ export default {
       this.isRequestNow = true
 
       try {
+        const paymentMethod = { ...this.reportDetailsInfo.paymentDetails.paymentMethod }
+        delete paymentMethod.name
+        const notes = Object.entries(paymentMethod).reduce((acc, curr) => {
+          acc = acc + `${ curr[0] }: ${ curr[1] }\n`
+          return acc
+        }, '')
+
         await this.$axios.post(`/vendor/zoho-bill-creation`, {
           paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
-          reportsIds: [ this.reportDetailsInfo._id.toString() ]
+          reportsIds: [ this.reportDetailsInfo._id.toString() ],
+          notes
         })
         await this.getReport()
       } catch (err) {

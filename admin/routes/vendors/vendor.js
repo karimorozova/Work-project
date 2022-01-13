@@ -103,9 +103,9 @@ router.post("/approve-report", checkVendor, async (req, res) => {
 
 router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
 	try {
-		const { paymentMethod, reportsIds } = req.body
+		const { paymentMethod, reportsIds, notes } = req.body
 		const [ report ] = await getPayable(reportsIds[0])
-		let { _id, vendor, reportId, steps } = report
+		let { _id, vendor, reportId, steps, paymentDetails } = report
 
 		if (!vendor.billingInfo.hasOwnProperty('paymentTerm') || !vendor.billingInfo.paymentTerm._id) {
 			const getPaymentTerms = await PaymentTerms.find()
@@ -125,8 +125,11 @@ router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
 		}, [])
 
 		const expectedPaymentDate = moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD')
-		const { bill } = await createBill(expectedPaymentDate, vendor.email, reportId, lineItems)
-		await updatePayable(_id, { zohoBillingId: bill.bill_id, paymentMethod })
+		paymentDetails.paymentMethod = paymentMethod
+		paymentDetails.expectedPaymentDate = new Date(expectedPaymentDate)
+
+		const { bill } = await createBill(expectedPaymentDate, vendor.email, reportId, lineItems, notes)
+		await updatePayable(_id, { zohoBillingId: bill.bill_id, paymentDetails })
 		res.send('Done')
 	} catch (err) {
 		console.log(err)
