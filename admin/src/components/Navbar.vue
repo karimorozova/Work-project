@@ -284,68 +284,68 @@ export default {
             }
           ]
         },
-        // {
-        //   type: 'group',
-        //   name: 'Finance',
-        //   path: 'pangea-finance',
-        //   isOpen: false,
-        //   parent: true,
-        //   children: [
-        //     // {
-        //     // 	type: 'link',
-        //     // 	name: 'Finance',
-        //     // 	path: '/pangea-finance/finance'
-        //     // },
-        //     {
-        //       type: 'group',
-        //       path: 'invoicing-payables',
-        //       name: 'Payables',
-        //       isOpen: false,
-        //       children: [
-        //         {
-        //           type: 'link',
-        //           path: '/pangea-finance/invoicing-payables/reports',
-        //           name: 'Invoices'
-        //         },
-        //         {
-        //           type: 'link',
-        //           path: '/pangea-finance/invoicing-payables/paid-invoices',
-        //           name: 'Paid Invoices'
-        //         },
-        //         {
-        //           type: 'link',
-        //           path: '/pangea-finance/invoicing-payables/create-reports',
-        //           name: 'Add Invoices'
-        //         }
-        //       ]
-        //
-        //     },
-        //     {
-        //       type: 'group',
-        //       path: 'invoicing-receivables',
-        //       name: 'Receivables',
-        //       isOpen: false,
-        //       children: [
-        //         {
-        //           type: 'link',
-        //           path: '/pangea-finance/invoicing-receivables/reports',
-        //           name: 'Invoices'
-        //         },
-        //         {
-        //           type: 'link',
-        //           path: '/pangea-finance/invoicing-receivables/paid-invoices',
-        //           name: 'Paid Invoices'
-        //         },
-        //         {
-        //           type: 'link',
-        //           path: '/pangea-finance/invoicing-receivables/create-reports',
-        //           name: 'Add Invoices'
-        //         }
-        //       ]
-        //
-        //     }
-        //   ]
-        // },
+        {
+          type: 'group',
+          name: 'Finance',
+          path: 'pangea-finance',
+          isOpen: false,
+          parent: true,
+          children: [
+            // {
+            // 	type: 'link',
+            // 	name: 'Finance',
+            // 	path: '/pangea-finance/finance'
+            // },
+            {
+              type: 'group',
+              path: 'invoicing-payables',
+              name: 'Payables',
+              isOpen: false,
+              children: [
+                {
+                  type: 'link',
+                  path: '/pangea-finance/invoicing-payables/reports',
+                  name: 'Invoices'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/invoicing-payables/paid-invoices',
+                  name: 'Paid Invoices'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/invoicing-payables/create-reports',
+                  name: 'Add Invoices'
+                }
+              ]
+
+            },
+            {
+              type: 'group',
+              path: 'invoicing-receivables',
+              name: 'Receivables',
+              isOpen: false,
+              children: [
+                {
+                  type: 'link',
+                  path: '/pangea-finance/invoicing-receivables/reports',
+                  name: 'Invoices'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/invoicing-receivables/paid-invoices',
+                  name: 'Paid Invoices'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/invoicing-receivables/create-reports',
+                  name: 'Add Invoices'
+                }
+              ]
+
+            }
+          ]
+        },
         {
           type: 'group',
           name: 'Reports',
