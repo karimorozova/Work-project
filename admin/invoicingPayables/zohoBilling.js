@@ -9,6 +9,8 @@ const { log } = require("nodemon/lib/utils")
 const moment = require("moment")
 const { returnMessageAndType } = require("./helpers")
 const { refreshToken } = require("../services")
+const { logging } = require("googleapis/build/src/apis/logging")
+const { paidOrAddPaymentInfo } = require("../invoicingPayables")
 
 async function getCurrentToken() {
 	try {
@@ -51,11 +53,17 @@ const sendRequestToZoho = async (link, data, method = "GET", header = {}, additi
 	try {
 		 return await	zohoRequest(link, data, token, method, header, additional )
 	} catch (err) {
-		if (err.response.data.code === 57) {
-			token = await setNewTokenFromRefresh()
-			if (!token) return returnMessageAndType('Can`t get access_token', 'error')
-			return await	zohoRequest(link, data, token, method, header, additional )
+		console.log(err.response)
+		try{
+			if (err.response || err.response.data.code === 57) {
+				token = await setNewTokenFromRefresh()
+				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
+				return await	zohoRequest(link, data, token, method, header, additional )
+			}
+		} catch (err) {
+			return returnMessageAndType(err.response.data.message, 'error')
 		}
+
 
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
@@ -115,7 +123,16 @@ const createNewPayable = async (vendorName, vendorEmail, billId, amount) => {
 		"date": moment().format('YYYY-MM-DD'),
 		"amount": amount
 	}
-	await sendRequestToZoho(`vendorpayments?organization_id=${organizationId}`, `JSONString=` + JSON.stringify(data), 'Post')
+	const { vendorpayment } = (await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')).data
+	return vendorpayment.payment_id
+}
+
+const updatePayableFromZoho = async (zohoId) => {
+	// const listBillPayments = await sendRequestToZoho(`bills/${zohoId}/payments?organization_id=${organizationId}`)
+	//
+	// listBillPayments.map(({})=> {
+	// 	// const result = await paidOrAddPaymentInfo(reportId, zohoPaymentId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
+	// })
 }
 
 const addFile = async ( billId, filePath) => {
@@ -129,6 +146,8 @@ const addFile = async ( billId, filePath) => {
 const removeFile = async ( billId) => {
 	await sendRequestToZoho(`bills/${billId}/attachment?organization_id=${organizationId}`, [], 'Delete' )
 }
+
+
 
 module.exports = {
 	createBill,
