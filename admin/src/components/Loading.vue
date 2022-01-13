@@ -1,7 +1,8 @@
 <template lang="pug">
   .alert-message
     .icon__loading
-      i.icon(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
+      .icon
+        i(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
     .text Loading...
 </template>
 
