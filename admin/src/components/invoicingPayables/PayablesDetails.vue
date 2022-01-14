@@ -291,7 +291,6 @@ export default {
       // showDeleteRequestModal: false,
       // showSendModal: false,
 
-
       isShowPaymentDetails: false
     }
   },

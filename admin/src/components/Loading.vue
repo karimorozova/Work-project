@@ -3,7 +3,7 @@
     .icon__loading
       .icon
         i(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
-    .text Loading...
+    .text Loading
 </template>
 
 <script>
