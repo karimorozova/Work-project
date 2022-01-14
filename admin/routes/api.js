@@ -1,79 +1,81 @@
-const router = require('express').Router();
-const axios = require('axios');
-const unirest = require('unirest');
-const { upload } = require('../utils/');
-const fs = require('fs');
+const router = require('express').Router()
+const axios = require('axios')
+const unirest = require('unirest')
+const { upload } = require('../utils/')
+const fs = require('fs')
 const {
-  Languages,
-  Industries,
-  Timezones,
-  LeadSource,
-  Group,
-  Step,
-  Instruction,
-  CancelReason,
-  User,
-  ClientRequest,
-  TierLqa,
-  Vendors,
-  Units
-} = require('../models');
-const { getFilteredProjects, getPdf } = require('../projects/');
-const { getFilteredClientRequests } = require('../clientRequests');
-const { getServices } = require('../services/');
-const reqq = require('request');
-const { getAllCountries } = require('../helpers/countries');
-const { createNewRequest } = require("../requests");
-const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units');
-const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps');
+	Languages,
+	Industries,
+	Timezones,
+	LeadSource,
+	Group,
+	Step,
+	Instruction,
+	CancelReason,
+	User,
+	ClientRequest,
+	TierLqa,
+	Vendors,
+	Units,
+	Projects
+} = require('../models')
+const { getFilteredProjects, getPdf } = require('../projects/')
+const { getFilteredClientRequests } = require('../clientRequests')
+const { getServices } = require('../services/')
+const reqq = require('request')
+const { getAllCountries } = require('../helpers/countries')
+const { createNewRequest } = require("../requests")
+const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units')
+const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps')
+const { ObjectId } = require("mongoose/lib/types")
+const moment = require("moment")
 
 router.get('/wordcount', async (req, res) => {
-  let link = req.query.web;
-  if (link.indexOf('dropbox') >= 0) {
-    let firstPart = link.split("=")[0];
-    link = firstPart + "=1";
-  }
-  try {
-    const resFull = await axios({
-      url: link,
-      method: 'GET',
-      responseType: 'blob', // important
-    });
-    let wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'));
-    wstream.write(resFull.data);
-    wstream.end(() => {
-      unirest.post('https://pangea.s.xtrf.eu/qrf/file')
-        .headers({ 'Content-Type': 'multipart/form-data' })
-        .attach('file', './dist/testtest.txt') // Attachment
-        .end(function (response) {
-          let token = response.body.token;
-          fs.unlink('./dist/testtest.txt', (err) => {
-            if (err) throw err;
-            console.log("testtеst.txt was deleted!")
-          });
-          console.log('done');
-          res.send({ token });
-        });
-    });
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Error on getting wordcount');
-  }
-});
+	let link = req.query.web
+	if (link.indexOf('dropbox') >= 0) {
+		let firstPart = link.split("=")[0]
+		link = firstPart + "=1"
+	}
+	try {
+		const resFull = await axios({
+			url: link,
+			method: 'GET',
+			responseType: 'blob' // important
+		})
+		let wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'))
+		wstream.write(resFull.data)
+		wstream.end(() => {
+			unirest.post('https://pangea.s.xtrf.eu/qrf/file')
+					.headers({ 'Content-Type': 'multipart/form-data' })
+					.attach('file', './dist/testtest.txt') // Attachment
+					.end(function (response) {
+						let token = response.body.token
+						fs.unlink('./dist/testtest.txt', (err) => {
+							if (err) throw err
+							console.log("testtеst.txt was deleted!")
+						})
+						console.log('done')
+						res.send({ token })
+					})
+		})
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on getting wordcount')
+	}
+})
 
-
-router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFiles' }]), async (req, res) => {
-    try {
-        const requestData = req.body;
-        const detailFiles = req.files["detailFiles"];
-        const refFiles = req.files["refFiles"];
-        await createNewRequest({requestData, detailFiles, refFiles});
-        res.send({message: "request was added"});
-  } catch (err) {
-      console.log(err);
-      res.status(500).send("Something went wrong while adding request")
-    }
-});
+router.post('/request', upload.fields([ { name: 'detailFiles' }, { name: 'refFiles' } ]), async (req, res) => {
+	try {
+		const requestData = req.body
+		const detailFiles = req.files["detailFiles"]
+		const refFiles = req.files["refFiles"]
+		await createNewRequest({ requestData, detailFiles, refFiles })
+		res.send({ message: "request was added" })
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Something went wrong while adding request")
+	}
+})
 
 // router.post('/allprojects', async (req, res) => {
 //     const filters = {...req.body};
@@ -87,371 +89,388 @@ router.post('/request', upload.fields([{ name: 'detailFiles' }, { name: 'refFile
 // });
 
 router.post('/all-requests', async (req, res) => {
-    const filters = {...req.body};
-    try {
-        const requests = await getFilteredClientRequests(filters);
-        res.send(requests);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Something wrong with DB while getting requests!');
-    }
-});
+	const filters = { ...req.body }
+	try {
+		const requests = await getFilteredClientRequests(filters)
+		res.send(requests)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB while getting requests!')
+	}
+})
 
 router.get('/requests-quantity', async (req, res) => {
-    try {
-        const quantity = await ClientRequest.countDocuments({status: {$ne: 'Cancelled'}});
-        res.send({quantity});
-    } catch(err) {
-        console.log(err);
-        res.status(500).send('Something wrong with DB while getting requests quantity');
-    }
+	try {
+		const quantity = await ClientRequest.countDocuments({ status: { $ne: 'Cancelled' } })
+		res.send({ quantity })
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB while getting requests quantity')
+	}
 })
-// //TODO: remove
-// router.get('/set-vendor-id', async (req, res) => {
-//     try {
-//       const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) ||  false
-//       let lastIntIndex = lastIndex.toJSON().hasOwnProperty('vendorId') ? parseInt(lastIndex.vendorId.split('_').pop()) : 0
-//       // person.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
-//
-//       const vendors = await Vendors.find({status: {$ne: 'Cancelled'}});
-//
-//       for (const vendor of vendors) {
-//         vendor.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
-//         await Vendors.updateOne({_id: vendor._id}, {vendorId: vendor.vendorId})
-//       }
-//       res.send('Success');
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send('Something wrong with DB while getting requests quantity');
-//     }
-// })
 
 router.get('/languages', async (req, res) => {
-  try {
-    const languages = await Languages.find({});
-    res.send(languages)
-  } catch(err) {
-      console.log(err);
-      res.status(500).send('Something wrong with DB / Cannot get languages');
-    }
-});
+	try {
+		const languages = await Languages.find({})
+		res.send(languages)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB / Cannot get languages')
+	}
+})
 
 router.get('/services', async (req, res) => {
-  try {
-    const { filter } = req.query;
-    let services = await getServices();
-    if(filter) {
-        services = services.filter(item => item.active);
-    }
-    res.send(services);
-  } catch(err) {
-      console.log(err);
-      res.status(500).send('Something wrong with DB / Cannot get Services');
-  }
-});
+	try {
+		const { filter } = req.query
+		let services = await getServices()
+		if (filter) {
+			services = services.filter(item => item.active)
+		}
+		res.send(services)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB / Cannot get Services')
+	}
+})
 
 router.get('/industries', async (req, res) => {
-  try {
-    const industries = await Industries.find({});
-    const lastIndustryIndex = industries.findIndex(item => item.isLast);
-    const lastIndustry = industries.splice(lastIndustryIndex, 1);
-    const sortedIndustries = industries.sort( (a,b) => {
-        if(a.name < b.name) return -1;
-        if(a.name > b.name) return 1;
-    });
-    sortedIndustries.push(lastIndustry[0]);
-    res.send(sortedIndustries)
-  } catch(err) {
-    console.log(err);
-    res.status(500).send('Something wrong with DB / Cannot get Industries');
-  }
-});
+	try {
+		const industries = await Industries.find({})
+		const lastIndustryIndex = industries.findIndex(item => item.isLast)
+		const lastIndustry = industries.splice(lastIndustryIndex, 1)
+		const sortedIndustries = industries.sort((a, b) => {
+			if (a.name < b.name) return -1
+			if (a.name > b.name) return 1
+		})
+		sortedIndustries.push(lastIndustry[0])
+		res.send(sortedIndustries)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB / Cannot get Industries')
+	}
+})
 
 router.get('/timezones', async (req, res) => {
-  try {
-    const timezones = await Timezones.find({});
-    res.send(timezones)
-  } catch(err) {
-      console.log(err);
-      res.status(500).send('Something wrong with DB / Cannot get Timezones');
-  }
-});
+	try {
+		const timezones = await Timezones.find({})
+		res.send(timezones)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong with DB / Cannot get Timezones')
+	}
+})
 
 
 router.get('/countries', (req, res) => {
-  try {
-    const countries = getAllCountries();
-    res.send(countries);
-  } catch(err) {
-    console.log(err)
-    res.status(500).send("Error on getting countries");
-  }
-});
+	try {
+		const countries = getAllCountries()
+		res.send(countries)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting countries")
+	}
+})
 
 router.get('/leadsources', async (req, res) => {
-  try {
-    const leadsources = await LeadSource.find({});
-    leadsources.sort((a, b) => {
-        if(a.source > b.source) return 1;
-        if(a.source < b.source) return -1;
-      });
-    res.send(leadsources);
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on getting lead sources from DB")
-  }
-});
+	try {
+		const leadsources = await LeadSource.find({})
+		leadsources.sort((a, b) => {
+			if (a.source > b.source) return 1
+			if (a.source < b.source) return -1
+		})
+		res.send(leadsources)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting lead sources from DB")
+	}
+})
 
 router.post('/leadsource', async (req, res) => {
-  const { leadSource } = req.body;
-  try {
-    if(leadSource._id) {
-      await LeadSource.updateOne({"_id": leadSource._id}, leadSource);
-      return res.send("Updated");
-    }
-    await LeadSource.create(leadSource);
-    res.send("New lead source created");
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on updating/creating a lead source")
-  }
-});
+	const { leadSource } = req.body
+	try {
+		if (leadSource._id) {
+			await LeadSource.updateOne({ "_id": leadSource._id }, leadSource)
+			return res.send("Updated")
+		}
+		await LeadSource.create(leadSource)
+		res.send("New lead source created")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating/creating a lead source")
+	}
+})
 
 router.delete('/leadsource/:id', async (req, res) => {
-  const { id } = req.params;
-  if(!id) {
-    return res.send('Deleted unsaved lead source')
-  }
-  try {
-    await LeadSource.deleteOne({"_id": id});
-    res.send('Deleted');
-  } catch(err) {
-    console.log(err);
-    res.status(500).send("Error on deleting lead source");
-  }
-});
+	const { id } = req.params
+	if (!id) {
+		return res.send('Deleted unsaved lead source')
+	}
+	try {
+		await LeadSource.deleteOne({ "_id": id })
+		res.send('Deleted')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting lead source")
+	}
+})
 
 router.get('/groups', async (req, res) => {
-    try {
-      const groups = await Group.find({});
-      groups.sort((a, b) => {
-          if(a.name > b.name) return 1;
-          if(a.name < b.name) return -1;
-        });
-      res.send(groups);
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on getting groups from DB")
-    }
-});
+	try {
+		const groups = await Group.find({})
+		groups.sort((a, b) => {
+			if (a.name > b.name) return 1
+			if (a.name < b.name) return -1
+		})
+		res.send(groups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting groups from DB")
+	}
+})
 
 router.post('/group', async (req, res) => {
-    const { group } = req.body;
-    try {
-        if(group._id) {
-        await Group.updateOne({"_id": group._id}, group);
-        return res.send("Updated");
-        }
-        await Group.create(group);
-        res.send("New group created");
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on updating/creating a group")
-    }
-});
+	const { group } = req.body
+	try {
+		if (group._id) {
+			await Group.updateOne({ "_id": group._id }, group)
+			return res.send("Updated")
+		}
+		await Group.create(group)
+		res.send("New group created")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating/creating a group")
+	}
+})
 
 router.delete('/group/:id', async (req, res) => {
-    const { id } = req.params;
-    if(!id) {
-        return res.send('Deleted unsaved group')
-    }
-    try {
-        await Group.deleteOne({"_id": id});
-        res.send('Deleted');
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on deleting group");
-    }
-});
+	const { id } = req.params
+	if (!id) {
+		return res.send('Deleted unsaved group')
+	}
+	try {
+		await Group.deleteOne({ "_id": id })
+		res.send('Deleted')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting group")
+	}
+})
 
 router.get('/group-user', async (req, res) => {
-    const { id } = req.query;
-    try {
-        const user = await User.findOne({group: id},{firstName: 1});
-        res.send(user);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting any user of group");
-    }
+	const { id } = req.query
+	try {
+		const user = await User.findOne({ group: id }, { firstName: 1 })
+		res.send(user)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting any user of group")
+	}
 })
 
 router.get('/steps', async (req, res) => {
-    try {
-      const steps = await Step.find({})
-        .populate('calculationUnit');
-      res.send(steps);
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on getting steps from DB")
-    }
-});
+	try {
+		const steps = await Step.find({})
+				.populate('calculationUnit')
+		res.send(steps)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting steps from DB")
+	}
+})
 
 router.post('/step', async (req, res) => {
-    const { step } = req.body;
-    try {
-      if(step._id) {
-        await changeStepsInUnits(step)
-        return res.send('Updated');
-      }
-      const { _id } = await Step.create(step);
-      await insertStepsIntoUnits(step, _id);
-      res.send(_id);
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on updating/creating a step")
-    }
-});
+	const { step } = req.body
+	try {
+		if (step._id) {
+			await changeStepsInUnits(step)
+			return res.send('Updated')
+		}
+		const { _id } = await Step.create(step)
+		await insertStepsIntoUnits(step, _id)
+		res.send(_id)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating/creating a step")
+	}
+})
 
 router.get('/instructions', async (req, res) => {
-    try {
-        const instructions = await Instruction.find({});
-        res.send(instructions);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting instructions from DB")
-    }
+	try {
+		const instructions = await Instruction.find({})
+		res.send(instructions)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting instructions from DB")
+	}
 })
 
 router.post('/instructions', async (req, res) => {
-    const { instruction } = req.body;
-    try {
-        if(instruction._id) {
-            await Instruction.updateOne({"_id": instruction._id}, instruction);
-            return res.send('Updated');
-        }
-        await Instruction.create(instruction);
-        res.send('New instruction saved.');
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on updating/creating a instruction")
-    }
-  });
+	const { instruction } = req.body
+	try {
+		if (instruction._id) {
+			await Instruction.updateOne({ "_id": instruction._id }, instruction)
+			return res.send('Updated')
+		}
+		await Instruction.create(instruction)
+		res.send('New instruction saved.')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating/creating a instruction")
+	}
+})
 
 router.delete('/instructions/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        await Instruction.deleteOne({"_id": id});
-        res.send("Package deleted");
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on deleting instruction")
-    }
-});
+	const { id } = req.params
+	try {
+		await Instruction.deleteOne({ "_id": id })
+		res.send("Package deleted")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting instruction")
+	}
+})
 
 router.get('/reasons', async (req, res) => {
-    try {
-      const reasons = await CancelReason.find({});
-      reasons.sort((a, b) => {
-          if(a.reason > b.reason) return 1;
-          if(a.reason < b.reason) return -1;
-        });
-      res.send(reasons);
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on getting reasons from DB")
-    }
-});
+	try {
+		const reasons = await CancelReason.find({})
+		reasons.sort((a, b) => {
+			if (a.reason > b.reason) return 1
+			if (a.reason < b.reason) return -1
+		})
+		res.send(reasons)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting reasons from DB")
+	}
+})
 
 router.post('/reason', async (req, res) => {
-    const { reason } = req.body;
-    try {
-      if(reason._id) {
-        await CancelReason.updateOne({"_id": reason._id}, {...reason});
-        return res.send("Updated");
-      }
-      await CancelReason.create(reason);
-      res.send("New reason created");
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on updating/creating a reason")
-    }
-});
+	const { reason } = req.body
+	try {
+		if (reason._id) {
+			await CancelReason.updateOne({ "_id": reason._id }, { ...reason })
+			return res.send("Updated")
+		}
+		await CancelReason.create(reason)
+		res.send("New reason created")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating/creating a reason")
+	}
+})
 
 router.delete('/reason/:id', async (req, res) => {
-    const { id } = req.params;
-    if(!id) {
-      return res.send('Deleted unsaved reason')
-    }
-    try {
-      await CancelReason.deleteOne({"_id": id});
-      res.send('Deleted');
-    } catch(err) {
-      console.log(err);
-      res.status(500).send("Error on deleting reason");
-    }
-});
+	const { id } = req.params
+	if (!id) {
+		return res.send('Deleted unsaved reason')
+	}
+	try {
+		await CancelReason.deleteOne({ "_id": id })
+		res.send('Deleted')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting reason")
+	}
+})
 
 router.get('/tier-lqas', async (req, res) => {
-    try {
-        const result = await TierLqa.find();
-        res.send(result);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting tier lqas");
-    }
+	try {
+		const result = await TierLqa.find()
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting tier lqas")
+	}
 })
 
 router.get('/pdf-file', async (req, res) => {
-    try {
-        const result = await getPdf();
-        res.send(result);
-    } catch(err) {
-        console.log(err);
-        res.status(500).send("Error on getting tier lqas");
-    }
+	try {
+		const result = await getPdf()
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting tier lqas")
+	}
 })
 
 router.get('/units', async (req, res) => {
-  try {
-    const units = await Units.find()
-      .populate('steps');
+	try {
+		const units = await Units.find()
+				.populate('steps')
 
-    res.send(units);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error on getting units");
-  }
+		res.send(units)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting units")
+	}
 })
 
 router.post('/units', async (req, res) => {
-  const { unit } = req.body;
-  try {
-    if (unit._id) {
-      await changeUnitsInSteps(unit);
-      return res.send("Updated");
-    }
-    const { _id } = await Units.create(unit);
-    await insertUnitIntoStep(unit, _id);
-    res.send(_id)
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error on creating unit");
-  }
+	const { unit } = req.body
+	try {
+		if (unit._id) {
+			await changeUnitsInSteps(unit)
+			return res.send("Updated")
+		}
+		const { _id } = await Units.create(unit)
+		await insertUnitIntoStep(unit, _id)
+		res.send(_id)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on creating unit")
+	}
 })
 
 router.delete('/units/:id', async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res.send("Id has not been provided");
-  }
-  try {
-    await Units.deleteOne({ _id: id });
-    await deleteUnitFromStep(id);
-    res.send("Deleted");
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Error on deleting unit");
-  }
+	const { id } = req.params
+	if (!id) {
+		return res.send("Id has not been provided")
+	}
+	try {
+		await Units.deleteOne({ _id: id })
+		await deleteUnitFromStep(id)
+		res.send("Deleted")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting unit")
+	}
 })
 
-module.exports = router;
+router.get('/cc-stat', async (req, res) => {
+	try {
+		const m1 = moment()
+		const todayDay = m1.date()
+		const todayMonth = m1.month() + 1
+		const todayYear = m1.year()
+
+		const m2 = moment().subtract(1, 'd')
+		const yesterdayDay = m2.date()
+		const yesterdayMonth = m2.month() + 1
+		const yesterdayYear = m2.year()
+
+		const projectsToday = await Projects.find({
+			"customer": '60c3757bb9a00961d7bb5e07',
+			"startDate": {
+				$gte: new Date(`${ todayYear }-${ todayMonth < 10 ? '0' + todayMonth : todayMonth }-${ todayDay < 10 ? '0' + todayDay : todayDay }T00:00:00.000Z`),
+				$lte: new Date(`${ todayYear }-${ todayMonth < 10 ? '0' + todayMonth : todayMonth }-${ todayDay < 10 ? '0' + todayDay : todayDay }T24:00:00.000Z`)
+			}
+		})
+		const projectsYesterday = await Projects.find({
+			"customer": '60c3757bb9a00961d7bb5e07',
+			"startDate": {
+				$gte: new Date(`${ yesterdayYear }-${ yesterdayMonth < 10 ? '0' + yesterdayMonth : yesterdayMonth }-${ yesterdayDay < 10 ? '0' + yesterdayDay : yesterdayDay }T00:00:00.000Z`),
+				$lte: new Date(`${ yesterdayYear }-${ yesterdayMonth < 10 ? '0' + yesterdayMonth : yesterdayMonth }-${ yesterdayDay < 10 ? '0' + yesterdayDay : yesterdayDay }T24:00:00.000Z`)
+			}
+		})
+		res.send(`<br><ul style="font-family: Arial; font-size: 14px;">
+				<p>Today: <strong>${ projectsToday.length } / ${ projectsToday.filter(item => item.status === 'Closed').length }</strong> </p>
+				<p>Yesterday: <strong>${ projectsYesterday.length } / ${ projectsYesterday.filter(item => item.status === 'Closed').length }</strong> </p>
+			</ul>`)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting stats")
+	}
+})
+
+module.exports = router
