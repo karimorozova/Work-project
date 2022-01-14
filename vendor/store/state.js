@@ -41,7 +41,7 @@ const state = {
   isAlert: false,
   alertType: "success",
   originallyUnits: [],
-  reports: [],
-  reportsPaid: [],
+  // reports: [],
+  // reportsPaid: [],
 };
 export default state

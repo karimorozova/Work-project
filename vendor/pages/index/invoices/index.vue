@@ -74,6 +74,8 @@ import moment from "moment"
 export default {
   data() {
     return {
+      reports: [],
+      reportsPaid: [],
       fields: [
         {
           label: "Report Id",
@@ -130,17 +132,28 @@ export default {
     dateRange(row) {
       return `${ this.formattedDateRange(row.firstPaymentDate) } <span style="color: #999999; margin: 0 4px;">/</span> ${ this.formattedDateRange(row.lastPaymentDate) || "-" }`
     },
-    test() {
-      console.log(this.dava)
+    async getVendorReports() {
+      try {
+        const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
+        const decode = window.atob(result.data)
+        this.reports = JSON.parse(decode)
+      } catch (err) {
+      }
+    },
+    async getVendorPaidReports() {
+      try {
+        const result = await this.$axios.get(`/vendor/paid-reports?token=${ this.$store.state.token }`)
+        const decode = window.atob(result.data)
+        this.reportsPaid = JSON.parse(decode)
+      } catch (err) {
+      }
     }
   },
-  computed: {
-    ...mapGetters({
-      reportsPaid: "getReportsPaid",
-      reports: "getReports"
-    })
-  },
-  components: { GeneralTable }
+  components: { GeneralTable },
+  async created() {
+    await this.getVendorReports()
+    await this.getVendorPaidReports()
+  }
 }
 </script>
 
@@ -180,6 +193,7 @@ export default {
   border-radius: 4px;
   width: 1025px;
   box-sizing: border-box;
+  background-color: white;
 }
 
 .container {

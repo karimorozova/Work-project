@@ -33,7 +33,7 @@ export default {
   }
 
   &__table {
-    width: 1000px;
+    width: 1025px;
     height: auto;
     box-shadow: $box-shadow;
     box-sizing: border-box;

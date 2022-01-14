@@ -113,7 +113,7 @@
             .item__header--icons(v-if="deletingIndex === null && editingIndex === null")
               .item__header--icon(@click="openModalForEdition(item, index)")
                 i(class="fas fa-pen")
-              .item__header--icon(@click="openApproveModal(index)")
+              .item__header--icon(@click="openApproveModal(item, index)")
                 i(class="fas fa-trash")
             .item__header--icons(v-else)
               .item__header--icon
@@ -163,7 +163,8 @@ export default {
       bankType: {},
       editingIndex: null,
       deletingIndex: null,
-      isDeletingModal: false
+      isDeletingModal: false,
+      reports: []
     }
   },
   methods: {
@@ -192,10 +193,6 @@ export default {
       this.deletingIndex = null
       this.isDeletingModal = false
     },
-    openApproveModal(index) {
-      this.deletingIndex = index
-      this.isDeletingModal = true
-    },
     async deletePaymentMethod() {
       try {
         const result = await this.$http.delete(`/vendorsapi/manage-payment-methods/${ this.$route.params.id }/${ this.deletingIndex }`)
@@ -208,7 +205,24 @@ export default {
         this.closeApproveModal()
       }
     },
+    isPaymentMethodInInvoice({ name }) {
+      const reports = this.reports.filter(item => item.paymentDetails.paymentMethod)
+      if (!reports.length) return false
+      return reports.some(item => item.paymentDetails.paymentMethod.name === name)
+    },
+    openApproveModal(item, index) {
+      if (this.isPaymentMethodInInvoice(item)) {
+        alert('Payment method in invoice!')
+        return
+      }
+      this.deletingIndex = index
+      this.isDeletingModal = true
+    },
     openModalForEdition(item, index) {
+      if (this.isPaymentMethodInInvoice(item)) {
+        alert('Payment method in invoice!')
+        return
+      }
       this.editingIndex = index
       this.isModal = true
       const { type, ...rest } = item
@@ -249,6 +263,14 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
       }
+    },
+    async getVendorReport() {
+      try {
+        const result = await this.$http.get(`/invoicing-payables/vendor-reports/${ this.$route.params.id }`)
+        this.reports = result.data
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Payment Reports", isShow: true, type: "error" })
+      }
     }
   },
   computed: {
@@ -266,6 +288,7 @@ export default {
   },
   created() {
     this.getAndSetPaymentTerms()
+    this.getVendorReport()
   },
   components: { ApproveModal, Button, Add, CheckBox, SelectSingle }
 
@@ -332,7 +355,7 @@ export default {
     &--name {
       font-size: 14px;
       font-family: 'Myriad600';
-      width: 210px;
+      width: 200px;
     }
 
     &--icons {
@@ -341,9 +364,18 @@ export default {
     }
 
     &--icon {
-      color: $border-focus;
-      font-size: 15px;
+      font-size: 14px;
+      border-radius: 4px;
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
       cursor: pointer;
+      transition: .2s ease-out;
+      justify-content: center;
+      border: 1px solid $border;
+      color: $dark-border;
+      box-sizing: border-box;
 
       &:hover {
         color: $text;

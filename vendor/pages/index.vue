@@ -98,9 +98,7 @@ export default {
     ...mapActions([
       "alertToggle",
       "logout",
-      "setOriginallyUnits",
-      "setReports",
-      "setReportsPaid"
+      "setOriginallyUnits"
     ]),
 
     mainPageRender() {
@@ -124,24 +122,6 @@ export default {
       } catch (err) {
         this.logout()
         this.$router.push('/login')
-      }
-    },
-    async getVendorReports() {
-      try {
-        const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
-        const decode = window.atob(result.data)
-        const data = JSON.parse(decode)
-        this.setReports(data)
-      } catch (err) {
-      }
-    },
-    async getVendorPaidReports() {
-      try {
-        const result = await this.$axios.get(`/vendor/paid-reports?token=${ this.$store.state.token }`)
-        const decode = window.atob(result.data)
-        const data = JSON.parse(decode)
-        this.setReportsPaid(data)
-      } catch (err) {
       }
     },
     async getAllIndustries() {
@@ -223,8 +203,6 @@ export default {
   async created() {
     await this.getVendorInfo()
     await this.getOriginallyUnits()
-    await this.getVendorReports()
-    await this.getVendorPaidReports()
     await this.getAllIndustries()
     await this.getAllLanguages()
     await this.getAllSteps()

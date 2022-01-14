@@ -252,7 +252,7 @@ a {
 
 .fontIcon {
   &__add {
-    font-size: 14px;
+    font-size: 16px;
     margin-right: 10px;
   }
 }

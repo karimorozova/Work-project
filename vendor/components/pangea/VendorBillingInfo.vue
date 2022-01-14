@@ -118,8 +118,9 @@
             .item__header--icons(v-if="deletingIndex === null && editingIndex === null")
               .item__header--icon(@click="openModalForEdition(item, index)")
                 i(class="fas fa-pen")
-              .item__header--icon(@click="openApproveModal(index)")
+              .item__header--icon(@click="openApproveModal(item, index)")
                 i(class="fas fa-trash")
+
             .item__header--icons(v-else)
               .item__header--icon
                 i(class="fas fa-pen")
@@ -174,7 +175,8 @@ export default {
       bankType: {},
       editingIndex: null,
       deletingIndex: null,
-      isDeletingModal: false
+      isDeletingModal: false,
+      reports: []
     }
   },
   methods: {
@@ -182,7 +184,12 @@ export default {
       setVendorBillingInfo: "setVendorBillingInfo",
       alertToggle: "alertToggle"
     }),
+    checkMethodExistingInInvoice(name) {
+      if (!this.reports.length) return true
 
+      console.log(this.reports, name)
+      return false
+    },
     async manageModalState() {
       const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
       Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
@@ -205,10 +212,6 @@ export default {
       this.deletingIndex = null
       this.isDeletingModal = false
     },
-    openApproveModal(index) {
-      this.deletingIndex = index
-      this.isDeletingModal = true
-    },
     async deletePaymentMethod() {
       try {
         const result = await this.$axios.post(`/vendor/manage-payment-methods/${ this.currentVendor._id }/${ this.deletingIndex }/delete`)
@@ -223,7 +226,24 @@ export default {
         this.closeApproveModal()
       }
     },
+    isPaymentMethodInInvoice({ name }) {
+      const reports = this.reports.filter(item => item.paymentDetails.paymentMethod)
+      if (!reports.length) return false
+      return reports.some(item => item.paymentDetails.paymentMethod.name === name)
+    },
+    openApproveModal(item, index) {
+      if (this.isPaymentMethodInInvoice(item)) {
+        alert('Payment method in invoice!')
+        return
+      }
+      this.deletingIndex = index
+      this.isDeletingModal = true
+    },
     openModalForEdition(item, index) {
+      if (this.isPaymentMethodInInvoice(item)) {
+        alert('Payment method in invoice!')
+        return
+      }
       this.editingIndex = index
       this.isModal = true
       const { type, ...rest } = item
@@ -288,6 +308,14 @@ export default {
     },
     cancelChanges() {
       this.billingInfo = JSON.parse(JSON.stringify(this.currentVendor.billingInfo))
+    },
+    async getVendorReports() {
+      try {
+        const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
+        const decode = window.atob(result.data)
+        this.reports = JSON.parse(decode)
+      } catch (err) {
+      }
     }
   },
   computed: {
@@ -304,8 +332,10 @@ export default {
       }
     }
   },
-  created() {
-    this.getAndSetPaymentTerms()
+  async created() {
+    await this.getAndSetPaymentTerms()
+    await this.getVendorReports()
+    console.log(this.reports)
   },
   components: { CheckBox, SelectSingle, Button, ApproveModal, Add }
 
@@ -372,7 +402,7 @@ export default {
     &--name {
       font-size: 14px;
       font-family: 'Myriad600';
-      width: 210px;
+      width: 200px;
     }
 
     &--icons {
@@ -381,9 +411,18 @@ export default {
     }
 
     &--icon {
-      color: $border-focus;
-      font-size: 15px;
+      font-size: 14px;
+      border-radius: 4px;
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
       cursor: pointer;
+      transition: .2s ease-out;
+      justify-content: center;
+      border: 1px solid $border;
+      color: $dark-border;
+      box-sizing: border-box;
 
       &:hover {
         color: $text;
