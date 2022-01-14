@@ -473,4 +473,25 @@ router.get('/cc-stat', async (req, res) => {
 	}
 })
 
+router.get('/cc-stat-custom/:from/:to', async (req, res) => {
+
+	try {
+		const { from, to } = req.params
+		const project = await Projects.find({
+			"customer": '60c3757bb9a00961d7bb5e07',
+			"startDate": {
+				$gte: from, $lte: to
+			}
+		})
+		res.send(`<br><ul style="font-family: Arial; font-size: 14px;">
+				<p> ${ moment(from).format('YYYY-MM-DD HH:mm') }</p>
+				<p>${ moment(to).format('YYYY-MM-DD HH:mm') }</p>
+				<p> Projects: <strong>${ project.length } / ${ project.filter(item => item.status === 'Closed').length }</strong> </p>
+			</ul>`)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting stats")
+	}
+})
+
 module.exports = router
