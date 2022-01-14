@@ -16,6 +16,8 @@ const {
 	getAllPaidPayables,
 	getPaidPayables,
 	createNewPayable,
+	updatePayableFromZoho,
+	updatePayablesFromZoho,
 } = require('../invoicingPayables')
 
 const ObjectId = require("mongodb").ObjectID
@@ -45,6 +47,27 @@ router.post("/not-selected-steps-list", async (req, res) => {
 		const query = stepsFiltersQuery(filters, allLanguages)
 		const steps = await getAllSteps(countToSkip, countToGet, query)
 		res.send(steps);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.get("/update-all-state-from-zoho", async (req, res) => {
+	try {
+		const statusAction =	await updatePayablesFromZoho()
+		res.send(statusAction);
+	} catch(err) {
+		console.log(err);
+		res.status(500).send('Something wrong on getting steps');
+	}
+});
+
+router.get("/update-state-from-zoho/:id", async (req, res) => {
+	const { id } = req.params
+	try {
+		const result = await updatePayableFromZoho(id)
+		res.send(result);
 	} catch(err) {
 		console.log(err);
 		res.status(500).send('Something wrong on getting steps');

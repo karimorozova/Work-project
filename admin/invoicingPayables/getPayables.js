@@ -100,11 +100,53 @@ const getPayable = async (id) => {
 						],
 						as: "steps"
 					}
+				},
+				{ $addFields: {
+						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
+						paidAmount: { $sum: "$paymentInformation.paidAmount" },
+					}
+				},
+				{ $addFields: {
+						unpaidAmount: { $subtract: ["$totalPrice", "$paidAmount" ] },
+					}
 				}
 			]
 	)
 	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
+
+const getAllPayable = async () => {
+	const invoicingReports = await InvoicingPayables.aggregate([
+				// { $match: { "_id": ObjectId(id) } },
+				{
+					$lookup: {
+						from: "projects",
+						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						pipeline: [
+							{ "$unwind": "$steps" },
+							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$addFields": { "steps.projectNativeId": '$_id' } },
+							{ "$addFields": { "steps.projectName": '$projectName' } },
+							{ "$addFields": { " steps.billingDate": '$billingDate' } },
+							{ '$replaceRoot': { newRoot: '$steps' } }
+						],
+						as: "steps"
+					}
+				},
+				{ $addFields: {
+						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
+						paidAmount: { $sum: "$paymentInformation.paidAmount" },
+					}
+				},
+				{ $addFields: {
+						unpaidAmount: { $subtract: ["$totalPrice", "$paidAmount" ] },
+					}
+				}
+			]
+	)
+	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
+}
+
 
 const getPayableByVendorId = async (id) => {
 	return await InvoicingPayables.aggregate([
@@ -205,6 +247,7 @@ module.exports = {
 	stepsFiltersQuery,
 	getAllPayables,
 	getPayable,
+	getAllPayable,
 	getAllSteps,
 	payablesFiltersQuery,
 	getPayablesDateRange,
