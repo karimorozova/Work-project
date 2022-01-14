@@ -23,6 +23,7 @@ const {
 const {
 	getAllPayables,
 	getPayable,
+	getAllPayable,
 	getAllSteps,
 	stepsFiltersQuery,
 	payablesFiltersQuery,
@@ -39,7 +40,9 @@ const {
 	createBill,
 	addFile,
 	removeFile,
-	createNewPayable
+	createNewPayable,
+	updatePayableFromZoho,
+	updatePayablesFromZoho
 } = require('./zohoBilling')
 
 module.exports = {
@@ -65,5 +68,8 @@ module.exports = {
 	addFile,
 	updatePayable,
 	removeFile,
-	createNewPayable
+	createNewPayable,
+	updatePayableFromZoho,
+	updatePayablesFromZoho,
+	getAllPayable
 }

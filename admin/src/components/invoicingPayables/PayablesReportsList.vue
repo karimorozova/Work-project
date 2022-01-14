@@ -73,6 +73,7 @@
           .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
         .options__button(v-else)
+          Button(value="Zoho sync." :outline="true" @clicked="updatePayablesStateFromZoho()" style="margin-right: 10px;")
           router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-payables/create-reports`}")
             Button(value="Add Reports")
 
@@ -440,7 +441,17 @@ export default {
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
         this.isDataRemain = result.data.length === 50
       }
-    }
+    },
+    async updatePayablesStateFromZoho() {
+      try {
+        const result = await this.$http.get('/invoicing-payables/update-all-state-from-zoho')
+        await this.getReports()
+        const { type, message } = result.data
+        this.alertToggle({ message, isShow: true, type })
+      } catch (e) {
+        console.log(e)
+      }
+    },
   },
   computed: {
     ...mapGetters({

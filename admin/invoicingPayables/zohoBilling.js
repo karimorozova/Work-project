@@ -10,7 +10,9 @@ const moment = require("moment")
 const { returnMessageAndType } = require("./helpers")
 const { refreshToken } = require("../services")
 const { logging } = require("googleapis/build/src/apis/logging")
-const { paidOrAddPaymentInfo } = require("../invoicingPayables")
+const { paidOrAddPaymentInfo } = require("./updatePayables")
+const { getPayable, getAllPayables, getAllPayable } = require("./getPayables")
+const { updatePayable } = require("./updatePayables")
 
 async function getCurrentToken() {
 	try {
@@ -123,12 +125,50 @@ const createNewPayable = async (vendorName, vendorEmail, billId, amount) => {
 	return vendorpayment.payment_id
 }
 
-const updatePayableFromZoho = async (zohoId) => {
-	// const listBillPayments = await sendRequestToZoho(`bills/${zohoId}/payments?organization_id=${organizationId}`)
-	//
-	// listBillPayments.map(({})=> {
-	// 	// const result = await paidOrAddPaymentInfo(reportId, zohoPaymentId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
-	// })
+const updatePayablesFromZoho = async () => {
+	try {
+		let allPayables = (await getAllPayable())
+		for (let {_id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId} of allPayables) {
+			await syncPayableWithZoho(reportId, { zohoId, paymentInformation, unpaidAmount}  )
+		}
+		return { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
+	} catch (err) {
+		return {type: 'error', message: err.message, isMovedToArchive: false}
+	}
+
+}
+
+const updatePayableFromZoho = async (reportId ) => {
+	try {
+		let { zohoBillingId: zohoId, paymentInformation, unpaidAmount} = (await getPayable(reportId))[0]
+		const statusAction = await syncPayableWithZoho(reportId, { zohoId, paymentInformation, unpaidAmount}  )
+		return statusAction === 'Moved' ? { type: 'success',message: 'Updated and moved to Archive', isMovedToArchive: true} : { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
+
+	} catch (err) {
+		return {type: 'error', message: err.message, isMovedToArchive: false}
+	}
+}
+
+const syncPayableWithZoho = async (reportId, { zohoId, paymentInformation, unpaidAmount}) => {
+	const createdZohoPaidIds =  paymentInformation.reduce((acc, {zohoPaymentId}) => {
+			acc.push(zohoPaymentId)
+			return acc
+	}, [])
+
+	const listBillPayments = (await sendRequestToZoho(`bills/${ zohoId }/payments?organization_id=${ organizationId }`)).data
+
+
+	for await (let { payment_id, date, amount } of listBillPayments.payments) {
+		if(!createdZohoPaidIds.includes(payment_id)) {
+			//TODO: https://stackoverflow.com/questions/31426740/how-to-return-many-promises-and-wait-for-them-all-before-doing-other-stuff
+
+			unpaidAmount = (unpaidAmount - amount).toFixed(2)
+			await paidOrAddPaymentInfo(reportId,  payment_id,  {paidAmount:amount, unpaidAmount, paymentMethod: 'Test1',	paymentDate: new Date(date), notes: ''})
+
+		}
+	}
+	if (unpaidAmount <= 0) return "Moved"
+	return "Success"
 }
 
 const addFile = async (billId, filePath) => {
@@ -149,5 +189,7 @@ module.exports = {
 	createBill,
 	addFile,
 	removeFile,
-	createNewPayable
+	createNewPayable,
+	updatePayableFromZoho,
+	updatePayablesFromZoho
 }

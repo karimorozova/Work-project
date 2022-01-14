@@ -411,7 +411,20 @@ export default {
     async getSteps() {
       this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
       console.log('steps', this.steps)
-    }
+    },
+    async updatePayableStateFromZoho(id) {
+      try {
+        const result = await this.$http.get('/invoicing-payables/update-state-from-zoho/' + id)
+        const { type, message, isMovedToArchive} = result.data
+        this.alertToggle({ message, isShow: true, type })
+        if (isMovedToArchive) {
+          await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+        }
+      } catch (err) {
+        console.log(err)
+        this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
+      }
+    },
   },
   computed: {
     abilityToSubmitPayment() {
@@ -435,6 +448,7 @@ export default {
     }
   },
   async created() {
+    await this.updatePayableStateFromZoho(this.$route.params.id)
     await this.openDetails(this.$route.params.id)
     this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
     this.domain = __WEBPACK__API_URL__
