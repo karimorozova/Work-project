@@ -92,9 +92,9 @@ const createVendor = async (vendorName, vendorEmail) => {
 }
 
 
-const createBill = async (due_date, vendorEmail, billNumber, lineItems, notes) => {
+const createBill = async (due_date,vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems, notes) => {
 	let zohoVendorId = await getVendor(vendorEmail)
-	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor('test', vendorEmail)
+	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
@@ -106,9 +106,9 @@ const createBill = async (due_date, vendorEmail, billNumber, lineItems, notes) =
 	return billing.data
 }
 
-const createNewPayable = async (vendorName, vendorEmail, billId, amount) => {
+const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, amount) => {
 	let vendorId = await getVendor(vendorEmail)
-	vendorId = vendorId ? vendorId : await createVendor('test', vendorEmail)
+	vendorId = vendorId ? vendorId : await createVendor(vendorName, vendorEmail)
 
 	const data = {
 		"vendor_id": vendorId,
@@ -127,9 +127,9 @@ const createNewPayable = async (vendorName, vendorEmail, billId, amount) => {
 
 const updatePayablesFromZoho = async () => {
 	try {
-		let allPayables = (await getAllPayable())
-		for (let {_id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId} of allPayables) {
-			await syncPayableWithZoho(reportId, { zohoId, paymentInformation, unpaidAmount}  )
+		let allPayables = (await getAllPayable({zohoBillingId: {$ne: ''}}))
+		for (let {_id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId, paymentDetails : {paymentMethod}} of allPayables) {
+			await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount}  )
 		}
 		return { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
 	} catch (err) {
@@ -140,8 +140,8 @@ const updatePayablesFromZoho = async () => {
 
 const updatePayableFromZoho = async (reportId ) => {
 	try {
-		let { zohoBillingId: zohoId, paymentInformation, unpaidAmount} = (await getPayable(reportId))[0]
-		const statusAction = await syncPayableWithZoho(reportId, { zohoId, paymentInformation, unpaidAmount}  )
+		let { zohoBillingId: zohoId, paymentInformation, unpaidAmount, paymentDetails : {paymentMethod}} = (await getPayable(reportId))[0]
+		const statusAction = await syncPayableWithZoho(reportId, paymentMethod,{ zohoId, paymentInformation, unpaidAmount}  )
 		return statusAction === 'Moved' ? { type: 'success',message: 'Updated and moved to Archive', isMovedToArchive: true} : { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
 
 	} catch (err) {
@@ -149,7 +149,7 @@ const updatePayableFromZoho = async (reportId ) => {
 	}
 }
 
-const syncPayableWithZoho = async (reportId, { zohoId, paymentInformation, unpaidAmount}) => {
+const syncPayableWithZoho = async (reportId, reportPaymentMethod, { zohoId, paymentInformation, unpaidAmount}) => {
 	const createdZohoPaidIds =  paymentInformation.reduce((acc, {zohoPaymentId}) => {
 			acc.push(zohoPaymentId)
 			return acc
@@ -163,7 +163,7 @@ const syncPayableWithZoho = async (reportId, { zohoId, paymentInformation, unpai
 			//TODO: https://stackoverflow.com/questions/31426740/how-to-return-many-promises-and-wait-for-them-all-before-doing-other-stuff
 
 			unpaidAmount = (unpaidAmount - amount).toFixed(2)
-			await paidOrAddPaymentInfo(reportId,  payment_id,  {paidAmount:amount, unpaidAmount, paymentMethod: 'Test1',	paymentDate: new Date(date), notes: ''})
+			await paidOrAddPaymentInfo(reportId,  payment_id,  {paidAmount:amount, unpaidAmount, paymentMethod: reportPaymentMethod,	paymentDate: new Date(date), notes: ''})
 
 		}
 	}

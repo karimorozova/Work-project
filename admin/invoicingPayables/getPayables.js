@@ -115,9 +115,9 @@ const getPayable = async (id) => {
 	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
-const getAllPayable = async () => {
+const getAllPayable = async (query = {}) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
-				// { $match: { "_id": ObjectId(id) } },
+		{ $match: query },
 				{
 					$lookup: {
 						from: "projects",
