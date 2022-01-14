@@ -10,8 +10,8 @@
             .drop-title Payment Method:
             .drop
               SelectSingle(
-                :selectedOption="paymentMethod"
-                :options="['test1', 'test2', 'test3' ]"
+                :selectedOption="paymentMethod.name || ''"
+                :options="reportDetailsInfo.vendor.billingInfo.paymentMethod.length ? reportDetailsInfo.vendor.billingInfo.paymentMethod.map(i => i.name) : []"
                 placeholder="Option"
                 @chooseOption="setPaymentMethod"
               )
@@ -89,9 +89,25 @@
                 .text__title Jobs:
                 .text__value {{ reportDetailsInfo.steps.length }}
 
+              .text__block(v-if="reportDetailsInfo.zohoBillingId" )
+                .text__title Zoho Link:
+                .text__value
+                  a(target="_blank" :href="`https://books.zoho.com/app#/bills/${reportDetailsInfo.zohoBillingId}?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D`") Bill
+
+              .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
+                .text__title Invoice:
+                .text__value
+                  .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                    i(class="fa-solid fa-download")
+                  span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
+
               .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
                 .text__title Payment method:
-                .text__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+                .text__value(style="display:flex; gap: 10px; align-items: center;")
+                  span.toggle-details(@click="togglePaymentDetails")
+                    i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
+                    i( v-else class="fa-solid fa-xmark")
+                  span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
 
               .text__block(v-if="reportDetailsInfo.paymentDetails.expectedPaymentDate" )
                 .text__title Expected payment date:
@@ -103,12 +119,13 @@
                   span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
                   span(v-html="'&euro;'")
 
-              .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
-                .text__title Invoice:
-                .text__value
-                  .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-                    i(class="fa-solid fa-download")
-                  span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
+            .payment-details(v-if="isShowPaymentDetails" )
+              .payment-details__row(v-for="[key, val] in Object.entries(reportDetailsInfo.paymentDetails.paymentMethod)" v-if="key !== 'name'" )
+                .payment-details__key {{ replaceKey(key) }}:
+                .payment-details__value
+                  span.details-icon(@click="copyDetailsInfo(val)")
+                    i(class="fa-regular fa-copy")
+                  span {{ val }}
 
             .payment-buttons
               Button(v-if='!toggleAddSteps && reportDetailsInfo.status === "Created"' value="Send" @clicked="changeReportStatus")
@@ -274,13 +291,25 @@ export default {
       // showDeleteRequestModal: false,
       // showSendModal: false,
 
-      disabled: {
-        to: moment().add(-1, 'day').endOf('day').toDate()
-      }
+
+      isShowPaymentDetails: false
     }
   },
   methods: {
-    ...mapActions([ 'alertToggle' ]),
+    replaceKey(key) {
+      switch (key) {
+        case 'accountName':
+          key = 'Account Name'
+      }
+      return key[0].toUpperCase() + key.substr(1)
+    },
+    copyDetailsInfo(str) {
+      navigator.clipboard.writeText(str.trim())
+      this.alertToggle({ message: "Copied!", isShow: true, type: "success" })
+    },
+    togglePaymentDetails() {
+      this.isShowPaymentDetails = !this.isShowPaymentDetails
+    },
     openPaymentCard() {
       this.isPaymentCard = true
       this.paymentDate = new Date()
@@ -305,7 +334,7 @@ export default {
       }, 0)
     },
     setPaymentMethod({ option }) {
-      this.paymentMethod = option
+      this.paymentMethod = this.reportDetailsInfo.vendor.billingInfo.paymentMethod.find(item => item.name === option)
     },
     setFromDate(e) {
       this.paymentDate = e
@@ -415,7 +444,7 @@ export default {
     async updatePayableStateFromZoho(id) {
       try {
         const result = await this.$http.get('/invoicing-payables/update-state-from-zoho/' + id)
-        const { type, message, isMovedToArchive} = result.data
+        const { type, message, isMovedToArchive } = result.data
         this.alertToggle({ message, isShow: true, type })
         if (isMovedToArchive) {
           await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
@@ -425,6 +454,7 @@ export default {
         this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
       }
     },
+    ...mapActions([ 'alertToggle' ])
   },
   computed: {
     abilityToSubmitPayment() {
@@ -483,19 +513,6 @@ textarea {
   &:focus {
     border: 1px solid $border-focus;
   }
-}
-
-.file-fake-button {
-  height: 30px;
-  width: 38px;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  border: 1px solid $border;
-  box-sizing: border-box;
-  background-color: white;
 }
 
 .green-value {
@@ -733,14 +750,24 @@ textarea {
   &__value {
     width: 180px;
     position: relative;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: .2s ease-out;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
 
 .file-name {
   position: absolute;
-  width: 140px;
+  width: 145px;
   top: 7px;
-  left: 50px;
+  left: 40px;
   opacity: 0.6;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -870,7 +897,6 @@ textarea {
 }
 
 .payment-button {
-  margin-top: 25px;
   display: flex;
   justify-content: center;
 }
@@ -880,5 +906,84 @@ textarea {
   display: flex;
   justify-content: center;
   gap: 20px;
+}
+
+.payment-details {
+  width: 380px;
+  background: white;
+  box-sizing: border-box;
+  padding: 25px;
+  border-radius: 4px;
+  border: 1px solid $light-border;
+  margin-top: 15px;
+
+  &__row {
+    display: flex;
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0px;
+    }
+  }
+
+  &__key {
+    width: 110px;
+    color: $dark-border;
+  }
+
+  &__value {
+    width: 210px;
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.details-icon {
+  transition: .2s ease-out;
+  color: $dark-border;
+  font-size: 15px;
+
+  &:hover {
+    cursor: pointer;
+    color: $text;
+  }
+}
+
+.toggle-details {
+  font-size: 15px;
+  border-radius: 4px;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: .2s ease-out;
+  justify-content: center;
+  border: 1px solid $border;
+  color: $dark-border;
+  box-sizing: border-box;
+
+  &:hover {
+    color: $text;
+  }
+}
+
+.file-fake-button {
+  height: 30px;
+  width: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: 1px solid $border;
+  box-sizing: border-box;
+  background-color: white;
+  color: $dark-border;
+  transition: .2s ease-out;
+
+  &:hover {
+    color: $text;
+  }
 }
 </style>

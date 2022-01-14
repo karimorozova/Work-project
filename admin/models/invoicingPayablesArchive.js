@@ -7,6 +7,11 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	zohoBillingId: {
+		type: String,
+		default: '',
+		trim: true
+	},
 	vendor: {
 		type: Schema.Types.ObjectId,
 		ref: 'Vendors'
@@ -16,10 +21,10 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	steps: [{
+	steps: [ {
 		type: Schema.Types.ObjectId,
 		ref: 'Projects.steps'
-	}],
+	} ],
 	firstPaymentDate: {
 		type: Date,
 		default: new Date()
@@ -30,8 +35,8 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 	},
 	paymentDetails: {
 		paymentMethod: {
-			type: String,
-			default: ''
+			type: Object,
+			default: null
 		},
 		file: {
 			type: Object,
@@ -39,27 +44,31 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		},
 		expectedPaymentDate: {
 			type: Date
-		},
+		}
 	},
-	paymentInformation: [{
+	paymentInformation: [ {
+		zohoPaymentId: {
+			type: String
+		},
 		paidAmount: {
-			type: Number,
+			type: Number
 		},
 		unpaidAmount: {
 			type: Number
 		},
 		paymentMethod: {
-			type: String,
+			type: Object,
+			default: null
 		},
 		paymentDate: {
 			type: Date,
-			default: new Date()
+			default: ''
 		},
 		notes: {
 			type: String,
 			default: ""
 		}
-	}],
+	} ],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},

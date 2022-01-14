@@ -254,7 +254,7 @@ export default {
         const paymentMethod = { ...this.reportDetailsInfo.paymentDetails.paymentMethod }
         delete paymentMethod.name
         const notes = Object.entries(paymentMethod).reduce((acc, curr) => {
-          acc = acc + `${ curr[0] }: ${ curr[1] }\n`
+          acc = acc + `${ replaceKey(curr[0]) }: ${ curr[1] }\n`
           return acc
         }, '')
 
@@ -283,10 +283,18 @@ export default {
         this.isRequestNow = false
       }
       this.isRequestNow = false
+
+      function replaceKey(key) {
+        switch (key) {
+          case 'accountName':
+            key = 'Account Name'
+        }
+        return key[0].toUpperCase() + key.substr(1)
+      }
     },
     async approveReport() {
       try {
-        const result = await this.$axios.post(`/vendor/approve-report`, { nextStatus: 'Approved' })
+        const result = await this.$axios.post(`/vendor/approve-report`, { nextStatus: 'Approved', reportsIds: [ this.reportDetailsInfo._id.toString() ] })
         const decode = window.atob(result.data)
         const data = JSON.parse(decode)
         await this.getReport(data)

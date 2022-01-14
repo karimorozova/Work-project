@@ -131,7 +131,6 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 	try {
 		const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
 		const result = await paidOrAddPaymentInfo(reportId, zohoPaymentId,  {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
-		// const reports = await getAllPayables( countToSkip, countToGet, query )
 		res.send(result);
 	} catch(err) {
 		console.log(err);

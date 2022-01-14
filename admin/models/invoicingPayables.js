@@ -57,7 +57,8 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 			type: Number
 		},
 		paymentMethod: {
-			type: String
+			type: Object,
+			default: null
 		},
 		paymentDate: {
 			type: Date,
