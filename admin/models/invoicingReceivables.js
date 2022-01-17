@@ -40,10 +40,12 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		default: new Date()
 	},
 	createdBy: {
-		type: Schema.Types.ObjectId, ref: 'user'
+		type: Schema.Types.ObjectId, ref: 'user',
+		default: null
 	},
 	updatedBy: {
-		type: Schema.Types.ObjectId, ref: 'user'
+		type: Schema.Types.ObjectId, ref: 'user',
+		default: null
 	},
 	createAt: {
 		type: Date,
@@ -78,15 +80,19 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		}
 	} ],
 	paymentInformation: [ {
+		zohoPaymentId: {
+			type: String
+		},
 		paidAmount: {
 			type: Number
 		},
 		unpaidAmount: {
 			type: Number
 		},
-		// paymentMethod: {
-		// 	type: String,
-		// },
+		paymentMethod: {
+			type: Object,
+			default: null
+		},
 		paymentDate: {
 			type: Date,
 			default: ''

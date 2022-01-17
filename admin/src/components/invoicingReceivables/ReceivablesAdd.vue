@@ -105,7 +105,7 @@
             .table__data {{ row.selectedBillingInfo.paymentType }}
 
           template(slot="stepId" slot-scope="{ row, index }")
-            .table__data {{ row.steps.stepId }}
+            .table__data {{ row.steps.stepId || '-' }}
 
           template(slot="startDate" slot-scope="{ row, index }")
             .table__data {{ formattedDate(row.startDate) }}
@@ -117,17 +117,19 @@
             .table__data {{ formattedDate(row.billingDate) }}
 
           template(slot="step" slot-scope="{ row, index }")
-            .table__data {{ row.steps.stepAndUnit.step.title }}
+            .table__data {{ row.type === 'Classic' ? row.steps.stepAndUnit.step.title : row.steps.title }}
 
           template(slot="jobStatus" slot-scope="{ row, index }")
-            .table__data {{ row.steps.status }}
+            .table__data {{ row.steps.status || 'Completed' }}
 
           template(slot="langPair" slot-scope="{ row, index }")
-            .table__data(v-if="row.steps.sourceLanguage === row.steps.targetLanguage") {{ row.steps.targetLanguage }}
-            .table__data(v-else) {{ row.steps.sourceLanguage }}
-              span(style="font-size: 12px;color: #9c9c9c;margin: 0 4px;")
-                i(class="fas fa-angle-double-right")
-              | {{ row.steps.targetLanguage }}
+            span(v-if="row.type === 'Classic'" )
+              .table__data(v-if="row.steps.sourceLanguage === row.steps.targetLanguage") {{ row.steps.targetLanguage }}
+              .table__data(v-else) {{ row.steps.sourceLanguage }}
+                span(style="font-size: 12px;color: #9c9c9c;margin: 0 4px;")
+                  i(class="fas fa-angle-double-right")
+                | {{ row.steps.targetLanguage }}
+            span(v-else) -
 
           template(slot="price" slot-scope="{ row, index }")
             .table__data
@@ -178,25 +180,25 @@ export default {
           label: "Project",
           headerKey: "headerProject",
           key: "project",
-          style: { width: "195px" }
+          style: { width: "175px" }
         },
         {
           label: "Client",
           headerKey: "headerClient",
           key: "client",
-          style: { width: "157px" }
+          style: { width: "150px" }
         },
         {
           label: "Billing Name",
           headerKey: "headerBN",
           key: "bn",
-          style: { width: "128px" }
+          style: { width: "125px" }
         },
         {
           label: "Payment Type",
           headerKey: "headerPT",
           key: "pt",
-          style: { width: "110px" }
+          style: { width: "105px" }
         },
         {
           label: "Step ID",
@@ -220,19 +222,19 @@ export default {
           label: "Start Date",
           headerKey: "headerStartDate",
           key: "startDate",
-          style: { width: "90px" }
+          style: { width: "95px" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { width: "90px" }
+          style: { width: "95px" }
         },
         {
           label: "Billing Date",
           headerKey: "headerBillingDate",
           key: "billingDate",
-          style: { width: "90px" }
+          style: { width: "95px" }
         },
         {
           label: "Status",
@@ -305,6 +307,8 @@ export default {
       })
     },
     async sendSteps() {
+      alert('nea')
+      return
       const checkedSteps = this.steps.filter(i => i.isCheck)
       try {
         await this.$http.post('/invoicing-receivables/create-report', { checkedSteps, createdBy: this.user._id })
@@ -641,7 +645,7 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 181px;
+  max-width: 161px;
 }
 
 .backspace-long {

@@ -223,7 +223,6 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 		{
 			$project: {
 				'steps': 1,
-				"testVendors": 1,
 				"projectId": 1,
 				'projectName': 1,
 				'deadline': 1,

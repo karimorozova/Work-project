@@ -81,7 +81,7 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	const allLanguages = await Languages.find()
 	try {
 		const query = stepsFiltersQuery(filters, allLanguages)
-		const steps = await getAllSteps(countToSkip, countToGet, {...query, "steps.status": "Completed", status: "Closed" })
+		const steps = await getAllSteps(countToSkip, countToGet, {...query})
 		res.send(steps)
 	} catch (err) {
 		console.log(err)
