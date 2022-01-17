@@ -17,7 +17,8 @@ const {
 	CurrencyRatio,
 	Discounts,
 	TierInfo,
-	IndustryTierInfo
+	IndustryTierInfo,
+	PaymentTerms
 } = require("../models")
 
 const {
@@ -495,6 +496,20 @@ async function fillIndustryTierInfo() {
 	}
 }
 
+async function fillPaymentTerms() {
+	const industryTierCount = await PaymentTerms.countDocuments()
+	if (industryTierCount > 0) return
+	try {
+		await PaymentTerms.create({
+			"name": "30 Days",
+			"value": 30,
+			"isActive": true
+		})
+	} catch (e) {
+
+	}
+}
+
 async function checkCollections() {
 	await fillInstructions()
 	await fillCancelReasons()
@@ -515,6 +530,7 @@ async function checkCollections() {
 	await fillPricelist()
 	await fillTierInfo()
 	await fillIndustryTierInfo()
+	await fillPaymentTerms()
 }
 
 module.exports = {

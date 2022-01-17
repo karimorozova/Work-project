@@ -15,7 +15,7 @@ const {
 } = require('../settings')
 
 const { getSimpleClients } = require('../clients')
-const { Languages, ClientsApiSetting } = require('../models')
+const { Languages, ClientsApiSetting, Vendors, Clients } = require('../models')
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]
@@ -51,8 +51,10 @@ router.get('/tier-info', async (req, res) => {
 
 router.get('/payment-terms', async (req, res) => {
 	try {
-		const result = await getPaymentTerms()
-		res.send(result)
+		const paymentTerms = await getPaymentTerms()
+		const vendors = await Vendors.find({}, { firstName: 1, billingInfo: 1 })
+		const clients = await Clients.find({}, { name: 1, billingInfo: 1 })
+		res.send({ paymentTerms, vendors, clients })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on get /payment-terms')

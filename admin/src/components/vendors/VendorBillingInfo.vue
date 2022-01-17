@@ -259,7 +259,8 @@ export default {
     async getAndSetPaymentTerms() {
       try {
         const result = await this.$http.get("/api-settings/payment-terms")
-        this.paymentTerms = result.data.filter(i => !!i.isActive)
+        const { paymentTerms } = result.data
+        this.paymentTerms = paymentTerms.filter(i => !!i.isActive)
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Terms in Billing Information", isShow: true, type: "error" })
       }

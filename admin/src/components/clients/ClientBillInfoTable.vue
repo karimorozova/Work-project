@@ -37,8 +37,8 @@
       template(slot="paymentType" slot-scope="{ row, index }")
         .table__data {{ row.paymentType || '' }}
 
-      template(slot="country" slot-scope="{ row, index }")
-        .table__data {{ row.address.country }}
+      template(slot="terms" slot-scope="{ row, index }")
+        .table__data {{ row.paymentTerms ? row.paymentTerms.name : '-' }}
 
       template(slot="contacts" slot-scope="{ row, index }")
         .table__data(v-if="!row.contacts.length") -
@@ -103,9 +103,9 @@
 						style: { width: "18%" }
 					},
 					{
-						label: "Country",
+						label: "Payment Terms",
 						headerKey: "headerCountry",
-						key: "country",
+						key: "terms",
 						style: { width: "18%" }
 					},
 					{
