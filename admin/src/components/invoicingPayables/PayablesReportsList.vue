@@ -138,7 +138,7 @@
             .table__data {{ getTime( row.updatedAt) }}
 
           template(slot="icon" slot-scope="{ row, index }")
-            .table__icon(v-if="row.status === 'Created'|| row.status === 'Sent'")
+            .table__icon(v-if="row.status === 'Created'|| row.status === 'Sent' || user.group.name === 'Developers'  || user.group.name === 'Administrators'")
               i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
         .table__empty(v-if="!reports.length") Nothing found...
@@ -457,7 +457,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      vendorsList: "getAllVendorsForOptions"
+      vendorsList: "getAllVendorsForOptions",
+      user: "getUser"
     }),
     availableActionOptions() {
       if (this.reports && this.reports.length) {
