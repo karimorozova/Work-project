@@ -17,8 +17,8 @@ const GBP = {
 const financeExtract = {
 	receivables: { type: Number },
 	payables: { type: Number },
-	halfReceivables: { type: Number },
-	halfPayables: { type: Number }
+	// halfReceivables: { type: Number },
+	// halfPayables: { type: Number }
 }
 
 const stepFinance = {
@@ -358,7 +358,7 @@ const ProjectsSchema = new mongoose.Schema({
 		finance: {
 			Price: {
 				receivables: { type: Number }
-			}
+			},
 		}
 	} ],
 	isMetricsExist: {

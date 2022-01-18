@@ -141,8 +141,6 @@
       .footer
         .footer__button
           Button(value="Create Report" :isDisabled="!isOptionToCreateReport" @clicked="sendSteps")
-        //.footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndClients }}
-
 
 </template>
 
@@ -307,14 +305,10 @@ export default {
       })
     },
     async sendSteps() {
-      alert('nea')
-      return
       const checkedSteps = this.steps.filter(i => i.isCheck)
       try {
         await this.$http.post('/invoicing-receivables/create-report', { checkedSteps, createdBy: this.user._id })
         await this.getSteps()
-        // TODO: ???? emit
-        // this.$emit('refreshReports')
       } catch (e) {
         console.log(e)
       }
@@ -424,13 +418,6 @@ export default {
       for (let variable of this.dataVariables) filters[variable] = this[variable]
       return filters
     },
-    // calculatingJobsAndClients() {
-    // 	if (this.isOptionToCreateReport) {
-    // 		const vendors = [ ...new Set(this.steps.filter(item => item.isCheck).map(item => item.currentVendor._id.toString())) ].length
-    // 		const steps = this.steps.filter(item => item.isCheck).length
-    // 		return `Vendors Selected : ${ vendors }, Jobs Selected: ${ steps }`
-    // 	}
-    // },
     isOptionToCreateReport() {
       if (this.steps.length) {
         return this.steps.some(item => item.isCheck)

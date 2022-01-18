@@ -29,6 +29,10 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		step: {
 			type: Schema.Types.ObjectId,
 			ref: 'Projects.steps'
+		},
+		type: {
+			type: String,
+			default: ''
 		}
 	} ],
 	firstPaymentDate: {

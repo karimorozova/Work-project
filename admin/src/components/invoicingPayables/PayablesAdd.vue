@@ -166,7 +166,7 @@ export default {
           style: { width: "36px" }
         },
         {
-          label: "Projects",
+          label: "Project",
           headerKey: "headerProject",
           key: "project",
           style: { width: "200px" }

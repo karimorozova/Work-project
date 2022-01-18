@@ -8,8 +8,6 @@ const {
 	getAllSteps,
 	createReports,
 	reportsFiltersQuery,
-	getAllReports,
-	getReportById,
 	receivableDelete,
 	deleteStepFromReport,
 	createZohoInvoice,
@@ -22,6 +20,7 @@ const {
 	paidOrAddPaymentInfo,
 	setInvoiceStatus,
 	createCustomerPayment,
+	getAllReportsFromDb
 } = require('../invoicingReceivables')
 
 const {
@@ -31,7 +30,7 @@ const {
 router.post("/report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
-		const [ report ] = await getReportById(id)
+		const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(id) })
 		res.send(report)
 	} catch (err) {
 		console.log(err)
@@ -68,7 +67,7 @@ router.post("/reports", async (req, res) => {
 	try {
 		const { countToSkip, countToGet, filters } = req.body
 		const query = reportsFiltersQuery(filters)
-		const reports = await getAllReports(countToSkip, countToGet, query)
+		const reports = await getAllReportsFromDb(countToSkip, countToGet, query)
 		res.send(reports)
 	} catch (err) {
 		console.log(err)
@@ -81,7 +80,7 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	const allLanguages = await Languages.find()
 	try {
 		const query = stepsFiltersQuery(filters, allLanguages)
-		const steps = await getAllSteps(countToSkip, countToGet, {...query})
+		const steps = await getAllSteps(countToSkip, countToGet, { ...query })
 		res.send(steps)
 	} catch (err) {
 		console.log(err)
@@ -193,41 +192,41 @@ router.get("/update-report-state-from-zoho/:id", async (req, res) => {
 
 router.post("/paid-reports", async (req, res) => {
 	try {
-		const {	countToSkip, countToGet, filters } = req.body
+		const { countToSkip, countToGet, filters } = req.body
 		const query = reportsFiltersQuery(filters)
 		// const query = {}
-		const reports = await getAllPaidReceivables( countToSkip, countToGet, query )
-		res.send(reports);
-	} catch(err) {
-		console.log(err);
-		res.status(500).send('Something wrong on getting steps');
+		const reports = await getAllPaidReceivables(countToSkip, countToGet, query)
+		res.send(reports)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
-});
+})
 
 router.post("/paid-report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
 		const report = await getPaidReceivables(id)
-		res.send(report);
-	} catch(err) {
-		console.log(err);
-		res.status(500).send('Something wrong on getting steps');
+		res.send(report)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
-});
+})
 
 router.post("/report-final-status/:reportId", async (req, res) => {
-	const {reportId} = req.params
-	const {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes} = req.body
+	const { reportId } = req.params
+	const { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes } = req.body
 
 	try {
 		await createCustomerPayment(reportId, paidAmount)
-		const result = await paidOrAddPaymentInfo(reportId, {paidAmount, unpaidAmount, paymentMethod,	paymentDate, notes})
-		res.send(result.status);
-	} catch(err) {
-		console.log(err);
-		res.status(500).send('Something wrong on getting steps');
+		const result = await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+		res.send(result.status)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
-});
+})
 
 
 module.exports = router

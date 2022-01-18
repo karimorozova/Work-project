@@ -10,7 +10,7 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 			? parseInt(lastIndex.reportId.split('_').pop())
 			: 1
 
-	await setUsedStatusToSteps(checkedSteps.map(({ steps }) => steps._id))
+	await setUsedStatusToSteps(checkedSteps.filter(i => i.type === 'Classic'), checkedSteps.filter(i => i.type === 'Extra'))
 
 	const [ jobsPPP, jobsPrePayment, jobsMonthly, jobsCustom ] = [
 		checkedSteps.filter(({ selectedBillingInfo }) => selectedBillingInfo.paymentType === 'PPP'),
@@ -22,14 +22,14 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 	const { temp: PPP, updatedReports: updatedReports1, lastIntIndex: lastIntIndex1 } = produceReportPerProject(jobsPPP, reportsFromDB, lastIntIndex, createdBy)
 	const { temp: prePayment, updatedReports: updatedReports2, lastIntIndex: lastIntIndex2 } = produceReportPerProject(jobsPrePayment, updatedReports1, lastIntIndex1, createdBy)
 	const { temp: monthly, updatedReports: updatedReports3, lastIntIndex: lastIntIndex3 } = produceReportManyProjects(jobsMonthly, updatedReports2, lastIntIndex2, createdBy)
-	const { temp: custom, updatedReports: updatedReports4 } = produceReportManyProjects(jobsCustom, updatedReports3, lastIntIndex3, createdBy)
+	const { temp: custom, updatedReports: finalUpdatedReports } = produceReportManyProjects(jobsCustom, updatedReports3, lastIntIndex3, createdBy)
 
 	await InvoicingReceivables.create(
 			...PPP,
 			...prePayment,
 			...monthly,
 			...custom,
-			...updatedReports4
+			...finalUpdatedReports
 	)
 }
 
@@ -39,12 +39,10 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 	const getIndex = (arr, clientBillingInfo) => arr.findIndex(({ clientBillingInfo: _clientBillingInfo }) => `${ clientBillingInfo }` === `${ _clientBillingInfo }`)
 
 	jobs.forEach(element => {
-		const { steps: { _id: nativeStepId }, _id: nativeProjectId, clientBillingInfo } = element
-
+		const { steps: { _id: nativeStepId }, _id: nativeProjectId, clientBillingInfo, type } = element
 		const _dbIndex = getIndex(updatedReports, clientBillingInfo)
 		if (_dbIndex === -1) {
-
-			const _tmpIndex = getIndex(temp, clientBillingInfo, nativeProjectId)
+			const _tmpIndex = getIndex(temp, clientBillingInfo)
 			if (_tmpIndex === -1) {
 				temp.push({
 					...getFirstReportStructureFromElement(element),
@@ -55,15 +53,12 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 			} else {
 				changePaymentRange(temp[_tmpIndex], element)
 				refreshUpdatedInfo(temp[_tmpIndex], createdBy)
-
-				temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
+				temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
 			}
-
 		} else {
 			changePaymentRange(updatedReports[_dbIndex], element)
 			refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
-
-			updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
+			updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
 		}
 	})
 	return {
@@ -78,11 +73,9 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 	const updatedReports = [ ...reportsDB ]
 
 	jobs.forEach(element => {
-		const { steps: { _id: nativeStepId }, _id: nativeProjectId, clientBillingInfo } = element
-
+		const { steps: { _id: nativeStepId }, _id: nativeProjectId, clientBillingInfo, type } = element
 		const _dbIndex = getIndex(updatedReports, clientBillingInfo, nativeProjectId)
 		if (_dbIndex === -1) {
-
 			const _tmpIndex = getIndex(temp, clientBillingInfo, nativeProjectId)
 			if (_tmpIndex === -1) {
 				temp.push({
@@ -94,15 +87,12 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 			} else {
 				changePaymentRange(temp[_tmpIndex], element)
 				refreshUpdatedInfo(temp[_tmpIndex], createdBy)
-
-				temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
+				temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
 			}
-
 		} else {
 			changePaymentRange(updatedReports[_dbIndex], element)
 			refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
-
-			updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId })
+			updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
 		}
 	})
 
@@ -119,21 +109,33 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 }
 
 const getFirstReportStructureFromElement = (element) => {
-	const { customer: client, clientBillingInfo, steps, _id, startDate, deadline } = element
+	const { customer: client, clientBillingInfo, steps, _id, startDate, deadline, type } = element
 	return {
 		client,
 		status: 'Created',
 		clientBillingInfo,
-		stepsAndProjects: [ { step: steps._id, project: _id } ],
+		stepsAndProjects: [ { step: steps._id, project: _id, type } ],
 		firstPaymentDate: startDate,
 		lastPaymentDate: deadline
 	}
 }
-const setUsedStatusToSteps = async (allStepsIds) => {
-	await Projects.updateMany(
-			{ 'steps._id': { $in: allStepsIds } },
-			{ 'steps.$[i].isInReportReceivables': true },
-			{ arrayFilters: [ { 'i._id': { $in: allStepsIds } } ] })
+
+const setUsedStatusToSteps = async (classicSteps, extraSteps) => {
+	classicSteps = classicSteps.map(({ steps }) => steps._id)
+	extraSteps = extraSteps.map(({ steps }) => steps._id)
+
+	if (classicSteps.length) await updateProjects('steps', classicSteps)
+	if (extraSteps.length) await updateProjects('additionsSteps', extraSteps)
+
+	async function updateProjects(key, value) {
+		const key1 = `${ key }._id`
+		const key2 = `${ key }.$[i].isInReportReceivables`
+		await Projects.updateMany(
+				{ [key1]: { $in: value } },
+				{ [key2]: true },
+				{ arrayFilters: [ { 'i._id': { $in: value } } ] }
+		)
+	}
 }
 
 function changePaymentRange(tempElement, element) {

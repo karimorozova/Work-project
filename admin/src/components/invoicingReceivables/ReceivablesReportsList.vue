@@ -134,7 +134,7 @@
 
           template(slot="amount" slot-scope="{ row, index }")
             .table__data
-              span.currency(v-html="'&euro;'")
+              span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
               span {{ row.total | roundTwoDigit }}
 
           template(slot="created" slot-scope="{ row, index }")
@@ -164,9 +164,11 @@ import Button from "../Button"
 import ApproveModal from "../ApproveModal"
 import '../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
+import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 export default {
   name: "InvoicingReportsList",
+  mixins: [ currencyIconDetected ],
   data() {
     return {
       selectedReportAction: '',
@@ -383,9 +385,6 @@ export default {
         return sum
       }, 0)
     },
-    // openDetails(id) {
-    // 	this.$emit('openDetails', id)
-    // },
     formattedDate(date) {
       return moment(date).format('MMM D')
     },
