@@ -86,7 +86,7 @@ const createVendor = async (vendorName, vendorEmail) => {
 			}
 		]
 	}
-	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')
+	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')
 	return customer.data.contact.contact_id
 }
 
@@ -94,6 +94,7 @@ const createVendor = async (vendorName, vendorEmail) => {
 const createBill = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems, notes) => {
 	let zohoVendorId = await getVendor(vendorEmail)
 	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
+	console.log('zohoVendorId1', zohoVendorId)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
@@ -101,7 +102,7 @@ const createBill = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billN
 		"line_items": lineItems,
 		"notes": notes,
 	}
-	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')
+	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')
 	return billing.data
 }
 
@@ -120,7 +121,7 @@ const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, a
 		"date": moment().format('YYYY-MM-DD'),
 		"amount": amount
 	}
-	const { vendorpayment } = (await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'Post')).data
+	const { vendorpayment } = (await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')).data
 	return vendorpayment.payment_id
 }
 
@@ -175,7 +176,7 @@ const addFile = async (billId, filePath) => {
 	const form = new FormData()
 	form.append('attachment', fs.createReadStream(finalPath))
 
-	const addedFile = await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, form, 'Post', form.getHeaders())
+	const addedFile = await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, form, 'POST', form.getHeaders())
 }
 
 const removeFile = async (billId) => {
