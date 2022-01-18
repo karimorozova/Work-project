@@ -94,7 +94,6 @@ const createVendor = async (vendorName, vendorEmail) => {
 const createBill = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems, notes) => {
 	let zohoVendorId = await getVendor(vendorEmail)
 	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
-	console.log('zohoVendorId1', zohoVendorId)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
