@@ -14,9 +14,14 @@ const history = require('connect-history-api-fallback');
 let logger = require('morgan');
 const { checkCollections } = require('./helpers/dbSetDefault');
 require('./schedule');
+const { sendRequestToZoho } = require('./invoicingPayables/zohoBilling')
 
 //NEW DB
 checkCollections()
+
+ sendRequestToZoho(`contacts?organization_id=${ '630935724' }&email_startswith=${ 'max' }&contact_type=vendor`).then(data => {
+	console.log(data)
+})
 
 
 const allowedOrigins = [

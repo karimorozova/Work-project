@@ -91,7 +91,7 @@ const createVendor = async (vendorName, vendorEmail) => {
 }
 
 
-const createBill = async (due_date,vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems, notes) => {
+const createBill = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems, notes) => {
 	let zohoVendorId = await getVendor(vendorEmail)
 	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
 	const data = {
@@ -190,5 +190,6 @@ module.exports = {
 	removeFile,
 	createNewPayable,
 	updatePayableFromZoho,
-	updatePayablesFromZoho
+	updatePayablesFromZoho,
+	sendRequestToZoho
 }
