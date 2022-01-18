@@ -191,5 +191,4 @@ module.exports = {
 	createNewPayable,
 	updatePayableFromZoho,
 	updatePayablesFromZoho,
-	sendRequestToZoho
 }
