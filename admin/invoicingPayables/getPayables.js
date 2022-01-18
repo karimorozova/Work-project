@@ -80,7 +80,7 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 				{ $limit: countToGet }
 			]
 	)
-	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname' ] }))
+	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname', 'email' ] }))
 }
 
 const getPayable = async (id) => {

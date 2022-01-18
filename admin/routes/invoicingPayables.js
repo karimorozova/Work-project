@@ -114,8 +114,10 @@ router.post("/reports-final-status", async (req, res) => {
 	const data = req.body
 
 	try {
-		for (let [ key, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes } ] of Object.entries(data)) {
-			await paidOrAddPaymentInfo(key, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+		for (let [ key, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId} ] of Object.entries(data)) {
+			paidAmount = paidAmount.toFixed(2)
+			const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
+			await paidOrAddPaymentInfo(key, zohoPaymentId,{ paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
 		}
 		res.send('success')
 	} catch (err) {

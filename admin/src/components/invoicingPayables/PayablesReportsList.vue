@@ -138,8 +138,7 @@
             .table__data {{ getTime( row.updatedAt) }}
 
           template(slot="icon" slot-scope="{ row, index }")
-            //.table__icon(v-if="row.status === 'Created'|| row.status === 'Send'")
-            .table__icon
+            .table__icon(v-if="row.status === 'Created'|| row.status === 'Sent'")
               i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
         .table__empty(v-if="!reports.length") Nothing found...
@@ -275,13 +274,16 @@ export default {
       this.closeApproveActionModal()
     },
     async paidChecked() {
-      const data = this.reports.filter(i => i.isCheck).reduce((acc, { _id, stepFinance, paymentDetails }) => {
+      const data = this.reports.filter(i => i.isCheck).reduce((acc, { _id, zohoBillingId, stepFinance, paymentDetails, vendor }) => {
         const amount = stepFinance.reduce((acc, { payables }) => acc += payables, 0)
         acc[_id] = {
           paidAmount: amount,
           unpaidAmount: 0,
           paymentMethod: paymentDetails.paymentMethod,
           paymentDate: new Date(),
+          vendorEmail: vendor.email,
+          vendorName: vendor.firstName + ' ' + vendor.surname,
+          zohoBillingId: zohoBillingId,
           notes: ''
         }
         return acc
@@ -459,15 +461,17 @@ export default {
     }),
     availableActionOptions() {
       if (this.reports && this.reports.length) {
+        const availableOptions = []
         if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
-          return [ 'Send Report' ]
+          availableOptions.push('Send Report')
         }
-        if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created' || i.status === 'Send')) {
-          return [ "Delete" ]
+        if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created' || i.status === 'Sent')) {
+          availableOptions.push('Delete')
         }
         if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Invoice Received')) {
-          return [ 'Paid' ]
+          availableOptions.push('Paid')
         }
+        return availableOptions
       }
     },
     allFilters() {

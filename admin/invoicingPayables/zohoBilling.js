@@ -63,11 +63,10 @@ const sendRequestToZoho = async (link, data, method = "GET", header = {}, additi
 				return await	zohoRequest(link, data, token, method, header, additional )
 			}
 		} catch (err) {
-			return returnMessageAndType(err.response.data.message, 'error')
+			  returnMessageAndType(err.message, 'error')
 		}
 
-
-		return returnMessageAndType(err.response.data.message, 'error')
+		 returnMessageAndType(err.message, 'error')
 	}
 }
 
