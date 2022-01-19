@@ -18,8 +18,8 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 	},
 	status: {
 		type: String,
-		default: '',
-		trim: true
+		enum: [ 'Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid', 'Paid' ],
+		default: 'Created'
 	},
 	steps: [ {
 		type: Schema.Types.ObjectId,

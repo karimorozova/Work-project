@@ -7,7 +7,6 @@ const updateInvoiceReceivablesStatus = async (reportId, status) => {
 	await InvoicingReceivables.updateOne({ _id: reportId }, { status })
 }
 
-
 const paidOrAddPaymentInfo = async (reportId, data) => {
 	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 

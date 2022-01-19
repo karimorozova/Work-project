@@ -1,6 +1,6 @@
 const axios = require("axios")
 const { Zoho, InvoicingPayables } = require("../models")
-const { getReportById } = require('./getReceivables')
+const { getAllReportsFromDb } = require('./getReceivables')
 const { updateInvoiceReceivablesStatus } = require('./updateReceivables')
 const { sendInvoiceToClientContacts } = require('./notification')
 const moment = require('moment')
@@ -107,7 +107,7 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
 		console.log(err)
-		if ( err.response.data && err.response.data.code === 57) {
+		if (err.response.data && err.response.data.code === 57) {
 			const isUpdated = await setNewTokenFromRefresh(attempt)
 			if (!isUpdated) return returnMessageAndType('Can`t get access_token', 'error')
 			return await createZohoInvoice(_reportId, ++attempt)
@@ -125,11 +125,11 @@ const deleteZohoInvoice = async (invoiceId) => {
 }
 
 const getZohoInvoiceCreationStructure = async (_reportId) => {
-	const [ report ] = await getReportById(_reportId)
+	const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(_reportId) })
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate } = report
 	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
 	// const customerId = await getCustomer(getOfficialCompanyName(clientBillingInfo))
-	const customerId =  "335260000005073023"
+	const customerId = "335260000005073023"
 	return {
 		"customer_id": customerId,
 		"line_items": [ {
@@ -141,27 +141,27 @@ const getZohoInvoiceCreationStructure = async (_reportId) => {
 }
 
 const getZohoClientPaymentCreationStructure = async (_reportId, amount) => {
-	const [ report ] = await getReportById(_reportId)
+	const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(_reportId) })
 	const { client, clientBillingInfo, externalIntegration } = report
 	const getOfficialCompanyName = (billingId) => client.billingInfo.find(({ _id }) => `${ _id }` === `${ billingId }`).officialName
 	const customerId = "335260000005073023"
-	return  {
+	return {
 		"customer_id": customerId,
 		"invoices": [
 			{
-				"invoice_id": externalIntegration. _id.toString(),
+				"invoice_id": externalIntegration._id.toString(),
 				"amount_applied": amount
 			}
 		],
 		"payment_mode": "cash",
 		"date": moment().format('YYYY-MM-DD'),
 		"amount": amount
-	}}
+	}
+}
 
 const saveInvoiceFile = async (_reportId, _zohoId) => {
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-invoice.pdf`
-
-	const fileResult = await sendRequestToZoho(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`, '', 'GET', { responseType: 'stream' })
+	const fileResult = await sendRequestToZoho(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`, '', 'GET', {}, { responseType: 'stream' })
 	fileResult.data.pipe(fs.createWriteStream(`dist/clientReportsFiles/${ _reportId }/${ fileName }`))
 	await InvoicingReceivables.updateOne({ _id: _reportId }, { invoice: { filename: fileName, path: `clientReportsFiles/${ _reportId }/${ fileName }` } })
 
@@ -206,7 +206,7 @@ const updateReportsStateFromZoho = async () => {
 			const _invoiceIdx = invoices.findIndex(({ invoice_id }) => invoice_id === report.externalIntegration._id)
 
 			if (_invoiceIdx !== -1) {
-			 // TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
+				// TODO: ДИМА ОБНОВЛЯЕТ ВСЕ ЧТО НУЖНО: Статус, финансы, и тд ...
 
 				// const isAllPaid = false
 				const isAllPaid = invoices[_invoiceIdx]["payment_made"] === invoices[_invoiceIdx].total
@@ -220,23 +220,23 @@ const updateReportsStateFromZoho = async () => {
 
 				const dataToUpdate = {
 					status: invoices[_invoiceIdx].status,
-					paymentInformation : isAllPaid ? [paymentInfo] : []
+					paymentInformation: isAllPaid ? [ paymentInfo ] : []
 				}
 				await InvoicingReceivables.updateOne({ _id: report._id }, { ...dataToUpdate })
 
 				if (isAllPaid) {
 					await InvoicingReceivables.aggregate([
-						{	"$match": {"_id" : ObjectId(report._id) } },
+						{ "$match": { "_id": ObjectId(report._id) } },
 						{
-							"$merge" : {
-								"into" : {
-									"db" : "pangea",
-									"coll" : "invoicingreceivablesarchives"
+							"$merge": {
+								"into": {
+									"db": "pangea",
+									"coll": "invoicingreceivablesarchives"
 								}
 							}
 						}
 					])
-					await InvoicingReceivables.remove({_id: report._id})
+					await InvoicingReceivables.remove({ _id: report._id })
 					// return returnMessageAndType('Inv', 'error')
 				}
 			}
@@ -250,10 +250,10 @@ const updateReportsStateFromZoho = async () => {
 
 const updateReportStateFromZoho = async (_reportId) => {
 	try {
-		const [ report ] = await getReportById(_reportId)
+		const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(_reportId) })
 		const { externalIntegration, status } = report
-		if(status === 'Created' || status === 'Invoice Ready' || status === "Partly Paid" ) return returnMessageAndType('Updated', 'success')
-		if (externalIntegration._id ) {
+		if (status === 'Created' || status === 'Invoice Ready' || status === "Partly Paid") return returnMessageAndType('Updated', 'success')
+		if (externalIntegration._id) {
 			const reportFromZoho = await sendRequestToZoho(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
 			const { data: { invoice } } = reportFromZoho
 			// const isAllPaid = false
@@ -269,24 +269,24 @@ const updateReportStateFromZoho = async (_reportId) => {
 
 			const dataToUpdate = {
 				status: invoice.status,
-				paymentInformation : isAllPaid ? [paymentInfo] : []
+				paymentInformation: isAllPaid ? [ paymentInfo ] : []
 			}
 
 			await InvoicingReceivables.updateOne({ _id: report._id }, { ...dataToUpdate })
 
 			if (isAllPaid) {
 				await InvoicingReceivables.aggregate([
-					{	"$match": {"_id" : ObjectId(_reportId) } },
+					{ "$match": { "_id": ObjectId(_reportId) } },
 					{
-						"$merge" : {
-							"into" : {
-								"db" : "pangea",
-								"coll" : "invoicingreceivablesarchives"
+						"$merge": {
+							"into": {
+								"db": "pangea",
+								"coll": "invoicingreceivablesarchives"
 							}
 						}
 					}
 				])
-				await InvoicingReceivables.remove({_id: _reportId})
+				await InvoicingReceivables.remove({ _id: _reportId })
 				// admin/invoicingReceivables/zoho.js:430 hard code "invoice paid"
 				return returnMessageAndType('Invoice paid', 'success')
 			}
@@ -303,5 +303,5 @@ module.exports = {
 	createZohoInvoice,
 	createAndSendZohoInvoice,
 	deleteZohoInvoice,
-	createCustomerPayment,
+	createCustomerPayment
 }

@@ -1,12 +1,13 @@
 const { sendEmail } = require('../utils/mailTemplate')
-const { getReportById } = require('./getReceivables')
+const { getAllReportsFromDb } = require('./getReceivables')
 const { generateReportPPP } = require('./statisticReportsGeneration')
 const { invoicingMessage } = require('../emailMessages/clientCommunication')
+const { ObjectID: ObjectId } = require("mongodb")
 
 const sendInvoiceToClientContacts = async (_reportId) => {
 	const attachments = []
 	const reportFiles = []
-	const [ report ] = await getReportById(_reportId)
+	const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(_reportId) })
 	const { client, clientBillingInfo, total, reportId, lastPaymentDate, invoice, externalIntegration } = report
 	const BI = client.billingInfo.find(({ _id }) => `${ _id }` === `${ clientBillingInfo }`)
 	const { officialName, contacts, paymentType, currency } = BI
@@ -23,7 +24,7 @@ const sendInvoiceToClientContacts = async (_reportId) => {
 	//--------- TODO удалить н=>
 	for await (let contact of [ { email: 'maksym@pangea.global' }, { email: 'dmitrii@pangea.global' } ]) {
 		const message = invoicingMessage(contact, report, currency)
-		await sendEmail({ to: contact.email, attachments: finalAttachments, subject}, message)
+		await sendEmail({ to: contact.email, attachments: finalAttachments, subject }, message)
 	}
 	//----------------------------------
 

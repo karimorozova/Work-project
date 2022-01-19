@@ -101,16 +101,16 @@ export default {
           style: { width: "12%" }
         },
         {
-          label: "Vendor",
-          headerKey: "headerVendorName",
-          key: "vendorName",
-          style: { width: "12%" }
-        },
-        {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
           style: { width: "14%" }
+        },
+        {
+          label: "Vendor",
+          headerKey: "headerVendorName",
+          key: "vendorName",
+          style: { width: "12%" }
         },
         {
           label: "Step",

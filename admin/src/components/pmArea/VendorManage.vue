@@ -911,9 +911,9 @@ export default {
     }
 
     &-image {
-      height: 60px;
-      width: 60px;
-      min-width: 60px;
+      height: 55px;
+      width: 55px;
+      min-width: 55px;
       position: relative;
 
       img {

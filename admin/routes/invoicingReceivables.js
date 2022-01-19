@@ -91,8 +91,7 @@ router.post("/not-selected-steps-list", async (req, res) => {
 router.post("/not-selected-steps-list-mono-project", async (req, res) => {
 	const { projectId, clientBillingInfo } = req.body
 	try {
-		const query = { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo), "steps.status": "Completed", status: "Closed" }
-		const steps = await getAllSteps(0, 0, query)
+		const steps = await getAllSteps(0, 1e6, { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo) })
 		res.send(steps)
 	} catch (err) {
 		console.log(err)
@@ -103,8 +102,7 @@ router.post("/not-selected-steps-list-mono-project", async (req, res) => {
 router.post("/not-selected-steps-list-multi-project/", async (req, res) => {
 	const { clientBillingInfo } = req.body
 	try {
-		const query = { "clientBillingInfo": ObjectId(clientBillingInfo), "steps.status": "Completed", status: "Closed" }
-		const steps = await getAllSteps(0, 0, query)
+		const steps = await getAllSteps(0, 1e6, { "clientBillingInfo": ObjectId(clientBillingInfo) })
 		res.send(steps)
 	} catch (err) {
 		console.log(err)

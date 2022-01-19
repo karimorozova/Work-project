@@ -24,11 +24,11 @@
             router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
               .short {{ row.projectName }}
 
+        template(slot="stepId" slot-scope="{ row, index }")
+          .table__data {{ row.steps.stepId || '-' }}
+
         template(slot="name" slot-scope="{row}" )
           .table__data {{ row.selectedBillingInfo.officialName }}
-
-        template(slot="stepId" slot-scope="{ row, index }")
-          .table__data {{ row.steps.stepId }}
 
         template(slot="startDate" slot-scope="{ row, index }")
           .table__data {{ formattedDate(row.startDate) }}
@@ -40,21 +40,25 @@
           .table__data {{ formattedDate(row.billingDate) }}
 
         template(slot="service" slot-scope="{ row, index }")
-          .table__data {{ row.steps.stepAndUnit.step.title }}
+          .table__data {{ row.type === 'Classic' ? row.steps.stepAndUnit.step.title : row.steps.title }}
 
         template(slot="jobStatus" slot-scope="{ row, index }")
-          .table__data {{ row.steps.status }}
+          .table__data {{ row.steps.status || 'Completed' }}
 
         template(slot="langPair" slot-scope="{ row, index }")
-          .table__data {{ row.steps.sourceLanguage}}
-            span(style="font-size: 12px;color: #999999;margin: 0 4px;")
-              i(class="fas fa-angle-double-right")
-            | {{ row.steps.targetLanguage }}
+          span(v-if="row.type === 'Classic'" )
+            .table__data(v-if="row.steps.sourceLanguage === row.steps.targetLanguage") {{ row.steps.targetLanguage }}
+            .table__data(v-else) {{ row.steps.sourceLanguage }}
+              span(style="font-size: 12px;color: #9c9c9c;margin: 0 4px;")
+                i(class="fas fa-angle-double-right")
+              | {{ row.steps.targetLanguage }}
+          span(v-else) -
 
-        template(slot="payables" slot-scope="{ row, index }")
+        template(slot="receivables" slot-scope="{ row, index }")
           .table__data
-            span.currency(v-html="'&euro;'")
-            span {{ row.steps.finance.Price.receivables | roundTwoDigit}}
+            span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+            span {{ row.steps.finance.Price.receivables | roundTwoDigit }}
+
 
       .table__empty(v-if="!steps.length") Nothing found...
 
@@ -70,8 +74,11 @@ import CheckBox from '../CheckBox'
 import Button from '../Button'
 import moment from "moment"
 import { mapGetters } from "vuex"
+import currencyIconDetected from "../../mixins/currencyIconDetected"
 
 export default {
+  mixins: [ currencyIconDetected ],
+
   props: {
     steps: {
       type: Array,
@@ -95,16 +102,16 @@ export default {
           style: { width: "12%" }
         },
         {
-          label: "Billing Name",
-          headerKey: "headerVendorName",
-          key: "name",
-          style: { width: "12%" }
-        },
-        {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
           style: { width: "14%" }
+        },
+        {
+          label: "Billing Name",
+          headerKey: "headerVendorName",
+          key: "name",
+          style: { width: "12%" }
         },
         {
           label: "Step",
@@ -145,7 +152,7 @@ export default {
         {
           label: "Fee",
           headerKey: "headerPayables",
-          key: "payables",
+          key: "receivables",
           style: { width: "8.8%" }
         }
       ]
