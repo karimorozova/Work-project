@@ -5,41 +5,59 @@ const { updateInvoiceReceivablesStatus } = require('./updateReceivables')
 const { sendInvoiceToClientContacts } = require('./notification')
 const moment = require('moment')
 const { InvoicingReceivables } = require('../models')
-const { getTokens, refreshToken } = require('../services')
 const { returnMessageAndType } = require('./helper')
 const fs = require('fs')
 const { ObjectID: ObjectId } = require("mongodb")
+const { refreshToken, sendRequestToZoho } = require("../services/zoho")
 
-const baseUrl = 'https://books.zoho.com/api/v3/'
+// const baseUrl = 'https://books.zoho.com/api/v3/'
 const organizationId = '630935724'
 
-async function getCurrentToken() {
-	try {
-		const token = await Zoho.findOne()
-		return token.access_token
-	} catch (err) {
-		console.log(err)
-		console.log("Error on getCurrentToken ZOHO from DB")
-	}
-}
-
-
-const zohoRequest = async (link, data, method = "GET", additional = {}) => {
-	const token = await getCurrentToken()
-	return (await axios({
-		headers: {
-			'Authorization': `Bearer  ${ token }`,
-			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-		},
-		method,
-		url: baseUrl + link,
-		data,
-		...(additional)
-	}))
-}
+// async function getCurrentToken() {
+// 	try {
+// 		const token = await Zoho.findOne()
+// 		return token.access_token
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error on getCurrentToken ZOHO from DB")
+// 	}
+// }
+//
+// const sendRequestToZoho = async (link, data, method = "GET", header = {}, additional = {}) => {
+// 	let token = await getCurrentToken()
+// 	try {
+// 		return await zohoRequest(link, data, token, method, header, additional)
+// 	} catch (err) {
+// 		try{
+// 			if (err.response || err.response.data.code === 57) {
+// 				token = await setNewTokenFromRefresh()
+// 				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
+// 				return await	zohoRequest(link, data, token, method, header, additional )
+// 			}
+// 		} catch (err) {
+// 			returnMessageAndType(err.message, 'error')
+// 		}
+//
+// 		returnMessageAndType(err.message, 'error')
+// 	}
+// }
+//
+// const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}) => {
+// 	return (await axios({
+// 		headers: {
+// 			'Authorization': `Bearer  ${ token }`,
+// 			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+// 			...header
+// 		},
+// 		method,
+// 		url: baseUrl + link,
+// 		data,
+// 		...(additional)
+// 	}))
+// }
 
 const getCustomer = async (companyName) => {
-	const customer = await zohoRequest(`contacts?organization_id=${ organizationId }&company_name=${ companyName }`)
+	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }&company_name=${ companyName }`)
 	return customer.data.contacts.length > 0 ? customer.data.contacts[0].contact_id : "335260000005073023"
 }
 
@@ -59,7 +77,7 @@ const setNewTokenFromRefresh = async (attempt) => {
 const createAndSendZohoInvoice = async (_reportId) => {
 	const data = await getZohoInvoiceCreationStructure(_reportId)
 	try {
-		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		const result = await sendRequestToZoho(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
 		const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
 		await saveInvoiceFile(_reportId, _id)
 		{
@@ -78,7 +96,7 @@ const createAndSendZohoInvoice = async (_reportId) => {
 const createZohoInvoice = async (_reportId, attempt = 1) => {
 	const data = await getZohoInvoiceCreationStructure(_reportId)
 	try {
-		const result = await zohoRequest(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		const result = await sendRequestToZoho(`invoices?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
 		const { invoice: { invoice_id: _id, invoice_number: reportId } } = result.data
 		await saveInvoiceFile(_reportId, _id)
 
@@ -88,7 +106,8 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 		}
 		return returnMessageAndType(result.data.message, 'success')
 	} catch (err) {
-		if (err.response.data.code === 57) {
+		console.log(err)
+		if ( err.response.data && err.response.data.code === 57) {
 			const isUpdated = await setNewTokenFromRefresh(attempt)
 			if (!isUpdated) return returnMessageAndType('Can`t get access_token', 'error')
 			return await createZohoInvoice(_reportId, ++attempt)
@@ -100,7 +119,7 @@ const createZohoInvoice = async (_reportId, attempt = 1) => {
 
 const deleteZohoInvoice = async (invoiceId) => {
 	try {
-		await zohoRequest(`invoices/${ invoiceId }?organization_id=${ organizationId }`, '', 'DELETE')
+		await sendRequestToZoho(`invoices/${ invoiceId }?organization_id=${ organizationId }`, '', 'DELETE')
 	} catch (e) {
 	}
 }
@@ -142,7 +161,7 @@ const getZohoClientPaymentCreationStructure = async (_reportId, amount) => {
 const saveInvoiceFile = async (_reportId, _zohoId) => {
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-invoice.pdf`
 
-	const fileResult = await zohoRequest(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`, '', 'GET', { responseType: 'stream' })
+	const fileResult = await sendRequestToZoho(`invoices/${ _zohoId }?organization_id=${ organizationId }&accept=pdf`, '', 'GET', { responseType: 'stream' })
 	fileResult.data.pipe(fs.createWriteStream(`dist/clientReportsFiles/${ _reportId }/${ fileName }`))
 	await InvoicingReceivables.updateOne({ _id: _reportId }, { invoice: { filename: fileName, path: `clientReportsFiles/${ _reportId }/${ fileName }` } })
 
@@ -150,7 +169,7 @@ const saveInvoiceFile = async (_reportId, _zohoId) => {
 
 const setInvoiceStatus = async (_zohoId, status) => {
 	try {
-		await zohoRequest(`invoices/${ _zohoId }/status/${ status }?organization_id=${ organizationId }`, '', 'POST')
+		await sendRequestToZoho(`invoices/${ _zohoId }/status/${ status }?organization_id=${ organizationId }`, '', 'POST')
 	} catch (err) {
 		return returnMessageAndType(err.response.data.message, 'error')
 	}
@@ -159,7 +178,7 @@ const setInvoiceStatus = async (_zohoId, status) => {
 const createCustomerPayment = async (_reportId, amount) => {
 	try {
 		const data = await getZohoClientPaymentCreationStructure(_reportId, amount)
-		await zohoRequest(`customerpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
+		await sendRequestToZoho(`customerpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), "POST")
 	} catch (err) {
 		console.log(err)
 		return returnMessageAndType(err.response.data.message, 'error')
@@ -179,7 +198,7 @@ const createCustomerPayment = async (_reportId, amount) => {
 
 const updateReportsStateFromZoho = async () => {
 	try {
-		const reportsFromZoho = await zohoRequest(`invoices?organization_id=${ organizationId }`)
+		const reportsFromZoho = await sendRequestToZoho(`invoices?organization_id=${ organizationId }`)
 		let reportsFromSystem = (await InvoicingReceivables.find({ $nor: [ { status: 'Created' }, { status: 'Invoice Ready' } ] })).filter(item => !!item.externalIntegration.reportId)
 		const { data: { invoices } } = reportsFromZoho
 
@@ -235,7 +254,7 @@ const updateReportStateFromZoho = async (_reportId) => {
 		const { externalIntegration, status } = report
 		if(status === 'Created' || status === 'Invoice Ready' || status === "Partly Paid" ) return returnMessageAndType('Updated', 'success')
 		if (externalIntegration._id ) {
-			const reportFromZoho = await zohoRequest(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
+			const reportFromZoho = await sendRequestToZoho(`invoices/${ externalIntegration._id }?organization_id=${ organizationId }`)
 			const { data: { invoice } } = reportFromZoho
 			// const isAllPaid = false
 			const isAllPaid = invoice["payment_made"] === invoice.total

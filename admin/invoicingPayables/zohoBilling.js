@@ -13,62 +13,64 @@ const { logging } = require("googleapis/build/src/apis/logging")
 const { paidOrAddPaymentInfo } = require("./updatePayables")
 const { getPayable, getAllPayables, getAllPayable } = require("./getPayables")
 const { updatePayable } = require("./updatePayables")
+const { sendRequestToZoho } = require("../services/zoho")
 
-async function getCurrentToken() {
-	try {
-		const token = await Zoho.findOne()
-		return token.access_token
-	} catch (err) {
-		console.log(err)
-		console.log("Error on getCurrentToken ZOHO from DB")
-	}
-}
 
-const setNewTokenFromRefresh = async () => {
-	try {
-		const { _id, refresh_token } = await Zoho.findOne()
-		const { access_token = '' } = await refreshToken(refresh_token)
-		if (access_token === '') return returnMessageAndType("test", 'error')
-		await Zoho.updateOne({ _id: _id }, { access_token })
-		return access_token
-	} catch (e) {
-		return false
-	}
-}
-
-const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}) => {
-	return (await axios({
-		headers: {
-			'Authorization': `Bearer  ${ token }`,
-			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-			...header
-		},
-		method,
-		url: baseUrl + link,
-		data,
-		...(additional)
-	}))
-}
-
-const sendRequestToZoho = async (link, data, method = "GET", header = {}, additional = {}) => {
-	let token = await getCurrentToken()
-	try {
-		return await zohoRequest(link, data, token, method, header, additional)
-	} catch (err) {
-		console.log(err.response)
-		try{
-			if (err.response || err.response.data.code === 57) {
-				token = await setNewTokenFromRefresh()
-				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
-				return await	zohoRequest(link, data, token, method, header, additional )
-			}
-		} catch (err) {
-			  returnMessageAndType(err.message, 'error')
-		}
-
-		 returnMessageAndType(err.message, 'error')
-	}
-}
+// async function getCurrentToken() {
+// 	try {
+// 		const token = await Zoho.findOne()
+// 		return token.access_token
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error on getCurrentToken ZOHO from DB")
+// 	}
+// }
+//
+// const setNewTokenFromRefresh = async () => {
+// 	try {
+// 		const { _id, refresh_token } = await Zoho.findOne()
+// 		const { access_token = '' } = await refreshToken(refresh_token)
+// 		if (access_token === '') return returnMessageAndType("test", 'error')
+// 		await Zoho.updateOne({ _id: _id }, { access_token })
+// 		return access_token
+// 	} catch (e) {
+// 		return false
+// 	}
+// }
+//
+// const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}) => {
+// 	return (await axios({
+// 		headers: {
+// 			'Authorization': `Bearer  ${ token }`,
+// 			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+// 			...header
+// 		},
+// 		method,
+// 		url: baseUrl + link,
+// 		data,
+// 		...(additional)
+// 	}))
+// }
+//
+// const sendRequestToZoho = async (link, data, method = "GET", header = {}, additional = {}) => {
+// 	let token = await getCurrentToken()
+// 	try {
+// 		return await zohoRequest(link, data, token, method, header, additional)
+// 	} catch (err) {
+// 		console.log(err.response)
+// 		try{
+// 			if (err.response || err.response.data.code === 57) {
+// 				token = await setNewTokenFromRefresh()
+// 				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
+// 				return await	zohoRequest(link, data, token, method, header, additional )
+// 			}
+// 		} catch (err) {
+// 			  returnMessageAndType(err.message, 'error')
+// 		}
+//
+// 		 returnMessageAndType(err.message, 'error')
+// 	}
+// }
 
 const getVendor = async (vendorEmail) => {
 	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }&email_startswith=${ vendorEmail }&contact_type=vendor`)
