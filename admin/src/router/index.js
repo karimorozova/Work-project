@@ -23,7 +23,6 @@ import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewVendor from '@/components/vendors/NewVendor'
 import AccountInfo from '@/components/account/AccountInfo'
-import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
@@ -40,6 +39,7 @@ import Navbar from "../components/Navbar"
 import clearRouterView from "../components/clearRouterView"
 import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
 import QuoteDecision from '../components/pmArea/QuoteDecision'
+import CreationLayout from "../components/pmArea/creationProject/CreationLayout"
 
 
 // LIST ================================================================================================
@@ -118,9 +118,9 @@ const router = new Router({
 			// },
 			children: [
 				{
-				    path: '/pangea-zoho-code',
-				    name: 'zoho',
-				    component: ZohoCode
+					path: '/pangea-zoho-code',
+					name: 'zoho',
+					component: ZohoCode
 				},
 				{
 					path: 'pangea-account',
@@ -584,7 +584,7 @@ const router = new Router({
 						{
 							path: 'create-project',
 							name: 'create-project',
-							component: CreateProject
+							component: CreationLayout
 						}
 					]
 				},
@@ -648,7 +648,7 @@ const router = new Router({
 							path: 'invoicing-receivables/create-reports',
 							name: 'invoicing-receivables',
 							component: ReceivablesAdd
-						},
+						}
 
 					]
 				},

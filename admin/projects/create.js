@@ -1,11 +1,10 @@
-const fs = require('fs')
 const moment = require('moment')
 const { XTMLanguageReplacer } = require('../enums')
-const { Projects, Clients, CurrencyRatio, ClientRequest, Languages, Units, Step, Services } = require('../models')
+const { Projects, Clients, CurrencyRatio, ClientRequest, Languages, Units, Step, Services, User } = require('../models')
 const { getProject, updateProject } = require('./getProjects')
 const { createTasksAndStepsForCustomUnits } = require('./taskForCommon')
 const { storeFiles } = require('./files')
-const { getModifiedFiles, createProjectFolder } = require('./helpers')
+const { createProjectFolder } = require('./helpers')
 const { calculateCrossRate } = require('../helpers/commonFunctions')
 const readXlsxFile = require('read-excel-file/node')
 const {
@@ -24,11 +23,91 @@ const {
 const { addProjectFile } = require('../services/memoqs/files')
 const { assignProjectManagers } = require('./updates')
 const { createTasksForWordcount } = require("./taskForWordcount")
-const { log } = require("nodemon/lib/utils")
+const Response = require("../helpers/Response")
 
+const createProjectFromXTMFile = async ({ files }) => {
+
+	console.log(files)
+	return
+	let fileData
+	try {
+		fileData = await readXlsxFile(file.path)
+	} catch (err) {
+		return new Response(Response.Error, 'Error on parsing file.')
+	}
+
+	console.log(fileData)
+
+	return new Response(Response.Error, 'No such client in system like on Memoq.')
+}
+
+const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflow, user }) => {
+	const { group: { name: role }, _id: userId } = user
+
+	let todayStart = new Date()
+	todayStart.setUTCHours(0, 0, 0, 0)
+	let todayEnd = new Date(todayStart)
+	todayEnd.setUTCHours(23, 59, 59, 0)
+
+	const allClients = await Clients.find().populate('discounts')
+	const memoqProjects = await getMemoqAllProjects()
+	const currentProject = memoqProjects.find(item => item.Name === memoqLink.trim())
+
+	if (!memoqProjects.length || !currentProject) return new Response(Response.Error, 'No such project found on Memoq.')
+	const { Client, Name, Deadline } = currentProject
+	const customer = allClients.find(item => item.name === Client)
+	if (!customer) return new Response(Response.Error, 'No such client in system like on Memoq.')
+
+	const { USD, GBP } = await CurrencyRatio.findOne()
+	const { contacts, projectManager, accountManager, discounts, minPrice, currency } = customer
+	const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
+
+	const currNumber = getNextProjectNumber(todayProjects)
+	const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
+
+	project.status = project.status || "Draft"
+	project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
+	project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
+	project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
+	project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
+	project.discounts = discounts
+	project.minimumCharge = { value: minPrice, toIgnore: false }
+	project.crossRate = calculateCrossRate(USD, GBP)
+	project.projectCurrency = currency
+	project.projectName = Name
+	project.deadline = Deadline
+	project.customer = customer._id
+
+	const createdProject = await Projects.create({
+		...project,
+		startDate: new Date(),
+		billingDate: new Date()
+	})
+
+	await createProjectFolder(createdProject.id)
+	const { _id: projectId, projectId: internalProjectId, startDate, deadline } = await getProject({ _id: createdProject.id })
+
+	try {
+		await autoCreatingTranslationTaskInProjectByMemoqLink({
+			memoqLink,
+			projectId,
+			memoqWorkFlow: selectedMemoqWorkflow,
+			creatorUserId: null,
+			internalProjectId,
+			startDate,
+			deadline
+		})
+	} catch (e) {
+		await Projects.deleteOne({ _id: projectId })
+		return new Response(Response.Error, 'Error creating T&S, your data has an incorrect structure, try another option')
+	}
+
+	return new Response(Response.Success, await getProject({ _id: createdProject.id }))
+}
 
 async function createProject(project, user) {
 	const { group: { name: role }, _id: userId } = user
+
 	let todayStart = new Date()
 	todayStart.setUTCHours(0, 0, 0, 0)
 	let todayEnd = new Date(todayStart)
@@ -37,21 +116,21 @@ async function createProject(project, user) {
 	try {
 		const { USD, GBP } = await CurrencyRatio.findOne()
 		const { contacts, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts')
-		const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lte: todayEnd } })
+		const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
 
 		const currNumber = getNextProjectNumber(todayProjects)
 		const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
 		project.status = project.status || "Draft"
-		project.projectId = "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber
-		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id
-		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id
+		project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
+		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
+		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
 		project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
 		project.discounts = discounts
 		project.minimumCharge = { value: minPrice, toIgnore: false }
 		project.crossRate = calculateCrossRate(USD, GBP)
 		project.projectCurrency = currency
-		project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
+		// project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
 
 		const createdProject = await Projects.create({
 			...project,
@@ -78,7 +157,7 @@ const createProjectFromRequest = async (requestId) => {
 	const {
 		projectManager,
 		accountManager,
-		paymentProfile,
+		// paymentProfile,
 		clientContacts,
 		projectName,
 		clientBillingInfo,
@@ -90,11 +169,14 @@ const createProjectFromRequest = async (requestId) => {
 		customer,
 		createdBy
 	} = request
+
 	const { _id, minPrice, currency } = customer
 	const { discounts, accountManager: { _id: AMId }, projectManager: { _id: PMId } } = await Clients.findOne({ '_id': _id }).populate('discounts')
+	const allUsers = await User.find().populate('group')
+	const { _id: userId } = allUsers.find(item => item.group.name === 'Administrators')
 
 	const { USD, GBP } = await CurrencyRatio.findOne()
-	const todayProjects = await Projects.find({ startDate: { $gte: todayStart, $lt: todayEnd } })
+	const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
 
 	const currNumber = getNextProjectNumber(todayProjects)
 	const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
@@ -109,11 +191,11 @@ const createProjectFromRequest = async (requestId) => {
 		brief,
 		isUrgent,
 		status: "Draft",
-		projectId: "Png " + moment(new Date()).format("YYYY MM DD") + " " + projectNumber,
-		projectManager: projectManager || PMId,
-		accountManager: accountManager || AMId,
+		projectId: moment(new Date()).format("YYYY MM DD") + " " + projectNumber,
+		projectManager: projectManager || PMId || userId,
+		accountManager: accountManager || AMId || userId,
 		clientBillingInfo,
-		paymentProfile,
+		// paymentProfile,
 		clientContacts,
 		discounts,
 		minimumCharge: { value: minPrice, toIgnore: false },
@@ -212,7 +294,7 @@ const createRequestTasks = async ({ tasksInfo, sourceFiles: sourceUploadFiles, r
 	delete tasksInfo.requestId
 
 	let existingTasksIds = tasksAndSteps.map(item => item.taskId).map(item => /\d*$/ig.exec(item)[0]).map(item => {
-		const [ first, ...rest ] = item
+		const [ , ...rest ] = item
 		return +rest[0]
 	})
 
@@ -314,8 +396,8 @@ function getNextProjectNumber(todayProjects) {
 
 const manageMemoqProjectName = (projectId, projectName) => {
 	projectName = projectId + ' ' + projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim()
-	if (!projectName.trim().length) projectName = "Png"
-	if (Number.isInteger(+projectName.charAt(0))) projectName = 'Png ' + projectName
+	if (!projectName.trim().length) projectName = "P"
+	if (Number.isInteger(+projectName.charAt(0))) projectName = 'P ' + projectName
 	return projectName
 }
 
@@ -369,7 +451,7 @@ const autoCreatingTranslationTaskInProjectByMemoqLink = async ({ memoqLink, proj
 	const allUnits = await Units.find()
 
 	const memoqProjects = await getMemoqAllProjects()
-	const currentProject = memoqProjects.find(item => item.Name === memoqLink)
+	const currentProject = memoqProjects.find(item => item.Name === memoqLink.trim())
 
 	if (!memoqProjects.length || !currentProject) return getError('No such project found on Memoq.')
 	const { ServerProjectGuid, SourceLanguageCode: sourceLanguage, TargetLanguageCodes } = currentProject
@@ -539,6 +621,7 @@ const autoCreatingTranslationTaskInProjectByXTMFile = async ({ projectId, intern
 }
 
 module.exports = {
+	createProjectFromXTMFile,
 	autoCreatingTranslationTaskInProject,
 	updateRequestTasks,
 	createProject,
@@ -547,5 +630,6 @@ module.exports = {
 	createProjectFromRequest,
 	autoCreatingTaskInProject,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
-	autoCreatingTranslationTaskInProjectByXTMFile
+	autoCreatingTranslationTaskInProjectByXTMFile,
+	createProjectFromMemoq
 }

@@ -331,9 +331,6 @@ export default {
       this.isAdditions = !this.isAdditions
     },
     async buildAutoData() {
-      // console.log('this.allServices', this.allServices)
-      // console.log('this.currentProject', this.currentProject)
-
       const service = this.activeClientServices()[0]
       this.setDataValue({ prop: "service", value: service })
 

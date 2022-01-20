@@ -101,8 +101,8 @@ const getPriceAfterApplyingDiscounts = (clientDiscounts, price) => {
 
 const manageProjectName = (tasksInfo) => {
 	tasksInfo.nativeProjectName = tasksInfo.nativeProjectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim()
-	if (!tasksInfo.nativeProjectName.trim().length) tasksInfo.nativeProjectName = "Png"
-	if (Number.isInteger(+tasksInfo.nativeProjectName.charAt(0))) tasksInfo.nativeProjectName = 'Png ' + tasksInfo.nativeProjectName
+	if (!tasksInfo.nativeProjectName.trim().length) tasksInfo.nativeProjectName = "P"
+	if (Number.isInteger(+tasksInfo.nativeProjectName.charAt(0))) tasksInfo.nativeProjectName = 'P ' + tasksInfo.nativeProjectName
 	return tasksInfo
 }
 

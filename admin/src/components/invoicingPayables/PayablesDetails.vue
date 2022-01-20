@@ -442,7 +442,7 @@ export default {
     },
     async updatePayableStateFromZoho(id) {
       try {
-        let acceptedStatuses = ['Partially Paid', "Invoice Received"]
+        let acceptedStatuses = [ 'Partially Paid', "Invoice Received" ]
         if (!acceptedStatuses.includes(this.reportDetailsInfo.status)) return
 
         const result = await this.$http.get('/invoicing-payables/update-state-from-zoho/' + id)
@@ -450,7 +450,7 @@ export default {
         this.alertToggle({ message, isShow: true, type })
         if (isMovedToArchive) {
           await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-        }else{
+        } else {
           await this.openDetails(this.$route.params.id)
         }
       } catch (err) {

@@ -18,6 +18,8 @@ const {
 const {
 	getProject,
 	createProject,
+	createProjectFromMemoq,
+	createProjectFromXTMFile,
 	createTasks,
 	createTasksForWordcount,
 	updateProject,
@@ -211,6 +213,36 @@ router.post('/new-project', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/new-project-from-memoq', async (req, res) => {
+	let { project, memoqLink, selectedMemoqWorkflow, user } = req.body
+	try {
+		const result = await createProjectFromMemoq({ project, memoqLink, selectedMemoqWorkflow, user })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/new-project-from-xtmFile', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	// const { projectId, internalProjectId, startDate, deadline } = req.body
+	const { file: files } = req.files
+	try {
+		const result = await createProjectFromXTMFile({ files })
+		// fs.access(file[0].path, (error) => {
+		// 	if (!error) {
+		// 		fs.unlink(file[0].path, (err) => {
+		// 			if (err) return console.log(err)
+		// 		})
+		// 	}
+		// })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
 	}
 })
 

@@ -14,7 +14,7 @@
               :selectedOption="project.customer.name"
               :options="clients"
               :hasSearch="true"
-              placeholder="Name"
+              placeholder="Option"
               @chooseOption="setCustomer"
             )
 
@@ -24,7 +24,7 @@
             span.require *
           .project-cd__select-input
             SelectSingle(
-              placeholder="Industry"
+              placeholder="Option"
               :selectedOption="project.selectedIndustry.name"
               :options="industriesList"
               :isDisabled="!project.customer.name"
@@ -58,6 +58,7 @@
             confirm-text="Set date"
             :disabled-date="notBeforeNow"
             prefix-class="xmx"
+            placeholder="Date"
           )
 
       .project-cd__rowButton
@@ -176,7 +177,7 @@ export default {
     choseBillingInfo({ option }) {
       const billingInfo = this.billingInfoList.find(({ name }) => name === option)
       this.setValue('clientBillingInfo', billingInfo)
-      this.project.inPause = billingInfo.paymentType === 'PPP';
+      this.project.inPause = billingInfo.paymentType === 'PPP'
     },
     updateProjectDate(date) {
       this.setValue('deadline', date)
@@ -210,7 +211,6 @@ export default {
     },
     async checkForErrors() {
       this.errors = []
-
       try {
         if (!this.project.projectName) {
           this.errors.push("Please, enter valid Project name.")

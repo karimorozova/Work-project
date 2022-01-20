@@ -213,7 +213,7 @@ export const alertToggle = ({ commit }, payload) => {
 	commit('alertingMessage', payload)
 	setTimeout(() => {
 		commit('alertingMessage', { message: "", isShow: false, type: "success" })
-	}, 5000)
+	}, 4000)
 }
 
 export const login = ({ commit, state }, payload) => {

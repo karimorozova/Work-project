@@ -12,6 +12,7 @@ $primary-color: rgb(209, 95, 69);
   transition: .1s ease-out;
   height: 32px;
   box-shadow: none;
+  padding-left: 7px;
 
   &:disabled {
     background: #FAFAFA;
@@ -28,6 +29,16 @@ $primary-color: rgb(209, 95, 69);
   }
 }
 
+.xmx-input::placeholder {
+  color: #333;
+  opacity: 0.45;
+}
+
+.xmx-input::-webkit-input-placeholder {
+  color: #333;
+  opacity: 0.45;
+}
+
 .cell {
   &:hover {
     background-color: #f5dfd9;
@@ -39,11 +50,16 @@ $primary-color: rgb(209, 95, 69);
   border-radius: 4px;
 }
 
+.xmx-datepicker-footer {
+  text-align: center;
+}
+
 .xmx-datepicker-btn-confirm {
   transition: .1s ease-out;
-  border: 1px solid #bfbfbf;
-  padding: 8px 15px;
-  margin-top: 5px;
+  border: 1px solid #d66f58;
+  padding: 7px 20px;
+  margin: 7px 0;
+  color: #d66f58;
 }
 
 .project__date .xmx-datepicker,
