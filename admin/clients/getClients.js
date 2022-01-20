@@ -95,6 +95,11 @@ async function getClientWithActions(obj) {
       {path: 'assignedTo', select: ['firstName','lastName']}
     ]) || []
 
+	client.billingInfo = client.billingInfo.map((billInfo) => {
+		billInfo.contacts = client.contacts.filter(({_id}) => billInfo.contacts.includes(_id.toString()) )
+		return billInfo
+	})
+
   return client
 }
 

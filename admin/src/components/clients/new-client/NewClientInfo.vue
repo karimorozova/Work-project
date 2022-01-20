@@ -310,19 +310,6 @@
           },
           notes: '',
           reports: [],
-          contacts: [
-            {
-              leadContact: true,
-              firstName: this.client.name,
-              surname: "",
-              email: this.client.email,
-              gender: "",
-              position: "Manager",
-              phone: "",
-              country: "",
-              notes: ""
-            }
-          ],
         }
 
 				sendData.append('client', JSON.stringify(this.client))
@@ -337,7 +324,7 @@
 					const newClient = { ...result.data.client }
 					await this.addNewClient(newClient)
 					this.alertToggle({ message: "New Client saved", isShow: true, type: "success" })
-					await this.$router.push(`/pangea-clients/all/details/${ newClient._id }`)
+					// await this.$router.push(`/pangea-clients/all/details/${ newClient._id }`)
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on updating Client info", isShow: true, type: "error" })
 				}
@@ -364,7 +351,6 @@
           },
           notes: '',
           reports: [],
-          contacts: this.client.contacts,
         }
 				delete this.client.paymentType
 

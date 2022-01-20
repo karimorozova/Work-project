@@ -66,7 +66,7 @@
             .block__data(v-if="isComments")
               ClientsNotes
 
-          .client-info__block
+          .client-info__block(v-if="!isIndividual")
             .block__header(@click="toggleBlock('isRates')" :class="{'block__header-grey': !isRates}")
               .title Rates
               .icon(v-if="!isRates")
@@ -142,7 +142,7 @@
                     :enum="'client'"
                   )
 
-          .client-info__block
+          .client-info__block(v-if="!isIndividual")
             .block__header(@click="toggleBlock('isServices')" :class="{'block__header-grey': !isServices}")
               .title Services
               .icon(v-if="!isServices")
@@ -175,7 +175,7 @@
                 :languages="languages"
               )
 
-          .client-info__block(v-if="!isIndividual")
+          .client-info__block
             .block__header(@click="toggleBlock('isContactDetails')" :class="{'block__header-grey': !isContactDetails}")
               .title Contact Details
               .icon(v-if="!isContactDetails")
@@ -191,7 +191,7 @@
                 @contactUpdate="contactUpdate"
               )
 
-          .client-info__block
+          .client-info__block(v-if="!isIndividual")
             .block__header(@click="toggleBlock('isDocuments')" :class="{'block__header-grey': !isDocuments}")
               .title Documents
               .icon(v-if="!isDocuments")

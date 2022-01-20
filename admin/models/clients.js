@@ -197,7 +197,9 @@ const ClientSchema = new mongoose.Schema({
 			type: Array,
 			default: []
 		},
-		contacts: [ billingContacts ]
+		contacts: [
+			{ type: Schema.Types.ObjectId }
+		],
 	} ],
 	services: [ {
 		sourceLanguage: {

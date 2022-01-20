@@ -32,6 +32,7 @@ const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('
 const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes } = require('../models')
 const { getProject } = require('../projects')
 const { createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require("../clients/clientService")
+const { createClient } = require("../clients/createClient")
 
 router.get('/client', async (req, res) => {
 	let { id } = req.query
@@ -127,14 +128,13 @@ router.get("/unique-email", async (req, res) => {
 router.post('/update-client', upload.any(), async (req, res) => {
 	let client = JSON.parse(req.body.client)
 	let clientId = client._id
+	let result
 	try {
 		if (!client._id) {
-			const { discountChart } = await Pricelist.findOne({ _id: client.defaultPricelist })
-			client.matrix = discountChart
-			let result = await Clients.create(client)
-			clientId = result.id
+			result =  await createClient(client)
+		}else {
+			 result = await updateClientInfo({ clientId, client, files: req.files })
 		}
-		const result = await updateClientInfo({ clientId, client, files: req.files })
 		res.send({ client: result })
 	} catch (err) {
 		console.log(err)
