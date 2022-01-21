@@ -62,7 +62,7 @@ import Button from "../../Button"
 export default {
   name: "Classic",
   components: { Button, SelectSingle, DatePicker },
-  props: [ 'clients', "industries", 'user' ],
+  props: [ 'clients', "industries", 'user', 'extraOptions' ],
   data() {
     return {
       project: {
@@ -70,10 +70,6 @@ export default {
         projectName: "",
         selectedIndustry: {},
         deadline: ""
-
-        // isTest: false,
-        // inPause: false,
-        // isUrgent: false,
       }
     }
   },
@@ -98,6 +94,10 @@ export default {
     async createProject() {
       this.project.industry = this.project.selectedIndustry._id
       this.project.customer = this.project.customer._id
+      this.project = {
+        ...this.project,
+        ...this.extraOptions
+      }
       try {
         const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
         await this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ newProject.data._id }`)

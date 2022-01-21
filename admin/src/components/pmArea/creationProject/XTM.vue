@@ -39,16 +39,12 @@ import UploadFileButton from "../../UploadFileButton"
 
 export default {
   name: "XTM",
-  props: [ 'clients', "industries", 'user' ],
+  props: [ 'clients', "industries", 'user', 'extraOptions' ],
   data() {
     return {
       xtmFileData: [],
-
       project: {
         selectedIndustry: {}
-        // isTest: false,
-        // inPause: false,
-        // isUrgent: false,
       },
       isRequestNow: false
     }
@@ -63,9 +59,13 @@ export default {
     },
     async createProject() {
       this.isRequestNow = true
+      let project = {}
+      for (let [ key, val ] of Object.entries(this.extraOptions)) project = { ...project, [key]: val }
+
       const formData = new FormData()
       formData.append('user', JSON.stringify(this.user))
       formData.append('industry', this.project.selectedIndustry._id)
+      formData.append('project', JSON.stringify(project))
 
       for (let file of this.xtmFileData) {
         formData.append('file', file)

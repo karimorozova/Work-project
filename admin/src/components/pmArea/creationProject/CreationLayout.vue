@@ -1,30 +1,40 @@
 <template lang="pug">
-  .creation
-    .creation__title Add Project
-    .creation__tabs
-      Tabs(
-        :tabs="tabs"
-        @setTab="setTab"
-        :selectedTab="selectedTab"
+  .layout
+    .creation
+      .creation__title Add Project
+      .creation__tabs
+        Tabs(
+          :tabs="tabs"
+          @setTab="setTab"
+          :selectedTab="selectedTab"
+        )
+      .creation__content(v-if="selectedTab === 'Classic'")
+        Classic(
+          :extraOptions="extraOptions"
+          :clients="clients",
+          :industries="industries"
+          :user="user"
+        )
+      .creation__content(v-else-if="selectedTab === 'Memoq Link'")
+        Memoq(
+          :extraOptions="extraOptions"
+          :clients="clients",
+          :industries="industries"
+          :user="user"
+        )
+      .creation__content(v-else-if="selectedTab === 'XTM Files'")
+        XTM(
+          :extraOptions="extraOptions"
+          :clients="clients",
+          :industries="industries"
+          :user="user"
+        )
+    .side
+      Side(
+        :extraOptions="extraOptions"
+        @setSideOption="setSideOption"
       )
-    .creation__content(v-if="selectedTab === 'Classic'")
-      Classic(
-        :clients="clients",
-        :industries="industries"
-        :user="user"
-      )
-    .creation__content(v-else-if="selectedTab === 'Memoq Link'")
-      Memoq(
-        :clients="clients",
-        :industries="industries"
-        :user="user"
-      )
-    .creation__content(v-else-if="selectedTab === 'XTM Files'")
-      XTM(
-        :clients="clients",
-        :industries="industries"
-        :user="user"
-      )
+
 
 </template>
 
@@ -34,6 +44,7 @@ import { mapGetters } from "vuex"
 import Classic from "./Classic"
 import Memoq from "./Memoq"
 import XTM from "./XTM"
+import Side from "./Side"
 
 export default {
   name: "creationLayout",
@@ -41,12 +52,20 @@ export default {
     return {
       tabs: [ 'Classic', 'Individual', 'Memoq Link', 'XTM Files' ],
       selectedTab: 'Classic',
-      clients: []
+      clients: [],
+      extraOptions: {
+        isTest: false,
+        isUrgent: false,
+        isSkipProgress: false
+      }
     }
   },
   methods: {
     setTab({ index }) {
       this.selectedTab = this.tabs[index]
+    },
+    setSideOption({ prop, value }) {
+      this.extraOptions = { ...this.extraOptions, [prop]: value }
     },
     async getCustomers() {
       try {
@@ -67,6 +86,7 @@ export default {
     await this.getCustomers()
   },
   components: {
+    Side,
     XTM,
     Memoq,
     Classic,
@@ -78,8 +98,12 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
 
+.layout {
+  margin: 50px 0 50px 50px;
+  display: flex;
+}
+
 .creation {
-  margin: 50px;
   padding: 25px;
   width: 1040px;
   box-shadow: $box-shadow;
@@ -87,6 +111,7 @@ export default {
   background: white;
   border-radius: 4px;
   box-sizing: border-box;
+  height: fit-content;
 
   &__title {
     font-size: 18px;

@@ -42,16 +42,13 @@ import Button from "../../Button"
 
 export default {
   name: "Memoq",
-  props: [ 'clients', "industries", 'user' ],
+  props: [ 'clients', "industries", 'user', 'extraOptions' ],
   data() {
     return {
       memoqLink: '',
       selectedMemoqWorkflow: '',
       project: {
         selectedIndustry: {}
-        // isTest: false,
-        // inPause: false,
-        // isUrgent: false,
       },
       isRequestNow: false
     }
@@ -63,6 +60,10 @@ export default {
     },
     setIndustry({ option }) {
       this.project.selectedIndustry = this.industries.find(i => i.name === option)
+      this.project = {
+        ...this.project,
+        ...this.extraOptions
+      }
     },
     async createProject() {
       this.project.industry = this.project.selectedIndustry._id

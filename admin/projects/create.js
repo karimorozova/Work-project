@@ -25,7 +25,7 @@ const { assignProjectManagers } = require('./updates')
 const { createTasksForWordcount } = require("./taskForWordcount")
 const Response = require("../helpers/Response")
 
-const createProjectFromXTMFile = async ({ files, user, industry }) => {
+const createProjectFromXTMFile = async ({ files, user, industry, project }) => {
 	const { group: { name: role }, _id: userId } = user
 	const allClients = await Clients.find().populate('discounts')
 	const { USD, GBP } = await CurrencyRatio.findOne()
@@ -63,8 +63,7 @@ const createProjectFromXTMFile = async ({ files, user, industry }) => {
 		const currNumber = getNextProjectNumber(todayProjects)
 		const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
-		const project = {}
-		project.status = project.status || "Draft"
+		project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
 		project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
@@ -99,8 +98,6 @@ const createProjectFromXTMFile = async ({ files, user, industry }) => {
 			return new Response(Response.Error, 'Error creating T&S, your data has an incorrect file structure, try another option.')
 		}
 	}
-
-	console.log('res')
 	return new Response(Response.Success, null)
 }
 
@@ -128,7 +125,7 @@ const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflo
 	const currNumber = getNextProjectNumber(todayProjects)
 	const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
-	project.status = project.status || "Draft"
+	project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
 	project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 	project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 	project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
@@ -185,7 +182,7 @@ async function createProject(project, user) {
 		const currNumber = getNextProjectNumber(todayProjects)
 		const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
-		project.status = project.status || "Draft"
+		project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
 		project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
@@ -194,7 +191,7 @@ async function createProject(project, user) {
 		project.minimumCharge = { value: minPrice, toIgnore: false }
 		project.crossRate = calculateCrossRate(USD, GBP)
 		project.projectCurrency = currency
-		// project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
+		project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
 
 		const createdProject = await Projects.create({
 			...project,

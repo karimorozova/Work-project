@@ -228,11 +228,12 @@ router.post('/new-project-from-memoq', async (req, res) => {
 })
 
 router.post('/new-project-from-xtmFile', upload.fields([ { name: 'file' } ]), async (req, res) => {
-	let { user, industry } = req.body
+	let { user, industry, project } = req.body
 	const { file: files } = req.files
 	try {
 		user = JSON.parse(user)
-		const result = await createProjectFromXTMFile({ files, user, industry })
+		project = JSON.parse(project)
+		const result = await createProjectFromXTMFile({ files, user, industry, project })
 		for (const file of files) {
 			fs.access(file.path, (error) => {
 				if (!error) {
