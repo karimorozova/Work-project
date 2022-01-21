@@ -26,7 +26,7 @@ export const mutations = {
             'otherInfo',
             'leadGeneration',
             'leadSource',
-            'contacts'
+            // 'contacts'
         ]
 
         for(let key of keys) state.currentClientOverallData[key] = payload[key]

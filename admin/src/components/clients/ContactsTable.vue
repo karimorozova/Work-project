@@ -108,7 +108,7 @@
 			},
 			contactSave(data) {
 				if (this.editingIndex !== -1) {
-					this.$emit('contactUpdate', { ...data, index: this.editingIndex })
+					this.$emit('contactUpdate', { ...data })
 				} else {
 					this.$emit('contactSave', { ...data })
 				}

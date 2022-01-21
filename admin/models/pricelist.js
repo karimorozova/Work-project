@@ -9,6 +9,9 @@ const PricelistSchema = new mongoose.Schema({
 	isVendorDefault: {
 		type: Boolean
 	},
+	isClientDefault: {
+		type: Boolean
+	},
 	isActive: {
 		type: Boolean
 	},

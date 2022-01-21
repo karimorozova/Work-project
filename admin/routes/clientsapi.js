@@ -33,6 +33,7 @@ const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes 
 const { getProject } = require('../projects')
 const { createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require("../clients/clientService")
 const { createClient, getContactsIdsWithCreate } = require("../clients/createClient")
+const { updateClientContact, addClientContact } = require("../clients/clientContacts")
 
 router.get('/client', async (req, res) => {
 	let { id } = req.query
@@ -195,6 +196,28 @@ router.delete('/deleteclient/:id', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on deleting Client")
+	}
+})
+
+router.post('/addContact',  upload.any(), async (req, res) => {
+	const { id, contact } = req.body
+	try {
+		const result = await addClientContact( id, JSON.parse(contact), req.files)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/updateContact', upload.any(), async (req, res) => {
+	const { id, contact } = req.body
+	try {
+		const result = await updateClientContact( id, JSON.parse(contact), req.files )
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
 	}
 })
 

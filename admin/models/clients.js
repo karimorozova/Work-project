@@ -58,7 +58,7 @@ delete billingContacts.password
 const ClientSchema = new mongoose.Schema({
 	name: {
 		type: String,
-		default: '',
+		required: [true, 'Name is required'],
 		trim: true
 	},
 	officialCompanyName: {
@@ -73,10 +73,12 @@ const ClientSchema = new mongoose.Schema({
 	},
 	email: {
 		type: String,
-		trim: true
+		trim: true,
+		required: [true, 'Email is required'],
 	},
 	nativeLanguage: {
-		type: Schema.Types.ObjectId, ref: 'Language'
+		type: Schema.Types.ObjectId, ref: 'Language',
+		default: null
 	},
 	defaultPricelist: {
 		type: Schema.Types.ObjectId, ref: 'Pricelist'
@@ -105,7 +107,9 @@ const ClientSchema = new mongoose.Schema({
 		trim: true
 	},
 	timeZone: {
-		type: Schema.Types.ObjectId, ref: 'Timezones'
+		type: Schema.Types.ObjectId,
+		ref: 'Timezones',
+		default: null
 	},
 	documents: {
 		type: Array,
@@ -145,14 +149,17 @@ const ClientSchema = new mongoose.Schema({
 	billingInfo: [ {
 		paymentType: {
 			type: String,
+			default: 'PPP',
 			trim: true
 		},
 		officialName: {
 			type: String,
+			required: [true, 'OfficialName is required'],
 			trim: true
 		},
 		name: {
 			type: String,
+			required: [true, 'BillingName is required'],
 			trim: true
 		},
 		paymentTerms: {
@@ -162,26 +169,32 @@ const ClientSchema = new mongoose.Schema({
 		address: {
 			country: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			street1: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			street2: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			city: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			state: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			zipCode: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			vat: {
@@ -191,6 +204,7 @@ const ClientSchema = new mongoose.Schema({
 		},
 		notes: {
 			type: String,
+			default: '',
 			trim: true
 		},
 		reports: {

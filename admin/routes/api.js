@@ -29,6 +29,7 @@ const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('
 const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps')
 const { ObjectId } = require("mongoose/lib/types")
 const moment = require("moment")
+const { createClient } = require("../clients/createClient")
 
 router.get('/wordcount', async (req, res) => {
 	let link = req.query.web
@@ -472,7 +473,14 @@ router.get('/cc-stat', async (req, res) => {
 		res.status(500).send("Error on getting stats")
 	}
 })
-
+router.get('/create-client/:name/:email', async (req, res) => {
+	try {
+		await createClient({...req.params})
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting stats")
+	}
+})
 router.get('/cc-stat-custom/:from/:to', async (req, res) => {
 
 	try {

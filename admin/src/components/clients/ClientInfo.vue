@@ -184,7 +184,7 @@
                 i.fas.fa-chevron-right
             .block__data(v-if="isContactDetails")
               ContactsTable(
-                :contacts="[...currentClientOverallData.contacts]"
+                :contacts="[...currentClient.contacts]"
                 @setLeadContact="setLeadContact"
                 @approveDelete="approveContactDelete"
                 @contactSave="contactSave"
@@ -335,7 +335,7 @@
 					'otherInfo',
 					'leadGeneration',
 					'leadSource',
-					'contacts'
+					// 'contacts'
 				],
 				createTaskModal: false,
 				createNoteModal: false,
@@ -486,13 +486,27 @@
 			cancel() {
 				this.storeCurrentClientOverallData(this.currentClient)
 			},
-			contactUpdate({ index, contact, file }) {
-				this.contactsPhotos.push(file)
-				this.updateClientContact({ index, contact })
+			async contactUpdate({ contact, file }) {
+        let sendData = new FormData()
+
+        sendData.append("id", this.currentClient._id)
+        sendData.append("contact", JSON.stringify(contact))
+        sendData.append("photos", file)
+
+        const result = await this.$http.post("/clientsapi/updateContact", sendData)
+        this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
 			},
-			contactSave({ contact, file }) {
-				this.contactsPhotos.push(file)
-				this.storeClientContactOverAll(contact)
+			async contactSave({ contact, file }) {
+        let sendData = new FormData()
+
+        sendData.append("id", this.currentClient._id)
+        sendData.append("contact", JSON.stringify(contact))
+        sendData.append("photos", file)
+
+        const result = await this.$http.post("/clientsapi/addContact", sendData)
+        this.currentClient.contacts.slice(this.currentClient.contacts - 1, 0 , result.data.addedContact)
+        this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value:  this.currentClient.contacts })
+
 			},
 			deleteClient() {
 				this.isApproveModal = true
@@ -509,7 +523,7 @@
 					const contacts = this.updateLeadWhenDeleted(index)
 					const result = await this.$http.post("/clientsapi/deleteContact", { id: this.currentClient._id, contacts })
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
-					this.storeCurrentClientOverallData(result.data)
+					// this.storeCurrentClientOverallData(result.data)
 					this.alertToggle({ message: "Contact has been deleted", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on deleting contact", isShow: true, type: "error" })
