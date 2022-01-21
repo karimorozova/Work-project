@@ -96,7 +96,7 @@ async function getClientWithActions(obj) {
     ]) || []
 
 	client.billingInfo = client.billingInfo.map((billInfo) => {
-		billInfo.contacts = client.contacts.filter(({_id}) => billInfo.contacts.includes(_id.toString()) )
+		billInfo.contacts = client.contacts.filter(({_id}) => billInfo.contacts.map(({_id}) => _id.toString()).includes(_id.toString()))
 		return billInfo
 	})
 
@@ -201,8 +201,8 @@ const getClientRates = async (obj) => {
  *
  * @returns {Array} - returns an array of clients with needed values
  */
-const getClientsForNewProject = () => {
-	return Clients
+const getClientsForNewProject = async () => {
+	return await Clients
 			.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, services: 1, billingInfo: 1 })
 			.populate('services.industries')
 }

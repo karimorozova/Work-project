@@ -12,4 +12,22 @@ const createClient = async (client) => {
 	return finalUpdate
 }
 
-module.exports = { createClient }
+const getContactsIdsWithCreate = async (_id, billingInfo) => {
+	let contactEmailsToAdd = []
+	const client = await Clients.findById(_id)
+	billingInfo.contacts.forEach((contact) => {
+		if (!contact.hasOwnProperty("_id")) {
+			client.contacts.push(contact)
+		}
+		contactEmailsToAdd.push(contact.email)
+	})
+	await client.save()
+
+	const test = await Clients.findById(_id).lean()
+
+	return test.contacts.filter(({email}) => {
+		return contactEmailsToAdd.includes(email)
+	}).map(({_id}) => _id.toString())
+}
+
+module.exports = { createClient, getContactsIdsWithCreate }

@@ -32,7 +32,7 @@ const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('
 const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes } = require('../models')
 const { getProject } = require('../projects')
 const { createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require("../clients/clientService")
-const { createClient } = require("../clients/createClient")
+const { createClient, getContactsIdsWithCreate } = require("../clients/createClient")
 
 router.get('/client', async (req, res) => {
 	let { id } = req.query
@@ -133,7 +133,7 @@ router.post('/update-client', upload.any(), async (req, res) => {
 		if (!client._id) {
 			result =  await createClient(client)
 		}else {
-			 result = await updateClientInfo({ clientId, client, files: req.files })
+		  result = await updateClientInfo({ clientId, client, files: req.files })
 		}
 		res.send({ client: result })
 	} catch (err) {
@@ -717,14 +717,16 @@ router.post('/get-billing-info/:_id', async (req, res) => {
 router.post('/update-billing-info/:_id', async (req, res) => {
 	try {
 		const { _id } = req.params
-		const { billingInfo } = req.body
-		let updated
+		let { billingInfo } = req.body
+
+		billingInfo.contacts = await getContactsIdsWithCreate(_id, billingInfo)
+
 		if(!billingInfo.hasOwnProperty("_id")) {
-			updated = await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo }})
+			await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo }})
 		} else  {
-			updated = await Clients.updateOne({_id}, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
+			 await Clients.updateOne({_id}, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
 		}
-		res.send(updated)
+		res.send(await getClientWithActions({_id: _id}) )
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on get /deleting | payment-terms')

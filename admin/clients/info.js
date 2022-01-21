@@ -2,6 +2,7 @@ const { moveFile } = require('../utils/movingFile');
 const fs = require('fs');
 const { Clients } = require('../models');
 const { getClientAfterUpdate } = require('./getClients');
+const { getContactsIdsWithCreate } = require("../clients/createClient")
 
 /**
  *
@@ -13,6 +14,12 @@ const { getClientAfterUpdate } = require('./getClients');
 async function updateClientInfo({ clientId, client, files }) {
   const { contacts } = client;
   let updatingClient = { ...client };
+  // console.log(updatingClient)
+  // for await (let billInfo of updatingClient.billingInfo) {
+  //   billInfo.contacts = await getContactsIdsWithCreate(clientId, billInfo)
+  //   console.log(billInfo.contacts)
+  // }
+  // console.log(updatingClient.billingInfo)
   const photoFiles = files.filter(item => item.fieldname === 'photos');
   try {
     if (photoFiles.length) {

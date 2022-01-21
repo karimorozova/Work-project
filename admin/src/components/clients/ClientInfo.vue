@@ -634,7 +634,7 @@
 				} ]
 
         // TODO: refacoring
-				clientForSave.billingInfo = {
+				clientForSave.billingInfo = [{
 					officialName: this.currentClientOverallData.name,
           paymentType: "PPP",
           paymentTerms: '',
@@ -659,11 +659,12 @@
               position: "Manager",
               phone: "",
               country: "",
-              notes: ""
+              notes: "",
+              test: 1
             }
           ],
 
-				}
+				}]
 
 				let sendData = new FormData()
 				let dataForClient = clientForSave
