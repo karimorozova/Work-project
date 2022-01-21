@@ -25,20 +25,83 @@ const { assignProjectManagers } = require('./updates')
 const { createTasksForWordcount } = require("./taskForWordcount")
 const Response = require("../helpers/Response")
 
-const createProjectFromXTMFile = async ({ files }) => {
+const createProjectFromXTMFile = async ({ files, user, industry }) => {
+	const { group: { name: role }, _id: userId } = user
+	const allClients = await Clients.find().populate('discounts')
+	const { USD, GBP } = await CurrencyRatio.findOne()
 
-	console.log(files)
-	return
-	let fileData
-	try {
-		fileData = await readXlsxFile(file.path)
-	} catch (err) {
-		return new Response(Response.Error, 'Error on parsing file.')
+	let todayStart = new Date()
+	todayStart.setUTCHours(0, 0, 0, 0)
+	let todayEnd = new Date(todayStart)
+	todayEnd.setUTCHours(23, 59, 59, 0)
+
+	for await (const file of files) {
+		try {
+			await readXlsxFile(file.path)
+		} catch (err) {
+			return new Response(Response.Error, `Error on parsing ${ file.filename } file.`)
+		}
 	}
 
-	console.log(fileData)
+	for await (file of files) {
+		const fileData = await readXlsxFile(file.path)
+		let deadline, projectName, client
+		client = fileData[2][2]
+		fileData.forEach((element, index, array) => {
+			if (element.includes('Project due date')) deadline = element[1]
+			if (element.includes('Project name')) projectName = element[1]
+		})
+		deadline = deadline.split("-")
+		deadline = new Date(`${ deadline[1] }-${ deadline[0] }-${ deadline[2] }`)
 
-	return new Response(Response.Error, 'No such client in system like on Memoq.')
+		const customer = allClients.find(item => item.name === client)
+		if (!customer) return new Response(Response.Error, `No such client on system, ${ client } like in file.`)
+
+		const { contacts, projectManager, accountManager, discounts, minPrice, currency } = customer
+		const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
+
+		const currNumber = getNextProjectNumber(todayProjects)
+		const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
+
+		const project = {}
+		project.status = project.status || "Draft"
+		project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
+		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
+		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
+		project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
+		project.discounts = discounts
+		project.deadline = deadline
+		project.industry = industry
+		project.customer = customer._id
+		project.minimumCharge = { value: minPrice, toIgnore: false }
+		project.crossRate = calculateCrossRate(USD, GBP)
+		project.projectCurrency = currency
+		project.projectName = project.isUrgent ? '[Urgent] ' + projectName : projectName
+
+		const createdProject = await Projects.create({
+			...project,
+			startDate: new Date(),
+			billingDate: new Date()
+		})
+		await createProjectFolder(createdProject.id)
+		const { _id: projectId, projectId: internalProjectId, startDate } = await getProject({ _id: createdProject.id })
+
+		try {
+			await autoCreatingTranslationTaskInProjectByXTMFile({
+				projectId,
+				internalProjectId,
+				startDate,
+				deadline,
+				file
+			})
+		} catch (e) {
+			await Projects.deleteOne({ _id: projectId })
+			return new Response(Response.Error, 'Error creating T&S, your data has an incorrect file structure, try another option.')
+		}
+	}
+
+	console.log('res')
+	return new Response(Response.Success, null)
 }
 
 const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflow, user }) => {
@@ -74,9 +137,10 @@ const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflo
 	project.minimumCharge = { value: minPrice, toIgnore: false }
 	project.crossRate = calculateCrossRate(USD, GBP)
 	project.projectCurrency = currency
-	project.projectName = Name
 	project.deadline = Deadline
 	project.customer = customer._id
+	project.projectName = project.isUrgent ? '[Urgent] ' + Name : Name
+
 
 	const createdProject = await Projects.create({
 		...project,

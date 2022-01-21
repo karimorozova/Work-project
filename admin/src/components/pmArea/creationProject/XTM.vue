@@ -20,16 +20,6 @@
         .data__xtm-fileWrapper(v-for="item in Array.from(xtmFileData)" )
           .data__xtm-fileName {{ item.name }}
           .data__xtm-removeFile( @click="removeXTMFile(item.name)") &#215;
-    //.row
-    //  .row__title Workflow:
-    //  .row__value
-    //    .drop
-    //      SelectSingle(
-    //        :selectedOption="selectedMemoqWorkflow"
-    //        :options="['Translation & Revising', 'Translation Only']"
-    //        placeholder="Option"
-    //        @chooseOption="setMemoqWorkflow"
-    //      )
 
     .create-btn
       Button(
@@ -72,53 +62,33 @@ export default {
       this.xtmFileData = this.xtmFileData.filter(item => item.name !== name)
     },
     async createProject() {
-      // this.project.industry = this.project.selectedIndustry._id
       this.isRequestNow = true
       const formData = new FormData()
+      formData.append('user', JSON.stringify(this.user))
+      formData.append('industry', this.project.selectedIndustry._id)
+
       for (let file of this.xtmFileData) {
         formData.append('file', file)
       }
       const result = await this.$http.post("/pm-manage/new-project-from-xtmFile", formData)
       const { data } = result
       if (data.status === 'success') {
-        // await this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ data.data._id }`)
-        // this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
+        await this.$router.push(`/pangea-projects/all-projects/All`)
+        this.alertToggle({ message: "New Projects has been created", isShow: true, type: "success" })
         this.isRequestNow = false
       } else {
         this.alertToggle({ ...data, type: data.status, isShow: true })
         this.isRequestNow = false
       }
     },
-    // setMemoqWorkflow({ option }) {
-    //   this.selectedMemoqWorkflow = option
-    // },
     setIndustry({ option }) {
       this.project.selectedIndustry = this.industries.find(i => i.name === option)
     }
-    // async createProject() {
-    //   this.project.industry = this.project.selectedIndustry._id
-    //   this.isRequestNow = true
-    //   const result = await this.$http.post("/pm-manage/new-project-from-memoq", {
-    //     project: this.project,
-    //     memoqLink: this.memoqLink,
-    //     selectedMemoqWorkflow: this.selectedMemoqWorkflow,
-    //     user: this.user
-    //   })
-    //   const { data } = result
-    //   if (data.status === 'success') {
-    //     await this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ data.data._id }`)
-    //     this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
-    //     this.isRequestNow = false
-    //   } else {
-    //     this.alertToggle({ ...data, type: data.status, isShow: true })
-    //     this.isRequestNow = false
-    //   }
-    // }
   },
   computed: {
-    // isDisableSubmitButton() {
-    //   return !this.memoqLink.trim() || !this.project.selectedIndustry.name || !this.selectedMemoqWorkflow
-    // }
+    isDisableSubmitButton() {
+      return !this.xtmFileData.length || !this.project.selectedIndustry.name
+    }
   },
   components: {
     UploadFileButton,

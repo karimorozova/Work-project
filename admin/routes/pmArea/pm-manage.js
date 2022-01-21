@@ -228,17 +228,20 @@ router.post('/new-project-from-memoq', async (req, res) => {
 })
 
 router.post('/new-project-from-xtmFile', upload.fields([ { name: 'file' } ]), async (req, res) => {
-	// const { projectId, internalProjectId, startDate, deadline } = req.body
+	let { user, industry } = req.body
 	const { file: files } = req.files
 	try {
-		const result = await createProjectFromXTMFile({ files })
-		// fs.access(file[0].path, (error) => {
-		// 	if (!error) {
-		// 		fs.unlink(file[0].path, (err) => {
-		// 			if (err) return console.log(err)
-		// 		})
-		// 	}
-		// })
+		user = JSON.parse(user)
+		const result = await createProjectFromXTMFile({ files, user, industry })
+		for (const file of files) {
+			fs.access(file.path, (error) => {
+				if (!error) {
+					fs.unlink(file.path, (err) => {
+						if (err) return console.log(err)
+					})
+				}
+			})
+		}
 		res.send(result)
 	} catch (err) {
 		console.log(err)
