@@ -102,6 +102,11 @@ export default {
   display: flex;
   align-items: center;
   height: 32px;
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0px;
+  }
 
   &__title {
     width: 100px;
@@ -119,6 +124,12 @@ export default {
   width: 220px;
   background-color: white;
   border-radius: 4px;
+}
+
+.create-btn {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
 }
 
 input {

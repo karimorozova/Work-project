@@ -107,6 +107,7 @@ export default {
   display: flex;
   align-items: center;
   min-height: 32px;
+  margin-bottom: 20px;
 
   &__title {
     width: 100px;
@@ -117,6 +118,11 @@ export default {
 .row2 {
   display: flex;
   min-height: 32px;
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0px;
+  }
 
   &__title {
     width: 100px;
@@ -147,6 +153,11 @@ export default {
       align-items: center;
       gap: 5px;
       border-radius: 4px;
+      margin-bottom: 8px;
+
+      &:last-child {
+        margin-bottom: 0px;
+      }
     }
 
     &-fileName {
@@ -176,21 +187,9 @@ export default {
   }
 }
 
-//input {
-//  font-size: 14px;
-//  color: $text;
-//  border: 1px solid $border;
-//  border-radius: 4px;
-//  box-sizing: border-box;
-//  padding: 0 7px;
-//  outline: none;
-//  height: 32px;
-//  transition: .1s ease-out;
-//  width: 220px;
-//  font-family: 'Myriad400';
-//
-//  &:focus {
-//    border: 1px solid $border-focus;
-//  }
-//}
+.create-btn {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+}
 </style>

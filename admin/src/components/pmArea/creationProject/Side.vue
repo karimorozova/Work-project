@@ -8,7 +8,6 @@
       .row__title Urgent:
       .row__data
         CheckBox(:isChecked="extraOptions.isUrgent", @check="() => setUrgentStatus(true)", @uncheck="() => setUrgentStatus(false)")
-
     .row
       .row__title Skip Progress:
       .row__data

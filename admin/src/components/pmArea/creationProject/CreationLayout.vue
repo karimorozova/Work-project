@@ -15,6 +15,12 @@
           :industries="industries"
           :user="user"
         )
+      .creation__content(v-if="selectedTab === 'Individual'")
+        Individual(
+          :extraOptions="extraOptions"
+          :industries="industries"
+          :user="user"
+        )
       .creation__content(v-else-if="selectedTab === 'Memoq Link'")
         Memoq(
           :extraOptions="extraOptions"
@@ -35,7 +41,6 @@
         @setSideOption="setSideOption"
       )
 
-
 </template>
 
 <script>
@@ -45,6 +50,7 @@ import Classic from "./Classic"
 import Memoq from "./Memoq"
 import XTM from "./XTM"
 import Side from "./Side"
+import Individual from "./Individual"
 
 export default {
   name: "creationLayout",
@@ -86,6 +92,7 @@ export default {
     await this.getCustomers()
   },
   components: {
+    Individual,
     Side,
     XTM,
     Memoq,
@@ -112,6 +119,10 @@ export default {
   border-radius: 4px;
   box-sizing: border-box;
   height: fit-content;
+
+  &__content {
+    margin-top: 25px;
+  }
 
   &__title {
     font-size: 18px;
