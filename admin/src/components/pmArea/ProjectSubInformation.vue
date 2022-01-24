@@ -57,6 +57,7 @@
           placeholder="Value"
           @change="setPO"
           @keyup.13="setPO"
+          :disabled="isProjectFinished"
         )
 
     //.sub-information__row

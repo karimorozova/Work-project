@@ -496,7 +496,8 @@ export default {
       return STATUSES.includes(status)
     },
     cancelledStepStatuses({ status }) {
-      const STATUSES = [ 'Cancelled', 'Cancelled Halfway', 'Completed' ]
+      let STATUSES = [ 'Cancelled', 'Cancelled Halfway' ]
+      if (!this.currentProject.isSkipProgress) STATUSES.push('Completed')
       return STATUSES.includes(status)
     },
     removeVendorAssignments() {

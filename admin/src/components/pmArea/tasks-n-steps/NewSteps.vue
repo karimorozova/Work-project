@@ -68,11 +68,8 @@
     GeneralTable(
       :fields="fields"
       :tableData="finalData"
-
-
       :isFilterShow="true"
       :isFilterAbsolute="true"
-
       @addSortKey="addSortKey"
       @changeSortKey="changeSortKey"
       @removeSortKey="removeSortKey"
@@ -163,10 +160,8 @@
       template(slot="info" slot-scope="{row, index}")
         .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal")
           img(src="../../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showStepDetails(index)")
-          //img(src="../../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
         .table__icons(v-else)
           img(src="../../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
-          //img(src="../../../assets/images/latest-version/money.svg" style="cursor: default; filter: opacity(0.5);")
 </template>
 
 <script>
@@ -536,6 +531,10 @@ export default {
     },
     rawData() {
       return this.currentProject.steps
+    },
+    isProjectFinished() {
+      const { status } = this.currentProject
+      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     }
   },
   components: {

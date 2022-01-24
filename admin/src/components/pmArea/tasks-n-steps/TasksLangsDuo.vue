@@ -4,6 +4,7 @@
       .tasks-langs__title-source Source Language:
       .source__drop-menu
         SelectSingle(
+          :hasSearch="this.currentProject.customer.clientType === 'Individual'"
           placeholder="Option",
           :options="mappedSourceLanguages",
           :selectedOption="tasksData.source ? tasksData.source.lang : ''",
@@ -86,6 +87,7 @@ export default {
     }),
     mappedSourceLanguages() {
       if (this.currentProject._id && this.tasksData.hasOwnProperty("service") && this.allLanguages.length) {
+        if (this.currentProject.customer.clientType === 'Individual') return this.allLanguages.map(item => item.lang)
         return this.getServiceSourceLanguages().length
             ? this.getServiceSourceLanguages().map(item => item.lang)
             : []
@@ -93,6 +95,7 @@ export default {
     },
     mappedTargetLanguages() {
       if (this.currentProject._id && this.tasksData.hasOwnProperty("service") && this.allLanguages.length && this.tasksData.hasOwnProperty("source")) {
+        if (this.currentProject.customer.clientType === 'Individual') return this.allLanguages.map(item => item.lang)
         return this.getServiceTargetLanguages().length
             ? this.getServiceTargetLanguages().map(item => item.lang)
             : []

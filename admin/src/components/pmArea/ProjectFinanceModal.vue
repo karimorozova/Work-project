@@ -53,13 +53,13 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables" :disabled="isProjectFinished")
+              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables" :disabled="isInReceivablesInvoicing")
               span(v-else) -
 
           template(slot="payables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.payables }}
             .table__data(v-else)
-              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor || isProjectFinished")
+              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor || isInPayablesInvoicing")
               span(v-else) -
 
     .finance__buttons
@@ -210,9 +210,15 @@ export default {
       if (!Object.keys(this.step).length) return []
       return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.step.vendor ? i !== 'Vendor Details' : true)
     },
-    isProjectFinished() {
-      const { status } = this.currentProject
-      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    // isProjectFinished() {
+    //   const { status } = this.currentProject
+    //   return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    // },
+    isInReceivablesInvoicing() {
+      return false
+    },
+    isInPayablesInvoicing() {
+      return false
     },
     isMinimumChargeUsed() {
       return this.currentProject.minimumCharge.isUsed

@@ -5,17 +5,6 @@
         input.project__name(v-if="existProjectAccessChangeName" type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
         .project__name(style="border: 1px solid white;" v-else) {{ project.projectName }}
 
-        //.textCheckbox(v-if="!isProjectFinished")
-        //  CheckBox(
-        //    :isChecked="project.isTest"
-        //    :isWhite="true"
-        //    @check="() => setTest(true)"
-        //    @uncheck="() => setTest(false)"
-        //  )
-        //  .textCheckbox__label Test
-        //.textCheckbox(v-else)
-        //  .textCheckbox__label {{ project.isTest  ? 'Test project' : '' }}
-
       .project__detailsRow
         .project__detailsRow-client
           .client
@@ -35,15 +24,14 @@
                 router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${ project.customer._id }`}" target="_blank")
                   span {{ project.customer.name }}
 
-              .project__detailsRow-client-subtitle(v-if="project.clientBillingInfo" ) {{ project.clientBillingInfo.name }}
-              div(v-else)
-                .input-title
-                  .input-title__text Billing Information:
-                  span.require *
+              .project__detailsRow-client-subtitle(
+                v-if="isInReceivablesInvoicing || project.customer.billingInfo.length === 1"
+              ) {{ project.clientBillingInfo.name }}
+              .project__detailsRow-client-drop(v-else)
                 .drop
                   SelectSingle(
                     placeholder="Choose BillingInfo"
-                    :selectedOption="''"
+                    :selectedOption="project.clientBillingInfo && project.clientBillingInfo.name || ''"
                     :options="billingInfoList.map(({name}) => name)"
                     @chooseOption="choseBillingInfo"
                   )
@@ -294,7 +282,13 @@ export default {
     // 	this.$emit('setValue', { option, prop: 'customer' })
     // },
     async choseBillingInfo({ option }) {
-    	const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+      const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+
+      const notStartedStatuses = [ 'Draft', 'Cost Quote', 'Quote sent', 'Rejected' ]
+      if (billingInfo.paymentType === 'PPP' && notStartedStatuses.includes(this.project.status)) {
+        await this.setProjectProp({ prop: 'inPause', value: true })
+      }
+
       await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
       await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
     },
@@ -324,7 +318,6 @@ export default {
       }
       try {
         await this.createProject()
-        await this.clientCreateProjectDate()
       } catch (err) {
         this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
       }
@@ -395,6 +388,9 @@ export default {
     isProjectFinished() {
       const { status } = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    },
+    isInReceivablesInvoicing() {
+      return false
     }
   },
   components: {
@@ -460,13 +456,10 @@ export default {
 
 .block {
   width: 100px;
-  border: 1px dotted $border;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6px 0px 4px 0px;
-  border-radius: 4px;
-  display: flex;
-  margin: 10px 5px;
+  padding: 8px 0px;
 
   &__value {
     display: flex;
@@ -523,6 +516,10 @@ export default {
         font-family: 'Myriad900';
         margin-bottom: 7px;
         margin-top: 7px;
+      }
+
+      &-drop {
+        margin-bottom: 7px;
       }
 
       &-subtitle {
@@ -832,7 +829,7 @@ a {
   border-radius: 50%;
 }
 
-.drop{
+.drop {
   height: 32px;
   width: 220px;
   position: relative;

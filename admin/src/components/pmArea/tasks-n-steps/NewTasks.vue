@@ -506,6 +506,10 @@ export default {
       if (this.users) {
         return this.users.filter(item => item.group.name === 'Project Managers').map(item => `${ item.firstName } ${ item.lastName }`)
       }
+    },
+    isProjectFinished() {
+      const { status } = this.currentProject
+      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     }
   },
   components: {

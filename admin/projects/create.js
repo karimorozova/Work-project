@@ -43,7 +43,7 @@ const createProjectIndividual = async ({ project, client, user }) => {
 	const { _id, contacts, projectManager, accountManager, discounts, minPrice, currency, billingInfo } = customer
 
 	project.customer = _id
-	project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
+	project.status = project.isSkipProgress ? 'In progress' : project.status || "Draft"
 	project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 	project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 	project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
@@ -104,7 +104,7 @@ const createProjectFromXTMFile = async ({ files, user, industry, project }) => {
 		const currNumber = getNextProjectNumber(todayProjects)
 		const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
-		project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
+		project.status = project.isSkipProgress ? 'In progress' : project.status || "Draft"
 		project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
@@ -167,7 +167,7 @@ const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflo
 	const currNumber = getNextProjectNumber(todayProjects)
 	const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
-	project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
+	project.status = project.isSkipProgress ? 'In progress' : project.status || "Draft"
 	project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 	project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 	project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
@@ -224,7 +224,7 @@ async function createProject(project, user) {
 		const currNumber = getNextProjectNumber(todayProjects)
 		const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
 
-		project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
+		project.status = project.isSkipProgress ? 'In progress' : project.status || "Draft"
 		project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
 		project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
 		project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId

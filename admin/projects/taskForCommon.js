@@ -12,17 +12,13 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 		targets,
 		source,
 		projectId: _id,
-		internalProjectId: projectId,
-		industry,
-		nativeProjectName,
-		projectManager,
-		customerName
+		internalProjectId: projectId
 	} = tasksInfo
 
-	const { tasks: projectsTasks } = await getProject({ _id })
+	const { tasks: projectsTasks, isSkipProgress } = await getProject({ _id })
 
 	try {
-		let tasks = await generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles }, iterator)
+		let tasks = await generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles, isSkipProgress }, iterator)
 		let { steps, additions } = await generateStepsForCustomUnits({ tasks, stepsAdditions })
 		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
 		await recalculateStepFinance(_id)
@@ -34,7 +30,7 @@ async function createTasksAndStepsForCustomUnits(tasksInfo, iterator = 0) {
 	}
 }
 
-async function generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles }, iterator) {
+async function generateTasksForCustomUnits({ source, service, targets, stepsAndUnits, projectsTasks, projectId, refFiles, sourceFiles, isSkipProgress }, iterator) {
 	let tasks = []
 	let tasksLength = projectsTasks.length + 1
 	const isDuo = service.languageForm === 'Duo'
@@ -54,7 +50,8 @@ async function generateTasksForCustomUnits({ source, service, targets, stepsAndU
 			fullSourceLanguage: isDuo ? source : item,
 			fullTargetLanguage: item,
 			refFiles,
-			sourceFiles
+			sourceFiles,
+			...(isSkipProgress && { status: 'Completed' })
 		})
 		tasksLength++
 	}
@@ -67,7 +64,7 @@ async function generateStepsForCustomUnits({ tasks, stepsAdditions }) {
 	const additions = []
 
 	for (const task of tasks) {
-		const { projectId, taskId, service, stepsAndUnits, memoqSource, memoqTarget, sourceLanguage, targetLanguage, fullSourceLanguage, fullTargetLanguage, metrics } = task
+		const { projectId, taskId, service, stepsAndUnits, memoqSource, memoqTarget, sourceLanguage, targetLanguage, fullSourceLanguage, fullTargetLanguage, metrics, status } = task
 		for (let i = 0; i < stepsAndUnits.length; i++) {
 
 			const { finance, nativeFinance, defaultStepPrice, clientRate, vendorRate, nativeVendorRate } =
@@ -106,7 +103,8 @@ async function generateStepsForCustomUnits({ tasks, stepsAdditions }) {
 				defaultStepPrice,
 				clientRate,
 				vendorRate,
-				nativeVendorRate
+				nativeVendorRate,
+				...(status && { status: 'Completed' })
 			})
 		}
 

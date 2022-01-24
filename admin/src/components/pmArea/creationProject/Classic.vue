@@ -111,7 +111,9 @@ export default {
     industriesList() {
       if (!this.project.customer.name) return []
       let res = []
-      const { customer: { services } } = this.project
+      const { customer: { services, clientType } } = this.project
+      if (clientType === 'Individual') return this.industries.map(i => i.name)
+
       for (let industry of services.map(i => i.industries[0])) {
         if (!res.length) res.push(industry)
         if (!res.map(i => i.name).includes(industry.name)) res.push(industry)

@@ -325,6 +325,10 @@ export default {
             await this.projectDetails(message)
             break
           case "Close Project":
+            if (!this.project.clientBillingInfo) {
+              alert('Set BI!')
+              return
+            }
             const updatedProject = await this.$http.post('/pm-manage/close-project', { projectId: this.project._id })
             await this.storeProject(updatedProject.data)
             break
@@ -451,7 +455,7 @@ export default {
     },
     isAm() {
       if (!this.user.hasOwnProperty('group')) return false
-      return this.project.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" &&  this.project.projectManager._id === "60b4dee7f2611f5115701566")
+      return this.project.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && this.project.projectManager._id === "60b4dee7f2611f5115701566")
     },
     isAdmin() {
       if (!this.user.hasOwnProperty('group')) return false

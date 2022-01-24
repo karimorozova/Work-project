@@ -29,78 +29,80 @@ async function getClient(obj) {
 			.populate('defaultPricelist', [ 'name' ])
 			.populate('services.services', [ 'title', 'steps' ])
 }
+
 async function getClientForPortal(obj) {
 	return await Clients.findOne(obj)
-			// .populate('industries', [ 'name', 'icon' ])
-			// .populate('nativeLanguage', [ 'lang' ])
-			// .populate('services.sourceLanguage', [ 'lang' ])
-			// .populate('services.targetLanguages', [ 'lang' ])
-			// .populate('services.industries', [ 'name' ])
-			// .populate('sourceLanguages', [ 'lang' ])
-			// .populate('targetLanguages', [ 'lang' ])
-			// .populate('rates.industryMultipliersTable.industry', [ 'name', 'icon' ])
-			// .populate('rates.stepMultipliersTable.step', [ 'title' ])
-			// .populate('rates.stepMultipliersTable.unit', [ 'type' ])
-			// .populate('rates.basicPricesTable.sourceLanguage', [ 'lang', 'iso1' ])
-			// .populate('rates.basicPricesTable.targetLanguage', [ 'lang', 'iso1' ])
-			// .populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
-			// .populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
-			// .populate('rates.pricelistTable.step', [ 'title' ])
-			// .populate('rates.pricelistTable.unit', [ 'type' ])
-			// .populate('rates.pricelistTable.industry', [ 'name' ])
-			// .populate('timeZone')
-			// .populate('defaultPricelist', [ 'name' ])
-			// .populate('services.services', [ 'title', 'steps' ])
+	// .populate('industries', [ 'name', 'icon' ])
+	// .populate('nativeLanguage', [ 'lang' ])
+	// .populate('services.sourceLanguage', [ 'lang' ])
+	// .populate('services.targetLanguages', [ 'lang' ])
+	// .populate('services.industries', [ 'name' ])
+	// .populate('sourceLanguages', [ 'lang' ])
+	// .populate('targetLanguages', [ 'lang' ])
+	// .populate('rates.industryMultipliersTable.industry', [ 'name', 'icon' ])
+	// .populate('rates.stepMultipliersTable.step', [ 'title' ])
+	// .populate('rates.stepMultipliersTable.unit', [ 'type' ])
+	// .populate('rates.basicPricesTable.sourceLanguage', [ 'lang', 'iso1' ])
+	// .populate('rates.basicPricesTable.targetLanguage', [ 'lang', 'iso1' ])
+	// .populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+	// .populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+	// .populate('rates.pricelistTable.step', [ 'title' ])
+	// .populate('rates.pricelistTable.unit', [ 'type' ])
+	// .populate('rates.pricelistTable.industry', [ 'name' ])
+	// .populate('timeZone')
+	// .populate('defaultPricelist', [ 'name' ])
+	// .populate('services.services', [ 'title', 'steps' ])
 }
+
 async function getSimpleClients(find = {}, filter = {}) {
-  return await Clients.find(find, filter)
-    .populate('industries', [ 'name', 'icon' ])
+	return await Clients.find(find, filter)
+			.populate('industries', [ 'name', 'icon' ])
 }
 
 async function getClientWithActions(obj) {
 
-  const client =  await Clients.findOne(obj)
-    .populate([
-      {path:'industries', select: [ 'name', 'icon' ]},
-      {path:'nativeLanguage', select: [ 'lang' ]},
-      {path:'services.sourceLanguage', select: [ 'lang' ]},
-      {path:'services.targetLanguages', select: [ 'lang' ]},
-      {path:'services.industries', select: [ 'name' ]},
-      {path:'sourceLanguages', select: [ 'lang' ]},
-      {path:'targetLanguages', select: [ 'lang' ]},
-      {path:'rates.industryMultipliersTable.industry', select: [ 'name', 'icon' ]},
-      {path:'rates.stepMultipliersTable.step', select: [ 'title' ]},
-      {path:'rates.stepMultipliersTable.unit', select: [ 'type' ]},
-      {path:'rates.basicPricesTable.sourceLanguage', select: [ 'lang', 'iso1' ]},
-      {path:'rates.basicPricesTable.targetLanguage', select: [ 'lang', 'iso1' ]},
-      {path:'rates.pricelistTable.sourceLanguage', select: [ 'lang' ]},
-      {path:'rates.pricelistTable.targetLanguage', select: [ 'lang' ]},
-      {path:'rates.pricelistTable.step', select: [ 'title' ]},
-      {path:'rates.pricelistTable.unit', select: [ 'type' ]},
-      {path:'rates.pricelistTable.industry', select: [ 'name' ]},
-      {path:'timeZone'},
-      {path:'defaultPricelist', select: [ 'name' ]},
-      {path:'services.services', select: [ 'title', 'steps' ]},
-    ]).lean()
+	const client = await Clients.findOne(obj)
+			.populate([
+				{ path: 'industries', select: [ 'name', 'icon' ] },
+				{ path: 'nativeLanguage', select: [ 'lang' ] },
+				{ path: 'services.sourceLanguage', select: [ 'lang' ] },
+				{ path: 'services.targetLanguages', select: [ 'lang' ] },
+				{ path: 'services.industries', select: [ 'name' ] },
+				{ path: 'sourceLanguages', select: [ 'lang' ] },
+				{ path: 'targetLanguages', select: [ 'lang' ] },
+				{ path: 'rates.industryMultipliersTable.industry', select: [ 'name', 'icon' ] },
+				{ path: 'rates.stepMultipliersTable.step', select: [ 'title' ] },
+				{ path: 'rates.stepMultipliersTable.unit', select: [ 'type' ] },
+				{ path: 'rates.basicPricesTable.sourceLanguage', select: [ 'lang', 'iso1' ] },
+				{ path: 'rates.basicPricesTable.targetLanguage', select: [ 'lang', 'iso1' ] },
+				{ path: 'rates.pricelistTable.sourceLanguage', select: [ 'lang' ] },
+				{ path: 'rates.pricelistTable.targetLanguage', select: [ 'lang' ] },
+				{ path: 'rates.pricelistTable.step', select: [ 'title' ] },
+				{ path: 'rates.pricelistTable.unit', select: [ 'type' ] },
+				{ path: 'rates.pricelistTable.industry', select: [ 'name' ] },
+				{ path: 'timeZone' },
+				{ path: 'defaultPricelist', select: [ 'name' ] },
+				{ path: 'services.services', select: [ 'title', 'steps' ] }
+			]).lean()
 
-  await ClientsTasks.updateMany({client: obj._id, status: "Upcoming", dateTime: {$lte:new Date()}},{$set: {status: "Overdue"}})
+	await ClientsTasks.updateMany({ client: obj._id, status: "Upcoming", dateTime: { $lte: new Date() } }, { $set: { status: "Overdue" } })
 
-  client.tasks = await ClientsTasks.find({client: obj._id})
-    .populate([
-      {path: 'assignedTo', select: ['firstName','lastName']}
-    ]) || []
+	client.tasks = await ClientsTasks.find({ client: obj._id })
+			.populate([
+				{ path: 'assignedTo', select: [ 'firstName', 'lastName' ] }
+			]) || []
 
-  client.activityNotes = await ClientsNotes.find({client: obj._id})
-    .populate([
-      {path: 'assignedTo', select: ['firstName','lastName']}
-    ]) || []
+	client.activityNotes = await ClientsNotes.find({ client: obj._id })
+			.populate([
+				{ path: 'assignedTo', select: [ 'firstName', 'lastName' ] }
+			]) || []
 
 	client.billingInfo = client.billingInfo.map((billInfo) => {
-		billInfo.contacts = client.contacts.filter(({_id}) => billInfo.contacts.map(({_id}) => _id.toString()).includes(_id.toString()))
+		billInfo.contacts = client.contacts.filter(({ _id }) => billInfo.contacts.map(({ _id }) => _id.toString()).includes(_id.toString()))
 		return billInfo
 	})
 
-  return client
+	return client
 }
 
 /**
@@ -162,13 +164,14 @@ async function gerFilteredClients(filters) {
 	try {
 		const query = getClientsFilteringQuery(filters)
 		return await Clients.find(query,
-				{ name: 1,
+				{
+					name: 1,
 					status: 1,
 					website: 1,
 					industries: 1,
 					leadSource: 1,
 					isTest: 1,
-					clientType: 1,
+					clientType: 1
 				})
 				.sort({ _id: 1 }).limit(25)
 				.populate('industries', [ 'icon' ])
@@ -203,7 +206,7 @@ const getClientRates = async (obj) => {
  */
 const getClientsForNewProject = async () => {
 	return await Clients
-			.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, services: 1, billingInfo: 1 })
+			.find({ $or: [ { status: 'Active' }, { status: 'Potential' } ] }, { _id: 1, name: 1, services: 1, billingInfo: 1, clientType: 1 })
 			.populate('services.industries')
 }
 
@@ -214,7 +217,7 @@ module.exports = {
 	gerFilteredClients,
 	getClientsForNewProject,
 	getClientRates,
-  getClientWithActions,
-  getSimpleClients,
-	getClientForPortal,
+	getClientWithActions,
+	getSimpleClients,
+	getClientForPortal
 }

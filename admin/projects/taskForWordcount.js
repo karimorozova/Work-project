@@ -27,7 +27,7 @@ async function createTasksForWordcount(tasksInfo) {
 		// projectName,
 	} = tasksInfo
 
-	const { tasks: projectsTasks, customer: { matrix } } = await getProject({ _id })
+	const { tasks: projectsTasks, isSkipProgress, customer: { matrix } } = await getProject({ _id })
 	const analysis = await tryToGetMemoqMetrics(memoqProjectId, undefined)
 
 	const currTargets = targets.map(i => i.memoq)
@@ -49,7 +49,8 @@ async function createTasksForWordcount(tasksInfo) {
 			memoqDocs,
 			analysis,
 			matrix,
-			memoqProjectId
+			memoqProjectId,
+			isSkipProgress
 		})
 		let { steps, additions } = await generateStepsForCATMemoqUnit({ tasks, stepsAdditions })
 		await updateProject({ _id }, { $push: { tasks, steps, additionsSteps: additions } })
@@ -64,7 +65,7 @@ async function createTasksForWordcount(tasksInfo) {
 }
 
 async function generateTasksForCATMemoqUnit(
-		{ projectsTasks, projectId, source, targets, service, stepsAndUnits, refFiles, translateFiles, memoqFiles, memoqDocs, analysis, matrix, memoqProjectId }
+		{ projectsTasks, projectId, source, targets, service, stepsAndUnits, refFiles, translateFiles, memoqFiles, memoqDocs, analysis, matrix, memoqProjectId, isSkipProgress }
 ) {
 	const tasks = []
 	let tasksLength = projectsTasks.length + 1
@@ -88,7 +89,8 @@ async function generateTasksForCATMemoqUnit(
 			sourceFiles: translateFiles,
 			memoqFiles,
 			memoqDocs: memoqDocs.filter(i => `${ i.TargetLangCode }` === `${ item.memoq }`),
-			memoqProjectId
+			memoqProjectId,
+			...(isSkipProgress && { status: 'Completed' })
 		}
 
 		task.metrics = getTaskMetrics({ task, matrix, analysis })
@@ -106,7 +108,21 @@ async function generateStepsForCATMemoqUnit({ tasks, stepsAdditions }) {
 	const additions = []
 
 	for (const task of tasks) {
-		const { projectId, taskId, service, stepsAndUnits, memoqDocs, memoqSource, memoqTarget, sourceLanguage, targetLanguage, fullSourceLanguage, fullTargetLanguage, metrics } = task
+		const {
+			projectId,
+			taskId,
+			service,
+			stepsAndUnits,
+			memoqDocs,
+			memoqSource,
+			memoqTarget,
+			sourceLanguage,
+			targetLanguage,
+			fullSourceLanguage,
+			fullTargetLanguage,
+			metrics,
+			status
+		} = task
 		for (let i = 0; i < stepsAndUnits.length; i++) {
 
 			const { finance, nativeFinance, defaultStepPrice, clientRate, vendorRate, nativeVendorRate } =
@@ -148,7 +164,8 @@ async function generateStepsForCATMemoqUnit({ tasks, stepsAdditions }) {
 				clientRate,
 				vendorRate,
 				nativeVendorRate,
-				totalWords: metrics.totalWords
+				totalWords: metrics.totalWords,
+				...(status && { status: 'Completed' })
 			})
 		}
 

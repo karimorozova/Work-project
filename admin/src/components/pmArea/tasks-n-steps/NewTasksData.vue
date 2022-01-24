@@ -51,6 +51,7 @@
             .drop__title Service:
             .drop
               SelectSingle(
+                :hasSearch="true"
                 :selectedOption="tasksData.service ? tasksData.service.title : ''"
                 :options="mappedClientServices"
                 placeholder="Option"
@@ -363,10 +364,17 @@ export default {
       this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
     },
     getServiceSourceLanguages(service) {
-      const { customer: { services }, industry } = this.currentProject
+      const { customer: { services, clientType }, industry } = this.currentProject
+      if (clientType === 'Individual') {
+        const englishLanguageIndex = this.allLanguages.findIndex(item => item.lang === "English (United Kingdom)")
+        const firstElem = this.allLanguages.splice(englishLanguageIndex, 1)
+        this.allLanguages.unshift(firstElem[0])
+        return this.allLanguages
+      }
       const neededServices = services
           .filter(item => item.services[0] === service._id.toString() && item.industries[0] === industry._id)
           .map(item => item.sourceLanguage)
+
       return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
     },
     async setService({ option }) {
@@ -383,7 +391,10 @@ export default {
     },
     activeClientServices() {
       let finalServicesArr = []
-      const { industry, customer: { services, rates: { stepMultipliersTable } } } = this.currentProject
+      const { industry, customer: { services, clientType, rates: { stepMultipliersTable } } } = this.currentProject
+
+      if (clientType === 'Individual') return this.allServices
+
       const arrayOfClientServices = [ ...new Set(services.filter(({ industries }) => industries[0] === industry._id).map(({ services }) => services).flat()) ]
       const clientServices = this.allServices.filter((a) => arrayOfClientServices.some((b) => a._id.toString() === b))
 
