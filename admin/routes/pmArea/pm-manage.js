@@ -49,7 +49,8 @@ const {
 	cancelProjectInMemoq,
 	updateWithApprovedTasks,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
-	autoCreatingTranslationTaskInProjectByXTMFile
+	autoCreatingTranslationTaskInProjectByXTMFile,
+	createProjectIndividual
 } = require('../../projects')
 
 const {
@@ -209,6 +210,17 @@ router.post('/new-project', async (req, res) => {
 	let { project, user } = req.body
 	try {
 		const result = await createProject(project, user)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/new-project-individual', async (req, res) => {
+	let { project, client, user } = req.body
+	try {
+		const result = await createProjectIndividual({ project, client, user })
 		res.send(result)
 	} catch (err) {
 		console.log(err)

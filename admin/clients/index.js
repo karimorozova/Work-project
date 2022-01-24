@@ -6,9 +6,9 @@ const {
 	getClientsForNewProject,
 	getClientRates,
 	getClientWithActions,
-  getSimpleClients,
-	getClientForPortal,
-} = require('./getClients')
+	getSimpleClients,
+	getClientForPortal
+} = require("./getClients")
 
 const {
 	updateClientRates,
@@ -23,13 +23,31 @@ const {
 	getClientAfterCombinationsUpdated,
 	filteredCombinationsResultRatesTable,
 	updateClientRatesFromSettings
+} = require("./clientRates")
 
-} = require('./clientRates')
+const {
+	updateClientInfo,
+	saveClientDocumentDefault,
+	saveClientDocument,
+	removeClientDoc
+} = require("./info")
 
-const { updateClientInfo, saveClientDocumentDefault, saveClientDocument, removeClientDoc } = require('./info')
-const { getAfterTaskStatusUpdate, updateClientProjectDate } = require('./projects')
-const { updateClientService, deleteClientService, getClientServices, createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require('./clientService')
-const { updateRates } = require('./updateClientRates')
+const {
+	getAfterTaskStatusUpdate,
+	updateClientProjectDate
+} = require("./projects")
+
+const {
+	updateClientService,
+	deleteClientService,
+	getClientServices,
+	createClientServicesGroup,
+	getClientServicesGroups,
+	deleteClientServiceGroups,
+	editClientServicesGroup
+} = require("./clientService")
+
+const { updateRates } = require("./updateClientRates")
 
 const {
 	syncClientRatesCost,
@@ -37,13 +55,20 @@ const {
 	synchronizeStepMultiplier,
 	synchronizeIndustryMultiplier,
 	synchronizePricelistTable
-} = require('./syncClientRatesCost')
+} = require("./syncClientRatesCost")
 
-const { updateClientMatrix, syncClientMatrix } = require('./clientMatrix')
+const { updateClientMatrix, syncClientMatrix } = require("./clientMatrix")
 
-const { updateTaskDataByCondition } = require('./clientActivity')
+const { updateTaskDataByCondition } = require("./clientActivity")
+
+const {
+	createClient,
+	getContactsIdsWithCreate
+} = require('./createClient')
 
 const clients = {
+	createClient,
+	getContactsIdsWithCreate,
 	getClient,
 	getClientWithActions,
 	getClients,
@@ -78,15 +103,15 @@ const clients = {
 	syncClientMatrix,
 	getClientAfterCombinationsUpdated,
 	filteredCombinationsResultRatesTable,
-  updateTaskDataByCondition,
-  getSimpleClients,
+	updateTaskDataByCondition,
+	getSimpleClients,
 	updateClientRatesFromSettings,
 	getClientForPortal,
 	getClientServices,
 	createClientServicesGroup,
 	getClientServicesGroups,
 	deleteClientServiceGroups,
-	editClientServicesGroup,
+	editClientServicesGroup
 }
 
 module.exports = clients

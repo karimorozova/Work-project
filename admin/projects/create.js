@@ -24,6 +24,47 @@ const { addProjectFile } = require('../services/memoqs/files')
 const { assignProjectManagers } = require('./updates')
 const { createTasksForWordcount } = require("./taskForWordcount")
 const Response = require("../helpers/Response")
+const { createClient } = require("../clients")
+
+const createProjectIndividual = async ({ project, client, user }) => {
+	const { group: { name: role }, _id: userId } = user
+	const customer = await createClient({ client, user })
+	const { USD, GBP } = await CurrencyRatio.findOne()
+
+	let todayStart = new Date()
+	todayStart.setUTCHours(0, 0, 0, 0)
+	let todayEnd = new Date(todayStart)
+	todayEnd.setUTCHours(23, 59, 59, 0)
+
+	const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
+	const currNumber = getNextProjectNumber(todayProjects)
+	const projectNumber = currNumber < 9 ? "[0" + (currNumber + 1) + "]" : "[" + (currNumber + 1) + "]"
+
+	const { _id, contacts, projectManager, accountManager, discounts, minPrice, currency, billingInfo } = customer
+
+	project.customer = _id
+	project.status = project.isSkipProgress ? 'Closed' : project.status || "Draft"
+	project.projectId = moment(new Date()).format("YYYY MM DD") + " " + projectNumber
+	project.projectManager = (role === 'Project Managers') ? userId : projectManager._id || userId
+	project.accountManager = (role === 'Account Managers') ? userId : accountManager._id || userId
+	project.clientContacts = [ contacts.find(({ leadContact }) => leadContact) ]
+	project.discounts = discounts
+	project.minimumCharge = { value: minPrice, toIgnore: false }
+	project.crossRate = calculateCrossRate(USD, GBP)
+	project.projectCurrency = currency
+	project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
+	project.clientBillingInfo = billingInfo.length === 1 ? billingInfo[0] : null
+	project.inPause = project.clientBillingInfo && project.clientBillingInfo.paymentType === 'PPP'
+
+	const createdProject = await Projects.create({
+		...project,
+		startDate: new Date(),
+		billingDate: new Date()
+	})
+
+	await createProjectFolder(createdProject.id)
+	return new Response(Response.Success, await getProject({ _id: createdProject.id }))
+}
 
 const createProjectFromXTMFile = async ({ files, user, industry, project }) => {
 	const { group: { name: role }, _id: userId } = user
@@ -57,7 +98,7 @@ const createProjectFromXTMFile = async ({ files, user, industry, project }) => {
 		const customer = allClients.find(item => item.name === client)
 		if (!customer) return new Response(Response.Error, `No such client on system, ${ client } like in file.`)
 
-		const { contacts, projectManager, accountManager, discounts, minPrice, currency } = customer
+		const { contacts, projectManager, accountManager, discounts, minPrice, currency, billingInfo } = customer
 		const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
 
 		const currNumber = getNextProjectNumber(todayProjects)
@@ -76,6 +117,7 @@ const createProjectFromXTMFile = async ({ files, user, industry, project }) => {
 		project.crossRate = calculateCrossRate(USD, GBP)
 		project.projectCurrency = currency
 		project.projectName = project.isUrgent ? '[Urgent] ' + projectName : projectName
+		project.clientBillingInfo = billingInfo.length === 1 ? billingInfo[0] : null
 
 		const createdProject = await Projects.create({
 			...project,
@@ -119,7 +161,7 @@ const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflo
 	if (!customer) return new Response(Response.Error, 'No such client in system like on Memoq.')
 
 	const { USD, GBP } = await CurrencyRatio.findOne()
-	const { contacts, projectManager, accountManager, discounts, minPrice, currency } = customer
+	const { contacts, projectManager, accountManager, discounts, minPrice, currency, billingInfo } = customer
 	const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
 
 	const currNumber = getNextProjectNumber(todayProjects)
@@ -137,7 +179,7 @@ const createProjectFromMemoq = async ({ project, memoqLink, selectedMemoqWorkflo
 	project.deadline = Deadline
 	project.customer = customer._id
 	project.projectName = project.isUrgent ? '[Urgent] ' + Name : Name
-
+	project.clientBillingInfo = billingInfo.length === 1 ? billingInfo[0] : null
 
 	const createdProject = await Projects.create({
 		...project,
@@ -176,7 +218,7 @@ async function createProject(project, user) {
 
 	try {
 		const { USD, GBP } = await CurrencyRatio.findOne()
-		const { contacts, projectManager, accountManager, discounts, minPrice, currency } = await Clients.findOne({ '_id': project.customer }).populate('discounts')
+		const { contacts, projectManager, accountManager, discounts, minPrice, currency, billingInfo } = await Clients.findOne({ '_id': project.customer }).populate('discounts')
 		const todayProjects = await Projects.find({ startDate: { $gt: todayStart, $lt: todayEnd } })
 
 		const currNumber = getNextProjectNumber(todayProjects)
@@ -192,6 +234,7 @@ async function createProject(project, user) {
 		project.crossRate = calculateCrossRate(USD, GBP)
 		project.projectCurrency = currency
 		project.projectName = project.isUrgent ? '[Urgent] ' + project.projectName : project.projectName
+		project.clientBillingInfo = billingInfo.length === 1 ? billingInfo[0] : null
 
 		const createdProject = await Projects.create({
 			...project,
@@ -218,7 +261,6 @@ const createProjectFromRequest = async (requestId) => {
 	const {
 		projectManager,
 		accountManager,
-		// paymentProfile,
 		clientContacts,
 		projectName,
 		clientBillingInfo,
@@ -256,7 +298,6 @@ const createProjectFromRequest = async (requestId) => {
 		projectManager: projectManager || PMId || userId,
 		accountManager: accountManager || AMId || userId,
 		clientBillingInfo,
-		// paymentProfile,
 		clientContacts,
 		discounts,
 		minimumCharge: { value: minPrice, toIgnore: false },
@@ -692,5 +733,6 @@ module.exports = {
 	autoCreatingTaskInProject,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
 	autoCreatingTranslationTaskInProjectByXTMFile,
-	createProjectFromMemoq
+	createProjectFromMemoq,
+	createProjectIndividual
 }

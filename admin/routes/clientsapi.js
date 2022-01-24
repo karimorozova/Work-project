@@ -132,9 +132,9 @@ router.post('/update-client', upload.any(), async (req, res) => {
 	let result
 	try {
 		if (!client._id) {
-			result =  await createClient(client)
-		}else {
-		  result = await updateClientInfo({ clientId, client, files: req.files })
+			result = await createClient({ client })
+		} else {
+			result = await updateClientInfo({ clientId, client, files: req.files })
 		}
 		res.send({ client: result })
 	} catch (err) {
@@ -199,10 +199,10 @@ router.delete('/deleteclient/:id', async (req, res) => {
 	}
 })
 
-router.post('/addContact',  upload.any(), async (req, res) => {
+router.post('/addContact', upload.any(), async (req, res) => {
 	const { id, contact } = req.body
 	try {
-		const result = await addClientContact( id, JSON.parse(contact), req.files)
+		const result = await addClientContact(id, JSON.parse(contact), req.files)
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -213,7 +213,7 @@ router.post('/addContact',  upload.any(), async (req, res) => {
 router.post('/updateContact', upload.any(), async (req, res) => {
 	const { id, contact } = req.body
 	try {
-		const result = await updateClientContact( id, JSON.parse(contact), req.files )
+		const result = await updateClientContact(id, JSON.parse(contact), req.files)
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -270,8 +270,8 @@ router.post('/update-client-status', async (req, res) => {
 router.post('/update-client-leadContact', async (req, res) => {
 	const { id, contactId } = req.body
 	try {
-		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$[].leadContact': false })
-		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$.leadContact': true  })
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, { 'contacts.$[].leadContact': false })
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, { 'contacts.$.leadContact': true })
 		const client = await Clients.findOne({ "_id": id }, { contacts: 1 })
 		res.send(client.contacts)
 	} catch (err) {
@@ -406,7 +406,7 @@ router.get('/client-services/:id', async (req, res) => {
 router.get('/client-group/:clientId', async (req, res) => {
 	const { clientId } = req.params
 	try {
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		console.log(servicesGroups)
 		res.send(servicesGroups)
 	} catch (err) {
@@ -419,7 +419,7 @@ router.delete('/client-group/:clientId/:id', async (req, res) => {
 	const { id, clientId } = req.params
 	try {
 		await deleteClientServiceGroups(clientId, id)
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		console.log(servicesGroups)
 		res.send(servicesGroups)
 	} catch (err) {
@@ -433,8 +433,8 @@ router.post('/client-group/:clientId', async (req, res) => {
 	const { groupName, industry, service, source, target } = req.body
 
 	try {
-		await createClientServicesGroup({clientId, groupName, industry, service, source, target})
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		await createClientServicesGroup({ clientId, groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)
@@ -443,12 +443,12 @@ router.post('/client-group/:clientId', async (req, res) => {
 })
 
 router.post('/client-group/:clientId/:id', async (req, res) => {
-	const { clientId, id} = req.params
+	const { clientId, id } = req.params
 	const { groupName, industry, service, source, target } = req.body
 
 	try {
-		await editClientServicesGroup(clientId, id,{ groupName, industry, service, source, target})
-		const {servicesGroups = []} = await getClientServicesGroups(clientId)
+		await editClientServicesGroup(clientId, id, { groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
 		res.send(servicesGroups)
 	} catch (err) {
 		console.log(err)
@@ -728,7 +728,7 @@ router.delete('/activity/note/:id', async (req, res) => {
 router.post('/get-billing-info/:_id', async (req, res) => {
 	try {
 		const { _id } = req.params
-		const billingInfo = await Clients.findOne({ _id }, {billingInfo: 1})
+		const billingInfo = await Clients.findOne({ _id }, { billingInfo: 1 })
 		res.send(billingInfo.billingInfo)
 	} catch (err) {
 		console.log(err)
@@ -744,12 +744,12 @@ router.post('/update-billing-info/:_id', async (req, res) => {
 
 		billingInfo.contacts = await getContactsIdsWithCreate(_id, billingInfo)
 
-		if(!billingInfo.hasOwnProperty("_id")) {
-			await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo }})
-		} else  {
-			 await Clients.updateOne({_id}, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
+		if (!billingInfo.hasOwnProperty("_id")) {
+			await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo } })
+		} else {
+			await Clients.updateOne({ _id }, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
 		}
-		res.send(await getClientWithActions({_id: _id}) )
+		res.send(await getClientWithActions({ _id: _id }))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on get /deleting | payment-terms')
@@ -760,7 +760,7 @@ router.post('/delete-billing-info/:_id', async (req, res) => {
 	try {
 		const { _id } = req.params
 		const { billingInfoId } = req.body
-		const updated = await Clients.updateOne({ _id }, { $pull: { "billingInfo": {_id: billingInfoId } } })
+		const updated = await Clients.updateOne({ _id }, { $pull: { "billingInfo": { _id: billingInfoId } } })
 		res.send(updated)
 	} catch (err) {
 		console.log(err)

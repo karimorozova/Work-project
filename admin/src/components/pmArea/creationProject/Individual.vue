@@ -34,7 +34,7 @@
                 prefix-class="xmx"
                 placeholder="Date"
               )
-      .spliter
+      .splitter
       .col
         .row
           .row__title Client:
@@ -66,6 +66,7 @@ export default {
   props: [ "industries", 'user', 'extraOptions' ],
   data() {
     return {
+      emailValidRegex: /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
       project: {
         projectName: "",
         selectedIndustry: {},
@@ -92,24 +93,32 @@ export default {
     },
     async createProject() {
       this.project.industry = this.project.selectedIndustry._id
-      // this.project.customer = this.project.customer._id
       this.project = {
         ...this.project,
         ...this.extraOptions
       }
-      // try {
-      //   const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
-      //   await this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ newProject.data._id }`)
-      //   this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
-      // } catch (err) {
-      //   this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
-      // }
+      const result = await this.$http.post("/pm-manage/new-project-individual", { project: this.project, client: this.client, user: this.user })
+      const { data } = result
+      if (data.status === 'success') {
+        await this.$router.push(`/pangea-projects/draft-projects/Draft/details/${ data.data._id }`)
+        this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
+        this.isRequestNow = false
+      } else {
+        this.alertToggle({ ...data, type: data.status, isShow: true })
+        this.isRequestNow = false
+      }
     }
   },
   computed: {
     isDisableSubmitButton() {
       const { projectName, selectedIndustry, deadline } = this.project
-      return !projectName.trim() || !selectedIndustry.name || !deadline
+      const { name, email } = this.client
+
+      return !projectName.trim()
+          || !selectedIndustry.name
+          || !deadline
+          || !name.trim()
+          || !this.emailValidRegex.test(email.toLowerCase())
     }
   }
 }
@@ -156,6 +165,12 @@ export default {
   margin-top: 25px;
   display: flex;
   justify-content: center;
+}
+
+.splitter {
+  width: 1px;
+  height: auto;
+  background: $light-border;
 }
 
 input {

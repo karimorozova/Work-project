@@ -65,7 +65,8 @@ const {
 	autoCreatingTranslationTaskInProjectByMemoqLink,
 	autoCreatingTranslationTaskInProjectByXTMFile,
 	createProjectFromMemoq,
-	createProjectFromXTMFile
+	createProjectFromXTMFile,
+	createProjectIndividual
 } = require('./create')
 
 
@@ -107,6 +108,7 @@ const {
 
 //EXPORT  =============================>
 module.exports = {
+	createProjectIndividual,
 	createProjectFromXTMFile,
 	createProjectFromMemoq,
 	autoCreatingTranslationTaskInProjectByXTMFile,

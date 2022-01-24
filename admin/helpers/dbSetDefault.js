@@ -500,13 +500,10 @@ async function fillPaymentTerms() {
 	const industryTierCount = await PaymentTerms.countDocuments()
 	if (industryTierCount > 0) return
 	try {
-		await PaymentTerms.create({
-			"name": "30 Days",
-			"value": 30,
-			"isActive": true
-		})
+		await PaymentTerms.create({ "name": "30 Days", "value": 30, "isActive": true })
+		await PaymentTerms.create({ "name": "21 Days", "value": 21, "isActive": true })
+		await PaymentTerms.create({ "name": "1 Day", "value": 1, "isActive": true })
 	} catch (e) {
-
 	}
 }
 

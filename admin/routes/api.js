@@ -473,16 +473,8 @@ router.get('/cc-stat', async (req, res) => {
 		res.status(500).send("Error on getting stats")
 	}
 })
-router.get('/create-client/:name/:email', async (req, res) => {
-	try {
-		await createClient({...req.params})
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on getting stats")
-	}
-})
-router.get('/cc-stat-custom/:from/:to', async (req, res) => {
 
+router.get('/cc-stat-custom/:from/:to', async (req, res) => {
 	try {
 		const { from, to } = req.params
 		const project = await Projects.find({

@@ -39,7 +39,7 @@
 
         template(slot="icons" slot-scope="{ row, index }")
           .table__icons
-            img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" v-if="row.name !== '30 Days'" :class="{'table__opacity': !isActive(key, index)}")
+            img.table__icon(v-for="(icon, key) in icons" :src="icon.icon" @click="makeAction(index, key)" v-if="isHIdeCRUDIcons(row.name)" :class="{'table__opacity': !isActive(key, index)}")
 
       .table__empty(v-show="!paymentTerms.length") No data...
 
@@ -81,6 +81,11 @@ export default {
     }
   },
   methods: {
+    isHIdeCRUDIcons(name) {
+      return name !== '30 Days'
+          && name !== '21 Days'
+          && name !== '1 Day'
+    },
     toggleActive(index) {
       if (this.currentActive !== index) return
       this.paymentTerms[index].isActive = !this.paymentTerms[index].isActive

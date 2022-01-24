@@ -1,28 +1,30 @@
 const { Pricelist, Clients, User, PaymentTerms } = require("../models")
-const Response = require('../helpers/Response')
+const { getClientAfterUpdate } = require("./getClients")
 
-const createClient = async (client) => {
-	if (!client.name || !client.email)  throw new Error('Email and Name is required')
+const createClient = async ({ client, user }) => {
+	if (!client.name || !client.email) throw new Error('Email and Name is required')
+	const defaultClientPriceList = await Pricelist.findOne({ isClientDefault: true })
+	const paymentTerms = await PaymentTerms.findOne({ name: '1 Day' })
 
-	const users = await User.find().populate("groups")
-	const admin = users.find(user => user.group.name === 'Administrators')
+	if (!user) {
+		const users = await User.find().populate("groups")
+		user = users.find(user => user.group.name === 'Administrators')
+	}
 
-	const defaultClientPriceList = await Pricelist.findOne({isClientDefault: true})
-
-	const paymentTerms = await PaymentTerms.findOne({name: '30 Days'})
-
-	const { projectManager, accountManager, name, email, contacts, defaultPricelist,  leadSource } = client
+	const { projectManager, accountManager, name, email, contacts, defaultPricelist, leadSource, status, clientType } = client
 
 	client = {
 		...client,
-		projectManager: projectManager || admin,
-		accountManager: accountManager || admin,
+		status: status || 'Active',
+		clientType: clientType || 'Individual',
+		projectManager: projectManager || user,
+		accountManager: accountManager || user,
 		name,
 		email,
 		contacts: contacts && contacts.length ? contacts : { leadContact: true, firstName: name, email, position: "Manager" },
 		defaultPricelist: defaultPricelist || defaultClientPriceList,
 		leadSource: leadSource || "API",
-		matrix: defaultClientPriceList.discountChart,
+		matrix: defaultClientPriceList.discountChart
 	}
 
 	let result = await Clients.create(client)
@@ -31,12 +33,10 @@ const createClient = async (client) => {
 		name,
 		officialName: name,
 		paymentTerms,
-		contacts: result.contacts.map(({_id}) => _id),
+		contacts: result.contacts.map(({ _id }) => _id)
 	}
 
-
-	const finalUpdate = await Clients.findByIdAndUpdate(result._id, { $set: { billingInfo }  } )
-	return finalUpdate
+	return await getClientAfterUpdate({ _id: result._id }, { $set: { billingInfo } })
 }
 
 const getContactsIdsWithCreate = async (_id, billingInfo) => {
@@ -52,9 +52,9 @@ const getContactsIdsWithCreate = async (_id, billingInfo) => {
 
 	const test = await Clients.findById(_id).lean()
 
-	return test.contacts.filter(({email}) => {
+	return test.contacts.filter(({ email }) => {
 		return contactEmailsToAdd.includes(email)
-	}).map(({_id}) => _id.toString())
+	}).map(({ _id }) => _id.toString())
 }
 
 module.exports = { createClient, getContactsIdsWithCreate }
