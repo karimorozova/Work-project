@@ -7,10 +7,12 @@ const PricelistSchema = new mongoose.Schema({
 		trim: true
 	},
 	isVendorDefault: {
-		type: Boolean
+		type: Boolean,
+		default: false
 	},
 	isClientDefault: {
-		type: Boolean
+		type: Boolean,
+		default: false
 	},
 	isActive: {
 		type: Boolean
