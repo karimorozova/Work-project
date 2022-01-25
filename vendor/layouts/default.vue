@@ -67,21 +67,21 @@ input::-webkit-input-placeholder {
   font-family: 'Myriad300';
   font-style: normal;
   font-weight: normal;
-  src: url('../assets/fonts/MYRIADPRO-LIGHT.woff') format('woff');
+  src: url('../assets/fonts/MYRIADPRO-LIGHT.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Myriad400';
   font-style: normal;
   font-weight: normal;
-  src: url('../assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
+  src: url('../assets/fonts/MYRIADPRO-REGULAR.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Myriad600';
   font-style: normal;
   font-weight: normal;
-  src: url('../assets/fonts/MYRIADPRO-SEMIBOLD.woff') format('woff');
+  src: url('../assets/fonts/MYRIADPRO-SEMIBOLD.woff2') format('woff2');
 }
 
 
@@ -89,6 +89,6 @@ input::-webkit-input-placeholder {
   font-family: 'Myriad900';
   font-style: normal;
   font-weight: normal;
-  src: url('../assets/fonts/MYRIADPRO-BOLD.woff') format('woff');
+  src: url('../assets/fonts/MYRIADPRO-BOLD.woff2') format('woff2');
 }
 </style>

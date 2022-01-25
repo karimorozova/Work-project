@@ -30,5 +30,5 @@ input[type="checkbox"] {
     font-family: 'Myriad400';
     font-style: normal;
     font-weight: normal;
-    src: url('../assets/fonts/MYRIADPRO-REGULAR.woff') format('woff');
+    src: url('../assets/fonts/MYRIADPRO-REGULAR.woff2') format('woff2');
 }
