@@ -664,10 +664,10 @@ export default {
 
   &__check-item {
     display: flex;
-    padding: 6px 0;
+    padding: 7px 0;
 
     &:nth-child(even) {
-      background-color: $table-list;
+      background-color: $light-background;
     }
   }
 

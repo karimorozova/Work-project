@@ -113,7 +113,6 @@
             @clicked="uploadFiles"
           )
 
-
       .deliverables__header
         .deliverables__title Deliverables
         .deliverablesActions
@@ -161,7 +160,12 @@
                 i.fas.fa-truck-loading
 
             .table__icons(v-if="row.status !== 'Ready for Delivery'")
-              img.table__icon(v-for="(icon, key) in getIcons(row)" :src="icon.src" @click="dr2Action(row, key)")
+              img.table__icon(
+                v-for="(icon, key) in getIcons(row)"
+                :src="icon.src"
+                :style="{...icon.style}"
+                @click="dr2Action(row, key)"
+              )
 
       Add(v-if="canUploadDR1 && currentProject.status !== 'Closed'" @add="showTasksModal")
 </template>
@@ -407,14 +411,14 @@ export default {
         return icons
       }
       if (type === 'multi' && this.canUpdateDr2) {
-        icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
+        icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.svg"), style: { 'width': '18px' } }
         icons.delete = { src: require("../../assets/images/latest-version/i-delete.png") }
       } else if (type === 'single' && !files.length && (this.isAdmin || `${ AMId }` === `${ this.user._id }` || `${ PMId }` === `${ this.user._id }`)
       ) {
-        icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
+        icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.svg"), style: { 'width': '18px' } }
         icons.delete = { src: require("../../assets/images/latest-version/i-delete.png") }
       } else {
-        icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.png") }
+        icons.dr2 = { src: require("../../assets/images/latest-version/delivery-list.svg"), style: { 'width': '18px' } }
       }
       return icons
     },
@@ -818,11 +822,11 @@ export default {
 
 .table {
   &__header {
-    padding: 0 0 0 6px;
+    padding: 0 0 0 7px;
   }
 
   &__data-langs {
-    padding: 0 6px;
+    padding: 0 7px;
     width: 100%;
     display: grid;
     align-items: center;
@@ -831,14 +835,14 @@ export default {
   }
 
   &__dataStatus {
-    padding: 0 6px;
+    padding: 0 7px;
     width: 100%;
     display: flex;
     align-items: center;
   }
 
   &__data {
-    padding: 0 6px;
+    padding: 0 7px;
     width: 100%;
     display: grid;
     align-items: center;
@@ -848,7 +852,7 @@ export default {
 
 
   &__checkbox {
-    padding: 0 6px;
+    padding: 0 7px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -860,6 +864,12 @@ export default {
     display: flex;
     justify-content: space-around;
     align-items: center;
+  }
+
+  &__iconSvg {
+    img {
+      height: 18px;
+    }
   }
 
   &__icon {

@@ -49,12 +49,10 @@ export default {
 @import "../../assets/scss/colors.scss";
 
 .action-buttonOutline {
-
   &__button {
-    transition: .2s ease-out;
     text-align: center;
     min-width: 110px;
-    padding: 0 24px 0 24px;
+    padding: 0 30px 0 30px;
     height: 30px;
     font-size: 14px;
     border-radius: 2px;
@@ -62,53 +60,39 @@ export default {
     outline: none;
     letter-spacing: 0.2px;
     cursor: pointer;
+    transition: .05s ease-out;
 
     &:hover {
-      box-shadow: $box-shadow;
-    }
-
-    &:active {
-      transform: scale(.98);
-    }
-  }
-
-  .other-choice & {
-    margin: 7px;
-    @media (max-width: 450px) {
-      margin: 5px;
-    }
-  }
-}
-
-.action-button {
-
-  &__button {
-    min-width: 110px;
-    padding: 0 24px 0 24px;
-    height: 30px;
-    color: $white;
-    font-size: 14px;
-    border-radius: 2px;
-    background-color: $red;
-    border: none;
-    transition: .2s ease-out;
-    outline: none;
-    letter-spacing: 0.2px;
-    cursor: pointer;
-
-    &:hover {
-      box-shadow: $box-shadow;
+      filter: brightness(0.96);
     }
 
     &:active {
       transform: scale(.97);
     }
   }
+}
 
-  .other-choice & {
-    margin: 7px;
-    @media (max-width: 450px) {
-      margin: 5px;
+.action-button {
+  &__button {
+    min-width: 110px;
+    padding: 0 30px 0 30px;
+    height: 30px;
+    color: $white;
+    font-size: 14px;
+    border-radius: 2px;
+    background-color: $red;
+    border: none;
+    outline: none;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: .05s ease-out;
+
+    &:hover {
+      filter: brightness(0.96);
+    }
+
+    &:active {
+      transform: scale(.97);
     }
   }
 }
@@ -135,5 +119,6 @@ export default {
     width: 100%;
   }
 }
+
 
 </style>

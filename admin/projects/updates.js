@@ -148,6 +148,36 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps }) {
 	}
 }
 
+const reImportFilesFromMemoq = async ({ tasksIds, projectId }) => {
+	const { tasks, tasksDR1 } = await getProject({ _id: projectId })
+
+	for await (const id of tasksIds) {
+		const targetFiles = []
+		const _taskIdx = tasks.findIndex(({ _id }) => `${ _id }` === `${ id }`)
+		const _taskDR1Idx = tasksDR1.findIndex(({ taskId }) => taskId === tasks[_taskIdx].taskId)
+		let { memoqDocs, memoqProjectId, targetLanguage } = tasks[_taskIdx]
+
+		for await (const doc of memoqDocs) {
+			const { DocumentName, DocumentGuid } = doc
+			let fileName = `${ targetLanguage }-${ Math.floor(Math.random() * 1000000) }-${ DocumentName }`
+			const path = `/projectFiles/${ projectId }/${ fileName }`
+			await downloadMemoqFile({ memoqProjectId, docId: DocumentGuid, path: `./dist${ path }` })
+			targetFiles.push({ fileName, path })
+		}
+
+		tasks[_taskIdx].targetFiles = tasks[_taskIdx].targetFilesFinalStage = targetFiles
+		tasksDR1[_taskDR1Idx].files = targetFiles.map(item => {
+			return {
+				...item,
+				isFileApproved: false,
+				isFilePushedDR2: false
+			}
+		})
+	}
+
+	return await getProjectAfterUpdate({ _id: projectId }, { tasks, tasksDR1 })
+}
+
 async function getTaskTargetFiles({ task, projectId, step }) {
 	let { memoqDocs, memoqProjectId, targetLanguage, targetFilesStages } = task
 	let { _id, stepNumber } = step
@@ -200,32 +230,6 @@ async function downloadCompletedFiles(stepId) {
 		throw new Error(err.message)
 	}
 }
-
-// function getTaskNewFinance(changedSteps, task) {
-// 	const { priceValues } = updateTaskNewFinance(changedSteps, task)
-// 	const { finance } = task
-// 	const Price = {
-// 		...finance.Price,
-// 		halfReceivables: +(priceValues.receivables.toFixed(2)),
-// 		halfPayables: +(priceValues.payables.toFixed(2))
-// 	}
-// 	return { ...finance, Price }
-// }
-
-// function updateTaskNewFinance(changedSteps, task) {
-// 	let priceValues = { receivables: 0, payables: 0 }
-// 	const taskSteps = changedSteps.filter(item => item.taskId === task.taskId)
-// 	for (let step of taskSteps) {
-// 		if (step.status === "Cancelled Halfway") {
-// 			priceValues.receivables += +step.finance.Price.halfReceivables
-// 			priceValues.payables += +step.finance.Price.halfPayables
-// 		} else if (step.status === "Completed") {
-// 			priceValues.receivables += +step.finance.Price.receivables
-// 			priceValues.payables += +step.finance.Price.payables
-// 		}
-// 	}
-// 	return { priceValues }
-// }
 
 function getTaskStatusAfterCancel(steps, taskId) {
 	const taskSteps = steps.filter(item => item.taskId === taskId).map(step => step.status)
@@ -280,28 +284,6 @@ async function reOpenProject(project, ifChangePreviousStatus = true) {
 			return item
 		})
 	}
-}
-
-async function updateProjectStatusForClientPortalProject(projectId, action) {
-	// const project = await getProject({ "_id": projectId })
-	//
-	// if (action === 'approve') {
-	// 	project.status = 'Approved'
-	// 	project.tasks = changeTasksStatus(project.tasks, 'Approved')
-	// } else {
-	// 	project.status = 'Rejected'
-	// 	project.tasks = changeTasksStatus(project.tasks, 'Rejected')
-	// }
-	//
-	// function changeTasksStatus(tasks, statusTask) {
-	// 	return tasks.map(task => {
-	// 		task.status = statusTask
-	// 		return task
-	// 	})
-	// }
-	//
-	// return await updateProject({ "_id": projectId }, { status: project.status, tasks: project.tasks, isClientOfferClicked: true }
-	// )
 }
 
 async function updateProjectStatus(id, status, reason) {
@@ -734,6 +716,7 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 }
 
 module.exports = {
+	reImportFilesFromMemoq,
 	cancelProjectInMemoq,
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
@@ -747,7 +730,6 @@ module.exports = {
 	assignMemoqTranslator,
 	assignProjectManagers,
 	checkProjectHasMemoqStep,
-	updateProjectStatusForClientPortalProject,
 	regainWorkFlowStatusByStepId,
 	setStepDeadlineProjectAndMemoq,
 	setApprovedStepStatus

@@ -34,11 +34,11 @@ const {
 	assignMemoqTranslator,
 	checkProjectHasMemoqStep,
 	assignProjectManagers,
-	updateProjectStatusForClientPortalProject,
 	regainWorkFlowStatusByStepId,
 	setStepDeadlineProjectAndMemoq,
 	cancelProjectInMemoq,
-	setApprovedStepStatus
+	setApprovedStepStatus,
+	reImportFilesFromMemoq
 } = require('./updates')
 
 const {
@@ -108,6 +108,7 @@ const {
 
 //EXPORT  =============================>
 module.exports = {
+	reImportFilesFromMemoq,
 	createProjectIndividual,
 	createProjectFromXTMFile,
 	createProjectFromMemoq,
@@ -176,7 +177,6 @@ module.exports = {
 	assignMemoqTranslator,
 	checkProjectHasMemoqStep,
 	assignProjectManagers,
-	updateProjectStatusForClientPortalProject,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
 	getPriceAfterApplyingDiscounts,

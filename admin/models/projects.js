@@ -303,6 +303,7 @@ const ProjectsSchema = new mongoose.Schema({
 		refFiles: [],
 		targetFiles: [],
 		targetFilesStages: [],
+		targetFilesFinalStage: [],
 		metrics: {},
 		reason: ""
 	} ],

@@ -3,7 +3,7 @@
     .project__all-info
       .project__info-row
         input.project__name(v-if="existProjectAccessChangeName" type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
-        .project__name(style="border: 1px solid white;" v-else) {{ project.projectName }}
+        .project__name(style="border: 1px solid white; padding: 0;" v-else) {{ project.projectName }}
 
       .project__detailsRow
         .project__detailsRow-client

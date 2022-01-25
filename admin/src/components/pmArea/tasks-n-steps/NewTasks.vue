@@ -13,6 +13,7 @@
     .tasks__fileDetails(v-if="isFilesDetailsModal && fileDetailsIndex !== null")
       Files(
         @close="hideFileDetails"
+        @reImportFinalFilesFromMemoq="reImportFinalFilesFromMemoq"
         :task="finalData[fileDetailsIndex]"
       )
     .tasks__preview(v-if="isEditAndSendQuote")
@@ -133,6 +134,7 @@
         :task="reviewTask"
         :deliveryTask="currentProject.tasksDR1.find(({taskId}) => taskId === reviewTask.taskId)"
         @close="closeReview"
+        @reImportFinalFilesFromMemoq="reImportFinalFilesFromMemoq"
       )
 </template>
 
@@ -204,6 +206,23 @@ export default {
       "alertToggle",
       "setCurrentProject"
     ]),
+    async reImportFinalFilesFromMemoq(tasksIds) {
+      try {
+        const updatedProject = await this.$http.post('/pm-manage/reimport-files-from-memoq', {
+          tasksIds,
+          projectId: this.currentProject._id
+        })
+        await this.setCurrentProject(updatedProject.data)
+        this.alertToggle({ message: "Files imported", isShow: true, type: "success" })
+      } catch (e) {
+        this.alertToggle({ message: "Server error / Cannot import files", isShow: true, type: "error" })
+      } finally {
+        this.closeReview()
+        this.hideFileDetails()
+        this.selectedAction = ""
+        this.toggleAll(false)
+      }
+    },
     marginCalcPercent(task) {
       const [ receivables, payables ] = [ this.getReceivables(task), this.getPayables(task) ]
       let percent = NaN
@@ -399,10 +418,16 @@ export default {
       this.selectedAction = option
 
       switch (this.selectedAction) {
-        case 'Approve [DR1]':
+        case 'Pass Approve [DR1]':
           if (this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').length) {
             this.reviewTasksMulti = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(i => i.taskId)
             this.isDeliveryReviewMulti = true
+          }
+          break
+        case 'Reimport Files [Memoq] [DR1]':
+          if (this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').length) {
+            const tasksIds = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(i => i._id)
+            this.reImportFinalFilesFromMemoq(tasksIds)
           }
           break
         case 'Send a Quote':
@@ -486,8 +511,8 @@ export default {
           ? [ 'Mark as Approved', 'Send a Quote' ]
           : []
 
-      // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel' ]
+      // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Cancel', 'Delete' ]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Reimport Files [Memoq] [DR1]', 'Cancel' ]
 
     },
     // finalData() {

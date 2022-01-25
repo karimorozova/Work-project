@@ -37,9 +37,9 @@
         span(v-if="!isHideForLoading" )
           Button(v-if="projectInProgress && project.inPause && !project.isPaid" value="Paid" :isDisabled="!isAm && !isPm && !isAdmin" @clicked="markAsPaid" :outline="true")
 
-    .sub-information__row
-      .row__title Payment Profile:
-      .row__data {{ (project.clientBillingInfo && project.clientBillingInfo.paymentType) || '' }}
+    .sub-information__row(v-if="project.clientBillingInfo && project.clientBillingInfo.paymentType" )
+      .row__title Payment Type:
+      .row__data {{ project.clientBillingInfo.paymentType }}
 
     .sub-information__row
       .row__title PO:

@@ -50,7 +50,8 @@ const {
 	updateWithApprovedTasks,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
 	autoCreatingTranslationTaskInProjectByXTMFile,
-	createProjectIndividual
+	createProjectIndividual,
+	reImportFilesFromMemoq
 } = require('../../projects')
 
 const {
@@ -203,6 +204,18 @@ router.get('/project', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		console.log('Error on getting Project')
+	}
+})
+
+
+router.post('/reimport-files-from-memoq', async (req, res) => {
+	let { tasksIds, projectId } = req.body
+	try {
+		const updatedProject = await reImportFilesFromMemoq({ tasksIds, projectId})
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
 	}
 })
 
