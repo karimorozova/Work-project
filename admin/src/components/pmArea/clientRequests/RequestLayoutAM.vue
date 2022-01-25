@@ -61,19 +61,19 @@
                     @chooseOption="approveChangeAM"
                   )
 
-            .form__inputs
-              .form__assignedPm
-                .input__title Client Billing Info:
-                .drop-white
-                  SelectSingle(
-                    :hasSearch="true"
-                    placeholder="Option"
-                    :options="billingInfoList.map(({name}) => name)"
-                    :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
-                    @chooseOption="choseBillingInfo"
-                  )
+            //.form__inputs
+            //  .form__assignedPm
+            //    .input__title Client Billing Info:
+            //    .drop-white
+            //      SelectSingle(
+            //        :hasSearch="true"
+            //        placeholder="Option"
+            //        :options="billingInfoList.map(({name}) => name)"
+            //        :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
+            //        @chooseOption="choseBillingInfo"
+            //      )
 
-          .form__title Files Preparation & Options
+          .form__title Files Preparation
           .form__table-box
             .form__table
               .approveModal(v-if="isDeleteModal")
@@ -247,7 +247,7 @@
       .side__info()
         .form__wrapper(v-if="!canUpdateRequest()")
         .form__project
-          .form__project-title Languages control
+          .form__project-title Languages
         .order__row(v-if="currentClientRequest.requestForm.service.languageForm !== 'Mono'" )
           .order__subTitle Source:
           .order__value
@@ -824,10 +824,10 @@ export default {
         ...refFiles.map(i => ({ ...i, type: 'Reference' }))
       ]
     },
-    deadlineOpen() {
-      if (!this.canUpdateRequest()) return
-      this.$refs.deadline.showCalendar()
-    },
+    // deadlineOpen() {
+    //   if (!this.canUpdateRequest()) return
+    //   this.$refs.deadline.showCalendar()
+    // },
     clearInputFiles(str) {
       if (!this.canUpdateRequest()) return
       let inputFiles = document.querySelectorAll(str)
@@ -925,20 +925,19 @@ export default {
         acc = acc + curr + '; '
         return acc
       }, '')
-    },
-
-    async choseBillingInfo({ option }) {
-      const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-      try {
-        const updatedProject = await this.$http.post(`/clients-requests/manage-client-billing-info/${ this.currentClientRequest._id }`, {
-          billingInfoId: billingInfo._id
-        })
-        this.setCurrentClientRequest(updatedProject.data)
-        this.alertToggle({ message: "Project billing info changed!", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Project billing info not changed!", isShow: true, type: "error" })
-      }
     }
+    // async choseBillingInfo({ option }) {
+    //   const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+    //   try {
+    //     const updatedProject = await this.$http.post(`/clients-requests/manage-client-billing-info/${ this.currentClientRequest._id }`, {
+    //       billingInfoId: billingInfo._id
+    //     })
+    //     this.setCurrentClientRequest(updatedProject.data)
+    //     this.alertToggle({ message: "Project billing info changed!", isShow: true, type: "success" })
+    //   } catch (err) {
+    //     this.alertToggle({ message: "Project billing info not changed!", isShow: true, type: "error" })
+    //   }
+    // }
   },
   mounted() {
     this.restructuredFiles(this.currentClientRequest)
@@ -1011,7 +1010,6 @@ export default {
     },
     isAllChecked() {
       const {
-        clientBillingInfo,
         requestForm: { sourceFiles, refFiles },
         checkedForm: { isCheckProjectName, isCheckDeadline, isCheckBrief, isCheckComplianceTemplate },
         projectManager
@@ -1020,7 +1018,7 @@ export default {
       const isSourceFiles = !sourceFiles.length ? true : sourceFiles.every(({ isCheck }) => isCheck)
       const isRefFiles = !refFiles.length ? true : refFiles.every(({ isCheck }) => isCheck)
 
-      return isSourceFiles && isRefFiles && isCheckProjectName && isCheckDeadline && isCheckBrief && !!projectManager && !!clientBillingInfo
+      return isSourceFiles && isRefFiles && isCheckProjectName && isCheckDeadline && isCheckBrief && !!projectManager
     }
   },
 
@@ -1354,12 +1352,12 @@ input[type="text"]:disabled {
     justify-content: space-between;
     margin-bottom: 30px;
     padding: 25px;
-    border: 2px solid $light-border;
+    border: 1px solid $light-border;
     border-radius: 4px;
   }
 
   &__table-box {
-    border: 2px solid $light-border;
+    border: 1px solid $light-border;
     border-radius: 4px;
     padding: 25px;
     margin-bottom: 30px;
@@ -1396,7 +1394,7 @@ input[type="text"]:disabled {
     flex-grow: 1;
     position: relative;
     padding: 25px 25px 5px 25px;
-    border: 2px solid $light-border;
+    border: 1px solid $light-border;
     border-radius: 4px;
     height: fit-content;
   }
@@ -1556,9 +1554,10 @@ input[type="text"]:disabled {
 
 .order {
   &__buttons {
-    padding-top: 25px;
-    margin-top: 5px;
-    border-top: 1px solid $light-border;
+    padding-top: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
   }
 
   &__details {
@@ -1569,7 +1568,7 @@ input[type="text"]:disabled {
   }
 
   &__subTitle {
-    width: 110px;
+    width: 150px;
   }
 
   &__title {
@@ -1579,7 +1578,7 @@ input[type="text"]:disabled {
 
   &__value {
     font-family: 'Myriad400';
-    width: 230px;
+    min-width: 220px;
   }
 
   &__row {

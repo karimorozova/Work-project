@@ -258,23 +258,10 @@ const createProjectFromRequest = async (requestId) => {
 	todayEnd.setUTCHours(23, 59, 59, 0)
 
 	const request = await getClientRequestById(requestId)
-	const {
-		projectManager,
-		accountManager,
-		clientContacts,
-		projectName,
-		clientBillingInfo,
-		isUrgent,
-		brief,
-		notes,
-		deadline,
-		industry,
-		customer,
-		createdBy
-	} = request
+	const { projectManager, accountManager, clientContacts, projectName, isUrgent, brief, notes, deadline, industry, customer, createdBy } = request
 
 	const { _id, minPrice, currency } = customer
-	const { discounts, accountManager: { _id: AMId }, projectManager: { _id: PMId } } = await Clients.findOne({ '_id': _id }).populate('discounts')
+	const { discounts, accountManager: { _id: AMId }, projectManager: { _id: PMId }, billingInfo } = await Clients.findOne({ '_id': _id }).populate('discounts')
 	const allUsers = await User.find().populate('group')
 	const { _id: userId } = allUsers.find(item => item.group.name === 'Administrators')
 
@@ -297,7 +284,6 @@ const createProjectFromRequest = async (requestId) => {
 		projectId: moment(new Date()).format("YYYY MM DD") + " " + projectNumber,
 		projectManager: projectManager || PMId || userId,
 		accountManager: accountManager || AMId || userId,
-		clientBillingInfo,
 		clientContacts,
 		discounts,
 		minimumCharge: { value: minPrice, toIgnore: false },
@@ -305,7 +291,8 @@ const createProjectFromRequest = async (requestId) => {
 		projectCurrency: currency,
 		createdBy,
 		startDate: new Date(),
-		billingDate: new Date()
+		billingDate: new Date(),
+		clientBillingInfo: billingInfo.length === 1 ? billingInfo[0] : null
 	}
 
 	const createdProject = await Projects.create({
@@ -508,7 +495,6 @@ const autoCreatingTranslationTaskInProject = async (project, requestId, creatorU
 	const { tasksAndSteps, industry, customer, requestForm, projectManager } = await getClientRequestById(requestId)
 	const { sourceLanguage, service } = requestForm
 
-
 	for await (let { refFiles, sourceFiles, taskData: { targets, template, stepsAndUnits } } of tasksAndSteps) {
 		const tasksInfo = {
 			projectId: _id,
@@ -520,7 +506,7 @@ const autoCreatingTranslationTaskInProject = async (project, requestId, creatorU
 			service,
 			stepsAndUnits,
 			translateFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, sourceFiles) ],
-			referenceFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, refFiles) ],
+			refFiles: [ ...await getTaskCopiedFilesFromRequestToProject(project._id, requestId, refFiles) ],
 			memoqProjectId: await createMemoqProjectWithTemplate({
 				customerName: customer.name,
 				creatorUserId: creatorUserForMemoqId,

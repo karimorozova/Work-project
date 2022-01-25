@@ -15,7 +15,7 @@
       .side(v-if="!currentClientRequest.tasksAndSteps.length")
         .side__info
           .form__project
-            .form__project-title Languages control
+            .form__project-title Languages
 
           .order__row(v-if="currentClientRequest.requestForm.service.languageForm !== 'Mono'" )
             .order__subTitle Source:
@@ -199,7 +199,7 @@ export default {
   }
 
   &__subTitle {
-    width: 110px;
+    width: 150px;
   }
 
   &__value {

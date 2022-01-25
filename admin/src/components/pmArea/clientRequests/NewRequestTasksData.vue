@@ -312,8 +312,7 @@ export default {
 
 .taskData {
   position: relative;
-  border: 2px solid $light-border;
-  border-radius: 4px;
+  border: 1px solid $light-border;
   padding: 25px;
   margin-bottom: 30px;
 

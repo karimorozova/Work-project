@@ -12,16 +12,7 @@
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
-    .sub-information__row
-      .row__title Payment Profile:
-      //.row__data(v-if="canUpdateRequest")
-      //  SelectSingle.drop(
-      //    placeholder="Select",
-      //    :selectedOption="project.paymentProfile",
-      //    :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
-      //    @chooseOption="setPayment"
-      //  )
-      .row__data {{ project.clientBillingInfo.paymentType || 'Not assigned' }}
+
     .sub-information__row
       .row__title Urgent:
       .row__data
@@ -127,7 +118,6 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject",
       updateClientsRequestsProps: "updateClientsRequestsProps"
-      // updateClientContacts: "updateClientContacts",
     }),
     refreshProject() {
       this.$emit("refreshProject")
@@ -202,7 +192,7 @@ export default {
               return
             }
           } else {
-            this.manageDeleteClick(index)
+            await this.manageDeleteClick(index)
           }
           break
         default:
@@ -274,25 +264,9 @@ export default {
 
         this.setCurrentProject(result.data)
         this.projectClientContacts = result.data.clientContacts
-
-        // await this.updateClientContacts(
-        //   {
-        //     projectId: this.project._id,
-        //     contact: this.currentClientContact,
-        //     oldContact: this.oldClientContact
-        //
-        //   })
-        this.alertToggle({
-          message: "Saved project client contact",
-          isShow: true,
-          type: "success"
-        })
+        this.alertToggle({ message: "Saved project client contact", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({
-          message: "Error on Saving project client contact",
-          isShow: true,
-          type: "error"
-        })
+        this.alertToggle({ message: "Error on Saving project client contact", isShow: true, type: "error" })
       } finally {
         this.setDefaults()
       }
@@ -320,22 +294,6 @@ export default {
     setClientContact({ option }) {
       this.currentClientContact = this.project.customer.contacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === option)
     },
-    // async setPayment({ option }) {
-    // 	try {
-    // 		await this.updateClientsRequestsProps({ projectId: this.project._id, value: { paymentProfile: option } })
-    // 		this.alertToggle({
-    // 			message: "Project payment profile updated",
-    // 			isShow: true,
-    // 			type: "success"
-    // 		})
-    // 	} catch (err) {
-    // 		this.alertToggle({
-    // 			message: "Cannot update project payment profile",
-    // 			isShow: true,
-    // 			type: "error"
-    // 		})
-    // 	}
-    // },
     async setUrgentStatus(event) {
       if (!this.canUpdateRequest) return
       try {

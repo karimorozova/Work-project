@@ -4,7 +4,6 @@
       .project__info-row
         input.project__name(type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name" :disabled="!canUpdateRequest")
 
-
       .project__detailsRow
         .project__detailsRow-client
           .client
@@ -12,7 +11,6 @@
               .project__detailsRow-client-title
                 router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${ project.customer._id }`}" target="_blank")
                   span {{ project.customer.name }}
-              .project__detailsRow-client-subtitle {{ project.clientBillingInfo && project.clientBillingInfo.name || 'Billing information absent...' }}
               .project__detailsRow-client-text {{ project.industry.name }}
 
         .project__detailsRow-dates
@@ -32,21 +30,6 @@
               :disabled="!canUpdateRequest"
               prefix-class="xmx"
             )
-
-            //DatepickerWithTime(
-            //  v-model="project.deadline"
-            //  @selected="(e) => updateProjectDate(e, 'deadline')"
-            //  monday-first=true
-            //  inputClass="datepicker-custom-project-info"
-            //  calendarClass="calendar-custom"
-            //  :format="customFormatter"
-            //  :disabledPicker="!canUpdateRequest"
-            //  :disabled="disabled"
-            //  ref="deadline"
-            //)
-            //.project__calendar-icon( @click="deadlineOpen")
-            //  i.far.fa-calendar-alt
-
 
       .project__block-row.project_no-margin
         .project__block
@@ -160,18 +143,12 @@ export default {
       }
       this[prop] = !this[prop]
     },
-    // async choseBillingInfo({ option }) {
-    //   const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-    //   await this.setRequestProp({ prop: 'clientBillingInfo', value: billingInfo })
-    //   await this.setRequestProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
-    // },
     async updateBrief() {
       await this.setRequestProp({ prop: 'brief', value: this.project.brief })
     },
     async updateNotes() {
       await this.setRequestProp({ prop: 'notes', value: this.project.notes })
     },
-
     async changeProjectName(projectName) {
       this.errors = []
       if (!this.project.projectName) this.errors.push("Please, enter valid Project name.")
@@ -205,12 +182,6 @@ export default {
         await this.updateClientsRequestsProps({ projectId: this.project._id, value: { 'isTest': e.target.checked } })
       }
     },
-    // async setSameDate(e) {
-    // 	this.isBilling = e.target.checked
-    // 	e.target.checked ?
-    // 			this.updateProjectDate(this.$refs.deadline.value, 'billingDate') :
-    // 			this.updateProjectDate(this.$refs.billingDate.value, 'billingDate')
-    // },
     async setRequestProp({ prop, value }) {
       try {
         await this.updateClientsRequestsProps({ projectId: this.project._id, value: { [prop]: value } })
@@ -228,94 +199,12 @@ export default {
     closeErrors() {
       this.areErrorsExist = false
     }
-    // async checkForErrors() {
-    //   this.errors = []
-    //   if (!this.project.projectName) {
-    //     this.errors.push("Please, enter valid Project name.")
-    //     this.project.projectName = this.project.projectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim().replace(/^\d+( ?\d*)*/g, '')
-    //   }
-    //   if (!this.project.startDate) this.errors.push("Please, set the start date.")
-    //   if (!this.project.deadline) this.errors.push("Please, set the deadline date.")
-    //   if (!this.project.customer.name) this.errors.push("Please, select a Client.")
-    //   if (!this.selectedIndustry) this.errors.push("Please, choose an industry.")
-    //   if (this.errors.length) {
-    //     this.areErrorsExist = true
-    //     return
-    //   }
-    //   try {
-    //     await this.createProject()
-    //     await this.clientCreateProjectDate()
-    //   } catch (err) {
-    //     this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
-    //   }
-    // },
-    // async clientCreateProjectDate() {
-    //   const formatDate = moment(new Date().getTime()).format('DD-MM-YYYY')
-    //   await this.$http.post('/clientsapi/client-project-date', {
-    //     date: formatDate,
-    //     clientId: this.project.customer
-    //   })
-    // },
-    // async createProject() {
-    //   this.project.dateFormatted = moment(this.project.startDate).format('YYYY MM DD')
-    //   this.project.industry = this.selectedIndustry._id
-    //   const customer = { ...this.project.customer }
-    //   this.project.customer = customer._id
-    //   this.project.isTest = this.isTest
-    //   try {
-    //     const newProject = await this.$http.post("/pm-manage/new-project", { project: this.project, user: this.user })
-    //     this.$emit('projectCreated', { project: newProject.data, customer: customer })
-    //     this.alertToggle({ message: "New Project has been created", isShow: true, type: "success" })
-    //   } catch (err) {
-    //     this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
-    //   }
-    // },
-    // startOpen() {
-    //   this.$refs.start.showCalendar()
-    // },
-    // deadlineOpen() {
-    //   this.$refs.deadline.showCalendar()
-    // },
-    // billingOpen() {
-    //   this.$refs.billingDate.showCalendar()
-    // },
-    // goToClientInfo() {
-    //   const route = this.$router.resolve({ path: `/pangea-clients/all/details/${ this.project.customer._id }` })
-    //   window.open(route.href, "_blank")
-    // }
-    // isBillingDate() {
-    //   if (this.project.deadline === "") {
-    //     this.isBilling = false
-    //   } else {
-    //     this.isBilling = this.project.deadline === this.project.billingDate
-    //   }
-    // },
-    // async setDefaultClientBI() {
-    //   if (this.billingInfoList.length === 1) {
-    //     const [ billingInfo ] = this.billingInfoList
-    //     await this.setRequestProp({ prop: 'clientBillingInfo', value: billingInfo })
-    //     await this.setRequestProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
-    //   }
-    // }
   },
   computed: {
     ...mapGetters({
       industries: "getAllIndustries",
       user: "getUser"
     }),
-    // billingInfoList() {
-    //   if (this.project.customer.billingInfo && this.project.customer.billingInfo.length) {
-    //     const billingInfo = this.project.customer.billingInfo
-    //     return billingInfo.map(({ _id, officialName, paymentType, name }) => ({ _id, officialName, paymentType, name }))
-    //   }
-    //   return []
-    // },
-    // existProjectAccessChangeName() {
-    //   if (this.project) {
-    //     const { status } = this.project
-    //     return status === 'Draft' || status === 'Quote sent'
-    //   }
-    // },
     industriesList() {
       let result = []
       if (this.project.customer.name) {
@@ -327,9 +216,6 @@ export default {
       }
       return result
     },
-    // nameOfProject() {
-    //   return this.project.isUrgent ? this.project.projectName + " URGENT" : this.project.projectName
-    // },
     disabledPicker() {
       return !!(this.project._id && this.project.tasks && this.project.tasks.length)
     },
@@ -342,7 +228,7 @@ export default {
           || this.user.group.name === "Developers"
           || this.project.projectManager._id === this.user._id
           || this.project.accountManager._id === this.user._id
-          || (this.user.position === 'Compliance Coordinator' && this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && this.project.projectManager._id.toString() === "60b4dee7f2611f5115701566" )
+          || (this.user.position === 'Compliance Coordinator' && this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && this.project.projectManager._id.toString() === "60b4dee7f2611f5115701566")
     }
   },
   components: {
@@ -354,10 +240,6 @@ export default {
     DatePicker,
     ckeditor: CKEditor.component
 
-  },
-  mounted() {
-    // this.isBillingDate()
-    // this.setDefaultClientBI()
   }
 }
 </script>
@@ -450,7 +332,8 @@ export default {
     display: flex;
     margin-bottom: 25px;
     align-items: baseline;
-    gap: 25px;
+    justify-content: space-between;
+    align-items: center;
 
     &-finance {
       margin-left: 10px;

@@ -50,7 +50,7 @@
                     :isDisabled="true"
                   )
 
-          .form__title Files Preparation & Options
+          .form__title Files Preparation
           .form__table-box
             .form__table
               .approveModal(v-if="isDeleteModal")
@@ -774,7 +774,7 @@ input[type="text"]:disabled {
   }
 
   &__subTitle {
-    width: 110px;
+    width: 150px;
   }
 
   &__title {
@@ -784,7 +784,7 @@ input[type="text"]:disabled {
 
   &__value {
     font-family: 'Myriad400';
-    width: 230px;
+    min-width: 220px;
   }
 
   &__row {

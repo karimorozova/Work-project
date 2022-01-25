@@ -71,7 +71,7 @@ export default {
       this.deleteCurrentRequest = true
     },
     async deleteRequest() {
-      if(!this.canUpdateRequest) return
+      if (!this.canUpdateRequest) return
       const { id } = this.$route.params
       await this.$http.post(`/clients-requests/${ id }/delete`)
       if (window.history.length > 2) {
@@ -149,6 +149,8 @@ export default {
   padding-top: 10px;
   margin-top: 10px;
   border-top: 1px solid $light-border;
+  display: flex;
+  justify-content: center;
 }
 
 .button-m-top {
