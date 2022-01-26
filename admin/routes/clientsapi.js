@@ -33,7 +33,8 @@ const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes 
 const { getProject } = require('../projects')
 const { createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require("../clients/clientService")
 const { createClient, getContactsIdsWithCreate } = require("../clients/createClient")
-const { updateClientContact, addClientContact } = require("../clients/clientContacts")
+const { updateClientContact, addClientContact, deleteClientContact } = require("../clients/clientContacts")
+const { addContactToBilling, removeContactToBilling } = require("../clients/clientBilling")
 
 router.get('/client', async (req, res) => {
 	let { id } = req.query
@@ -221,10 +222,32 @@ router.post('/updateContact', upload.any(), async (req, res) => {
 	}
 })
 
-router.post('/deleteContact', async (req, res) => {
-	const { id, contacts } = req.body
+router.post('/add-contact-to-bill', async (req, res) => {
+	const { clientId, billingId, contactsIds } = req.body
 	try {
-		const result = await getClientAfterUpdate({ "_id": id }, { contacts: contacts })
+		const result = await addContactToBilling(clientId, billingId, contactsIds)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/remove-contact-to-bill', async (req, res) => {
+	const { clientId, billingId, contactId } = req.body
+	try {
+		const result = await removeContactToBilling(clientId, billingId, contactId)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/deleteContact', async (req, res) => {
+	const { id, contactId } = req.body
+	try {
+		const result = await deleteClientContact(id, contactId)
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -742,7 +765,7 @@ router.post('/update-billing-info/:_id', async (req, res) => {
 		const { _id } = req.params
 		let { billingInfo } = req.body
 
-		billingInfo.contacts = await getContactsIdsWithCreate(_id, billingInfo)
+		// billingInfo.contacts = await getContactsIdsWithCreate(_id, billingInfo)
 
 		if (!billingInfo.hasOwnProperty("_id")) {
 			await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo } })

@@ -177,7 +177,7 @@
 
           .client-info__block
             .block__header(@click="toggleBlock('isContactDetails')" :class="{'block__header-grey': !isContactDetails}")
-              .title Contact Details
+              .title Contacts
               .icon(v-if="!isContactDetails")
                 i.fas.fa-chevron-down
               .icon(v-else)
@@ -221,7 +221,7 @@
               .icon(v-else)
                 i.fas.fa-chevron-right
             .block__data(v-if="isBillingInformation")
-              ClientBillInfoTable(:client="currentClient")
+              ClientBillInfoTable(:client="currentClient" @setContact="setUpClientProp" @updateBillingInfo="updateBillingInfo")
 
           .client-info__block
             .block__header(@click="toggleBlock('isLogs')" :class="{'block__header-grey': !isLogs}")
@@ -495,6 +495,7 @@
 
         const result = await this.$http.post("/clientsapi/updateContact", sendData)
         this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
+        await this.updateBillingInfo()
 			},
 			async contactSave({ contact, file }) {
         let sendData = new FormData()
@@ -504,8 +505,7 @@
         sendData.append("photos", file)
 
         const result = await this.$http.post("/clientsapi/addContact", sendData)
-        this.currentClient.contacts.slice(this.currentClient.contacts - 1, 0 , result.data.addedContact)
-        this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value:  this.currentClient.contacts })
+        this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value:  [...this.currentClient.contacts,  result.data.addedContact] })
 
 			},
 			deleteClient() {
@@ -514,26 +514,19 @@
 			contactLeadError() {
 				return this.currentClient.contacts.find((item) => item.leadContact)
 			},
-			async approveContactDelete({ index }) {
+			async approveContactDelete({ id }) {
 				this.clientShow = true
 				this.contactShow = false
 				try {
 					if (this.currentClient.contacts.length === 1) return this.alertToggle({ message: "Error! At least one contact should remain!", isShow: true, type: "error" })
 
-					const contacts = this.updateLeadWhenDeleted(index)
-					const result = await this.$http.post("/clientsapi/deleteContact", { id: this.currentClient._id, contacts })
+					const result = await this.$http.post("/clientsapi/deleteContact", { id: this.currentClient._id, contactId: id })
 					this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
 					// this.storeCurrentClientOverallData(result.data)
 					this.alertToggle({ message: "Contact has been deleted", isShow: true, type: "success" })
 				} catch (err) {
 					this.alertToggle({ message: "Internal server error on deleting contact", isShow: true, type: "error" })
 				}
-			},
-			updateLeadWhenDeleted(index) {
-				let contacts = this.currentClient.contacts.filter((item, ind) => ind !== index)
-				const leadContact = contacts.find((item) => item.leadContact)
-				if (!leadContact) contacts[0].leadContact = true
-				return contacts
 			},
 			cancelApprove() {
 				this.isApproveModal = false
@@ -637,7 +630,7 @@
 					leadContact: true,
 					firstName: this.currentClientOverallData.name,
 					surname: "",
-					password: "11111",
+					password: "",
 					email: this.currentClientOverallData.email,
 					gender: "",
 					position: "Manager",
@@ -786,7 +779,18 @@
 						type: "error"
 					})
 				}
-			}
+			},
+      async updateBillingInfo() {
+        let billingInfo = (await this.$http.post(`/clientsapi/get-billing-info/${ this.$route.params.id }`)).data
+        billingInfo = billingInfo.map(item => {
+          item.contacts = this.currentClient.contacts.filter(({_id}) => item.contacts.includes(_id) )
+          return item
+        })
+        this.setUpClientProp({_id: this.$route.params.id, key: 'billingInfo', value: billingInfo })
+        // this.closeModalBillingInfo()
+        // this.closeDeleteModal()
+
+      },
 		},
 		computed: {
 			...mapGetters({

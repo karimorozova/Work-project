@@ -29,7 +29,6 @@
         :contact="controlContact"
         @closeModal="closeContactModal"
         @contactSave="contactSave"
-        :withoutImageMode="true"
       )
     .billing-info__approveModal(v-if="errors.length")
       ValidationErrors(
@@ -131,7 +130,8 @@
             label Address 2:
             textarea(v-model="billingInfoCopy.address.street2")
 
-      .billing-info__addContactsRow
+
+      .billing-info__addContactsRow(v-if="billingInfo.hasOwnProperty('_id')")
         span Billing Contacts
         .adds
           .addContacts(@click="openContactModal")
@@ -143,15 +143,15 @@
           //Add(@add="openContactModal" style="margin-top: -6px;")
 
 
-      .items
+      .items(v-if="billingInfo.hasOwnProperty('_id')")
         .item(v-for="(item, index) in billingInfoCopy.contacts")
           .item__header
             .item__header--name {{ item.firstName }} {{ item.surname || '' }}
 
-            .item__header--icons(v-if="deletingContactIndex === -1 && editingIndex === -1")
+            .item__header--icons(v-if="deletingContactId === -1 && editingIndex === -1")
               .item__header--icon(@click="openModalForEdition(index)")
                 i(class="fas fa-pen")
-              .item__header--icon(@click="openApproveModal(index)")
+              .item__header--icon(@click="openApproveModal(item._id)")
                 i(class="fas fa-trash")
             .item__header--icons(v-else)
               .item__header--icon
@@ -181,10 +181,22 @@ import ContactsManageModal from "./ContactsManageModal"
 import ApproveModal from "../ApproveModal"
 import SelectMulti from "../SelectMulti"
 import ValidationErrors from "../ValidationErrors"
+import Tabs from "../Tabs"
 import { mapActions } from "vuex"
 
 export default {
   name: "BillingDetails",
+  components: {
+    SelectMulti,
+    ApproveModal,
+    ContactsManageModal,
+    SelectSingle,
+    Add,
+    Button,
+    CheckBox,
+    ValidationErrors,
+    Tabs
+  },
   props: {
     billingInfo: {
       type: Object,
@@ -205,7 +217,7 @@ export default {
       isContactModalAuto: false,
       controlContact: {},
       controlContacts: [],
-      deletingContactIndex: -1,
+      deletingContactId: -1,
       editingIndex: -1,
       isDeletingModal: false,
       errors: [],
@@ -214,16 +226,33 @@ export default {
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
-    addContactsModalAuto() {
+    async addContactsModalAuto() {
       if (!this.controlContacts.length) {
         this.closeContactModalAuto()
         return
       }
-      this.billingInfoCopy.hasOwnProperty('contacts')
-          ? this.billingInfoCopy.contacts.push(...this.controlContacts.filter(({ email }) => !this.billingInfoCopy.contacts.map(({ email }) => email).includes(email)))
-          : this.billingInfoCopy.contacts = [ ...this.controlContacts ]
-      this.closeContactModalAuto()
+
+      await this.addContactToBilling(this.controlContacts, this.billingInfo._id, this.billingInfoCopy )
+
+      // this.$emit('updateBillingInfo')
+
+      // this.billingInfoCopy.hasOwnProperty('contacts')
+      //     ? this.billingInfoCopy.contacts.push(...this.controlContacts.filter(({ _id }) => !this.billingInfoCopy.contacts.map(({ _id }) => _id.toString()).includes(_id.toString())))
+      //     : this.billingInfoCopy.contacts = [ ...this.controlContacts ]
+      // this.closeContactModalAuto()
     },
+    async addContactToBilling(contactsToAdd, billingInfoId, billingInfo) {
+      const rawContactsIdsToAdd = contactsToAdd.map(({_id}) => _id)
+
+      await this.$http.post("/clientsapi/add-contact-to-bill", {
+        clientId: this.$route.params.id,
+        billingId: billingInfoId,
+        contactsIds: billingInfo.hasOwnProperty('contacts')
+            ? rawContactsIdsToAdd.filter(( _id ) => !billingInfo.contacts.map(({ _id }) => _id.toString()).includes(_id.toString()) )
+            : rawContactsIdsToAdd
+      })
+    },
+
     openContactModalAuto() {
       this.controlContacts = []
       this.isContactModalAuto = true
@@ -237,16 +266,22 @@ export default {
       if (position !== -1) this.controlContacts.splice(position, 1)
       else this.controlContacts.push(this.clientContacts.find(item => `${ item.firstName } ${ item.surname }` === option))
     },
-    deleteContact() {
-      this.billingInfoCopy.contacts.splice(this.deletingContactIndex, 1)
+    async deleteContact() {
+      const result = await this.$http.post("/clientsapi/remove-contact-to-bill", {
+        clientId: this.$route.params.id,
+        billingId: this.billingInfo._id,
+        contactId: this.deletingContactId
+      })
+      this.$emit('updateBillingInfo')
+      // this.billingInfoCopy.contacts.splice(this.deletingContactId, 1)
       this.closeApproveModal()
     },
-    openApproveModal(index) {
-      this.deletingContactIndex = index
+    openApproveModal(id) {
+      this.deletingContactId = id
       this.isDeletingModal = true
     },
     closeApproveModal() {
-      this.deletingContactIndex = -1
+      this.deletingContactId = -1
       this.isDeletingModal = false
     },
     openModalForEdition(index) {
@@ -254,16 +289,50 @@ export default {
       this.controlContact = { ...this.billingInfoCopy.contacts[index] }
       this.isContactModal = true
     },
-    contactSave({ contact }) {
-      if (this.editingIndex !== -1) this.billingInfoCopy.contacts[this.editingIndex] = contact
-      else this.billingInfoCopy.hasOwnProperty('contacts') ? this.billingInfoCopy.contacts.push(contact) : this.billingInfoCopy.contacts = [ contact ]
+    async contactSave({ contact, file }) {
+      if (!contact.hasOwnProperty('_id')){
+        const newContactId = await this.createContact({contact, file})
+        await this.addContactToBilling([{_id: newContactId}], this.billingInfo._id, this.billingInfo)
+
+        this.$emit('updateBillingInfo')
+        // this.billingInfoCopy.contacts[this.editingIndex] = contact
+      } else {
+        await this.contactUpdate({contact, file})
+        this.$emit('updateBillingInfo')
+        // this.billingInfoCopy.hasOwnProperty('contacts') ? this.billingInfoCopy.contacts.push(contact) : this.billingInfoCopy.contacts = [ contact ]
+      }
       this.closeContactModal()
     },
+    async createContact({ contact, file }) {
+      let sendData = new FormData()
+
+      sendData.append("id", this.$route.params.id )
+      sendData.append("contact", JSON.stringify(contact))
+      sendData.append("photos", file)
+      console.log("client",this.clientContacts)
+      const result = (await this.$http.post("/clientsapi/addContact", sendData)).data
+      this.clientContacts.slice(this.clientContacts - 1, 0 , result.addedContact)
+      this.$emit('setContact', { _id: this.$route.params.id, key: 'contacts', value:  this.clientContacts })
+      return result.addedContact._id
+
+    },
+    async contactUpdate({ contact, file }) {
+      let sendData = new FormData()
+
+      sendData.append("id", this.$route.params.id )
+      sendData.append("contact", JSON.stringify(contact))
+      sendData.append("photos", file)
+
+      const result = (await this.$http.post("/clientsapi/updateContact", sendData)).data
+      this.$emit('setContact', { _id: this.$route.params.id, key: 'contacts', value: result.contacts })
+      return result.contacts
+    },
+
     closeContactModal() {
       this.controlContact = {}
       this.isContactModal = false
       this.editingIndex = -1
-      this.deletingContactIndex = -1
+      this.deletingContactId = -1
     },
     openContactModal() {
       this.controlContact = {
@@ -330,12 +399,16 @@ export default {
 
       this.errors.push(...allErrors)
       if (!this.errors.length) {
-        this.createBillingInfo()
+          this.createBillingInfo()
       }
     },
     createBillingInfo() {
       this.$http.post(`/clientsapi/update-billing-info/${ this.$route.params.id }`, { billingInfo: this.billingInfoCopy })
-      this.$emit('updateBillingInfo')
+      if (this.billingInfo.hasOwnProperty("_id")) {
+        this.$emit('updateBillingInfo')
+      } else  {
+        this.$emit('createBillingInfo')
+      }
     },
     closeErrors() {
       this.errors = []
@@ -362,16 +435,6 @@ export default {
     await this.getAndSetPaymentTerms()
     await this.getCountries()
   },
-  components: {
-    SelectMulti,
-    ApproveModal,
-    ContactsManageModal,
-    SelectSingle,
-    Add,
-    Button,
-    CheckBox,
-    ValidationErrors
-  }
 }
 </script>
 
@@ -437,12 +500,14 @@ export default {
   padding: 25px;
   width: 786px;
 
+  &__tabs {
+    border-bottom: 1px solid #bfbfbf;
+  }
+
   &__addContactsRow {
     font-size: 14px;
     font-family: Myriad600;
     margin-top: 16px;
-    padding-top: 24px;
-    border-top: 1px solid $border;
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
@@ -481,6 +546,7 @@ export default {
 
   &__splited-part {
     display: flex;
+    padding-top: 16px;
   }
 
   &__buttons {

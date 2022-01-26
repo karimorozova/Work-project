@@ -1,13 +1,14 @@
 const {Clients} = require('../models')
 const fs = require("fs")
 const { moveFile } = require("../utils/movingFile")
+const { getClientAfterUpdate } = require("./getClients")
 
 const addClientContact = async (clientId, contactInfo, file) => {
 	if (file.length) {
 		contactInfo = await attachPhotos(file[0], contactInfo, clientId );
 	}
 
-	const client = await Clients.findOneAndUpdate({_id: clientId }, {$push: {"contacts": contactInfo }}, {new: true} )
+	const client = await Clients.findOneAndUpdate({_id: clientId }, {$push: {"contacts": contactInfo }}, {new: true} ).lean()
 	return {addedContact:  client.contacts.find(({email}) => contactInfo.email === email) }
 }
 
@@ -17,6 +18,11 @@ const updateClientContact = async (clientId, contactInfo, file) => {
 	}
 	const client = await Clients.findOneAndUpdate({_id: clientId }, {"contacts.$[i]": contactInfo }, { new: true, arrayFilters: [ { 'i._id': contactInfo._id } ] } )
 	return { contacts: client.contacts }
+}
+
+const deleteClientContact = async (clientId, contactId ) => {
+	await Clients.updateOne({_id: clientId}, {$pull: {"contacts": { _id: contactId }, "billingInfo.$[].contacts": contactId}})
+	return await getClientAfterUpdate({_id: clientId, "contacts.leadContact": {$ne: true}}, { $set: {"contacts.0.leadContact": true}})
 }
 
 
@@ -35,4 +41,4 @@ async function attachPhotos(file, contact, clientId ) {
 
 
 
-module.exports = { addClientContact, updateClientContact }
+module.exports = { addClientContact, updateClientContact, deleteClientContact }

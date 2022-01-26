@@ -33,7 +33,6 @@
         .col
           .col__row
             .input__title Position:
-              span.mandatory *
             input.input__main(type="text" placeholder="Value" v-model="contact.position")
           .col__row
             .input__title Phone:
@@ -78,7 +77,7 @@
         textarea(type="text" v-model="contact.notes")
 
     .contact__buttons
-      Button(value="Save" @clicked="checkErrors" :isDisabled="!contact.firstName || !contact.position || !contact.email")
+      Button(value="Save" @clicked="checkErrors" :isDisabled="!contact.firstName || !contact.email")
       Button(value="Cancel", :outline="true" @clicked="closeModal")
 
 </template>
@@ -121,7 +120,6 @@
 				const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 				const textReg = /^[-\sa-zA-Z]+$/
 				if (!this.contact.firstName || !textReg.test(this.contact.firstName)) this.errors.push("Please, enter valid contact's first name.")
-				if (!this.contact.position || !textReg.test(this.contact.position)) this.errors.push("Please, enter valid contact's position.")
 				if (this.contact.surname && !textReg.test(this.contact.surname)) this.errors.push("Please, enter valid contact's surname.")
 
 				if (!this.previousEmail || this.previousEmail !== this.contact.email) {

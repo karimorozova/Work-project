@@ -28,7 +28,7 @@
         .table__icons(slot="icons" slot-scope="{ row, index }")
           .table__icon(@click="showContactDetails(index)")
             i(class="fas fa-pen")
-          .table__icon(@click="openDeleteModal(index)")
+          .table__icon(@click="openDeleteModal(row._id)")
             i(class="fas fa-trash")
 
     .contacts-info__approveModal(v-if="isDeleteMessageShow")
@@ -71,7 +71,7 @@
 				isDeleteMessageShow: false,
 				controlContact: {},
 				isContactsManageModal: false,
-				deletingContactIndex: -1,
+				deletingContactId: null,
 				editingIndex: -1
 			}
 		},
@@ -115,15 +115,15 @@
 			},
 			cancelDelete() {
 				this.isDeleteMessageShow = false
-				this.deletingContactIndex = -1
+				this.deletingContactId = null
 			},
-			openDeleteModal(index) {
-				this.deletingContactIndex = index
+			openDeleteModal(id) {
+				this.deletingContactId = id
 				this.isDeleteMessageShow = true
 			},
 			approveDelete() {
-				if (this.deletingContactIndex === -1) return
-				this.$emit('approveDelete', { index: this.deletingContactIndex })
+				if (this.deletingContactId === null) return
+				this.$emit('approveDelete', { id: this.deletingContactId })
 				this.cancelDelete()
 			}
 		},

@@ -49,6 +49,8 @@ const {
 
 const { updateRates } = require("./updateClientRates")
 
+const { addContactToBilling, removeContactToBilling } = require("./clientBilling")
+
 const {
 	syncClientRatesCost,
 	synchronizeBasicPrice,
@@ -58,6 +60,8 @@ const {
 } = require("./syncClientRatesCost")
 
 const { updateClientMatrix, syncClientMatrix } = require("./clientMatrix")
+
+const {  deleteClientContact } = require("./clientContacts")
 
 const { updateTaskDataByCondition } = require("./clientActivity")
 
@@ -111,7 +115,10 @@ const clients = {
 	createClientServicesGroup,
 	getClientServicesGroups,
 	deleteClientServiceGroups,
-	editClientServicesGroup
+	editClientServicesGroup,
+	addContactToBilling,
+	removeContactToBilling,
+	deleteClientContact,
 }
 
 module.exports = clients

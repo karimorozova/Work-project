@@ -3,10 +3,13 @@
     .billing-table__modal
       .billing-table__modal-wrapper(v-if="isModalBillingInfo")
         BillingDetails(
+          :clientContacts="client.contacts"
           :billingInfo="editedInfoOrEmpty"
           @closeBillingInfo="closeModalBillingInfo"
+          @updateBillingInfoAndClose="updateBillingInfoAndCloseModals"
           @updateBillingInfo="updateBillingInfo"
-          :clientContacts="client.contacts"
+          @createBillingInfo="createBillingInfo"
+          @setContact="setContact"
         )
 
       .billing-table__modal-wrapper(v-if="modalBillingInfoDeleteIdOrEmpty")
@@ -146,18 +149,36 @@
 			},
 			async deleteBillingInfo() {
 				await this.$http.post(`/clientsapi/delete-billing-info/${ this.$route.params.id }`, { billingInfoId: this.modalBillingInfoDeleteIdOrEmpty })
-				await this.updateBillingInfo()
+				// await this.updateBillingInfo()
+        await this.updateBillingInfoAndCloseModals()
 			},
 			closeDeleteModal() {
 				this.modalBillingInfoDeleteIdOrEmpty = ''
 			},
+      async createBillingInfo() {
+			  await this.updateBillingInfo()
+        this.editBillingInfo(this.client.billingInfo[this.client.billingInfo.length - 1])
+      },
 			async updateBillingInfo() {
-				const billingInfo = await this.$http.post(`/clientsapi/get-billing-info/${ this.$route.params.id }`)
-				this.setUpClientProp({ prop: 'billingInfo', value: billingInfo.data })
-				this.closeModalBillingInfo()
-				this.closeDeleteModal()
+			  // this.$emit("updateBillingInfo")
+				let billingInfo = (await this.$http.post(`/clientsapi/get-billing-info/${ this.$route.params.id }`)).data
+        billingInfo = billingInfo.map(item => {
+          item.contacts = this.client.contacts.filter(({_id}) => item.contacts.includes(_id) )
+          return item
+        })
+				this.setUpClientProp({ prop: 'billingInfo', value: billingInfo })
+				// this.closeModalBillingInfo()
+				// this.closeDeleteModal()
 
-			}
+			},
+			async updateBillingInfoAndCloseModals() {
+			  await this.updateBillingInfo()
+        this.closeModalBillingInfo()
+        this.closeDeleteModal()
+      },
+      setContact(data) {
+			  this.$emit('setContact', data )
+      }
 		},
 		components: {
 			GeneralTable,
