@@ -69,6 +69,16 @@
 
                     .header__options
                       .header__option
+                        .header__option-title Source:
+                        .drop
+                          SelectSingle(
+                            :hasSearch="true"
+                            placeholder="Option"
+                            :selectedOption="selectedSource"
+                            :options="allLanguages.map(i => i.lang)"
+                            @chooseOption="setFakeSource"
+                          )
+                      .header__option
                         .header__option-title Target:
                         .drop
                           SelectSingle(
@@ -359,6 +369,7 @@ export default {
       isAllVendors: false,
       isReassignment: false,
 
+      selectedSource: '',
       selectedTarget: '',
       selectedUnit: '',
       selectedStep: '',
@@ -530,6 +541,9 @@ export default {
     removeStepSearch() {
       this.stepSearch = ''
     },
+    setFakeSource({ option }) {
+      this.selectedSource = option
+    },
     setFakeTarget({ option }) {
       this.selectedTarget = option
     },
@@ -550,6 +564,7 @@ export default {
       if (this.isAllVendors) {
         this.isEditable = false
       }
+      this.selectedSource = this.currentStep.fullSourceLanguage.lang
       this.selectedTarget = this.currentStep.fullTargetLanguage.lang
       this.selectedUnit = this.currentStep.payablesUnit.type
       this.selectedStep = this.currentStep.step.title
@@ -602,6 +617,7 @@ export default {
       if (this.currentStepId === step._id.toString()) {
         this.currentStepId = null
         this.currentStep = null
+        this.selectedSource = ''
         this.selectedTarget = ''
         this.selectedUnit = ''
         this.selectedStep = ''
@@ -609,6 +625,7 @@ export default {
       } else {
         this.currentStepId = step._id.toString()
         this.currentStep = step
+        this.selectedSource = step.fullSourceLanguage.lang
         this.selectedTarget = step.fullTargetLanguage.lang
         this.selectedUnit = step.payablesUnit.type
         this.selectedStep = step.step.title
@@ -681,7 +698,7 @@ export default {
     listOfVendors() {
       if (!this.allVendors.length || !this.currentStepId || !this.currentProject) return []
       let vendors = this.allVendors
-      const query = `${ this.currentStep.fullSourceLanguage.lang }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
+      const query = `${ this.selectedSource }-${ this.selectedTarget }-${ this.selectedStep }-${ this.selectedUnit }-${ this.selectedIndustry }`
       const { projectCurrency, crossRate } = this.currentProject
       const { finance, payablesUnit, vendor, taskId } = this.currentStep
 
@@ -1193,20 +1210,19 @@ export default {
   &__options {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
     padding-top: 10px;
-    background-color: $table-list;
+    background-color: $light-background;
     margin-left: -25px;
   }
 
   &__option {
     display: flex;
     align-items: center;
-    gap: 12px;
     margin-bottom: 10px;
 
     &-title {
-      width: 65px;
+      width: 61px;
+      margin-left: 8px;
     }
   }
 
