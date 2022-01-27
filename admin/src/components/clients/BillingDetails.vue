@@ -44,22 +44,22 @@
           .billing-info__field
             label Billing name:
               span.require *
-            input(v-model="billingInfoCopy.name" placeholder="Value" :class="{'error-shadow': !billingInfoCopy.name && isSaveClicked}")
+            input(v-model="billingInfo.name" placeholder="Value" :class="{'error-shadow': !billingInfo.name && isSaveClicked}")
 
           .billing-info__field
             label Company name:
               span.require *
-            input(v-model="billingInfoCopy.officialName" placeholder="Value" :class="{'error-shadow': !billingInfoCopy.officialName && isSaveClicked}")
+            input(v-model="billingInfo.officialName" placeholder="Value" :class="{'error-shadow': !billingInfo.officialName && isSaveClicked}")
 
           .billing-info__field
             label Payment type:
               span.require *
             .field__select-single
               SelectSingle(
-                :class="{'error-shadow': !billingInfoCopy.paymentType && isSaveClicked}"
+                :class="{'error-shadow': !billingInfo.paymentType && isSaveClicked}"
                 :options="['PPP', 'Pre-Payment', 'Monthly', 'Custom']"
                 placeholder="Payment Type",
-                :selectedOption="billingInfoCopy.paymentType",
+                :selectedOption="billingInfo.paymentType",
                 @chooseOption="setPaymentType"
               )
           .billing-info__field
@@ -67,26 +67,16 @@
               span.require *
             .field__select-single
               SelectSingle(
-                :class="{'error-shadow': (!billingInfoCopy.paymentTerms || !billingInfoCopy.paymentTerms.name) && isSaveClicked}"
+                :class="{'error-shadow': (!billingInfo.paymentTerms || !billingInfo.paymentTerms.name) && isSaveClicked}"
                 placeholder="Select"
                 :options="paymentTerms.map(({name}) => name)"
-                :selectedOption="(billingInfoCopy.paymentTerms && billingInfoCopy.paymentTerms.name) || ''"
+                :selectedOption="(billingInfo.paymentTerms && billingInfo.paymentTerms.name) || ''"
                 @chooseOption="setPaymentTerms"
               )
 
           .billing-info__field
-            label Reports:
-            .field__select-single
-              SelectMulti(
-                placeholder="Option"
-                :options="['Report1', 'Report2', 'Report3']"
-                :selectedOptions="billingInfoCopy.reports || []"
-                @chooseOptions="setReports"
-              )
-
-          .billing-info__field
             label Notes:
-            textarea(v-model="billingInfoCopy.notes")
+            textarea(v-model="billingInfo.notes")
 
         .billing-info__part-two
           .billing-info__title Billing Address
@@ -98,37 +88,36 @@
                 :hasSearch="true"
                 placeholder="Option"
                 :options="countries"
-                :selectedOption="billingInfoCopy.address.country"
+                :selectedOption="billingInfo.address.country"
                 @chooseOption="setCountry"
               )
 
-
           .billing-info__field
             label City:
-            input(v-model="billingInfoCopy.address.city" placeholder="Value")
+            input(v-model="billingInfo.address.city" placeholder="Value")
 
           .billing-info__field
             label State:
             .field__select-single
-              input(v-model="billingInfoCopy.address.state" placeholder="Value")
+              input(v-model="billingInfo.address.state" placeholder="Value")
 
           .billing-info__field
             label Zip-code:
-            input(v-model="billingInfoCopy.address.zipCode" placeholder="Value")
+            input(v-model="billingInfo.address.zipCode" placeholder="Value")
 
         .billing-info__part-three
           .billing-info__field
             .billing-info__label-group
               label VAT:
-            input(v-model="billingInfoCopy.address.vat" placeholder="Value")
+            input(v-model="billingInfo.address.vat" placeholder="Value")
 
           .billing-info__field
             label Address 1:
-            textarea(v-model="billingInfoCopy.address.street1")
+            textarea(v-model="billingInfo.address.street1")
 
           .billing-info__field
             label Address 2:
-            textarea(v-model="billingInfoCopy.address.street2")
+            textarea(v-model="billingInfo.address.street2")
 
 
       .billing-info__addContactsRow(v-if="billingInfo.hasOwnProperty('_id')")
@@ -140,11 +129,9 @@
           .addContacts(@click="openContactModalAuto")
             i.fas.fa-plus
             span Add existing contacts
-          //Add(@add="openContactModal" style="margin-top: -6px;")
 
-
-      .items(v-if="billingInfo.hasOwnProperty('_id')")
-        .item(v-for="(item, index) in billingInfoCopy.contacts")
+      .items(v-if="billingInfo._id")
+        .item(v-for="(item, index) in billingInfo.contacts")
           .item__header
             .item__header--name {{ item.firstName }} {{ item.surname || '' }}
 
@@ -212,7 +199,6 @@ export default {
     return {
       countries: [],
       paymentTerms: [],
-      billingInfoCopy: JSON.parse(JSON.stringify(this.billingInfo)),
       isContactModal: false,
       isContactModalAuto: false,
       controlContact: {},
@@ -225,34 +211,24 @@ export default {
     }
   },
   methods: {
-    ...mapActions([ 'alertToggle' ]),
+    ...mapActions([ 'alertToggle', "storeCurrentClient" ]),
     async addContactsModalAuto() {
       if (!this.controlContacts.length) {
         this.closeContactModalAuto()
         return
       }
-
-      await this.addContactToBilling(this.controlContacts, this.billingInfo._id, this.billingInfoCopy )
-
-      // this.$emit('updateBillingInfo')
-
-      // this.billingInfoCopy.hasOwnProperty('contacts')
-      //     ? this.billingInfoCopy.contacts.push(...this.controlContacts.filter(({ _id }) => !this.billingInfoCopy.contacts.map(({ _id }) => _id.toString()).includes(_id.toString())))
-      //     : this.billingInfoCopy.contacts = [ ...this.controlContacts ]
-      // this.closeContactModalAuto()
+      await this.addContactToBilling(this.controlContacts, this.billingInfo._id, this.billingInfo)
+      this.$emit('updateClientWithoutClosing', { billingInfoId: this.billingInfo._id })
+      this.closeContactModalAuto()
     },
     async addContactToBilling(contactsToAdd, billingInfoId, billingInfo) {
-      const rawContactsIdsToAdd = contactsToAdd.map(({_id}) => _id)
-
+      const contactsToAddIds = contactsToAdd.map(({ _id }) => _id)
       await this.$http.post("/clientsapi/add-contact-to-bill", {
         clientId: this.$route.params.id,
         billingId: billingInfoId,
-        contactsIds: billingInfo.hasOwnProperty('contacts')
-            ? rawContactsIdsToAdd.filter(( _id ) => !billingInfo.contacts.map(({ _id }) => _id.toString()).includes(_id.toString()) )
-            : rawContactsIdsToAdd
+        contactsIds: contactsToAddIds.filter(_id => !billingInfo.contacts.map(({ _id }) => `${ _id }`).includes(`${ _id }`))
       })
     },
-
     openContactModalAuto() {
       this.controlContacts = []
       this.isContactModalAuto = true
@@ -272,8 +248,7 @@ export default {
         billingId: this.billingInfo._id,
         contactId: this.deletingContactId
       })
-      this.$emit('updateBillingInfo')
-      // this.billingInfoCopy.contacts.splice(this.deletingContactId, 1)
+      this.$emit('updateClientWithoutClosing', { billingInfoId: this.billingInfo._id })
       this.closeApproveModal()
     },
     openApproveModal(id) {
@@ -286,48 +261,38 @@ export default {
     },
     openModalForEdition(index) {
       this.editingIndex = index
-      this.controlContact = { ...this.billingInfoCopy.contacts[index] }
+      this.controlContact = { ...this.billingInfo.contacts[index] }
       this.isContactModal = true
     },
     async contactSave({ contact, file }) {
-      if (!contact.hasOwnProperty('_id')){
-        const newContactId = await this.createContact({contact, file})
-        await this.addContactToBilling([{_id: newContactId}], this.billingInfo._id, this.billingInfo)
-
-        this.$emit('updateBillingInfo')
-        // this.billingInfoCopy.contacts[this.editingIndex] = contact
+      if (!contact._id) {
+        const newContactId = await this.createContact({ contact, file })
+        await this.addContactToBilling([ { _id: newContactId } ], this.billingInfo._id, this.billingInfo)
+        this.$emit('updateClientWithoutClosing', { billingInfoId: this.billingInfo._id })
       } else {
-        await this.contactUpdate({contact, file})
-        this.$emit('updateBillingInfo')
-        // this.billingInfoCopy.hasOwnProperty('contacts') ? this.billingInfoCopy.contacts.push(contact) : this.billingInfoCopy.contacts = [ contact ]
+        await this.contactUpdate({ contact, file })
+        this.$emit('updateClientWithoutClosing', { billingInfoId: this.billingInfo._id })
       }
       this.closeContactModal()
     },
     async createContact({ contact, file }) {
       let sendData = new FormData()
-
-      sendData.append("id", this.$route.params.id )
+      sendData.append("id", this.$route.params.id)
       sendData.append("contact", JSON.stringify(contact))
       sendData.append("photos", file)
-      console.log("client",this.clientContacts)
       const result = (await this.$http.post("/clientsapi/addContact", sendData)).data
-      this.clientContacts.slice(this.clientContacts - 1, 0 , result.addedContact)
-      this.$emit('setContact', { _id: this.$route.params.id, key: 'contacts', value:  this.clientContacts })
       return result.addedContact._id
-
     },
     async contactUpdate({ contact, file }) {
       let sendData = new FormData()
 
-      sendData.append("id", this.$route.params.id )
+      sendData.append("id", this.$route.params.id)
       sendData.append("contact", JSON.stringify(contact))
       sendData.append("photos", file)
 
       const result = (await this.$http.post("/clientsapi/updateContact", sendData)).data
-      this.$emit('setContact', { _id: this.$route.params.id, key: 'contacts', value: result.contacts })
       return result.contacts
     },
-
     closeContactModal() {
       this.controlContact = {}
       this.isContactModal = false
@@ -350,65 +315,45 @@ export default {
       }
       this.isContactModal = true
     },
-    setReports({ option }) {
-      if (!this.billingInfoCopy.hasOwnProperty('reports')) {
-        this.$set(this.billingInfoCopy, 'reports', [])
-      }
-      const position = this.billingInfoCopy.reports.indexOf(option)
-      if (position === -1) {
-        this.billingInfoCopy.reports.push(option)
-      } else {
-        this.billingInfoCopy.reports.splice(position, 1)
-      }
-    },
     setPaymentType({ option }) {
-      this.$set(this.billingInfoCopy, 'paymentType', option)
+      this.$set(this.billingInfo, 'paymentType', option)
     },
     setCountry({ option }) {
-      this.$set(this.billingInfoCopy.address, 'country', option)
+      this.$set(this.billingInfo.address, 'country', option)
     },
     setState({ option }) {
-      this.$set(this.billingInfoCopy.address, 'state', option)
+      this.$set(this.billingInfo.address, 'state', option)
     },
     setPaymentTerms({ option }) {
-      this.$set(this.billingInfoCopy, 'paymentTerms', this.paymentTerms.find(i => i.name === option))
+      this.$set(this.billingInfo, 'paymentTerms', this.paymentTerms.find(i => i.name === option))
     },
     closeModal() {
-      this.billingInfoCopy = JSON.parse(JSON.stringify(this.billingInfo))
-      this.$emit('closeBillingInfo')
+      this.$emit('updateClient', { billingInfoId: this.billingInfo._id })
     },
     checkErrors() {
       const allErrors = []
       this.errors = []
       this.isSaveClicked = true
-      if (!this.billingInfoCopy.hasOwnProperty('officialName') || !this.billingInfoCopy.officialName.trim().length) {
+      if (!this.billingInfo.hasOwnProperty('officialName') || !this.billingInfo.officialName.trim().length) {
         allErrors.push('Official Name name cannot be empty.')
       }
-
-      if (!this.billingInfoCopy.hasOwnProperty('name') || !this.billingInfoCopy.name.trim().length) {
+      if (!this.billingInfo.hasOwnProperty('name') || !this.billingInfo.name.trim().length) {
         allErrors.push('Name name cannot be empty.')
       }
-
-      if (!this.billingInfoCopy.hasOwnProperty('paymentType') || !this.billingInfoCopy.paymentType.trim().length) {
+      if (!this.billingInfo.hasOwnProperty('paymentType') || !this.billingInfo.paymentType.trim().length) {
         allErrors.push('Please select Payment Type.')
       }
-
-      if (!this.billingInfoCopy.hasOwnProperty('paymentTerms') || !this.billingInfoCopy.paymentTerms.hasOwnProperty('name')) {
+      if (!this.billingInfo.hasOwnProperty('paymentTerms') || !this.billingInfo.paymentTerms.hasOwnProperty('name')) {
         allErrors.push('Please select Payment Terms.')
       }
-
       this.errors.push(...allErrors)
       if (!this.errors.length) {
-          this.createBillingInfo()
+        this.createBillingInfo()
       }
     },
-    createBillingInfo() {
-      this.$http.post(`/clientsapi/update-billing-info/${ this.$route.params.id }`, { billingInfo: this.billingInfoCopy })
-      if (this.billingInfo.hasOwnProperty("_id")) {
-        this.$emit('updateBillingInfo')
-      } else  {
-        this.$emit('createBillingInfo')
-      }
+    async createBillingInfo() {
+      await this.$http.post(`/clientsapi/update-billing-info/${ this.$route.params.id }`, { billingInfo: this.billingInfo })
+      this.$emit('updateClient', { billingInfoId: this.billingInfo._id })
     },
     closeErrors() {
       this.errors = []
@@ -434,7 +379,7 @@ export default {
   async created() {
     await this.getAndSetPaymentTerms()
     await this.getCountries()
-  },
+  }
 }
 </script>
 

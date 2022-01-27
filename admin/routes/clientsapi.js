@@ -225,6 +225,7 @@ router.post('/updateContact', upload.any(), async (req, res) => {
 router.post('/add-contact-to-bill', async (req, res) => {
 	const { clientId, billingId, contactsIds } = req.body
 	try {
+		console.log(clientId, billingId, contactsIds)
 		const result = await addContactToBilling(clientId, billingId, contactsIds)
 		res.send(result)
 	} catch (err) {
@@ -748,16 +749,16 @@ router.delete('/activity/note/:id', async (req, res) => {
 // End Notes
 // End Activities
 
-router.post('/get-billing-info/:_id', async (req, res) => {
-	try {
-		const { _id } = req.params
-		const billingInfo = await Clients.findOne({ _id }, { billingInfo: 1 })
-		res.send(billingInfo.billingInfo)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on get /deleting | payment-terms')
-	}
-})
+// router.post('/get-billing-info/:_id', async (req, res) => {
+// 	try {
+// 		const { _id } = req.params
+// 		const billingInfo = await getClientAfterUpdate() Clients.findOne({ _id }, { billingInfo: 1 })
+// 		res.send(billingInfo.billingInfo)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on get /deleting | payment-terms')
+// 	}
+// })
 
 
 router.post('/update-billing-info/:_id', async (req, res) => {
@@ -765,9 +766,7 @@ router.post('/update-billing-info/:_id', async (req, res) => {
 		const { _id } = req.params
 		let { billingInfo } = req.body
 
-		// billingInfo.contacts = await getContactsIdsWithCreate(_id, billingInfo)
-
-		if (!billingInfo.hasOwnProperty("_id")) {
+		if (!billingInfo._id) {
 			await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo } })
 		} else {
 			await Clients.updateOne({ _id }, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
