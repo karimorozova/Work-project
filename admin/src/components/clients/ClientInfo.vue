@@ -388,9 +388,9 @@ export default {
       this.selectedServiceTab = this.serviceTabs.find((item, index) => index === i)
     },
     toggleRadio({ value }) {
-      if (value === 'Company') {
-        this.currentClient.billingInfo = []
-      }
+      // if (value === 'Company') {
+      //   this.currentClient.billingInfo = []
+      // }
       this.storeClientPropertyOverallData({ prop: "clientType", value })
     },
     backToMainPage() {
@@ -615,57 +615,57 @@ export default {
       let keys = [ ...this.generalKeys ]
       for (let key of keys) clientForSave[key] = this.currentClientOverallData[key]
 
-      clientForSave.nativeLanguage = null
-      clientForSave.timeZone = null
-      clientForSave.website = ""
-      clientForSave.officialCompanyName = this.currentClientOverallData.name
-
-      clientForSave.contacts = [ {
-        leadContact: true,
-        firstName: this.currentClientOverallData.name,
-        surname: "",
-        password: "",
-        email: this.currentClientOverallData.email,
-        gender: "",
-        position: "Manager",
-        phone: "",
-        photo: "",
-        country: "",
-        notes: ""
-      } ]
-
-      // TODO: refacoring
-      clientForSave.billingInfo = [ {
-        officialName: this.currentClientOverallData.name,
-        paymentType: "PPP",
-        paymentTerms: '',
-        address: {
-          country: '',
-          street1: '',
-          street2: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          vat: ''
-        },
-        notes: '',
-        reports: [],
-        contacts: [
-          {
-            leadContact: true,
-            firstName: this.currentClientOverallData.name,
-            surname: "",
-            email: this.currentClientOverallData.email,
-            gender: "",
-            position: "Manager",
-            phone: "",
-            country: "",
-            notes: "",
-            test: 1
-          }
-        ]
-
-      } ]
+      // clientForSave.nativeLanguage = null
+      // clientForSave.timeZone = null
+      // clientForSave.website = ""
+      // clientForSave.officialCompanyName = this.currentClientOverallData.name
+      //
+      // clientForSave.contacts = [ {
+      //   leadContact: true,
+      //   firstName: this.currentClientOverallData.name,
+      //   surname: "",
+      //   password: "",
+      //   email: this.currentClientOverallData.email,
+      //   gender: "",
+      //   position: "Manager",
+      //   phone: "",
+      //   photo: "",
+      //   country: "",
+      //   notes: ""
+      // } ]
+      //
+      // // TODO: refacoring
+      // clientForSave.billingInfo = [ {
+      //   officialName: this.currentClientOverallData.name,
+      //   paymentType: "PPP",
+      //   paymentTerms: '',
+      //   address: {
+      //     country: '',
+      //     street1: '',
+      //     street2: '',
+      //     city: '',
+      //     state: '',
+      //     zipCode: '',
+      //     vat: ''
+      //   },
+      //   notes: '',
+      //   reports: [],
+      //   // contacts: [
+      //   //   {
+      //   //     leadContact: true,
+      //   //     firstName: this.currentClientOverallData.name,
+      //   //     surname: "",
+      //   //     email: this.currentClientOverallData.email,
+      //   //     gender: "",
+      //   //     position: "Manager",
+      //   //     phone: "",
+      //   //     country: "",
+      //   //     notes: "",
+      //   //     test: 1
+      //   //   }
+      //   // ]
+      //
+      // } ]
 
       let sendData = new FormData()
       let dataForClient = clientForSave

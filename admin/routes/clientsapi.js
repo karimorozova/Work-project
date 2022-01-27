@@ -137,7 +137,7 @@ router.post('/update-client', upload.any(), async (req, res) => {
 		} else {
 			result = await updateClientInfo({ clientId, client, files: req.files })
 		}
-		res.send({ client: result })
+		res.send({ client: await getClientWithActions({_id: result._id}) })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on updating/creating Client')
