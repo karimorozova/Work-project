@@ -91,7 +91,7 @@ const createXtrf = async (projId, taskId) => {
 	}
 
 	const xtrfProjectInfo = await sendRequest('post', 'v2/projects/', {
-		name: `${ projectId }: ${ projectName }`,
+		name: `Png ${ projectId }: ${ projectName }`,
 		clientId: customers.id,
 		serviceId: currentServices.id
 	})

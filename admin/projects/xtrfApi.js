@@ -132,7 +132,7 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 		}
 
 		const xtrfProjectInfo = await sendRequest('post', 'v2/projects/', {
-			name: `${ projectId }: ${ projectName }`,
+			name: `Png ${ projectId }: ${ projectName }`,
 			clientId: customers.id,
 			serviceId: currentServices.id
 		})
