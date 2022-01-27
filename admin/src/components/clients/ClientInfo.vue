@@ -492,9 +492,10 @@ export default {
       sendData.append("contact", JSON.stringify(contact))
       sendData.append("photos", file)
 
-      const result = await this.$http.post("/clientsapi/updateContact", sendData)
-      this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
-      await this.updateBillingInfo()
+      await this.$http.post("/clientsapi/updateContact", sendData)
+      const client = (await this.$http.get(`/clientsapi/client-with-activities?id=${ this.$route.params.id }`)).data
+      await this.storeCurrentClient(client)
+      // this.setUpClientProp({ _id: this.$route.params.id, key: 'contacts', value: result.data.contacts })
     },
     async contactSave({ contact, file }) {
       let sendData = new FormData()
