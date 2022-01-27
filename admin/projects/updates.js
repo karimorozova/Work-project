@@ -1,4 +1,17 @@
-const { Projects, User, MemoqProject, Units, Vendors } = require('../models')
+const {
+	Projects,
+	User,
+	MemoqProject,
+	Units,
+	Vendors
+} = require('../models')
+
+const _ = require('lodash')
+const parser = require('xml2json')
+const fs = require("fs")
+const Response = require('../helpers/Response')
+const xl = require('excel4node')
+
 const { getProject, updateProject, getProjectAfterUpdate } = require('./getProjects')
 
 const {
@@ -23,7 +36,11 @@ const {
 	cancelMemoqDocs
 } = require('../services/memoqs/projects')
 
-const { downloadMemoqFile } = require('../services/memoqs/files')
+const {
+	downloadMemoqFile,
+	downloadMemoqFileXML
+} = require('../services/memoqs/files')
+
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users')
 const { notifyManagerProjectStarts } = require('../utils')
 const { sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
@@ -146,6 +163,79 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps }) {
 		console.log("Error in cancelCheckedTasks")
 		throw new Error(err.message)
 	}
+}
+
+const generateTargetFileFromMemoq = async ({ tasksIds, projectId }) => {
+	const { tasks } = await getProject({ _id: projectId })
+	const translations = []
+
+	for await (const id of tasksIds) {
+		const { memoqProjectId, memoqDocs, sourceLanguage, targetLanguage } = tasks.find(({ _id }) => `${ _id }` === `${ id }`)
+
+		if (!memoqDocs.length) return new Response(Response.Error, 'No such documents on current task!')
+
+		for await (const doc of memoqDocs) {
+			const { DocumentGuid } = doc
+			const path = `/projectFiles/${ projectId }/${ targetLanguage }-${ Math.floor(Math.random() * 1000000) }-${ DocumentGuid }-target.xml`
+			await downloadMemoqFileXML({ memoqProjectId, DocumentGuid, path: `./dist${ path }` })
+
+			await new Promise((resolve) => {
+				fs.readFile(`./dist${ path }`, (err, data) => {
+					if (err) return new Response(Response.Error, 'Cannot read data from saved file!')
+					const fileContent = data.toString()
+					let result
+					try {
+						result = parser.toJson(fileContent, { object: true, sanitize: true, trim: true })
+					} catch (e) {
+						return new Response(Response.Error, 'Cannot parse xml file!')
+					}
+					let { xliff: { file: { body: { "trans-unit": translation } } } } = result
+					translation = translation
+							.map(item => ({ sourceText: item.source['$t'], targetText: item.target['$t'] }))
+							.filter(item => item.sourceText)
+							.reduce((acc, curr) => {
+								return {
+									sourceText: acc.sourceText + curr.sourceText + ' ',
+									targetText: acc.targetText + curr.targetText || '' + ' ',
+									sourceLanguage,
+									targetLanguage
+								}
+							}, { sourceText: '', targetText: '' })
+					translations.push(translation)
+					fs.stat(`./dist${ path }`, (err) => {
+						if (err) return console.error(err)
+						fs.unlink(`./dist${ path }`, (err) => {
+							if (err) return console.log(err)
+						})
+					})
+					resolve()
+				})
+			})
+		}
+	}
+	const groupedTranslation = _.groupBy(translations, "sourceText")
+
+	const wb = new xl.Workbook()
+	let i = 1
+	for await (let [ sourceText, obj ] of Object.entries(groupedTranslation)) {
+		const temp = wb.addWorksheet('Sheet ' + i)
+		temp.cell(1, 1).string(obj[0].sourceLanguage)
+		temp.cell(2, 1).string(sourceText)
+		let col = 2
+		for (const elem of obj) {
+			temp.cell(1, col).string(elem.targetLanguage)
+			temp.cell(2, col).string(elem.targetText)
+			col++
+		}
+		i++
+	}
+	const targetPath = `/projectFiles/${ projectId }/${ Math.floor(Math.random() * 1000000) }-Target.xlsx`
+	await new Promise((resolve) => {
+		wb.write(`./dist${ targetPath }`)
+		resolve()
+	})
+
+	return new Response(Response.Success, targetPath)
 }
 
 const reImportFilesFromMemoq = async ({ tasksIds, projectId }) => {
@@ -317,7 +407,6 @@ async function updateProjectStatus(id, status, reason) {
 		throw new Error(err.message)
 	}
 }
-
 
 const setApprovedStepStatus = ({ project, step, steps }) => {
 	const { status } = project
@@ -716,6 +805,7 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 }
 
 module.exports = {
+	generateTargetFileFromMemoq,
 	reImportFilesFromMemoq,
 	cancelProjectInMemoq,
 	getProjectAfterCancelTasks,

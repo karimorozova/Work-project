@@ -223,6 +223,19 @@ export default {
         this.toggleAll(false)
       }
     },
+    async generateAndDownloadTargetFile(tasksIds) {
+      const result = (await this.$http.post('/pm-manage/generate-file-from-memoq', {
+        tasksIds,
+        projectId: this.currentProject._id
+      })).data
+      if (result.status === 'success') {
+        window.open(__WEBPACK__API_URL__ + result.data, '_blank')
+      } else {
+        this.alertToggle({ ...data, type: data.status, isShow: true })
+      }
+      this.selectedAction = ""
+      this.toggleAll(false)
+    },
     marginCalcPercent(task) {
       const [ receivables, payables ] = [ this.getReceivables(task), this.getPayables(task) ]
       let percent = NaN
@@ -424,12 +437,22 @@ export default {
             this.isDeliveryReviewMulti = true
           }
           break
-        case 'Reimport Files [Memoq] [DR1]':
-          if (this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').length) {
-            const tasksIds = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(i => i._id)
-            this.reImportFinalFilesFromMemoq(tasksIds)
+        case 'Reimport Files [Memoq] [DR1]': {
+          const checkedAndSorted = this.checkedTasks.filter(({ status, memoqDocs }) => memoqDocs.length && status === 'Pending Approval [DR1]')
+          if (checkedAndSorted.length) {
+            const tasksIds = checkedAndSorted.map(i => i._id)
+            await this.reImportFinalFilesFromMemoq(tasksIds)
           }
           break
+        }
+        case 'Generate .xlsx [Memoq] [DR1]': {
+          const checkedAndSorted = this.checkedTasks.filter(({ status, memoqDocs }) => memoqDocs.length && status === 'Pending Approval [DR1]' || status === 'Completed')
+          if (checkedAndSorted.length) {
+            const tasksIds = checkedAndSorted.map(i => i._id)
+            await this.generateAndDownloadTargetFile(tasksIds)
+          }
+          break
+        }
         case 'Send a Quote':
           await this.getSendQuoteMessage()
           break
@@ -512,7 +535,7 @@ export default {
           : []
 
       // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Cancel', 'Delete' ]
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Reimport Files [Memoq] [DR1]', 'Cancel' ]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Reimport Files [Memoq] [DR1]', 'Generate .xlsx [Memoq] [DR1]', 'Cancel' ]
 
     },
     // finalData() {

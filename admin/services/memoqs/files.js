@@ -2,7 +2,7 @@ const { xmlHeader, getHeaders } = require("../../configs")
 const parser = require('xml2json')
 const soapRequest = require('easy-soap-request')
 const fs = require('fs')
-const { getMemoqFileId, getMemoqFileIdNativeFormat } = require("./projects")
+const { getMemoqFileId, getMemoqFileIdNativeFormat, getMemoqFileIdAsXML } = require("./projects")
 
 const url = `https://memoq.pangea.global:8080/memoQServices/FileManager/FileManagerService`
 const headerWithoutAction = getHeaders('IFileManagerService')
@@ -145,6 +145,18 @@ async function downloadMemoqFile({ memoqProjectId, docId, path }) {
 	}
 }
 
+async function downloadMemoqFileXML({ memoqProjectId, DocumentGuid, path }) {
+	try {
+		const fileId = await getMemoqFileIdAsXML(memoqProjectId, DocumentGuid)
+		const sessionId = await exportMemoqFile(fileId)
+		await getMemoqFileChunks(sessionId, path)
+	} catch (err) {
+		console.log(err)
+		console.log("Error in downloadMemoqFileXML")
+		throw new Error(err.message)
+	}
+}
+
 async function exportMemoqFile(fileId) {
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
@@ -224,5 +236,6 @@ module.exports = {
 	addProjectFile,
 	exportMemoqFile,
 	getMemoqFileChunks,
-	downloadMemoqFile
+	downloadMemoqFile,
+	downloadMemoqFileXML
 }

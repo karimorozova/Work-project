@@ -507,32 +507,34 @@ async function renameMemoqProject(projectId, name) {
 	}
 }
 
-// async function getMemoqFileId(projectId, docId) {
-//     const xml = `${xmlHeader}
-//             <soapenv:Body>
-//             <ns:ExportTranslationDocumentAsTwoColumnRtf>
-//                 <ns:serverProjectGuid>${projectId}</ns:serverProjectGuid>
-//                 <ns:docGuid>${docId}</ns:docGuid>
-//                 <ns:options>
-//                     <ns:ExportComment>true</ns:ExportComment>
-//                     <ns:ExportSegmentStatus>false</ns:ExportSegmentStatus>
-//                     <ns:ExportTwoTargetColumns>false</ns:ExportTwoTargetColumns>
-//                     <ns:SecondTargetColumnEmpty>false</ns:SecondTargetColumnEmpty>
-//                 </ns:options>
-//             </ns:ExportTranslationDocumentAsTwoColumnRtf>
-//             </soapenv:Body>
-//         </soapenv:Envelope>`
-//     const headers = headerWithoutAction('ExportTranslationDocumentAsTwoColumnRtf');
-//     try {
-//         const { response } = await soapRequest({url, headers, xml});
-//         const result = parser.toJson(response.body, {object: true, sanitize: true, trim: true})["s:Envelope"]["s:Body"];
-//         return !result["s:Fault"] ?
-//             result.ExportTranslationDocumentAsTwoColumnRtfResponse.ExportTranslationDocumentAsTwoColumnRtfResult.FileGuid : false;
-//     } catch(err) {
-//         console.log("Error in getMemoqFileId");
-//         console.log(err);
-//     }
-// }
+async function getMemoqFileIdAsXML(memoqProjectId, DocumentGuid) {
+	const xml1 = `${ xmlHeader }
+            <soapenv:Body>
+				      <ns:ExportTranslationDocumentAsXliffBilingual>
+				         <ns:serverProjectGuid>${ memoqProjectId }</ns:serverProjectGuid>
+				         <ns:docGuid>${ DocumentGuid }</ns:docGuid>
+				         <ns:options>
+				            <ns:FullVersionHistory>false</ns:FullVersionHistory>
+				            <ns:IncludeSkeleton>false</ns:IncludeSkeleton>
+				            <ns:SaveCompressed>false</ns:SaveCompressed>
+				         </ns:options>
+				      </ns:ExportTranslationDocumentAsXliffBilingual>
+            </soapenv:Body>
+        </soapenv:Envelope>`
+	const headers = headerWithoutAction('ExportTranslationDocumentAsXliffBilingual')
+	try {
+		const { response } = await soapRequest({ url, headers, xml: xml1 })
+		const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"]
+
+		return !result["s:Fault"]
+				? result.ExportTranslationDocumentAsXliffBilingualResponse.ExportTranslationDocumentAsXliffBilingualResult.FileGuid
+				: false
+
+	} catch (err) {
+		console.log("Error in getMemoqFileIdAsXML")
+		console.log(err)
+	}
+}
 
 
 async function listAnalysisReports(projectId) {
@@ -826,5 +828,6 @@ module.exports = {
 	setMemoqDocumentWorkFlowStatus,
 	assignedDefaultTranslator,
 	documentsWithMetrics,
-	setMemoqDocsDeadline
+	setMemoqDocsDeadline,
+	getMemoqFileIdAsXML
 }

@@ -38,7 +38,8 @@ const {
 	setStepDeadlineProjectAndMemoq,
 	cancelProjectInMemoq,
 	setApprovedStepStatus,
-	reImportFilesFromMemoq
+	reImportFilesFromMemoq,
+	generateTargetFileFromMemoq
 } = require('./updates')
 
 const {
@@ -108,6 +109,7 @@ const {
 
 //EXPORT  =============================>
 module.exports = {
+	generateTargetFileFromMemoq,
 	reImportFilesFromMemoq,
 	createProjectIndividual,
 	createProjectFromXTMFile,
