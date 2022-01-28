@@ -76,6 +76,28 @@
         .input__title Notes:
         textarea(type="text" v-model="contact.notes")
 
+      .permissions
+        GeneralTable(
+          :fields="fields",
+          :tableData="Object.entries(contact.permissions)",
+          :isFilterShow="false"
+          :isFilterAbsolute="false"
+        )
+          template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+            .table__header {{ field.label }}
+
+
+          template(slot="title" slot-scope="{ row, index }")
+            .table__data {{row[1].title}}
+
+          template(slot="view" slot-scope="{ row, index }")
+            .table__check-box
+              CheckBox(:isChecked="row[1].view" @check="toggleCheck(row[0], 'view', true)" @uncheck="toggleCheck(row[0], 'view', false)")
+
+          template(slot="edit" slot-scope="{ row, index }")
+            .table__check-box
+              CheckBox(:isChecked="row[1].edit" @check="toggleCheck(row[0], 'edit', true)" @uncheck="toggleCheck(row[0], 'edit', false)")
+
     .contact__buttons
       Button(value="Save" @clicked="checkErrors" :isDisabled="!contact.firstName || !contact.email")
       Button(value="Cancel", :outline="true" @clicked="closeModal")
@@ -87,11 +109,19 @@
 	import photoPreview from '@/mixins/photoPreview'
 	import SelectSingle from "../SelectSingle"
 	import ValidationErrors from "../ValidationErrors"
+	import GeneralTable from "../GeneralTable"
+	import CheckBox from "../CheckBox"
 
 	export default {
 		mixins: [ photoPreview ],
 		name: "ContactsManageModal",
-		components: { ValidationErrors, SelectSingle, Button },
+		components: {
+		  ValidationErrors,
+      SelectSingle,
+      Button,
+      GeneralTable,
+      CheckBox,
+    },
 		props: {
 			contact: {
 				type: Object
@@ -110,11 +140,38 @@
 				photoFile: [],
 				countries: [],
 				timezones: [],
-				errors: []
+				errors: [],
+        fields: [
+          { label: "Section", headerKey: "headerTitle", key: "title", style: { width: "70%" } },
+          { label: "View", headerKey: "headerView", key: "view", style: { width: "15%" } },
+          { label: "Manage", headerKey: "headerEdit", key: "edit", style: { width: "15%" } },
+        ],
+        permissions: {
+          contacts: {
+				    title: 'Contacts',
+				    view: false,
+            edit: false
+          },
+          billing: {
+            title: 'Billing',
+            view: false,
+            edit: false
+          }
+        }
 			}
 		},
 		methods: {
+      toggleCheck(groupName, fieldName, value) {
+        if (fieldName === 'edit' && value) {
+          this.contact.permissions[groupName].view = value
+        }
 
+        if (fieldName === 'view' && !value) {
+          this.contact.permissions[groupName].edit = value
+        }
+
+        this.contact.permissions[groupName][fieldName] = value
+      },
 			async checkErrors() {
 				this.errors = []
 				const emailValidReg = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
@@ -189,12 +246,13 @@
 				} catch (err) {
 					console.log(err)
 				}
-			}
+			},
 		},
 		created() {
 			this.getTimezones()
 			this.getCountries()
-		}
+      this.contact.permissions = this.contact.permissions || this.permissions
+    }
 	}
 </script>
 
@@ -361,7 +419,7 @@
   textarea {
     color: $text;
     height: 50px;
-    width: 450px;
+    width: 444px;
     border: 1px solid $border;
     border-radius: 4px;
     outline: none;
@@ -377,5 +435,25 @@
   .mandatory {
     color: $red;
     padding-left: 2px;
+  }
+  .permissions {
+    margin-top: 15px;
+  }
+  .table {
+    &__header {
+      padding: 0 0 0 6px;
+    }
+
+    &__data {
+      padding: 0 6px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+    &__check-box {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
   }
 </style>

@@ -2,6 +2,17 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const Schema = mongoose.Schema
 
+const defaultPermissions = {
+	view: {
+		type: Boolean,
+		default: false
+	},
+	edit: {
+		type: Boolean,
+		default: false
+	},
+}
+
 const contacts = {
 	password: {
 		type: String
@@ -47,7 +58,12 @@ const contacts = {
 	leadContact: {
 		type: Boolean,
 		default: false
+	},
+	permissions: {
+		contacts: { ...defaultPermissions, title: {type: String, default: "Contacts"} },
+		billing: { ...defaultPermissions, title: {type: String, default: "Billing"} },
 	}
+
 }
 
 const billingContacts = {}
