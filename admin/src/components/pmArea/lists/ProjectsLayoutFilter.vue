@@ -229,6 +229,7 @@
 				disabled: {
 					to: moment().add(-1, 'day').endOf('day').toDate()
 				},
+        vendors: [],
 				highlighted: {
 					days: [ 6, 0 ]
 				}
@@ -391,14 +392,16 @@
 				this.replaceRoute('deadline', '')
 			}
 		},
-		computed: {
+    async created() {
+      this.vendors = (await this.$http.get('/pm-manage/vendors-for-options')).data
+    },
+    computed: {
 			...mapGetters({
 				users: "getUsers",
 				user: "getUser",
 				languages: "getAllLanguages",
 				services: "getAllServices",
 				industries: "getAllIndustries",
-				vendors: "getAllVendorsForOptions"
 			}),
 			mappedLanguages() {
 				return this.languages.map(({ lang }) => lang)

@@ -28,32 +28,32 @@ export const getServices = async ({ commit, dispatch }) => {
 		commit('endRequest')
 	}
 }
-export const setVendorsForOption = async ({ commit, dispatch }) => {
-	commit('startRequest')
-	try {
-		const result = await Vue.http.get('/pm-manage/vendors-for-options')
-		let allVendors = result.data
-		allVendors.sort((a, b) => `${ a.firstName } ${ a.surname }`.localeCompare(`${ b.firstName } ${ b.surname }`))
-		commit('storeVendorsForOptions', allVendors)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
-	} finally {
-		commit('endRequest')
-	}
-}
+// export const setVendorsForOption = async ({ commit, dispatch }) => {
+// 	commit('startRequest')
+// 	try {
+// 		const result = await Vue.http.get('/pm-manage/vendors-for-options')
+// 		let allVendors = result.data
+// 		allVendors.sort((a, b) => `${ a.firstName } ${ a.surname }`.localeCompare(`${ b.firstName } ${ b.surname }`))
+// 		commit('storeVendorsForOptions', allVendors)
+// 	} catch (err) {
+// 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
+// 	} finally {
+// 		commit('endRequest')
+// 	}
+// }
 
-export const setClientsForOption = async ({ commit, dispatch }) => {
-	commit('startRequest')
-	try {
-		const result = await Vue.http.get('/pm-manage/clients-for-options')
-		const customers = result.data.sort((a, b) => a.name.localeCompare(b.name))
-		commit('storeClientsForOptions', customers)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
-	} finally {
-		commit('endRequest')
-	}
-}
+// export const setClientsForOption = async ({ commit, dispatch }) => {
+// 	commit('startRequest')
+// 	try {
+// 		const result = await Vue.http.get('/pm-manage/clients-for-options')
+// 		const customers = result.data.sort((a, b) => a.name.localeCompare(b.name))
+// 		commit('storeClientsForOptions', customers)
+// 	} catch (err) {
+// 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
+// 	} finally {
+// 		commit('endRequest')
+// 	}
+// }
 
 export const getSteps = async ({ commit, dispatch }) => {
 	commit('startRequest')

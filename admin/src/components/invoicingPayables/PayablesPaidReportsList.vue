@@ -117,6 +117,7 @@ export default {
     return {
       selectedReportAction: '',
       isActionModal: false,
+      vendorsList: [],
       reports: [],
       highlighted: {
         days: [ 6, 0 ]
@@ -279,6 +280,7 @@ export default {
         countToGet: 100,
         filters: this.allFilters
       })).data.map(i => ({ ...i, isCheck: false }))
+      this.vendorsList = (await this.$http.get('/pm-manage/vendors-for-options')).data
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
@@ -294,7 +296,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      vendorsList: "getAllVendorsForOptions"
+      // vendorsList: "getAllVendorsForOptions"
     }),
     allFilters() {
       const filters = {}

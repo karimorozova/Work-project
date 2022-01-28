@@ -264,6 +264,7 @@ export default {
       billingDateFrom: '',
       billingDateTo: '',
       status: '',
+      clientsList: [],
 
       dataVariables: [
         'reportId',
@@ -444,6 +445,8 @@ export default {
         countToGet: 100,
         filters: this.allFilters
       })).data.map(i => ({ ...i, isCheck: false }))
+      this.clientsList = (await this.$http.get('/pm-manage/clients-for-options')).data
+
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
@@ -459,7 +462,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      clientsList: "getAllClientsForOptions"
+      // clientsList: "getAllClientsForOptions"
     }),
     selectedClients() {
       return this.$route.query.clients && this.clientsList.length

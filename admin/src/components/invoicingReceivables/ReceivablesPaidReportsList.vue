@@ -282,6 +282,7 @@
 					'status'
 				],
 
+        clientsList: [],
         deleteReceivablesId: ''
 			}
 		},
@@ -309,7 +310,7 @@
 			      nextStatus
 		      })
 		      this.closeApproveActionModal()
-		      this.getReports()
+		      await this.getReports()
 	      } catch (error) {
 		      this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
 	      }
@@ -421,7 +422,8 @@
 					countToGet: 100,
 					filters: this.allFilters
 				})).data.map(i => ({ ...i, isCheck: false }))
-			},
+        this.clientsList = (await this.$http.get('/pm-manage/clients-for-options')).data
+      },
 			async bottomScrolled() {
 				if (this.isDataRemain) {
 					const result = await this.$http.post("/invoicing-receivables/paid-reports", {
@@ -461,7 +463,7 @@
 		},
 		computed: {
 			...mapGetters({
-				clientsList: "getAllClientsForOptions"
+				// clientsList: "getAllClientsForOptions"
 			}),
 			availableActionOptions() {
 				if (this.reports && this.reports.length) {

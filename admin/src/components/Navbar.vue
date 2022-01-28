@@ -471,8 +471,8 @@ export default {
       setAllUsers: "setAllUsers",
       setIndustries: "setIndustries",
       setSteps: "setSteps",
-      setVendorsForOption: 'setVendorsForOption',
-      setClientsForOption: 'setClientsForOption'
+      // setVendorsForOption: 'setVendorsForOption',
+      // setClientsForOption: 'setClientsForOption'
     }),
     async getCurrentUserGroup() {
       try {
@@ -506,8 +506,8 @@ export default {
     this.setAllUsers()
     this.setIndustries()
     this.setSteps()
-    this.setVendorsForOption()
-    this.setClientsForOption()
+    // this.setVendorsForOption()
+    // this.setClientsForOption()
   },
   components: {
     Header,

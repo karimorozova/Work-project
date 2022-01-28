@@ -255,6 +255,8 @@ export default {
       billingDateTo: '',
       step: '',
 
+      clientsList: [],
+
       dataVariables: [
         'clients',
         'sourceLanguages',
@@ -333,6 +335,7 @@ export default {
             filters: this.allFilters
           })
       ).data.map(i => ({ ...i, isCheck: false }))
+      this.clientsList = (await this.$http.get('/pm-manage/clients-for-options')).data
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
@@ -409,7 +412,7 @@ export default {
   computed: {
     ...mapGetters({
       user: "getUser",
-      clientsList: "getAllClientsForOptions",
+      // clientsList: "getAllClientsForOptions",
       languages: "getAllLanguages",
       settingSteps: "getAllSteps"
     }),

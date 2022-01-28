@@ -182,10 +182,12 @@ export default {
     userGroup: {
       type: Object,
       required: true
-    },
+    }
   },
   data() {
     return {
+      vendors: [],
+      allClientsNames: [],
       stepStatuses: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ]
     }
   },
@@ -335,8 +337,8 @@ export default {
       services: "getAllServices",
       steps: "getAllSteps",
       // industries: "getAllIndustries",
-      vendors: "getAllVendorsForOptions",
-      allClientsNames: "getAllClientsForOptions"
+      // vendors: "getAllVendorsForOptions",
+      // allClientsNames: "getAllClientsForOptions"
     }),
     selectedStartRange() {
       return this.$route.query.startDateFrom
@@ -434,10 +436,11 @@ export default {
       return this.userGroup.name === 'Project Managers'
     }
   },
-  // mounted() {
-  //   // console.log('Mount')
-  //   // this.setCurrentAmOrPm()
-  // }
+  async created() {
+    this.vendors = (await this.$http.get('/pm-manage/vendors-for-options')).data
+    this.allClientsNames = (await this.$http.get('/pm-manage/clients-for-options')).data
+
+  }
 }
 </script>
 

@@ -169,6 +169,7 @@ export default {
       highlighted: {
         days: [ 6, 0 ]
       },
+      vendorsList: [],
       fields: [
         {
           label: "",
@@ -432,6 +433,7 @@ export default {
         countToGet: 100,
         filters: this.allFilters
       })).data.map(i => ({ ...i, isCheck: false }))
+      this.vendorsList = (await this.$http.get('/pm-manage/vendors-for-options')).data
     },
     async bottomScrolled() {
       if (this.isDataRemain) {
@@ -457,7 +459,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      vendorsList: "getAllVendorsForOptions",
+      // vendorsList: "getAllVendorsForOptions",
       user: "getUser"
     }),
     availableActionOptions() {

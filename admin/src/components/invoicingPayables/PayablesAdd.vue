@@ -156,6 +156,7 @@ export default {
       highlighted: {
         days: [ 6, 0 ]
       },
+      vendorsList: [],
       isDataRemain: true,
       steps: [],
       fields: [
@@ -305,6 +306,8 @@ export default {
             filters: this.allFilters
           })
       ).data.map(i => ({ ...i, isCheck: false }))
+      this.vendorsList = (await this.$http.get('/pm-manage/vendors-for-options')).data
+
     },
     replaceRoute(key, value) {
       let query = this.$route.query
@@ -375,7 +378,7 @@ export default {
   computed: {
     ...mapGetters({
       user: "getUser",
-      vendorsList: "getAllVendorsForOptions",
+      // vendorsList: "getAllVendorsForOptions",
       languages: "getAllLanguages",
       settingSteps: "getAllSteps"
     }),
