@@ -195,7 +195,7 @@ a {
 
   &__open {
     @extend %flexBetween;
-    padding: 10px 12px 10px 0;
+    padding: 10px 15px 10px 0;
 
     &-image {
       display: flex;
@@ -212,7 +212,7 @@ a {
 
   &__close {
     @extend %flexBetween;
-    padding: 10px 12px 10px 0;
+    padding: 10px 15px 10px 0;
 
     &-image {
       display: flex;

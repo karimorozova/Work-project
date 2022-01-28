@@ -4,7 +4,6 @@ const { InvoicingPayables, InvoicingReceivables } = require("../models")
 
 
 const getClientForPortal = async (obj) => {
-	console.log(obj)
 	const agg = await Clients.aggregate([
 		{
 			$match: { ...obj }

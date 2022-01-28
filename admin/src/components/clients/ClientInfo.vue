@@ -177,7 +177,7 @@
 
           .client-info__block
             .block__header(@click="toggleBlock('isContactDetails')" :class="{'block__header-grey': !isContactDetails}")
-              .title Contacts
+              .title Contact & Permissions
               .icon(v-if="!isContactDetails")
                 i.fas.fa-chevron-down
               .icon(v-else)
@@ -949,7 +949,7 @@ export default {
     }
 
     .title {
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .icon {
