@@ -92,7 +92,7 @@ export default {
           key: "projectId",
           sortInfo: { isSort: true, order: 'default' },
           filterInfo: { isFilter: true },
-          style: { width: "19%" }
+          style: { width: "20%" }
         },
         {
           label: "Project Name",
@@ -137,7 +137,7 @@ export default {
           label: "",
           headerKey: "headerIcon",
           key: "icon",
-          style: { width: "5%" }
+          style: { width: "4%" }
         }
       ],
       isDeleting: false,

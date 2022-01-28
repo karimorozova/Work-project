@@ -87,7 +87,7 @@ export default {
           key: "projectId",
           sortInfo: { isSort: true, order: 'default' },
           filterInfo: { isFilter: true },
-          style: { width: "19%" }
+          style: { width: "20%" }
         },
         {
           label: "Project Name",
@@ -112,7 +112,7 @@ export default {
           key: "startDate",
           sortInfo: { isSort: true, order: 'default' },
           filterInfo: { isFilter: false },
-          style: { width: "18%" }
+          style: { width: "17%" }
         },
         {
           label: "Deadline",
