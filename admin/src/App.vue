@@ -133,10 +133,16 @@ sup {
 }
 
 @font-face {
+  font-family: 'Roboto700';
+  font-weight: 700;
+  font-style: normal;
+  src: url('./assets/fonts/Roboto700.woff2') format('woff2');
+}
+
+@font-face {
   font-family: 'Myriad900';
   font-weight: 900;
   font-style: normal;
   src: url('./assets/fonts/Roboto900.woff2') format('woff2');
 }
-
 </style>

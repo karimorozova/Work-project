@@ -1,9 +1,5 @@
 <template lang="pug">
   .dashboard(v-if="Object.keys(client).length && client")
-    .swapper
-      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
-      .swapper__button
-        Button(:value="'Archive'" @clicked="goToAnotherPortal")
     .row
       .col
         AllOpenRequests(:client="client" :allRequests="clientRequests")
@@ -19,6 +15,10 @@
         AllOpenProjects(:client="client" :allProjects="projects")
       .col
         MyOpenProjects(:client="client" :myProjects="myFilteredProjects")
+    .swapper
+      .swapper__button
+        Button(:value="'Archive'" @clicked="goToAnotherPortal")
+      .swapper__text If you cannot see your project(s), please click on the button below to be redirected.
 </template>
 
 <script>
@@ -111,16 +111,15 @@ export default {
 @import "./assets/scss/colors";
 
 .swapper {
-  width: 500px;
+  width: 750px;
   text-align: center;
-  padding: 20px;
-  border: 1px solid #333;
-  font-size: 18px;
-  margin-bottom: 50px;
-
-  &__button {
-    margin-top: 15px;
-  }
+  padding: 10px 25px;
+  border: 1px solid #ccc;
+  display: flex;
+  font-size: 14px;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 25px;
 }
 
 .dashboard {

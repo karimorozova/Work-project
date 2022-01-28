@@ -190,7 +190,7 @@ a {
 
 .group {
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
   font-family: 'Myriad600';
 
   &__open {
@@ -236,8 +236,7 @@ a {
   justify-content: flex-end;
   align-items: center;
   font-family: 'Myriad400';
-  font-size: 15px;
-  /*letter-spacing: 0.1px;*/
+  font-size: 14px;
 }
 
 #link.router-link-active,

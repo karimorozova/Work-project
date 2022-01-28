@@ -247,7 +247,7 @@ export default {
   &__title {
     font-family: Myriad600;
     margin-left: 15px;
-    font-size: 15px;
+    font-size: 14px;
     margin-top: 1px;
   }
 

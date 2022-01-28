@@ -73,6 +73,12 @@ export default {
               path: "/settings/account",
               img: require("../assets/images/navbar/Profile.svg"),
               active: false
+            },
+            {
+              title: "Contacts",
+              path: "/settings/contacts",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
             }
           ]
         }
@@ -197,7 +203,7 @@ export default {
   &__title {
     font-family: Myriad600;
     margin-left: 15px;
-    font-size: 15px;
+    font-size: 14px;
     margin-top: 1px;
   }
 
@@ -227,7 +233,7 @@ export default {
   &__title {
     font-family: Myriad600;
     margin-left: 20px;
-    font-size: 15px;
+    font-size: 14px;
     margin-top: 1px;
   }
 

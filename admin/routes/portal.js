@@ -40,6 +40,7 @@ const {
 	setClientsContactNewPassword,
 	updateAccountDetails
 } = require('../users')
+const { ObjectId } = require("mongoose/lib/types")
 
 
 router.post('/translation-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
@@ -238,7 +239,13 @@ router.get('/extra-quotes', checkClientContact, async (req, res) => {
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
 		// const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: activeStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
-		const quotes = await getProjectsForPortalList({ $and: [ { "tasks.status": 'Quote sent', status: { $in: activeStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		const quotes = await getProjectsForPortalList({
+			$and: [ {
+				"tasks.status": 'Quote sent',
+				status: { $in: activeStatuses },
+				isTest: false
+			}, { 'customer': verificationResult.clientId } ]
+		})
 		res.send(quotes)
 	} catch (err) {
 		console.log(err)
@@ -251,8 +258,8 @@ router.get('/client', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const client = await getClient({ '_id': verificationResult.clientId })
-		for await (let key of [ 'rates' ]) delete client[key]
+		const client = await getClientForPortal({ '_id': ObjectId(verificationResult.clientId) })
+		// for await (let key of [ 'rates' ]) delete client[key]
 		res.send({ client })
 	} catch (err) {
 		console.log(err)
@@ -263,7 +270,7 @@ router.get('/client', checkClientContact, async (req, res) => {
 router.get('/all-languages', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
+		// const verificationResult = jwt.verify(token, secretKey)
 		const languages = await Languages.find()
 		res.send({
 			languages
@@ -277,7 +284,7 @@ router.get('/all-languages', checkClientContact, async (req, res) => {
 router.get('/all-industries', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
+		// const verificationResult = jwt.verify(token, secretKey)
 		const industries = await Industries.find()
 		res.send(industries)
 	} catch (err) {
@@ -290,9 +297,10 @@ router.get('/user', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const client = await getClientForPortal({ '_id': verificationResult.clientId })
+		const client = await Clients.findOne({ '_id': verificationResult.clientId }).lean()
 		const user = client.contacts.find(item => item.email === verificationResult.contactEmail)
-		res.send({ user })
+		const { password, ...restUser } = user
+		res.send({ user: restUser })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")

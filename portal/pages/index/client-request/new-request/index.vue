@@ -665,7 +665,7 @@ export default {
   }
 
   &__btn {
-    width: 100px;
+    width: 120px;
   }
 
   &__close {

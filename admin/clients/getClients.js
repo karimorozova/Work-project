@@ -1,11 +1,51 @@
 const { Clients, ClientsTasks, ClientsNotes } = require('../models/')
 const { getClientsFilteringQuery } = require('./filter')
+const { InvoicingPayables, InvoicingReceivables } = require("../models")
 
-/**
- *
- * @param {Object} obj - query for searching needed client
- * @returns {Object} returns client with populated(fullfilled) rows
- */
+
+const getClientForPortal = async (obj) => {
+	console.log(obj)
+	const agg = await Clients.aggregate([
+		{
+			$match: { ...obj }
+		},
+		{
+			$project: {
+				"billingInfo": 1,
+				"name": 1,
+				"officialCompanyName": 1,
+				"currency": 1,
+				"status": 1,
+				"accountManager": 1,
+				"projectManager": 1,
+				"timeZone": 1,
+				"services": 1,
+				"contacts.timezone": 1,
+				"contacts.leadContact": 1,
+				"contacts._id": 1,
+				"contacts.firstName": 1,
+				"contacts.surname": 1,
+				"contacts.email": 1,
+				"contacts.gender": 1,
+				"contacts.position": 1,
+				"contacts.phone": 1,
+				"contacts.photo": 1,
+				"contacts.country": 1,
+				"contacts.notes": 1
+			}
+		}
+	])
+
+	const [ client ] = await Clients.populate(agg, [
+		{ path: 'services.sourceLanguage', select: [ 'lang' ] },
+		{ path: 'services.targetLanguages', select: [ 'lang' ] },
+		{ path: 'services.services', select: [ 'title', 'steps' ] },
+		{ path: 'services.industries', select: [ 'name' ] }
+	])
+	console.log(client)
+	return client
+}
+
 async function getClient(obj) {
 	return await Clients.findOne(obj)
 			.populate('industries', [ 'name', 'icon' ])
@@ -28,30 +68,6 @@ async function getClient(obj) {
 			.populate('timeZone')
 			.populate('defaultPricelist', [ 'name' ])
 			.populate('services.services', [ 'title', 'steps' ])
-}
-
-async function getClientForPortal(obj) {
-	return await Clients.findOne(obj)
-	// .populate('industries', [ 'name', 'icon' ])
-	// .populate('nativeLanguage', [ 'lang' ])
-	// .populate('services.sourceLanguage', [ 'lang' ])
-	// .populate('services.targetLanguages', [ 'lang' ])
-	// .populate('services.industries', [ 'name' ])
-	// .populate('sourceLanguages', [ 'lang' ])
-	// .populate('targetLanguages', [ 'lang' ])
-	// .populate('rates.industryMultipliersTable.industry', [ 'name', 'icon' ])
-	// .populate('rates.stepMultipliersTable.step', [ 'title' ])
-	// .populate('rates.stepMultipliersTable.unit', [ 'type' ])
-	// .populate('rates.basicPricesTable.sourceLanguage', [ 'lang', 'iso1' ])
-	// .populate('rates.basicPricesTable.targetLanguage', [ 'lang', 'iso1' ])
-	// .populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
-	// .populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
-	// .populate('rates.pricelistTable.step', [ 'title' ])
-	// .populate('rates.pricelistTable.unit', [ 'type' ])
-	// .populate('rates.pricelistTable.industry', [ 'name' ])
-	// .populate('timeZone')
-	// .populate('defaultPricelist', [ 'name' ])
-	// .populate('services.services', [ 'title', 'steps' ])
 }
 
 async function getSimpleClients(find = {}, filter = {}) {
