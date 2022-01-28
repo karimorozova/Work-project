@@ -11,7 +11,9 @@ const createClient = async ({ client, user }) => {
 		user = users.find(user => user.group.name === 'Administrators')
 	}
 
-	const { projectManager, accountManager, name, email, contacts, defaultPricelist, leadSource, status, clientType } = client
+	let { projectManager, accountManager, name, email, contacts, defaultPricelist, leadSource, status, clientType } = client
+	defaultPricelist = defaultPricelist || defaultClientPriceList
+	const matrix = defaultPricelist.discountChart
 
 	client = {
 		...client,
@@ -22,9 +24,9 @@ const createClient = async ({ client, user }) => {
 		name,
 		email,
 		contacts: contacts && contacts.length ? contacts : { leadContact: true, firstName: name, email, position: "Manager" },
-		defaultPricelist: defaultPricelist || defaultClientPriceList,
+		defaultPricelist,
 		leadSource: leadSource || "API",
-		matrix: defaultClientPriceList.discountChart
+		matrix
 	}
 
 	let result = await Clients.create(client)
