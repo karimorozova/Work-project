@@ -52,8 +52,6 @@ module.exports = {
 	getClientRequestAfterUpdate,
 	updateClientContacts,
 	removeClientRequestById,
-	// removeContactClientRequest,
-	// sendMailToClient,
 	removeContactClientRequest,
 	sendMailToClient,
 	getClientsRequestsForPortal,

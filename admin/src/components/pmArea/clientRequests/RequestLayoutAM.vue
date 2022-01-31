@@ -568,7 +568,7 @@ export default {
         if (!re) return 'Compliance Basic'
 
         const [ , num ] = re
-        return (num.toString() === '9' || num.toString() === '10')
+        return (num.toString() === '3' || num.toString() === '9' || num.toString() === '10')
             ? 'Compliance Advance'
             : 'Compliance Basic'
       }

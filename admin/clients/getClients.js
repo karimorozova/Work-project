@@ -2,7 +2,6 @@ const { Clients, ClientsTasks, ClientsNotes } = require('../models/')
 const { getClientsFilteringQuery } = require('./filter')
 const { InvoicingPayables, InvoicingReceivables } = require("../models")
 
-
 const getClientForPortal = async (obj) => {
 	const agg = await Clients.aggregate([
 		{
@@ -41,7 +40,6 @@ const getClientForPortal = async (obj) => {
 		{ path: 'services.services', select: [ 'title', 'steps' ] },
 		{ path: 'services.industries', select: [ 'name' ] }
 	])
-	console.log(client)
 	return client
 }
 

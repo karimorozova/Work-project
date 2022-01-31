@@ -149,11 +149,12 @@ module.exports = {
 			title: '[3] Tax declarations',
 			description:
 					'<ul>' +
-					'<li>Name of taxpayer</li>' +
+					'<li>Name of taxpayer (person or a company)</li>' +
 					'<li>Net annual declared income</li>' +
 					'<li>Year of declaration</li>' +
 					'<li>Issue date</li>' +
 					'<li>Currency</li>' +
+					'<li>Source of declared income</li>' +
 					'</ul>'
 		},
 		{
