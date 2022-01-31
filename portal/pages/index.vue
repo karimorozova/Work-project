@@ -51,6 +51,34 @@ export default {
           active: true
         },
         {
+          title: "Billing",
+          path: "/billing",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Overview",
+              // path: "/billing/overview",
+              path: "/billing/invoices",
+              img: require("../assets/images/navbar/Templates.svg"),
+              active: false
+            },
+            {
+              title: "Invoices",
+              path: "/billing/invoices",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            },
+            {
+              title: "PrePayment",
+              // path: "/billing/pre-payment",
+              path: "/billing/invoices",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            }
+          ]
+        },
+        {
           title: "Projects",
           path: "/projects",
           img: require("../assets/images/navbar/Projects.svg"),

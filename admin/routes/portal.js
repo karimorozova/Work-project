@@ -41,7 +41,7 @@ const {
 	updateAccountDetails
 } = require('../users')
 const { ObjectId } = require("mongoose/lib/types")
-
+const { getAllReportsFromDb } = require("../invoicingReceivables")
 
 router.post('/translation-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
 	try {
@@ -504,6 +504,24 @@ router.post('/service-template/:clientId/:id', checkClientContact, async (req, r
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.get('/invoices', checkClientContact,async (req, res) => {
+	// const { clientId } = req.params
+	//
+	// let client = await getClient({ "_id": verificationResult.clientId })
+	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	console.log({client: verificationResult.clientId})
+	try {
+		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString())})
+		console.log({ reportsList })
+		res.json(reportsList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
 	}
 })
 
