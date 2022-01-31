@@ -13,7 +13,6 @@ const LeadSource = require('./leadSource');
 const Group = require('./group');
 const Step = require('./step');
 const Zoho = require('./zoho');
-const ZohoReport = require('./zohoReport');
 const ClientRequest = require('./clientRequest');
 const Instruction = require('./instruction');
 const CancelReason = require('./cancelReason');
@@ -65,7 +64,6 @@ const Models = {
   Clients,
   Vendors,
   Zoho,
-  ZohoReport,
   ClientRequest,
   Instruction,
   CancelReason,

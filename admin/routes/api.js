@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const axios = require('axios')
-const unirest = require('unirest')
+// const unirest = require('unirest')
 const { upload } = require('../utils/')
 const fs = require('fs')
 const {
@@ -22,7 +22,7 @@ const {
 const { getFilteredProjects, getPdf } = require('../projects/')
 const { getFilteredClientRequests } = require('../clientRequests')
 const { getServices } = require('../services/')
-const reqq = require('request')
+// const reqq = require('request')
 const { getAllCountries } = require('../helpers/countries')
 const { createNewRequest } = require("../requests")
 const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units')
@@ -31,39 +31,39 @@ const { ObjectId } = require("mongoose/lib/types")
 const moment = require("moment")
 const { createClient } = require("../clients/createClient")
 
-router.get('/wordcount', async (req, res) => {
-	let link = req.query.web
-	if (link.indexOf('dropbox') >= 0) {
-		let firstPart = link.split("=")[0]
-		link = firstPart + "=1"
-	}
-	try {
-		const resFull = await axios({
-			url: link,
-			method: 'GET',
-			responseType: 'blob' // important
-		})
-		let wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'))
-		wstream.write(resFull.data)
-		wstream.end(() => {
-			unirest.post('https://pangea.s.xtrf.eu/qrf/file')
-					.headers({ 'Content-Type': 'multipart/form-data' })
-					.attach('file', './dist/testtest.txt') // Attachment
-					.end(function (response) {
-						let token = response.body.token
-						fs.unlink('./dist/testtest.txt', (err) => {
-							if (err) throw err
-							console.log("testtеst.txt was deleted!")
-						})
-						console.log('done')
-						res.send({ token })
-					})
-		})
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on getting wordcount')
-	}
-})
+// router.get('/wordcount', async (req, res) => {
+// 	let link = req.query.web
+// 	if (link.indexOf('dropbox') >= 0) {
+// 		let firstPart = link.split("=")[0]
+// 		link = firstPart + "=1"
+// 	}
+// 	try {
+// 		const resFull = await axios({
+// 			url: link,
+// 			method: 'GET',
+// 			responseType: 'blob' // important
+// 		})
+// 		let wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'))
+// 		wstream.write(resFull.data)
+// 		wstream.end(() => {
+// 			unirest.post('https://pangea.s.xtrf.eu/qrf/file')
+// 					.headers({ 'Content-Type': 'multipart/form-data' })
+// 					.attach('file', './dist/testtest.txt') // Attachment
+// 					.end(function (response) {
+// 						let token = response.body.token
+// 						fs.unlink('./dist/testtest.txt', (err) => {
+// 							if (err) throw err
+// 							console.log("testtеst.txt was deleted!")
+// 						})
+// 						console.log('done')
+// 						res.send({ token })
+// 					})
+// 		})
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on getting wordcount')
+// 	}
+// })
 
 router.post('/request', upload.fields([ { name: 'detailFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
