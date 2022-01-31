@@ -1,12 +1,12 @@
 <template lang="pug">
-  .invoices(v-if="false")
+  .invoices
     GeneralTable(
       :fields="fields"
       :tableData="reports"
       :isFilterShow="false"
       :isBodyShort="false"
     )
-      template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+      template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header {{ field.label }}
 
       template(slot="date" slot-scope="{ row, index }")
@@ -24,12 +24,13 @@
         .table__data {{ row.status }}
 
       template(slot="total" slot-scope="{ row, index }")
-        .table__data {{ row.total }} EUR
+        .table__data
+          span.currency(v-html="currencyIconDetected(row.client.currency)" )
+          span {{ row.total }}
 
       template(slot="icon" slot-scope="{ row, index }")
-        .table__data
-          router-link(:to="'/billing/invoices/details/' + row._id")
-            span get
+        .table__icons(v-if="row.invoice.path" @click="() => download(row.invoice.path)")
+          i(class="fas fa-download")
 </template>
 
 <script>
@@ -80,7 +81,8 @@ export default {
           style: { width: "5%" }
         }
       ],
-      reports: []
+      reports: [],
+      domain: ''
     }
   },
   methods: {
@@ -97,6 +99,27 @@ export default {
       const {  paymentType } = client.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
       return  paymentType
     },
+    download(path) {
+      let link = document.createElement('a')
+      link.href = this.domain + '/' +  path
+      link.target = "_blank"
+      link.click()
+    },
+    currencyIconDetected(currencyStingCode) {
+      switch (currencyStingCode) {
+        case "EUR":
+          return "&euro;"
+        case "USD":
+          return "&#36;"
+        case "GBP":
+          return "&pound;"
+        default:
+          return "&euro;"
+      }
+    }
+  },
+  mounted() {
+    this.domain = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://admin.pangea.global'
   },
   async created() {
     await this.getReports()
@@ -115,6 +138,11 @@ export default {
     box-shadow: $box-shadow;
     padding: 25px;
     position: relative;
+
+    .currency {
+      margin-right: 4px;
+      color: $dark-border;
+    }
   }
 
   .table {
@@ -144,6 +172,7 @@ export default {
       justify-content: center;
       width: 100%;
       gap: 8px;
+      cursor: pointer;
     }
 
     &__icon {

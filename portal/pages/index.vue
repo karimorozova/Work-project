@@ -58,8 +58,7 @@ export default {
           children: [
             {
               title: "Overview",
-              // path: "/billing/overview",
-              path: "/billing/invoices",
+              path: "/billing/overview",
               img: require("../assets/images/navbar/Templates.svg"),
               active: false
             },
@@ -71,8 +70,7 @@ export default {
             },
             {
               title: "PrePayment",
-              // path: "/billing/pre-payment",
-              path: "/billing/invoices",
+              path: "/billing/pre-payment",
               img: require("../assets/images/navbar/Profile.svg"),
               active: false
             }

@@ -514,9 +514,18 @@ router.get('/invoices', checkClientContact,async (req, res) => {
 	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
 	const  token  = req.headers['token-header']
 	const verificationResult = jwt.verify(token, secretKey)
-	console.log({client: verificationResult.clientId})
 	try {
-		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString())})
+		const projectFields = {
+			"reportId": 1,
+			"lastPaymentDate": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+			"invoice": 1
+		}
+
+		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString())}, projectFields)
 		console.log({ reportsList })
 		res.json(reportsList)
 	} catch (err) {

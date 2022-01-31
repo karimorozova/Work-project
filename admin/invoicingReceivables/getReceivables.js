@@ -25,8 +25,9 @@ const reportsFiltersQuery = ({ reportId, clients, billingDateTo, billingDateFrom
 	return q
 }
 
-const getAllReportsFromDb = async (countToSkip, countToGet, query) => {
-	const queryResult = await InvoicingReceivables.aggregate([
+const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields) => {
+	const queryResult = InvoicingReceivables.aggregate([
+		{ $match: { ...query } },
 		{
 			$lookup: {
 				from: "projects",
@@ -58,14 +59,14 @@ const getAllReportsFromDb = async (countToSkip, countToGet, query) => {
 		{ $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
 		{ $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
 		{ $unset: [ 'stepsClassic', 'stepsExtra' ] },
-		{ $match: { ...query } },
+		...(!!projectFields ? [{$project:  projectFields}] : []),
 		{ $sort: { reportId: -1 } },
 		{ $skip: countToSkip },
 		{ $limit: countToGet }
 	])
 
 	return await InvoicingReceivables.populate(queryResult, [
-				{ path: 'client', select: [ 'name', 'billingInfo' ] }
+				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] }
 			]
 	)
 
