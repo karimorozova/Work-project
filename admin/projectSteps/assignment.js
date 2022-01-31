@@ -63,6 +63,7 @@ async function reassignVendor({ projectId, stepId, progress, isStart, isPay, rea
 
 const makeStep = ({ task, step, progress, vendor, projectCurrency, crossRate, isStart, isPay }) => {
 	const { finance, receivablesUnit: { type }, vendorRate, nativeVendorRate, nativeFinance, status, stepId, progress: oldProgress } = step._doc
+	console.log(finance, nativeFinance)
 	const { _id: vendorId, nativeRate: comingNativeVendorRate } = Object.values(vendor)[0]
 	const newVendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +comingNativeVendorRate, crossRate)
 	const restProgress = +(100 - progress).toFixed(2)
@@ -178,9 +179,9 @@ const makeStep = ({ task, step, progress, vendor, projectCurrency, crossRate, is
 	}
 
 	function mutatedFinanceByPercent(finance, progress) {
-		for (const QWP in finance) if (Object.hasOwnProperty.call(finance, QWP)) {
-			for (const RP in finance[QWP]) if (Object.hasOwnProperty.call(finance[QWP], RP)) {
-				finance[QWP][RP] = +(finance[QWP][RP] * (progress / 100)).toFixed(2)
+		for (const quantity_wordcount_price in finance) if (Object.hasOwnProperty.call(finance, quantity_wordcount_price)) {
+			for (const receivables_payables in finance[quantity_wordcount_price]) if (Object.hasOwnProperty.call(finance[quantity_wordcount_price], receivables_payables)) {
+				finance[quantity_wordcount_price][receivables_payables] = +(finance[quantity_wordcount_price][receivables_payables] * (progress / 100)).toFixed(2)
 			}
 		}
 		return finance

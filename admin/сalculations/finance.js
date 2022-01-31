@@ -139,7 +139,7 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 	if (isMemoqCatUnit) {
 		task.metrics = setTaskMetrics({ metrics: task.metrics, matrix: vendor.matrix, prop: "vendor" })
-		step.finance.Wordcount.payables = step.step.title === 'Translation' ? +getRelativeQuantity(task.metrics, 'vendor') : task.metrics.totalWords
+		step.finance.Wordcount.payables = step.nativeFinance.Wordcount.payables = step.step.title === 'Translation' ? +getRelativeQuantity(task.metrics, 'vendor') : task.metrics.totalWords
 	}
 
 	const quantity = isMemoqCatUnit ? step.finance.Wordcount.payables : step.finance.Quantity.payables

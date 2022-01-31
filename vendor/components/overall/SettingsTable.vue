@@ -26,7 +26,7 @@
 </template>
 
 <script>
-	import ValidationErrors from "../ValidationErrors"
+	import ValidationErrors from "../pangea/ValidationErrors"
 	import ApproveModal from "../overall/ApproveModal"
 
 	export default {

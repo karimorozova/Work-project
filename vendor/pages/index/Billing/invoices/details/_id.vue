@@ -294,6 +294,7 @@ export default {
       }
     },
     async approveReport() {
+      if(this.notEnoughMoney) return
       try {
         const result = await this.$axios.post(`/vendor/approve-report`, { nextStatus: 'Approved', reportsIds: [ this.reportDetailsInfo._id.toString() ] })
         const decode = window.atob(result.data)
