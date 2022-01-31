@@ -48,7 +48,7 @@ import CheckBox from "../../../../components/CheckBox"
 
 const TermsAgree = () => import("../../../components/details/TermsAgree")
 const UploadDeliverable = () => import("../../../components/details/UploadDeliverable")
-const Button = () => import("~/components/buttons/Button")
+const Button = () => import("~/components/pangea/Button")
 
 export default {
   props: {

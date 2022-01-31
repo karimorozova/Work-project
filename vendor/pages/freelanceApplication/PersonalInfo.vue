@@ -74,7 +74,7 @@ import SelectTimezone from "./personInfo/SelectTimezone";
 import UploadFileButton from "../../components/buttons/UploadFileButton";
 import SelectPosition from "./personInfo/SelectPosition";
 import OtherChoice from "./OtherChoice";
-import Add from "@/components/buttons/Add" ;
+import Add from "@/components/pangea/Add" ;
 import TextInput from "@/components/TextInput";
 import FilesList from "@/components/FilesList";
 

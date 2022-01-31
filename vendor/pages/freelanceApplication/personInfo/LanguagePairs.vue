@@ -33,7 +33,7 @@
 
 <script>
 import SelectLanguage from "./SelectLanguage";
-import Add from "@/components/buttons/Add" 
+import Add from "@/components/pangea/Add"
 
 export default {
     data() {

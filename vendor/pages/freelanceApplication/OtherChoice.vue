@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import Button from "@/components/buttons/Button"
+import Button from "@/components/pangea/Button"
 
 export default {
     props: {

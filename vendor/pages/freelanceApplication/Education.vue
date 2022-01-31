@@ -28,8 +28,8 @@
 
 <script>
 import EduTable from "./education/EduTable";
-import SelectSingle from "@/components/dropdowns/tableDrops/SelectSingle" 
-import Add from "@/components/buttons/Add" 
+import SelectSingle from "@/components/pangea/SelectSingle"
+import Add from "@/components/pangea/Add"
 
 export default {
     data() {
