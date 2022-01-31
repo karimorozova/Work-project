@@ -120,13 +120,13 @@
 <script>
 
 import { mapActions, mapGetters } from "vuex"
-import GeneralTable from "../../../../components/pangea/GeneralTable"
+import GeneralTable from "../../../../../components/pangea/GeneralTable"
 import moment from 'moment'
-import Button from "../../../../components/pangea/Button"
-import SelectSingle from "../../../../components/pangea/SelectSingle"
-import ValidationErrors from "../../../../components/pangea/ValidationErrors"
-import PaymentInformationCard from "../../../../components/pangea/PaymentInformationCard"
-import getBgColor from "../../../../mixins/getBgColor"
+import Button from "../../../../../components/pangea/Button"
+import SelectSingle from "../../../../../components/pangea/SelectSingle"
+import ValidationErrors from "../../../../../components/pangea/ValidationErrors"
+import PaymentInformationCard from "../../../../../components/pangea/PaymentInformationCard"
+import getBgColor from "../../../../../mixins/getBgColor"
 
 export default {
   mixins: [ getBgColor ],
@@ -297,7 +297,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../assets/scss/colors";
+@import "../../../../../assets/scss/colors";
 
 .cards {
   display: flex;

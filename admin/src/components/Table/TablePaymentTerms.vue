@@ -84,7 +84,7 @@ export default {
     isHIdeCRUDIcons(name) {
       return name !== '30 Days'
           && name !== '21 Days'
-          && name !== '1 Day'
+          && name !== 'Due on receipt'
     },
     toggleActive(index) {
       if (this.currentActive !== index) return

@@ -4,10 +4,22 @@
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
       .navbar__menu
-        .item(v-for="(item, index) in navbarList" :key="index" @click="switchSection(index)" :class="{'active__item': item.active}")
-          .item__image
-            img(:src="item.img")
-          .item__title {{ item.title }}
+        .menu(v-for="(item, index) in navbarList" :key="index" )
+          router-link(v-if="!item.isGroup" class="item" tag="div" :to="item.path" )
+            .item__image
+              img(:src="item.img")
+            .item__title {{ item.title }}
+          .item__group(v-else )
+            .item__drop-down( @click="() => toggleDropDown(item)")
+              .item__icon(:class="{'open': item.active}")
+                i(class="fas fa-chevron-right")
+              .drop-down__title {{ item.title }}
+
+            template(v-if="item.active")
+              router-link(class="drop-down__item item" tag="div" :to="subItem.path" v-for="subItem in item.children" :key="item.children.path")
+                .item__image
+                  img(:src="subItem.img")
+                .item__title {{ subItem.title }}
       .navbar__name
         .navbar__name-title VENDOR PORTAL
 
@@ -23,7 +35,6 @@
 import ClickOutside from "vue-click-outside"
 import { mapGetters, mapActions } from "vuex"
 import Header from "../components/pangea/Header"
-import { testtt } from "../store/actions/vendors/info"
 
 export default {
   components: { Header },
@@ -34,57 +45,73 @@ export default {
         {
           title: "Dashboard",
           path: "/dashboard",
-          img: require("../assets/images/navbar/Dashboard.png"),
+          img: require("../assets/images/navbar/Dashboard.svg"),
           active: false
         },
         {
           title: "Completed Jobs",
           path: "/completed-jobs",
-          img: require("../assets/images/navbar/CompleteJobs.png"),
+          img: require("../assets/images/navbar/Projects.svg"),
           active: false
         },
         {
           title: "Competencies & Rate",
           path: "/competency-and-rate",
-          img: require("../assets/images/navbar/Competencies.png"),
+          img: require("../assets/images/navbar/Rate.svg"),
           active: false
         },
         {
           title: "Assessment",
           path: "/qualification-and-assessment",
-          img: require("../assets/images/navbar/Assessment.png"),
+          img: require("../assets/images/navbar/Assessment.svg"),
           active: false
         },
-        {
-          title: "Billing Information",
-          path: "/billing-information",
-          img: require("../assets/images/navbar/Invoices.png"),
-          active: false
-        },
+
         {
           title: "Experience & Education",
           path: "/experience-and-education",
-          img: require("../assets/images/navbar/ExperienceEducation.png"),
+          img: require("../assets/images/navbar/Education.svg"),
           active: false
         },
         {
           title: "Documents",
           path: "/documents",
-          img: require("../assets/images/navbar/Documents.png"),
+          img: require("../assets/images/navbar/Documents.svg"),
           active: false
         },
         {
-          title: "Invoices",
-          path: "/invoices",
-          img: require("../assets/images/navbar/Invoices.png"),
-
-          active: false
+          title: "Billing",
+          path: "/billing",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Invoices",
+              path: "/billing/invoices",
+              img: require("../assets/images/navbar/Invoice.svg"),
+              active: false
+            },
+            {
+              title: "Billing Information",
+              path: "/billing/billing-information",
+              img: require("../assets/images/navbar/BI.svg"),
+              active: false
+            }
+          ]
         },
         {
-          title: "Profile",
-          path: "/account",
-          img: require("../assets/images/navbar/Profile.png"),
-          active: false
+          title: "Settings",
+          path: "/settings",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Profile",
+              path: "/settings/account",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            }
+          ]
         }
       ],
       isAccountMenu: false,
@@ -100,9 +127,16 @@ export default {
       "logout",
       "setOriginallyUnits"
     ]),
-
     mainPageRender() {
       this.toggleSideBar(true)
+    },
+    toggleDropDown(item) {
+      item.active = !item.active
+    },
+    toggleSideBar() {
+      for (let elem of this.navbarList) {
+        elem.active = window.location.toString().indexOf(elem.path) !== -1
+      }
     },
     async getOriginallyUnits() {
       try {
@@ -158,19 +192,6 @@ export default {
 
       }
     },
-    toggleSideBar(isFirstRender) {
-      for (let elem of this.navbarList) {
-        if (window.location.toString().indexOf(elem.path) !== -1) {
-          elem.active = true
-          if (isFirstRender) {
-            // this.$router.push(elem.path);
-          }
-        } else {
-          elem.active = false
-        }
-      }
-    },
-
     switchSection(index) {
       this.navbarList.forEach((item, i) => {
         item.active = i === index
@@ -208,9 +229,9 @@ export default {
     await this.getAllSteps()
     // // this.setToken()
   },
-  updated() {
-    this.toggleSideBar(false)
-  },
+  // updated() {
+  //   this.toggleSideBar(false)
+  // },
   mounted() {
     this.domain = process.env.domain
     this.mainPageRender()
@@ -224,7 +245,11 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/scss/colors";
 
-.active__item {
+.fa-chevron-right {
+  font-size: 17px;
+}
+
+.nuxt-link-active {
   color: $red;
 }
 
@@ -251,9 +276,47 @@ export default {
     margin-top: 1px;
   }
 
+  &__drop-down {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 10px 10px 30px;
+
+    &:hover {
+      background: $light-border;
+    }
+  }
+
+  &__icon {
+    transition: transform .2s ease;
+  }
+
+
   &:hover {
     background: $light-border;
   }
+
+}
+
+.drop-down {
+  &__title {
+    font-family: Myriad600;
+    margin-left: 20px;
+    font-size: 14px;
+    margin-top: 1px;
+  }
+
+  &__item {
+    display: flex;
+    transition: .1s ease-in-out;
+    cursor: pointer;
+    padding: 10px 10px 10px 55px;
+    align-items: center;
+  }
+}
+
+.open {
+  transform: rotate(90deg);
 }
 
 .wrapper {
@@ -278,7 +341,6 @@ export default {
     padding-top: 26px;
     cursor: default;
     position: relative;
-
   }
 
   &__menu {
@@ -310,22 +372,6 @@ export default {
 
   &__body {
     padding: 50px 0px 50px 50px;
-  }
-}
-
-.spinner1 {
-  position: relative;
-  width: 42px;
-  height: 42px;
-
-  &:before,
-  &:after {
-    content: "";
-    display: block;
-    position: absolute;
-    border-width: 3px;
-    border-style: solid;
-    border-radius: 50%;
   }
 }
 

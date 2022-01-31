@@ -4,7 +4,7 @@ const { getClientAfterUpdate } = require("./getClients")
 const createClient = async ({ client, user }) => {
 	if (!client.name || !client.email) throw new Error('Email and Name is required')
 	const defaultClientPriceList = await Pricelist.findOne({ isClientDefault: true })
-	const paymentTerms = await PaymentTerms.findOne({ name: '1 Day' })
+	const paymentTerms = await PaymentTerms.findOne({ name: 'Due on receipt' })
 
 	if (!user) {
 		const users = await User.find().populate("groups")

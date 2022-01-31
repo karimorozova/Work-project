@@ -1,12 +1,5 @@
 <template lang="pug">
   .dashboard
-    //V ==>
-    .swapper
-      .swapper__text IF YOU CANNOT SEE YOUR PROJECT(S), PLEASE CLICK ON THE BUTTON BELOW TO BE REDIRECTED
-      .swapper__button
-        Button(:value="'Archive'" @clicked="goToAnotherPortal")
-    //V <==
-
     .jobs_block
       .jobs_block__title Upcoming Jobs
       .jobs
@@ -32,6 +25,11 @@
             approveValue="Complete"
             notApproveValue="Cancel"
           )
+    .swapper
+      .swapper__button
+        Button(:value="'Archive'" @clicked="goToAnotherPortal")
+      .swapper__text If you cannot see your project(s), please click on the button below to be redirected.
+
     nuxt-child
 </template>
 
@@ -137,16 +135,15 @@ export default {
 @import '../../../assets/scss/colors.scss';
 
 .swapper {
-  width: 500px;
+  width: 750px;
   text-align: center;
-  padding: 20px;
-  border: 1px solid #333;
-  font-size: 18px;
-  margin-bottom: 50px;
-
-  &__button {
-    margin-top: 15px;
-  }
+  padding: 10px 25px;
+  border: 1px solid #ccc;
+  display: flex;
+  font-size: 14px;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 25px;
 }
 
 .dashboard {

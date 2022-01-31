@@ -75,7 +75,6 @@ export default {
     text-align: center;
     opacity: .4;
     margin-top: 4px;
-    font-family: 'Myriad300';
   }
 }
 

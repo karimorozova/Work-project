@@ -67,8 +67,9 @@
 
             Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
 
+          .div(v-if="notEnoughMoney" style="margin-top: 20px; text-align: center;") You cannot confirm the report and upload invoice, because you have not reached the minimum payment amount!
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
-            Button.button-center( value="Approve report" @clicked="approveReport")
+            Button.button-center( value="Approve report" @clicked="approveReport" :isDisabled="notEnoughMoney")
 
 
           .body__submission(v-if="reportDetailsInfo.status === 'Approved'")
@@ -90,7 +91,7 @@
                 )
             .row(v-if="!vendor.hasOwnProperty('billingInfo') || !vendor.billingInfo.paymentMethod.length" )
               span Enter your billing information and payment method.
-              router-link(v-bind:to="'/billing-information'" style="margin-left: 8px;") Here
+              router-link(v-bind:to="'/billing/billing-information'" style="margin-left: 8px;") Here
 
             Button(:isDisabled="isRequestNow" style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
 
@@ -139,13 +140,13 @@
 <script>
 
 import { mapActions, mapGetters } from "vuex"
-import GeneralTable from "../../../../components/pangea/GeneralTable"
+import GeneralTable from "../../../../../components/pangea/GeneralTable"
 import moment from 'moment'
-import Button from "../../../../components/pangea/Button"
-import SelectSingle from "../../../../components/pangea/SelectSingle"
-import ValidationErrors from "../../../../components/pangea/ValidationErrors"
-import getBgColor from "../../../../mixins/getBgColor"
-import PaymentInformationCard from "../../../../components/pangea/PaymentInformationCard"
+import Button from "../../../../../components/pangea/Button"
+import SelectSingle from "../../../../../components/pangea/SelectSingle"
+import ValidationErrors from "../../../../../components/pangea/ValidationErrors"
+import getBgColor from "../../../../../mixins/getBgColor"
+import PaymentInformationCard from "../../../../../components/pangea/PaymentInformationCard"
 
 export default {
   mixins: [ getBgColor ],
@@ -332,13 +333,16 @@ export default {
   computed: {
     ...mapGetters({
       vendor: "getVendor"
-    })
+    }),
+    notEnoughMoney() {
+      return this.reportDetailsInfo.totalPrice < 50
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import "../../../../assets/scss/colors";
+@import "../../../../../assets/scss/colors";
 
 .cards {
   display: flex;

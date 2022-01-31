@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import VendorBillingInfo from "../../../components/pangea/VendorBillingInfo"
+import VendorBillingInfo from "../../../../components/pangea/VendorBillingInfo"
 import { mapGetters } from "vuex"
 
 export default {
@@ -23,7 +23,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../../assets/scss/colors";
+@import "../../../../assets/scss/colors";
 
 .billing-info {
   &__title {

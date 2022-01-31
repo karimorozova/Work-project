@@ -13,7 +13,7 @@
     .body
       .row.margin
         .row__title Payment Method
-        .row__value {{ cardInfo.paymentMethod }}
+        .row__value {{ cardInfo.paymentMethod.name }}
       .row.margin
         .row__title Currency
         .row__value EUR
@@ -75,7 +75,6 @@ export default {
     text-align: center;
     opacity: .4;
     margin-top: 4px;
-    font-family: 'Myriad300';
   }
 }
 

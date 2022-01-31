@@ -129,7 +129,7 @@ router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
 		paymentDetails.paymentMethod = paymentMethod
 		paymentDetails.expectedPaymentDate = new Date(expectedPaymentDate)
 
-		const { bill } = await createBill(expectedPaymentDate,  vendorName, vendor.email, reportId, lineItems, notes)
+		const { bill } = await createBill(expectedPaymentDate, vendorName, vendor.email, reportId, lineItems, notes)
 		await updatePayable(_id, { zohoBillingId: bill.bill_id, paymentDetails })
 		res.send('Done')
 	} catch (err) {

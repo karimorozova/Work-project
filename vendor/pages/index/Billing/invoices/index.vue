@@ -12,7 +12,7 @@
 
         template(slot="reportId" slot-scope="{ row, index }" )
           .table__data
-            router-link(:to="'/invoices/details/' + row._id")
+            router-link(:to="'/billing/invoices/details/' + row._id")
               span {{ row.reportId }}
 
         template(slot="dateRange" slot-scope="{ row, index }")
@@ -44,7 +44,7 @@
 
         template(slot="reportId" slot-scope="{ row, index }" )
           .table__data
-            router-link(:to="'/invoices/details-paid/' + row._id")
+            router-link(:to="'/billing/invoices/details-paid/' + row._id")
               span {{ row.reportId }}
 
         template(slot="dateRange" slot-scope="{ row, index }")
@@ -68,7 +68,7 @@
 
 <script>
 import { mapGetters } from "vuex"
-import GeneralTable from "../../../components/pangea/GeneralTable"
+import GeneralTable from "../../../../components/pangea/GeneralTable"
 import moment from "moment"
 
 export default {
@@ -158,7 +158,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../../assets/scss/colors";
+@import "../../../../assets/scss/colors";
 
 .fa-chalkboard-teacher {
   font-size: 15px;
