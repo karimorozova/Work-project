@@ -22,7 +22,7 @@
         template(slot="grade"  slot-scope="{ row }")
             input.education__input(@change="setEducation" type="text" v-model="row.grade")
     .education__button
-        Add(@makeAction="addEducation")
+        Add(@add="addEducation")
         .education__button-label Add more Education information
 </template>
 

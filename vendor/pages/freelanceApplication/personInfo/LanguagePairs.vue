@@ -20,13 +20,13 @@
         .language-pairs__delete
             .language-pairs__button_rotated
                 Add(
-                    @makeAction="(e) => deleteElement(e, index)"
+                    @add="(e) => deleteElement(e, index)"
                 )
             span.language-pairs__button-label_opacity Delete
     transition(name="slide-fade")
         .language-pairs__button(v-if="showAddButton") 
             Add(
-                @makeAction="addLanguagePair"
+                @add="addLanguagePair"
                 )
             .language-pairs__button-label Add Language pair
 </template>

@@ -5,11 +5,11 @@
     .other-choice__buttons
         Button(
             value="Cancel"
-            @makeAction="cancelChanges"
+            @clicked="cancelChanges"
         )
         Button(
             value="Save"
-            @makeAction="saveChanges"
+            @clicked="saveChanges"
         )
 </template>
 

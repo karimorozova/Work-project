@@ -414,8 +414,6 @@
     watch: {
       selectedRate(value) {
         const regex = /[^0-9\.,]/g
-        console.log(value)
-        console.log(value,value.replace(regex, ''))
         value = parseFloat(value.replace(regex, '').replace(',', '.')) || 0
         this.selectedRate = (+value).toFixed(4)
       },

@@ -99,7 +99,6 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
       ]),
 
 			makeActions(index, key) {
-        console.log(index)
 				switch (key) {
 					case "delete":
             this.isDeleting = true

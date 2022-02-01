@@ -184,12 +184,6 @@ export default {
       setVendorBillingInfo: "setVendorBillingInfo",
       alertToggle: "alertToggle"
     }),
-    checkMethodExistingInInvoice(name) {
-      if (!this.reports.length) return true
-
-      console.log(this.reports, name)
-      return false
-    },
     async manageModalState() {
       const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
       Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
@@ -335,7 +329,6 @@ export default {
   async created() {
     await this.getAndSetPaymentTerms()
     await this.getVendorReports()
-    console.log(this.reports)
   },
   components: { CheckBox, SelectSingle, Button, ApproveModal, Add }
 

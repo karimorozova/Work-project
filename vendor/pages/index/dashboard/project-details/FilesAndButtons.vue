@@ -26,9 +26,9 @@
     .files-buttons__buttons(v-if="deliverables.length || isWithoutFile || (isButton && job.status !== 'Completed')" :class="{'files-buttons_opacity05': !job.isVendorRead}")
 
       .files-buttons__button(v-if="isStartButton")
-        Button(value="Start" :isDisabled="!job.isVendorRead" @makeAction="startJob")
+        Button(value="Start" :isDisabled="!job.isVendorRead" @clicked="startJob")
       .files-buttons__button(v-if="isCompleteButton")
-        Button(value="Complete" @makeAction="showModal")
+        Button(value="Complete" @clicked="showModal")
 
     .files-buttons__icons(v-if="areIcons && job.status !== 'Completed'")
       .files-buttons__icon(v-for="(icon, key) in icons")
@@ -172,6 +172,7 @@ export default {
       }
     },
     showModal() {
+      console.log('asd')
       this.$emit("showModal")
       this.$emit("withoutFile", this.isWithoutFile)
     }
