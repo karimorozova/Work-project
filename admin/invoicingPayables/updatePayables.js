@@ -52,7 +52,6 @@ const paidOrAddPaymentInfo = async (reportId, zohoPaymentId, data) => {
 	}
 
 	return 'Success'
-
 }
 
 const updatePayable = async (reportId, obj) => {

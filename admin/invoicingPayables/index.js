@@ -1,11 +1,11 @@
 const {
 	payablesAddSteps,
-	addStepsToPayables,
+	addStepsToPayables
 } = require('./createPayables')
 
 const {
 	payableDeleteStep,
-	payableDelete,
+	payableDelete
 } = require('./deletePayables')
 
 const {
@@ -17,23 +17,23 @@ const {
 } = require('./updatePayables')
 
 const {
-	clearPayablesStepsPrivateKeys,
+	clearPayablesStepsPrivateKeys
 } = require('./helpers')
 
 const {
 	getAllPayables,
 	getPayable,
-	getAllPayable,
+	getAllPayableByDefaultQuery,
 	getAllSteps,
 	stepsFiltersQuery,
 	payablesFiltersQuery,
-	getPayableByVendorId,
+	getPayableByVendorId
 } = require('./getPayables')
 
 const {
 	getAllPaidPayables,
 	getPaidReport,
-	getPayablePaidByVendorId,
+	getPayablePaidByVendorId
 } = require('./getPaidPayables')
 
 const {
@@ -45,7 +45,14 @@ const {
 	updatePayablesFromZoho
 } = require('./zohoBilling')
 
+const {
+	notifyVendorReportsIsSent,
+	notifyVendorReportsIsPaid
+} = require("./notification")
+
 module.exports = {
+	notifyVendorReportsIsSent,
+	notifyVendorReportsIsPaid,
 	invoiceReloadFile,
 	invoiceSubmission,
 	clearPayablesStepsPrivateKeys,
@@ -71,5 +78,5 @@ module.exports = {
 	createNewPayable,
 	updatePayableFromZoho,
 	updatePayablesFromZoho,
-	getAllPayable
+	getAllPayableByDefaultQuery
 }

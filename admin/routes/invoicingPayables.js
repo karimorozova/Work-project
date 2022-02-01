@@ -18,7 +18,9 @@ const {
 	createNewPayable,
 	updatePayableFromZoho,
 	updatePayablesFromZoho,
-	getPayableByVendorId
+	getPayableByVendorId,
+	notifyVendorReportsIsSent,
+	notifyVendorReportsIsPaid,
 } = require('../invoicingPayables')
 
 const ObjectId = require("mongodb").ObjectID
@@ -30,7 +32,7 @@ router.post("/manage-report-status", async (req, res) => {
 			case "Sent":
 				const { reportsIds } = req.body
 				await setPayablesNextStatus(reportsIds, nextStatus)
-				//TODO send nofitication
+				await notifyVendorReportsIsSent(reportsIds)
 				break
 		}
 		res.send('foo')
@@ -114,10 +116,11 @@ router.post("/reports-final-status", async (req, res) => {
 	const data = req.body
 
 	try {
-		for (let [ key, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId} ] of Object.entries(data)) {
+		for await (let [ reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId } ] of Object.entries(data)) {
 			paidAmount = paidAmount.toFixed(2)
 			const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
-			await paidOrAddPaymentInfo(key, zohoPaymentId,{ paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+			await paidOrAddPaymentInfo(reportId, zohoPaymentId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+			await notifyVendorReportsIsPaid(true, { reportId })
 		}
 		res.send('success')
 	} catch (err) {
@@ -133,6 +136,11 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 	try {
 		const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
 		const result = await paidOrAddPaymentInfo(reportId, zohoPaymentId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+
+		result === 'Success'
+				? await notifyVendorReportsIsPaid(false, { reportId })
+				: await notifyVendorReportsIsPaid(true, { reportId })
+
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -197,7 +205,6 @@ router.post("/report/:reportId/delete/:stepId", async (req, res) => {
 		res.status(500).send('Something wrong on getting steps')
 	}
 })
-
 
 router.post("/report/:reportId/steps/add", async (req, res) => {
 	const { reportId } = req.params

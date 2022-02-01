@@ -132,7 +132,7 @@
               Button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")' value="Add Jobs" @clicked="changeToggleAddSteps")
 
             .payment-button(v-if="!isPaymentCard && (this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid')" )
-              Button(value="Add Payment" @clicked="openPaymentCard")
+              Button(value="Add Payment" @clicked="openPaymentCard" :isDisabled="isRequestNow")
 
           .invoicing-details__table
             ApproveModal(
@@ -229,6 +229,7 @@ export default {
       isPaymentCard: false,
       domain: '',
       reportDetailsInfo: {},
+      isRequestNow: false,
       fields: [
         {
           label: "Project",
@@ -342,6 +343,7 @@ export default {
       return moment(date).format('DD-MM-YYYY, HH:mm')
     },
     async reportToPayment() {
+      this.isRequestNow = true
       const amount = +(parseFloat(this.amount)).toFixed(2)
       const data = {
         paidAmount: amount,
@@ -360,6 +362,7 @@ export default {
       } else {
         await this.refreshReports()
       }
+      this.isRequestNow = false
     },
     // updatePaidAmount(event) {
     //   const value = event.target.value

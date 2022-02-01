@@ -60,7 +60,7 @@ const payablesFiltersQuery = ({ reportId, vendors, billingDateTo, billingDateFro
 
 
 const getAllPayables = async (countToSkip, countToGet, query) => {
-	const invoicingReprots = await InvoicingPayables.aggregate([
+	const invoicingReports = await InvoicingPayables.aggregate([
 				{
 					$lookup: {
 						from: "projects",
@@ -80,7 +80,7 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 				{ $limit: countToGet }
 			]
 	)
-	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname', 'email' ] }))
+	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'email' ] }))
 }
 
 const getPayable = async (id) => {
@@ -115,7 +115,7 @@ const getPayable = async (id) => {
 	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
-const getAllPayable = async (query = {}) => {
+const getAllPayableByDefaultQuery = async (query = {}) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
 		{ $match: query },
 				{
@@ -246,7 +246,7 @@ module.exports = {
 	stepsFiltersQuery,
 	getAllPayables,
 	getPayable,
-	getAllPayable,
+	getAllPayableByDefaultQuery,
 	getAllSteps,
 	payablesFiltersQuery,
 	getPayablesDateRange,

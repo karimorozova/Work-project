@@ -289,27 +289,25 @@ export default {
         }
         return acc
       }, {})
-
+      this.closeApproveActionModal()
       await (this.$http.post(`/invoicing-payables/reports-final-status/`, data))
-
       await this.getReports()
-
     },
     async deleteChecked() {
+      this.closeApproveActionModal()
       await this.$http.post('/invoicing-payables/delete-reports', {
         reportIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString())
       })
-      // this.closeApproveActionModal()
       await this.getReports()
     },
     async changeTaskStatus() {
       const nextStatus = this.selectedReportAction === 'Send Report' ? 'Sent' : this.selectedReportAction
+      this.closeApproveActionModal()
       try {
         await this.$http.post('/invoicing-payables/manage-report-status', {
           reportsIds: this.reports.filter(i => i.isCheck).map(i => i._id.toString()),
           nextStatus
         })
-        // this.closeApproveActionModal()
         await this.getReports()
       } catch (error) {
         this.alertToggle({ message: "Error on Reports Actions", isShow: true, type: "error" })
@@ -455,7 +453,7 @@ export default {
       } catch (e) {
         console.log(e)
       }
-    },
+    }
   },
   computed: {
     ...mapGetters({

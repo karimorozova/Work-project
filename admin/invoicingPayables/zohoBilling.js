@@ -11,7 +11,7 @@ const { returnMessageAndType } = require("./helpers")
 const { refreshToken } = require("../services")
 const { logging } = require("googleapis/build/src/apis/logging")
 const { paidOrAddPaymentInfo } = require("./updatePayables")
-const { getPayable, getAllPayables, getAllPayable } = require("./getPayables")
+const { getPayable, getAllPayableByDefaultQuery, getAllPayable } = require("./getPayables")
 const { updatePayable } = require("./updatePayables")
 const { sendRequestToZoho } = require("../services/zoho")
 
@@ -128,7 +128,7 @@ const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, a
 
 const updatePayablesFromZoho = async () => {
 	try {
-		let allPayables = (await getAllPayable({zohoBillingId: {$ne: ''}}))
+		let allPayables = (await getAllPayableByDefaultQuery({zohoBillingId: {$ne: ''}}))
 		for (let {_id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId, paymentDetails : {paymentMethod}} of allPayables) {
 			await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount}  )
 		}

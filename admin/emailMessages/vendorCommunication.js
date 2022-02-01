@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 const logo = apiUrl + '/static/certificate-images/logo.png'
-const { Units } = require('../models')
 const moment = require('moment')
 
 function applicationMessage(obj, infoForMail) {
@@ -488,6 +487,52 @@ async function generatePO(requestInfo, fullVendor, project) {
 			</div>`
 }
 
+function invoiceReportIsReady({ yearAndMonth, reportId, vendor }) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
+                </header>
+                <div class="main" style="padding:25px;" >
+                		<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ vendor.firstName } ${ vendor.surname || '' }</span></p>
+										<p>The report for <b>${ yearAndMonth }</b> is ready for your review. You can access it from
+											<a href="https://vendor.pangea.global/billing/invoices/details/${ reportId }" target="_blank">here</a>.
+									 	</p>
+									 	<p>Please ensure that the report accurately and completely reflects your activity for the reporting month.</p>
+									 	<p>To confirm accuracy and approve the report in this format, please click “Confirm” and upload your invoice.</p>
+									 	<p>Many thanks</p>
+                </div>
+                <footer>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
+                </footer>
+            </div>`
+
+}
+
+function invoiceReportIsPaid(isFull, { vendor, _id, reportId }) {
+	const link = isFull
+			? `<a href="https://vendor.pangea.global/billing/invoices/details-paid/${ _id }" target="_blank">${ reportId }</a>`
+			: `<a href="https://vendor.pangea.global/billing/invoices/details/${ _id }" target="_blank">${ reportId }</a>`
+
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
+                </header>
+                <div class="main" style="padding:25px;" >
+                		<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ vendor.firstName } ${ vendor.surname || '' }</span></p>
+                		<p>
+                			This is to inform you that your Invoice ${ link } has been ${ isFull ? 'paid' : 'partially paid' }.
+										</p>
+										<p>Looking forward to working with you again.</p>
+										<p>Best regards</p>
+                </div>
+                <footer>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
+                </footer>
+            </div>`
+}
+
 module.exports = {
 	generatePO,
 	applicationMessage,
@@ -501,5 +546,7 @@ module.exports = {
 	stepReadyToStartMessage,
 	sendMemoqCredentials,
 	vendorRegistration,
-	vendorCanStartStartedSecondStep
+	vendorCanStartStartedSecondStep,
+	invoiceReportIsReady,
+	invoiceReportIsPaid
 }

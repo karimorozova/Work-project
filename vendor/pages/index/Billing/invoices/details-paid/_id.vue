@@ -49,7 +49,7 @@
                 span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
             .row
               .row__title Payment method:
-              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
+              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
 
             .row
               .row__title Expected payment date:
