@@ -1,5 +1,5 @@
 <template lang="pug">
-  .invoices
+  .invoices(v-if="false")
     GeneralTable(
       :fields="fields"
       :tableData="reports"
@@ -8,9 +8,6 @@
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header {{ field.label }}
-
-      template(slot="date" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.lastPaymentDate) }}
 
       template(slot="invoiceId" slot-scope="{ row, index }")
         .table__data
@@ -28,9 +25,6 @@
           span.currency(v-html="currencyIconDetected(row.client.currency)" )
           span {{ row.total }}
 
-      template(slot="icon" slot-scope="{ row, index }")
-        .table__icons(v-if="row.invoice.path" @click="() => download(row.invoice.path)")
-          i(class="fas fa-download")
 </template>
 
 <script>
@@ -45,44 +39,31 @@ export default {
     return {
       fields: [
         {
-          label: "Date",
-          headerKey: "headerDate",
-          key: "date",
-          style: { width: "15%" }
-        },
-        {
           label: "Invoice ID",
           headerKey: "headerInvoiceId",
           key: "invoiceId",
-          style: { width: "15%" }
+          style: { width: "25%" }
         },
         {
           label: "Plan",
           headerKey: "headerPlan",
           key: "plan",
-          style: { width: "35%" }
+          style: { width: "25%" }
         },
         {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { width: "15%" }
+          style: { width: "25%" }
         },
         {
           label: "Total",
           headerKey: "headerTotal",
           key: "total",
-          style: { width: "15%" }
+          style: { width: "25%" }
         },
-        {
-          label: "",
-          headerKey: "headerIcon",
-          key: "icon",
-          style: { width: "5%" }
-        }
       ],
-      reports: [],
-      domain: ''
+      reports: []
     }
   },
   methods: {
@@ -99,12 +80,6 @@ export default {
       const {  paymentType } = client.billingInfo.find(({ _id }) => _id.toString() === clientBillingInfo)
       return  paymentType
     },
-    download(path) {
-      let link = document.createElement('a')
-      link.href = this.domain + '/' +  path
-      link.target = "_blank"
-      link.click()
-    },
     currencyIconDetected(currencyStingCode) {
       switch (currencyStingCode) {
         case "EUR":
@@ -117,9 +92,6 @@ export default {
           return "&euro;"
       }
     }
-  },
-  mounted() {
-    this.domain = window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://admin.pangea.global'
   },
   async created() {
     await this.getReports()

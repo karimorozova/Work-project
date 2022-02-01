@@ -69,7 +69,13 @@ export default {
               active: false
             },
             {
-              title: "PrePayment",
+              title: "Paid Invoices",
+              path: "/billing/invoices-paid",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            },
+            {
+              title: "Pre-Payment",
               path: "/billing/pre-payment",
               img: require("../assets/images/navbar/Profile.svg"),
               active: false

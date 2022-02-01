@@ -517,17 +517,37 @@ router.get('/invoices', checkClientContact,async (req, res) => {
 	try {
 		const projectFields = {
 			"reportId": 1,
-			"lastPaymentDate": 1,
 			"clientBillingInfo": 1,
 			"client": 1,
 			"status": 1,
 			"total": 1,
-			"invoice": 1
 		}
 
-		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString())}, projectFields)
+		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
 		console.log({ reportsList })
 		res.json(reportsList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
+	}
+})
+
+router.get('/invoice/:invoiceId', checkClientContact,async (req, res) => {
+	const { invoiceId } = req.params
+
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		// const projectFields = {
+		// 	"reportId": 1,
+		// 	"clientBillingInfo": 1,
+		// 	"client": 1,
+		// 	"status": 1,
+		// 	"total": 1,
+		// }
+
+		const reportList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)})
+		res.json(reportList)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on rollback-review')
