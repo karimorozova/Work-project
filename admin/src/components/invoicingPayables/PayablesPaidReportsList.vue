@@ -26,8 +26,8 @@
           label Date Range:
           .filter__input
             DatePicker.range-with-one-panel(
-              :value="selectedBillingDateRange"
-              @input="(e) => setBillingDateRange(e)"
+              :value="selectedDeadlineDateRange"
+              @input="(e) => setDeadlineDateRange(e)"
               format="DD-MM-YYYY, HH:mm"
               prefix-class="xmx"
               range-separator=" - "
@@ -36,7 +36,7 @@
               range
               placeholder="Select datetime range"
             )
-          .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+          .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
             i.fas.fa-backspace.backspace-long
 
       .reports__container
@@ -182,15 +182,15 @@ export default {
 
       reportId: '',
       vendors: '',
-      billingDateFrom: '',
-      billingDateTo: '',
+      deadlineDateFrom: '',
+      deadlineDateTo: '',
       status: '',
 
       dataVariables: [
         'reportId',
         'vendors',
-        'billingDateFrom',
-        'billingDateTo',
+        'deadlineDateFrom',
+        'deadlineDateTo',
         'status'
       ],
 
@@ -199,11 +199,11 @@ export default {
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
-    removeSelectedBillingDateRange() {
+    removeSelectedDeadlineDateRange() {
       let query = this.$route.query
       this.$router.replace({
         path: this.$route.path,
-        query: { ...query, billingDateFrom: '', billingDateTo: '' }
+        query: { ...query, deadlineDateFrom: '', deadlineDateTo: '' }
       })
     },
     getTime(date) {
@@ -219,15 +219,15 @@ export default {
       const { value } = e.target
       this.replaceRoute('reportId', value)
     },
-    setBillingDateRange(e) {
+    setDeadlineDateRange(e) {
       let query = this.$route.query
-      delete query.billingDateFrom
-      delete query.billingDateTo
+      delete query.deadlineDateFrom
+      delete query.deadlineDateTo
       this.$router.replace({
         path: this.$route.path,
         query: {
-          ...query, billingDateFrom: new Date(e[0]).getTime(),
-          billingDateTo: new Date(e[1]).getTime()
+          ...query, deadlineDateFrom: new Date(e[0]).getTime(),
+          deadlineDateTo: new Date(e[1]).getTime()
         }
       })
     },
@@ -314,9 +314,9 @@ export default {
     allVendors() {
       return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
     },
-    selectedBillingDateRange() {
-      return this.$route.query.billingDateFrom
-          ? [ new Date(+this.$route.query.billingDateFrom), new Date(+this.$route.query.billingDateTo) ]
+    selectedDeadlineDateRange() {
+      return this.$route.query.deadlineDateFrom
+          ? [ new Date(+this.$route.query.deadlineDateFrom), new Date(+this.$route.query.deadlineDateTo) ]
           : [ null, null ]
     },
     reportIdValue() {

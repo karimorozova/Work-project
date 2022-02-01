@@ -4,14 +4,14 @@ const { InvoicingPayables, Projects } = require("../models")
 
 
 const getPayablesDateRange = (steps) => {
-	return steps.reduce((acc, { billingDate }) => {
-		acc.firstPaymentDate = moment.min(moment(billingDate.toString()), moment(acc.firstPaymentDate)).toISOString()
-		acc.lastPaymentDate = moment.max(moment(billingDate.toString()), moment(acc.lastPaymentDate)).toISOString()
+	return steps.reduce((acc, { deadline }) => {
+		acc.firstPaymentDate = moment.min(moment(deadline.toString()), moment(acc.firstPaymentDate)).toISOString()
+		acc.lastPaymentDate = moment.max(moment(deadline.toString()), moment(acc.lastPaymentDate)).toISOString()
 		return acc
 	}, { firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20, 'years') })
 }
 
-const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, billingDateTo, billingDateFrom, step }, allLanguages) => {
+const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, deadlineDateTo, deadlineDateFrom, step }, allLanguages) => {
 	const q = {}
 	if (vendors) {
 		q["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
@@ -28,14 +28,14 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 	if (step) {
 		q["steps.stepAndUnit.step.title"] = step
 	}
-	if (!!billingDateTo && !!billingDateFrom) {
-		q["billingDate"] = { $gte: new Date(+billingDateFrom), $lt: new Date(+billingDateTo) }
+	if (!!deadlineDateTo && !!deadlineDateFrom) {
+		q["deadline"] = { $gte: new Date(+deadlineDateFrom), $lt: new Date(+deadlineDateTo) }
 	}
 
 	return q
 }
 
-const payablesFiltersQuery = ({ reportId, vendors, billingDateTo, billingDateFrom, status }) => {
+const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateFrom, status }) => {
 	const q = {}
 	const reg = /[.*+?^${}()|[\]\\]/g
 
@@ -50,14 +50,13 @@ const payablesFiltersQuery = ({ reportId, vendors, billingDateTo, billingDateFro
 		q["status"] = status
 	}
 
-	if (!!billingDateTo && !!billingDateFrom) {
-		q['firstPaymentDate'] = { $gte: new Date(+billingDateFrom) }
-		q['lastPaymentDate'] = { $lt: new Date(+billingDateTo) }
+	if (!!deadlineDateTo && !!deadlineDateFrom) {
+		q['firstPaymentDate'] = { $gte: new Date(+deadlineDateFrom) }
+		q['lastPaymentDate'] = { $lt: new Date(+deadlineDateTo) }
 	}
 
 	return q
 }
-
 
 const getAllPayables = async (countToSkip, countToGet, query) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
@@ -69,6 +68,7 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.nativeFinance.Price.projectName": '$projectName' } },
+							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
 						],
 						as: "stepFinance"
@@ -89,25 +89,29 @@ const getPayable = async (id) => {
 				{
 					$lookup: {
 						from: "projects",
-						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						let: {
+							'steps': '$steps'
+						},
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.projectNativeId": '$_id' } },
 							{ "$addFields": { "steps.projectName": '$projectName' } },
-							{ "$addFields": { " steps.billingDate": '$billingDate' } },
+							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps' } }
 						],
 						as: "steps"
 					}
 				},
-				{ $addFields: {
+				{
+					$addFields: {
 						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
-						paidAmount: { $sum: "$paymentInformation.paidAmount" },
+						paidAmount: { $sum: "$paymentInformation.paidAmount" }
 					}
 				},
-				{ $addFields: {
-						unpaidAmount: { $subtract: ["$totalPrice", "$paidAmount" ] },
+				{
+					$addFields: {
+						unpaidAmount: { $subtract: [ "$totalPrice", "$paidAmount" ] }
 					}
 				}
 			]
@@ -117,29 +121,33 @@ const getPayable = async (id) => {
 
 const getAllPayableByDefaultQuery = async (query = {}) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
-		{ $match: query },
+				{ $match: query },
 				{
 					$lookup: {
 						from: "projects",
-						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						let: {
+							'steps': '$steps'
+						},
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.projectNativeId": '$_id' } },
 							{ "$addFields": { "steps.projectName": '$projectName' } },
-							{ "$addFields": { " steps.billingDate": '$billingDate' } },
+							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps' } }
 						],
 						as: "steps"
 					}
 				},
-				{ $addFields: {
+				{
+					$addFields: {
 						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
-						paidAmount: { $sum: "$paymentInformation.paidAmount" },
+						paidAmount: { $sum: "$paymentInformation.paidAmount" }
 					}
 				},
-				{ $addFields: {
-						unpaidAmount: { $subtract: ["$totalPrice", "$paidAmount" ] },
+				{
+					$addFields: {
+						unpaidAmount: { $subtract: [ "$totalPrice", "$paidAmount" ] }
 					}
 				}
 			]
@@ -154,11 +162,13 @@ const getPayableByVendorId = async (id) => {
 				{
 					$lookup: {
 						from: "projects",
-						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						let: {
+							'steps': '$steps'
+						},
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-							{ "$addFields": { "steps.billingDate": '$billingDate' } },
+							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps' } }
 						],
 						as: "steps"
@@ -182,7 +192,7 @@ const getPayableByVendorId = async (id) => {
 }
 
 const getPayablesProjectsAndSteps = async (id) => {
-	const invoicingReprots = await InvoicingPayables.aggregate([
+	const invoicingReports = await InvoicingPayables.aggregate([
 		{ $match: { "_id": ObjectId(id) } },
 		{
 			$lookup: {
@@ -196,12 +206,11 @@ const getPayablesProjectsAndSteps = async (id) => {
 			}
 		} ]
 	)
-	return (await InvoicingPayables.populate(invoicingReprots, [ 'vendor' ]))
+	return (await InvoicingPayables.populate(invoicingReports, [ 'vendor' ]))
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	const queryPipeline = [
-		// { $match: { status: "Closed" } },
 		{ $unwind: "$steps" },
 		{
 			$match: {
@@ -227,7 +236,6 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				'projectName': 1,
 				'deadline': 1,
 				'startDate': 1,
-				'billingDate': 1,
 				'currentVendor': { $arrayElemAt: [ "$steps.vendor", 0 ] }
 			}
 		},

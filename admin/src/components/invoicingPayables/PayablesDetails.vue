@@ -172,8 +172,8 @@
                     i(class="fas fa-angle-double-right")
                   | {{ row.targetLanguage }}
 
-              template(slot="billing" slot-scope="{ row, index }")
-                .table__data {{ formattedDate(row.billingDate) }}
+              template(slot="deadline" slot-scope="{ row, index }")
+                .table__data {{ formattedDate(row.deadline) }}
 
               template(slot="status" slot-scope="{ row, index }")
                 .table__data {{ row.status }}
@@ -250,9 +250,9 @@ export default {
           style: { width: "13%" }
         },
         {
-          label: "Billing Date",
+          label: "Deadline",
           headerKey: "headerBilling",
-          key: "billing",
+          key: "deadline",
           style: { width: "11%" }
         },
         {

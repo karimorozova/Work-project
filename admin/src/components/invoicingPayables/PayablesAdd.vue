@@ -53,11 +53,11 @@
               @removeOption="removeSettingStep"
             )
         .filter__itemLong
-          label Billing Date Range:
+          label Deadline Date Range:
           .filter__input
             DatePicker.range-with-one-panel(
-              :value="selectedBillingDateRange"
-              @input="(e) => setBillingDateRange(e)"
+              :value="selectedDeadlineDateRange"
+              @input="(e) => setDeadlineDateRange(e)"
               format="DD-MM-YYYY, HH:mm"
               prefix-class="xmx"
               range-separator=" - "
@@ -66,7 +66,7 @@
               range
               placeholder="Select datetime range"
             )
-          .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+          .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
             i.fas.fa-backspace.backspace-long
 
       .invoicing-payables-add__table
@@ -105,9 +105,6 @@
 
           template(slot="deadline" slot-scope="{ row, index }")
             .table__data {{ formattedDate(row.deadline) }}
-
-          template(slot="billingDate" slot-scope="{ row, index }")
-            .table__data {{ formattedDate(row.billingDate) }}
 
           template(slot="service" slot-scope="{ row, index }")
             .table__data {{ row.steps.stepAndUnit.step.title }}
@@ -176,43 +173,37 @@ export default {
           label: "Vendor",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "185px" }
+          style: { width: "200px" }
         },
         {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "190px" }
+          style: { width: "230px" }
         },
         {
           label: "Step",
           headerKey: "headerService",
           key: "service",
-          style: { width: "120px" }
+          style: { width: "140px" }
         },
         {
           label: "Language Pair",
           headerKey: "headerLangPair",
           key: "langPair",
-          style: { width: "140px" }
+          style: { width: "145px" }
         },
         {
           label: "Start Date",
           headerKey: "headerStartDate",
           key: "startDate",
-          style: { width: "110px" }
+          style: { width: "130px" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { width: "110px" }
-        },
-        {
-          label: "Billing Date",
-          headerKey: "headerBillingDate",
-          key: "billingDate",
-          style: { width: "110px" }
+          style: { width: "130px" }
         },
         {
           label: "Status",
@@ -231,37 +222,37 @@ export default {
       vendors: '',
       sourceLanguages: '',
       targetLanguages: '',
-      billingDateFrom: '',
-      billingDateTo: '',
+      deadlineDateFrom: '',
+      deadlineDateTo: '',
       step: '',
 
       dataVariables: [
         'vendors',
         'sourceLanguages',
         'targetLanguages',
-        'billingDateFrom',
-        'billingDateTo',
+        'deadlineDateFrom',
+        'deadlineDateTo',
         'step'
       ]
     }
   },
   methods: {
-    removeSelectedBillingDateRange() {
+    removeSelectedDeadlineDateRange() {
       let query = this.$route.query
       this.$router.replace({
         path: this.$route.path,
-        query: { ...query, billingDateFrom: '', billingDateTo: '' }
+        query: { ...query, deadlineDateFrom: '', deadlineDateTo: '' }
       })
     },
-    setBillingDateRange(e) {
+    setDeadlineDateRange(e) {
       let query = this.$route.query
-      delete query.billingDateFrom
-      delete query.billingDateTo
+      delete query.deadlineDateFrom
+      delete query.deadlineDateTo
       this.$router.replace({
         path: this.$route.path,
         query: {
-          ...query, billingDateFrom: new Date(e[0]).getTime(),
-          billingDateTo: new Date(e[1]).getTime()
+          ...query, deadlineDateFrom: new Date(e[0]).getTime(),
+          deadlineDateTo: new Date(e[1]).getTime()
         }
       })
     },
@@ -430,9 +421,9 @@ export default {
     selectedStep() {
       return this.$route.query.step || ''
     },
-    selectedBillingDateRange() {
-      return this.$route.query.billingDateFrom
-          ? [ new Date(+this.$route.query.billingDateFrom), new Date(+this.$route.query.billingDateTo) ]
+    selectedDeadlineDateRange() {
+      return this.$route.query.deadlineDateFrom
+          ? [ new Date(+this.$route.query.deadlineDateFrom), new Date(+this.$route.query.deadlineDateTo) ]
           : [ null, null ]
     },
     isAllSelected() {

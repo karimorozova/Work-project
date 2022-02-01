@@ -78,7 +78,7 @@ export default {
       reportsPaid: [],
       fields: [
         {
-          label: "Report Id",
+          label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
           style: { width: "20%" }

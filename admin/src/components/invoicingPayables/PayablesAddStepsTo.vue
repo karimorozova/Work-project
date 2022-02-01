@@ -36,9 +36,6 @@
         template(slot="deadline" slot-scope="{ row, index }")
           .table__data {{ formattedDate(row.deadline) }}
 
-        template(slot="billingDate" slot-scope="{ row, index }")
-          .table__data {{ formattedDate(row.billingDate) }}
-
         template(slot="service" slot-scope="{ row, index }")
           .table__data {{ row.steps.stepAndUnit.step.title }}
 
@@ -98,49 +95,43 @@ export default {
           label: "Projects",
           headerKey: "headerProject",
           key: "project",
-          style: { width: "12%" }
+          style: { width: "13%" }
         },
         {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "14%" }
+          style: { width: "16%" }
         },
         {
           label: "Vendor",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "12%" }
+          style: { width: "13%" }
         },
         {
           label: "Step",
           headerKey: "headerService",
           key: "service",
-          style: { width: "10%" }
+          style: { width: "11%" }
         },
         {
           label: "Language Pair",
           headerKey: "headerLangPair",
           key: "langPair",
-          style: { width: "8%" }
+          style: { width: "9%" }
         },
         {
           label: "Start Date",
           headerKey: "headerStartDate",
           key: "startDate",
-          style: { width: "8%" }
+          style: { width: "9%" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { width: "8%" }
-        },
-        {
-          label: "Billing Date",
-          headerKey: "headerBillingDate",
-          key: "billingDate",
-          style: { width: "8%" }
+          style: { width: "9%" }
         },
         {
           label: "Status",

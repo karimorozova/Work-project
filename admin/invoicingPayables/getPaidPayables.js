@@ -3,7 +3,7 @@ const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 
 
 const getAllPaidPayables = async (countToSkip, countToGet, query) => {
-	const invoicingReprots = await InvoicingPayablesArchive.aggregate([
+	const invoicingReports = await InvoicingPayablesArchive.aggregate([
 				{
 					$lookup: {
 						from: "projects",
@@ -23,7 +23,7 @@ const getAllPaidPayables = async (countToSkip, countToGet, query) => {
 				{ $limit: countToGet }
 			]
 	)
-	return (await InvoicingPayables.populate(invoicingReprots, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
+	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
 const getPaidReport = async (id) => {
@@ -32,13 +32,15 @@ const getPaidReport = async (id) => {
 				{
 					$lookup: {
 						from: "projects",
-						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						let: {
+							'steps': '$steps'
+						},
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.projectNativeId": '$_id' } },
 							{ "$addFields": { "steps.projectName": '$projectName' } },
-							{ "$addFields": { "steps.billingDate": '$billingDate' } },
+							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps' } }
 						],
 						as: "steps"
@@ -55,12 +57,14 @@ const getReportPaidByVendorId = async (id) => {
 				{
 					$lookup: {
 						from: "projects",
-						let: { 'steps': '$steps', 'steps2': '$billingDate' },
+						let: {
+							'steps': '$steps'
+						},
 						pipeline: [
 							{ "$unwind": "$steps" },
 							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.projectName": '$projectName' } },
-							{ "$addFields": { "steps.billingDate": '$billingDate' } },
+							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps' } }
 						],
 						as: "steps"

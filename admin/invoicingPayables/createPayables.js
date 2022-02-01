@@ -5,14 +5,14 @@ const { getPayablesProjectsAndSteps, getPayablesDateRange } = require("./getPaya
 const { createDir } = require("./PayablesFilesAndDirecrory")
 
 const payablesAddSteps = async (reportId, stepsId) => {
-	await InvoicingPayables.updateOne({_id: reportId }, {$push: {'steps': {$each: stepsId}} })
+	await InvoicingPayables.updateOne({ _id: reportId }, { $push: { 'steps': { $each: stepsId } } })
 
 	const currentPayable = (await getPayablesProjectsAndSteps(reportId)).pop()
 
 	const { firstPaymentDate, lastPaymentDate } = getPayablesDateRange(currentPayable.steps)
 
-	await InvoicingPayables.updateOne({_id: reportId },
-			{$set: {firstPaymentDate, lastPaymentDate}})
+	await InvoicingPayables.updateOne({ _id: reportId },
+			{ $set: { firstPaymentDate, lastPaymentDate } })
 
 	await Projects.updateMany(
 			{ 'steps._id': { $in: stepsId } },
@@ -24,9 +24,12 @@ const payablesAddSteps = async (reportId, stepsId) => {
 const addStepsToPayables = async (projects, createdBy) => {
 	let groupedProjectsByVendor = {}
 
-	const stepsVendors = projects.map(({ currentVendor }) => currentVendor._id )
-	const existsVendors = (await InvoicingPayables.find({vendor: {$in: stepsVendors}, $or: [{status: 'Created'}, {status: 'Sent'}]}, {vendor: 1, firstPaymentDate: 1, lastPaymentDate: 1}, {lean: 'toObject'}))
-
+	const stepsVendors = projects.map(({ currentVendor }) => currentVendor._id)
+	const existsVendors = (await InvoicingPayables.find({ vendor: { $in: stepsVendors }, $or: [ { status: 'Created' }, { status: 'Sent' } ] }, {
+		vendor: 1,
+		firstPaymentDate: 1,
+		lastPaymentDate: 1
+	}, { lean: 'toObject' }))
 
 
 	const lastIndex = await InvoicingPayables.findOne().sort({ 'reportId': -1 })
@@ -34,7 +37,7 @@ const addStepsToPayables = async (projects, createdBy) => {
 
 	const lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 100
 	const lastIntIndexFromArchive = lastIndexInArchive != null ? parseInt(lastIndexInArchive.reportId.split('_').pop()) : 0
-	let lastMaxIndex = Math.max(lastIntIndexFromArchive,lastIntIndex)
+	let lastMaxIndex = Math.max(lastIntIndexFromArchive, lastIntIndex)
 
 	let allSteps = []
 	for (const project of projects) {
@@ -43,15 +46,15 @@ const addStepsToPayables = async (projects, createdBy) => {
 		if (groupedProjectsByVendor.hasOwnProperty(projectVendorId)) {
 			const currentProject = groupedProjectsByVendor[projectVendorId]
 			currentProject.steps.push(project.steps._id)
-			currentProject.firstPaymentDate = moment.min(moment(currentProject.firstPaymentDate), moment(project.billingDate)).toISOString()
-			currentProject.lastPaymentDate = moment.max(moment(currentProject.lastPaymentDate), moment(project.billingDate)).toISOString()
+			currentProject.firstPaymentDate = moment.min(moment(currentProject.firstPaymentDate), moment(project.deadline)).toISOString()
+			currentProject.lastPaymentDate = moment.max(moment(currentProject.lastPaymentDate), moment(project.deadline)).toISOString()
 		} else {
 			groupedProjectsByVendor[projectVendorId] = {
 				vendor: projectVendorId,
 				status: INVOICING_STATUSES.CREATED,
 				steps: [ project.steps._id ],
-				firstPaymentDate: project.billingDate,
-				lastPaymentDate: project.billingDate,
+				firstPaymentDate: project.deadline,
+				lastPaymentDate: project.deadline,
 				file: {},
 				createdBy: createdBy,
 				updatedBy: createdBy,
@@ -63,15 +66,15 @@ const addStepsToPayables = async (projects, createdBy) => {
 
 
 	for await (const report of Object.values(groupedProjectsByVendor)) {
-		const foundInDB = existsVendors.find(({vendor}) => vendor.toString() === report.vendor.toString())
+		const foundInDB = existsVendors.find(({ vendor }) => vendor.toString() === report.vendor.toString())
 		const DIR = './dist/vendorReportsFiles/'
 
-		if ( foundInDB  && foundInDB.hasOwnProperty('_id')) {
-			const firstPaymentDate =  moment.min(moment(foundInDB.firstPaymentDate), moment(report.firstPaymentDate)).toISOString()
-			const lastPaymentDate =  moment.max(moment(foundInDB.lastPaymentDate), moment(report.lastPaymentDate)).toISOString()
-			await  InvoicingPayables.updateOne({_id: foundInDB._id}, {$set: {lastPaymentDate, firstPaymentDate}, $push: {steps: {$each: report.steps}}} )
+		if (foundInDB && foundInDB.hasOwnProperty('_id')) {
+			const firstPaymentDate = moment.min(moment(foundInDB.firstPaymentDate), moment(report.firstPaymentDate)).toISOString()
+			const lastPaymentDate = moment.max(moment(foundInDB.lastPaymentDate), moment(report.lastPaymentDate)).toISOString()
+			await InvoicingPayables.updateOne({ _id: foundInDB._id }, { $set: { lastPaymentDate, firstPaymentDate }, $push: { steps: { $each: report.steps } } })
 		} else {
-			const { _id } = await InvoicingPayables.create({...report, reportId: 'RPT_' + (++lastMaxIndex + '').padStart(6, "0")})
+			const { _id } = await InvoicingPayables.create({ ...report, reportId: 'RPT_' + (++lastMaxIndex + '').padStart(6, "0") })
 			await createDir(DIR, _id.toString())
 		}
 
@@ -82,4 +85,4 @@ const addStepsToPayables = async (projects, createdBy) => {
 	}
 }
 
-module.exports = { payablesAddSteps, addStepsToPayables}
+module.exports = { payablesAddSteps, addStepsToPayables }

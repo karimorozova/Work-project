@@ -97,8 +97,8 @@
                   i(class="fas fa-angle-double-right")
                 | {{ row.targetLanguage }}
 
-            template(slot="billing" slot-scope="{ row, index }")
-              .table__data {{ formattedDate(row.billingDate) }}
+            template(slot="deadline" slot-scope="{ row, index }")
+              .table__data {{ formattedDate(row.deadline) }}
 
             template(slot="payables" slot-scope="{ row, index }")
               .table__data
@@ -139,7 +139,7 @@ export default {
       reportDetailsInfo: {},
       fields: [
         {
-          label: "Step Id",
+          label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
           style: { width: "35%" }
@@ -151,10 +151,10 @@ export default {
           style: { width: "18%" }
         },
         {
-          label: "Billing Date",
+          label: "Deadline",
           headerKey: "headerBilling",
-          key: "billing",
-          style: { width: "16%" }
+          key: "deadline",
+          style: { width: "17%" }
         },
         {
           label: "Language Pair",
@@ -166,7 +166,7 @@ export default {
           label: "Fee ",
           headerKey: "headerPayables",
           key: "payables",
-          style: { width: "12%" }
+          style: { width: "11%" }
         }
       ]
     }
