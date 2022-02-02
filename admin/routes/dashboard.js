@@ -7,6 +7,7 @@ const { sendRequest } = require("../projects/xtrfApi")
 const axios = require("axios")
 const { Projects, ClientsTasks, ClientsNotes} = require("../models")
 const moment = require("moment")
+const { getAllProjectFinanceStats } = require("../dashboard/projectsStats")
 
 
 router.post("/finance-view", async (req, res) => {
@@ -36,6 +37,16 @@ router.get("/all-client-requests", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on Finance getting')
+	}
+})
+
+router.get("/projects-finance", async (req, res) => {
+	try {
+	  const financeStats =  await	getAllProjectFinanceStats()
+		res.json(financeStats)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on Finance Stats getting')
 	}
 })
 
