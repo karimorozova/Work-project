@@ -18,6 +18,7 @@ const getClientForPortal = async (obj) => {
 				"projectManager": 1,
 				"timeZone": 1,
 				"services": 1,
+				"servicesGroups": 1,
 				"contacts.timezone": 1,
 				"contacts.leadContact": 1,
 				"contacts._id": 1,
