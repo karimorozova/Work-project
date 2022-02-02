@@ -89,7 +89,6 @@
               :clearable="false"
               :confirm="true"
               confirm-text="Set date"
-              :disabled-date="notBeforeStartDate"
               :disabled="isProjectFinished"
               prefix-class="xmx"
             )
@@ -219,11 +218,11 @@ export default {
     // notBeforeToday(date) {
     //   return date < new Date(new Date().setHours(0, 0, 0, 0));
     // },
-    notBeforeStartDate(date) {
-      let d = new Date()
-      d.setDate(d.getDate() - 1)
-      return date < d
-    },
+    // notBeforeStartDate(date) {
+    //   let d = new Date()
+    //   d.setDate(d.getDate() - 1)
+    //   return date < d
+    // },
     async updateBrief() {
       if (this.isProjectFinished) return
       await this.setProjectProp({ prop: 'brief', value: this.project.brief })

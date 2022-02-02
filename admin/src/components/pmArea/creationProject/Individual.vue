@@ -30,7 +30,6 @@
                 :clearable="false"
                 :confirm="true"
                 confirm-text="Set date"
-                :disabled-date="notBeforeNow"
                 prefix-class="xmx"
                 placeholder="Date"
               )
@@ -85,11 +84,6 @@ export default {
     },
     updateProjectDate(date) {
       this.project.deadline = date
-    },
-    notBeforeNow(date) {
-      let now = new Date()
-      now.setDate(now.getDate() - 1)
-      return date < now
     },
     async createProject() {
       this.project.industry = this.project.selectedIndustry._id
