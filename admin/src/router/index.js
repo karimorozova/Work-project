@@ -17,6 +17,7 @@ import TableIndustries from '@/components/Table/TableIndustries'
 import TablePaymentTerms from "@/components/Table/TablePaymentTerms"
 import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
+import MinimumPaymentVendorAmount from "../components/Table/MinimumPaymentVendorAmount"
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
 import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
@@ -29,7 +30,6 @@ import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
 import StepsDashboard from '@/components/dashboard/StepsDashboard'
-// import Xtrf from '@/components/reports/Xtrf'
 import OverallView from '@/components/dashboard/OverallView'
 import Activity from '@/components/dashboard/Activity'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
@@ -67,7 +67,6 @@ import PayablesPaidReportsList from "../components/invoicingPayables/PayablesPai
 import PayablesDetails from "../components/invoicingPayables/PayablesDetails"
 import PayablesAdd from "../components/invoicingPayables/PayablesAdd"
 import PayablesPaidDetails from "../components/invoicingPayables/PayablesPaidDetails"
-
 
 import ReceivablesReportsList from "../components/invoicingReceivables/ReceivablesReportsList"
 import ReceivablesPaidReportsList from "../components/invoicingReceivables/ReceivablesPaidReportsList"
@@ -225,6 +224,11 @@ const router = new Router({
 							path: 'industry-lqas',
 							name: 'industry-lqas',
 							component: IndustryLqa
+						},
+						{
+							path: 'vendor-minimum-benchmark',
+							name: 'vendor-minimum-benchmark',
+							component: MinimumPaymentVendorAmount
 						},
 						{
 							path: 'users',

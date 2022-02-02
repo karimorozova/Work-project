@@ -15,6 +15,7 @@ const notifyVendorReportsIsSent = async (reportsIds) => {
 		const [ { vendor } ] = await getPayable(reportId)
 		await sendFlexibleEmail({
 			subject,
+			nickName: 'Pangea Support',
 			from: 'support@pangea.global',
 			to: vendor.email
 		}, invoiceReportIsReady({
@@ -34,6 +35,7 @@ const notifyVendorReportsIsPaid = async (isFull, { reportId: _id }) => {
 	const subject = `Your Invoice ${ reportId } has been ${ isFull ? 'paid' : 'partially paid' }  (V013.0)`
 	await sendFlexibleEmail({
 		subject,
+		nickName: 'Pangea Support',
 		from: 'support@pangea.global',
 		to: vendor.email
 	}, invoiceReportIsPaid(isFull, {

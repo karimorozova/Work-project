@@ -3,6 +3,14 @@ const fs = require('fs')
 const { upload, moveFile } = require('../utils/')
 
 const {
+	Languages,
+	ClientsApiSetting,
+	Vendors,
+	Clients,
+	VendorPaymentBenchmark
+} = require('../models')
+
+const {
 	updateLanguage,
 	getTierInfo,
 	updateTierInfo,
@@ -14,8 +22,31 @@ const {
 	deletePaymentTerms
 } = require('../settings')
 
-const { getSimpleClients } = require('../clients')
-const { Languages, ClientsApiSetting, Vendors, Clients } = require('../models')
+const {
+	getSimpleClients
+} = require('../clients')
+
+router.put('/vendor-payment-benchmark/:value', async (req, res) => {
+	const { value } = req.params
+	try {
+		const { _id } = await VendorPaymentBenchmark.findOne({})
+		await VendorPaymentBenchmark.updateOne({ _id }, { value })
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.get('/vendor-payment-benchmark', async (req, res) => {
+	try {
+		const result = await VendorPaymentBenchmark.findOne({})
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]

@@ -44,6 +44,7 @@ const InvoicingPayablesArchive = require('./invoicingPayablesArchive')
 const PaymentTerms = require('./paymentTerms')
 const InvoicingReceivables = require('./invoicingReceivables')
 const invoicingReceivablesArchive = require('./invoicingReceivablesArchive')
+const VendorPaymentBenchmark = require('./Settings/DefaultVendorPaymentBanchmark')
 
 const Models = {
   InvoicingReceivables,
@@ -92,6 +93,7 @@ const Models = {
   InvoicingPayables,
   InvoicingPayablesArchive,
   PaymentTerms,
+  VendorPaymentBenchmark
 };
 
 module.exports = Models;

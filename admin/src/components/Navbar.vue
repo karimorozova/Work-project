@@ -449,6 +449,11 @@ export default {
             },
             {
               type: 'link',
+              name: 'Default Vendor Benchmark',
+              path: '/pangea-settings/vendor-minimum-benchmark'
+            },
+            {
+              type: 'link',
               name: 'Users',
               path: '/pangea-settings/users'
             },

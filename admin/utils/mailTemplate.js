@@ -74,7 +74,7 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 	return new Promise((res, rej) => {
 		let mailOptions = {
-			from: mailSettings.from, // sender address
+			from: `${ mailSettings.nickName } ${ mailSettings.from }`, // sender address
 			to: `${ mailSettings.to }`, // pm@pangea.global list of receivers
 			subject: `${ mailSettings.subject }`, // Subject line
 			text: "", // plain text body

@@ -3,15 +3,45 @@
     .content
       .amount Amount:
       .input
-        input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
+        input(type="text" placeholder="Value" :value="value" @change="setValue" @keyup.13="setValue")
         span.currency &euro;
 
 
 </template>
 
 <script>
+import { mapActions } from "vuex"
+
 export default {
-  name: "MinimumPaymentVendorAmount"
+  name: "MinimumPaymentVendorAmount",
+  data() {
+    return {
+      value: null
+    }
+  },
+  methods: {
+    ...mapActions([ 'alertToggle' ]),
+    async setValue(e) {
+      try {
+        await this.$http.put(`/api-settings/vendor-payment-benchmark/${ e.target.value }`)
+        this.alertToggle({ message: "Updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Error on setting Value", isShow: true, type: "error" })
+      } finally {
+        await this.getValue()
+      }
+    },
+    async getValue() {
+      try {
+        this.value = (await this.$http.get('/api-settings/vendor-payment-benchmark')).data.value
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Value", isShow: true, type: "error" })
+      }
+    }
+  },
+  created() {
+    this.getValue()
+  }
 }
 </script>
 

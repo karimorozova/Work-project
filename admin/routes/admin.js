@@ -139,8 +139,8 @@ router.delete("/user/:id", requiresLogin, async (req, res) => {
 
 router.get('/requests', requiresLogin, async (req, res, next) => {
 	try {
-		const requests = await Requests.find()
-		res.send(requests)
+		// const requests = await Requests.find()
+		res.send('')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Requests from DB ")
