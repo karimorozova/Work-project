@@ -105,7 +105,7 @@ router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
 	try {
 		const { paymentMethod, reportsIds, notes } = req.body
 		const [ report ] = await getPayable(reportsIds[0])
-		let { _id, vendor, reportId, steps, paymentDetails } = report
+		let { _id, vendor, reportId, steps, paymentDetails, lastPaymentDate } = report
 		const vendorName = vendor.firstName + ' ' + vendor.surname
 
 		if (!vendor.billingInfo.hasOwnProperty('paymentTerm') || !vendor.billingInfo.paymentTerm._id) {
@@ -115,15 +115,20 @@ router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
 			vendor = await getVendorAfterUpdate({ _id: vendor._id }, { billingInfo })
 		}
 
-		const lineItems = steps.reduce((acc, step) => {
-			acc.push({
-				"name": step.stepId,
-				"account_id": "335260000002330131",
-				"rate": step.nativeFinance.Price.payables,
-				"quantity": 1
-			})
+		const rate = steps.reduce((acc, { nativeFinance }) => {
+			acc += nativeFinance.Price.payables
 			return acc
-		}, [])
+		}, 0)
+
+		const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
+
+		const lineItems = [{
+			"name": `TS ${monthAndYear}`,
+			"account_id": "335260000002330131",
+			"rate": rate,
+			"quantity": 1
+
+		}]
 
 		const expectedPaymentDate = moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD')
 		paymentDetails.paymentMethod = paymentMethod
