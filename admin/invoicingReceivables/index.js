@@ -30,6 +30,7 @@ const {
 const {
 	getAllPaidReceivables,
 	getPaidReceivables,
+	getAllPaidReceivablesFromDbWithProject,
 } = require('./getPaidReceivables')
 
 const {
@@ -65,4 +66,5 @@ module.exports = {
 	getAllPaidReceivables,
 	getPaidReceivables,
 	createCustomerPayment,
+	getAllPaidReceivablesFromDbWithProject,
 }

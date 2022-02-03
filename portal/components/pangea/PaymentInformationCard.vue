@@ -11,15 +11,11 @@
         .row__value {{ customFormatter(cardInfo.paymentDate) }}
 
     .body
-      .row.margin
-        .row__title Payment Method
-        .row__value {{ cardInfo.paymentMethod }}
+
       .row.margin
         .row__title Currency
         .row__value EUR
-      .row.margin
-        .row__title Expected Payment Date
-        .row__value {{ customFormatter(paymentDetails.expectedPaymentDate) }}
+
       .row
         .row__title Unpaid Amount
         .row__value € {{ cardInfo.unpaidAmount }}
@@ -41,9 +37,6 @@ export default {
     cardInfo: {
       type: Object
     },
-    paymentDetails: {
-      type: Object
-    }
   },
   methods: {
     customFormatter(date) {

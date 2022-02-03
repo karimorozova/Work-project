@@ -41,7 +41,7 @@ const {
 	updateAccountDetails
 } = require('../users')
 const { ObjectId } = require("mongoose/lib/types")
-const { getAllReportsFromDb } = require("../invoicingReceivables")
+const { getAllReportsFromDb, getAllPaidReceivablesFromDbWithProject } = require("../invoicingReceivables")
 
 router.post('/translation-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
 	try {
@@ -524,7 +524,30 @@ router.get('/invoices', checkClientContact,async (req, res) => {
 		}
 
 		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
-		console.log({ reportsList })
+		res.json(reportsList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
+	}
+})
+
+router.get('/invoices-paid', checkClientContact,async (req, res) => {
+	// const { clientId } = req.params
+	//
+	// let client = await getClient({ "_id": verificationResult.clientId })
+	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+		}
+
+		const reportsList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
 		res.json(reportsList)
 	} catch (err) {
 		console.log(err)
@@ -538,15 +561,66 @@ router.get('/invoice/:invoiceId', checkClientContact,async (req, res) => {
 	const  token  = req.headers['token-header']
 	const verificationResult = jwt.verify(token, secretKey)
 	try {
-		// const projectFields = {
-		// 	"reportId": 1,
-		// 	"clientBillingInfo": 1,
-		// 	"client": 1,
-		// 	"status": 1,
-		// 	"total": 1,
-		// }
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+			"stepsAndProjects": 1,
+			"stepsWithProject.projectName": 1,
+			"stepsWithProject.projectId": 1,
+			"stepsWithProject.stepId": 1,
+			"stepsWithProject.type": 1,
+			"stepsWithProject.stepAndUnit": 1,
+			"stepsWithProject.title": 1,
+			"stepsWithProject.sourceLanguage": 1,
+			"stepsWithProject.targetLanguage": 1,
+			"stepsWithProject.deadline": 1,
+			"stepsWithProject.projectCurrency": 1,
+			"stepsWithProject.finance.Price": 1,
+			"stepsWithProject.projectNativeId": 1,
+			"invoice": 1,
+			"paymentInformation": 1,
+		}
 
-		const reportList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)})
+		const reportList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)}, projectFields)
+		res.json(reportList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
+	}
+})
+router.get('/invoice-paid/:invoiceId', checkClientContact,async (req, res) => {
+	const { invoiceId } = req.params
+
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+			"stepsAndProjects": 1,
+			"stepsWithProject.projectName": 1,
+			"stepsWithProject.projectId": 1,
+			"stepsWithProject.stepId": 1,
+			"stepsWithProject.type": 1,
+			"stepsWithProject.stepAndUnit": 1,
+			"stepsWithProject.title": 1,
+			"stepsWithProject.sourceLanguage": 1,
+			"stepsWithProject.targetLanguage": 1,
+			"stepsWithProject.deadline": 1,
+			"stepsWithProject.projectCurrency": 1,
+			"stepsWithProject.finance.Price": 1,
+			"stepsWithProject.projectNativeId": 1,
+			"invoice": 1,
+			"paymentInformation": 1,
+		}
+
+		const reportList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)}, projectFields)
 		res.json(reportList)
 	} catch (err) {
 		console.log(err)

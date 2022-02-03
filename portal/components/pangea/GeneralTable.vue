@@ -288,8 +288,9 @@ input {
 
     &-close {
       position: absolute;
-      right: 14px;
-      top: 8px;
+      font-size: 16px;
+      right: 10px;
+      top: 1px;
     }
   }
 }
@@ -385,5 +386,15 @@ tbody tr:hover {
 
 .shortBody {
   max-height: 252px;
+}
+.icon-wrapper {
+    transition: .2s ease-out;
+    color: $dark-border;
+    cursor: pointer;
+
+    &:hover {
+      color: $text;
+    }
+
 }
 </style>

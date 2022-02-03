@@ -1,10 +1,15 @@
 <template lang="pug">
-  .invoicing-details
-    .invoicing-details__main-info(v-if="reportDetailsInfo.client")
-      .invoicing-details__text
-        .text__block
-          .text__title Billing Name:
-          .text__value {{ billingDetails.name }}
+  .invoicing-details(v-if="reportDetailsInfo.client")
+    .invoicing-details__main-info
+      .invoicing-details__table.style-wrapper
+        Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
+        ReportsByJob(v-if="selectedTab === 'Per Job'" :stepsWithProject="reportDetailsInfo.stepsWithProject" )
+        ReportsByProject(v-if="selectedTab === 'Per Project'" :stepsWithProject="reportDetailsInfo.stepsWithProject" )
+
+      .invoicing-details__side-card.style-wrapper
+        .text__main-block
+          .text__block-title {{ billingDetails.officialName }}
+          .text__text-gray {{address}}
 
         .text__block
           .text__title Status:
@@ -40,79 +45,46 @@
         .text__block
           .text__title Total Amount:
           .text__value
+            span.currency(v-html="'&euro;'")
             span(style="margin-right: 4px;") {{ reportDetailsInfo.total  }}
-            span(v-html="'&euro;'")
 
-      .invoicing-details__table
-        GeneralTable(
-          :fields="fields"
-          :tableData="reportDetailsInfo.stepsWithProject"
+        .text__block(v-if="this.reportDetailsInfo.status !== 'Created' && reportDetailsInfo.invoice.path")
+          .text__title Invoice:
+          .text__button
+            IconButton(@clicked="downloadFile(reportDetailsInfo.invoice.path)")
+              i(class="fa-solid fa-download")
+
+
+    .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
+      .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
+        PaymentInformationCard(
+          :cardInfo="cardInfo"
         )
-          template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-            .table__header {{ field.label }}
 
-          template(slot="jobId" slot-scope="{ row, index }")
-            .table__data
-              .id
-                span {{row.stepId}}
-              //router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              .short
-                span {{ row.projectName }}
-
-          template(slot="step" slot-scope="{ row, index }")
-            .table__data {{row.type === 'Classic' ? row.stepAndUnit.step.title : row.title}}
-
-          template(slot="langPair" slot-scope="{ row, index }")
-            .table__data(v-html="getStepPair(row)")
-
-          template(slot="fee" slot-scope="{ row, index }")
-            span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-            span {{ row.finance.Price.receivables.toFixed(2) }}
-
-    .invoicing-details__payments
-      //PaymentInformationCard(:cardInfo="reportDetailsInfo.")
 
 </template>
 
 <script>
 import moment from "moment"
-import GeneralTable from "../../../../../components/pangea/GeneralTable"
+import ReportsByJob from "../../../../../components/pangea/invoicing/ReportsByJob"
+import ReportsByProject from "../../../../../components/pangea/invoicing/ReportsByProject"
+import Tabs from "../../../../../components/pangea/Tabs"
 import PaymentInformationCard from "../../../../../components/pangea/PaymentInformationCard"
+import IconButton from "../../../../../components/pangea/IconButton"
 
 export default {
   components: {
-    GeneralTable,
+    Tabs,
+    IconButton,
+    ReportsByJob,
+    ReportsByProject,
     PaymentInformationCard
   },
   data() {
     return {
+      tabs: [ "Per Job", "Per Project"],
+      selectedTab: "Per Job",
       reportDetailsInfo: [],
-      fields: [
-        {
-          label: "Job ID",
-          headerKey: "headerJobId",
-          key: "jobId",
-          style: { width: "40%" }
-        },
-        {
-          label: "Service",
-          headerKey: "headerStep",
-          key: "step",
-          style: { width: "25%" }
-        },
-        {
-          label: "Language Pair",
-          headerKey: "headerLangPair",
-          key: "langPair",
-          style: { width: "25%" }
-        },
-        {
-          label: "Fee",
-          headerKey: "headerfee",
-          key: "fee",
-          style: { width: "10%" }
-        },
-      ]
     }
   },
   methods: {
@@ -132,23 +104,26 @@ export default {
           ? `${ step.targetLanguage }`
           : `<span>${ step.sourceLanguage }</span><span style="font-size: 12px;color: #9c9c9c;margin: 0 4px;"><i class="fas fa-angle-double-right"></i></span><span>${ step.targetLanguage }</span>`
     },
-    returnIconCurrencyByStringCode(currencyStingCode) {
-      switch (currencyStingCode) {
-        case "EUR":
-          return "&nbsp;&euro;&nbsp;";
-        case "USD":
-          return "&nbsp;&#36;&nbsp;";
-        case "GBP":
-          return "&nbsp;&pound;&nbsp;";
-        default:
-          return "&nbsp;&euro;&nbsp;";
-      }
-    }
+    setTab({index}) {
+      this.selectedTab = this.tabs[index]
+    },
+    downloadFile(path) {
+      const domain = window.location.hostname === 'localhost'
+          ? 'http://localhost:3001'
+          : 'https://admin.pangea.global'
+      let link = document.createElement('a')
+      link.href = domain + '/' + path
+      link.target = "_blank"
+      link.click()
+    },
   },
   computed: {
     billingDetails() {
       const { billingInfo } = this.reportDetailsInfo.client
       return  billingInfo.find(item => item._id.toString() === this.reportDetailsInfo.clientBillingInfo.toString())
+    },
+    address() {
+      return `${ this.billingDetails.address.street1 || 'No street' },  ${ this.billingDetails.address.city || 'No city' }, ${ this.billingDetails.address.country || 'No country' }`
     }
   },
   async created() {
@@ -159,19 +134,24 @@ export default {
 
 <style scoped lang="scss">
 @import "assets/scss/colors";
-.invoicing-details {
-  width: 980px;
+
+.style-wrapper {
   box-sizing: border-box;
   border-radius: 4px;
   background-color: #fff;
   box-shadow: $box-shadow;
   padding: 25px;
+}
 
+.invoicing-details {
   &__main-info{
     display: flex;
-    justify-content: space-between;
   }
 
+  &__cards {
+    display: flex;
+    flex-wrap: wrap;
+  }
 
   &__text {
     width: 300px;
@@ -184,7 +164,14 @@ export default {
   }
 
   &__table {
-    width: 590px;
+    width: 1000px;
+  }
+
+
+  &__side-card {
+    width: 290px;
+    margin-left: 25px;
+    height: fit-content;
   }
 
   .text {
@@ -198,12 +185,27 @@ export default {
       }
     }
     &__title {
-      width: 200px;
+      width: 120px;
+      color: $dark-border;
+    }
+
+    &__main-block {
+      border-bottom: 1px solid $border;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+    }
+
+    &__block-title  {
+      font-size: 18px;
+      font-family: Myriad600;
+      margin-bottom: 5px;
+    }
+    &__text-gray {
       color: $dark-border;
     }
 
     &__value {
-      width: 140px;
+      width: 100px;
       position: relative;
 
       a {
@@ -223,58 +225,8 @@ export default {
     color: $dark-border;
   }
 
-  .short {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    max-width: 146px;
-    opacity: 0.3;
-  }
-
 }
 
-.table {
-  width: 100%;
 
-  &__data {
-    padding: 0 7px;
-  }
 
-  &__header {
-    padding: 0 7px;
-  }
-
-  &__drop {
-    position: relative;
-    height: 32px;
-    max-width: 220px;
-    margin: 0 7px;
-    width: 100%;
-    background: white;
-    border-radius: 4px;
-  }
-
-  &__icons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  &__icon {
-    cursor: pointer;
-    opacity: 0.5;
-  }
-
-  &__opacity {
-    opacity: 1;
-  }
-
-  &__input {
-    width: 100%;
-    padding: 0 7px;
-  }
-}
 </style>

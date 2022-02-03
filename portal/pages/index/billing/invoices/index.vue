@@ -3,8 +3,6 @@
     GeneralTable(
       :fields="fields"
       :tableData="reports"
-      :isFilterShow="false"
-      :isBodyShort="false"
     )
       template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
         .table__header {{ field.label }}
