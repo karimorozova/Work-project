@@ -302,7 +302,7 @@ export default {
     },
     async approveCancelAction() {
       if (!this.checkedTasks.length) return this.closeApproveModal()
-      const validCancelStatuses = [ 'Created', 'Approved', 'Rejected', 'Quote Sent', 'In progress' ]
+      const validCancelStatuses = [ 'Created', 'Approved', 'Rejected', 'Quote sent', 'In progress' ]
       const filteredTasks = this.checkedTasks.filter(item => validCancelStatuses.indexOf(item.status) !== -1)
       if (filteredTasks.length) {
         try {
