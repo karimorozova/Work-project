@@ -17,7 +17,8 @@ const {
 	TierInfo,
 	IndustryTierInfo,
 	PaymentTerms,
-	VendorPaymentBenchmark
+	PaymentMethods,
+	PaymentMethodsKeys
 } = require("../models")
 
 const {
@@ -39,6 +40,7 @@ const {
 	defaultTierInfo,
 	defaultIndustryTierInfo
 } = require("./defaults")
+const { Schema } = require("mongoose")
 
 async function fillInstructions() {
 	try {
@@ -433,6 +435,32 @@ async function fillPaymentTerms() {
 	}
 }
 
+async function fillPaymentMethods() {
+	const methods = await PaymentMethods.countDocuments()
+	const methodsKeys = await PaymentMethodsKeys.countDocuments()
+
+	if (!methodsKeys && !methods) {
+		await PaymentMethodsKeys.create({ "key": "Email" })
+		await PaymentMethodsKeys.create({ "key": "IBAN" })
+		await PaymentMethodsKeys.create({ "key": "SWIFT/BIC" })
+		await PaymentMethodsKeys.create({ "key": "Bank Account Name" })
+
+		const keys = await PaymentMethodsKeys.find()
+		await PaymentMethods.create({
+			name: 'PayPal',
+			minimumAmount: 50,
+			isActive: true,
+			keys: keys.filter(item => item.key === 'Email')
+		})
+		await PaymentMethods.create({
+			name: 'Bank Details',
+			minimumAmount: 100,
+			isActive: true,
+			keys: keys
+		})
+	}
+}
+
 async function checkCollections() {
 	await fillInstructions()
 	await fillCancelReasons()
@@ -454,6 +482,7 @@ async function checkCollections() {
 	await fillTierInfo()
 	await fillIndustryTierInfo()
 	await fillPaymentTerms()
+	await fillPaymentMethods()
 }
 
 module.exports = {
