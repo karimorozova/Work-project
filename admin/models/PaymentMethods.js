@@ -10,13 +10,14 @@ const PaymentMethodsSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	active: {
+	isActive: {
 		type: Boolean,
 		default: false
 	},
 	keys: [{
 		type: Schema.Types.ObjectId,
-		ref: 'PaymentMethodsKeys'
+		ref: 'PaymentMethodsKey',
+		default: null
 	}]
 
 });

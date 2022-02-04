@@ -433,16 +433,6 @@ async function fillPaymentTerms() {
 	}
 }
 
-async function fillDefaultVendorPaymentBenchmark() {
-
-	const industryTierCount = await VendorPaymentBenchmark.countDocuments()
-	if (industryTierCount > 0) return
-	try {
-		await VendorPaymentBenchmark.create({ "value": 50 })
-	} catch (e) {
-	}
-}
-
 async function checkCollections() {
 	await fillInstructions()
 	await fillCancelReasons()
@@ -464,7 +454,6 @@ async function checkCollections() {
 	await fillTierInfo()
 	await fillIndustryTierInfo()
 	await fillPaymentTerms()
-	await fillDefaultVendorPaymentBenchmark()
 }
 
 module.exports = {

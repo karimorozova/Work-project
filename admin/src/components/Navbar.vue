@@ -449,8 +449,8 @@ export default {
             },
             {
               type: 'link',
-              name: 'Default Vendor Benchmark',
-              path: '/pangea-settings/vendor-minimum-benchmark'
+              name: 'Payment Methods',
+              path: '/pangea-settings/payment-methods'
             },
             {
               type: 'link',
@@ -475,7 +475,7 @@ export default {
       setLanguages: "setLanguages",
       setAllUsers: "setAllUsers",
       setIndustries: "setIndustries",
-      setSteps: "setSteps",
+      setSteps: "setSteps"
       // setVendorsForOption: 'setVendorsForOption',
       // setClientsForOption: 'setClientsForOption'
     }),

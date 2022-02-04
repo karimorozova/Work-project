@@ -44,7 +44,6 @@ const InvoicingPayablesArchive = require('./invoicingPayablesArchive')
 const PaymentTerms = require('./paymentTerms')
 const InvoicingReceivables = require('./invoicingReceivables')
 const invoicingReceivablesArchive = require('./invoicingReceivablesArchive')
-const VendorPaymentBenchmark = require('./Settings/DefaultVendorPaymentBanchmark')
 const PaymentMethods = require('./PaymentMethods')
 const PaymentMethodsKeys = require('./PaymentMethodsKeys')
 
@@ -95,7 +94,6 @@ const Models = {
   InvoicingPayables,
   InvoicingPayablesArchive,
   PaymentTerms,
-  VendorPaymentBenchmark,
   PaymentMethods,
   PaymentMethodsKeys,
 };

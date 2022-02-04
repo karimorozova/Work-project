@@ -2,20 +2,20 @@ const { PaymentMethods, PaymentMethodsKeys } = require('../models')
 
 
 const getAllPaymentMethods = async (query = {}) => {
-	return (await PaymentMethods.find(query))
+	return (await PaymentMethods.find(query).populate('keys'))
 }
 
-const createPaymentMethod = async (newData) => {
-	await PaymentMethods.create(newData)
+const createPaymentMethod = async ({ name, minimumAmount, isActive, keys }) => {
+	await PaymentMethods.create({ name, minimumAmount, isActive, keys })
 	return await getAllPaymentMethods()
 }
 
-const updatePaymentMethod = async (paymentId, newData) => {
-	await PaymentMethods.findByIdAndUpdate(paymentId, newData)
-	return getAllPaymentMethods()
+const updatePaymentMethod = async (paymentId, { name, minimumAmount, isActive, keys }) => {
+	await PaymentMethods.findByIdAndUpdate(paymentId, { name, minimumAmount, isActive, keys })
+	return await getAllPaymentMethods()
 }
 
-const removePaymentMethod = async  (paymentId) => {
+const removePaymentMethod = async (paymentId) => {
 	await PaymentMethods.findByIdAndDelete(paymentId)
 	return await getAllPaymentMethods()
 }
@@ -34,10 +34,10 @@ const createPaymentMethodKeys = async (newData) => {
 
 const updatePaymentMethodKeys = async (paymentId, newData) => {
 	await PaymentMethodsKeys.findByIdAndUpdate(paymentId, newData)
-	return getAllPaymentMethodsKeys()
+	return await getAllPaymentMethodsKeys()
 }
 
-const removePaymentMethodKeys = async  (paymentId) => {
+const removePaymentMethodKeys = async (paymentId) => {
 	await PaymentMethodsKeys.findByIdAndDelete(paymentId)
 	return await getAllPaymentMethodsKeys()
 }
@@ -50,5 +50,5 @@ module.exports = {
 	getAllPaymentMethodsKeys,
 	createPaymentMethodKeys,
 	updatePaymentMethodKeys,
-	removePaymentMethodKeys,
+	removePaymentMethodKeys
 }

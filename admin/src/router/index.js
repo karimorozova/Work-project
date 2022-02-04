@@ -17,7 +17,6 @@ import TableIndustries from '@/components/Table/TableIndustries'
 import TablePaymentTerms from "@/components/Table/TablePaymentTerms"
 import Instructions from '@/components/Table/Instructions'
 import CancelReasons from '@/components/Table/CancelReasons'
-import MinimumPaymentVendorAmount from "../components/Table/MinimumPaymentVendorAmount"
 import TierLqas from '@/components/Table/TierLqas'
 import Users from '@/components/Table/Users'
 import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
@@ -40,6 +39,7 @@ import clearRouterView from "../components/clearRouterView"
 import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
 import QuoteDecision from '../components/pmArea/QuoteDecision'
 import CreationLayout from "../components/pmArea/creationProject/CreationLayout"
+import PaymentMethodsLayout from "../components/Table/PaymentMethods/Layout"
 
 
 // LIST ================================================================================================
@@ -226,9 +226,9 @@ const router = new Router({
 							component: IndustryLqa
 						},
 						{
-							path: 'vendor-minimum-benchmark',
-							name: 'vendor-minimum-benchmark',
-							component: MinimumPaymentVendorAmount
+							path: 'payment-methods',
+							name: 'payment-methods',
+							component: PaymentMethodsLayout
 						},
 						{
 							path: 'users',

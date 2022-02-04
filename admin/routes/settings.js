@@ -7,7 +7,6 @@ const {
 	ClientsApiSetting,
 	Vendors,
 	Clients,
-	VendorPaymentBenchmark
 } = require('../models')
 
 const {
@@ -33,28 +32,6 @@ const {
 const {
 	getSimpleClients
 } = require('../clients')
-
-router.put('/vendor-payment-benchmark/:value', async (req, res) => {
-	const { value } = req.params
-	try {
-		const { _id } = await VendorPaymentBenchmark.findOne({})
-		await VendorPaymentBenchmark.updateOne({ _id }, { value })
-		res.send('Done!')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on vendor-payment-benchmark')
-	}
-})
-
-router.get('/vendor-payment-benchmark', async (req, res) => {
-	try {
-		const result = await VendorPaymentBenchmark.findOne({})
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on vendor-payment-benchmark')
-	}
-})
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]
@@ -243,9 +220,9 @@ router.get('/payment-methods', async (req, res) => {
 })
 
 router.post('/payment-methods', async (req, res) => {
-	const {name, minimumAmount, active, keys} = req.body
+	const {name, minimumAmount, isActive, keys} = req.body
 	try {
-		const paymentsMethods = await createPaymentMethod({ name, minimumAmount, active, keys })
+		const paymentsMethods = await createPaymentMethod({ name, minimumAmount, isActive, keys })
 		res.json(paymentsMethods)
 	} catch (err) {
 		console.log(err)
@@ -255,9 +232,9 @@ router.post('/payment-methods', async (req, res) => {
 
 router.put('/payment-methods/:id', async (req, res) => {
 	const { id } = req.params
-	const {name, minimumAmount, active, keys} = req.body
+	const {name, minimumAmount, isActive, keys} = req.body
 	try {
-		const paymentsMethods = await updatePaymentMethod(id, { name, minimumAmount, active, keys })
+		const paymentsMethods = await updatePaymentMethod(id, { name, minimumAmount, isActive, keys })
 		res.json(paymentsMethods)
 	} catch (err) {
 		console.log(err)
@@ -275,9 +252,6 @@ router.delete('/payment-methods/:id', async (req, res) => {
 		res.status(500).send('Error on vendor-payment-benchmark')
 	}
 })
-
-
-
 
 router.get('/payment-methods-keys', async (req, res) => {
 	try {
