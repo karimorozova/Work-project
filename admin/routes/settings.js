@@ -19,7 +19,15 @@ const {
 	getClientsApi,
 	getPaymentTerms,
 	managePaymentTerms,
-	deletePaymentTerms, getAllPaymentMethods, createPaymentMethod, getAllPaymentMethodsKeys, createPaymentMethodKeys, removePaymentMethodKeys, updatePaymentMethodKeys
+	deletePaymentTerms,
+	getAllPaymentMethods,
+	createPaymentMethod,
+	getAllPaymentMethodsKeys,
+	createPaymentMethodKeys,
+	removePaymentMethodKeys,
+	updatePaymentMethodKeys,
+	removePaymentMethod,
+	updatePaymentMethod
 } = require('../settings')
 
 const {
@@ -237,37 +245,36 @@ router.get('/payment-methods', async (req, res) => {
 router.post('/payment-methods', async (req, res) => {
 	const {name, minimumAmount, active, keys} = req.body
 	try {
-		await createPaymentMethod({ name, minimumAmount, active, keys })
-		res.send('Done!')
+		const paymentsMethods = await createPaymentMethod({ name, minimumAmount, active, keys })
+		res.json(paymentsMethods)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on vendor-payment-benchmark')
 	}
 })
 
-// router.put('/payment-methods/:id', async (req, res) => {
-// 	const { id } = req.params
-// 	try {
-// 		const { _id } = await VendorPaymentBenchmark.findOne({})
-// 		await VendorPaymentBenchmark.updateOne({ _id }, { value })
-// 		res.send('Done!')
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on vendor-payment-benchmark')
-// 	}
-// })
-//
-// router.delete('/payment-methods/:id', async (req, res) => {
-// 	const { id } = req.params
-// 	try {
-// 		const { _id } = await VendorPaymentBenchmark.findOne({})
-// 		await VendorPaymentBenchmark.updateOne({ _id }, { value })
-// 		res.send('Done!')
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on vendor-payment-benchmark')
-// 	}
-// })
+router.put('/payment-methods/:id', async (req, res) => {
+	const { id } = req.params
+	const {name, minimumAmount, active, keys} = req.body
+	try {
+		const paymentsMethods = await updatePaymentMethod(id, { name, minimumAmount, active, keys })
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.delete('/payment-methods/:id', async (req, res) => {
+	const { id } = req.params
+	try {
+		const paymentsMethods = await removePaymentMethod(id)
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
 
 
 
