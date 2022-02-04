@@ -607,6 +607,9 @@ export default {
       this.selectedTab = this.listOfStepsTitles[index]
       this.currentStepId = null
       this.currentStep = null
+      this.vendorsSearch = ''
+      this.isAllVendors = false
+      this.isEditable = false
     },
     chooseStep(step) {
       this.isReassignment = false
@@ -634,14 +637,15 @@ export default {
         }
       }
     },
-    setEditableDefaults() {
+    setEditableDefaults(step) {
       this.currentStepId = step._id.toString()
       this.currentStep = step
       this.selectedSource = step.fullSourceLanguage.lang
       this.selectedTarget = step.fullTargetLanguage.lang
       this.selectedUnit = step.payablesUnit.type
       this.selectedStep = step.step.title
-      this.selectedIndustry = this.currentProject.industry.name
+      this.selectedIndustry = this.currentProject.industry.name,
+          this.vendorsSearch = ''
     },
     closeVendorManage() {
       this.$emit('closeVendorManage')
