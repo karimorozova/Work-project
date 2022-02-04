@@ -1,5 +1,8 @@
+import { mapActions } from "vuex"
+
 export default {
 	methods: {
+		...mapActions([ 'alertToggle' ]),
 		previewPhoto() {
 			let input = document.getElementsByClassName('photo-file')[0]
 			if (this.checkFile(input.files)) {
@@ -22,6 +25,7 @@ export default {
 		},
 		showFileError(input) {
 			this.isFileError = true
+			this.alertToggle({ message: "Incorrect file type or size", isShow: true, type: 'error' })
 			input.value = ""
 			setTimeout(() => {
 				this.isFileError = false
@@ -31,7 +35,7 @@ export default {
 			if (files && files[0]) {
 				const types = [ 'jpg', 'jpeg', 'png' ]
 				const type = files[0].name.split('.').pop()
-				return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 2000000
+				return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 3000000
 			}
 			return false
 		}

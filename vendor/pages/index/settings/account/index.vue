@@ -76,6 +76,9 @@
                 placeholder="Your Gender"
                 @chooseOption="({option}) => setValue(option, 'gender')"
               )
+          .Rside__col
+            label Skype:
+            input(type="text" autocomplete="off" :value="getActualField('skype')" placeholder="Value" @change="(e) => setValue(e.target.value, 'skype')")
 
         .Rside__title(style="margin-top: 25px;") Security
         .Rside__row
@@ -210,7 +213,8 @@ export default {
           phone: this.vendor.phone,
           timezone: this.vendor.timezone,
           native: this.vendor.native,
-          gender: this.vendor.gender
+          gender: this.vendor.gender,
+          skype: this.vendor.skype
         }
         let formData = new FormData()
         formData.append("id", this.vendor._id)

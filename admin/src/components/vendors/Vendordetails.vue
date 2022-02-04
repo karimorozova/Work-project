@@ -4,8 +4,7 @@
     .vendor-info(v-if="currentVendor._id")
 
       .vendor-info__block
-        .block__data(v-if="isGeneralInformation" style="border: none;")
-          VendorMainInfo
+        VendorMainInfo
 
       .vendor-info__preview(v-if="isEditAndSend")
         WYSIWYG(
@@ -216,33 +215,32 @@
         input.button(type="button", value="Delete", @click="approveVendorDelete")
 
     .vendor-subinfo(v-if="currentVendor._id")
-      .vendor-subinfo__general
-        .vendor-subinfo__title {{getVendorUpdatedData.vendorId}}
-        .block-item-subinfo
-          label.block-item-subinfo__label Vendor Status:
-            span.require *
-          .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(
-            :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !getVendorUpdatedData.status }"
-          )
-            SelectSingle(:options="statuses"
-              placeholder="Vendor Status"  :selectedOption="getVendorUpdatedData.status", @chooseOption="chosenStatus")
-        .block-item-subinfo
-          label.block-item-subinfo__label Professional level:
-          .block-item-subinfo__drop.block-item-subinfo_high-index
-            SelectSingle(
-              :options="['level1', 'level2']",
-              placeholder="Level",
-              :selectedOption="optionProfessionalLevel",
-              @chooseOption="updateProfessionalLevel"
-            )
-        .block-item-subinfo
-          label.block-item-subinfo__label Test:
-          .block-item-subinfo__check-item.checkbox
-            input#test(type="checkbox", :checked="currentVendor.isTest", @change="setTest")
-            label(for="test")
+      VendorSubDetails(
+        :vendor="currentVendor"
+        @setVendorProp="setVendorProp"
+      )
+      VendorAction(
+        @openPreview="openPreview"
+        @openVendor="openVendor"
+      )
+      //.vendor-subinfo__general
+      //  .vendor-subinfo__title {{getVendorUpdatedData.vendorId}}
+      //  .block-item-subinfo
+      //    label.block-item-subinfo__label Vendor Status:
+      //      span.require *
+      //    .block-item-subinfo__drop.block-item-subinfo_maxhigh-index(
+      //      :class="{ 'block-item-subinfo_error-shadow': isSaveClicked && !getVendorUpdatedData.status }"
+      //    )
+      //      SelectSingle(:options="statuses"
+      //        placeholder="Vendor Status"  :selectedOption="getVendorUpdatedData.status", @chooseOption="chosenStatus")
+      //
+      //  .block-item-subinfo
+      //    label.block-item-subinfo__label Test:
+      //    .block-item-subinfo__check-item.checkbox
+      //      input#test(type="checkbox", :checked="currentVendor.isTest", @change="setTest")
+      //      label(for="test")
 
-      .vendor-subinfo__action
-        VendorAction(@openPreview="openPreview" @openVendor="openVendor")
+
 
     ValidationErrors(v-if="areErrorsExist", :errors="errors", @closeErrors="closeErrors")
 </template>
@@ -277,12 +275,12 @@ import SaveCancelPopUp from "../SaveCancelPopUp"
 import Tabs from "../Tabs"
 import FinanceMatrixWithReset from "./pricelists/FinanceMatrixWithReset"
 import VendorBillingInfo from "./VendorBillingInfo"
+import VendorSubDetails from "./VendorSubDetails"
 
 export default {
   mixins: [ photoPreview ],
   data() {
     return {
-      isGeneralInformation: true,
       isPendingCompetencies: false,
       isCompetencies: false,
       isQualifications: false,
@@ -346,17 +344,27 @@ export default {
       updateCurrentVendor: "updateCurrentVendor",
       deleteCurrentVendor: "deleteCurrentVendor",
       storeCurrentVendor: "storeCurrentVendor",
-      // updateIndustry: "updateIndustry",
-      getDuoCombinations: "getVendorDuoCombinations",
       updateVendorStatus: "updateVendorStatus",
       setVendorsMatrixData: "setVendorsMatrixData",
       setDefaultValuesMatrixData: "setDefaultValuesMatrixData",
       initCurrentVendorGeneralData: "initCurrentVendorGeneralData",
       updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-      updateVendorGeneralData: "updateVendorGeneralData",
       updateVendorRatesByKey: 'updateVendorRatesFromServer',
       updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo'
     }),
+    async setVendorProp({ prop, value }) {
+      if (prop === 'isTest') {
+        await this.setTest(value)
+        return
+      }
+      try {
+        this.currentVendor[prop] = value
+        await this.updateCurrentVendor({ vendor: JSON.stringify(this.currentVendor) })
+        this.alertToggle({ message: "Updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Not Updated", isShow: true, type: "error" })
+      }
+    },
     toggleBlock(prop) {
       this[prop] = !this[prop]
     },
@@ -462,16 +470,16 @@ export default {
         this.isRefreshAfterServiceUpdate = !action
       }, 1000)
     },
-    async setTest(event) {
+    async setTest(bool) {
       const vendor = {
         id: this.currentVendor._id,
-        isTest: event.target.checked
+        isTest: bool
       }
       try {
         await this.updateVendorStatus(vendor)
-        this.alertToggle({ message: "Vendor status updated", isShow: true, type: "success" })
+        this.alertToggle({ message: "Updated", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({ message: "Server error / Cannot update Vendor status", isShow: true, type: "error" })
+        this.alertToggle({ message: "Server error / Cannot update Vendor TEST status", isShow: true, type: "error" })
       }
     },
     closePreview() {
@@ -498,12 +506,6 @@ export default {
         this.alertToggle({ message: err.message, isShow: true, type: 'error' })
       }
       this.closePreview()
-    },
-    closeLangPairs() {
-      this.isAvailablePairs = false
-    },
-    deleteVendor() {
-      this.isApproveModal = true
     },
     cancelApprove() {
       this.isApproveModal = false
@@ -536,19 +538,15 @@ export default {
       }
     },
     async checkForErrors() {
-      const textReg = /^[-\sa-zA-Z]+$/
       try {
         this.errors = []
         // TODO: don't delete commits
-        // if (!this.getVendorUpdatedData.firstName || !textReg.test(this.getVendorUpdatedData.firstName))
         if (!this.getVendorUpdatedData.firstName)
           this.errors.push("Please, enter valid first name.")
         if (/^\s+$/.exec(this.getVendorUpdatedData.firstName)) {
           this.errors.push("Please, enter valid first name.")
         }
-        // if (this.getVendorUpdatedData.surname && !textReg.test(this.getVendorUpdatedData.surname))
         if (!this.getVendorUpdatedData.surname) this.errors.push("Please, enter valid surname.")
-        // if (!this.getVendorUpdatedData.industries.length) this.errors.push("Please, choose at least one industry.")
         if (!this.getVendorUpdatedData.status) this.errors.push("Please, choose status.")
         await this.checkEmail()
         if (this.errors.length) {
@@ -574,19 +572,12 @@ export default {
         this.initCurrentVendorGeneralData(this.currentVendor)
         this.oldEmail = this.getVendorUpdatedData.email
         this.$socket.emit('updatedVendorData', { id: this.$route.params.id })
-        // this.$socket.emit('updatedVendorData', {id:  this.$route.params.id, data: this.getVendorUpdatedData})
         this.alertToggle({ message: "Vendor info updated", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
       } finally {
         this.closeErrors()
       }
-    },
-    updateProfessionalLevel({ option }) {
-      this.updateCurrentVendorGeneralData({ key: "professionalLevel", value: option })
-    },
-    chosenStatus({ option }) {
-      this.updateCurrentVendorGeneralData({ key: "status", value: option })
     },
     cancel() {
       this.initCurrentVendorGeneralData(this.currentVendor)
@@ -633,7 +624,7 @@ export default {
     }),
     isChangedVendorGeneralInfo() {
       if (this.currentVendor.hasOwnProperty('firstName')) {
-        let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'gender', 'status', 'professionalLevel', 'notes' ]
+        let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'gender', 'professionalLevel', 'notes' ]
         let billKeys = [ 'officialName', 'paymentTerm', 'address', 'email' ]
 
         for (let key of keys) if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
@@ -649,6 +640,7 @@ export default {
     }
   },
   components: {
+    VendorSubDetails,
     FinanceMatrixWithReset,
     Tabs,
     SaveCancelPopUp,
@@ -805,14 +797,6 @@ export default {
     background-color: white;
   }
 
-  &__action {
-    margin-top: 40px;
-    border-radius: 4px;
-    width: 390px;
-    margin-left: 40px;
-    box-shadow: $box-shadow;
-    background-color: white;
-  }
 }
 
 .block {
@@ -924,67 +908,67 @@ export default {
   }
 }
 
-#test {
-  width: 0;
-}
+//#test {
+//  width: 0;
+//}
 
-.checkbox {
-  display: flex;
-  height: 28px;
-
-  input[type="checkbox"] {
-    opacity: 0;
-
-    + {
-      label {
-        &::after {
-          content: none;
-        }
-      }
-    }
-
-    &:checked {
-      + {
-        label {
-          &::after {
-            content: "";
-          }
-        }
-      }
-    }
-  }
-
-  label {
-    position: relative;
-    display: inline-block;
-    padding-left: 22px;
-    padding-top: 4px;
-
-    &::before {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid $border;
-      left: 0px;
-      top: 3px;
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
-    }
-  }
-}
+//.checkbox {
+//  display: flex;
+//  height: 28px;
+//
+//  input[type="checkbox"] {
+//    opacity: 0;
+//
+//    + {
+//      label {
+//        &::after {
+//          content: none;
+//        }
+//      }
+//    }
+//
+//    &:checked {
+//      + {
+//        label {
+//          &::after {
+//            content: "";
+//          }
+//        }
+//      }
+//    }
+//  }
+//
+//  label {
+//    position: relative;
+//    display: inline-block;
+//    padding-left: 22px;
+//    padding-top: 4px;
+//
+//    &::before {
+//      position: absolute;
+//      content: "";
+//      display: inline-block;
+//      height: 16px;
+//      width: 16px;
+//      border: 1px solid $border;
+//      left: 0px;
+//      top: 3px;
+//    }
+//
+//    &::after {
+//      position: absolute;
+//      content: "";
+//      display: inline-block;
+//      height: 5px;
+//      width: 9px;
+//      border-left: 2px solid;
+//      border-bottom: 2px solid;
+//      transform: rotate(-45deg);
+//      left: 4px;
+//      top: 7px;
+//    }
+//  }
+//}
 
 .buttons {
   display: flex;

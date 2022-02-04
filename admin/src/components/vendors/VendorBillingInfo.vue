@@ -11,6 +11,7 @@
           @notApprove="closeApproveModal"
         )
 
+    //PAYMENT MODAL START ==>>
     .payment-methods__modal(v-if="isModal")
       template(v-if="currentPaymentType === 'PayPal'")
         input.hugeInput(v-model="paypalType.name" placeholder="Payment Type Name")
@@ -22,7 +23,7 @@
         .modalRow__value
           .selectSingle
             SelectSingle(
-              placeholder="Select"
+              placeholder="Option"
               :options="paymentTypes"
               :selectedOption="currentPaymentType"
               @chooseOption="setPaymentType"
@@ -32,25 +33,34 @@
         .modalRow
           .modalRow__key Email:
           .modalRow__value
-            input(v-model="paypalType.email" placeholder="Email")
+            input(v-model="paypalType.email" placeholder="Value")
+        .modalRow
+          .modalRow__key Min Benchmark:
+          .modalRow__value
+            input(v-model="paypalType.vendorPaymentBenchmarks" type="number" placeholder="Value")
 
       template(v-if="currentPaymentType === 'Bank Details'")
         .modalRow
           .modalRow__key Bank Account Name:
           .modalRow__value
-            input(v-model="bankType.accountName" placeholder="Account Name")
+            input(v-model="bankType.accountName" placeholder="Value")
         .modalRow
           .modalRow__key IBAN:
           .modalRow__value
-            input(v-model="bankType.IBAN" placeholder="IBAN")
+            input(v-model="bankType.IBAN" placeholder="Value")
         .modalRow
           .modalRow__key SWIFT/BIC:
           .modalRow__value
-            input(v-model="bankType.SWIFT" placeholder="SWIFT/BIC")
+            input(v-model="bankType.SWIFT" placeholder="Value")
+        .modalRow
+          .modalRow__key Min Benchmark:
+          .modalRow__value
+            input(v-model="bankType.vendorPaymentBenchmarks" type="number" placeholder="Value")
 
       .buttons
         Button(@clicked="manageModalState" :isDisabled="!bankType.name && !paypalType.name" value="Save")
         Button(@clicked="closeModal" value="Cancel" :outline="true")
+    //PAYMENT MODAL START <<==
 
     .billing-info
       .billing-info__col
@@ -131,11 +141,17 @@
             .item__body
               .item__body--key SWIFT/BIC:
               .item__body--value {{ item.SWIFT || '-' }}
+            .item__body
+              .item__body--key Minimum Benchmark:
+              .item__body--value {{item.vendorPaymentBenchmarks ? item.vendorPaymentBenchmarks + ' ' + '&#8364;' : 'Not installed'}}
 
           template(v-if="item.type === 'PayPal'")
             .item__body
               .item__body--key Email:
               .item__body--value {{item.email || '-'}}
+            .item__body
+              .item__body--key Minimum Benchmark:
+              .item__body--value {{item.vendorPaymentBenchmarks ? item.vendorPaymentBenchmarks + ' ' + '&#8364;' : 'Not installed'}}
 
           .item__footer
             .item__footer--title {{ item.type  }}
@@ -159,6 +175,7 @@ export default {
       currentPaymentType: '',
       isModal: false,
 
+      value: 0,
       paypalType: {},
       bankType: {},
       editingIndex: null,
@@ -174,8 +191,9 @@ export default {
       storeCurrentVendor: "storeCurrentVendor"
     }),
     async manageModalState() {
-      const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => !!Object.keys(i).length)
+      const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => Object.keys(i).length > 1)
       Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
+      if (neededPaymentTypeObj.vendorPaymentBenchmarks < 0) neededPaymentTypeObj.vendorPaymentBenchmarks = 0
       try {
         const result = await this.$http.post("/vendorsapi/manage-payment-methods", {
           index: this.editingIndex,
@@ -225,6 +243,7 @@ export default {
       }
       this.editingIndex = index
       this.isModal = true
+      if (!item.hasOwnProperty('vendorPaymentBenchmarks')) item.vendorPaymentBenchmarks = this.value
       const { type, ...rest } = item
       this.currentPaymentType = type
 
@@ -243,8 +262,9 @@ export default {
       this.setDefaultPaymentObjectsState()
     },
     setDefaultPaymentObjectsState() {
-      this.paypalType = {}
-      this.bankType = {}
+      const benchmark = { vendorPaymentBenchmarks: this.value }
+      this.paypalType = { ...benchmark }
+      this.bankType = { ...benchmark }
     },
     changeBillingProp(key, value) {
       this.updateCurrentVendorGeneralDataBillingInfo({ key, value })
@@ -272,6 +292,13 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Reports", isShow: true, type: "error" })
       }
+    },
+    async getValue() {
+      try {
+        this.value = (await this.$http.get('/api-settings/vendor-payment-benchmark')).data.value
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Value", isShow: true, type: "error" })
+      }
     }
   },
   computed: {
@@ -290,6 +317,7 @@ export default {
   created() {
     this.getAndSetPaymentTerms()
     this.getVendorReport()
+    this.getValue()
   },
   components: { ApproveModal, Button, Add, CheckBox, SelectSingle }
 
@@ -333,7 +361,6 @@ export default {
     background: $table-list;
     text-align: center;
     color: #666;
-    font-family: 'Myriad300';
     letter-spacing: 0.3px;
     font-size: 14px;
     margin-top: 10px;

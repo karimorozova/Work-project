@@ -26,11 +26,6 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	website: {
-		type: String,
-		default: '',
-		trim: true
-	},
 	status: {
 		type: String,
 		default: '',
@@ -41,10 +36,6 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	// aliases: {
-	// 	type: Array,
-	// 	default: []
-	// },
 	email: {
 		type: String,
 		default: '',
@@ -79,29 +70,6 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	linkedin: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	whatsapp: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	//MM
-	//need refactor change/delete
-	basicRate: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	tqi: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	//end
 	experienceYears: {
 		type: String,
 		default: '',
@@ -129,11 +97,6 @@ const VendorSchema = new mongoose.Schema({
 	isTest: {
 		type: Boolean,
 		default: false
-	},
-	professionalLevel: {
-		type: String,
-		default: '',
-		trim: true
 	},
 	isCreatedByManager: {
 		type: Boolean,
@@ -224,6 +187,9 @@ const VendorSchema = new mongoose.Schema({
 		address: {
 			type: String,
 			default: ''
+		},
+		vendorPaymentBenchmark: {
+			type: Number
 		}
 	},
 	profExperiences: {

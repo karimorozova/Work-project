@@ -504,7 +504,7 @@ export default {
   &__row {
     width: 100%;
     display: flex;
-    height: 30px;
+    height: 32px;
     align-items: center;
     margin-bottom: 10px;
   }

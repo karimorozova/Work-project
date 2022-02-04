@@ -557,7 +557,9 @@ export default {
       this.selectedUnit = option
     },
     toggleEditable() {
-      if (this.isEditable) this.isAllVendors = false
+      if (this.isEditable) {
+        this.setEditableDefaults(this.currentStep)
+      }
       this.isEditable = !this.isEditable
     },
     toggleAllVendors() {
@@ -607,14 +609,14 @@ export default {
       this.currentStep = null
     },
     chooseStep(step) {
-      this.isAllVendors = false
-      this.isEditable = false
       this.isReassignment = false
       this.limitForVendorsFrom = 20
       this.isPossibleToGiveNextPortion = false
       this.removeVendorAssignments()
 
       if (this.currentStepId === step._id.toString()) {
+        this.isAllVendors = false
+        this.isEditable = false
         this.currentStepId = null
         this.currentStep = null
         this.selectedSource = ''
@@ -623,15 +625,23 @@ export default {
         this.selectedStep = ''
         this.selectedIndustry = ''
       } else {
-        this.currentStepId = step._id.toString()
-        this.currentStep = step
-        this.selectedSource = step.fullSourceLanguage.lang
-        this.selectedTarget = step.fullTargetLanguage.lang
-        this.selectedUnit = step.payablesUnit.type
-        this.selectedStep = step.step.title
-        this.selectedIndustry = this.currentProject.industry.name
-        this.vendorsSearch = ''
+        if (this.isEditable) {
+          this.currentStepId = step._id.toString()
+          this.currentStep = step
+          this.selectedTarget = step.fullTargetLanguage.lang
+        } else {
+          this.setEditableDefaults(step)
+        }
       }
+    },
+    setEditableDefaults() {
+      this.currentStepId = step._id.toString()
+      this.currentStep = step
+      this.selectedSource = step.fullSourceLanguage.lang
+      this.selectedTarget = step.fullTargetLanguage.lang
+      this.selectedUnit = step.payablesUnit.type
+      this.selectedStep = step.step.title
+      this.selectedIndustry = this.currentProject.industry.name
     },
     closeVendorManage() {
       this.$emit('closeVendorManage')

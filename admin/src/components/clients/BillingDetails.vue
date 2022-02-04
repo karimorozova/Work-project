@@ -353,7 +353,7 @@ export default {
     },
     async createBillingInfo() {
       await this.$http.post(`/clientsapi/update-billing-info/${ this.$route.params.id }`, { billingInfo: this.billingInfo })
-      this.$emit('updateClientWithoutClosing', { billingInfoId: this.billingInfo._id })
+      this.$emit('updateClient', { billingInfoId: this.billingInfo._id })
     },
     closeErrors() {
       this.errors = []

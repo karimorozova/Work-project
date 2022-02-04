@@ -172,7 +172,6 @@ export default {
       }
     },
     showModal() {
-      console.log('asd')
       this.$emit("showModal")
       this.$emit("withoutFile", this.isWithoutFile)
     }

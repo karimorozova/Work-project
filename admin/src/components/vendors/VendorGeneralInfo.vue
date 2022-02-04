@@ -1,126 +1,104 @@
 <template lang="pug">
   .gen-info
-    .gen-info__block
-      .contact__photo
-        .photo-wrap(v-if="!currentVendorFull.photo")
-          input.photo-file(type="file" @change="previewPhoto")
-          .photo-text(v-if="!isImageExist")
-            p.photo-text__message(v-if="!isFileError") Upload File
-              span.photo-extensions *.jpg/jpeg/png
-              span.photo-size <= 2MB
-          img.photo-image(v-if="isImageExist")
-          p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
-        .photo-wrap(v-if="currentVendorFull.photo")
-          input.photo-file(type="file" @change="previewPhoto")
-          img.photo-image(:src="currentVendorFull.photo")
+    //ValidationErrors(
+    //  v-if="areErrorsExist"
+    //  :errors="errors"
+    //  :isAbsolute="true"
+    //  @closeErrors="closeErrors"
+    //)
+    .vendorInformation
+      .vendorInformation__line1
+        .row
+          .row__key
+            span First Name:
+            span.require *
+          .row__value
+            input.input(
+              type="text"
+              placeholder="Value"
+              :value="currentVendor.firstName"
+              @change="(e) => updateVendorProp(e.target.value,'firstName')"
+            )
+        .row
+          .row__key
+            span Surname:
+            span.require *
+          .row__value
+            input.input(
+              type="text"
+              placeholder="Value"
+              :value="currentVendor.surname"
+              @change="(e) => updateVendorProp(e.target.value,'surname')"
+            )
+        .row
+          .row__key
+            span Email:
+            span.require *
+          .row__value
+            input.input(
+              type="text"
+              placeholder="Value"
+              :value="currentVendor.email"
+              @change="(e) => updateVendorProp(e.target.value,'email')"
+            )
 
-    .gen-info__block
-      .block-item
-        label.block-item__label.block-item_relative First Name:
-          span.require *
-        input.block-item__input-filed(
-          :class="{ 'block-item_error-shadow': errors.includes('Please, enter valid first name.') && isSaveClicked }",
-          type="text",
-          placeholder="First Name",
-          :value="currentVendor.firstName",
-          @change="(e) => updateVendorProp(e.target.value, 'firstName')"
-        )
-      .block-item
-        label Surname:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Surname",
-          :value="currentVendor.surname",
-          @change="(e) => updateVendorProp(e.target.value,  'surname')"
-        )
-      .block-item
-        label.block-item__label.block-item_relative Email:
-          span.require *
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Email",
-          :value="currentVendor.email",
-          @change="(e) => updateVendorProp(e.target.value, 'email')"
-        )
-      .block-item
-        label Phone:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Phone",
-          :value="currentVendor.phone",
-          @input="(e) => updateVendorProp(e.target.value, 'phone')",
-          ref="phone"
-        )
-      .block-item
-        label Time Zone:
-        .block-item__drop-menu.block-item_high-index
-          SelectSingle(
-            :hasSearch="true"
-            :options="timezones.map(item => item.zone)",
-            placeholder="Timezone",
-            :selectedOption="currentVendor.timezone",
-            @chooseOption="updateVendorTimeZone"
-          )
-      .block-item
-        label.block-item__label.block-item_relative Native Language:
-        .block-item__drop-menu.block-item_medium-index
-          SelectSingle(
-            :selectedOption="currentVendor.native != null ? currentVendor.native.lang : ''",
-            :options="filteredLanguages.map(({lang}) => lang)",
-            placeholder="Native Language"
-            :hasSearch="true"
-            @chooseOption="updateVendorNative"
-          )
-    .gen-info__block
-      .block-item
-        label Company Name:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Company Name",
-          :value="currentVendor.companyName",
-          @change="(e) => updateVendorProp(e.target.value,  'companyName')"
-        )
-      .block-item
-        label Website:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Website",
-          :value="currentVendor.website",
-          @change="(e) => updateVendorProp(e.target.value,  'website')"
-        )
-      .block-item
-        label Skype:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Skype",
-          :value="currentVendor.skype",
-          @change="(e) => updateVendorProp(e.target.value,  'skype')"
-        )
-      .block-item
-        label Linkedin:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="Linkedin",
-          :value="currentVendor.linkedin",
-          @change="(e) => updateVendorProp(e.target.value,  'linkedin')"
-        )
-      .block-item
-        label WhatsApp:
-        input.block-item__input-filed(
-          type="text",
-          placeholder="WhatsApp",
-          :value="currentVendor.whatsapp",
-          @change="(e) => updateVendorProp(e.target.value,  'whatsapp')"
-        )
-      .block-item.no-margin
-        label Gender:
-        .block-item__drop-menu
-          SelectSingle(
-            :options="genders",
-            :selectedOption="currentVendor.gender",
-            placeholder="Gender",
-            @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
-          )
+      .vendorInformation__line2
+        .vendorInformation__photo
+          .photo-wrap(v-if="!currentVendorFull.photo")
+            input.photo-file(type="file" @change="previewPhoto")
+            .photo-text(v-if="!isImageExist")
+              p.photo-text__message(v-if="!isFileError") Upload File
+                br
+                span.photo-extensions *.jpg/jpeg/png
+                span.photo-size <= 3MB
+            img.photo-image(v-if="isImageExist")
+            p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
+          .photo-wrap(v-if="currentVendorFull.photo")
+            input.photo-file(type="file" @change="previewPhoto")
+            img.photo-image(:src="currentVendorFull.photo")
+
+        .vendorInformation__description
+          .row.mbRow
+            .row__key Phone:
+            .row__value
+              input.input( type="text" placeholder="Value" :value="currentVendor.phone" @input="(e)=>updateVendorProp(e.target.value, 'phone')" ref="phone")
+          .row.mbRow
+            .row__key Native Language:
+            .row__value
+              SelectSingle(
+                :selectedOption="currentVendor.native ? currentVendor.native.lang: ''",
+                :options="filteredLanguages.map(({lang}) => lang)",
+                :hasSearch="true"
+                placeholder="Option"
+                @chooseOption="updateVendorNative"
+              )
+          .row.mbRow
+            .row__key Time Zone:
+            .row__value
+              SelectSingle(
+                :hasSearch="true"
+                placeholder="Option"
+                :options="timezones.map(item => item.zone)",
+                :selectedOption="currentVendor.timezone",
+                @chooseOption="updateVendorTimeZone"
+              )
+          .row
+            .row__key Gender:
+            .row__value
+              SelectSingle(
+                :options="genders"
+                :selectedOption="currentVendor.gender"
+                placeholder="Option"
+                @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
+              )
+          .row
+            .row__key Company Name:
+            .row__value
+              input.input(type="text" placeholder="Value" :value="currentVendor.companyName" @change="(e) => updateVendorProp(e.target.value,'companyName')")
+          .row
+            .row__key Skype:
+            .row__value
+              input.input(type="text" placeholder="Value" :value="currentVendor.skype" @change="(e) => updateVendorProp(e.target.value,'skype')")
 </template>
 
 <script>
@@ -135,9 +113,7 @@ export default {
     return {
       photoFile: [],
       errors: [],
-      aliases: [],
       genders: [ "Male", "Female", "Other" ],
-      currentVendorAliases: [],
       timezone: '',
       native: '',
       gender: '',
@@ -195,7 +171,7 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendorGeneralData",
       languages: "getAllLanguages",
-      currentVendorFull: "getCurrentVendor",
+      currentVendorFull: "getCurrentVendor"
     }),
     filteredLanguages() {
       let result = this.languages
@@ -232,115 +208,98 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors.scss";
 
+.vendorInformation {
+  width: 100%;
+
+  &__photo {
+    width: 210px;
+    margin-top: -60px;
+    margin-left: 60px;
+  }
+
+  &__line2 {
+    display: flex;
+  }
+
+  &__line1 {
+    background-color: $light-background;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 270px;
+  }
+
+  &__description {
+    box-sizing: border-box;
+    padding: 25px 25px 25px 0;
+    width: 770px;
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+  }
+}
+
+.gen-info {
+  box-sizing: border-box;
+  box-shadow: $box-shadow;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 1040px;
+  width: 1040px;
+  border-radius: 4px;
+  background: white;
+  height: fit-content;
+  position: relative;
+}
+
 .require {
   color: $red;
 }
 
-.gen-info {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
+.row {
+  &__key {
+    margin-bottom: 3px;
+  }
 
-  &__block {
-    width: 35%;
-
-    &:first-child {
-      width: 20%;
-      text-align: center;
-    }
+  &__value {
+    width: 220px;
+    background-color: powderbluer;
+    position: relative;
+    height: 32px;
   }
 }
 
-.block-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  width: 220px;
+  height: 32px;
+  transition: .1s ease-out;
 
-  &__label {
-    margin-bottom: 0;
-  }
-
-  &_relative {
-    position: relative;
-  }
-
-  &__drop-menu {
-    position: relative;
-    width: 220px;
-    height: 32px;
-    box-sizing: border-box;
-  }
-
-  &_high-index {
-    z-index: 10;
-  }
-
-  &_medium-index {
-    z-index: 8;
-  }
-
-  label {
-    margin-bottom: 0;
-  }
-
-  &__input-filed {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    width: 220px;
-    height: 32px;
-    transition: .1s ease-out;
-
-    &:focus {
-      border: 1px solid $border-focus;
-    }
-  }
-
-  ::-webkit-input-placeholder {
-    opacity: 0.5;
-  }
-
-  &_error-shadow {
-    box-shadow: 0 0 5px red;
-    border-radius: 4px;
+  &:focus {
+    border: 1px solid $border-focus;
   }
 }
 
-.photo-wrap {
-  width: 195px;
-  height: 160px;
-  border: 1px solid #c1bbb1;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
+.saveButtons {
   display: flex;
   justify-content: center;
-  align-items: center;
-  border-radius: 4px;
-
-  .photo-image {
-    max-width: 100%;
-    max-height: 100%;
-  }
+  margin-top: 25px;
+  gap: 20px;
 }
 
-.photo-file {
-  position: absolute;
-  top: -25px;
-  left: 0px;
-  height: 180px;
-  background-color: transparent;
-  outline: none;
-  border: none;
-  z-index: 5;
-  cursor: pointer;
+.mbRow {
+  margin-bottom: 15px;
 }
 
+//Photo
 .photo-text {
   display: flex;
   justify-content: center;
@@ -349,43 +308,58 @@ export default {
   height: 100%;
 
   &__message {
-    font-size: 18px;
-    opacity: 0.5;
-    width: 50%;
+    opacity: .4;
     text-align: center;
   }
 
   &__error-message {
     position: absolute;
-    bottom: 30%;
-    z-index: 10;
-    background-color: $white;
-    padding: 3px;
+    z-index: 12;
+    background-color: white;
+    color: $red;
+    height: 150px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
     box-sizing: border-box;
-    color: $orange;
+    font-size: 14px;
+    text-align: center;
   }
 }
 
-.photo-extensions,
-.photo-size {
-  display: block;
-  font-size: 12px;
-  margin-top: 10px;
-}
-
-.edited {
-  opacity: .5;
-}
-
-.actionsButton {
+.photo-wrap {
+  width: 150px;
+  height: 150px;
+  border: 2px solid $light-border;
+  position: relative;
+  overflow: hidden;
   display: flex;
-  position: absolute;
-  right: 10px;
-  top: -30px;
+  justify-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8%;
+  background-color: white;
+
+  .photo-image {
+    object-fit: cover;
+    height: 150px;
+    width: 150px;
+  }
 }
 
-.actionsButton__icon {
-  padding: 0 5px;
+.photo-file {
+  position: absolute;
+  top: -22px;
+  height: 172px;
+  width: 150px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  z-index: 5;
+  cursor: pointer;
+  border-radius: 8%;
 }
 
 </style>

@@ -28,7 +28,7 @@ const { notifyTestStatus, sendMessageToVendor } = require('./emails')
 const {
 	updateVendorCompetencies,
 	deleteVendorCompetencies,
-	generateCompetenciesCombinations,
+	generateCompetenciesCombinations
 } = require('./competencies')
 
 const { updateVendorMatrix, syncVendorMatrix } = require('./vendorMatrix')
@@ -48,13 +48,18 @@ const {
 	deletePendingCompetence
 } = require('./pendingCompetencies')
 
+const {
+	createVendor
+} = require("./createVendor")
+
 module.exports = {
+	createVendor,
 	managePaymentMethods,
 	getVendor,
 	getVendors,
 	getVendorAfterUpdate,
 	getFilteredVendors,
-  getFilteredVendorsWithCustomFilters,
+	getFilteredVendorsWithCustomFilters,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
 	removeVendorDoc,
@@ -81,12 +86,12 @@ module.exports = {
 	getVendorAssessmentsWordCount,
 	updateVendorMatrix,
 	syncVendorMatrix,
-  getFilteredVendorsPendingCompetencies,
+	getFilteredVendorsPendingCompetencies,
 	extendVendorsPendingCompetencies,
 	approvePendingCompetence,
 	setRatePriceAfterPassedTest,
 	sendVendorTestAndUpdateQualification,
-  hasVendorCompetenciesAndPending,
+	hasVendorCompetenciesAndPending,
 	rejectedPendingCompetence,
 	deletePendingCompetence,
 	getFilteredVendorsPotential,

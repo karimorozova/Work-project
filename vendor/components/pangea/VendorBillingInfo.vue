@@ -144,6 +144,7 @@
               .item__body--value {{item.email || '-'}}
 
           .item__footer
+            .item__footer--subtitle Minimum payment amount: {{item.vendorPaymentBenchmarks || 50 }} &#8364;
             .item__footer--title {{ item.type  }}
 </template>
 
@@ -372,10 +373,16 @@ export default {
     background: $table-list;
     text-align: center;
     color: #666;
-    font-family: 'Myriad300';
     letter-spacing: 0.3px;
     font-size: 14px;
     margin-top: 10px;
+
+    &--subtitle {
+      margin-bottom: 6px;
+      border-bottom: 1px solid $border;
+      padding-bottom: 5px;
+    }
+
   }
 
   &__body {
@@ -460,6 +467,7 @@ export default {
   &__header {
     display: flex;
     justify-content: space-between;
+
 
     &--title {
       font-size: 14px;
