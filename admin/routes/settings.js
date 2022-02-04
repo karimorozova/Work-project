@@ -19,7 +19,7 @@ const {
 	getClientsApi,
 	getPaymentTerms,
 	managePaymentTerms,
-	deletePaymentTerms
+	deletePaymentTerms, getAllPaymentMethods, createPaymentMethod, getAllPaymentMethodsKeys, createPaymentMethodKeys, removePaymentMethodKeys, updatePaymentMethodKeys
 } = require('../settings')
 
 const {
@@ -223,5 +223,98 @@ router.post('/all-clients', async (req, res) => {
 		res.status(500).send("Error on getting Clients from DB ")
 	}
 })
+
+router.get('/payment-methods', async (req, res) => {
+	try {
+		const paymentsMethods = await getAllPaymentMethods()
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.post('/payment-methods', async (req, res) => {
+	const {name, minimumAmount, active, keys} = req.body
+	try {
+		await createPaymentMethod({ name, minimumAmount, active, keys })
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+// router.put('/payment-methods/:id', async (req, res) => {
+// 	const { id } = req.params
+// 	try {
+// 		const { _id } = await VendorPaymentBenchmark.findOne({})
+// 		await VendorPaymentBenchmark.updateOne({ _id }, { value })
+// 		res.send('Done!')
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on vendor-payment-benchmark')
+// 	}
+// })
+//
+// router.delete('/payment-methods/:id', async (req, res) => {
+// 	const { id } = req.params
+// 	try {
+// 		const { _id } = await VendorPaymentBenchmark.findOne({})
+// 		await VendorPaymentBenchmark.updateOne({ _id }, { value })
+// 		res.send('Done!')
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on vendor-payment-benchmark')
+// 	}
+// })
+
+
+
+
+router.get('/payment-methods-keys', async (req, res) => {
+	try {
+		const paymentsMethods = await getAllPaymentMethodsKeys()
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.post('/payment-methods-keys', async (req, res) => {
+	const { key } = req.body
+	try {
+		const paymentsMethods = await createPaymentMethodKeys({ key })
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.put('/payment-methods-keys/:id', async (req, res) => {
+	const { id } = req.params
+	const { key } = req.body
+	try {
+		const paymentsMethods = await updatePaymentMethodKeys(id, { key })
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.delete('/payment-methods-keys/:id', async (req, res) => {
+	const { id } = req.params
+	try {
+		const paymentsMethods = await removePaymentMethodKeys( id)
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
 
 module.exports = router

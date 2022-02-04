@@ -32,6 +32,17 @@ const {
 	deletePaymentTerms
 } = require('./paymentTerms')
 
+const {
+	getAllPaymentMethods,
+	createPaymentMethod,
+	updatePaymentMethod,
+	removePaymentMethod,
+	getAllPaymentMethodsKeys,
+	createPaymentMethodKeys,
+	updatePaymentMethodKeys,
+	removePaymentMethodKeys,
+} = require('./paymentsMethods')
+
 module.exports = {
 	deletePaymentTerms,
 	managePaymentTerms,
@@ -48,5 +59,13 @@ module.exports = {
 	getIndustryTier,
 	updateIndustryTier,
 	createIndustryTier,
-	getClientsApi
+	getClientsApi,
+	getAllPaymentMethods,
+	createPaymentMethod,
+	updatePaymentMethod,
+	removePaymentMethod,
+	getAllPaymentMethodsKeys,
+	createPaymentMethodKeys,
+	updatePaymentMethodKeys,
+	removePaymentMethodKeys,
 }
