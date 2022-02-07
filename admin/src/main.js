@@ -11,13 +11,14 @@ import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
 import GAuth from 'vue-google-oauth2'
+import io from 'socket.io-client'
 
 const gauthOption = {
   clientId: '1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com',
 }
 
 
-const io = require("socket.io-client");
+// const io = require("socket.io-client");
 const socket = io(window.location.origin)
 Vue.prototype.$socket = socket
 
