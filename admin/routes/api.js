@@ -30,40 +30,17 @@ const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps')
 const { ObjectId } = require("mongoose/lib/types")
 const moment = require("moment")
 const { createClient } = require("../clients/createClient")
+const { getAllPaymentMethods } = require("../settings")
 
-// router.get('/wordcount', async (req, res) => {
-// 	let link = req.query.web
-// 	if (link.indexOf('dropbox') >= 0) {
-// 		let firstPart = link.split("=")[0]
-// 		link = firstPart + "=1"
-// 	}
-// 	try {
-// 		const resFull = await axios({
-// 			url: link,
-// 			method: 'GET',
-// 			responseType: 'blob' // important
-// 		})
-// 		let wstream = await reqq(link).pipe(fs.createWriteStream('./dist/testtest.txt'))
-// 		wstream.write(resFull.data)
-// 		wstream.end(() => {
-// 			unirest.post('https://pangea.s.xtrf.eu/qrf/file')
-// 					.headers({ 'Content-Type': 'multipart/form-data' })
-// 					.attach('file', './dist/testtest.txt') // Attachment
-// 					.end(function (response) {
-// 						let token = response.body.token
-// 						fs.unlink('./dist/testtest.txt', (err) => {
-// 							if (err) throw err
-// 							console.log("testtеst.txt was deleted!")
-// 						})
-// 						console.log('done')
-// 						res.send({ token })
-// 					})
-// 		})
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on getting wordcount')
-// 	}
-// })
+router.get('/payment-methods', async (req, res) => {
+	try {
+		const paymentsMethods = await getAllPaymentMethods()
+		res.json(paymentsMethods)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
 
 router.post('/request', upload.fields([ { name: 'detailFiles' }, { name: 'refFiles' } ]), async (req, res) => {
 	try {
@@ -75,38 +52,6 @@ router.post('/request', upload.fields([ { name: 'detailFiles' }, { name: 'refFil
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Something went wrong while adding request")
-	}
-})
-
-// router.post('/allprojects', async (req, res) => {
-//     const filters = {...req.body};
-//     try {
-//         const projects = await getFilteredProjects(filters);
-//         res.send(projects)
-//     } catch(err) {
-//         console.log(err);
-//         res.status(500).send('Something wrong with DB while getting projects!');
-//     }
-// });
-
-router.post('/all-requests', async (req, res) => {
-	const filters = { ...req.body }
-	try {
-		const requests = await getFilteredClientRequests(filters)
-		res.send(requests)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Something wrong with DB while getting requests!')
-	}
-})
-
-router.get('/requests-quantity', async (req, res) => {
-	try {
-		const quantity = await ClientRequest.countDocuments({ status: { $ne: 'Cancelled' } })
-		res.send({ quantity })
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Something wrong with DB while getting requests quantity')
 	}
 })
 
@@ -160,7 +105,6 @@ router.get('/timezones', async (req, res) => {
 		res.status(500).send('Something wrong with DB / Cannot get Timezones')
 	}
 })
-
 
 router.get('/countries', (req, res) => {
 	try {

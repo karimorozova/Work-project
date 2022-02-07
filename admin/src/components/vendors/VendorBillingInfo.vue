@@ -11,56 +11,12 @@
           @notApprove="closeApproveModal"
         )
 
-    //PAYMENT MODAL START ==>>
-    .payment-methods__modal(v-if="isModal")
-      template(v-if="currentPaymentType === 'PayPal'")
-        input.hugeInput(v-model="paypalType.name" placeholder="Payment Type Name")
-      template(v-if="currentPaymentType === 'Bank Details'")
-        input.hugeInput(v-model="bankType.name" placeholder="Payment Type Name")
-
-      .modalRow
-        .modalRow__key Payment type:
-        .modalRow__value
-          .selectSingle
-            SelectSingle(
-              placeholder="Option"
-              :options="paymentTypes"
-              :selectedOption="currentPaymentType"
-              @chooseOption="setPaymentType"
-            )
-
-      template(v-if="currentPaymentType === 'PayPal'")
-        .modalRow
-          .modalRow__key Email:
-          .modalRow__value
-            input(v-model="paypalType.email" placeholder="Value")
-        .modalRow
-          .modalRow__key Min Benchmark:
-          .modalRow__value
-            input(v-model="paypalType.vendorPaymentBenchmarks" type="number" placeholder="Value")
-
-      template(v-if="currentPaymentType === 'Bank Details'")
-        .modalRow
-          .modalRow__key Bank Account Name:
-          .modalRow__value
-            input(v-model="bankType.accountName" placeholder="Value")
-        .modalRow
-          .modalRow__key IBAN:
-          .modalRow__value
-            input(v-model="bankType.IBAN" placeholder="Value")
-        .modalRow
-          .modalRow__key SWIFT/BIC:
-          .modalRow__value
-            input(v-model="bankType.SWIFT" placeholder="Value")
-        .modalRow
-          .modalRow__key Min Benchmark:
-          .modalRow__value
-            input(v-model="bankType.vendorPaymentBenchmarks" type="number" placeholder="Value")
-
-      .buttons
-        Button(@clicked="manageModalState" :isDisabled="!bankType.name && !paypalType.name" value="Save")
-        Button(@clicked="closeModal" value="Cancel" :outline="true")
-    //PAYMENT MODAL START <<==
+    .modal(v-if="isModal")
+      VendorBillingInfoPaymentModal(
+        :editablePaymentMethod="editablePaymentMethod"
+        @closePaymentMethod="closeModal"
+        @savePaymentMethod="savePaymentMethod"
+      )
 
     .billing-info
       .billing-info__col
@@ -88,7 +44,7 @@
             )
 
         .colRow
-          .colRow__key Payment term:
+          .colRow__key Payment Term:
           .colRow__value
             .selectSingle
               SelectSingle(
@@ -118,7 +74,6 @@
       .payment-methods__body
         .item(v-for="(item, index) in currentFullVendor.billingInfo.paymentMethod")
           .item__header
-            .item__header--name {{ item.name }}
 
             .item__header--icons(v-if="deletingIndex === null && editingIndex === null")
               .item__header--icon(@click="openModalForEdition(item, index)")
@@ -131,31 +86,9 @@
               .item__header--icon
                 i(class="fas fa-trash")
 
-          template(v-if="item.type === 'Bank Details'")
-            .item__body
-              .item__body--key Bank Account Name:
-              .item__body--value {{ item.accountName || '-' }}
-            .item__body
-              .item__body--key IBAN:
-              .item__body--value {{ item.IBAN || '-' }}
-            .item__body
-              .item__body--key SWIFT/BIC:
-              .item__body--value {{ item.SWIFT || '-' }}
-            .item__body
-              .item__body--key Minimum Benchmark:
-              .item__body--value {{item.vendorPaymentBenchmarks ? item.vendorPaymentBenchmarks + ' ' + '&#8364;' : 'Not installed'}}
-
-          template(v-if="item.type === 'PayPal'")
-            .item__body
-              .item__body--key Email:
-              .item__body--value {{item.email || '-'}}
-            .item__body
-              .item__body--key Minimum Benchmark:
-              .item__body--value {{item.vendorPaymentBenchmarks ? item.vendorPaymentBenchmarks + ' ' + '&#8364;' : 'Not installed'}}
-
-          .item__footer
-            .item__footer--title {{ item.type  }}
-
+          .item__body(v-for="[ key, value ] in Object.entries(item)")
+            .item__body--key {{ replaceKeyName(key) }}:
+            .item__body--value {{ value }}
 
 </template>
 
@@ -166,18 +99,15 @@ import { mapActions, mapGetters } from "vuex"
 import Add from "../Add"
 import Button from "../Button"
 import ApproveModal from "../ApproveModal"
+import VendorBillingInfoPaymentModal from "./VendorBillingInfoPaymentModal"
 
 export default {
   data() {
     return {
+      editablePaymentMethod: {},
       paymentTerms: [],
-      paymentTypes: [ 'Bank Details', 'PayPal' ],
-      currentPaymentType: '',
       isModal: false,
 
-      value: 0,
-      paypalType: {},
-      bankType: {},
       editingIndex: null,
       deletingIndex: null,
       isDeletingModal: false,
@@ -190,15 +120,12 @@ export default {
       alertToggle: 'alertToggle',
       storeCurrentVendor: "storeCurrentVendor"
     }),
-    async manageModalState() {
-      const [ neededPaymentTypeObj ] = [ this.paypalType, this.bankType ].filter(i => Object.keys(i).length > 1)
-      Object.assign(neededPaymentTypeObj, { type: this.currentPaymentType })
-      if (neededPaymentTypeObj.vendorPaymentBenchmarks < 0) neededPaymentTypeObj.vendorPaymentBenchmarks = 0
+    async savePaymentMethod(paymentMethod) {
       try {
         const result = await this.$http.post("/vendorsapi/manage-payment-methods", {
           index: this.editingIndex,
           vendorId: this.$route.params.id,
-          paymentTypeObj: neededPaymentTypeObj
+          paymentTypeObj: paymentMethod
         })
         await this.storeCurrentVendor(result.data)
       } catch (err) {
@@ -241,31 +168,16 @@ export default {
         alert('Payment method in invoice!')
         return
       }
-      this.editingIndex = index
+      this.editablePaymentMethod = item
       this.isModal = true
-      if (!item.hasOwnProperty('vendorPaymentBenchmarks')) item.vendorPaymentBenchmarks = this.value
-      const { type, ...rest } = item
-      this.currentPaymentType = type
-
-      item.type === 'PayPal'
-          ? this.paypalType = { ...rest }
-          : this.bankType = { ...rest }
+      this.editingIndex = index
     },
     closeModal() {
       this.editingIndex = null
       this.isModal = false
-      this.currentPaymentType = ''
-      this.setDefaultPaymentObjectsState()
+      this.editablePaymentMethod = {}
     },
-    setPaymentType({ option }) {
-      this.currentPaymentType = option
-      this.setDefaultPaymentObjectsState()
-    },
-    setDefaultPaymentObjectsState() {
-      const benchmark = { vendorPaymentBenchmarks: this.value }
-      this.paypalType = { ...benchmark }
-      this.bankType = { ...benchmark }
-    },
+
     changeBillingProp(key, value) {
       this.updateCurrentVendorGeneralDataBillingInfo({ key, value })
     },
@@ -275,6 +187,12 @@ export default {
         this.updateCurrentVendorGeneralDataBillingInfo({ key: 'officialName', value: `${ firstName } ${ surname || '' }` })
         this.updateCurrentVendorGeneralDataBillingInfo({ key: 'email', value: `${ email }` })
       }
+    },
+    replaceKeyName(key) {
+      if (key === 'type') return 'Type'
+      if (key === 'minimumAmount') return 'Minimum Payment Amount'
+      if (key === 'name') return 'Name'
+      return key
     },
     async getAndSetPaymentTerms() {
       try {
@@ -319,7 +237,7 @@ export default {
     this.getVendorReport()
     this.getValue()
   },
-  components: { ApproveModal, Button, Add, CheckBox, SelectSingle }
+  components: { VendorBillingInfoPaymentModal, ApproveModal, Button, Add, CheckBox, SelectSingle }
 
 }
 </script>
@@ -327,11 +245,41 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
-.hugeInput {
-  height: 39px;
-  width: 360px;
-  margin-bottom: 15px;
-  font-size: 16px;
+.payment-methods {
+  margin-top: 15px;
+  padding-top: 25px;
+  border-top: 1px solid $light-border;
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+
+    &--title {
+      font-size: 14px;
+      font-family: Myriad600;
+    }
+
+    &--add {
+      margin-top: -17px;
+    }
+  }
+}
+
+.modal {
+  padding: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  box-shadow: $box-shadow;
+  z-index: 20;
 }
 
 .wrapper {
@@ -355,17 +303,6 @@ export default {
   border: 1px solid $light-border;
   height: fit-content;
 
-  &__footer {
-    border-top: 1px solid $light-border;
-    padding: 6px 20px;
-    background: $table-list;
-    text-align: center;
-    color: #666;
-    letter-spacing: 0.3px;
-    font-size: 14px;
-    margin-top: 10px;
-  }
-
   &__body {
     padding: 6px 15px;
     display: flex;
@@ -374,9 +311,10 @@ export default {
 
   &__header {
     display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid $border;
-    padding: 15px 15px 10px 15px;
+    justify-content: end;
+    border-bottom: 1px solid $light-border;
+    background-color: $light-background;
+    padding: 5px 10px;
     margin-bottom: 10px;
     min-height: 18px;
 
@@ -404,58 +342,11 @@ export default {
       border: 1px solid $border;
       color: $dark-border;
       box-sizing: border-box;
+      background-color: white;
 
       &:hover {
         color: $text;
       }
-    }
-  }
-}
-
-.modalRow {
-  display: flex;
-  height: 32px;
-  align-items: center;
-  margin-bottom: 10px;
-
-  &__key {
-    width: 140px;
-  }
-}
-
-.payment-methods {
-  margin-top: 15px;
-  padding-top: 25px;
-  border-top: 1px solid $light-border;
-
-  &__modal {
-    padding: 25px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    box-shadow: $box-shadow;
-    z-index: 20;
-  }
-
-  &__body {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 19px;
-  }
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-
-    &--title {
-      font-size: 14px;
-      font-family: Myriad600;
-    }
-
-    &--add {
-      margin-top: -17px;
     }
   }
 }
@@ -476,7 +367,7 @@ export default {
   }
 
   &__key {
-    width: 210px;
+    width: 220px;
   }
 }
 
@@ -534,10 +425,5 @@ textarea {
   }
 }
 
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 10px;
-}
+
 </style>
