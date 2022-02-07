@@ -50,38 +50,38 @@ export default {
           img: require("../assets/images/navbar/Dashboard.svg"),
           active: true
         },
-        {
-          title: "Billing",
-          path: "/billing",
-          active: false,
-          isGroup: true,
-          children: [
-            {
-              title: "Overview",
-              path: "/billing/overview",
-              img: require("../assets/images/navbar/Templates.svg"),
-              active: false
-            },
-            {
-              title: "Invoices",
-              path: "/billing/invoices",
-              img: require("../assets/images/navbar/Profile.svg"),
-              active: false
-            },
-            {
-              title: "Paid Invoices",
-              path: "/billing/invoices-paid",
-              img: require("../assets/images/navbar/Profile.svg"),
-              active: false
-            },
-            {
-              title: "Pre-Payment",
-              path: "/billing/pre-payment",
-              img: require("../assets/images/navbar/Profile.svg"),
-              active: false
-            }
-          ]
-        },
+        // {
+        //   title: "Billing",
+        //   path: "/billing",
+        //   active: false,
+        //   isGroup: true,
+        //   children: [
+        //     {
+        //       title: "Overview",
+        //       path: "/billing/overview",
+        //       img: require("../assets/images/navbar/Templates.svg"),
+        //       active: false
+        //     },
+        //     {
+        //       title: "Invoices",
+        //       path: "/billing/invoices",
+        //       img: require("../assets/images/navbar/Profile.svg"),
+        //       active: false
+        //     },
+        //     {
+        //       title: "Paid Invoices",
+        //       path: "/billing/invoices-paid",
+        //       img: require("../assets/images/navbar/Profile.svg"),
+        //       active: false
+        //     },
+        //     {
+        //       title: "Pre-Payment",
+        //       path: "/billing/pre-payment",
+        //       img: require("../assets/images/navbar/Profile.svg"),
+        //       active: false
+        //     }
+        //   ]
+        // },
         {
           title: "Projects",
           path: "/projects",
@@ -106,12 +106,12 @@ export default {
               img: require("../assets/images/navbar/Profile.svg"),
               active: false
             },
-            {
-              title: "Contacts",
-              path: "/settings/contacts",
-              img: require("../assets/images/navbar/Profile.svg"),
-              active: false
-            }
+            // {
+            //   title: "Contacts",
+            //   path: "/settings/contacts",
+            //   img: require("../assets/images/navbar/Profile.svg"),
+            //   active: false
+            // }
           ]
         }
       ],
