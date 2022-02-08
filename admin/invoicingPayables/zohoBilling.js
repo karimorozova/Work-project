@@ -5,7 +5,6 @@ const organizationId = '630935724'
 const FormData = require("form-data")
 const path = require("path")
 const fs = require("fs")
-const { log } = require("nodemon/lib/utils")
 const moment = require("moment")
 const { returnMessageAndType } = require("./helpers")
 const { refreshToken } = require("../services")
