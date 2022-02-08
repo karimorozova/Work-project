@@ -112,38 +112,38 @@ sup {
   opacity: 0;
 }
 
-//@font-face {
-//  font-family: 'Myriad300';
-//  font-weight: 300;
-//  font-style: normal;
-//  src: url('./assets/fonts/Roboto300.woff2') format('woff2');
-//}
-//
-//@font-face {
-//  font-family: 'Myriad400';
-//  font-weight: 400;
-//  font-style: normal;
-//  src: url('./assets/fonts/Roboto400.woff2') format('woff2');
-//}
-//
-//@font-face {
-//  font-family: 'Myriad600';
-//  font-weight: 600;
-//  font-style: normal;
-//  src: url('./assets/fonts/Roboto600.woff2') format('woff2');
-//}
-//
-//@font-face {
-//  font-family: 'Roboto700';
-//  font-weight: 700;
-//  font-style: normal;
-//  src: url('./assets/fonts/Roboto700.woff2') format('woff2');
-//}
-//
-//@font-face {
-//  font-family: 'Myriad900';
-//  font-weight: 900;
-//  font-style: normal;
-//  src: url('./assets/fonts/Roboto900.woff2') format('woff2');
-//}
+@font-face {
+  font-family: 'Myriad300';
+  font-weight: 300;
+  font-style: normal;
+  src: url('./assets/fonts/Roboto300.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Myriad400';
+  font-weight: 400;
+  font-style: normal;
+  src: url('./assets/fonts/Roboto400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Myriad600';
+  font-weight: 600;
+  font-style: normal;
+  src: url('./assets/fonts/Roboto600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto700';
+  font-weight: 700;
+  font-style: normal;
+  src: url('./assets/fonts/Roboto700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Myriad900';
+  font-weight: 900;
+  font-style: normal;
+  src: url('./assets/fonts/Roboto900.woff2') format('woff2');
+}
 </style>
