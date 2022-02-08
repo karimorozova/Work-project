@@ -9,7 +9,7 @@ module.exports = merge([ {
 	entry: './src/main.js',
 	output: {
 		path: path.resolve(__dirname, '../../dist'),
-		filename: "[name].js",
+		filename: "js/[name].js",
 		publicPath: '/'
 	},
 	plugins: [

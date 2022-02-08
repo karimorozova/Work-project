@@ -3,6 +3,7 @@ const { merge } = require("webpack-merge")
 const vue = require('../modules/vue')
 const javaScript = require('../modules/javaScript')
 const style = require('../modules/style')
+const utils = require("../modules/utils")
 
 module.exports = merge([ common, {
 	mode: 'development',
@@ -10,5 +11,6 @@ module.exports = merge([ common, {
 },
 	vue.loadVueDev(),
 	javaScript.loadJSDev(),
-	style.loadStyleDev()
+	style.loadStyleDev(),
+	utils.optimizationsDev()
 ])

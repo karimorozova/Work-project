@@ -7,7 +7,10 @@ exports.loadImages = () => ({
 			test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
 			use: [
 				{
-					loader: 'file-loader'
+					loader: 'file-loader',
+					options: {
+						name: './images/[name].[ext]'
+					}
 				}
 			]
 		} ]
