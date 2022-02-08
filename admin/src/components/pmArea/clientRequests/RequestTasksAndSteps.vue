@@ -54,7 +54,6 @@
 </template>
 
 <script>
-import RequestTasksData from "./tasks-n-steps/RequestTasksData"
 import { mapGetters, mapActions } from 'vuex'
 import ValidationErrors from "../../ValidationErrors"
 import Tabs from "../../Tabs"
@@ -255,7 +254,6 @@ export default {
     DataTable,
     Tabs,
     ValidationErrors,
-    RequestTasksData
   },
   mounted() {
     this.setDefaultIsTaskData()

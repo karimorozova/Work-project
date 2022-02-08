@@ -27,7 +27,7 @@
             <text class="center-text" x="100" y="100" fill="#d66f58" text-anchor="middle" alignment-baseline="central">{{currentVal}}</text>
             <text class="bottom-text" x="100" y="190" fill="#66563d" text-anchor="middle" alignment-baseline="central">{{recordName}}</text>
         </svg>
-        <div class="radial__num radial_right">{{ total }}<div>
+        <div class="radial__num radial_right">{{ total }}</div>
     </div>
 </template>
 

@@ -214,6 +214,7 @@ export default {
   mixins: [ getBgColor, currencyIconDetected ],
   data() {
     return {
+      deadlineModal: false,
       isApproveActionShow: false,
       selectedAction: '',
       infoIndex: -1,

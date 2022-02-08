@@ -207,6 +207,7 @@
 		data() {
 			const startDate = this.openDate ? new Date(this.openDate) : new Date()
 			return {
+        bootstrapStyling: true,
 				pageTimestamp: startDate.setDate(1),
 				selectedDate: null,
 				showDayView: false,

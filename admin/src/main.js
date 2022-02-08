@@ -6,7 +6,6 @@ import router from './router'
 import { store } from './vuex/store'
 import axios from 'axios';
 import VueResource from 'vue-resource';
-import 'normalize.css';
 import VueLodash from 'vue-lodash';
 import "./filters/GeneralFilters";
 export const bus = new Vue();
