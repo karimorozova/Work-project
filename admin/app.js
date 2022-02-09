@@ -18,18 +18,10 @@ require('./schedule');
 //NEW DB
 checkCollections()
 
-
-
 const allowedOrigins = [
-	"https://admin.pangea.global",
-	"https://vendor.pangea.global",
-	"https://portal.pangea.global",
-	"http://localhost:3000",
-	"http://localhost:3002",
-	"http://localhost:8081",
-	"https://testadmin.pangea.global",
-	"http://testvendor.pangea.global",
-	"http://testportal.pangea.global",
+	process.env.ADMIN_URL,
+	process.env.PORTAL_URL,
+	process.env.VENDOR_URL,
 	"http://95.216.165.38"
 ];
 
