@@ -14,28 +14,29 @@ const history = require('connect-history-api-fallback');
 let logger = require('morgan');
 const { checkCollections } = require('./helpers/dbSetDefault');
 require('./schedule');
+const env = process.env
 
 //NEW DB
 checkCollections()
 
 const allowedOrigins = [
-	process.env.ADMIN_URL,
-	process.env.PORTAL_URL,
-	process.env.VENDOR_URL,
-	"http://95.216.165.38"
+	env.ADMIN_URL,
+	env.PORTAL_URL,
+	env.VENDOR_URL,
+	env.WORDPRES_URL,
 ];
 
-mongoose.connect(config.mongoDB.url, {
+mongoose.connect(env.MONGO_URL, {
 	useNewUrlParser: true,
 	useFindAndModify: false,
 	useUnifiedTopology: true,
 	useCreateIndex: true
 });
 
-app.use(logger('dev'));
+app.use(logger(env.LOGGER_FORMAT));
 app.use(
 		session({
-			secret: "Cookies Very Much secret key!",
+			secret: env.SESSION_SECRET,
 			resave: true,
 			saveUninitialized: false,
 			store: new MongoStore({
@@ -44,7 +45,7 @@ app.use(
 		})
 );
 
-app.use(express.static("dist"));
+app.use(express.static(env.EXPRESS_STATIC));
 app.use(bodyParser.json({ limit: '50mb', extended: true }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
@@ -75,7 +76,7 @@ const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "https://admin.pangea.global:*, http://localhost:*",
+    origin: env.ADMIN_URL + ":*",
     methods: ["GET", "POST"]
   },
   secure: true,
@@ -98,6 +99,6 @@ io.on('connection', socket => {
   })
 })
 
-httpServer.listen(port, () => {
+httpServer.listen(env.EXPRESS_PORT, () => {
 	console.log('\x1b[32m', `✈  Server is working on: ${ port }`, '\x1b[0m');
 });
