@@ -1,7 +1,6 @@
 const {
 	Projects,
 	User,
-	MemoqProject,
 	Units,
 	Vendors
 } = require('../models')
@@ -19,7 +18,6 @@ const {
 	notifyVendorStepStart
 } = require('./emails')
 
-const { pmMail } = require('../utils/mailtopm')
 
 const {
 	getUpdatedProjectFinanceToZero,
@@ -42,8 +40,7 @@ const {
 } = require('../services/memoqs/files')
 
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users')
-const { notifyManagerProjectStarts } = require('../utils')
-const { sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
+const { notifyManagerProjectStarts, managerNotifyMail, sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
 const { calculateProjectTotal, recalculateStepFinance } = require("../сalculations/finance")
 
 
@@ -440,7 +437,11 @@ async function setNewProjectDetails(project, status, reason) {
 		if (status === "Rejected") {
 			const client = { ...project.customer._doc, id: project.customer.id }
 			const user = await User.findOne({ "_id": client.projectManager._id })
-			await pmMail(project, client, user)
+			await managerNotifyMail(
+					user,
+					`<li>Dear ${ user.firstName }</li>` + `<p>The Quote with ID ${ project.projectId } was rejected ` + `by the client ${ client.name }</p>`,
+					`Quote Details ${ project.projectId }`
+			)
 		}
 		return await updateProject({ "_id": project.id }, { status, isPriceUpdated: false, reason: reason })
 	} catch (err) {
@@ -654,7 +655,7 @@ function getTasksAfterReopen({ steps, tasks }) {
 }
 
 async function updateOtherProject(query, update) {
-	return await MemoqProject.findOneAndUpdate(query, update, { new: false })
+	// return await MemoqProject.findOneAndUpdate(query, update, { new: false })
 }
 
 const assignMemoqTranslator = async (vendorId, stepId, projectId) => {

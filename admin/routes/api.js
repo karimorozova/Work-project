@@ -24,7 +24,6 @@ const { getFilteredClientRequests } = require('../clientRequests')
 const { getServices } = require('../services/')
 // const reqq = require('request')
 const { getAllCountries } = require('../helpers/countries')
-const { createNewRequest } = require("../requests")
 const { insertUnitIntoStep, deleteUnitFromStep, changeUnitsInSteps } = require('../units')
 const { insertStepsIntoUnits, changeStepsInUnits } = require('../steps')
 const { ObjectId } = require("mongoose/lib/types")
@@ -39,19 +38,6 @@ router.get('/payment-methods', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on vendor-payment-benchmark')
-	}
-})
-
-router.post('/request', upload.fields([ { name: 'detailFiles' }, { name: 'refFiles' } ]), async (req, res) => {
-	try {
-		const requestData = req.body
-		const detailFiles = req.files["detailFiles"]
-		const refFiles = req.files["refFiles"]
-		await createNewRequest({ requestData, detailFiles, refFiles })
-		res.send({ message: "request was added" })
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Something went wrong while adding request")
 	}
 })
 

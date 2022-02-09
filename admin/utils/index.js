@@ -4,10 +4,6 @@ const {
   clientQuoteEmail,
   managerNotifyMail
 } = require("./mailTemplate");
-const { sendMail } = require("./mailhandler");
-const { sendMailClient } = require("./mailhandlerclient");
-const { sendMailPortal } = require("./mailhandlerportal");
-const { pmMail } = require("./mailtopm");
 
 const {
   notifyManagerProjectStarts,
@@ -34,10 +30,6 @@ module.exports = {
   clientQuoteEmail,
   upload,
   moveFile,
-  sendMail,
-  sendMailClient,
-  sendMailPortal,
-  pmMail,
   managerNotifyMail,
   notifyManagerProjectStarts,
   notifyManagerProjectRejected,
