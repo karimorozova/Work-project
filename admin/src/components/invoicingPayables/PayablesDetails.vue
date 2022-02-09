@@ -323,7 +323,7 @@ export default {
     },
     downloadFile(path) {
       let link = document.createElement('a')
-      link.href = __WEBPACK__API_URL__ + '/' + path
+      link.href = this.$domains.admin + '/' + path
       link.target = "_blank"
       link.click()
     },
@@ -488,7 +488,7 @@ export default {
     await this.openDetails(this.$route.params.id)
     await this.updatePayableStateFromZoho(this.$route.params.id)
     this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
-    this.domain = __WEBPACK__API_URL__
+    this.domain = this.$domains.admin
   },
   components: {
     Button,

@@ -1,5 +1,5 @@
-let apiUrl = require("../helpers/apiurl")
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+let apiUrl = process.env.ADMIN_URL
+let apiUrlVendor = process.env.VENDOR_URL
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
@@ -70,7 +70,7 @@ function vendorRegistration(obj) {
                       you can access the candidate platform and adjust your profile. 
                       Here is what you need to do:
 										</p>
-										<p style="font-weight: 400;color:#333;">1. Go to: <a href="https://vendor.pangea.global/login" style="color: #D15F46;">Vendor Portal</a></p>
+										<p style="font-weight: 400;color:#333;">1. Go to: <a href="${ apiUrlVendor }/login" style="color: #D15F46;">Vendor Portal</a></p>
 										<p style="font-weight: 400;color:#333;">2. Log in to the system with the following details:</p>
                     <p style="font-weight: 400;color:#333;margin-left: 10px;">• username: <b>${ obj.email.replace(/@/g, '<span>@</span>').replace(/\./g, '<span>.</span>') }</b> </p>
                     <p style="font-weight: 400;color:#333;margin-left: 10px;">• password: <b>${ obj.pass }</b> </p>
@@ -228,7 +228,7 @@ function vendorCanStartStartedSecondStep(obj) {
                     	You can go to the system at the link below.
 										</p>
                     <p style="font-weight: 400;">
-                    	<a href="https://vendor.pangea.global/dashboard/" target="_blank">Vendor Portal</a>
+                    	<a href="${ apiUrlVendor }/dashboard/" target="_blank">Vendor Portal</a>
 										</p>
                 </div>
                 <footer>
@@ -328,7 +328,7 @@ function stepReadyToStartMessage(obj) {
                         You can access the system or click on the link below and enter the task directly.
                     </p>
                     <p style="font-weight: 400;">
-                        <a style="color: #D15F46;" href="https://vendor.pangea.global/dashboard/" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
+                        <a style="color: #D15F46;" href="${ apiUrlVendor }/dashboard/" target="_blank">Open job: ${ obj.step.stepId }: ${ obj.project.projectName }</a>
                     </p>
                 </div>
                 <footer>
@@ -495,7 +495,7 @@ function invoiceReportIsReady({ yearAndMonth, reportId, vendor }) {
                 <div class="main" style="padding:25px;" >
                 		<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear ${ vendor.firstName } ${ vendor.surname || '' }</span></p>
 										<p>The report for <b>${ yearAndMonth }</b> is ready for your review. You can access it from
-											<a href="https://vendor.pangea.global/billing/invoices/details/${ reportId }" target="_blank">here</a>.
+											<a href="${ apiUrlVendor }/billing/invoices/details/${ reportId }" target="_blank">here</a>.
 									 	</p>
 									 	<p>Please ensure that the report accurately and completely reflects your activity for the reporting month.</p>
 									 	<p>To confirm accuracy and approve the report in this format, please click “Confirm” and upload your invoice.</p>
@@ -511,8 +511,8 @@ function invoiceReportIsReady({ yearAndMonth, reportId, vendor }) {
 
 function invoiceReportIsPaid(isFull, { vendor, _id, reportId }) {
 	const link = isFull
-			? `<a href="https://vendor.pangea.global/billing/invoices/details-paid/${ _id }" target="_blank">${ reportId }</a>`
-			: `<a href="https://vendor.pangea.global/billing/invoices/details/${ _id }" target="_blank">${ reportId }</a>`
+			? `<a href="${ apiUrlVendor }/billing/invoices/details-paid/${ _id }" target="_blank">${ reportId }</a>`
+			: `<a href="${ apiUrlVendor }/billing/invoices/details/${ _id }" target="_blank">${ reportId }</a>`
 
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
                 <header style="background-color:#efefef;text-align:center;" >

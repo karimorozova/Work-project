@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const { upload } = require('../utils')
-let apiUrl = require('../helpers/apiurl')
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+let apiUrl = process.env.ADMIN_URL
 const fse = require('fs-extra')
 
 const {
@@ -137,7 +136,7 @@ router.post('/update-client', upload.any(), async (req, res) => {
 		} else {
 			result = await updateClientInfo({ clientId, client, files: req.files })
 		}
-		res.send({ client: await getClientWithActions({_id: result._id}) })
+		res.send({ client: await getClientWithActions({ _id: result._id }) })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on updating/creating Client')

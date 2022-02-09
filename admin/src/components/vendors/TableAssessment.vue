@@ -113,7 +113,7 @@
 				errors: [],
 				isDeleting: false,
 				deleteIndex: -1,
-				domain: "http://localhost:3001",
+				domain: this.$domains.admin,
 				assessmentsWordCount: []
 			}
 		},
@@ -225,7 +225,7 @@
 			VendorLqa
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__
+			this.domain = this.$domains.admin
 		},
 		created() {
 			this.getVendorReports()

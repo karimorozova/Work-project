@@ -58,185 +58,185 @@
 </template>
 
 <script>
-	import CheckBox from "../CheckBox"
-	import Button from "../Button"
-	import currencyIconDetected from "../../mixins/currencyIconDetected"
-	import moment from 'moment'
+import CheckBox from "../CheckBox"
+import Button from "../Button"
+import currencyIconDetected from "../../mixins/currencyIconDetected"
+import moment from 'moment'
 
-	export default {
-		mixins: [ currencyIconDetected ],
-		name: "QuoteDecision",
-		data() {
-			return {
-				isCheck: false,
-				query: {},
-				dataToDisplay: '',
-				mandatoryKeys: [ 't', 'projectId', 'from' ],
-				lengthThinkingTime: 0
-			}
-		},
-		methods: {
-			calculateNewDeadline(deadline) {
-				this.lengthThinkingTime = +new Date().getTime() - +this.query.from
-				return moment(new Date(deadline).getTime() + this.lengthThinkingTime).format('LLL')
-			},
-			getVendorDateFormat(deadline) {
-				return moment(deadline).format('DD-MM-YYYY, HH:mm')
-			},
-			getClientDateFormat(deadline) {
-				return moment(deadline).format('LLL')
-			},
-			toggleCheck() {
-				this.isCheck = !this.isCheck
-			},
-			async makeAction() {
-				let code = 0
-				const { t, projectId, from, prop, tasksIds, stepId, vendorId } = this.query
+export default {
+  mixins: [ currencyIconDetected ],
+  name: "QuoteDecision",
+  data() {
+    return {
+      isCheck: false,
+      query: {},
+      dataToDisplay: '',
+      mandatoryKeys: [ 't', 'projectId', 'from' ],
+      lengthThinkingTime: 0
+    }
+  },
+  methods: {
+    calculateNewDeadline(deadline) {
+      this.lengthThinkingTime = +new Date().getTime() - +this.query.from
+      return moment(new Date(deadline).getTime() + this.lengthThinkingTime).format('LLL')
+    },
+    getVendorDateFormat(deadline) {
+      return moment(deadline).format('DD-MM-YYYY, HH:mm')
+    },
+    getClientDateFormat(deadline) {
+      return moment(deadline).format('LLL')
+    },
+    toggleCheck() {
+      this.isCheck = !this.isCheck
+    },
+    async makeAction() {
+      let code = 0
+      const { t, projectId, from, prop, tasksIds, stepId, vendorId } = this.query
 
-				if (this.query.type === 'client') {
-					const { data } = this.query.hasOwnProperty('tasksIds')
-							? await this.$http.get(`/quotesApi/client-decide-tasks?t=${ t }&projectId=${ projectId }&from=${ from }&prop=${ prop }&tasksIds=${ tasksIds }`)
-							: await this.$http.get(`/quotesApi/client-decide?t=${ t }&projectId=${ projectId }&from=${ from }&prop=${ prop }&lengthThinkingTime=${ +this.lengthThinkingTime }`)
+      if (this.query.type === 'client') {
+        const { data } = this.query.hasOwnProperty('tasksIds')
+            ? await this.$http.get(`/quotesApi/client-decide-tasks?t=${ t }&projectId=${ projectId }&from=${ from }&prop=${ prop }&tasksIds=${ tasksIds }`)
+            : await this.$http.get(`/quotesApi/client-decide?t=${ t }&projectId=${ projectId }&from=${ from }&prop=${ prop }&lengthThinkingTime=${ +this.lengthThinkingTime }`)
 
-					code = data.code
-				} else {
-					const { data } = await this.$http.get(`/quotesApi/vendor-decide?projectId=${ projectId }&vendorId=${ vendorId }&stepId=${ stepId }&from=${ from }&t=${ t }&prop=${ prop }`)
-					code = data.code
-				}
-        if(code === -5){
-          window.location.href = 'https://vendor.pangea.global/dashboard'
-          return
-        }
-				if (code > 0) window.location.href = `/quotesApi/get-error-message?code=${ code }`
-				if (code < 0) window.location.href = `/quotesApi/get-success-message?code=${ code }`
-			},
-			async getClientFullData() {
-				const { t, projectId } = this.query
-				try {
-					this.dataToDisplay = (await this.$http.get(`/quotesApi/client-data-to-display?t=${ t }&projectId=${ projectId }`)).data
-				} catch (e) {
-					window.location.href = '/quotesApi/get-error-message?code=1'
-				}
-			},
-			async getClientTasksData() {
-				const { t, projectId, tasksIds } = this.query
-				try {
-					this.dataToDisplay = (await this.$http.get(`/quotesApi/client-data-tasks-to-display?t=${ t }&projectId=${ projectId }&tasksIds=${ tasksIds }`)).data
-				} catch (e) {
-					window.location.href = '/quotesApi/get-error-message?code=2'
-				}
-			},
-			async getVendorJobData() {
-				const { t, projectId, stepId, vendorId } = this.query
-				try {
-					this.dataToDisplay = (await this.$http.get(`/quotesApi/vendor-data-to-display?t=${ t }&projectId=${ projectId }&vendorId=${ vendorId }&stepId=${ stepId }`)).data
-				} catch (e) {
-					window.location.href = '/quotesApi/get-error-message?code=9'
-				}
-			}
-		},
-		created() {
-			const { query } = this.$route
-			this.query = query
+        code = data.code
+      } else {
+        const { data } = await this.$http.get(`/quotesApi/vendor-decide?projectId=${ projectId }&vendorId=${ vendorId }&stepId=${ stepId }&from=${ from }&t=${ t }&prop=${ prop }`)
+        code = data.code
+      }
+      if (code === -5) {
+        window.location.href = this.$domains.vendor
+        return
+      }
+      if (code > 0) window.location.href = `/quotesApi/get-error-message?code=${ code }`
+      if (code < 0) window.location.href = `/quotesApi/get-success-message?code=${ code }`
+    },
+    async getClientFullData() {
+      const { t, projectId } = this.query
+      try {
+        this.dataToDisplay = (await this.$http.get(`/quotesApi/client-data-to-display?t=${ t }&projectId=${ projectId }`)).data
+      } catch (e) {
+        window.location.href = '/quotesApi/get-error-message?code=1'
+      }
+    },
+    async getClientTasksData() {
+      const { t, projectId, tasksIds } = this.query
+      try {
+        this.dataToDisplay = (await this.$http.get(`/quotesApi/client-data-tasks-to-display?t=${ t }&projectId=${ projectId }&tasksIds=${ tasksIds }`)).data
+      } catch (e) {
+        window.location.href = '/quotesApi/get-error-message?code=2'
+      }
+    },
+    async getVendorJobData() {
+      const { t, projectId, stepId, vendorId } = this.query
+      try {
+        this.dataToDisplay = (await this.$http.get(`/quotesApi/vendor-data-to-display?t=${ t }&projectId=${ projectId }&vendorId=${ vendorId }&stepId=${ stepId }`)).data
+      } catch (e) {
+        window.location.href = '/quotesApi/get-error-message?code=9'
+      }
+    }
+  },
+  created() {
+    const { query } = this.$route
+    this.query = query
 
-			this.mandatoryKeys.forEach(el => {
-				if (!Object.keys(this.query).length || Object.keys(this.query).indexOf(el) === -1) window.location.href = '/quotesApi/get-error-message?code=12'
-			})
+    this.mandatoryKeys.forEach(el => {
+      if (!Object.keys(this.query).length || Object.keys(this.query).indexOf(el) === -1) window.location.href = '/quotesApi/get-error-message?code=12'
+    })
 
-			if (this.query.type === 'client') {
-				this.query.hasOwnProperty('tasksIds') ? this.getClientTasksData() : this.getClientFullData()
-			} else {
-				this.getVendorJobData()
-			}
-		},
-		components: { Button, CheckBox }
-	}
+    if (this.query.type === 'client') {
+      this.query.hasOwnProperty('tasksIds') ? this.getClientTasksData() : this.getClientFullData()
+    } else {
+      this.getVendorJobData()
+    }
+  },
+  components: { Button, CheckBox }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import '../../assets/scss/colors';
+@import '../../assets/scss/colors';
 
-  .wrapper {
-    margin: 50px;
+.wrapper {
+  margin: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+.block {
+  background: white;
+  border-radius: 4px;
+  width: 560px;
+  box-shadow: $box-shadow;
+
+  &__header {
+    background-color: $table-list-hover;
     display: flex;
     justify-content: center;
+    padding: 20px;
   }
 
-  .block {
-    background: white;
-    border-radius: 4px;
-    width: 560px;
-    box-shadow: $box-shadow;
+  &__button {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+  }
 
-    &__header {
-      background-color: $table-list-hover;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
+  &__checks {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    height: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+
+  &__details {
+    padding: 25px;
+
+    &-data {
+      border: 1px solid $border;
     }
 
-    &__button {
+    &-row {
       display: flex;
-      justify-content: center;
-      margin-bottom: 25px;
+      border-bottom: 1px solid $light-border;
     }
 
-    &__checks {
+    &-key {
+      width: 30%;
+      padding: 10px;
       display: flex;
-      justify-content: center;
-      gap: 10px;
-      height: 20px;
       align-items: center;
-      margin-bottom: 20px;
-      margin-top: 10px;
     }
 
-    &__details {
-      padding: 25px;
+    &-value {
+      width: 70%;
+      display: flex;
+      justify-content: end;
+      padding: 10px;
+      align-items: center;
+    }
 
-      &-data {
-        border: 1px solid $border;
-      }
+    &-title {
+      font-size: 14px;
+      text-align: center;
+      font-family: 'Myriad900';
+      margin-bottom: 25px;
+      text-transform: uppercase;
+    }
 
-      &-row {
-        display: flex;
-        border-bottom: 1px solid $light-border;
-      }
-
-      &-key {
-        width: 30%;
-        padding: 10px;
-        display: flex;
-        align-items: center;
-      }
-
-      &-value {
-        width: 70%;
-        display: flex;
-        justify-content: end;
-        padding: 10px;
-        align-items: center;
-      }
-
-      &-title {
-        font-size: 14px;
-        text-align: center;
-        font-family: 'Myriad900';
-        margin-bottom: 25px;
-        text-transform: uppercase;
-      }
-
-      &-title2 {
-        margin-bottom: 4px;
-      }
+    &-title2 {
+      margin-bottom: 4px;
     }
   }
+}
 
-  .image {
-    height: 60px;
-  }
+.image {
+  height: 60px;
+}
 
-  .grey {
-    background: $table-list;
-  }
+.grey {
+  background: $table-list;
+}
 </style>

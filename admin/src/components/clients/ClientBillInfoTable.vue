@@ -185,7 +185,7 @@ export default {
     }
   },
   mounted() {
-    this.domain = __WEBPACK__API_URL__
+    this.domain = this.$domains.admin
   },
   components: {
     GeneralTable,

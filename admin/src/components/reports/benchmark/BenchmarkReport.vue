@@ -48,11 +48,9 @@
 <script>
 	import Table from "./Table"
 	import NewVendor from "../NewVendor"
-	import newXtrfVendor from "@/mixins/newXtrfVendor"
 	import BenchmarkFilter from "./BenchmarkFilter"
 
 	export default {
-		mixins: [ newXtrfVendor ],
 		props: {
 			allXtrfLangs: { type: Array, default: () => [] }
 		},

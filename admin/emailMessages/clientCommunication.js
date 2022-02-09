@@ -1,10 +1,8 @@
-let apiUrl = require("../helpers/apiurl")
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
-
+let apiUrl = process.env.ADMIN_URL
+let apiUrlClient = process.env.PORTAL_URL
 const jwt = require('jsonwebtoken')
 const { secretKey } = require('../configs')
 const { Projects, Units } = require('../models')
-// const moment = require('moment')
 const { returnIconCurrencyByStringCode } = require('../helpers/commonFunctions')
 
 const {
@@ -13,7 +11,7 @@ const {
 	getStepsTotal,
 	getStepsSubTotal,
 	getProjectDetails,
-	getJobsDetails,
+	getJobsDetails
 } = require('./buildersQuote')
 
 async function messageForClientSendQuote(project, tasksIds, allUnits, allSettingsSteps) {
@@ -32,7 +30,6 @@ async function messageForClientSendQuote(project, tasksIds, allUnits, allSetting
 	}
 	let total = isHideWhenMinimumCharge ? project.minimumCharge.value + totalForAdditions : finance.Price.receivables + totalForAdditions
 	total = tasksIds.length ? steps.filter(i => tasksIds.includes(i.taskId)).reduce((a, c) => a + c.finance.Price.receivables, 0).toFixed(2) : total
-
 
 
 	const displaySubTotal = discounts.length || TMDiscount > 0.05
@@ -112,7 +109,6 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 	total = tasksIds.length ? steps.filter(i => tasksIds.includes(i.taskId)).reduce((a, c) => a + c.finance.Price.receivables, 0).toFixed(2) : total
 
 
-
 	const displaySubTotal = discounts.length || TMDiscount > 0.05
 			? `<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 			<div style="display: inline-block; min-width: 110px; text-align: left;">Sub-total:</div>
@@ -156,7 +152,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 		
 			<div style="text-align: right; padding: 22px 0; font-size: 14px; font-weight: 600;">
 						<div style="display: inline-block; min-width: 110px; text-align: left;">Total:</div>
-						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${+parseFloat(total).toFixed(2) } </div>
+						<div style="display: inline-block; min-width: 150px;">${ returnIconCurrencyByStringCode(projectCurrency) } ${ +parseFloat(total).toFixed(2) } </div>
 			</div>
 			</div>
 			<div class="footer" style="position: absolute; width: 754px; border-top: 3px solid #c8e4e4;bottom: 0;padding: 15px 0 12px;">
@@ -187,7 +183,7 @@ async function messageForClientSendCostQuote(project, allUnits, allSettingsSteps
 	let total = isHideWhenMinimumCharge ? project.minimumCharge.value + totalForAdditions : finance.Price.receivables + totalForAdditions
 
 	const displaySubTotal = discounts.length || TMDiscount > 0.05
-			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Sub-total: ${ +(subTotal + + totalForAdditions).toFixed(2) } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</p>`
+			? `<p style="padding: 5px 0; font-size: 14px; font-weight: 600;"> Sub-total: ${ +(subTotal + +totalForAdditions).toFixed(2) } ${ returnIconCurrencyByStringCode(project.projectCurrency) }</p>`
 			: ''
 
 	const displayFinanceDetails = discounts.length || TMDiscount > 0.05
@@ -250,7 +246,7 @@ function getDeliveryMessage(obj) {
 													</li>
 												</ul>
 			                    <p style="font-weight: 400;">
-			                        The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+			                        The files are available for you in our <a href="${ apiUrlClient }/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
 		                    	</p>
                         <p style="font-weight: 400;">
                             In case of any questions, please do not hesitate to contact us :-)
@@ -282,7 +278,7 @@ function getNotifyDeliveryMessage(obj) {
 													</li>
 												</ul>
 		                    <p style="font-weight: 400;">
-		                        The files are available for you in our <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
+		                        The files are available for you in our <a href="${ apiUrlClient }/dashboard/details/${ obj.id }">Portal</a> and attached to this email in a zip format.
 	                      </p>
                         <p style="font-weight: 400;">
                             In case of any questions, please do not hesitate to contact us :-)
@@ -432,7 +428,7 @@ function projectDeliveryMessage(obj) {
                     </p>
                     <p style="font-weight: 400;">
                         The files are available for you in our
-                        <a href="https://portal.pangea.global/dashboard/details/${ obj.id }">Portal</a>
+                        <a href="${ apiUrlClient }/dashboard/details/${ obj.id }">Portal</a>
                         and attached to this email in a zip format.
                     </p>
                      <div style="font-weight: 400;">

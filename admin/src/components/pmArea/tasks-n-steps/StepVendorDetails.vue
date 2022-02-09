@@ -118,7 +118,7 @@ export default {
         up: require("../../../assets/images/latest-version/up.png"),
         down: require("../../../assets/images/latest-version/down.png")
       },
-      domain: "http://localhost:3001",
+      domain: this.$domains.admin,
       isShowBriefModal: false,
       vendorDetails: null,
       vendorBrief: this.currentStep.vendorBrief,
@@ -152,7 +152,7 @@ export default {
     async goToVendor() {
       const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendorId })
       const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
-      const redirectTo = window.location.origin.indexOf('pangea') !== -1 ? 'https://vendor.pangea.global/dashboard' : 'http://localhost:3002/dashboard'
+      const redirectTo = this.$domains.vendor
       document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
       window.open(redirectTo, '_blank')
     },
@@ -219,7 +219,7 @@ export default {
     }
   },
   mounted() {
-    this.domain = __WEBPACK__API_URL__
+    this.domain = this.$domains.admin
   },
   created() {
     this.getVendorDetails()

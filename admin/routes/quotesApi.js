@@ -185,22 +185,22 @@ router.get('/get-success-message', async (req, res) => {
 			case '-1':
 				title = 'Thank you'
 				message = 'for accepting the quote'
-				footer = 'Go to <a style="margin-left: 3px;" href="https://portal.pangea.global/dashboard"> portal.pangea</a>'
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.PORTAL_URL }/dashboard"> portal.pangea</a>`
 				break
 			case '-2':
 				title = 'Quote rejected'
 				message = ''
-				footer = 'Go to <a style="margin-left: 3px;" href="https://portal.pangea.global/dashboard"> portal.pangea</a>'
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.PORTAL_URL }/dashboard"> portal.pangea</a>`
 				break
 			case '-3':
 				title = 'Thank you'
 				message = ''
-				footer = 'Go to <a style="margin-left: 3px;" href="https://vendor.pangea.global/dashboard"> vendor.pangea</a>'
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.VENDOR_URL }/dashboard"> vendor.pangea</a>`
 				break
 			case '-4':
 				title = 'Quote rejected'
 				message = ''
-				footer = 'Go to <a style="margin-left: 3px;" href="https://vendor.pangea.global/dashboard"> vendor.pangea</a>'
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.VENDOR_URL }/dashboard"> vendor.pangea</a>`
 				break
 			default:
 				title = 'ERROR CODE 0'

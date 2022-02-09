@@ -1,8 +1,6 @@
 const { Projects, Languages, Vendors } = require('../models')
 const htmlToPdf = require('html-pdf')
-let apiUrl = require('../helpers/apiurl')
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
-
+let apiUrl = process.env.ADMIN_URL
 const { archiveMultipleFiles } = require('../utils/archiving')
 const { moveProjectFile, moveFile } = require('../utils/movingFile')
 const { getProject, getProjectAfterUpdate } = require('./getProjects')
@@ -60,29 +58,6 @@ async function getProjectDeliverables(project) {
 	//     console.log("Error in getProjectDeliverables");
 	// }
 }
-
-// async function getDeliverablesLink({taskFiles, projectId, taskId}) {
-// try {
-//     const files = getParsedFiles(taskFiles);
-//     const outputPath = `./dist/projectFiles/${projectId}/deliverables-${taskId.replace(/\s+/g, '_')}.zip`;
-//     await archiveMultipleFiles({outputPath, files});
-//     return outputPath.split("./dist")[1];
-// } catch(err) {
-//     console.log(err);
-//     console.log("Error in getDeliverablesLink");
-// }
-// }
-
-// function getParsedFiles(taskFiles) {
-// return taskFiles.reduce((acc, cur) =>
-// 				[...acc,
-// 					{
-// 						path: cur.path.indexOf('./dist') === 0 ?  cur.path : `./dist${cur.path}`,
-// 						name: cur.fileName
-// 					}
-// 				],
-// 		[])
-// }
 
 const createArchiveForDeliverableItem = async ({ type, projectId, entityId, user, tasksDR2, tasksDeliverables }) => {
 	const outputPath = `/projectFiles/${ projectId }/${ Math.floor(Math.random() * 1000000) }-deliverables.zip`

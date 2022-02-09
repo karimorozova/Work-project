@@ -530,7 +530,7 @@ export default {
     createLinkAndDownload(id) {
       const deliverables = this.currentProject.tasksDeliverables.find(({ deliverablesId }) => deliverablesId === id)
       let link = document.createElement('a')
-      link.href = __WEBPACK__API_URL__ + deliverables.path
+      link.href = this.$domains.admin + deliverables.path
       link.target = "_blank"
       link.click()
     },

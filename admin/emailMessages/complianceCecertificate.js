@@ -1,13 +1,5 @@
-let apiUrl = require('../helpers/apiurl')
 const moment = require('moment')
-
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
-// apiUrl = 'http://localhost:3001'
-
-// const logo = apiUrl + '/static/certificate-images/logo.png'
 const background = ''
-const stamp = apiUrl + '/static/certificate-images/stamp.png'
-
 
 module.exports.getCertificateTemplate = ({ project, allLanguages, tasks, deliveryData }) => {
 	const dateNow = new Date()

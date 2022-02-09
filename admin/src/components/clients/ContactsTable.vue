@@ -69,7 +69,7 @@ export default {
   },
   data() {
     return {
-      domain: 'http://localhost:3001',
+      domain: this.$domains.admin,
       fields: [
         { label: "Full Name", headerKey: "headerName", key: "name", style: { width: "35%" } },
         { label: "Position", headerKey: "headerPosition", key: "position", style: { width: "20%" } },
@@ -137,7 +137,7 @@ export default {
     }
   },
   mounted() {
-    this.domain = __WEBPACK__API_URL__
+    this.domain = this.$domains.admin
   },
   components: {
     ContactsManageModal,

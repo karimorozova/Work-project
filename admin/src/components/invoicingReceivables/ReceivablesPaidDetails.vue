@@ -263,7 +263,7 @@
 			},
       downloadFile(path) {
         let link = document.createElement('a')
-        link.href = __WEBPACK__API_URL__ + '/' + path
+        link.href = this.$domains.admin + '/' + path
         link.target = "_blank"
         link.click()
       },

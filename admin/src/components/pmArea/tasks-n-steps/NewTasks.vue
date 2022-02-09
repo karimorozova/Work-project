@@ -229,7 +229,7 @@ export default {
         projectId: this.currentProject._id
       })).data
       if (result.status === 'success') {
-        window.open(__WEBPACK__API_URL__ + result.data, '_blank')
+        window.open(this.$domains.admin + result.data, '_blank')
       } else {
         this.alertToggle({ ...data, type: data.status, isShow: true })
       }

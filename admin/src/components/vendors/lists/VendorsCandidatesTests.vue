@@ -265,7 +265,7 @@
 				isDeleting: false,
 				deleteIndex: -1,
 				isTableDropMenu: true,
-				domain: "http://localhost:3001",
+				domain: this.$domains.admin,
 				isPopup: false
 			}
 		},
@@ -545,7 +545,7 @@
 			}
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__
+			this.domain = this.$domains.admin
 		},
 		created() {
 			this.getTests()

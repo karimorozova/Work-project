@@ -326,7 +326,7 @@ import MailSender from "../MailSender"
 
 export default {
   mounted() {
-    this.domain = __WEBPACK__API_URL__
+    this.domain = this.$domains.admin
   },
   mixins: [ currencyIconDetected, getBgColor ],
   props: {
@@ -348,7 +348,7 @@ export default {
       isSender: false,
 
       toEmail: null,
-      domain: "http://localhost:3001",
+      domain: this.$domains.admin,
       reasons: [ 'Unresponsive', 'Technical issues', 'Personal issues' ],
       reason: null,
       isStart: { yes: false, no: true },
