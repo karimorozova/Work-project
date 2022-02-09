@@ -47,6 +47,21 @@ router.post('/all-clients', requiresLogin, async (req, res) => {
 	}
 })
 
+router.post('/check-jwt', async (req, res) => {
+	const { token } = req.body
+	try {
+		console.log(token)
+		const date = Date.now()
+		const jwtObj = jwt.verify(token, secretKey)
+		if (jwtObj) {
+			if (date > new Date(jwtObj.timestamp)) return res.status(401).send()
+			return res.status(200).send()
+		}
+	} catch (err) {
+		res.status(500).send()
+	}
+})
+
 router.get('/active-clients', requiresLogin, async (req, res) => {
 	try {
 		const clients = await getClientsForNewProject()

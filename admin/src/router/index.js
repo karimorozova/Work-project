@@ -1,6 +1,4 @@
 import Vue from 'vue'
-import jwt from 'jsonwebtoken'
-import secretKey from '../../configs/jwtkey'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
@@ -73,6 +71,7 @@ import ReceivablesPaidReportsList from "../components/invoicingReceivables/Recei
 import ReceivablesDetails from "../components/invoicingReceivables/ReceivablesDetails"
 import ReceivablesAdd from "../components/invoicingReceivables/ReceivablesAdd"
 import ReceivablesPaidDetails from "../components/invoicingReceivables/ReceivablesPaidDetails"
+import axios from "axios"
 // =====================================================================================================
 
 
@@ -695,15 +694,15 @@ const router = new Router({
 	]
 })
 
-router.beforeEach((to, from, next) => {
-	const date = Date.now()
+router.beforeEach( async (to, from, next) => {
+
 	const token = localStorage.getItem("token")
 	try {
 		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot' || to.name === 'quote-decision') return next()
 		if (!!token) {
-			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
-			if (jwtObj) {
-				if (date > new Date(jwtObj.timestamp)) exit()
+			const { status } = await axios.post('/check-jwt', { token: JSON.parse(token).value })
+			console.log(status)
+			if (status === 200) {
 				return next()
 			}
 		}

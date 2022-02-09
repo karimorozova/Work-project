@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo")(session);
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
+const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
@@ -14,13 +15,14 @@ require('./schedule');
 const env = process.env
 
 //NEW DB
+
 checkCollections()
 
 const allowedOrigins = [
 	env.ADMIN_URL,
 	env.PORTAL_URL,
 	env.VENDOR_URL,
-	env.WORDPRES_URL,
+	env.WORDPRESS_URL,
 ];
 
 mongoose.connect(env.MONGO_URL, {
@@ -97,5 +99,5 @@ io.on('connection', socket => {
 })
 
 httpServer.listen(env.EXPRESS_PORT, () => {
-	console.log('\x1b[32m', `✈  Server is working on: ${ port }`, '\x1b[0m');
+	console.log('\x1b[32m', `✈  Server is working on: ${ env.EXPRESS_PORT }`, '\x1b[0m');
 });
