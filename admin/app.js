@@ -19,6 +19,8 @@ const env = process.env
 checkCollections()
 
 const allowedOrigins = [
+	"http://localhost:3000",
+	"http://localhost:3002",
 	env.ADMIN_URL,
 	env.PORTAL_URL,
 	env.VENDOR_URL,
