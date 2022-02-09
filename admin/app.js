@@ -19,18 +19,9 @@ const env = process.env
 checkCollections()
 
 const allowedOrigins = [
-	"https://admin.pangea.global",
-	"https://vendor.pangea.global",
-	"https://portal.pangea.global",
-	"http://localhost:3000",
-	"http://localhost:3002",
-	"http://localhost:8081",
-	"https://testadmin.pangea.global",
-	"https://testvendor.pangea.global",
-	"https://testportal.pangea.global",
-	// env.ADMIN_URL,
-	// env.PORTAL_URL,
-	// env.VENDOR_URL,
+	env.ADMIN_URL,
+	env.PORTAL_URL,
+	env.VENDOR_URL,
 	env.WORDPRESS_URL,
 ];
 
