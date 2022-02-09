@@ -50,7 +50,6 @@ router.post('/all-clients', requiresLogin, async (req, res) => {
 router.post('/check-jwt', async (req, res) => {
 	const { token } = req.body
 	try {
-		console.log(token)
 		const date = Date.now()
 		const jwtObj = jwt.verify(token, secretKey)
 		if (jwtObj) {

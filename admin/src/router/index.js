@@ -701,7 +701,6 @@ router.beforeEach( async (to, from, next) => {
 		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot' || to.name === 'quote-decision') return next()
 		if (!!token) {
 			const { status } = await axios.post('/check-jwt', { token: JSON.parse(token).value })
-			console.log(status)
 			if (status === 200) {
 				return next()
 			}
