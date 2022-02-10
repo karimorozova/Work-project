@@ -1,5 +1,5 @@
 <template lang="pug">
-  .finance(v-if="true || user.email === 'michal@pangea.global'")
+  .finance(v-if="user.email === 'michal@pangea.global'")
     .row
       .col-size
         ProjectStats(:projectsStats="stats")
