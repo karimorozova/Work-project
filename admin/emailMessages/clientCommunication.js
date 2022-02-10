@@ -138,9 +138,9 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 			</div>
 			<div class="body" style="margin: 50px 0; width: 754px;">
 				<div class="body__to" style="font-size: 16px;margin-bottom: 15px;">To: </div>
-				<div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ clientBillingInfo.officialName || '' }</div>
+				<div class="body__vendor" style="font-size: 22px;font-weight: 600;margin-bottom: 15px;">${ clientBillingInfo?.officialName || project.customer?.name || '' }</div>
 				<div class="body__address" style="margin-bottom: 50px;">
-								${ clientBillingInfo.address.street1 || clientBillingInfo.address.street2 || '' }, ${ clientBillingInfo.address.city || '' }, ${ clientBillingInfo.address.country || '' }
+								${ clientBillingInfo?.address?.street1 || clientBillingInfo?.address?.street2 || '' }, ${ clientBillingInfo?.address?.city || '' }, ${ clientBillingInfo?.address?.country || '' }
 						</div>
 				<div class="body__line" style="background-color: #b5dbdb; height: 1px;"></div>
 			</div>

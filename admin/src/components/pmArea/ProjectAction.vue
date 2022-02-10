@@ -208,24 +208,9 @@ export default {
     openPreviewCostQuote() {
       this.isEditAndSendCostQuote = true
     },
-    getCancelStatus() {
-      if (
-          this.project.status === 'Draft' ||
-          this.project.status === "Quote sent" ||
-          this.project.status === "Approved" ||
-          this.project.status === "Rejected" ||
-          this.project.status === "Cost Quote" ||
-          this.project.status === "Requested"
-      ) {
-        return "Cancelled"
-      } else {
-        return "Cancelled Halfway"
-      }
-    },
     async getCancelMessage() {
-      let cancelStatus = this.getCancelStatus()
       try {
-        const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay })
+        const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus: 'Cancelled', reason: this.selectedReason, isPay: this.isPay })
         this.previewMessage = template.data.message
         this.openPreviewCancel()
       } catch (err) {
@@ -273,9 +258,8 @@ export default {
       }
     },
     async sendMessageCancel(message) {
-      let cancelStatus = this.getCancelStatus()
       try {
-        await this.setProjectStatus({ id: this.$route.params.id, status: cancelStatus, reason: this.selectedReason || "" })
+        await this.setProjectStatus({ id: this.$route.params.id, status: "Cancelled", reason: this.selectedReason || "" })
         await this.sendCancelProjectMessage({ id: this.project._id, message, isNotify: true })
         this.alertToggle({ message: "Sent successfully", isShow: true, type: "success" })
       } catch (err) {
@@ -286,9 +270,8 @@ export default {
       }
     },
     async cancelProjectWithoutNotification() {
-      let cancelStatus = this.getCancelStatus()
       try {
-        await this.setProjectStatus({ id: this.$route.params.id, status: cancelStatus, reason: this.selectedReason || "" })
+        await this.setProjectStatus({ id: this.$route.params.id, status: "Cancelled", reason: this.selectedReason || "" })
         await this.sendCancelProjectMessage({ id: this.project._id, message: null, isNotify: false })
         this.alertToggle({ message: "Sent successfully", isShow: true, type: "success" })
       } catch (err) {
@@ -531,7 +514,7 @@ export default {
       }
 
       if (this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-        result = [ 'ReOpen' ]
+        result = []
       }
 
       if (!result.includes('Delete') && this.project.status !== 'Closed') result.push('Delete')

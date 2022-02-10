@@ -4,7 +4,6 @@ const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject, rateExchangeProjectOntoVendor } = require('../helpers/commonFunctions')
 const { getProject, updateProject } = require('../projects/getProjects')
 const { setTaskMetrics } = require("../сalculations/wordcount")
-const { getProjectAfterUpdate } = require("../projects/getProjects")
 
 const setUpdatedFinanceData = async (data) => {
 	const { projectId, stepId, quantityReceivables, quantityPayables, rateReceivables, ratePayables, totalReceivables, totalPayables } = data
@@ -37,36 +36,30 @@ const setUpdatedFinanceData = async (data) => {
 	}
 
 	await Projects.updateOne({ "_id": projectId }, { steps })
-	// await recalculateStepFinance(projectId)
 	return await calculateProjectTotal(projectId)
 }
 
-//FINANCE 2 FOR PROJECT ==>
+//FINANCE FN #2 USED FOR PROJECT TOTAL ==>
 const calculateProjectTotal = async (projectId) => {
 	const { steps } = await Projects.findOne({ "_id": projectId })
-
 	const finance = {
 		"Price": {
 			receivables: 0,
 			payables: 0
 		}
 	}
-
 	steps.forEach(step => {
 		const { finance: { Price } } = step
 		finance.Price.receivables += +Price.receivables
 		finance.Price.payables += +Price.payables
 	})
-
 	return await updateProject({ '_id': projectId }, { finance })
 }
 
-//FINANCE 1 FOR STEPS  ==>
+//FINANCE FN #1 USED FOR STEPS  ==>
 const recalculateStepFinance = async (projectId) => {
 	const { steps, discounts, minimumCharge, customer } = await getProject({ _id: projectId })
-	// let newDiscounts = !discounts.length ? await getClientDiscount( customer.discounts ) : discounts
 	let newDiscounts = discounts
-	// console.log({disco: await getClientDiscount( customer.discounts )})
 	const newSteps = updateStepsFinanceWithDiscounts(steps, newDiscounts)
 	let queryToUpdateSteps = { steps: newSteps }
 	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
@@ -170,10 +163,6 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 	const nativeFinance = stepFinance()
 	const defaultStepPrice = finance.Price.receivables
 
-	// if (discounts.length) {
-	// 	const { Price: { receivables } } = finance
-	// 	finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
-	// }
 
 	function stepFinance() {
 		return {

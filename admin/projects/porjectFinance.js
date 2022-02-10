@@ -39,18 +39,6 @@ function getProjectFinancePrice(tasks) {
 	// return { receivables, payables }
 }
 
-function getUpdatedProjectFinanceToZero(tasks) {
-	// let receivables = 0
-	// let payables = 0
-	// for (let task of tasks) {
-	// 	if (task.status !== 'Cancelled') {
-	// 		receivables += task.status === 'Cancelled Halfway' ? +task.finance.Price.halfReceivables : receivables
-	// 		payables += task.status === 'Cancelled Halfway' ? +task.finance.Price.halfPayables : payables
-	// 	}
-	// }
-	// return { receivables: +receivables.toFixed(2), payables: +payables.toFixed(2) }
-}
-
 // const addPaymentAdditions = async (_id, paymentAddition) => {
 // 	const { finance } = await Projects.findOne({ _id: _id })
 //
@@ -118,7 +106,6 @@ const findStepMultiplier = (step) => {
 
 module.exports = {
 	getProjectAfterFinanceUpdated,
-	getUpdatedProjectFinanceToZero,
 	getProjectFinancePrice,
 	// addPaymentAdditions,
 	// deletePaymentAddition

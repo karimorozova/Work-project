@@ -20,7 +20,6 @@ const {
 
 
 const {
-	getUpdatedProjectFinanceToZero,
 	getProjectFinancePrice
 } = require('./porjectFinance')
 
@@ -77,13 +76,15 @@ async function getProjectAfterCancelTasks(tasks, project) {
 	try {
 		const { changedTasks, changedSteps, stepIdentify } = await cancelTasks(tasks, project)
 
-		const notifySteps = stepIdentify.length ? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1) : changedSteps
+		const notifySteps = stepIdentify.length
+				? changedSteps.filter(item => stepIdentify.indexOf(item.stepId) !== -1)
+				: changedSteps
+
 		await stepCancelNotifyVendor(notifySteps)
 
 		await updateProject({ "_id": project.id }, { tasks: changedTasks, steps: changedSteps })
 		await recalculateStepFinance(project.id)
 		return await calculateProjectTotal(project.id)
-
 	} catch (err) {
 		console.log(err)
 		console.log("Error in getProjectAfterCancelTasks")
@@ -96,16 +97,18 @@ async function cancelTasks(tasks, project) {
 	let projectSteps = [ ...project.steps ]
 	const tasksIds = tasks.map(item => item.taskId)
 	let inCompletedSteps = []
-
 	if (projectSteps.length) {
 		inCompletedSteps = projectSteps.map(item => {
-			if (item.status !== "Completed" && tasksIds.indexOf(item.taskId) !== -1) return { ...item._doc }
+			if (item.status !== "Completed" && item.status !== 'Cancelled' && item.status !== 'Cancelled Halfway' && tasksIds.indexOf(item.taskId) !== -1) return { ...item._doc }
 		}).filter(item => !!item)
 	}
+	const stepIdentify = inCompletedSteps.length
+			? inCompletedSteps.map(step => step.stepId)
+			: []
 
-	const stepIdentify = inCompletedSteps.length ? inCompletedSteps.map(step => step.stepId) : []
-	const changedSteps = stepIdentify.length ? cancelSteps({ stepIdentify, steps: projectSteps }) : []
-
+	const changedSteps = stepIdentify.length
+			? cancelSteps({ stepIdentify, steps: projectSteps })
+			: []
 	try {
 		const changedTasks = await cancelCheckedTasks({ tasksIds, projectTasks, changedSteps })
 		return {
@@ -127,16 +130,15 @@ function cancelSteps({ stepIdentify, steps }) {
 
 			if (+item.progress.wordsDone > 0 && newStatus !== 'Completed') {
 				newStatus = "Cancelled Halfway"
-				let finance = getStepNewFinance(item)
-				return { ...item._doc, previousStatus: item.status, status: newStatus, finance }
+				let { finance, nativeFinance } = getStepNewFinanceHalfway(item)
+				return { ...item._doc, previousStatus: item.status, status: newStatus, finance, nativeFinance }
 			} else {
-				item.finance = {
+				item.finance = item.nativeFinance = {
 					Quantity: { receivables: 0, payables: 0 },
 					Wordcount: { receivables: 0, payables: 0 },
 					Price: { receivables: 0, payables: 0 }
 				}
 			}
-
 			item.previousStatus = item.status
 			item.status = newStatus
 		}
@@ -159,6 +161,33 @@ async function cancelCheckedTasks({ tasksIds, projectTasks, changedSteps }) {
 		console.log(err)
 		console.log("Error in cancelCheckedTasks")
 		throw new Error(err.message)
+	}
+}
+
+function getTaskStatusAfterCancel(steps, taskId) {
+	const taskSteps = steps.filter(item => item.taskId === taskId).map(step => step.status)
+
+	return taskSteps.map(i => i.status).includes('Cancelled Halfway')
+			? 'Cancelled Halfway'
+			: 'Cancelled'
+}
+
+function getStepNewFinanceHalfway(step) {
+	let { progress, finance, nativeFinance } = step
+	progress = (progress.wordsDone / progress.totalWordCount) * 100
+
+	return {
+		finance: mutatedFinanceByPercent(finance, progress),
+		nativeFinance: mutatedFinanceByPercent(nativeFinance, progress)
+	}
+
+	function mutatedFinanceByPercent(finance, progress) {
+		for (const quantity_wordcount_price in finance) if (Object.hasOwnProperty.call(finance, quantity_wordcount_price)) {
+			for (const receivables_payables in finance[quantity_wordcount_price]) if (Object.hasOwnProperty.call(finance[quantity_wordcount_price], receivables_payables)) {
+				finance[quantity_wordcount_price][receivables_payables] = +((finance[quantity_wordcount_price][receivables_payables] * progress) / 100).toFixed(2)
+			}
+		}
+		return finance
 	}
 }
 
@@ -318,38 +347,6 @@ async function downloadCompletedFiles(stepId) {
 	}
 }
 
-function getTaskStatusAfterCancel(steps, taskId) {
-	const taskSteps = steps.filter(item => item.taskId === taskId).map(step => step.status)
-
-	return taskSteps.map(i => i.status).includes('Cancelled Halfway')
-			? 'Cancelled Halfway'
-			: 'Cancelled'
-
-	// const cancelledSteps = taskSteps.filter(item => item === "Cancelled")
-	// const completedSteps = taskSteps.filter(item => item === "Completed")
-	// const halfCancelledSteps = taskSteps.filter(item => item === "Cancelled Halfway")
-	//
-	// if (cancelledSteps.length === taskSteps.length || !steps.length) {
-	// 	return "Cancelled"
-	// }
-	// if (completedSteps.length === taskSteps.length) {
-	// 	return "Pending Approval [DR1]"
-	// }
-	// if (halfCancelledSteps.length || (completedSteps.length && completedSteps.length < taskSteps.length)) {
-	// 	return "Cancelled Halfway"
-	// }
-}
-
-function getStepNewFinance(step) {
-	const { progress, finance } = step
-	const { Wordcount, Price } = finance
-	const done = progress.wordsDone / progress.totalWordCount
-	Wordcount.payables = progress.wordsDone
-	Price.halfReceivables = +((Price.receivables * done).toFixed(2))
-	Price.halfPayables = +((Price.payables * done).toFixed(2))
-	return { Wordcount, Price }
-}
-
 async function reOpenProject(project, ifChangePreviousStatus = true) {
 	let { steps, tasks } = project
 
@@ -378,26 +375,22 @@ async function updateProjectStatus(id, status, reason) {
 		const project = await getProject({ "_id": id })
 		// if (status === 'fromCancelled') return await reOpenProject(project)
 		// if (status === 'fromClosed') return await reOpenProject(project, false)
-		if (status !== "Cancelled" && status !== "Cancelled Halfway") {
-			return await setNewProjectDetails(project, status, reason)
-		}
-
-		if (status === "Cancelled" || status === "Cancelled Halfway") {
+		if (status === "Cancelled") {
 			const { tasks, steps } = project
 			const { changedTasks, changedSteps } = await cancelTasks(tasks, project)
-			const Price = getUpdatedProjectFinanceToZero(changedTasks)
-
 			if (steps.length) await stepCancelNotifyVendor(steps)
-			return await updateProject({ "_id": id }, {
-				status,
+			await updateProject({ "_id": id }, {
+				status: changedSteps.some(i => i.status === 'Cancelled Halfway') ? 'Cancelled Halfway' : status,
 				reason,
 				isPriceUpdated: false,
-				finance: { ...project.finance, Price },
 				tasks: changedTasks,
 				steps: changedSteps
 			})
+			await recalculateStepFinance(id)
+			return await calculateProjectTotal(id)
+		} else {
+			return await setNewProjectDetails(project, status, reason)
 		}
-
 	} catch (err) {
 		console.log(err)
 		console.log("Error in updateProjectStatus")
