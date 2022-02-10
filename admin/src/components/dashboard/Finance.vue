@@ -40,19 +40,25 @@
 <script>
 import ProjectStats from "./Tables/ProjectStats"
 import XtrfStatsToday from "./Tables/XtrfStatsToday"
+import { mapGetters } from "vuex"
 
 export default {
   name: "Finance",
   components: {
     ProjectStats,
-    XtrfStatsToday,
+    XtrfStatsToday
   },
   data() {
     return {
       stats: [],
       todayStats: [],
-      xtrfStatsByClient: {},
+      xtrfStatsByClient: {}
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: 'getUser'
+    })
   },
   async created() {
     this.stats = (await this.$http.get('/dashboard-api/projects-finance')).data
@@ -64,6 +70,7 @@ export default {
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
+
 .finance {
   width: 1530px;
   margin: 50px;
@@ -90,21 +97,26 @@ export default {
     box-sizing: border-box;
   }
 }
-.strings{
+
+.strings {
   display: flex;
   justify-content: space-between;
 }
+
 .string {
   width: 300px;
 }
+
 .test {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
 }
+
 .name {
   width: 160px;
 }
+
 .amount {
   width: 80px;
 }
