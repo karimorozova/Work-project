@@ -132,7 +132,7 @@
               span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
 
           template(slot="created" slot-scope="{ row, index }")
-            .table__data {{ getTime( row.createdAt) }}
+            .table__data {{ getTime( row.createAt) }}
 
           template(slot="updated" slot-scope="{ row, index }")
             .table__data {{ getTime( row.updatedAt) }}

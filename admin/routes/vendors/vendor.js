@@ -21,7 +21,7 @@ const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunicatio
 const { assignMemoqTranslator, getProject, updateProjectProgress, regainWorkFlowStatusByStepId } = require('../../projects')
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
-const { storeFiles, updateNonWordsTaskTargetFiles, updateNonWordsTaskTargetFile, downloadCompletedFiles, updateProject } = require('../../projects')
+const { storeFiles, updateNonWordsTaskTargetFiles, downloadCompletedFiles, updateProject } = require('../../projects')
 const {
 	getPayableByVendorId,
 	getPayablePaidByVendorId,
