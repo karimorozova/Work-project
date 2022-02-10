@@ -1,3 +1,7 @@
+const { moveProjectFile } = require("../utils/movingFile")
+const { getVendorAfterUpdate, getVendor } = require("../vendors")
+const { PaymentTerms } = require("../models")
+
 const clearPayablesStepsPrivateKeys = async (reports) => {
 	const privateKeys = [
 		'finance',
@@ -45,5 +49,28 @@ const returnMessageAndType = (message, type) => {
 	}
 }
 
+const invoiceFileUploading = async (invoiceFile) => {
+	const fileName = `${ Math.floor(Math.random() * 1000000) }-${ invoiceFile.filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
+	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
+	await moveProjectFile(invoiceFile, `./dist${ newPath }`)
+	return { fileName, newPath }
+}
 
-module.exports = { clearPayablesStepsPrivateKeys, returnMessageAndType }
+const getVendorAndCheckPaymentTerms = async (vendorId) => {
+	const vendor = await getVendor({ "_id": vendorId })
+	const allPaymentTerms = await PaymentTerms.find()
+
+	if (!vendor.billingInfo.hasOwnProperty('paymentTerm') || !vendor.billingInfo.paymentTerm._id) {
+		const { billingInfo } = vendor
+		billingInfo.paymentTerm = allPaymentTerms.find(item => item.name === '30 Days') || allPaymentTerms[0]
+		return await getVendorAfterUpdate({ "_id": vendorId }, { billingInfo })
+	}
+	return vendor
+}
+
+module.exports = {
+	clearPayablesStepsPrivateKeys,
+	returnMessageAndType,
+	invoiceFileUploading,
+	getVendorAndCheckPaymentTerms
+}

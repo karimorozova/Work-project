@@ -101,55 +101,11 @@ router.post("/approve-report", checkVendor, async (req, res) => {
 	}
 })
 
-router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
-	try {
-		const { paymentMethod, reportsIds, notes } = req.body
-		const [ report ] = await getPayable(reportsIds[0])
-		let { _id, vendor, reportId, steps, paymentDetails, lastPaymentDate } = report
-		const vendorName = vendor.firstName + ' ' + vendor.surname
-
-		if (!vendor.billingInfo.hasOwnProperty('paymentTerm') || !vendor.billingInfo.paymentTerm._id) {
-			const getPaymentTerms = await PaymentTerms.find()
-			const { billingInfo } = vendor
-			billingInfo.paymentTerm = getPaymentTerms.find(item => item.name === '30 Days') || getPaymentTerms[0]
-			vendor = await getVendorAfterUpdate({ _id: vendor._id }, { billingInfo })
-		}
-
-		const rate = steps.reduce((acc, { nativeFinance }) => {
-			acc += nativeFinance.Price.payables
-			return acc
-		}, 0)
-
-		const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
-
-		const lineItems = [{
-			"name": `TS ${monthAndYear}`,
-			"account_id": "335260000002330131",
-			"rate": rate,
-			"quantity": 1
-
-		}]
-
-		const expectedPaymentDate = moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD')
-		paymentDetails.paymentMethod = paymentMethod
-		paymentDetails.expectedPaymentDate = new Date(expectedPaymentDate)
-
-		const { bill } = await createBill(expectedPaymentDate, vendorName, vendor.email, reportId, lineItems, notes)
-		await updatePayable(_id, { zohoBillingId: bill.bill_id, paymentDetails })
-		res.send('Done')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error / Cannot create bill file (invoice-submission)')
-	}
-})
-
 router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
 	try {
 		const { invoiceFile } = req.files
-		const { reportId, zohoBillingId } = req.body
-		const newPath = await invoiceSubmission({ reportId, invoiceFile })
-		await addFile(zohoBillingId, newPath)
-		res.send('Done')
+		const { reportId, paymentMethod, vendorId } = req.body
+		await invoiceSubmission({ reportId, vendorId, invoiceFile, paymentMethod })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error / Cannot add invoice file (invoice-submission)')
@@ -159,10 +115,8 @@ router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoice
 router.post('/invoice-reload', checkVendor, upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
 	try {
 		const { invoiceFile } = req.files
-		const { reportId, expectedPaymentDate, oldPath, zohoBillingId } = req.body
-		const newPath = await invoiceReloadFile({ reportId, expectedPaymentDate, invoiceFile, oldPath })
-		await removeFile(zohoBillingId)
-		await addFile(zohoBillingId, newPath)
+		const { reportId, oldPath } = req.body
+		await invoiceReloadFile({ reportId, invoiceFile, oldPath })
 		res.send('Done')
 	} catch (err) {
 		console.log(err)

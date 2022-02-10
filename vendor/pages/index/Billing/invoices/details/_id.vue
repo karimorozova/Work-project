@@ -225,14 +225,9 @@ export default {
     },
     async submitFile() {
       const fileData = new FormData()
-      const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
-      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
-      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
-      fileData.append("expectedPaymentDate", expectedPaymentDate)
       fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
-
       try {
         await this.$axios.post(`/vendor/invoice-reload`, fileData)
         this.clearInputFiles(".file-button")
@@ -242,9 +237,10 @@ export default {
       } catch (err) {
         console.log(err)
       }
-
     },
     async submitReport() {
+      return
+
       this.errors = []
       if (!this.invoiceFile) this.errors.push('Please upload invoice file')
       if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
@@ -254,15 +250,15 @@ export default {
       try {
         const paymentMethod = { ...this.reportDetailsInfo.paymentDetails.paymentMethod }
         delete paymentMethod.name
-        const notes = Object.entries(paymentMethod).reduce((acc, curr) => {
-          acc = acc + `${ replaceKey(curr[0]) }: ${ curr[1] }\n`
-          return acc
-        }, '')
+        // const billNotes = Object.entries(paymentMethod).reduce((acc, curr) => {
+        //   acc = acc + `${ replaceKey(curr[0]) }: ${ curr[1] }\n`
+        //   return acc
+        // }, '')
 
         await this.$axios.post(`/vendor/zoho-bill-creation`, {
           paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
           reportsIds: [ this.reportDetailsInfo._id.toString() ],
-          notes
+          // billNotes
         })
         await this.getReport()
       } catch (err) {

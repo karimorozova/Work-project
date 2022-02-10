@@ -15,68 +15,13 @@ const { updatePayable } = require("./updatePayables")
 const { sendRequestToZoho } = require("../services/zoho")
 
 
-// async function getCurrentToken() {
-// 	try {
-// 		const token = await Zoho.findOne()
-// 		return token.access_token
-// 	} catch (err) {
-// 		console.log(err)
-// 		console.log("Error on getCurrentToken ZOHO from DB")
-// 	}
-// }
-//
-// const setNewTokenFromRefresh = async () => {
-// 	try {
-// 		const { _id, refresh_token } = await Zoho.findOne()
-// 		const { access_token = '' } = await refreshToken(refresh_token)
-// 		if (access_token === '') return returnMessageAndType("test", 'error')
-// 		await Zoho.updateOne({ _id: _id }, { access_token })
-// 		return access_token
-// 	} catch (e) {
-// 		return false
-// 	}
-// }
-//
-// const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}) => {
-// 	return (await axios({
-// 		headers: {
-// 			'Authorization': `Bearer  ${ token }`,
-// 			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-// 			...header
-// 		},
-// 		method,
-// 		url: baseUrl + link,
-// 		data,
-// 		...(additional)
-// 	}))
-// }
-//
-// const sendRequestToZoho = async (link, data, method = "GET", header = {}, additional = {}) => {
-// 	let token = await getCurrentToken()
-// 	try {
-// 		return await zohoRequest(link, data, token, method, header, additional)
-// 	} catch (err) {
-// 		console.log(err.response)
-// 		try{
-// 			if (err.response || err.response.data.code === 57) {
-// 				token = await setNewTokenFromRefresh()
-// 				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
-// 				return await	zohoRequest(link, data, token, method, header, additional )
-// 			}
-// 		} catch (err) {
-// 			  returnMessageAndType(err.message, 'error')
-// 		}
-//
-// 		 returnMessageAndType(err.message, 'error')
-// 	}
-// }
-
 const getVendor = async (vendorEmail) => {
 	const customer = await sendRequestToZoho(`contacts?organization_id=${ organizationId }&email_startswith=${ vendorEmail }&contact_type=vendor`)
 	return customer.data.contacts.length
 			? customer.data.contacts[0].contact_id
 			: null
 }
+
 const createVendor = async (vendorName, vendorEmail) => {
 	const data = {
 		"contact_name": vendorName,
@@ -91,16 +36,14 @@ const createVendor = async (vendorName, vendorEmail) => {
 	return customer.data.contact.contact_id
 }
 
-
-const createBill = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems, notes) => {
+const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems) => {
 	let zohoVendorId = await getVendor(vendorEmail)
 	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
 		"due_date": due_date,
-		"line_items": lineItems,
-		"notes": notes,
+		"line_items": lineItems
 	}
 	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')
 	return billing.data
@@ -127,44 +70,47 @@ const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, a
 
 const updatePayablesFromZoho = async () => {
 	try {
-		let allPayables = (await getAllPayableByDefaultQuery({zohoBillingId: {$ne: ''}}))
-		for (let {_id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId, paymentDetails : {paymentMethod}} of allPayables) {
-			await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount}  )
+		let allPayables = (await getAllPayableByDefaultQuery({ zohoBillingId: { $ne: '' } }))
+		for (let { _id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId, paymentDetails: { paymentMethod } } of allPayables) {
+			await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount })
 		}
 		return { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
 	} catch (err) {
-		return {type: 'error', message: err.message, isMovedToArchive: false}
+		return { type: 'error', message: err.message, isMovedToArchive: false }
 	}
-
 }
 
-const updatePayableFromZoho = async (reportId ) => {
+const updatePayableFromZoho = async (reportId) => {
 	try {
-		let { zohoBillingId: zohoId, paymentInformation, unpaidAmount, paymentDetails : {paymentMethod}} = (await getPayable(reportId))[0]
-		const statusAction = await syncPayableWithZoho(reportId, paymentMethod,{ zohoId, paymentInformation, unpaidAmount}  )
-		return statusAction === 'Moved' ? { type: 'success',message: 'Updated and moved to Archive', isMovedToArchive: true} : { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
-
+		let { zohoBillingId: zohoId, paymentInformation, unpaidAmount, paymentDetails: { paymentMethod } } = (await getPayable(reportId))[0]
+		const statusAction = await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount })
+		return statusAction === 'Moved'
+				? {
+					type: 'success',
+					message: 'Updated and moved to Archive',
+					isMovedToArchive: true
+				}
+				: {
+					type: 'success',
+					message: 'Updated from Zoho',
+					isMovedToArchive: false
+				}
 	} catch (err) {
-		return {type: 'error', message: err.message, isMovedToArchive: false}
+		return { type: 'error', message: err.message, isMovedToArchive: false }
 	}
 }
 
-const syncPayableWithZoho = async (reportId, reportPaymentMethod, { zohoId, paymentInformation, unpaidAmount}) => {
-	const createdZohoPaidIds =  paymentInformation.reduce((acc, {zohoPaymentId}) => {
-			acc.push(zohoPaymentId)
-			return acc
+const syncPayableWithZoho = async (reportId, reportPaymentMethod, { zohoId, paymentInformation, unpaidAmount }) => {
+	const createdZohoPaidIds = paymentInformation.reduce((acc, { zohoPaymentId }) => {
+		acc.push(zohoPaymentId)
+		return acc
 	}, [])
-
 	const listBillPayments = (await sendRequestToZoho(`bills/${ zohoId }/payments?organization_id=${ organizationId }`)).data
 
-
 	for await (let { payment_id, date, amount } of listBillPayments.payments) {
-		if(!createdZohoPaidIds.includes(payment_id)) {
-			//TODO: https://stackoverflow.com/questions/31426740/how-to-return-many-promises-and-wait-for-them-all-before-doing-other-stuff
-
+		if (!createdZohoPaidIds.includes(payment_id)) {
 			unpaidAmount = (unpaidAmount - amount).toFixed(2)
-			await paidOrAddPaymentInfo(reportId,  payment_id,  {paidAmount:amount, unpaidAmount, paymentMethod: reportPaymentMethod,	paymentDate: new Date(date), notes: ''})
-
+			await paidOrAddPaymentInfo(reportId, payment_id, { paidAmount: amount, unpaidAmount, paymentMethod: reportPaymentMethod, paymentDate: new Date(date), notes: '' })
 		}
 	}
 	if (unpaidAmount <= 0) return "Moved"
@@ -175,8 +121,7 @@ const addFile = async (billId, filePath) => {
 	const finalPath = path.join('./dist', filePath)
 	const form = new FormData()
 	form.append('attachment', fs.createReadStream(finalPath))
-
-	const addedFile = await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, form, 'POST', form.getHeaders())
+	await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, form, 'POST', form.getHeaders())
 }
 
 const removeFile = async (billId) => {
@@ -184,12 +129,11 @@ const removeFile = async (billId) => {
 }
 
 
-
 module.exports = {
-	createBill,
+	createBillZohoRequest,
 	addFile,
 	removeFile,
 	createNewPayable,
 	updatePayableFromZoho,
-	updatePayablesFromZoho,
+	updatePayablesFromZoho
 }
