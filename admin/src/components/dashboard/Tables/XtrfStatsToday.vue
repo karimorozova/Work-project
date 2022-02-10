@@ -1,6 +1,6 @@
 <template lang="pug">
   .component
-    .component__title Receivables
+    .component__title XTRF
     .component__table-group
       .component__content
         GeneralTable(
