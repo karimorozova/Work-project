@@ -29,6 +29,7 @@ import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
 import StepsDashboard from '@/components/dashboard/StepsDashboard'
 import OverallView from '@/components/dashboard/OverallView'
 import Activity from '@/components/dashboard/Activity'
+import Finance from '@/components/dashboard/Finance'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
 import TableClientApiSetting from "../components/Table/TableClientApiSetting"
@@ -149,6 +150,11 @@ const router = new Router({
 							path: 'activities',
 							name: 'activities',
 							component: Activity
+						},
+						{
+							path: 'finance',
+							name: 'finance',
+							component: Finance
 						}
 
 					]

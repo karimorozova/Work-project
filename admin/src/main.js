@@ -66,7 +66,8 @@ if(location.hostname !== 'localhost') {
 }
 
 Vue.config.errorHandler = (err, vm, info) => {
-    console.log(`Error: ${err.toString()}\nInfo: ${info}`);
+  console.error(err)
+    // console.log(`Error: ${err.toString()}\nInfo: ${info}`);
 }
 
 /* eslint-disable no-new */

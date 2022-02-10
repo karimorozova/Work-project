@@ -50,6 +50,11 @@ export default {
               type: 'link',
               name: 'Activities',
               path: '/pangea-dashboard/activities'
+            },
+            {
+              type: 'link',
+              name: 'Finance',
+              path: '/pangea-dashboard/finance'
             }
             // {
             // 	type: 'link',

@@ -2,7 +2,7 @@
   .overallView
 
     div(v-if="isAdmin")
-      .row(v-if="user.email === 'michal@pangea.global'")
+      .row(v-if="true || user.email === 'michal@pangea.global'")
         .col-size
           ProjectStats(:projectsStats="stats")
         .col
@@ -253,6 +253,7 @@ export default {
     this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
     this.stats = (await this.$http.get('/dashboard-api/projects-finance')).data
     this.todayStats = (await this.$http.get('/dashboard-api/finance')).data
+    console.log(this.todayStats)
   },
 }
 </script>

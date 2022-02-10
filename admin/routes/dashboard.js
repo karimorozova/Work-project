@@ -150,6 +150,67 @@ router.get("/finance", async (req, res) => {
 	}
 })
 
+
+router.get("/finance-by-client", async (req, res) => {
+	try {
+		const currencyNormalize = {
+			'[&euro;]': 'EUR',
+			'[$]': 'USD'
+		}
+		let todayClientsAmount = {}
+		let monthClientsAmount = {}
+
+		const reportsLink = await sendRequest('get', 'reports/136/result/printerFriendly')
+		const xtrfPayments = (await axios({
+			method: 'get',
+			url: reportsLink.data.url
+		}))
+
+		const reportsLinkMonth = await sendRequest('get', 'reports/137/result/printerFriendly')
+		const xtrfPaymentsMonth = (await axios({
+			method: 'get',
+			url: reportsLinkMonth.data.url
+		}))
+
+		const matchStrings = xtrfPayments.data.matchAll(/xtrf-financial-report-body.*?:center\;\"\>(.*?)<.*?(\[\$\]|\[\&euro\;\]).*?center;">(.*?)</gm) || []
+
+		for await (let [_, name, currency, amount] of matchStrings) {
+			if (!todayClientsAmount.hasOwnProperty(name)) {
+				todayClientsAmount[name] = {
+					name,
+					currencyNormalized: currencyNormalize[currency],
+					amount: parseFloat(amount)
+				}
+			}else {
+				todayClientsAmount[name].amount += parseFloat(amount)
+			}
+
+
+		}
+		const matchStringsMonth = xtrfPaymentsMonth.data.matchAll(/xtrf-financial-report-body.*?:center\;\"\>(.*?)<.*?(\[\$\]|\[\&euro\;\]).*?center;">(.*?)</gm) || []
+
+		for await (let [_, name, currency, amount] of matchStringsMonth || []) {
+			if (!monthClientsAmount.hasOwnProperty(name)) {
+				monthClientsAmount[name] = {
+					name,
+					currencyNormalized: currencyNormalize[currency],
+					amount: parseFloat(amount)
+				}
+			}else {
+				monthClientsAmount[name].amount += parseFloat(amount)
+			}
+		}
+
+		todayClientsAmount = Object.values(todayClientsAmount).sort((a, b) => a.name.localeCompare(b.name))
+		monthClientsAmount = Object.values(monthClientsAmount).sort((a, b) => a.name.localeCompare(b.name))
+
+		res.json({ todayClientsAmount, monthClientsAmount })
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on Finance getting')
+	}
+})
+
 router.get("/all-client-activity", async (req, res) => {
 	try {
 		const clientsTasks = await ClientsTasks.find({status: {$ne: 'Completed'}}, {"associatedTo.password": 0}).populate(  'assignedTo',  ['firstName', 'lastName']).populate( 'client', ['name'])
