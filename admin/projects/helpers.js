@@ -30,50 +30,6 @@ const filterQuoteStepsInStartedProjectForClientPortal = (project) => {
 	return []
 }
 
-
-function getProjectFinance(tasks, projectFinance, minimumCharge) {
-	return {
-		fiance: {
-			Price: { receivables: 12, payables: 13 }
-		}
-	}
-	// const currentReceivables = projectFinance.Price.receivables || 0;
-	// const currentPayables = projectFinance.Price.payables || 0;
-	// const receivables = +(
-	//   tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0) +
-	//   +currentReceivables
-	// ).toFixed(2);
-	// const payables = +(
-	//   tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
-	//   +currentPayables
-	// ).toFixed(2);
-	// let roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
-	// if (minimumCharge) {
-	//   const { value, toIgnore } = minimumCharge;
-	//   if (!toIgnore && value > receivables) {
-	//     roi = payables ? ((value - payables) / payables).toFixed(2) : 0
-	//   }
-	// }
-	// return {
-	//   projectFinance: {
-	//     Price: { receivables, payables },
-	//     Wordcount: { ...projectFinance.Wordcount }
-	//   },
-	//   roi
-	// };
-}
-
-function getModifiedFiles(files) {
-	if (files && files.length) {
-		return files.map(item => {
-			item.path = `./dist${ item.path }`
-			item.filename = item.fileName
-			return item
-		})
-	}
-	return []
-}
-
 function createProjectFolder(projectId) {
 	return new Promise((resolve, reject) => {
 		fs.mkdir(`./dist/projectFiles/${ projectId }`, err => {
@@ -110,8 +66,6 @@ module.exports = {
 	filterQuoteStepsInStartedProjectForClientPortal,
 	filterNotQuoteStepsInStartedProjectForClientPortal,
 	manageProjectName,
-	getProjectFinance,
-	getModifiedFiles,
 	createProjectFolder,
 	getPriceAfterApplyingDiscounts
 }

@@ -1,50 +1,37 @@
-const { getClientRates } = require('../clients');
-const { getVendor } = require('../vendors');
+const { getClientRates } = require('../clients')
+const { getVendor } = require('../vendors')
 
-/**
- *
- * @param {Array} pricelistTable
- * @param {Object} filters
- * @returns {Array} - returns filtered pricelist table
- */
 const getFilteredPricelist = (pricelistTable, filters) => {
-  const { sourceFilter, targetFilter, stepFilter, unitFilter, industryFilter } = filters;
-  if (sourceFilter) {
-    pricelistTable = pricelistTable.filter(item => item.sourceLanguage.lang === sourceFilter);
-  }
-  if (targetFilter) {
-    pricelistTable = pricelistTable.filter(item => item.targetLanguage.lang === targetFilter);
-  }
-  if (stepFilter) {
-    pricelistTable = pricelistTable.filter(item => item.step.title === stepFilter);
-  }
-  if (unitFilter) {
-    pricelistTable = pricelistTable.filter(item => item.unit.type === unitFilter);
-  }
-  if (industryFilter) {
-    pricelistTable = pricelistTable.filter(item => item.industry.name === industryFilter);
-  }
-  return pricelistTable;
-};
+	const { sourceFilter, targetFilter, stepFilter, unitFilter, industryFilter } = filters
+	if (sourceFilter) {
+		pricelistTable = pricelistTable.filter(item => item.sourceLanguage.lang === sourceFilter)
+	}
+	if (targetFilter) {
+		pricelistTable = pricelistTable.filter(item => item.targetLanguage.lang === targetFilter)
+	}
+	if (stepFilter) {
+		pricelistTable = pricelistTable.filter(item => item.step.title === stepFilter)
+	}
+	if (unitFilter) {
+		pricelistTable = pricelistTable.filter(item => item.unit.type === unitFilter)
+	}
+	if (industryFilter) {
+		pricelistTable = pricelistTable.filter(item => item.industry.name === industryFilter)
+	}
+	return pricelistTable
+}
 
-/**
- *
- * @param {ObjectId} personId
- * @param {Object} filters
- * @param {Boolean} fromVendor
- * @returns {Array | []} - returns rather spliced or empty array
- */
 const getRatePricelist = async (personId, filters, fromVendor = false) => {
-  const { countFilter } = filters;
-  const neededQuery = fromVendor ? getVendor : getClientRates;
-  const { rates } = await neededQuery({ _id: personId });
-  const { pricelistTable } = rates;
-  if (pricelistTable.length) {
-    const filteredPricelistTable = getFilteredPricelist(pricelistTable, filters);
-    return filteredPricelistTable.splice(countFilter, 25);
-  } else {
-    return [];
-  }
-};
+	const { countFilter } = filters
+	const neededQuery = fromVendor ? getVendor : getClientRates
+	const { rates } = await neededQuery({ _id: personId })
+	const { pricelistTable } = rates
+	if (pricelistTable.length) {
+		const filteredPricelistTable = getFilteredPricelist(pricelistTable, filters)
+		return filteredPricelistTable.splice(countFilter, 25)
+	} else {
+		return []
+	}
+}
 
-module.exports = { getRatePricelist };
+module.exports = { getRatePricelist }

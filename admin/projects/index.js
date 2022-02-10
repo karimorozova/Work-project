@@ -7,7 +7,7 @@ const {
 	getProjectAfterUpdate,
 	getProjectsForVendorPortal,
 	getProjectsForPortalList,
-	getProjectForClientPortal,
+	getProjectForClientPortal
 } = require('./getProjects')
 
 const {
@@ -28,7 +28,6 @@ const {
 	downloadCompletedFiles,
 	updateProjectProgress,
 	getAfterReopenSteps,
-	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
 	updateOtherProject,
 	assignMemoqTranslator,
@@ -52,7 +51,7 @@ const {
 	notifyVendorStepStart,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
-	nextVendorCanStartWorkNotification,
+	nextVendorCanStartWorkNotification
 } = require('./emails')
 
 const {
@@ -76,10 +75,6 @@ const {
 } = require('./taskForWordcount')
 
 const {
-	getProjectAfterFinanceUpdated,
-} = require('./porjectFinance')
-
-const {
 	addDR2,
 	addMultiLangDR2,
 	removeDR2,
@@ -98,7 +93,7 @@ const {
 	approveFilesDR2,
 	changeManagersDR1,
 	saveCertificateTODR1Files,
-	changeNameLang,
+	changeNameLang
 } = require('./delivery')
 
 const {
@@ -164,8 +159,6 @@ module.exports = {
 	updateProjectProgress,
 	updateWithApprovedTasks,
 	getAfterReopenSteps,
-	getProjectAfterFinanceUpdated,
-	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
 	createTasksForWordcount,
 	downloadCompletedFiles,
@@ -188,5 +181,5 @@ module.exports = {
 	removeMultiDR2,
 	changeNameLang,
 	getProjectsForPortalAll,
-	getProjectsForPortalList,
+	getProjectsForPortalList
 }

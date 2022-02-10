@@ -13,8 +13,6 @@ const {
 	getProjectForClientPortal
 } = require("../projects/")
 
-const { getProjectDeliverables } = require('../projects/files')
-
 const {
 	getClientsRequestsForPortal,
 	getClientsRequestForPortal,
@@ -419,17 +417,6 @@ router.get('/deliverables', checkClientContact, async (req, res) => {
 	//     console.log(err);
 	//     res.status(500).send("Error on downloading deliverables");
 	// }
-})
-
-router.post('/project-deliverables', checkClientContact, async (req, res) => {
-	const { project } = req.body
-	try {
-		const result = await getProjectDeliverables(project)
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on downloading project deliverables")
-	}
 })
 
 router.post('/task-status', checkClientContact, async (req, res) => {

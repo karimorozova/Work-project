@@ -36,29 +36,6 @@ async function storeFiles(filesArr, projectId) {
 	}
 }
 
-async function getProjectDeliverables(project) {
-	console.log('IN DEV => getProjectDeliverables')
-	// const { tasks, id: projectId } = project;
-	// const { tasks: tasksInDelivery } = await Delivery.findOne({ 'projectId' : projectId })
-	// let files = [];
-	// try {
-	//     for(let task of tasks) {
-	//         if(task.status !== 'Cancelled') {
-	//             const { taskId } = task;
-	//             let taskFiles = tasksInDelivery.find(item => item.taskId === taskId).files
-	//             let taskDeliverables = task.deliverables || await getDeliverablesLink({taskId, taskFiles, projectId});
-	//             files.push({path: `./dist${taskDeliverables}`, name: taskDeliverables.split("/").pop()});
-	//         }
-	//     }
-	//     const outputPath = `./dist/projectFiles/${projectId}/project-deliverables.zip`;
-	//     await archiveMultipleFiles({outputPath, files});
-	//     return outputPath.split("./dist")[1];
-	// } catch(err) {
-	//     console.log(err);
-	//     console.log("Error in getProjectDeliverables");
-	// }
-}
-
 const createArchiveForDeliverableItem = async ({ type, projectId, entityId, user, tasksDR2, tasksDeliverables }) => {
 	const outputPath = `/projectFiles/${ projectId }/${ Math.floor(Math.random() * 1000000) }-deliverables.zip`
 	const qProject = { "_id": projectId }
@@ -229,10 +206,8 @@ module.exports = {
 	generatePOFile,
 	storeFiles,
 	createArchiveForDeliverableItem,
-	// getDeliverablesLink,
 	copyProjectFiles,
 	manageDeliveryFile,
-	getProjectDeliverables,
 	getPdf,
 	generateAndSaveCertificate
 }

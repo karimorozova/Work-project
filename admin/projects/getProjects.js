@@ -1,4 +1,4 @@
-const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
+const { Projects, Languages, Services, ClientRequest } = require('../models/')
 const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery } = require('./filter')
 const { filterNotQuoteStepsInStartedProjectForClientPortal, filterQuoteStepsInStartedProjectForClientPortal } = require('./helpers')
 
@@ -175,34 +175,6 @@ async function getProjectForClientPortal(obj) {
 
 	return project
 }
-
-// async function getInvoiceForEachSteps(projectId) {
-// 	const steps = await Projects.aggregate([
-// 		{$match: {_id: projectId}},
-// 		{$unwind: '$steps'},
-// 		{
-// 			$lookup:
-// 					{
-// 						from: "invoicingpayables",
-// 						localField: 'steps._id',
-// 						foreignField: 'steps',
-// 						as:'rawInvoicingInfo'
-// 					}
-// 		},
-// 		{
-// 			$lookup:
-// 					{
-// 						from: "invoicingpayablesarchives",
-// 						localField: 'steps._id',
-// 						foreignField: 'steps',
-// 						as:'rawInvoicingInfoArchive'
-// 					}
-// 		},
-// 		{$addFields: {invoicing: {$concatArrays: ['$rawInvoicingInfo', '$rawInvoicingInfoArchive'] }}},
-// 		{$unset: ['rawInvoicingInfo', 'rawInvoicingInfoArchive']},
-// 	])
-// 	return steps
-// }
 
 async function getProject(obj) {
 	const project = await Projects.findOne(obj)

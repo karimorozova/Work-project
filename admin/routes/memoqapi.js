@@ -29,7 +29,6 @@ const { getMemoqTemplates } = require("../services/memoqs/resources")
 const { assignProjectManagers } = require('../projects/updates')
 const { storeFiles } = require("../projects/files")
 const { getMemoqUsers } = require("../services/memoqs/users")
-const { updateProjectMetricsAndCreateSteps } = require("../projects/metrics")
 
 const {
 	getFilteredOtherProjects,
@@ -169,14 +168,14 @@ router.get('/project-docs', async (req, res) => {
 })
 
 router.post('/metrics', async (req, res) => {
-	const { projectId, tasks } = req.body
-	try {
-		const updatedProject = await updateProjectMetricsAndCreateSteps(projectId, tasks)
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on getting metrics ")
-	}
+	// const { projectId, tasks } = req.body
+	// try {
+	// 	const updatedProject = await updateProjectMetricsAndCreateSteps(projectId, tasks)
+	// 	res.send(updatedProject)
+	// } catch (err) {
+	// 	console.log(err)
+	// 	res.status(500).send("Error on getting metrics ")
+	// }
 })
 
 router.get('/project-analysis', async (req, res) => {

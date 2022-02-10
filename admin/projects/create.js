@@ -526,9 +526,6 @@ const autoCreatingTranslationTaskInProject = async (project, requestId, creatorU
 
 		const listProjectTranslationDocuments = await getProjectTranslationDocs(tasksInfo.memoqProjectId)
 		await createTasksForWordcount({ ...tasksInfo, docs: listProjectTranslationDocuments })
-		// const tasks = await createTasksForWordcount(tasksInfo, listProjectTranslationDocuments)
-		// let updatedProject = await updateProjectMetricsAndCreateSteps(_id, tasks)
-		// updatedProject = await updateProjectCosts(updatedProject)
 	}
 }
 

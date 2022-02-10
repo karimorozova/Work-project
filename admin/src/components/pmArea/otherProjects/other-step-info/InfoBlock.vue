@@ -106,9 +106,6 @@
 		},
 		methods: {
 			...mapActions({
-				// updateStepFinance: "updateStepFinance",
-				// updateClientRate: "updateClientRate",
-				// updateVendorRate: "updateVendorRate",
 				alertToggle: "alertToggle",
 			}),
 			setTab({ index }) {

@@ -18,11 +18,6 @@ const {
 	notifyVendorStepStart
 } = require('./emails')
 
-
-const {
-	getProjectFinancePrice
-} = require('./porjectFinance')
-
 const {
 	getProjectTranslationDocs,
 	getProjectUsers,
@@ -481,16 +476,6 @@ function updateWithApprovedTasks({ taskIds, project }) {
 			steps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps })
 		}
 	}
-
-	// const approvedSteps = project.steps.filter(item => item.status === 'Approved')
-	// const notApprovedSteps = project.steps.filter(item => item.status !== 'Approved')
-	// for (const step of approvedSteps) {
-	// 	readySteps = setApprovedStepStatus({ project: { status: 'Approved' }, step, steps: project.steps })
-	// }
-	// console.log()
-	// throw 'eeerr'
-	// steps.push(...notApprovedSteps, ...readySteps)
-
 	return { tasks, steps }
 }
 
@@ -532,49 +517,6 @@ function setStepsProgress(title, docs) {
 		}
 	}
 	return { ...stepProgress, ...totalProgress }
-}
-
-async function updateNonWordsTaskTargetFile({ project, jobId, path, fileName }) {
-	// const steps = project.steps.map(item => {
-	// 	if (item.id === jobId) {
-	// 		item.status = 'Completed'
-	// 		item.progress = 100
-	// 	}
-	// 	return item
-	// })
-	//
-	// const neededStep = steps.find(item => item.id.toString() === jobId.toString())
-	// // const stepCounter = neededStep.stepId.replace('-R', '')[neededStep.stepId.replace('-R', '').length - 1]
-	//
-	// const tasks = project.tasks.map(item => {
-	// 	if (neededStep.taskId === item.taskId) {
-	// 		let targetFiles = []
-	// 		targetFiles.push({ fileName, path: path.split('./dist').pop() })
-	// 		item.targetFiles = targetFiles
-	//
-	//
-	// 		// let targetFilesStage1 = item.targetFilesStage1 || []
-	// 		// let targetFilesStage2 = item.targetFilesStage2 || []
-	//
-	//
-	//
-	// 		// eval('targetFilesStage' + stepCounter).push({ fileName, path: path.split('./dist').pop() })
-	//
-	//
-	// 		// item.targetFilesStage1 = targetFilesStage1
-	// 		// item.targetFilesStage2 = targetFilesStage2
-	//
-	// 	}
-	// 	return item
-	// })
-	//
-	// try {
-	// 	return await updateProject({ "_id": project.id }, { steps, tasks })
-	// } catch (err) {
-	// 	console.log(err)
-	// 	console.log("Error in updateNonWordsTaskTargetFiles")
-	// 	throw new Error(err.message)
-	// }
 }
 
 async function updateNonWordsTaskTargetFiles({ project, paths, jobId }) {
@@ -808,7 +750,6 @@ module.exports = {
 	updateProjectProgress,
 	updateWithApprovedTasks,
 	getAfterReopenSteps,
-	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
 	updateOtherProject,
 	assignMemoqTranslator,

@@ -431,9 +431,6 @@ router.post('/step-target', checkVendor, upload.fields([ { name: 'targetFile' } 
 
 		const paths = await storeFiles(targetFile, project.id)
 		await updateNonWordsTaskTargetFiles({ project, paths, jobId })
-		// experimental
-		// const paths = await storeFiles(targetFile, project.id)
-		// await updateNonWordsTaskTargetFile({ project, path: paths[0], jobId, fileName: targetFile[0].filename })
 		res.send(true)
 	} catch (err) {
 		console.log(err)

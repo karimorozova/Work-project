@@ -26,7 +26,6 @@ const {
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
 	setApprovedStepStatus,
-	getProjectAfterFinanceUpdated,
 	updateProjectProgress,
 	storeFiles,
 	notifyStepReopened,
@@ -71,14 +70,9 @@ const {
 } = require('../../utils')
 
 const {
-	getStepsWithFinanceUpdated,
 	reassignVendor,
 	removeVendorFromStep
 } = require('../../projectSteps')
-
-const {
-	getTasksWithFinanceUpdated
-} = require('../../projectTasks')
 
 const {
 	getClientRequestById
@@ -818,20 +812,6 @@ router.post('/generate-certificate', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on generate certificate')
-	}
-})
-
-router.post('/step-finance', async (req, res) => {
-	const { step } = req.body
-	try {
-		const project = await getProject({ 'steps._id': step._id })
-		const steps = await getStepsWithFinanceUpdated(step, project)
-		const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
-		const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on changing Step finance')
 	}
 })
 

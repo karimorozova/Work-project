@@ -195,109 +195,6 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 	}
 }
 
-const getStepFinanceData = async (projectData, forWords = false) => {
-	// const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData
-	// // const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
-	// const { metrics, sourceLanguage, targetLanguage } = task
-	//
-	// // const client = await Clients.findOne({ _id: customer })
-	// // const { rates, defaultPricelist, currency } = client
-	// // const currencyRatio = await CurrencyRatio.findOne()
-	// // const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
-	// // const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
-	// // const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
-	// const { step, unit, size, title } = serviceStep
-	// const fullUnit = await Units.findOne({ _id: unit })
-	//
-	// let vendor
-	// if (vendorId) vendor = await Vendors.findOne({ _id: vendorId })
-	//
-	// const dataForComparison = {
-	// 	sourceLanguage: sourceId,
-	// 	targetLanguage: targetId,
-	// 	step,
-	// 	unit,
-	// 	size: size ? size : 1,
-	// 	industry: industry._id
-	// }
-	//
-	// let clientPrice = getPriceFromPersonRates(rates.pricelistTable, dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
-	// let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) : 0
-	//
-	// vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
-	//
-	// const clientRate = {
-	// 	value: clientPrice,
-	// 	active: true
-	// }
-	//
-	// let vendorRate = ""
-	// let nativeVendorRate = ""
-	//
-	// if (!!vendor) {
-	// 	vendorRate = { value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate), active: true }
-	// 	nativeVendorRate = { value: +vendorPrice, active: true }
-	// }
-	//
-	// const finance = stepFinance(false)
-	// const nativeFinance = stepFinance(true)
-	//
-	// const defaultStepPrice = finance.Price.receivables
-	// if (discounts.length) {
-	// 	const { Price: { receivables } } = finance
-	// 	finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
-	// }
-	//
-	// return {
-	// 	clientRate,
-	// 	vendorRate,
-	// 	nativeVendorRate,
-	// 	vendor: vendor ? vendor._id : null,
-	// 	finance,
-	// 	nativeFinance,
-	// 	defaultStepPrice
-	// }
-	//
-	// function stepFinance(isNative) {
-	// 	return {
-	// 		Quantity: {
-	// 			receivables: quantity.receivables,
-	// 			payables: quantity.payables
-	// 		},
-	// 		Wordcount: {
-	// 			receivables: getRelativeWordCountByEntity('client', quantity.receivables),
-	// 			payables: getRelativeWordCountByEntity('vendor', quantity.payables)
-	// 		},
-	// 		Price: {
-	// 			receivables: getTotalStepPriceClient(),
-	// 			payables: getTotalStepPriceVendor()
-	// 		}
-	// 	}
-	//
-	// 	function getTotalStepPriceClient() {
-	// 		return +clientRate.value * getRelativeWordCountByEntity('client', quantity.receivables)
-	// 	}
-	//
-	// 	function getTotalStepPriceVendor() {
-	// 		if (vendor) {
-	// 			const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
-	// 			return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
-	// 		}
-	// 		return 0
-	// 	}
-	//
-	// 	function getRelativeWordCountByEntity(entity, quantity) {
-	// 		quantity = quantity || 0
-	// 		if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
-	// 				? +getRelativeQuantity(metrics, entity)
-	// 				: +quantity
-	//
-	// 		return +quantity
-	// 	}
-	// }
-
-}
-
 const getPriceFromPersonRates = (pricelistTable, data) => {
 	const { sourceLanguage, targetLanguage, step, unit, industry } = data
 	const row = pricelistTable.find(row => (
@@ -346,7 +243,6 @@ const getCorrectBasicPrice = (basicPriceRow, currency) => {
 
 module.exports = {
 	setUpdatedFinanceData,
-	getStepFinanceData,
 	getPriceFromPersonRates,
 	getPriceFromPricelist,
 	getCorrectBasicPrice,

@@ -2,7 +2,6 @@ import Vue from "vue"
 
 export const setTasksDataValue = ({ commit }, payload) => commit('SET_TASKS_DATA_VALUE', payload)
 export const clearTasksData = ({ commit }) => commit('CLEAR_DATA')
-export const setShowTasksAndDeliverables = ({ commit }, payload) => commit('SET_SHOW_TASK_AND_DELIVERABLES', payload)
 export const incrementFileCounter = ({ commit }) => commit('INCREMENT_FILE_COUNTER')
 
 export const setProjectDate = async ({ dispatch }, payload) => {
@@ -173,52 +172,6 @@ export const reopenSteps = async ({ dispatch }, payload) => {
 			await dispatch('setCurrentProject', updatedProject.data)
 		}
 		dispatch('alertToggle', { message: "Steps reopened", isShow: true, type: "success" })
-	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" })
-	} finally {
-		dispatch('decrementRequestCounter')
-	}
-}
-
-export const updateStepFinance = async ({ dispatch }, payload) => {
-	dispatch('incrementRequestCounter')
-	try {
-		const updatedProject = await Vue.http.post("/pm-manage/step-finance", { step: payload })
-		await dispatch('setCurrentProject', updatedProject.data)
-		dispatch('alertToggle', { message: "Step finance updated", isShow: true, type: "success" })
-	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" })
-	} finally {
-		dispatch('decrementRequestCounter')
-	}
-}
-
-export const removeRequestFile = async ({ dispatch }, payload) => {
-	dispatch('incrementRequestCounter')
-	try {
-		const updatedRequest = await Vue.http.post("/pm-manage/remove-request-file", payload)
-		await dispatch('setCurrentProject', updatedRequest.data)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" })
-	} finally {
-		dispatch('decrementRequestCounter')
-	}
-}
-
-export const approveRequestFiles = async ({ dispatch }, payload) => {
-	dispatch('incrementRequestCounter')
-	let { id, sourceFiles, refFiles } = payload
-	sourceFiles = sourceFiles.map(item => {
-		const { isChecked, type, ...file } = item
-		return { ...file }
-	})
-	refFiles = refFiles.map(item => {
-		const { isChecked, type, ...file } = item
-		return { ...file }
-	})
-	try {
-		await dispatch('setRequestValue', { id, prop: "sourceFiles", value: sourceFiles })
-		await dispatch('setRequestValue', { id, prop: "refFiles", value: refFiles })
 	} catch (err) {
 		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" })
 	} finally {
