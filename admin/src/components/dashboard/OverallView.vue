@@ -2,11 +2,6 @@
   .overallView
 
     div(v-if="isAdmin")
-      .row(v-if="true || user.email === 'michal@pangea.global'")
-        .col-size
-          ProjectStats(:projectsStats="stats")
-        .col
-          XtrfStatsToday( :xtrfStats="todayStats")
       .row
         .col
           AcceptedRequest( :projects="acceptedRequest")
@@ -80,8 +75,6 @@
 <script>
 import ProjectFinanceStats from "./OverallViewChildrens/ProjectFinanceStats"
 import moment from "moment"
-import ProjectStats from "./Tables/ProjectStats"
-import XtrfStatsToday from "./Tables/XtrfStatsToday"
 import DueToday from "./Tables/DueToday"
 import StartedToday from "./Tables/StartedToday"
 import Quotes from "./Tables/Quotes"
@@ -95,8 +88,6 @@ import { mapGetters } from "vuex"
 export default {
   components: {
     DueToday,
-    ProjectStats,
-    XtrfStatsToday,
     StartedToday,
     Quotes,
     MyQuotes,
@@ -251,9 +242,6 @@ export default {
   async created() {
     this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
     this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
-    this.stats = (await this.$http.get('/dashboard-api/projects-finance')).data
-    this.todayStats = (await this.$http.get('/dashboard-api/finance')).data
-    console.log(this.todayStats)
   },
 }
 </script>
