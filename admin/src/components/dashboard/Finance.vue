@@ -110,7 +110,7 @@ export default {
 
       return listOfAllClients.map(client => {
         const amountInPangea = Object.values(this.stats.statsMonthByClient).find(item => item.name === client)?.amount || 0
-        const amountInXTRF = this.xtrfStatsByClient.todayClientsAmount.find(item => item.name === client)?.amount || 0
+        const amountInXTRF = this.xtrfStatsByClient.monthClientsAmount.find(item => item.name === client)?.amount || 0
         return {
           client,
           amountInPangea,
