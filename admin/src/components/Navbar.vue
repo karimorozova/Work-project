@@ -260,29 +260,6 @@ export default {
               ]
             },
             {
-              type: 'group',
-              path: 'xtrf',
-              name: 'Other Projects (XTRF)',
-              isOpen: false,
-              children: [
-                {
-                  type: 'link',
-                  path: '/pangea-projects/xtrf/open-other-projects?status=In-progress',
-                  name: 'Open Projects'
-                },
-                {
-                  type: 'link',
-                  path: '/pangea-projects/xtrf/quote-other-projects?status=Quote',
-                  name: 'Quotes Projects'
-                },
-                {
-                  type: 'link',
-                  path: '/pangea-projects/xtrf/closed-other-projects?status=Closed',
-                  name: 'Closed Projects'
-                }
-              ]
-            },
-            {
               type: 'link',
               name: 'Add Project',
               path: '/pangea-projects/create-project'
