@@ -6,15 +6,15 @@ const getAllProjectFinanceStats = async () => {
 	const startMonth = moment().startOf('month').format('YYYY-MM-DD')
 	const endMonth = moment().endOf('month').format('YYYY-MM-DD')
 
-	const projectFinance = await getProjects({startDate: { $gte: new Date(today + 'T00:00:00.000Z'), $lt: new Date(today + 'T23:59:59.000Z') }})
+	const projectFinance = await getProjects({ startDate: { $gte: new Date(today + 'T00:00:00.000Z'), $lt: new Date(today + 'T23:59:59.000Z') } })
 	const statsDaily = getFinanceInfo(projectFinance)
 	const statsDailyByClient = getFinanceInfoByClient(projectFinance)
 
-	const projectFinanceMonth = await getProjects({billingDate: { $gte: new Date(startMonth + 'T00:00:00.000Z'), $lt: new Date(endMonth + 'T23:59:59.000Z') }})
+	const projectFinanceMonth = await getProjects({ billingDate: { $gte: new Date(startMonth + 'T00:00:00.000Z'), $lt: new Date(endMonth + 'T23:59:59.000Z') } })
 	const statsMonth = getFinanceInfo(projectFinanceMonth)
 	const statsMonthByClient = getFinanceInfoByClient(projectFinanceMonth)
 
-	return {statsDaily, statsMonth, statsDailyByClient, statsMonthByClient}
+	return { statsDaily, statsMonth, statsDailyByClient, statsMonthByClient }
 }
 
 
@@ -24,10 +24,10 @@ function getFinanceInfo(projects) {
 
 		if (cur.projectCurrency === 'USD') {
 			acc.dollarSum = +(+acc.dollarSum + +cur.finance.Price.receivables).toFixed(2)
-			acc.totalSum = +( +acc.totalSum + +cur.finance.Price.receivables * +cur.crossRate.USD.EUR).toFixed(2)
-		}else {
+			acc.totalSum = +(+acc.totalSum + +cur.finance.Price.receivables * +cur.crossRate.USD.EUR).toFixed(2)
+		} else {
 			acc.euroSum = +(+acc.euroSum + +cur.finance.Price.receivables).toFixed(2)
-			acc.totalSum = +(+acc.totalSum +  +cur.finance.Price.receivables).toFixed(2)
+			acc.totalSum = +(+acc.totalSum + +cur.finance.Price.receivables).toFixed(2)
 		}
 
 		return acc
@@ -35,7 +35,7 @@ function getFinanceInfo(projects) {
 }
 
 function getFinanceInfoByClient(projects) {
-	return projects.reduce((acc, cur ) => {
+	return projects.reduce((acc, cur) => {
 		const amount = +cur.finance.Price.receivables
 		if (!acc.hasOwnProperty(cur.customer.name)) {
 			acc[cur.customer.name] = {
@@ -43,7 +43,7 @@ function getFinanceInfoByClient(projects) {
 				currencyNormalized: cur.projectCurrency,
 				amount: +amount.toFixed(2)
 			}
-		}else {
+		} else {
 			acc[cur.customer.name].amount = +(+amount + +acc[cur.customer.name].amount).toFixed(2)
 		}
 		return acc
@@ -51,11 +51,46 @@ function getFinanceInfoByClient(projects) {
 }
 
 async function getProjects(additionalQuery) {
-	return (await Projects.find({
-		status: { $not: { $in: [ 'Created', 'Draft', 'Cost Quote', 'Quote sent', 'Cancelled', 'Rejected' ] } },
-		isTest: false,
-		...additionalQuery,
-	}, { finance: 1, projectCurrency: 1, crossRate: 1, projectId: 1, customer: 1 }).populate('customer', {name:1}).lean())
+	const projects = await Projects.aggregate([
+		{
+			$match: {
+				...additionalQuery,
+				isTest: false,
+				status: { $not: { $in: [ 'Created', 'Draft', 'Cost Quote', 'Quote sent', 'Cancelled', 'Rejected' ] } }
+			}
+		},
+		{
+			$project: {
+				"additionsSteps.finance": 1,
+				"steps.finance": 1,
+				projectCurrency: 1,
+				crossRate: 1,
+				projectId: 1,
+				customer: 1
+			}
+		},
+		{
+			$addFields: {
+				"sumSteps": { $sum: "$steps.finance.Price.receivables" }
+			}
+		},
+		{
+			$addFields: {
+				"sumExtraSteps": { $sum: "$additionsSteps.finance.Price.receivables" }
+			}
+		},
+		{
+			$addFields: {
+				"finance.Price.payables": { $sum: "$steps.finance.Price.payables" }
+			}
+		},
+		{
+			$addFields: {
+				"finance.Price.receivables": { $sum: [ "$sumSteps", "$sumExtraSteps" ] }
+			}
+		}
+	])
+	return await Projects.populate(projects, [ { path: 'customer', select: [ 'name' ] } ])
 }
 
-module.exports = {getAllProjectFinanceStats}
+module.exports = { getAllProjectFinanceStats }
