@@ -41,8 +41,13 @@ export default {
       clientName: '',
       projectManager: '',
       accountManager: '',
-      startDate: '',
-      deadline: '',
+
+      startDateFrom: '',
+      startDateTo: '',
+      deadlineFrom: '',
+      deadlineTo: '',
+
+
       sourceLanguages: '',
       targetLanguages: '',
       industry: '',
@@ -60,8 +65,10 @@ export default {
         'clientName',
         'projectManager',
         'accountManager',
-        'startDate',
-        'deadline',
+        'startDateFrom',
+        'startDateTo',
+        'deadlineFrom',
+        'deadlineTo',
         'sourceLanguages',
         'targetLanguages',
         'industry',

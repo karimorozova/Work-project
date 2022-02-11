@@ -43,7 +43,7 @@ function getFilteredPortalProjectsQuery(filters, allLanguages, allServices) {
 		query["tasks.service.title"] = { $in: services.split(',').map(item => allServices.find(({ _id }) => _id.toString() === item.toString()).title) }
 	}
 	if (status) {
-		query["status"] = { $in: [status] }
+		query["status"] = { $in: [ status ] }
 	} else {
 		query["status"] = { $ne: 'Draft' }
 	}
@@ -72,8 +72,10 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 		clientName,
 		projectManager,
 		accountManager,
-		startDate,
-		deadline,
+		startDateFrom,
+		startDateTo,
+		deadlineFrom,
+		deadlineTo,
 		sourceLanguages,
 		targetLanguages,
 		industry,
@@ -85,7 +87,6 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 		tasksStatuses,
 		requestId
 	} = filters
-
 
 	if (status !== 'All') query["status"] = status
 
@@ -110,11 +111,11 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 	if (accountManager) {
 		query["accountManager"] = ObjectId(accountManager)
 	}
-	if (startDate) {
-		query["startDate"] = { $gte: new Date(`${ startDate }T00:00:00.000Z`), $lt: new Date(`${ startDate }T24:00:00.000Z`) }
+	if (!!startDateFrom && !!startDateTo) {
+		query["startDate"] = { $gte: new Date(+startDateFrom), $lt: new Date(+startDateTo) }
 	}
-	if (deadline) {
-		query["deadline"] = { $gte: new Date(`${ deadline }T00:00:00.000Z`), $lt: new Date(`${ deadline }T24:00:00.000Z`) }
+	if (!!deadlineFrom && !!deadlineTo) {
+		query["deadline"] = { $gte: new Date(+deadlineFrom), $lt: new Date(+deadlineTo) }
 	}
 	if (sourceLanguages) {
 		query["tasks.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
