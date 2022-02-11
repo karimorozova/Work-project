@@ -1,6 +1,6 @@
 const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 const fs = require('fs')
-const { getPayable } = require("./getPayables")
+const { getPayable, getPayableByVendorId } = require("./getPayables")
 
 const {
 	removeFile,
@@ -56,23 +56,34 @@ const zohoBillCreation = async (_id) => {
 
 
 const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMethod }) => {
-	paymentMethod = typeof paymentMethod === 'string'
+	const vendorReports = await getPayableByVendorId(vendorId).filter(({ status }) => status === 'Invoice on-hold')
+	const [ { paymentDetails, totalPrice } ] = await getPayable(reportId)
+
+	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
+	const { fileName, newPath: path } = await invoiceFileUploading(invoiceFile[0], reportId)
+
+	paymentDetails.paymentMethod = typeof paymentMethod === 'string'
 			? JSON.parse(paymentMethod)
 			: paymentMethod
-
-	const [ { paymentDetails } ] = await getPayable(reportId)
-	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
-	const { fileName, newPath } = await invoiceFileUploading(invoiceFile[0], reportId)
-	paymentDetails.paymentMethod = paymentMethod
 	paymentDetails.expectedPaymentDate = new Date(moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD'))
+	paymentDetails.file = { fileName, path }
 
-	console.log(reportId, vendorId, invoiceFile, paymentMethod)
+
+	switch (true) {
+		case (!vendorReports.length && paymentMethod.minimumAmount > totalPrice): {
+			console.log(vendorReports.length, paymentMethod.minimumAmount, totalPrice)
+		}
+
+	}
+
+
+	// console.log(reportId, vendorId, invoiceFile, paymentMethod)
 
 	//TODO HOLD CHECK
 
 	// await InvoicingPayables.updateOne(
 	// 		{ _id: reportId },
-	// 		{ status: 'SOON ASDASDASD', 'paymentDetails.file': { fileName, path: newPath } }
+	// 		{ status: 'SOON ASDASDASD', 'paymentDetails.file': { } }
 	// )
 }
 
