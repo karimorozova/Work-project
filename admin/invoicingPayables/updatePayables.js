@@ -32,31 +32,11 @@ const invoiceReloadFile = async ({ reportId, invoiceFile, oldPath }) => {
 	}
 }
 
-const zohoBillCreation = async (_id) => {
-	const [ { vendor, reportId: billNumber, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } }, steps } ] = await getPayable(_id)
-	const vendorName = vendor.firstName + ' ' + vendor.surname
-	const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
-
-	const rate = steps.reduce((acc, { nativeFinance }) => {
-		acc += nativeFinance.Price.payables
-		return acc
-	}, 0)
-
-	const lineItems = [ {
-		"name": `TS ${ monthAndYear }`,
-		"account_id": "335260000002330131",
-		"rate": rate,
-		"quantity": 1
-	} ]
-	const { bill } = await createBillZohoRequest(expectedPaymentDate, vendorName, vendor.email, billNumber, lineItems)
-	const zohoBillingId = bill.bill_id
-	await updatePayableReport(_id, { zohoBillingId })
-	await addFile(zohoBillingId, path)
-}
-
-
 const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMethod }) => {
-	const vendorReports = await getPayableByVendorId(vendorId).filter(({ status }) => status === 'Invoice on-hold')
+	//TODO Проверка API  на работоспособность
+
+	let vendorReportsAll = await getPayableByVendorId(vendorId)
+
 	const [ { paymentDetails, totalPrice } ] = await getPayable(reportId)
 
 	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
@@ -69,11 +49,29 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 	paymentDetails.file = { fileName, path }
 
 
-	switch (true) {
-		case (!vendorReports.length && paymentMethod.minimumAmount > totalPrice): {
-			console.log(vendorReports.length, paymentMethod.minimumAmount, totalPrice)
-		}
+	let vendorReports = vendorReportsAll.filter(({ status, _id, paymentDetails: paymentDetailsReport }) =>
+			status === 'Invoice on-hold' && `${ reportId }` !== `${ _id }` && paymentDetailsReport.paymentMethod.type === paymentDetails.paymentMethod.type)
 
+	switch (true) {
+		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +totalPrice):
+		case (vendorReports.length && (holdReportsSum(vendorReports) + +totalPrice) < paymentDetails.paymentMethod.minimumAmount): {
+			await updatePayableReport(reportId, { status: 'Invoice on-hold', paymentDetails })
+			console.log('set to HOLD')
+			break
+		}
+		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount <= +totalPrice): {
+			await updatePayableReport(reportId, { status: 'Invoice Ready', paymentDetails })
+			// await zohoBillCreation(reportId)
+			console.log('set to Ready generate Bill')
+			break
+		}
+		case (vendorReports.length && (holdReportsSum(vendorReports) + +totalPrice) > paymentDetails.paymentMethod.minimumAmount): {
+			await updatePayableReport(reportId, { paymentDetails })
+			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
+				await updatePayableReport(id, { status: 'Invoice Ready' })
+			}
+			break
+		}
 	}
 
 
@@ -85,8 +83,30 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 	// 		{ _id: reportId },
 	// 		{ status: 'SOON ASDASDASD', 'paymentDetails.file': { } }
 	// )
+	function holdReportsSum(arr) {
+		return arr.reduce((acc, curr) => acc + +curr.totalPrice, 0)
+	}
+
+	throw new Error('asd')
 }
 
+const zohoBillCreation = async (_id) => {
+	const [ { vendor, reportId: billNumber, totalPrice, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } } } ] = await getPayable(_id)
+	const vendorName = vendor.firstName + ' ' + vendor.surname
+	const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
+
+	const lineItems = [ {
+		"name": `TS ${ monthAndYear }`,
+		"account_id": "335260000002330131",
+		"rate": totalPrice,
+		"quantity": 1
+	} ]
+
+	const { bill } = await createBillZohoRequest(expectedPaymentDate, vendorName, vendor.email, billNumber, lineItems)
+	const zohoBillingId = bill.bill_id
+	await updatePayableReport(_id, { zohoBillingId })
+	await addFile(zohoBillingId, path)
+}
 
 module.exports = {
 	setPayablesNextStatus,

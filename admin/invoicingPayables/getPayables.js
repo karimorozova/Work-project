@@ -175,6 +175,11 @@ const getPayableByVendorId = async (id) => {
 					}
 				},
 				{
+					$addFields: {
+						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
+					}
+				},
+				{
 					$unset: [
 						"steps.finance",
 						"steps.nativeFinance.Price.receivables",
