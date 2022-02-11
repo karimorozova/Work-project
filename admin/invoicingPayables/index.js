@@ -10,16 +10,16 @@ const {
 
 const {
 	setPayablesNextStatus,
-	paidOrAddPaymentInfo,
 	invoiceSubmission,
 	invoiceReloadFile,
-	updatePayable
 } = require('./updatePayables')
 
 const {
 	clearPayablesStepsPrivateKeys,
 	invoiceFileUploading,
-	getVendorAndCheckPaymentTerms
+	getVendorAndCheckPaymentTerms,
+	paidOrAddPaymentInfo,
+	updatePayableReport
 } = require('./helpers')
 
 const {
@@ -77,7 +77,7 @@ module.exports = {
 	getPayablePaidByVendorId,
 	createBillZohoRequest,
 	addFile,
-	updatePayable,
+	updatePayableReport,
 	removeFile,
 	createNewPayable,
 	updatePayableFromZoho,

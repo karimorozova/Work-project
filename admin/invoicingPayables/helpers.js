@@ -1,6 +1,8 @@
 const { moveProjectFile } = require("../utils/movingFile")
 const { getVendorAfterUpdate, getVendor } = require("../vendors")
-const { PaymentTerms } = require("../models")
+const { PaymentTerms, InvoicingPayables } = require("../models")
+const { ObjectID: ObjectId } = require("mongodb")
+const { getPayable } = require("./getPayables")
 
 const clearPayablesStepsPrivateKeys = async (reports) => {
 	const privateKeys = [
@@ -49,7 +51,7 @@ const returnMessageAndType = (message, type) => {
 	}
 }
 
-const invoiceFileUploading = async (invoiceFile) => {
+const invoiceFileUploading = async (invoiceFile, reportId) => {
 	const fileName = `${ Math.floor(Math.random() * 1000000) }-${ invoiceFile.filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
 	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
 	await moveProjectFile(invoiceFile, `./dist${ newPath }`)
@@ -68,9 +70,40 @@ const getVendorAndCheckPaymentTerms = async (vendorId) => {
 	return vendor
 }
 
+const paidOrAddPaymentInfo = async (reportId, zohoPaymentId, data) => {
+	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
+
+	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data, zohoPaymentId } } })
+
+	if ("Paid" === status) {
+		await InvoicingPayables.aggregate([
+			{ "$match": { "_id": ObjectId(reportId) } },
+			{
+				"$merge": {
+					"into": {
+						"db": "pangea",
+						"coll": "invoicingpayablesarchives"
+					}
+				}
+			}
+		])
+		await InvoicingPayables.remove({ _id: reportId })
+		return "Moved"
+	}
+
+	return 'Success'
+}
+
+const updatePayableReport = async (reportId, obj) => {
+	await InvoicingPayables.updateOne({ _id: reportId }, obj)
+	return await getPayable(reportId)
+}
+
 module.exports = {
 	clearPayablesStepsPrivateKeys,
 	returnMessageAndType,
 	invoiceFileUploading,
-	getVendorAndCheckPaymentTerms
+	getVendorAndCheckPaymentTerms,
+	paidOrAddPaymentInfo,
+	updatePayableReport
 }

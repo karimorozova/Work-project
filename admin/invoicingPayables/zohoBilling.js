@@ -9,9 +9,8 @@ const moment = require("moment")
 const { returnMessageAndType } = require("./helpers")
 const { refreshToken } = require("../services")
 const { logging } = require("googleapis/build/src/apis/logging")
-const { paidOrAddPaymentInfo } = require("./updatePayables")
+const { paidOrAddPaymentInfo } = require("./helpers")
 const { getPayable, getAllPayableByDefaultQuery, getAllPayable } = require("./getPayables")
-const { updatePayable } = require("./updatePayables")
 const { sendRequestToZoho } = require("../services/zoho")
 
 
