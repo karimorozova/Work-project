@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Login from '@/components/Login'
 import PasswordRestore from '@/components/PasswordRestore'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
-import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import Pricelists from '@/components/finance/Pricelists'
 import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
 import TableLeadsources from '@/components/Table/TableLeadsources'
@@ -44,9 +43,6 @@ import PaymentMethodsLayout from "../components/Table/PaymentMethods/Layout"
 // LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
 import Requests from '@/components/pmArea/lists/Requests'
-import OpenOtherProjects from '@/components/pmArea/lists/OpenOtherProjects'
-import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
-import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
 
 import Allclients from '@/components/clients/lists/Allclients'
 import ActiveClients from '@/components/clients/lists/ActiveClients'
@@ -81,11 +77,6 @@ Vue.use(Router)
 const router = new Router({
 	mode: 'history',
 	routes: [
-		// {
-		//     path: '/xtrf',
-		//     name: 'xtrf',
-		//     component: Xtrf
-		// },
 		{
 			path: '/login',
 			name: 'login',
@@ -107,14 +98,6 @@ const router = new Router({
 			redirect: '/pangea-dashboard/overall-view',
 			component: Navbar,
 			props: true,
-			// beforeEnter: (to, from, next) => {
-			// 	const token = localStorage.getItem("token")
-			// 	if (token) {
-			// 		next()
-			// 	} else {
-			// 		next('/login')
-			// 	}
-			// },
 			children: [
 				{
 					path: '/pangea-zoho-code',
@@ -542,50 +525,6 @@ const router = new Router({
 									path: 'closed-requests/:status/details/:id',
 									name: 'closed-requests-details',
 									component: RequestInfo,
-									props: true
-								}
-							]
-						},
-						{
-							path: 'xtrf',
-							name: 'xtrf',
-							component: clearRouterView,
-							props: true,
-							children: [
-								{
-									path: 'open-other-projects',
-									name: 'open-other-projects',
-									component: OpenOtherProjects,
-									props: true
-								},
-								{
-									path: 'open-other-projects/details/:id',
-									name: 'open-other-projects-details',
-									component: OtherProjectInfo,
-									props: true
-								},
-								{
-									path: 'closed-other-projects',
-									name: 'closed-other-projects',
-									component: ClosedOtherProjects,
-									props: true
-								},
-								{
-									path: 'closed-other-projects/details/:id',
-									name: 'closed-other-projects-details',
-									component: OtherProjectInfo,
-									props: true
-								},
-								{
-									path: 'quote-other-projects',
-									name: 'quote-other-projects',
-									component: QuoteOtherProjects,
-									props: true
-								},
-								{
-									path: 'quote-other-projects/details/:id',
-									name: 'quote-other-projects-details',
-									component: OtherProjectInfo,
 									props: true
 								}
 							]
