@@ -25,7 +25,8 @@
 
     .content
       Header
-      .content__body(v-if="unitsLength")
+      //.content__body(v-if="unitsLength")
+      .content__body
         nuxt-child
 
 </template>
@@ -34,7 +35,7 @@
 
 import ClickOutside from "vue-click-outside"
 import { mapGetters, mapActions } from "vuex"
-import Header from "../components/pangea/Header"
+import Header from "../components/Header"
 
 export default {
   components: { Header },
@@ -54,30 +55,37 @@ export default {
           img: require("../assets/images/navbar/Projects.svg"),
           active: false
         },
+        // {
+        //   title: "Documents",
+        //   path: "/documents",
+        //   img: require("../assets/images/navbar/Documents.svg"),
+        //   active: false
+        // },
         {
-          title: "Competencies & Rate",
-          path: "/competency-and-rate",
-          img: require("../assets/images/navbar/Rate.svg"),
-          active: false
-        },
-        {
-          title: "Assessment",
-          path: "/qualification-and-assessment",
-          img: require("../assets/images/navbar/Assessment.svg"),
-          active: false
-        },
-
-        {
-          title: "Experience & Education",
-          path: "/experience-and-education",
-          img: require("../assets/images/navbar/Education.svg"),
-          active: false
-        },
-        {
-          title: "Documents",
-          path: "/documents",
-          img: require("../assets/images/navbar/Documents.svg"),
-          active: false
+          title: "Profile",
+          path: "/profile-details",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Competencies & Rates",
+              path: "/profile-details/competency-and-rate",
+              img: require("../assets/images/navbar/Rate.svg"),
+              active: false
+            },
+            {
+              title: "Assessments",
+              path: "/profile-details/qualification-and-assessment",
+              img: require("../assets/images/navbar/Assessment.svg"),
+              active: false
+            },
+            {
+              title: "Experience & Documents",
+              path: "/profile-details/experience-and-document",
+              img: require("../assets/images/navbar/Education.svg"),
+              active: false
+            },
+          ]
         },
         {
           title: "Billing",
@@ -106,7 +114,7 @@ export default {
           isGroup: true,
           children: [
             {
-              title: "Profile",
+              title: "User",
               path: "/settings/account",
               img: require("../assets/images/navbar/Profile.svg"),
               active: false
@@ -270,7 +278,7 @@ export default {
   }
 
   &__title {
-    font-family: Myriad600;
+    font-family: Roboto600;
     margin-left: 15px;
     font-size: 14px;
     margin-top: 1px;
@@ -300,7 +308,7 @@ export default {
 
 .drop-down {
   &__title {
-    font-family: Myriad600;
+    font-family: Roboto600;
     margin-left: 20px;
     font-size: 14px;
     margin-top: 1px;

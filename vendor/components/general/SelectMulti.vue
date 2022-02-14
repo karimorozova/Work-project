@@ -258,7 +258,7 @@ i {
           color: $text;
           cursor: pointer;
           font-size: 12px;
-          font-family: 'Myriad600';
+          font-family: 'Roboto600';
           display: flex;
           justify-content: center;
           align-items: center;

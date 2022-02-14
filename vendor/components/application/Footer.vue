@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import Navbar from '../Navbar';
-import SocialIcons from '../SocialIcons';
+import Navbar from './Navbar';
+import SocialIcons from './SocialIcons';
 
 export default {
     data() {

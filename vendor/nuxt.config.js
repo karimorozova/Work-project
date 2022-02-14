@@ -29,7 +29,7 @@ module.exports = {
     ]
   },
   // loading: { color: '#3B8070' },
-  loading: '~/components/Loading.vue',
+  loading: '~/components/general/Loading.vue',
   /*
   ** Build configuration
   */

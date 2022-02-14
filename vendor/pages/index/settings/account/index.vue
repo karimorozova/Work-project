@@ -101,10 +101,10 @@
 </template>
 
 <script>
-import Button from "../../../../components/pangea/Button"
-import ValidationErrors from "../../../../components/pangea/ValidationErrors"
+import Button from "../../../../components/general/Button"
+import ValidationErrors from "../../../../components/general/ValidationErrors"
 import { mapActions, mapGetters } from "vuex"
-import SelectSingle from "../../../../components/pangea/SelectSingle"
+import SelectSingle from "../../../../components/general/SelectSingle"
 import getBgColor from "../../../../mixins/getBgColor"
 
 export default {
@@ -280,7 +280,7 @@ label {
   border-left: 1px solid $light-border;
 
   &__title {
-    font-family: Myriad600;
+    font-family: Roboto600;
     font-size: 16px;
     margin-bottom: 25px;
   }
@@ -411,7 +411,7 @@ input {
   outline: none;
   height: 32px;
   width: 220px;
-  font-family: 'Myriad400';
+  font-family: 'Roboto400';
   transition: .1s ease-out;
 
   &:focus {

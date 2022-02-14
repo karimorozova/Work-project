@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import Button from "../components/pangea/Button"
+import Button from "../components/general/Button"
 
 export default {
   components: { Button },
@@ -26,7 +26,7 @@ export default {
 .error {
   &__body {
     color: #333;
-    font-family: Myriad400;
+    font-family: Roboto400;
     max-width: 600px;
     position: absolute;
     left: 50%;
@@ -36,7 +36,7 @@ export default {
   }
 
   &__code {
-    font-family: Myriad900;
+    font-family: Roboto900;
     font-size: 125px;
     margin-bottom: 15px;
     color: #ddd;
@@ -45,7 +45,7 @@ export default {
 
   &__title {
     font-size: 24px;
-    font-family: Myriad600;
+    font-family: Roboto600;
     margin: 0;
     margin-bottom: 10px;
     cursor: default;

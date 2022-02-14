@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import AlertMessage from "../components/AlertMessage"
+import AlertMessage from "../components/general/AlertMessage"
 import { mapGetters } from "vuex"
 
 export default {
@@ -32,7 +32,7 @@ export default {
 body {
   color: $text;
   font-size: 14px;
-  font-family: Myriad400;
+  font-family: Roboto400;
   background-color: $body;
 }
 
