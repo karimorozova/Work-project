@@ -7,7 +7,7 @@
             a.footer__link(href="http://www.aboutcookies.org/" target="_blank") Use of Cookies
             p.footer__legal-maps
                 a.footer__link(href="https://www.google.com/maps/place/Pangea+Localization+Services/@34.6831861,33.0312479,15z/data=!4m5!3m4!1s0x0:0xd80067655ceaa5df!8m2!3d34.6831861!4d33.0312479" target="_blank")
-                    img.footer__legal-icon(src="../assets/images/direction_icon.svg")
+                    img.footer__legal-icon(src="../../assets/images/direction_icon.svg")
                 |  Maximos Court A’, Arch. Leontiou A’ 254, 3020, Limassol office : +35725252150 
                 | Reg. No. HE362046 ©{{ year }} Pangea Translation Services (Cyprus) LTD
         SocialIcons
@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import Navbar from './Navbar';
-import SocialIcons from './SocialIcons';
+import Navbar from '../Navbar';
+import SocialIcons from '../SocialIcons';
 
 export default {
     data() {
@@ -104,11 +104,6 @@ export default {
         text-align: justify;
         line-height: normal;
     }
-}
-
-@font-face {
-    font-family: FuturaStd;
-    src: url("../assets/fonts/futurastd-light.otf");
 }
 
 </style>

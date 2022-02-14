@@ -1,9 +1,4 @@
-const webpack = require('webpack');
-
 module.exports = {
-  /*
-  ** Headers of the page
-  */
   modules: [
     '@nuxtjs/axios'
   ],
@@ -33,9 +28,6 @@ module.exports = {
       { href: "/reset.css", rel: "stylesheet" }
     ]
   },
-  /*
-  ** Customize the progress bar color
-  */
   // loading: { color: '#3B8070' },
   loading: '~/components/Loading.vue',
   /*
@@ -53,12 +45,6 @@ module.exports = {
         })
       }
     },
-    plugins: [
-      new webpack.ProvidePlugin({
-        '_': 'lodash'
-        // ...etc.
-      })
-    ]
   },
   router: {
     base: '/',

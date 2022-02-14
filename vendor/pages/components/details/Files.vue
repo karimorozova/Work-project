@@ -278,21 +278,21 @@ export default {
   }
 
   &__data, &__checkbox, &__name {
-    @extend %flex;
+    //@extend %flex;
   }
 
   &__link {
-    @extend %flex;
+    //@extend %flex;
     padding-left: 0;
   }
 
   &__progress {
-    @extend %flex;
+    //@extend %flex;
     padding: 0 7px;
   }
 
   &__editor {
-    @extend %flex;
+    //@extend %flex;
     padding: 0;
     justify-content: center;
   }

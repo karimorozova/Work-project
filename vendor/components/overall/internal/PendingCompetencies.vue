@@ -167,7 +167,6 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors";
-  @import "../../../assets/scss/SettingsTable";
 
   .competencies {
     width: 1040px;
@@ -179,21 +178,21 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
     margin-bottom: 50px;
 
     &__data {
-      @extend %table-data;
+      //@extend %table-data;
       overflow-x: hidden;
     }
 
     &__editing-data {
-      @extend %table-data;
+      //@extend %table-data;
       box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &__data-input {
-      @extend %table-text-input;
+      //@extend %table-text-input;
     }
 
     &__icons {
-      @extend %table-icons;
+      //@extend %table-icons;
       height: 30px;
       justify-content: center;
     }
@@ -213,7 +212,7 @@ import PendingCompetenciesModifyModal from "./PendingCompetenciesModifyModal";
     }
 
     &__input {
-      @extend %table-text-input;
+      //@extend %table-text-input;
     }
   }
 </style>

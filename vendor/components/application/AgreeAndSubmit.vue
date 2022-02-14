@@ -136,16 +136,16 @@ export default {
     &__text {
         font-size: 14px;
       margin-left: 7px;
-      font-family: Myriad600;
+      font-family: Roboto600;
     }
     &__link {
-        color: #67573E;
+        color: #333;
         font-weight: 600;
     }
     &__checkbox {
         width: 16px;
         height: 16px;
-        border: 1px solid #67573E;
+        border: 1px solid #333;
         .checked {
             width: 100%;
             height: 100%;
@@ -155,7 +155,7 @@ export default {
               position: absolute;
               width: 10px;
               height: 3px;
-              background-color: #67573E;
+              background-color: #333;
               top: 9px;
               left: 1px;
               -webkit-transform: rotate(45deg);
@@ -166,7 +166,7 @@ export default {
               position: absolute;
               width: 12px;
               height: 3px;
-              background-color: #67573E;
+              background-color: #333;
               top: 7px;
               left: 5px;
               -webkit-transform: rotate(-65deg);

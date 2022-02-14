@@ -238,7 +238,6 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors";
-  @import "../../../assets/scss/SettingsTable";
 
   .assessment {
     width: 1040px;
@@ -277,20 +276,20 @@
     }
 
     &__editing-data {
-      @extend %table-data;
+      //@extend %table-data;
       box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &__input {
-      @extend %table-text-input;
+      //@extend %table-text-input;
     }
 
     &__icons {
-      @extend %table-icons;
+      //@extend %table-icons;
     }
 
     &__icon {
-      @extend %table-icon;
+      //@extend %table-icon;
     }
 
     &_opacity {

@@ -507,7 +507,6 @@
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors";
-  @import "../../../assets/scss/SettingsTable";
 
   .qualifications {
     width: 1040px;
@@ -519,27 +518,27 @@
     margin-bottom: 50px;
 
     &__data {
-      @extend %table-data;
+      //@extend %table-data;
       overflow-x: hidden;
     }
 
     &__editing-data {
-      @extend %table-data;
+      //@extend %table-data;
       box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &__data-input {
-      @extend %table-text-input;
+      //@extend %table-text-input;
     }
 
     &__icons {
-      @extend %table-icons;
+      //@extend %table-icons;
       height: 30px;
       justify-content: flex-end;
     }
 
     &__icon {
-      @extend %table-icon;
+      //@extend %table-icon;
     }
 
     &__drop-menu {

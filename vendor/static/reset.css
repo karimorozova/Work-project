@@ -1,35 +1,26 @@
 html, body {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-family: Myriad400;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: Roboto400;
 }
 
 html {
-	line-height: 1.15
+    line-height: 1.15
 }
 
 input, textarea {
-    color: #67573E;
-    font-family: Myriad400;
+    font-family: Roboto400;
 }
 
 button {
-    font-family: Myriad400;
+    font-family: Roboto400;
 }
 
 blockquote, q {
-	quotes: none;
+    quotes: none;
 }
 
 input[type="checkbox"] {
     margin: 0;
-}
-
-
-@font-face {
-    font-family: 'Myriad400';
-    font-style: normal;
-    font-weight: normal;
-    src: url('../assets/fonts/Roboto400.woff2') format('woff2');
 }

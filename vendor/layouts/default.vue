@@ -40,16 +40,6 @@ input::-webkit-input-placeholder {
   opacity: 0.5;
 }
 
-//::-moz-selection { /* Code for Firefox */
-//  color: $text;
-//  background: #F5C653AA;
-//}
-//
-//::selection {
-//  color: $text;
-//  background: #F5C653;
-//}
-
 .slide-fade-enter-active {
   transition: all .5s ease;
 }
@@ -64,21 +54,21 @@ input::-webkit-input-placeholder {
 }
 
 @font-face {
-  font-family: 'Myriad300';
+  font-family: 'Roboto300';
   font-style: normal;
   font-weight: normal;
   src: url('../assets/fonts/Roboto300.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Myriad400';
+  font-family: 'Roboto400';
   font-style: normal;
   font-weight: normal;
   src: url('../assets/fonts/Roboto400.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Myriad600';
+  font-family: 'Roboto600';
   font-style: normal;
   font-weight: normal;
   src: url('../assets/fonts/Roboto600.woff2') format('woff2');
@@ -86,7 +76,7 @@ input::-webkit-input-placeholder {
 
 
 @font-face {
-  font-family: 'Myriad900';
+  font-family: 'Roboto900';
   font-style: normal;
   font-weight: normal;
   src: url('../assets/fonts/Roboto900.woff2') format('woff2');

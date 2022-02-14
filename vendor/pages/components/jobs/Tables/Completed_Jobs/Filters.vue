@@ -113,7 +113,7 @@
 		},
 		mounted() {
 			this.getJobs()
-			this.uniqJobInvoiceDates = _.uniqBy(this.jobs, 'invoiceDate')
+			// this.uniqJobInvoiceDates = _.uniqBy(this.jobs, 'invoiceDate')
 			this.uniqJobInvoiceDates.unshift({ invoiceDate: "All" })
 			this.uniqJobInvoiceDates.map((job) => {
 				this.invoiceDates.push(job.invoiceDate)

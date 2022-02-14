@@ -357,7 +357,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../../assets/scss/SettingsTable";
   @import "../../../assets/scss/colors";
 
   .education {
@@ -369,25 +368,25 @@
     position: relative;
 
     &__data {
-      @extend %table-data;
+      //@extend %table-data;
     }
 
     &__editing-data {
-      @extend %table-data;
+      //@extend %table-data;
       box-shadow: inset 0 0 7px $brown-shadow;
     }
 
     &__input {
-      @extend %table-text-input;
+      //@extend %table-text-input;
     }
 
     &__icons {
-      @extend %table-icons;
+      //@extend %table-icons;
       justify-content: flex-end;
     }
 
     &__icon {
-      @extend %table-icon;
+      //@extend %table-icon;
     }
 
     &_opacity {

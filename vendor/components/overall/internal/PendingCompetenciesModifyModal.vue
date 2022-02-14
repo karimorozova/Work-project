@@ -86,7 +86,6 @@ import SelectSingle from "../SelectSingle";
 
 <style lang="scss" scoped>
   @import "../../../assets/scss/colors";
-  @import "../../../assets/scss/SettingsTable";
 
   .modal {
     box-shadow: rgba(103, 87, 62, 0.3) 0px 2px 5px, rgba(103, 87, 62, 0.15) 0px 2px 6px 2px;
