@@ -17,7 +17,6 @@
               .user__description
                 .user__name {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
                 .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
-
           .details__info
             .row
               .row__title Report Id:
@@ -40,12 +39,12 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
                 span(v-html="'&euro;'")
 
-          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Received' || reportDetailsInfo.status === 'Partially Paid'")
+          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Ready' || reportDetailsInfo.status === 'Invoice on-hold'")
             .row
               .row__title Invoice:
-              .row__value2(v-if="reportDetailsInfo.status === 'Invoice Received'" )
-                input.file-button(type="file" @change="uploadFile")
-                .file-fake-button
+              .row__value2
+                input.file-button(type="file" :disabled="isPaymentMethodChanging" @change="uploadFile" )
+                .file-fake-button(:class="{'file-button-disabled': isPaymentMethodChanging}")
                   i(class="fa-solid fa-upload")
 
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
@@ -53,23 +52,56 @@
 
                 span.file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
                 span.file-name2(v-else) {{ reportDetailsInfo.paymentDetails.file.fileName }}
-              .row__value2(v-else)
-                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-                  i(class="fa-solid fa-download")
-                span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
 
             .row
               .row__title Payment Method:
-              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+              .row__valueDrops
+                SelectSingle(
+                  :isDisabled="!!invoiceFile"
+                  :options="vendor.billingInfo.paymentMethod",
+                  placeholder="Option",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod.name",
+                  @chooseOption="resetPaymentMethod"
+                )
             .row
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
 
-            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
+            .row
+              .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
+
+            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="submitFile")
+
+          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Partially Paid'")
+            //.row
+            //  .row__title Invoice:
+            //  .row__value2(v-if="reportDetailsInfo.status === 'Invoice Received'" )
+            //    input.file-button(type="file" @change="uploadFile")
+            //    .file-fake-button
+            //      i(class="fa-solid fa-upload")
+            //
+            //    .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+            //      i(class="fa-solid fa-download")
+            //
+            //    span.file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
+            //    span.file-name2(v-else) {{ reportDetailsInfo.paymentDetails.file.fileName }}
+            //  .row__value2(v-else)
+            //    .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+            //      i(class="fa-solid fa-download")
+            //    span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
+            //
+            //.row
+            //  .row__title Payment Method:
+            //  .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+            //.row
+            //  .row__title Expected payment date:
+            //  .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
+            //
+            //Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
+
 
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
             Button.button-center( value="Approve report" @clicked="approveReport" )
-
 
           .body__submission(v-if="reportDetailsInfo.status === 'Approved'")
             .row(v-if="isVendorHavePaymentMethod")
@@ -94,7 +126,7 @@
               router-link(v-bind:to="'/billing/billing-information'")
                 Button(value="Billing & Payment Info")
             div(v-else)
-              .submission-alert.center(v-if="isSubmissionAlert" ) skdjfksjdklfjskldfj skdjf lksjdfklsj k
+              .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
 
               Button(:isDisabled="isRequestNow" v-if="!isVendorDontHaveBI" style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
 
@@ -159,6 +191,7 @@ export default {
       isSubmissionAlert: false,
       submissionAlertMessage: '',
 
+      isPaymentMethodChanging: false,
       isRequestNow: false,
       domain: '',
       invoiceFile: null,
@@ -221,6 +254,18 @@ export default {
         elem.value = ''
       }
     },
+    resetPaymentMethod({ option }) {
+      if (this.reportDetailsInfo.paymentDetails.paymentMethod.name === option.name) {
+        this.isPaymentMethodChanging = false
+        return
+      }
+      const paymentMethod = option
+      this.isPaymentMethodChanging = true
+      this.submissionAlertMessage = 'CHECKS ALERTS!!'
+      this.isSubmissionAlert = true
+
+      this.mutatePaymentMethod(paymentMethod)
+    },
     setPaymentMethod({ option }) {
       const paymentMethod = option
 
@@ -235,6 +280,9 @@ export default {
           break
         }
       }
+      this.mutatePaymentMethod(paymentMethod)
+    },
+    mutatePaymentMethod(paymentMethod) {
       this.reportDetailsInfo = Object.assign({}, this.reportDetailsInfo, {
         ...this.reportDetailsInfo,
         paymentDetails: {
@@ -603,5 +651,10 @@ export default {
   cursor: pointer;
   font-size: 16px;
   margin-right: 10px;
+}
+
+.file-button-disabled {
+  background: #F8F8F8;
+  cursor: default !important;
 }
 </style>

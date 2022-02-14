@@ -22,11 +22,11 @@ const invoiceReloadFile = async ({ reportId, invoiceFile, oldPath }) => {
 	await fs.unlink(`./dist${ oldPath }`, (err) => {
 		if (err) console.log("Error in removeOldInvoiceFile")
 	})
-	const { newPath } = await invoiceFileUploading(invoiceFile[0], reportId)
+	const { fileName, newPath } = await invoiceFileUploading(invoiceFile[0], reportId)
 	const { status, zohoBillingId } = await InvoicingPayables.findOneAndUpdate({ _id: reportId }, {
 		'paymentDetails.file': { fileName, path: newPath }
 	})
-	if (status === 'Invoice Ready') {
+	if (status === 'Invoice Ready' && !!zohoBillingId) {
 		await removeFile(zohoBillingId)
 		await addFile(zohoBillingId, newPath)
 	}
@@ -48,9 +48,8 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 	paymentDetails.expectedPaymentDate = new Date(moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD'))
 	paymentDetails.file = { fileName, path }
 
-
 	let vendorReports = vendorReportsAll.filter(({ status, _id, paymentDetails: paymentDetailsReport }) =>
-			status === 'Invoice on-hold' && `${ reportId }` !== `${ _id }` && paymentDetailsReport.paymentMethod.type === paymentDetails.paymentMethod.type)
+			status === 'Invoice on-hold' && `${ reportId }` !== `${ _id }` && paymentDetailsReport.paymentMethod.name === paymentDetails.paymentMethod.name)
 
 	switch (true) {
 		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +totalPrice):
@@ -69,25 +68,16 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 			await updatePayableReport(reportId, { paymentDetails })
 			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
 				await updatePayableReport(id, { status: 'Invoice Ready' })
+				// await zohoBillCreation(reportId)
 			}
+			console.log('vse vuvodiu s hold')
 			break
 		}
 	}
 
-
-	// console.log(reportId, vendorId, invoiceFile, paymentMethod)
-
-	//TODO HOLD CHECK
-
-	// await InvoicingPayables.updateOne(
-	// 		{ _id: reportId },
-	// 		{ status: 'SOON ASDASDASD', 'paymentDetails.file': { } }
-	// )
 	function holdReportsSum(arr) {
 		return arr.reduce((acc, curr) => acc + +curr.totalPrice, 0)
 	}
-
-	throw new Error('asd')
 }
 
 const zohoBillCreation = async (_id) => {
