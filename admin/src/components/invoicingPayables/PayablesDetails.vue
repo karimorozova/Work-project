@@ -81,7 +81,13 @@
                     )
                   span(v-else) {{reportDetailsInfo.status}}
 
-                IconButton(@clicked="showChangingStatus")
+                IconButton(
+                  :hasPopup="true"
+                  popupBg="#758d8d"
+                  popupTextColor="#232d2d"
+                  popupText="My pop up testing"
+                  @clicked="showChangingStatus"
+                )
                   i(class="fas fa-pen" )
               .text__block
                 .text__title Created On:

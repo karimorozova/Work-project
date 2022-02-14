@@ -1,15 +1,36 @@
 <template lang="pug">
-  .button(:class="{disabled: isDisable}" @click.stop="click")
-    .button__icon
-      slot
+  PopUp(:backgroundColor="popupBg" :color="popupTextColor" :text="popupText" :side="popupSide" :isDisabled="!hasPopup" )
+    .button(:class="{disabled: isDisable}" @click.stop="click")
+      .button__icon
+        slot
 </template>
 
 <script>
+import PopUp from "./PopUp"
 	export default {
+    components: {
+      PopUp
+    },
     props: {
       isDisable: {
         type: Boolean,
         default: false
+      },
+      hasPopup: {
+        type: Boolean,
+        default: false
+      },
+      popupBg: {
+        type: String,
+      },
+      popupTextColor: {
+        type: String
+      },
+      popupText: {
+        type: String,
+      },
+      popupSide: {
+        type: String
       }
     },
 		methods: {

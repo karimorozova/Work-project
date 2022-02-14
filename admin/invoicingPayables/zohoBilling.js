@@ -123,6 +123,14 @@ const addFile = async (billId, filePath) => {
 	await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, form, 'POST', form.getHeaders())
 }
 
+const deleteBill = async (billId) => {
+	await sendRequestToZoho(`bills/${ billId }?organization_id=${ organizationId }`)
+}
+
+const setVendorStatusToActive = async (contact_id) => {
+	await sendRequestToZoho(`/contacts/${contact_id}/active?organization_id=${ organizationId }`)
+}
+
 const removeFile = async (billId) => {
 	await sendRequestToZoho(`bills/${ billId }/attachment?organization_id=${ organizationId }`, [], 'Delete')
 }
