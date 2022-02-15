@@ -1,14 +1,26 @@
 <template lang="pug">
-  .foo foo
+  .profile-layout
+
 
 </template>
 
 <script>
 export default {
-  name: "index"
+  name: "index",
+  methods: {
+    name() {
+
+    }
+    // portal-vendor-extra-info
+  },
+  created() {
+
+  }
 }
 </script>
 
 <style lang="scss" scoped>
+.profile-layout {
 
+}
 </style>

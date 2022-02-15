@@ -347,7 +347,6 @@ export default {
       return this.errorsExist = this.errors.length ? true : false
     },
     uploadCvFile(field, { files }) {
-      console.log(files)
       files = Array.from(files).filter(file =>
           this.filesExtensions.includes(file.name.split('.').pop().toString())
           && file.size < 10000000

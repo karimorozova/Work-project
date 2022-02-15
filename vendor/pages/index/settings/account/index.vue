@@ -129,7 +129,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      "alertToggle"
+      "alertToggle",
+      "setCurrentVendor"
     ]),
     async getTimezones() {
       try {
@@ -223,9 +224,7 @@ export default {
         if (this.photoFile.length) formData.append("photo", this.photoFile[0])
 
         const result = await this.$axios.post(`/vendor/info`, formData)
-        const decode = window.atob(result.data)
-        const data = JSON.parse(decode)
-        this.$store.commit("SET_VENDOR", data)
+        this.setCurrentVendor(result.data)
         this.setDefault()
         this.alertToggle({ message: "Saved", isShow: true, type: "success" })
       } catch (err) {
@@ -275,8 +274,8 @@ label {
 }
 
 .Rside {
-  margin-left: 25px;
-  padding-left: 25px;
+  margin-left: 20px;
+  padding-left: 30px;
   border-left: 1px solid $light-border;
 
   &__title {

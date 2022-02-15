@@ -19,7 +19,7 @@ module.exports = {
 
     ],
     script: [
-      { src: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js' },
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js' },
       { src: 'https://www.google.com/recaptcha/api.js', async: true, defer: true}
     ],
     link: [

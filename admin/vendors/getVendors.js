@@ -208,6 +208,49 @@ const getVendorForPortal = async (query) => {
 	)
 }
 
+const getVendorExtraForPortal = async (query) => {
+	return (await Vendors.findOne(query, {
+				documents: 1,
+				profExperiences: 1,
+				educations: 1,
+				matrix: 1,
+				competencies: 1,
+				qualifications: 1,
+				assessments: 1,
+				pendingCompetencies: 1,
+				rates: 1,
+				billingInfo: 1
+			})
+					.populate('qualifications.source', [ 'lang' ])
+					.populate('qualifications.target', [ 'lang' ])
+					.populate('qualifications.industries', [ 'name' ])
+					.populate('qualifications.steps', [ 'title' ])
+					.populate('assessments.sourceLanguage', [ 'lang' ])
+					.populate('assessments.targetLanguage', [ 'lang' ])
+					.populate("assessments.industries.industry", [ 'name' ])
+					.populate("assessments.industries.steps.step", [ 'title' ])
+					.populate('competencies.sourceLanguage', [ 'lang' ])
+					.populate('competencies.targetLanguage', [ 'lang' ])
+					.populate('competencies.industry', [ 'name' ])
+					.populate('competencies.step', [ 'title' ])
+					.populate('competencies.step.calculationUnit', [ 'type' ])
+					.populate('rates.basicPricesTable.sourceLanguage', [ 'lang', 'iso1' ])
+					.populate('rates.basicPricesTable.targetLanguage', [ 'lang', 'iso1' ])
+					.populate('rates.stepMultipliersTable.step', [ 'title' ])
+					.populate('rates.stepMultipliersTable.unit', [ 'type' ])
+					.populate('rates.industryMultipliersTable.industry', [ 'name', 'icon' ])
+					.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+					.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+					.populate('rates.pricelistTable.step', [ 'title' ])
+					.populate('rates.pricelistTable.unit', [ 'type' ])
+					.populate('rates.pricelistTable.industry', [ 'name' ])
+					.populate('pendingCompetencies.sourceLanguage', [ 'lang' ])
+					.populate('pendingCompetencies.targetLanguage', [ 'lang' ])
+					.populate('pendingCompetencies.industry', [ 'name' ])
+					.populate('pendingCompetencies.step', [ 'title' ])
+	)
+}
+
 async function getVendor(query) {
 	return (await Vendors.findOne(query)
 			.populate('native')
@@ -406,5 +449,6 @@ module.exports = {
 	getFilteredVendorsPotential,
 	getVendorsForSteps,
 	getVendorStepDetails,
-	getVendorForPortal
+	getVendorForPortal,
+	getVendorExtraForPortal
 }

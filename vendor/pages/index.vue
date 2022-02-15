@@ -214,7 +214,6 @@ export default {
     this.domain = process.env.domain
     this.isLoad = await new Promise(async (res) => {
       if (document) {
-        console.log(this.$store.commit)
         this.$store.commit("SET_TOKEN", this.$cookie.get('vendor'))
         res(true)
       }
