@@ -41,9 +41,9 @@
 
 </template>
 <script>
-import SelectSingle from "../general/SelectSingle"
-import Button from "../general/Button"
-import ValidationErrors from "../general/ValidationErrors"
+import SelectSingle from "../../../../../components/general/SelectSingle"
+import Button from "../../../../../components/general/Button"
+import ValidationErrors from "../../../../../components/general/ValidationErrors"
 import { mapActions } from "vuex"
 
 export default {
@@ -138,7 +138,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../assets/scss/colors";
+@import "assets/scss/colors";
 
 .modalButton {
   display: flex;

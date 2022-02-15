@@ -147,7 +147,6 @@ import { mapGetters, mapActions } from "vuex"
 import WYSIWYG from "../../../../components/sub-components/WYSIWYG"
 import ApproveModal from "../../../../components/general/ApproveModal"
 import Button from "../../../../components/general/Button"
-import Modal from "../../../../components/sub-components/Modal"
 import removeLang from "../../../../mixins/removeLang"
 import ValidationErrors from "../../../../components/general/ValidationErrors"
 
@@ -375,7 +374,6 @@ export default {
   },
   components: {
     ValidationErrors,
-    Modal,
     Button,
     ApproveModal,
     SelectSingle,

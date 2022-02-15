@@ -6,14 +6,12 @@
 </template>
 
 <script>
-import Button from "../general/Button"
-import SelectSingle from "../general/SelectSingle"
 
 export default {
   props: {
     text: {
       type: String
-    },
+    }
   },
   data() {
     return {}
@@ -21,8 +19,8 @@ export default {
   methods: {
     close() {
       this.$emit("close")
-    },
-  },
+    }
+  }
 }
 </script>
 

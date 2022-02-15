@@ -97,11 +97,11 @@
 </template>
 
 <script>
-import CheckBox from "../general/CheckBox"
-import SelectSingle from "../general/SelectSingle"
-import Button from "../general/Button"
-import Add from "../general/Add"
-import ApproveModal from "../general/ApproveModal"
+import CheckBox from "../../../../../components/general/CheckBox"
+import SelectSingle from "../../../../../components/general/SelectSingle"
+import Button from "../../../../../components/general/Button"
+import Add from "../../../../../components/general/Add"
+import ApproveModal from "../../../../../components/general/ApproveModal"
 import { mapActions } from "vuex"
 import VendorBillingInfoPaymentModal from "./VendorBillingInfoPaymentModal"
 
@@ -110,6 +110,11 @@ export default {
   props: {
     currentVendor: {
       type: Object
+    }
+  },
+  watch: {
+    currentVendor: function (updatedVendor) {
+      this.billingInfo = JSON.parse(JSON.stringify(updatedVendor.billingInfo))
     }
   },
   data() {
@@ -127,7 +132,6 @@ export default {
   },
   methods: {
     ...mapActions({
-      setVendorBillingInfo: "setVendorBillingInfo",
       alertToggle: "alertToggle"
     }),
     replaceKeyName(key) {
@@ -143,9 +147,7 @@ export default {
           vendorId: this.currentVendor._id,
           paymentTypeObj: paymentMethod
         })
-        await this.setVendorBillingInfo({ billingInfo: result.data.billingInfo })
-        this.billingInfo = JSON.parse(JSON.stringify(this.currentVendor.billingInfo))
-
+        await this.$emit('updateData')
       } catch (err) {
         this.alertToggle({ message: "Error on updating payment methods", isShow: true, type: "error" })
       } finally {
@@ -159,8 +161,7 @@ export default {
     async deletePaymentMethod() {
       try {
         const result = await this.$axios.post(`/vendor/manage-payment-methods/${ this.currentVendor._id }/${ this.deletingIndex }/delete`)
-        await this.setVendorBillingInfo({ billingInfo: result.data.billingInfo })
-        this.billingInfo = JSON.parse(JSON.stringify(this.currentVendor.billingInfo))
+        await this.$emit('updateData')
         this.alertToggle({ message: "Removed", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Error on removing!", isShow: true, type: "error" })
@@ -225,7 +226,7 @@ export default {
     async saveChanges() {
       try {
         await this.$axios.post(`/vendor/payment-terms/${ this.currentVendor._id }/update`, { billingInfo: this.billingInfo })
-        this.setVendorBillingInfo({ billingInfo: JSON.parse(JSON.stringify(this.billingInfo)) })
+        await this.$emit('updateData')
         this.alertToggle({ message: "Saved", isShow: true, type: "success" })
       } catch (e) {
         this.alertToggle({ message: "Error on saving changes Billing Information", isShow: true, type: "error" })
@@ -267,7 +268,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../assets/scss/colors";
+@import "../../../../../assets/scss/colors";
 
 .payment-methods {
   margin-top: 15px;
@@ -277,7 +278,7 @@ export default {
   &__body {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: 14px;
   }
 
   &__header {

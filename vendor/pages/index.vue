@@ -305,7 +305,7 @@ export default {
     display: flex;
     transition: .1s ease-in-out;
     cursor: pointer;
-    padding: 10px 10px 10px 55px;
+    padding: 10px 10px 10px 40px;
     align-items: center;
   }
 }
