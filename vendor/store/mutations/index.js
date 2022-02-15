@@ -1,23 +1,38 @@
-import language from "./language";
-import industry from "./industry";
-import steps from "./steps";
-import timezones from "./timezones";
-import vendors from "./vendors";
-import rates from "./rates";
-import { INCREASE_REQUEST, DECREASE_REQUEST, SET_REQUEST_ZERO } from "./requests";
-import { ALERTING_MESSAGE } from "./alerts";
-import { SET_TOKEN } from "./auth";
+export const ALERTING_MESSAGE = (state, payload) => {
+	state.alertMessage = payload.message
+	state.isAlert = payload.isShow
+	state.alertType = payload.type
+}
 
-export default {
-  ...language,
-  ...industry,
-  ...steps,
-  ...timezones,
-  ...vendors,
-  ...rates,
-  INCREASE_REQUEST,
-  DECREASE_REQUEST,
-  ALERTING_MESSAGE,
-  SET_REQUEST_ZERO,
-  SET_TOKEN,
-};
+export const SET_TOKEN = (state, payload) => {
+	state.token = payload
+}
+
+export const SET_INDUSTRIES = (state, payload) => {
+	state.industries = payload
+}
+
+export const SET_LANGUAGES = (state, payload) => {
+	state.languages = payload
+}
+
+export const INCREASE_REQUEST = (state) => {
+	state.currentRequests++
+}
+
+export const DECREASE_REQUEST = (state) => {
+	state.currentRequests--
+}
+
+export const SET_REQUEST_ZERO = (state) => {
+	state.currentRequests = 0
+}
+
+export const SET_STEPS = (state, payload) => {
+	state.allSteps = payload
+}
+
+export const SET_ALL_TIMEZONES = (state, payload) => {
+	state.timezones = payload
+}
+

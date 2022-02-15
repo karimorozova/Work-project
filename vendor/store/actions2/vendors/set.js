@@ -1,4 +1,4 @@
-import { SET_APPLICATION_DATA } from "../../mutation-types";
+import { SET_APPLICATION_DATA } from "../../mutation-types2";
 
 export const setApplicationForm = ( { commit }, payload ) => {
     commit(SET_APPLICATION_DATA, payload);

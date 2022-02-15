@@ -1,5 +1,5 @@
 <template lang="pug">
-  .wrapper
+  .wrapper(v-if="isLoad" )
     .navbar
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
@@ -84,7 +84,7 @@ export default {
               path: "/profile-details/experience-and-document",
               img: require("../assets/images/navbar/Education.svg"),
               active: false
-            },
+            }
           ]
         },
         {
@@ -114,7 +114,7 @@ export default {
           isGroup: true,
           children: [
             {
-              title: "User",
+              title: "Account",
               path: "/settings/account",
               img: require("../assets/images/navbar/Profile.svg"),
               active: false
@@ -125,8 +125,9 @@ export default {
       isAccountMenu: false,
       accountInfo: false,
       domain: '',
+      isLoad: false
 
-      unitsLength: 0
+      // unitsLength: 0
     }
   },
   methods: {
@@ -230,19 +231,25 @@ export default {
     })
   },
   async created() {
-    await this.getVendorInfo()
-    await this.getOriginallyUnits()
-    await this.getAllIndustries()
-    await this.getAllLanguages()
-    await this.getAllSteps()
+    // await this.getVendorInfo()
+    // await this.getOriginallyUnits()
+    // await this.getAllIndustries()
+    // await this.getAllLanguages()
+    // await this.getAllSteps()
     // // this.setToken()
   },
   // updated() {
   //   this.toggleSideBar(false)
   // },
-  mounted() {
-    this.domain = process.env.domain
+  async mounted() {
     this.mainPageRender()
+    this.domain = process.env.domain
+    this.isLoad = await new Promise(async (res) => {
+      if (document) {
+        this.$store.commit("SET_TOKEN", this.$cookie.get('client'))
+        res(true)
+      }
+    })
   },
   directives: {
     ClickOutside
