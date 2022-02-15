@@ -136,7 +136,7 @@ export default {
 
 .block {
   &__header {
-    height: 50px;
+    height: 45px;
     display: flex;
     justify-content: space-between;
     padding: 0 50px;

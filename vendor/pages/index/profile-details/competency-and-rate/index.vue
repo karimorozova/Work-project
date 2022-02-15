@@ -5,20 +5,43 @@
       :selectedTab="selectedTab"
       @setTab="setTab"
     )
+    div(v-if="selectedTab === 'Competencies'" )
+      Competencies(
+        :arr="vendorExtra.competencies"
+      )
+    div(v-if="selectedTab === 'Pending Competencies'" )
+      PendingCompetencies(
+        :arr="vendorExtra.pendingCompetencies"
+        @updateProp="getVendorExtra"
+      )
+    div(v-if="selectedTab === 'Rates'" )
+      Rates(
+        :arr="vendorExtra.rates.pricelistTable.filter(i => !!i.isActive)"
+      )
+    div(v-if="selectedTab === 'Discount Chart'" )
+      DiscountChart(
+        :arr="vendorExtra.matrix"
+      )
+    //Button(value="Add Competency" @clicked="redirectToModal")
 
 </template>
 
 <script>
 import Tabs from "../../../../components/general/Tabs"
+import Competencies from "./sub-components/Competencies"
+import DiscountChart from "./sub-components/DiscountChart"
+import Rates from "./sub-components/Rates"
+import PendingCompetencies from "./sub-components/PendingCompetencies"
+import Button from "../../../../components/general/Button"
 
 export default {
   name: "index",
-  components: { Tabs },
+  components: { Button, PendingCompetencies, Rates, DiscountChart, Competencies, Tabs },
   data() {
     return {
       vendorExtra: {},
-      tabs: [ 'foo', 'boo' ],
-      selectedTab: 'foo'
+      tabs: [ 'Competencies', 'Pending Competencies', 'Rates', 'Discount Chart' ],
+      selectedTab: 'Competencies'
     }
   },
   methods: {

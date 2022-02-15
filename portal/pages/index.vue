@@ -220,7 +220,7 @@ export default {
   display: flex;
   transition: .1s ease-in-out;
   cursor: pointer;
-  padding: 10px 10px 10px 25px;
+  padding: 10px 10px 10px 20px;
   align-items: center;
 
   &__image {
@@ -234,7 +234,7 @@ export default {
 
   &__title {
     font-family: Myriad600;
-    margin-left: 15px;
+    margin-left: 12px;
     font-size: 14px;
     margin-top: 1px;
   }
@@ -243,7 +243,7 @@ export default {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 10px 10px 10px 30px;
+    padding: 10px 10px 10px 25px;
 
     &:hover {
       background: $light-border;

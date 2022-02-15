@@ -411,19 +411,6 @@ router.post('/update-progress', checkVendor, async (req, res) => {
 	}
 })
 
-router.get("/vendor-rates", checkVendor, async (req, res) => {
-	const { token } = req.query
-	try {
-		const { vendorId } = jwt.verify(token, secretKey)
-		const { rates: { pricelistTable } } = await getVendor({ "_id": vendorId })
-
-		res.send(pricelistTable)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on assigning vendor as translator')
-	}
-})
-
 router.post('/step-target-new-request', checkVendor, upload.fields([ { name: 'targetFile' } ]), async (req, res) => {
 	const { jobId } = req.body
 	try {
