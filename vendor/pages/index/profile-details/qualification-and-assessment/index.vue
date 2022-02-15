@@ -5,20 +5,29 @@
       :selectedTab="selectedTab"
       @setTab="setTab"
     )
-
+    div(v-if="selectedTab === 'Qualifications Test'" )
+      Qualifications(
+        :arr="vendorExtra.qualifications"
+      )
+    div(v-if="selectedTab === 'Assessment'")
+      Assessment(
+        :arr="vendorExtra.assessments"
+      )
 </template>
 
 <script>
 import Tabs from "../../../../components/general/Tabs"
+import Qualifications from "./sub-components/Qualifications"
+import Assessment from "./sub-components/Assessment"
 
 export default {
   name: "index",
-  components: { Tabs },
+  components: { Assessment, Qualifications, Tabs },
   data() {
     return {
       vendorExtra: {},
-      tabs: [ 'foo', 'boo' ],
-      selectedTab: 'foo'
+      tabs: [ 'Qualifications Test', 'Assessment' ],
+      selectedTab: 'Qualifications Test'
     }
   },
   methods: {

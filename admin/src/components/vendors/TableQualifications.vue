@@ -73,7 +73,7 @@
         template(slot="progress", slot-scope="{ row, index }")
           .progress-line
             .progress-line__body(v-for="stage in 5")
-              .progress-line__bar(v-if="stage <= setStatusStage(row.status)", :style="{ background: '#2cb42c' }")
+              .progress-line__bar(v-if="stage <= setStatusStage(row.status)", :style="{ background: '#4ba5a5' }")
               .progress-line__bar(v-else)
 
         template(slot="tqi", slot-scope="{ row, index }")
@@ -724,7 +724,7 @@
 
     &__bar {
       height: 5px;
-      margin: 0 1px;
+      margin: 0 2px;
       background: #ccc;
     }
   }
