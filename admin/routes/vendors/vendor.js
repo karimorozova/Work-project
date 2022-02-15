@@ -12,7 +12,8 @@ const {
 	getJobs,
 	updateStepProp,
 	hasVendorCompetenciesAndPending,
-	managePaymentMethods
+	managePaymentMethods,
+	getVendorForPortal
 } = require('../../vendors')
 const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
@@ -210,12 +211,14 @@ router.post("/reset-pass", async (req, res) => {
 	}
 })
 
-router.get("/info", checkVendor, async (req, res) => {
+router.get("/portal-vendor-info", checkVendor, async (req, res) => {
 	const { token } = req.query
 	try {
+		console.log(token)
 		const verificationResult = jwt.verify(token, secretKey)
-		const vendor = await getVendor({ "_id": verificationResult.vendorId })
-		res.send(Buffer.from(JSON.stringify(vendor)).toString('base64'))
+		console.log(verificationResult.vendorId)
+		const vendor = await getVendorForPortal({ "_id": verificationResult.vendorId })
+		res.send(vendor)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Vendor info. Try later.")

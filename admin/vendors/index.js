@@ -5,7 +5,8 @@ const {
 	getFilteredVendors,
 	getFilteredVendorsWithCustomFilters,
 	hasVendorCompetenciesAndPending,
-	getFilteredVendorsPotential
+	getFilteredVendorsPotential,
+	getVendorForPortal
 } = require('./getVendors')
 
 const {
@@ -53,6 +54,7 @@ const {
 } = require("./createVendor")
 
 module.exports = {
+	getVendorForPortal,
 	createVendor,
 	managePaymentMethods,
 	getVendor,

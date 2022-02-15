@@ -2,11 +2,11 @@ import cookie from "./vue-cookie"
 
 export default function ({ store, $axios, route }) {
 	$axios.onRequest(config => {
-		store.dispatch('addRequest');
-		if(config && config.progress === false) {
+		store.dispatch('addRequest')
+		if (config && config.progress === false) {
 			return config
 		}
-	});
+	})
 
 	$axios.onResponse(response => {
 		store.dispatch('delRequest')
@@ -24,7 +24,7 @@ export default function ({ store, $axios, route }) {
 
 	$axios.interceptors.request.use(async config => {
 		return await new Promise(res => {
-			config.headers.common['token-header'] = cookie.get('client')
+			config.headers.common['token-header'] = cookie.get('vendor')
 			res(config)
 		})
 	}, error => {

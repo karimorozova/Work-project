@@ -18,7 +18,6 @@ export const alertToggle = ({ commit }, payload) => {
 	}, 5000)
 }
 
-
 export const addRequest = ({ commit }) => {
 	commit('INCREASE_REQUEST')
 }
@@ -30,3 +29,26 @@ export const delRequest = ({ commit }) => {
 export const noRequest = ({ commit }) => {
 	commit("SET_REQUEST_ZERO")
 }
+
+export const setCurrentVendor = ({ commit }, payload) => {
+	commit("SET_VENDOR", payload)
+}
+
+export const setLanguages = ({ commit }, payload) => {
+	commit("SET_LANGUAGES", payload)
+}
+export const setIndustries = ({ commit }, payload) => {
+	commit("SET_INDUSTRIES", payload)
+}
+export const setSteps = ({ commit }, payload) => {
+	commit("SET_STEPS", payload)
+}
+export const setUnits = ({ commit }, payload) => {
+	commit("SET_UNITS", payload)
+}
+export const setServices = ({ commit }, payload) => {
+	commit("SET_SERVICES", payload)
+}
+
+
+

@@ -5,10 +5,10 @@ import { setApplicationData, SET_VENDOR, SET_NEW_PASSWORD,
     // SET_REPORTS_PAID,
     SET_BILLING_INFO
 } from './set';
-import { SET_APPLICATION_DATA } from '../../mutation-types2';
+// import { SET_APPLICATION_DATA } from '../../mutation-types2';
 
 export default {
-    [SET_APPLICATION_DATA]: setApplicationData,
+    // [SET_APPLICATION_DATA]: setApplicationData,
     SET_VENDOR,
     SET_NEW_PASSWORD,
     SET_CONFIRMED_PASSWORD,

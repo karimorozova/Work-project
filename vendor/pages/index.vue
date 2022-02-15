@@ -23,9 +23,8 @@
       .navbar__name
         .navbar__name-title VENDOR PORTAL
 
-    .content
+    .content(v-if="vendor._id" )
       Header
-      //.content__body(v-if="unitsLength")
       .content__body
         nuxt-child
 
@@ -36,6 +35,8 @@
 import ClickOutside from "vue-click-outside"
 import { mapGetters, mapActions } from "vuex"
 import Header from "../components/Header"
+import { setCurrentVendor } from "../store/actions"
+import { getVendor } from "../store/getters"
 
 export default {
   components: { Header },
@@ -55,12 +56,6 @@ export default {
           img: require("../assets/images/navbar/Projects.svg"),
           active: false
         },
-        // {
-        //   title: "Documents",
-        //   path: "/documents",
-        //   img: require("../assets/images/navbar/Documents.svg"),
-        //   active: false
-        // },
         {
           title: "Profile",
           path: "/profile-details",
@@ -122,19 +117,25 @@ export default {
           ]
         }
       ],
-      isAccountMenu: false,
-      accountInfo: false,
       domain: '',
       isLoad: false
-
-      // unitsLength: 0
     }
+  },
+  computed: {
+    ...mapGetters({
+      vendor: 'getVendor'
+    })
   },
   methods: {
     ...mapActions([
       "alertToggle",
       "logout",
-      "setOriginallyUnits"
+      "setCurrentVendor",
+      "setLanguages",
+      'setIndustries',
+      'setSteps',
+      'setUnits',
+      'setServices'
     ]),
     mainPageRender() {
       this.toggleSideBar(true)
@@ -147,35 +148,13 @@ export default {
         elem.active = window.location.toString().indexOf(elem.path) !== -1
       }
     },
-    async getOriginallyUnits() {
+    async getVendor() {
       try {
-        const result = await this.$axios.get("/api/units")
-        this.setOriginallyUnits(result.data)
-        this.unitsLength = result.data.length
-      } catch (err) {
-      }
-    },
-    async getVendorInfo() {
-      try {
-        const result = await this.$axios.get(`/vendor/info?token=${ this.$store.state.token }`)
-        const decode = window.atob(result.data)
-        const data = JSON.parse(decode)
-        this.$store.commit("SET_VENDOR", data)
-        this.$store.commit("SET_ACCOUNT_INFO")
+        const result = await this.$axios.get(`/vendor/portal-vendor-info?token=${ this.$store.state.token }`)
+        this.setCurrentVendor(result.data)
       } catch (err) {
         this.logout()
         this.$router.push('/login')
-      }
-    },
-    async getAllIndustries() {
-      try {
-        let result = await this.$axios.$get("/api/industries")
-        result.sort((a, b) => {
-          if (a.lang < b.lang) return -1
-          if (a.lang > b.lang) return 1
-        })
-        this.$store.commit("SET_INDUSTRIES", result)
-      } catch (err) {
       }
     },
     async getAllLanguages() {
@@ -185,7 +164,25 @@ export default {
           if (a.lang < b.lang) return -1
           if (a.lang > b.lang) return 1
         })
-        this.$store.commit('SET_LANGUAGES', result)
+        this.setLanguages(result)
+      } catch (err) {
+      }
+    },
+    async getAllUnits() {
+      try {
+        const result = await this.$axios.get("/api/units")
+        this.setUnits(result.data)
+      } catch (err) {
+      }
+    },
+    async getAllIndustries() {
+      try {
+        let result = await this.$axios.$get("/api/industries")
+        result.sort((a, b) => {
+          if (a.lang < b.lang) return -1
+          if (a.lang > b.lang) return 1
+        })
+        this.setIndustries(result)
       } catch (err) {
       }
     },
@@ -196,60 +193,38 @@ export default {
           if (a.title < b.title) return -1
           if (a.title > b.title) return 1
         })
-        this.$store.commit('SET_STEPS', result)
+        this.setSteps(result)
       } catch (err) {
-
       }
     },
-    switchSection(index) {
-      this.navbarList.forEach((item, i) => {
-        item.active = i === index
-      })
-      this.$router.push(this.navbarList[index].path)
-    },
-    showAccountMenu() {
-      this.isAccountMenu = !this.isAccountMenu
-    },
-    // showAccountInfo() {
-    // 	this.hideAccountMenu()
-    // 	this.$router.push('/account')
-    // },
-    hideAccountMenu() {
-      this.isAccountMenu = false
+    async getAllServices() {
+      try {
+        let result = await this.$axios.$get("/api/services")
+        result.sort((a, b) => {
+          if (a.title < b.title) return -1
+          if (a.title > b.title) return 1
+        })
+        this.setServices(result)
+      } catch (err) {
+      }
     }
-    // setToken() {
-    // 	const vendorToken = this.$cookie.get("vendor")
-    // 	this.$store.commit("SET_TOKEN", vendorToken)
-    // }
   },
-  computed: {
-    ...mapGetters({
-      token: "getToken",
-      vendor: "getVendor",
-      steps: "getAllSteps",
-      currentRequests: "getRequestsCount"
-    })
-  },
-  async created() {
-    // await this.getVendorInfo()
-    // await this.getOriginallyUnits()
-    // await this.getAllIndustries()
-    // await this.getAllLanguages()
-    // await this.getAllSteps()
-    // // this.setToken()
-  },
-  // updated() {
-  //   this.toggleSideBar(false)
-  // },
   async mounted() {
     this.mainPageRender()
     this.domain = process.env.domain
     this.isLoad = await new Promise(async (res) => {
       if (document) {
-        this.$store.commit("SET_TOKEN", this.$cookie.get('client'))
+        console.log(this.$store.commit)
+        this.$store.commit("SET_TOKEN", this.$cookie.get('vendor'))
         res(true)
       }
     })
+    await this.getVendor()
+    await this.getAllLanguages()
+    await this.getAllUnits()
+    await this.getAllIndustries()
+    await this.getAllSteps()
+    await this.getAllServices()
   },
   directives: {
     ClickOutside

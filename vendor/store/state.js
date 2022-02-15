@@ -7,10 +7,18 @@ const state = {
   // languages: [],
   // industries: [],
   // timezones: [],
-  // steps: [],
+  // : [],
   // allSteps: [],
   // packages: [],
   // originallyUnits: [],
+
+  vendor: {},
+
+  allLanguages: [],
+  allIndustries: [],
+  allSteps: [],
+  allUnits: [],
+  allServices: [],
 
   token: "",
   currentRequests: 0,

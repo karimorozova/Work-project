@@ -21,7 +21,7 @@
             input.upload-button__input(type="file" @change="previewPhoto")
             i.fas.fa-pencil-alt
         .tip.tip-info
-          div Maximum size should be 2Mb
+          div Maximum size should be 3Mb
           div (only png/jpg/jpeg types)
         .tip.tip-error(v-if="isFileError") Incorrect file type or size
 
@@ -172,7 +172,7 @@ export default {
       if (files && files[0]) {
         const types = [ 'jpg', 'jpeg', 'png' ]
         const type = files[0].name.split('.').pop()
-        return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 2000000
+        return types.indexOf(type.toLowerCase()) !== -1 && files[0].size <= 3200000
       }
       return false
     },
@@ -236,7 +236,7 @@ export default {
   computed: {
     ...mapGetters({
       vendor: "getVendor",
-      languages: "getLangs"
+      languages: "getAllLanguages"
     })
   },
   components: {

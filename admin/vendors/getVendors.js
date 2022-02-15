@@ -118,7 +118,7 @@ async function getVendorStepDetails(id, stepInfo) {
 	const groupStepInfoWithoutUnit = `${ stepInfo.source }-${ stepInfo.target }-${ stepInfo.step }-${ stepInfo.industry }`
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	let vendor = await Vendors.findOne(
-			{_id: id },
+			{ _id: id },
 			{
 				"firstName": 1,
 				"surname": 1,
@@ -140,11 +140,11 @@ async function getVendorStepDetails(id, stepInfo) {
 		return groupStepInfo === currentInfo
 	})
 	const stepInfoForBenchmark = {
-		sourceLanguage: {_id: stepInfo.source},
-		targetLanguage: {_id: stepInfo.target},
-		step: {_id: stepInfo.step},
-		unit: {_id: stepInfo.unit},
-		industry: {_id: stepInfo.industry }
+		sourceLanguage: { _id: stepInfo.source },
+		targetLanguage: { _id: stepInfo.target },
+		step: { _id: stepInfo.step },
+		unit: { _id: stepInfo.unit },
+		industry: { _id: stepInfo.industry }
 	}
 
 	if (!priceListTable) return {
@@ -190,8 +190,26 @@ async function getVendorStepDetails(id, stepInfo) {
 	}
 }
 
+const getVendorForPortal = async (query) => {
+	return (await Vendors.findOne(query, {
+				photo: 1,
+				firstName: 1,
+				status: 1,
+				surname: 1,
+				email: 1,
+				phone: 1,
+				timezone: 1,
+				native: 1,
+				gender: 1,
+				skype: 1,
+				availability: 1,
+				password: 1
+			}).populate('native')
+	)
+}
+
 async function getVendor(query) {
-	return await Vendors.findOne(query)
+	return (await Vendors.findOne(query)
 			.populate('native')
 			.populate('industries', [ 'name', 'icon' ])
 			.populate('languagePairs.source')
@@ -222,7 +240,7 @@ async function getVendor(query) {
 			.populate('pendingCompetencies.sourceLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.targetLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.industry', [ 'name' ])
-			.populate('pendingCompetencies.step', [ 'title' ])
+			.populate('pendingCompetencies.step', [ 'title' ]))
 }
 
 async function hasVendorCompetenciesAndPending(vendorId) {
@@ -231,7 +249,7 @@ async function hasVendorCompetenciesAndPending(vendorId) {
 }
 
 async function getVendors(query) {
-	return await Vendors.find(query)
+	return (await Vendors.find(query)
 			.populate('native')
 			.populate('industries', [ 'name', 'icon' ])
 			.populate('languagePairs.source')
@@ -258,11 +276,11 @@ async function getVendors(query) {
 			.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
 			.populate('rates.pricelistTable.step', [ 'title' ])
 			.populate('rates.pricelistTable.unit', [ 'type' ])
-			.populate('rates.pricelistTable.industry', [ 'name' ])
+			.populate('rates.pricelistTable.industry', [ 'name' ]))
 }
 
 async function getVendorAfterUpdate(query, update) {
-	return await Vendors.findOneAndUpdate(query, update, { new: true })
+	return (await Vendors.findOneAndUpdate(query, update, { new: true })
 			.populate("native")
 			.populate('industries', [ 'name', 'icon' ])
 			.populate("languagePairs.source")
@@ -293,7 +311,7 @@ async function getVendorAfterUpdate(query, update) {
 			.populate('pendingCompetencies.sourceLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.targetLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.industry', [ 'name' ])
-			.populate('pendingCompetencies.step', [ 'title' ])
+			.populate('pendingCompetencies.step', [ 'title' ]))
 }
 
 async function getFilteredVendors(filters) {
@@ -387,6 +405,6 @@ module.exports = {
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential,
 	getVendorsForSteps,
-	getVendorStepDetails
-
+	getVendorStepDetails,
+	getVendorForPortal
 }

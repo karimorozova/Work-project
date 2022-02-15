@@ -199,7 +199,6 @@
 import Header from "../components/application/Header"
 import Footer from "../components/application/Footer"
 import TextInput from "../components/application/TextInput"
-
 import SelectSingle from "../components/general/SelectSingle"
 import SelectMulti from "../components/general/SelectMulti"
 import UploadFileButton from "../components/application/UploadFileButton"
@@ -266,9 +265,7 @@ export default {
       }
 
       this.person.confirmed = confirmed
-
       const sendData = new FormData()
-
       for (let file of this.person.cv) {
         sendData.append('cvFile', file)
       }
@@ -277,7 +274,6 @@ export default {
         for (let file of this.person.cover) {
           sendData.append('coverLetterFile', file)
         }
-
       }
 
       let pendingCompetencies = []
@@ -359,9 +355,6 @@ export default {
 
       this.files[field] = files
       this.person[field] = files
-    },
-    setCoverLetter() {
-      this.person['coverLetter'] = this.coverLetter
     },
     closeErrors() {
       this.errorsExist = false
