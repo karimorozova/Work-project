@@ -1,6 +1,56 @@
 const ObjectId = require('mongodb').ObjectID
 const reg = /[.*+?^${}()|[\]\\]/g
 
+const getFilteredVendorPortalProjectsQuery = (filters, allLanguages, allSteps) => {
+	let query = {}
+
+	const {
+		jobId,
+		projectName,
+		sourceLanguages,
+		targetLanguages,
+		industry,
+		services,
+		startDateFrom,
+		startDateTo,
+		deadlineFrom,
+		deadlineTo,
+		lastDate
+	} = filters
+
+	if (jobId) {
+		const filter = jobId.replace(reg, '\\$&')
+		query['steps.stepId'] = { "$regex": new RegExp(filter, 'g') }
+	}
+	if (projectName) {
+		const filter = projectName.replace(reg, '\\$&')
+		query['projectName'] = { "$regex": new RegExp(filter, 'gi') }
+	}
+	if (lastDate) {
+		query['startDate'] = { $lte: new Date(lastDate) }
+	}
+	if (sourceLanguages) {
+		query["steps.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if (targetLanguages) {
+		query["steps.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if (services) {
+		query["steps.step"] = { $in: services.split(',').map(item => ObjectId(item)) }
+	}
+	if (industry) {
+		query["industry"] = ObjectId(industry)
+	}
+	if (startDateFrom && startDateTo) {
+		query["startDate"] = { $gte: new Date(+startDateFrom), $lt: new Date(+startDateTo) }
+	}
+	if (deadlineFrom && deadlineTo) {
+		query["deadline"] = { $gte: new Date(+deadlineFrom), $lt: new Date(+deadlineTo) }
+	}
+
+	return query
+}
+
 function getFilteredPortalProjectsQuery(filters, allLanguages, allServices) {
 	let query = {}
 	const {
@@ -25,7 +75,7 @@ function getFilteredPortalProjectsQuery(filters, allLanguages, allServices) {
 	}
 	if (projectName) {
 		const filter = projectName.replace(reg, '\\$&')
-		query['projectName'] = { "$regex": new RegExp(filter, 'g') }
+		query['projectName'] = { "$regex": new RegExp(filter, 'gi') }
 	}
 	if (lastDate) {
 		query['startDate'] = { $lte: new Date(lastDate) }
@@ -96,7 +146,7 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 	}
 	if (projectName) {
 		const filter = projectName.replace(reg, '\\$&')
-		query['projectName'] = { "$regex": new RegExp(filter, 'i') }
+		query['projectName'] = { "$regex": new RegExp(filter, 'gi') }
 	}
 	if (lastDate) {
 		query['startDate'] = { $lt: new Date(lastDate) }
@@ -154,4 +204,4 @@ function getFilterdProjectsQuery(filters, allLanguages, allServices, allRequests
 	return query
 }
 
-module.exports = { getFilterdProjectsQuery, getFilteredPortalProjectsQuery }
+module.exports = { getFilterdProjectsQuery, getFilteredPortalProjectsQuery, getFilteredVendorPortalProjectsQuery }

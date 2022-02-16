@@ -1,6 +1,6 @@
 export default {
 	methods: {
-		returnIconCurrencyByStringCode(currencyStingCode) {
+		currencyIconDetected(currencyStingCode) {
 			switch (currencyStingCode) {
 				case "EUR":
 					return "&nbsp;&euro;&nbsp;";

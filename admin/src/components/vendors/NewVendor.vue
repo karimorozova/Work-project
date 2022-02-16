@@ -468,7 +468,7 @@ export default {
 
 .photo-file {
   position: absolute;
-  top: -22px;
+  top: -24px;
   height: 172px;
   width: 150px;
   background-color: transparent;

@@ -14,76 +14,76 @@ const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs')
 
-async function getJobs(id) {
-	const allLanguages = await Languages.find()
-	try {
-		let jobs = []
-		const projects = await getProjectsForVendorPortal({ 'steps.vendor': id })
-		for (let project of projects) {
-			const steps = getSteps(project, id, allLanguages)
-			jobs.push(...steps)
-		}
-		return jobs
-	} catch (err) {
-		console.log(err)
-		console.log("Error in getJobs")
-	}
-}
+// async function getJobs(id) {
+// 	const allLanguages = await Languages.find()
+// 	try {
+// 		let jobs = []
+// 		const projects = await getProjectsForVendorPortal({ 'steps.vendor': id })
+// 		for (let project of projects) {
+// 			const steps = getSteps(project, id, allLanguages)
+// 			jobs.push(...steps)
+// 		}
+// 		return jobs
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error in getJobs")
+// 	}
+// }
 
-function getSteps(project, id, allLanguages) {
-	try {
-		const { steps, tasks } = project
-		let assignedSteps = []
-		let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id)
+// function getSteps(project, id, allLanguages) {
+// 	try {
+// 		const { steps, tasks } = project
+// 		let assignedSteps = []
+// 		let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id)
+//
+// 		for (let step of filteredSteps) {
+// 			// if (step.name !== 'invalid') {
+// 			const stepTask = tasks.find(item => item.taskId === step.taskId)
+// 			const prevStep = getPrevStepData(stepTask, steps, step)
+// 			const { targetLanguage, sourceLanguage } = step._doc
+// 			assignedSteps.push({
+// 				...step._doc,
+// 				currentTask: stepTask,
+// 				project_Id: project._id,
+// 				projectId: project.projectId,
+// 				projectName: project.projectName,
+// 				projectStatus: project.status,
+// 				brief: project.brief,
+// 				manager: project.projectManager,
+// 				industry: project.industry,
+// 				memoqDocs: stepTask.memoqDocs,
+// 				sourceFiles: stepTask.sourceFiles,
+// 				refFiles: stepTask.refFiles,
+// 				targetFiles: stepTask.targetFiles,
+// 				taskTargetFiles: stepTask.targetFiles,
+// 				fullSourceLanguage: getLangBySymbol(sourceLanguage),
+// 				fullTargetLanguage: getLangBySymbol(targetLanguage),
+// 				prevStep
+// 			})
+// 			// }
+// 		}
+// 		return assignedSteps
+//
+// 		function getLangBySymbol(symbol) {
+// 			return allLanguages.find(({ symbol: s }) => s === symbol)
+// 		}
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// }
 
-		for (let step of filteredSteps) {
-			// if (step.name !== 'invalid') {
-			const stepTask = tasks.find(item => item.taskId === step.taskId)
-			const prevStep = getPrevStepData(stepTask, steps, step)
-			const { targetLanguage, sourceLanguage } = step._doc
-			assignedSteps.push({
-				...step._doc,
-				currentTask: stepTask,
-				project_Id: project._id,
-				projectId: project.projectId,
-				projectName: project.projectName,
-				projectStatus: project.status,
-				brief: project.brief,
-				manager: project.projectManager,
-				industry: project.industry,
-				memoqDocs: stepTask.memoqDocs,
-				sourceFiles: stepTask.sourceFiles,
-				refFiles: stepTask.refFiles,
-				targetFiles: stepTask.targetFiles,
-				taskTargetFiles: stepTask.targetFiles,
-				fullSourceLanguage: getLangBySymbol(sourceLanguage),
-				fullTargetLanguage: getLangBySymbol(targetLanguage),
-				prevStep
-			})
-			// }
-		}
-		return assignedSteps
-
-		function getLangBySymbol(symbol) {
-			return allLanguages.find(({ symbol: s }) => s === symbol)
-		}
-	} catch (err) {
-		console.log(err)
-	}
-}
-
-function getPrevStepData(stepTask, steps, step) {
-
-	const brotherlySteps = steps.filter(item => item.taskId === stepTask.taskId)
-	const prevStep = brotherlySteps.find(item => item.stepNumber === step.stepNumber - 1)
-	if (!prevStep) return false
-	const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2) : prevStep.progress
-
-	return {
-		status: prevStep.status,
-		progress: prevProgress
-	}
-}
+// function getPrevStepData(stepTask, steps, step) {
+//
+// 	const brotherlySteps = steps.filter(item => item.taskId === stepTask.taskId)
+// 	const prevStep = brotherlySteps.find(item => item.stepNumber === step.stepNumber - 1)
+// 	if (!prevStep) return false
+// 	const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2) : prevStep.progress
+//
+// 	return {
+// 		status: prevStep.status,
+// 		progress: prevProgress
+// 	}
+// }
 
 async function updateStepProp({ jobId, prop, value }) {
 	try {
@@ -294,4 +294,9 @@ function isAllStepsCompleted({ steps, task }) {
 	return taskSteps.length ? taskSteps.every(item => item.status === 'Completed') : false
 }
 
-module.exports = { getJobs, updateStepProp, setRejectedStatus, manageStatuses }
+module.exports = {
+	// getJobs,
+	updateStepProp,
+	setRejectedStatus,
+	manageStatuses
+}

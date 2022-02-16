@@ -24,7 +24,10 @@ const {
 	managePaymentMethods
 } = require('./info')
 
-const { getJobs, updateStepProp } = require('./jobs')
+const {
+	// getJobs,
+	updateStepProp
+} = require('./jobs')
 const { manageNewApplication } = require('./application')
 const { notifyTestStatus, sendMessageToVendor } = require('./emails')
 const {
@@ -70,7 +73,7 @@ module.exports = {
 	saveHashedPassword,
 	getPhotoLink,
 	removeOldVendorFile,
-	getJobs,
+	// getJobs,
 	updateStepProp,
 	manageNewApplication,
 	updateVendorEducation,

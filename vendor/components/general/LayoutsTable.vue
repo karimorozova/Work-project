@@ -33,8 +33,7 @@
 </template>
 
 <script>
-import ApproveModal from './pangea/ApproveModal'
-import { mapGetters } from "vuex"
+import ApproveModal from './ApproveModal'
 
 export default {
   props: {
@@ -102,7 +101,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../assets/scss/colors";
+@import "assets/scss/colors";
 
 .layoutTable {
   overflow: auto;
@@ -211,7 +210,7 @@ td {
 
 table thead th {
   font-weight: unset;
-  font-family: 'Myriad600';
+  font-family: 'Roboto600';
 }
 
 tbody {

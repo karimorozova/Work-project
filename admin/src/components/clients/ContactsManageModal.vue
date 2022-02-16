@@ -332,7 +332,7 @@
 
   .photo-file {
     position: absolute;
-    top: -22px;
+    top: -24px;
     height: 152px;
     width: 130px;
     background-color: transparent;

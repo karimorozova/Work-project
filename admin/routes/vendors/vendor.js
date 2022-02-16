@@ -22,7 +22,7 @@ const { sendMemoqCredentials } = require('../../emailMessages/vendorCommunicatio
 const { assignMemoqTranslator, getProject, updateProjectProgress, regainWorkFlowStatusByStepId } = require('../../projects')
 const { getMemoqUsers } = require('../../services/memoqs/users')
 const { setMemoqDocumentWorkFlowStatus } = require('../../services/memoqs/projects')
-const { storeFiles, updateNonWordsTaskTargetFiles, downloadCompletedFiles, updateProject } = require('../../projects')
+const { storeFiles, updateNonWordsTaskTargetFiles, downloadCompletedFiles, updateProject, getProjectsForVendorPortalAll } = require('../../projects')
 const {
 	getPayableByVendorId,
 	getPayablePaidByVendorId,
@@ -38,6 +38,7 @@ const {
 	removeFile
 } = require('../../invoicingPayables')
 const moment = require("moment")
+
 
 
 router.get("/reports", checkVendor, async (req, res) => {
@@ -270,12 +271,10 @@ router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (r
 	}
 })
 
-router.get("/jobs", checkVendor, async (req, res) => {
-	const { token } = req.query
+router.post("/all-closed-jobs", checkVendor, async (req, res) => {
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
-		// const jobs = await getJobs(verificationResult.vendorId)
-		// res.send(Buffer.from(JSON.stringify(jobs)).toString('base64'))
+		const projects = await getProjectsForVendorPortalAll({ filters: req.body })
+		res.send(projects)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting jobs.")

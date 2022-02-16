@@ -148,7 +148,7 @@
             :clearable="false"
             type="datetime"
             range
-            placeholder="Select datetime range"
+            placeholder="Datetime range"
           )
           .clear-icon-picker(v-if="!!selectedStartRange[0]" @click="removeSelectedStartRange()")
             i.fas.fa-backspace
@@ -164,7 +164,7 @@
             :clearable="false"
             type="datetime"
             range
-            placeholder="Select datetime range"
+            placeholder="Datetime range"
           )
           .clear-icon-picker(v-if="!!selectedDeadlineRange[0]" @click="removeSelectedDeadlineRange()")
             i.fas.fa-backspace
@@ -189,7 +189,6 @@ export default {
   data() {
     return {
       domain: '',
-      isFilterShow: false,
       allStatuses: [ 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'Cancelled', 'Closed' ],
       projects: [],
       isDataRemain: true,
@@ -502,7 +501,6 @@ export default {
     }
   },
   async created() {
-    if (Object.keys(this.$route.query).length) this.isFilterShow = true
     this.domain = process.env.domain
     await this.getIndustries()
     await this.getLanguages()
@@ -677,25 +675,6 @@ input {
 
   &:focus {
     border: 1px solid $border-focus;
-  }
-}
-
-.show-filter {
-  position: absolute;
-  right: 25px;
-  top: 12px;
-  background: #fff;
-  border: 1px solid $border;
-  border-radius: 4px;
-  cursor: pointer;
-  padding: 5px;
-  transition: .2s ease-out;
-  color: $dark-border;
-  width: 90px;
-  text-align: center;
-
-  &:hover {
-    color: $text !important;
   }
 }
 

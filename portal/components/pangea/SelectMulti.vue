@@ -312,10 +312,6 @@
       .project-info__tasks & {
         max-height: 170px;
       }
-
-      .filters & {
-        max-height: 200px;
-      }
     }
 
     .filters & {

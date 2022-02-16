@@ -1,10 +1,11 @@
-const { Projects, Languages, Services, ClientRequest } = require('../models/')
-const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery } = require('./filter')
+const { Projects, Languages, Services, ClientRequest, Step } = require('../models/')
+const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery, getFilteredVendorPortalProjectsQuery } = require('./filter')
 const { filterNotQuoteStepsInStartedProjectForClientPortal, filterQuoteStepsInStartedProjectForClientPortal } = require('./helpers')
+const { ObjectID: ObjectId } = require("mongodb")
 
 
 async function getProjectsForVendorPortal(obj) {
-	return await Projects.find(obj)
+	return (await Projects.find(obj)
 			.populate('industry')
 			.populate('customer')
 			.populate('service')
@@ -19,11 +20,11 @@ async function getProjectsForVendorPortal(obj) {
 			.populate('steps.fullTargetLanguage')
 			.populate('tasks.service')
 			.populate('tasks.fullSourceLanguage')
-			.populate('tasks.fullTargetLanguage')
+			.populate('tasks.fullTargetLanguage'))
 }
 
 async function getProjects(obj) {
-	return await Projects.find(obj)
+	return (await Projects.find(obj)
 			.populate('industry')
 			.populate('customer')
 			.populate('service')
@@ -39,8 +40,64 @@ async function getProjects(obj) {
 			.populate('tasks.service')
 			.populate('tasks.fullSourceLanguage')
 			.populate('tasks.fullTargetLanguage')
-			.populate('requestId', [ 'projectId' ])
+			.populate('requestId', [ 'projectId' ]))
+}
 
+async function getProjectsForVendorPortalAll({ filters }) {
+	console.log(filters)
+	const allLanguages = await Languages.find()
+	const allSteps = await Step.find()
+	const query = getFilteredVendorPortalProjectsQuery(filters, allLanguages, allSteps)
+
+	const projects = await Projects.aggregate([
+		{
+			$unwind: "$steps"
+		},
+		{
+			$match: {
+				isTest: false,
+				'steps.vendor': ObjectId(filters.vendor),
+				'steps.status': filters.stepsStatuses || {},
+				"steps.nativeFinance.Price.payables": { $gt: 0 },
+				...query,
+			}
+		},
+		{
+			$project: {
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				startDate: 1,
+				deadline: 1,
+				brief: 1,
+				projectManager: 1,
+				steps: 1
+			}
+		},
+		{
+			$unset: [
+				'steps.finance',
+				'steps.defaultStepPrice',
+				'steps.clientRate',
+				'steps.nativeFinance.Price.receivables'
+			]
+		},
+		{
+			$sort: {
+				startDate: -1
+			}
+		},
+		{
+			$limit: 25
+		}
+	])
+	return Projects.populate(projects, [
+		'steps.step',
+		'steps.payablesUnit',
+		'steps.fullSourceLanguage',
+		'steps.fullTargetLanguage',
+		{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] }
+	])
 }
 
 async function getProjectsForPortalAll({ filters }) {
@@ -53,7 +110,8 @@ async function getProjectsForPortalAll({ filters }) {
 				'isTest': 'false',
 				'customer': filters.customer,
 				...query
-			}, {
+			},
+			{
 				projectId: 1,
 				projectName: 1,
 				status: 1,
@@ -380,5 +438,6 @@ module.exports = {
 	getProjectAfterUpdate,
 	getProjectsForVendorPortal,
 	getProjectsForPortalList,
-	getProjectForClientPortal
+	getProjectForClientPortal,
+	getProjectsForVendorPortalAll
 }
