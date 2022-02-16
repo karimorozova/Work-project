@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
+import NewLogin from '@/components/NewLogin'
 import PasswordRestore from '@/components/PasswordRestore'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import Pricelists from '@/components/finance/Pricelists'
@@ -69,6 +70,7 @@ import ReceivablesDetails from "../components/invoicingReceivables/ReceivablesDe
 import ReceivablesAdd from "../components/invoicingReceivables/ReceivablesAdd"
 import ReceivablesPaidDetails from "../components/invoicingReceivables/ReceivablesPaidDetails"
 import axios from "axios"
+import cookie from "../../../vendor/plugins/vue-cookie"
 // =====================================================================================================
 
 
@@ -80,7 +82,7 @@ const router = new Router({
 		{
 			path: '/login',
 			name: 'login',
-			component: Login
+			component: NewLogin
 		},
 		{
 			path: '/forgot',
@@ -640,23 +642,20 @@ const router = new Router({
 })
 
 router.beforeEach( async (to, from, next) => {
-
-	const token = localStorage.getItem("token")
+	// const token = localStorage.getItem("token")
 	try {
 		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot' || to.name === 'quote-decision') return next()
-		if (!!token) {
-			const { status } = await axios.post('/check-jwt', { token: JSON.parse(token).value })
+			const { status } = await axios.post('/check-jwt')
 			if (status === 200) {
 				return next()
 			}
-		}
 		next('/login')
 	} catch (e) {
 		exit()
 	}
 
 	function exit() {
-		localStorage.removeItem("token")
+		cookie.delete('admin')
 		return next('/login')
 	}
 })

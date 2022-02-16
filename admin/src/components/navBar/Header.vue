@@ -31,6 +31,7 @@ import Button from "../Button"
 import { mapGetters } from "vuex"
 import ClickOutside from "vue-click-outside"
 import getBgColor from "../../mixins/getBgColor"
+import cookie from "../../../../vendor/plugins/vue-cookie"
 
 export default {
   mixins: [ getBgColor ],
@@ -66,7 +67,7 @@ export default {
     },
     async signOut() {
       try {
-        localStorage.removeItem("token")
+        await this.$http.get('/logout')
         this.$router.push('/login')
       } catch (err) {
         console.log(err, 'in signOut()')

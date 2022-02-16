@@ -102,7 +102,7 @@ const UserSchema = new mongoose.Schema({
 }, { minimize: false })
 
 UserSchema.statics.authenticate = function (email, password, callback) {
-	User.findOne({ email: email }).populate("group")
+	User.findOne({ email: email }).populate("group").lean()
 			.exec((err, user) => {
 				if (err) {
 					return callback(err)

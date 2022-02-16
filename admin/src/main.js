@@ -28,14 +28,14 @@ Vue.prototype.$domains = {
 
 
 
-axios.interceptors.request.use(config => {
-  const token = localStorage.getItem("token");
-  const value = token || "";
-  config.headers.common['token-header'] = value;
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
+// axios.interceptors.request.use(config => {
+//   const token = cookie.get("token");
+//   const value = token || "";
+//   config.headers.common['token-header'] = value;
+//   return config;
+// }, error => {
+//   return Promise.reject(error);
+// });
 
 Vue.use(GAuth, gauthOption)
 Vue.use(VueResource);
@@ -49,12 +49,12 @@ Vue.http.interceptors.push((request, next) => {
   })
 })
 
-Vue.http.interceptors.push((request, next) => {
-  const token = localStorage.getItem("token");
-  const value = token || ""
-  request.headers.set('token-header', value);
-  next();
-})
+// Vue.http.interceptors.push((request, next) => {
+//   const token = localStorage.getItem("token");
+//   const value = token || ""
+//   request.headers.set('token-header', value);
+//   next();
+// })
 
 Vue.use(VueLodash);
 Vue.config.productionTip = false

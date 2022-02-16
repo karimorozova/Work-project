@@ -27,7 +27,7 @@
           .table__data {{ setShortProjectName( row.projectName ) }}
 
         template(slot="customer" slot-scope="{ row, index }")
-          .table__data
+          .table__data(v-if="row.customer")
             router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${row.customer._id}`}" target="_blank")
               span {{ row.customer.name }}
 

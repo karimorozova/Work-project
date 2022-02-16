@@ -5,9 +5,9 @@ const { secretKey } = require('../configs')
 
 const middleware = {
 	requiresLogin(req, res, next) {
-		if (req.headers['token-header']) {
+		if (req.cookies.admin) {
 			try {
-				const token = JSON.parse(req.headers['token-header']).value
+				const token = req.cookies.admin
 				jwt.verify(token, secretKey, async (err, decoded) => {
 					if (err) {
 						return res.status(403).send(err)

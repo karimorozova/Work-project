@@ -10,15 +10,10 @@ const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com");
 
 router.get('/logout', (req, res, next) => {
-	if (req.session) {
-		req.session.destroy((err) => {
-			if (err) {
-				return next(err)
-			} else {
-				return res.redirect('/')
-			}
-		})
-	}
+	// if (req.cookies.admin) {
+		res.clearCookie("admin");
+		return res.status(200).send()
+	// }
 })
 
 router.post('/reset-pass', async (req, res) => {
@@ -48,14 +43,16 @@ router.post('/all-clients', requiresLogin, async (req, res) => {
 })
 
 router.post('/check-jwt', async (req, res) => {
-	const { token } = req.body
+	const { admin } = req.cookies
 	try {
 		const date = Date.now()
-		const jwtObj = jwt.verify(token, secretKey)
+		const jwtObj = jwt.verify(admin, secretKey)
 		if (jwtObj) {
 			if (date > new Date(jwtObj.timestamp)) return res.status(401).send()
-			return res.status(200).send()
+			return res.status(200).json({status: "Success"})
 		}
+		// res.clearCookie('admin')
+		// return res.status(401).send()
 	} catch (err) {
 		res.status(500).send()
 	}
@@ -107,8 +104,7 @@ router.get('/users-full', requiresLogin, async (req, res, next) => {
 
 router.get('/user', requiresLogin, async (req, res, next) => {
 	try {
-		const key = req.query["key"]
-		const userFromJWT = jwt.verify(key, secretKey)
+		const userFromJWT = jwt.verify  (req.cookies.admin, secretKey)
 		const result = await User.findOne({_id: userFromJWT.user._id}, {password: 0}).populate("group")
 		res.send(result)
 	} catch (err) {
@@ -136,10 +132,9 @@ router.post('/user', requiresLogin, async (req, res) => {
 
 router.delete("/user/:id", requiresLogin, async (req, res) => {
 	const { id } = req.params
-	const { token } = req.body
 	try {
 		await User.deleteOne({ "_id": id })
-		const tokenValue = JSON.parse(token).value
+		const tokenValue = req.cookies.admin
 		const result = jwt.verify(tokenValue, secretKey)
 		if (result.user._id === id) {
 			return res.send('logout')
@@ -172,8 +167,8 @@ router.get('/reps', requiresLogin, (req, res) => {
 })
 
 router.post('/login', (req, res, next) => {
-	if (req.body.logemail && req.body.logpassword) {
-		User.authenticate(req.body.logemail, req.body.logpassword, async (error, user) => {
+	if (req.body.email && req.body.password) {
+		User.authenticate(req.body.email, req.body.password, async (error, user) => {
 			if (error || (!user || !user.isActive)) {
 				var err = new Error('Wrong email or password.')
 				err.status = 401
@@ -183,13 +178,8 @@ router.post('/login', (req, res, next) => {
 					const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
 					req.session.userId = user._id
 					res.statusCode = 200
-					const loggedUser = Object.keys(user).reduce((init, cur) => {
-						if (cur !== "__v" && cur !== "password") {
-							init[cur] = user[cur]
-						}
-						return { ...init }
-					}, {})
-					res.send({ token, ...loggedUser })
+					res.cookie('admin', token, { maxAge: 900000, httpOnly: true });
+					res.status(200).send()
 				} catch (err) {
 					console.log(err)
 					return next(err)
