@@ -1,140 +1,11 @@
 <template lang="pug">
   .allProjects
     .table
-      .clear-filter(v-if="isFilterShow" @click="clearFilters")
-        i(class="fas fa-broom")
-
-      .show-filter(@click="toggleFilters")
-        span(v-if="!isFilterShow" ) Show filters
-        span(v-else) Hide filters
-
-
-      .table__filters(ref="filter")
-        .filter(v-if="isFilterShow")
-          .filter__item
-            label Project Id:
-            .filter__input
-              input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
-              .clear-icon(v-if="projectIdValue.length" @click="removeSelectedInputs('projectId')")
-                i.fas.fa-backspace
-
-          .filter__item
-            label Project Name:
-            .filter__input
-              input(type="text" placeholder="Value" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
-              .clear-icon(v-if="projectNameValue.length" @click="removeSelectedInputs('projectName')")
-                i.fas.fa-backspace
-
-          .filter__item
-            label Created By:
-            .filter__input
-              input(type="text" placeholder="Value" :value="createdByValue" @change="createdBySetFilter" @keyup.13="createdBySetFilter")
-              .clear-icon(v-if="createdByValue.length" @click="removeSelectedInputs('createdBy')")
-                i.fas.fa-backspace
-
-          .filter__item
-            label Source Languages:
-            .filter__input
-              SelectMulti(
-                :selectedOptions="selectedSourceLanguages"
-                :options="mappedLanguages"
-                :hasSearch="true"
-                placeholder="Options"
-                @chooseOptions="chooseSourceLanguages"
-                :isSelectedWithIcon="true"
-                :isRemoveOption="true"
-                @removeOption="removeSourceLanguages"
-              )
-          .filter__item
-            label Target Languages:
-            .filter__input
-              SelectMulti(
-                :selectedOptions="selectedTargetLanguages"
-                :options="mappedLanguages"
-                :hasSearch="true"
-                placeholder="Options"
-                @chooseOptions="chooseTargetLanguages"
-                :isSelectedWithIcon="true"
-                :isRemoveOption="true"
-                @removeOption="removeTargetLanguages"
-              )
-          .filter__item
-            label Industry:
-            .filter__input
-              SelectSingle(
-                :hasSearch="true"
-                :selectedOption="selectedIndustry"
-                :options="allIndustries"
-                placeholder="Option"
-                @chooseOption="setIndustry"
-                :isRemoveOption="true"
-                @removeOption="removeIndustry"
-              )
-          .filter__item
-            label Services:
-            .filter__input
-              SelectMulti(
-                :selectedOptions="selectedServices"
-                :options="allServicesMapped"
-                :hasSearch="true"
-                placeholder="Options"
-                @chooseOptions="setServices"
-                :isSelectedWithIcon="true"
-                :isRemoveOption="true"
-                @removeOption="removeService"
-              )
-          .filter__item
-            label Status:
-            .filter__input
-              SelectSingle(
-                :selectedOption="selectedStatus"
-                :options="allStatuses"
-                placeholder="Option"
-                @chooseOption="setStatus"
-                :isRemoveOption="true"
-                @removeOption="removeStatus"
-              )
-
-          .filter__itemLong
-            label Start Date Range:
-            .filter__input
-              DatePicker.range-with-one-panel(
-                :value="selectedStartRange"
-                @input="(e) => setStartRange(e)"
-                format="DD-MM-YYYY, HH:mm"
-                prefix-class="xmx"
-                range-separator=" - "
-                :clearable="false"
-                type="datetime"
-                range
-                placeholder="Select datetime range"
-              )
-            .clear-icon-picker(v-if="!!selectedStartRange[0]" @click="removeSelectedStartRange()")
-              i.fas.fa-backspace
-
-          .filter__itemLong
-            label Deadline Range:
-            .filter__input
-              DatePicker.range-with-one-panel(
-                :value="selectedDeadlineRange"
-                @input="(e) => setDeadlineRange(e)"
-                format="DD-MM-YYYY, HH:mm"
-                prefix-class="xmx"
-                range-separator=" - "
-                :clearable="false"
-                type="datetime"
-                range
-                placeholder="Select datetime range"
-              )
-            .clear-icon-picker(v-if="!!selectedDeadlineRange[0]" @click="removeSelectedDeadlineRange()")
-              i.fas.fa-backspace
-
       .table__result
         LayoutsTable(
           :fields="fields"
           :tableData="projects"
           @bottomScrolled="bottomScrolled"
-          :isProjectsFilterShow="isFilterShow"
         )
           template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
             .table__header {{ field.label }}
@@ -183,6 +54,122 @@
                 .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else) {{ row.accountManager.firstName[0].toUpperCase() }}
 
         .table__empty(v-if="!projects.length") No data...
+
+    .filters
+      .filter__item
+        label Project ID:
+        .filter__input
+          input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
+          .clear-icon(v-if="projectIdValue.length" @click="removeSelectedInputs('projectId')")
+            i.fas.fa-backspace
+      .filter__item
+        label Project Name:
+        .filter__input
+          input(type="text" placeholder="Value" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
+          .clear-icon(v-if="projectNameValue.length" @click="removeSelectedInputs('projectName')")
+            i.fas.fa-backspace
+      .filter__item
+        label Created By:
+        .filter__input
+          input(type="text" placeholder="Value" :value="createdByValue" @change="createdBySetFilter" @keyup.13="createdBySetFilter")
+          .clear-icon(v-if="createdByValue.length" @click="removeSelectedInputs('createdBy')")
+            i.fa-solid.fa-backspace
+      .filter__item
+        label Source Languages:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedSourceLanguages"
+            :options="mappedLanguages"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="chooseSourceLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeSourceLanguages"
+          )
+      .filter__item
+        label Target Languages:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedTargetLanguages"
+            :options="mappedLanguages"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="chooseTargetLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeTargetLanguages"
+          )
+      .filter__item
+        label Industry:
+        .filter__input
+          SelectSingle(
+            :hasSearch="true"
+            :selectedOption="selectedIndustry"
+            :options="allIndustries"
+            placeholder="Option"
+            @chooseOption="setIndustry"
+            :isRemoveOption="true"
+            @removeOption="removeIndustry"
+          )
+      .filter__item
+        label Services:
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedServices"
+            :options="allServicesMapped"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setServices"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeService"
+          )
+      .filter__item
+        label Status:
+        .filter__input
+          SelectSingle(
+            :selectedOption="selectedStatus"
+            :options="allStatuses"
+            placeholder="Option"
+            @chooseOption="setStatus"
+            :isRemoveOption="true"
+            @removeOption="removeStatus"
+          )
+      .filter__item
+        label Start Date Range:
+        .filter__input
+          DatePicker.range-with-one-panel(
+            :value="selectedStartRange"
+            @input="(e) => setStartRange(e)"
+            format="DD-MM-YYYY, HH:mm"
+            prefix-class="xmx"
+            range-separator=" - "
+            :clearable="false"
+            type="datetime"
+            range
+            placeholder="Select datetime range"
+          )
+          .clear-icon-picker(v-if="!!selectedStartRange[0]" @click="removeSelectedStartRange()")
+            i.fas.fa-backspace
+      .filter__item
+        label Deadline Range:
+        .filter__input
+          DatePicker.range-with-one-panel(
+            :value="selectedDeadlineRange"
+            @input="(e) => setDeadlineRange(e)"
+            format="DD-MM-YYYY, HH:mm"
+            prefix-class="xmx"
+            range-separator=" - "
+            :clearable="false"
+            type="datetime"
+            range
+            placeholder="Select datetime range"
+          )
+          .clear-icon-picker(v-if="!!selectedDeadlineRange[0]" @click="removeSelectedDeadlineRange()")
+            i.fas.fa-backspace
+      .clear-filter(@click="clearFilters")
+        i(class="fas fa-broom")
 
 </template>
 <script>
@@ -307,12 +294,6 @@ export default {
     },
     customFormatter(date) {
       return moment(date).format('MMM D, HH:mm')
-    },
-    toggleFilters() {
-      if (this.isFilterShow) {
-        this.clearFilters()
-      }
-      this.isFilterShow = !this.isFilterShow
     },
     clearFilters() {
       this.$router.replace({ 'query': null }).catch((err) => err)
@@ -578,6 +559,21 @@ export default {
 }
 
 .allProjects {
+  display: flex;
+  gap: 25px;
+}
+
+.filters {
+  padding: 25px;
+  background-color: white;
+  height: fit-content;
+  position: relative;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  margin-right: 50px;
+}
+
+.table {
   width: 980px;
   box-sizing: border-box;
   border-radius: 4px;
@@ -585,10 +581,7 @@ export default {
   box-shadow: $box-shadow;
   padding: 25px;
   position: relative;
-}
-
-.table {
-  margin-top: 25px;
+  height: fit-content;
 
   &__projectName {
     width: 100%;
@@ -626,21 +619,35 @@ a {
   }
 }
 
-.filter {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+.clear-icon-picker,
+.clear-icon {
+  position: absolute;
+  right: 25px;
+  top: 19px;
 
+  font-size: 16px;
+  transition: .2s ease-out;
+  color: $dark-border;
+  cursor: pointer;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  background-color: white;
+
+  &:hover {
+    color: $text;
+  }
+}
+
+.clear-icon-picker {
+  right: 30px;
+}
+
+.filter {
   &__item {
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     width: 220px;
-  }
-
-  &__itemLong {
-    position: relative;
-    margin-bottom: 30px;
-    width: 457px;
   }
 
   &__input {
@@ -673,20 +680,6 @@ input {
   }
 }
 
-.fa-backspace {
-  font-size: 16px;
-  transition: .2s ease-out;
-  color: $dark-border;
-  cursor: pointer;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-
-  &:hover {
-    color: $text;
-  }
-}
-
 .show-filter {
   position: absolute;
   right: 25px;
@@ -706,16 +699,8 @@ input {
   }
 }
 
-.clear-icon-picker {
-  position: absolute;
-  right: 25px;
-  top: 19px;
-}
-
 .clear-filter {
-  position: absolute;
-  right: 135px;
-  top: 12px;
+  width: fit-content;
   background: #fff;
   border: 1px solid $border;
   border-radius: 4px;
@@ -800,6 +785,10 @@ input {
 .currency {
   margin-right: 4px;
   color: $dark-border;
+}
+
+.range-with-one-panel {
+  width: 220px;
 }
 
 </style>

@@ -274,8 +274,8 @@ router.get("/jobs", checkVendor, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const jobs = await getJobs(verificationResult.vendorId)
-		res.send(Buffer.from(JSON.stringify(jobs)).toString('base64'))
+		// const jobs = await getJobs(verificationResult.vendorId)
+		// res.send(Buffer.from(JSON.stringify(jobs)).toString('base64'))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting jobs.")

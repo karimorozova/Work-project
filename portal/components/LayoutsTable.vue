@@ -57,7 +57,7 @@ export default {
   },
   data() {
     return {
-      // innerHeight: 0
+      innerHeight: 0
     }
   },
   methods: {
@@ -87,17 +87,12 @@ export default {
     }
   },
   mounted() {
+    this.innerHeight = window.innerHeight
   },
   computed: {
-    ...mapGetters({
-      // user: "getUser"
-    }),
     getUserHeight() {
-      if (!this.isProjectsFilterShow) {
-        return 710
-      } else {
-        return 510
-      }
+      const height = Math.floor(this.innerHeight - 200)
+      return height > 1200 ? 1200 : height
     }
   },
   components: {

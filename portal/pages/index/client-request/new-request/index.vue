@@ -34,6 +34,7 @@
                     :confirm="true"
                     confirm-text="Set date"
                     :disabled-date="notBeforeToday"
+                    :disabled-time="notBeforeTodayTime"
                     prefix-class="xmx"
                   )
             .form__row
@@ -276,8 +277,13 @@ export default {
       getLanguages: "getLanguages",
       getUser: "getUser"
     }),
-    notBeforeToday(date) {
+    notBeforeTodayTime(date) {
       return date < new Date()
+    },
+    notBeforeToday(date) {
+      let d = new Date()
+      d.setTime(new Date().getTime() - (24 * 3600000))
+      return date < d
     },
     selectOnlyExisted() {
       if (!this.selectedService) return []
@@ -881,8 +887,8 @@ export default {
     padding: 0 20px 20px 20px;
     width: 300px;
     height: fit-content;
-    margin-left: 40px;
-    margin-bottom: 40px;
+    margin-left: 25px;
+    margin-bottom: 25px;
     background-color: white;
     border-radius: 4px;
   }

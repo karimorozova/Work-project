@@ -20,7 +20,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.profile-layout {
+@import "assets/scss/colors";
 
+.profile-layout {
+  padding: 25px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  width: 1000px;
+  box-sizing: border-box;
 }
 </style>

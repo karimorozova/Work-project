@@ -643,9 +643,10 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 290px;
+  width: 300px;
   margin-left: 25px;
   height: fit-content;
+  margin-right: 50px;
 }
 
 .sideRight {
@@ -654,7 +655,7 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 680px;
+  width: 840px;
   height: fit-content;
 }
 
