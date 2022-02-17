@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/Login'
 import NewLogin from '@/components/NewLogin'
+import PasswordReset from '../components/PasswordReset'
+import PasswordResetRequest from '../components/PasswordResetRequest'
 import PasswordRestore from '@/components/PasswordRestore'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
 import Pricelists from '@/components/finance/Pricelists'
@@ -83,6 +85,16 @@ const router = new Router({
 			path: '/login',
 			name: 'login',
 			component: NewLogin
+		},
+		{
+			path: '/password-reset/token/:token',
+			name: 'password-reset',
+			component: PasswordReset
+		},
+		{
+			path: '/password-reset-request',
+			name: 'password-reset-request',
+			component: PasswordResetRequest
 		},
 		{
 			path: '/forgot',
@@ -644,7 +656,7 @@ const router = new Router({
 router.beforeEach( async (to, from, next) => {
 	// const token = localStorage.getItem("token")
 	try {
-		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot' || to.name === 'quote-decision') return next()
+		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/password-reset-request' || to.name === 'password-reset' || to.name === 'quote-decision') return next()
 			const { status } = await axios.post('/check-jwt')
 			if (status === 200) {
 				return next()

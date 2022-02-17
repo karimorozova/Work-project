@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken")
 const { secretKey } = require('../configs')
 const { setNewPassword } = require('../users')
 const {OAuth2Client} = require('google-auth-library');
+const { sendResetToken, changePass } = require("../helpers/passwordReset")
 const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com");
 
 router.get('/logout', (req, res, next) => {
@@ -221,6 +222,25 @@ router.post('/login-with-google',  async (req, res, next) => {
   } catch (err) {
     res.send({status: "error"})
   }
+})
+
+router.post('/pass-reset',  async (req, res, next) => {
+	const {pass, passRepeat, token} = req.body
+	try {
+		await changePass(token, pass, passRepeat)
+	} catch (err) {
+		res.send({status: "error"})
+	}
+})
+
+router.post('/pass-generate-mail',  async (req, res, next) => {
+	const {email, portal} = req.body
+	try {
+		sendResetToken(email, portal)
+		res.send('success')
+	} catch (err) {
+		res.send({status: "error"})
+	}
 })
 
 

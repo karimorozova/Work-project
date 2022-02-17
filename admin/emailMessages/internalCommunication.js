@@ -503,6 +503,28 @@ function pmAssignInRequest(request) {
             </div>`
 }
 
+function getMessageResetPassword(token, url) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
+                </header>
+                <div class="main" style="padding:25px;" >
+                   <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear pangea system user,</span></p>
+                   	<p style="font-weight: 400;">
+                   		We got a request to reset password for you.
+										</p>
+                    <a href="${ url }/token/${ token }" target="_blank">RESET PASSWORD</a> 
+                    <p style="font-weight: 400;">
+                   		If you didn't request to reset password just ignore this message.
+										</p>
+                </div>
+                <footer>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
+                </footer>
+            </div>
+`
+}
 
 module.exports = {
 	pmAssignInRequest,
@@ -521,5 +543,6 @@ module.exports = {
 	managerDr1Assigned,
 	rollbackDR1Template,
 	severalDr1Assign,
-	severalDr1reAssign
+	severalDr1reAssign,
+	getMessageResetPassword,
 }
