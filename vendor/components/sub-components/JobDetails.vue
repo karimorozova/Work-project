@@ -5,20 +5,20 @@
         :job="job"
       )
     .job-details__Lside
-      ProjectManagerBlock(
-        :projectManager="job.projectManager"
+      ProjectManageBlock(
+        :job="job"
       )
 
 </template>
 
 <script>
 import { mapGetters } from "vuex"
-import ProjectManagerBlock from "./JobsDetailsSub/ProjectManagerBlock"
+import ProjectManageBlock from "./JobsDetailsSub/ProjectManageBlock"
 import ProjectDescription from "./JobsDetailsSub/ProjectDescription"
 
 export default {
   name: "JobDetails",
-  components: { ProjectDescription, ProjectManagerBlock },
+  components: { ProjectDescription, ProjectManageBlock },
   data() {
     return {
       job: null

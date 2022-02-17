@@ -113,11 +113,12 @@ export default {
   padding: 10px;
   border: 1px solid $light-border;
   border-radius: 4px;
-  width: 160px;
+  width: 163px;
   box-sizing: border-box;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
   position: relative;
+  cursor: default;
 
   &__number {
     font-size: 16px;
@@ -146,7 +147,7 @@ export default {
 }
 
 .wrapper {
-  width: 700px;
+  width: 720px;
   background-color: white;
   padding: 25px;
   border-radius: 4px;
@@ -160,11 +161,11 @@ export default {
   margin-top: 20px;
 
   &__Rside {
-    width: 335px;
+    width: 345px;
   }
 
   &__Lside {
-    width: 335px;
+    width: 345px;
   }
 }
 
@@ -176,11 +177,11 @@ export default {
 
   &__key {
     color: $dark-border;
-    width: 115px;
+    width: 125px;
   }
 
   &__val {
-    width: 200px;
+    width: 210px;
   }
 }
 
