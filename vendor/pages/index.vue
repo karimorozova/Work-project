@@ -45,9 +45,9 @@ export default {
     return {
       navbarList: [
         {
-          title: "Dashboard",
+          title: "Open & Upcoming Jobs",
           path: "/dashboard",
-          img: require("../assets/images/navbar/Dashboard.svg"),
+          img: require("../assets/images/navbar/Jobs.svg"),
           active: false
         },
         {

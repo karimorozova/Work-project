@@ -151,7 +151,6 @@
       .clear-filter(@click="clearFilters")
         i(class="fas fa-broom")
 
-
 </template>
 
 <script>
@@ -269,7 +268,9 @@ export default {
         ...this.filters,
         stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
         lastDate: this.lastDate,
-        vendor: this.vendor._id
+        vendor: this.vendor._id,
+        isFilterZeroFinance: true,
+        isLimit: true
       })
       this.projects = projects.data
       this.isDataRemain = projects.data.length === 25
@@ -283,7 +284,9 @@ export default {
               ...this.filters,
               stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
               lastDate: this.lastDate,
-              vendor: this.vendor._id
+              vendor: this.vendor._id,
+              isFilterZeroFinance: true,
+              isLimit: true
             })
         ).data
         this.projects.push(...projects)

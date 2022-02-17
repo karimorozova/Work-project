@@ -44,7 +44,6 @@ async function getProjects(obj) {
 }
 
 async function getProjectsForVendorPortalAll({ filters }) {
-	console.log(filters)
 	const allLanguages = await Languages.find()
 	const allSteps = await Step.find()
 	const query = getFilteredVendorPortalProjectsQuery(filters, allLanguages, allSteps)
@@ -58,8 +57,8 @@ async function getProjectsForVendorPortalAll({ filters }) {
 				isTest: false,
 				'steps.vendor': ObjectId(filters.vendor),
 				'steps.status': filters.stepsStatuses || {},
-				"steps.nativeFinance.Price.payables": { $gt: 0 },
-				...query,
+				...(filters.isFilterZeroFinance && { "steps.nativeFinance.Price.payables": { $gt: 0 } }),
+				...query
 			}
 		},
 		{
@@ -88,7 +87,7 @@ async function getProjectsForVendorPortalAll({ filters }) {
 			}
 		},
 		{
-			$limit: 25
+			$limit: filters.isLimit ? 25 : 9999
 		}
 	])
 	return Projects.populate(projects, [

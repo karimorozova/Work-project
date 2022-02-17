@@ -32,7 +32,7 @@
         .table__data {{ row.industry.name }}
       template(slot="price", slot-scope="{ row, index }")
         .table__data {{ row.price }}
-          span.currency(v-html="returnIconCurrencyByStringCode('EUR')")
+          span.currency(v-html="currencyIconDetected('EUR')")
 
 </template>
 

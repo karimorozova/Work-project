@@ -44,7 +44,7 @@
 
         template(slot="rate", slot-scope="{ row, index }")
           .table__data {{ row.rate }}
-            span.currency(v-html="returnIconCurrencyByStringCode('EUR')")
+            span.currency(v-html="currencyIconDetected('EUR')")
 
         template(slot="icons" slot-scope="{ row, index }")
           .table__icons
