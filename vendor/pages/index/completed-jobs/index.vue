@@ -11,12 +11,11 @@
 
         template(slot="jobId" slot-scope="{ row, index }")
           .table__data
-            //router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
-            span {{row.steps.stepId}}
+            router-link(class="link-to" :to="{path: `/completed-jobs/job-details/${row.steps._id}_${row._id}`}")
+              span {{row.steps.stepId}}
 
         template(slot="projectName" slot-scope="{ row, index }")
           .table__data
-            //router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
             .table__projectName
               .short {{ row.projectName }}
               .tooltip(v-if="row.projectName.length >= 18")
@@ -264,7 +263,7 @@ export default {
       this.lastDate = new Date()
       this.lastDate.setDate(this.lastDate.getDate() + 1)
 
-      const projects = await this.$axios.post(`/vendor/all-closed-jobs`, {
+      const projects = await this.$axios.post(`/vendor/all-vendor-jobs`, {
         ...this.filters,
         stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
         lastDate: this.lastDate,
@@ -280,7 +279,7 @@ export default {
     },
     async bottomScrolled() {
       if (this.isDataRemain && this.lastDate) {
-        const projects = (await this.$axios.post(`/vendor/all-closed-jobs`, {
+        const projects = (await this.$axios.post(`/vendor/all-vendor-jobs`, {
               ...this.filters,
               stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
               lastDate: this.lastDate,
@@ -691,5 +690,14 @@ input {
   width: 220px;
 }
 
+a {
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
 
 </style>

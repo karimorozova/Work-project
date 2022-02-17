@@ -6,14 +6,14 @@ const { requiresLogin } = require('../middleware/index')
 const jwt = require("jsonwebtoken")
 const { secretKey } = require('../configs')
 const { setNewPassword } = require('../users')
-const {OAuth2Client} = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library')
 const { sendResetToken, changePass } = require("../helpers/passwordReset")
-const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com");
+const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com")
 
 router.get('/logout', (req, res, next) => {
 	// if (req.cookies.admin) {
-		res.clearCookie("admin");
-		return res.status(200).send()
+	res.clearCookie("admin")
+	return res.status(200).send()
 	// }
 })
 
@@ -50,7 +50,7 @@ router.post('/check-jwt', async (req, res) => {
 		const jwtObj = jwt.verify(admin, secretKey)
 		if (jwtObj) {
 			if (date > new Date(jwtObj.timestamp)) return res.status(401).send()
-			return res.status(200).json({status: "Success"})
+			return res.status(200).json({ status: "Success" })
 		}
 		// res.clearCookie('admin')
 		// return res.status(401).send()
@@ -105,8 +105,8 @@ router.get('/users-full', requiresLogin, async (req, res, next) => {
 
 router.get('/user', requiresLogin, async (req, res, next) => {
 	try {
-		const userFromJWT = jwt.verify  (req.cookies.admin, secretKey)
-		const result = await User.findOne({_id: userFromJWT.user._id}, {password: 0}).populate("group")
+		const userFromJWT = jwt.verify(req.cookies.admin, secretKey)
+		const result = await User.findOne({ _id: userFromJWT.user._id }, { password: 0 }).populate("group")
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -122,7 +122,7 @@ router.post('/user', requiresLogin, async (req, res) => {
 			await User.updateOne({ "_id": user._id }, { firstName, lastName, email, position, group, isActive })
 		} else {
 			const password = "pangea1234"
-			await User.create({  password, firstName, lastName, email, position, group, isActive })
+			await User.create({ password, firstName, lastName, email, position, group, isActive })
 		}
 		res.send("User info saved")
 	} catch (err) {
@@ -170,8 +170,8 @@ router.get('/reps', requiresLogin, (req, res) => {
 router.post('/login', (req, res, next) => {
 	if (req.body.email && req.body.password) {
 		User.authenticate(req.body.email, req.body.password, async (error, user) => {
-			if (error || (!user || !user.isActive)) {
-				var err = new Error('Wrong email or password.')
+			if (error || (!user || user?.isActive === undefined ? false : !user.isActive)) {
+				const err = new Error('Wrong email or password.')
 				err.status = 401
 				return next(err)
 			} else {
@@ -179,7 +179,7 @@ router.post('/login', (req, res, next) => {
 					const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
 					req.session.userId = user._id
 					res.statusCode = 200
-					res.cookie('admin', token, { maxAge: 900000, httpOnly: true });
+					res.cookie('admin', token, { maxAge: 900000, httpOnly: true })
 					res.status(200).send()
 				} catch (err) {
 					console.log(err)
@@ -194,52 +194,52 @@ router.post('/login', (req, res, next) => {
 	}
 })
 
-router.post('/login-with-google',  async (req, res, next) => {
-  const { idToken } = req.body
-  try {
-    const ticket = await client.verifyIdToken({
-      idToken: idToken,
-      audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com",
-    });
-
-    const { email, picture } = ticket.getPayload();
-
-    await User.updateOne({email: email},{$set: {photo: picture}})
-    const user = await User.findOne({email: email}).populate("group")
-
-    if (!user || !user.isActive) res.send({status: "error"})
-
-    const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
-
-    res.statusCode = 200
-    const loggedUser = Object.keys(user).reduce((init, cur) => {
-      if (cur !== "__v" && cur !== "password") {
-        init[cur] = user[cur]
-      }
-      return { ...init }
-    }, {})
-    res.send({status: "success", token, ...loggedUser })
-  } catch (err) {
-    res.send({status: "error"})
-  }
-})
-
-router.post('/pass-reset',  async (req, res, next) => {
-	const {pass, passRepeat, token} = req.body
+router.post('/login-with-google', async (req, res, next) => {
+	const { idToken } = req.body
 	try {
-		await changePass(token, pass, passRepeat)
+		const ticket = await client.verifyIdToken({
+			idToken: idToken,
+			audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com"
+		})
+
+		const { email, picture } = ticket.getPayload()
+
+		await User.updateOne({ email: email }, { $set: { photo: picture } })
+		const user = await User.findOne({ email: email }).populate("group")
+
+		if (!user || !user.isActive) res.send({ status: "error" })
+
+		const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
+
+		res.statusCode = 200
+		const loggedUser = Object.keys(user).reduce((init, cur) => {
+			if (cur !== "__v" && cur !== "password") {
+				init[cur] = user[cur]
+			}
+			return { ...init }
+		}, {})
+		res.send({ status: "success", token, ...loggedUser })
 	} catch (err) {
-		res.send({status: "error"})
+		res.send({ status: "error" })
 	}
 })
 
-router.post('/pass-generate-mail',  async (req, res, next) => {
-	const {email, portal} = req.body
+router.post('/pass-reset', async (req, res, next) => {
+	const { pass, passRepeat, token } = req.body
+	try {
+		await changePass(token, pass, passRepeat)
+	} catch (err) {
+		res.send({ status: "error" })
+	}
+})
+
+router.post('/pass-generate-mail', async (req, res, next) => {
+	const { email, portal } = req.body
 	try {
 		sendResetToken(email, portal)
 		res.send('success')
 	} catch (err) {
-		res.send({status: "error"})
+		res.send({ status: "error" })
 	}
 })
 

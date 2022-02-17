@@ -26,8 +26,10 @@ const {
 
 const {
 	// getJobs,
+	getJobDetails,
 	updateStepProp
 } = require('./jobs')
+
 const { manageNewApplication } = require('./application')
 const { notifyTestStatus, sendMessageToVendor } = require('./emails')
 const {
@@ -58,6 +60,7 @@ const {
 } = require("./createVendor")
 
 module.exports = {
+	getJobDetails,
 	getVendorExtraForPortal,
 	getVendorForPortal,
 	createVendor,

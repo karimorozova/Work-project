@@ -10,11 +10,13 @@ const {
 	getPhotoLink,
 	removeOldVendorFile,
 	getJobs,
+	getJobDetails,
 	updateStepProp,
 	hasVendorCompetenciesAndPending,
 	managePaymentMethods,
 	getVendorForPortal, getVendorExtraForPortal
 } = require('../../vendors')
+
 const { upload, sendEmail } = require('../../utils')
 const { setVendorNewPassword } = require('../../users')
 const { createMemoqUser } = require('../../services/memoqs/users')
@@ -38,7 +40,6 @@ const {
 	removeFile
 } = require('../../invoicingPayables')
 const moment = require("moment")
-
 
 
 router.get("/reports", checkVendor, async (req, res) => {
@@ -124,13 +125,13 @@ router.post('/zoho-bill-creation', checkVendor, async (req, res) => {
 
 		const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
 
-		const lineItems = [{
-			"name": `TS ${monthAndYear}`,
+		const lineItems = [ {
+			"name": `TS ${ monthAndYear }`,
 			"account_id": "335260000002330131",
 			"rate": rate,
 			"quantity": 1
 
-		}]
+		} ]
 
 		const expectedPaymentDate = moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD')
 		paymentDetails.paymentMethod = paymentMethod
@@ -236,8 +237,6 @@ router.get("/portal-vendor-extra-info", checkVendor, async (req, res) => {
 	}
 })
 
-
-
 router.get("/has-competencies", checkVendor, async (req, res) => {
 	const { token } = req.query
 	try {
@@ -271,13 +270,24 @@ router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (r
 	}
 })
 
-router.post("/all-closed-jobs", checkVendor, async (req, res) => {
+router.post("/all-vendor-jobs", checkVendor, async (req, res) => {
 	try {
 		const projects = await getProjectsForVendorPortalAll({ filters: req.body })
 		res.send(projects)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting jobs.")
+	}
+})
+
+router.post("/jobs-details", checkVendor, async (req, res) => {
+	const { _stepId, _projectId, _vendorId } = req.body
+	try {
+		const job = await getJobDetails(_stepId, _projectId, _vendorId)
+		res.send(job)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting job details")
 	}
 })
 
@@ -292,16 +302,16 @@ router.post("/job", checkVendor, async (req, res) => {
 	}
 })
 
-router.post("/selected-job", checkVendor, async (req, res) => {
-	const { jobId, value } = req.body
-	try {
-		await updateProject({ "steps._id": jobId }, { $set: { "steps.$.isVendorRead": value } }, { arrayFilters: [ { 'i._id': jobId } ] })
-		res.send("Terms agreement status changed")
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on checking job's terms agreement")
-	}
-})
+// router.post("/selected-job", checkVendor, async (req, res) => {
+// 	const { jobId, value } = req.body
+// 	try {
+// 		await updateProject({ "steps._id": jobId }, { $set: { "steps.$.isVendorRead": value } }, { arrayFilters: [ { 'i._id': jobId } ] })
+// 		res.send("Terms agreement status changed")
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send("Error on checking job's terms agreement")
+// 	}
+// })
 
 router.post("/create-memoq-vendor", checkVendor, async (req, res) => {
 	const { token } = req.body

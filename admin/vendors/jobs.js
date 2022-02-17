@@ -14,6 +14,50 @@ const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs')
 
+const getJobDetails = async (_stepId, _projectId, _vendorId) => {
+	const { projectName, projectId, steps, _id, status, brief, industry, tasks, projectManager } = await getProject({ _id: _projectId })
+	let step = steps.find(({ _id, vendor }) => `${ _id }` === `${ _stepId }` && `${ vendor._id }` === `${ _vendorId }`)
+	step = step._doc
+	const stepTask = tasks.find(item => item.taskId === step.taskId)
+	const prevStep = getPrevStepData(stepTask, steps, step)
+
+	delete step.finance
+	delete step.clientRate
+	delete step.defaultStepPrice
+	step.nativeFinance.Price.receivables = 0
+
+	return {
+		...step,
+		currentTask: stepTask,
+		_projectId: _id,
+		projectId: projectId,
+		projectName: projectName,
+		projectStatus: status,
+		brief: brief,
+		industry,
+		memoqDocs: stepTask.memoqDocs,
+		sourceFiles: stepTask.sourceFiles,
+		refFiles: stepTask.refFiles,
+		prevStep,
+		projectManager
+	}
+}
+
+function getPrevStepData(stepTask, steps, step) {
+	const brotherlySteps = steps.filter(i => i.taskId === stepTask.taskId)
+	const prevStep = brotherlySteps.find(i => i.stepNumber === step.stepNumber - 1)
+	if (!prevStep) return false
+
+	const prevProgress = isNaN(prevStep.progress)
+			? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2)
+			: prevStep.progress
+
+	return {
+		status: prevStep.status,
+		progress: prevProgress
+	}
+}
+
 // async function getJobs(id) {
 // 	const allLanguages = await Languages.find()
 // 	try {
@@ -51,9 +95,8 @@ const fs = require('fs')
 // 				brief: project.brief,
 // 				manager: project.projectManager,
 // 				industry: project.industry,
-// 				memoqDocs: stepTask.memoqDocs,
-// 				sourceFiles: stepTask.sourceFiles,
-// 				refFiles: stepTask.refFiles,
+
+
 // 				targetFiles: stepTask.targetFiles,
 // 				taskTargetFiles: stepTask.targetFiles,
 // 				fullSourceLanguage: getLangBySymbol(sourceLanguage),
@@ -72,18 +115,6 @@ const fs = require('fs')
 // 	}
 // }
 
-// function getPrevStepData(stepTask, steps, step) {
-//
-// 	const brotherlySteps = steps.filter(item => item.taskId === stepTask.taskId)
-// 	const prevStep = brotherlySteps.find(item => item.stepNumber === step.stepNumber - 1)
-// 	if (!prevStep) return false
-// 	const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2) : prevStep.progress
-//
-// 	return {
-// 		status: prevStep.status,
-// 		progress: prevProgress
-// 	}
-// }
 
 async function updateStepProp({ jobId, prop, value }) {
 	try {
@@ -298,5 +329,6 @@ module.exports = {
 	// getJobs,
 	updateStepProp,
 	setRejectedStatus,
-	manageStatuses
+	manageStatuses,
+	getJobDetails
 }

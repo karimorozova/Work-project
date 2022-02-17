@@ -19,8 +19,8 @@
 
       template(slot="stepId" slot-scope="{ row, index }")
         .table__data
-          //router-link(class="link-to" :to="{path: `/projects/details/${row._id}`}")
-          span {{ row.stepId }}
+          router-link(class="link-to" :to="{path: `/dashboard/job-details/${row._id}_${row.project_id}`}")
+            span {{ row.stepId }}
 
       template(slot="project_projectName" slot-scope="{ row, index }")
         .table__projectName
@@ -47,10 +47,18 @@
           span.currency(v-html="currencyIconDetected('EUR')" )
           span {{ +(row.total).toFixed(2) }}
 
+      template(slot="project_projectManager" slot-scope="{ row, index }")
+        .table__dataImage
+          .tooltip.user__image
+            .tooltip-data.user(v-html="row.project_projectManager.firstName + ' ' + row.project_projectManager.lastName || ''")
+            img(v-if="row.project_projectManager.photo && !row.project_projectManager.photo.includes('https://')" :src="domain+row.project_projectManager.photo")
+            .user__fakeImage(:style="{'--bgColor': getBgColor(row.project_projectManager._id)[0], '--color':getBgColor(row.project_projectManager._id)[1]  }" v-else) {{ row.project_projectManager.firstName[0].toUpperCase() }}
+
       template(slot="enter" slot-scope="{ row, index }")
         .table__icons
-          .icon
-            i(class="fa-solid fa-arrow-right-to-bracket")
+          router-link(class="link-to" :to="{path: `/dashboard/job-details/${row._id}_${row.project_id}`}")
+            .icon
+              i(class="fa-solid fa-arrow-right-to-bracket")
 
 </template>
 
@@ -59,12 +67,14 @@ import GeneralTable from "../../../../components/general/GeneralTable"
 import tableSortAndFilter from "../../../../mixins/tableSortAndFilter"
 import moment from "moment"
 import currencyIconDetected from "../../../../mixins/currencyIconDetected"
+import getBgColor from "../../../../mixins/getBgColor"
 
 export default {
-  mixins: [ tableSortAndFilter, currencyIconDetected ],
+  mixins: [ tableSortAndFilter, currencyIconDetected, getBgColor ],
   props: [ 'arr' ],
   data() {
     return {
+      domain: '',
       fields: [
         {
           label: "Job ID",
@@ -72,7 +82,7 @@ export default {
           key: "stepId",
           filterInfo: { isFilter: true },
           sortInfo: { isSort: true, order: 'default' },
-          style: { width: "17%" }
+          style: { width: "16%" }
         },
         {
           label: "Project Name",
@@ -80,7 +90,7 @@ export default {
           key: "project_projectName",
           filterInfo: { isFilter: true },
           sortInfo: { isSort: true, order: 'default' },
-          style: { width: "17%" }
+          style: { width: "16%" }
         },
         {
           label: "Service",
@@ -105,24 +115,30 @@ export default {
           key: "status",
           filterInfo: { isFilter: true },
           sortInfo: { isSort: true, order: 'default' },
-          style: { width: "13%" }
+          style: { width: "12%" }
         },
         {
           label: "Languages",
-          headerKey: "h5",
+          headerKey: "h6",
           key: "languages",
-          style: { width: "13%" }
-        },
-        {
-          label: "Total Cost",
-          headerKey: "h5",
-          key: "total",
-          sortInfo: { isSort: true, order: 'default' },
           style: { width: "11%" }
         },
         {
+          label: "Total Cost",
+          headerKey: "h7",
+          key: "total",
+          sortInfo: { isSort: true, order: 'default' },
+          style: { width: "10%" }
+        },
+        {
+          label: "PM",
+          headerKey: "h8",
+          key: "project_projectManager",
+          style: { width: "6%" }
+        },
+        {
           label: "",
-          headerKey: "h6",
+          headerKey: "h9",
           key: "enter",
           style: { width: "6%" }
         }
@@ -146,15 +162,50 @@ export default {
   },
   components: {
     GeneralTable
+  },
+  created() {
+    this.domain = process.env.domain
   }
-
 }
 </script>
 <style lang="scss" scoped>
 @import "assets/scss/colors";
 
+.user {
+  &__fakeImage {
+    height: 32px;
+    width: 32px;
+    border-radius: 32px;
+    background-color: var(--bgColor);
+    color: var(--color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+  }
+
+  &__image {
+    height: 32px;
+    width: 32px;
+    border-radius: 32px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 32px;
+    }
+  }
+}
+
 .table {
   width: 100%;
+
+  &__dataImage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
   &__projectName {
     padding: 0 7px;
@@ -296,6 +347,16 @@ input {
       visibility: visible;
       opacity: 1;
     }
+  }
+}
+
+a {
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 </style>
