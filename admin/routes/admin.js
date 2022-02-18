@@ -168,18 +168,19 @@ router.get('/reps', requiresLogin, (req, res) => {
 })
 
 router.post('/login', (req, res, next) => {
-	if (req.body.email && req.body.password) {
-		User.authenticate(req.body.email, req.body.password, async (error, user) => {
-			if (error || (!user || user?.isActive === undefined ? false : !user.isActive)) {
+	let {email, password} = req.body
+	if (email && password) {
+		email = email.toLowerCase()
+		User.authenticate(email, password, async (error, user) => {
+			if (error || (!user || (user?.isActive === undefined ? false : !user.isActive))) {
 				const err = new Error('Wrong email or password.')
 				err.status = 401
 				return next(err)
 			} else {
 				try {
 					const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
-					req.session.userId = user._id
 					res.statusCode = 200
-					res.cookie('admin', token, { maxAge: 900000, httpOnly: true })
+					res.cookie('admin', token, { maxAge: 12 * 60 * 60 * 1000, httpOnly: true })
 					res.status(200).send()
 				} catch (err) {
 					console.log(err)
@@ -227,9 +228,13 @@ router.post('/login-with-google', async (req, res, next) => {
 router.post('/pass-reset', async (req, res, next) => {
 	const { pass, passRepeat, token } = req.body
 	try {
-		await changePass(token, pass, passRepeat)
+		const result = await changePass(token, pass, passRepeat)
+		if (result.status === "success") {
+			return res.status(200).json(result)
+		}
+		res.status(400).json(result)
 	} catch (err) {
-		res.send({ status: "error" })
+		res.status(400).json({ status: "error", message: 'Something went wrong'})
 	}
 })
 

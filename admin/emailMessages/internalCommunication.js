@@ -509,13 +509,16 @@ function getMessageResetPassword(token, url) {
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
                 </header>
                 <div class="main" style="padding:25px;" >
-                   <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear pangea system user,</span></p>
+                   <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear user</span></p>
                    	<p style="font-weight: 400;">
-                   		We got a request to reset password for you.
-										</p>
-                    <a href="${ url }/token/${ token }" target="_blank">RESET PASSWORD</a> 
-                    <p style="font-weight: 400;">
-                   		If you didn't request to reset password just ignore this message.
+                   		A request to reset your Pangea password has been made. 
+										</p>	
+										<p style="font-weight: 400;">
+                      If you did not make this request, simply ignore this email. If you did make this request, please reset your password: 
+										</p>	
+										
+										<p style="font-weight: 400;">
+										<a href="${ url }/token/${ token }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">Reset Password</a>
 										</p>
                 </div>
                 <footer>

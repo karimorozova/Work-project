@@ -6,6 +6,7 @@
 
 <script>
 import Button from "./Button"
+import { mapActions } from "vuex"
 
 export default {
   components: {
@@ -17,8 +18,19 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: "alertToggle",
+    }),
     async sendRequest() {
-      await this.$http.post('/pass-generate-mail', {email: this.email, portal: 'admin'})
+      try {
+        await this.$http.post('/pass-generate-mail', {email: this.email, portal: 'admin'})
+        this.alertToggle({ message: 'Success', isShow: true, type: "success" })
+        await this.$router.push('/login')
+      }catch (e) {
+
+        this.alertToggle({ message: 'Something went wrong', isShow: true, type: "error" })
+        console.log(e)
+      }
 
     }
   }
