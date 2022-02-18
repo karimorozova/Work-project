@@ -1,5 +1,4 @@
 // export const getTimezones = state => state.timezones;
-// export const getAlertType = state => state.alertType;
 // // export const getReportsPaid = state => state.reportsPaid;
 // // export const getReports = state => state.reports;
 // export const getAccountInfo = state => state.accountInfo;
@@ -9,6 +8,7 @@
 // export const getAllJobs = state => state.jobs;
 // export const getSelectedJob = state => state.selectedJob;
 
+export const getAlertType = state => state.alertType;
 export const getIsAlert = state => state.isAlert
 export const getVendor = state => state.vendor;
 export const getRequestsCount = state => state.currentRequests;

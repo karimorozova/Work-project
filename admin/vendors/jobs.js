@@ -38,6 +38,7 @@ const getJobDetails = async (_stepId, _projectId, _vendorId) => {
 		memoqDocs: stepTask.memoqDocs,
 		sourceFiles: stepTask.sourceFiles,
 		refFiles: stepTask.refFiles,
+		targetFiles: stepTask.targetFiles,
 		prevStep,
 		projectManager
 	}
@@ -117,9 +118,9 @@ function getPrevStepData(stepTask, steps, step) {
 
 
 async function updateStepProp({ jobId, prop, value }) {
+
 	try {
 		const project = await getProject({ 'steps._id': jobId })
-
 		const steps = project.steps.map(item => {
 			if (item.id === jobId) {
 				item.status = value

@@ -3,49 +3,79 @@
     .job-details__Rside
       ProjectDescription(
         :job="job"
+        @updateProgress="getJobsDetails"
+      )
+      ProjectWorkflow(
+        :job="job"
+        @setJobStatus="setJobStatus"
       )
     .job-details__Lside
       ProjectManageBlock(
         :job="job"
       )
-
 </template>
 
 <script>
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import ProjectManageBlock from "./JobsDetailsSub/ProjectManageBlock"
 import ProjectDescription from "./JobsDetailsSub/ProjectDescription"
+import ProjectWorkflow from "./JobsDetailsSub/ProjectWorkflow"
 
 export default {
   name: "JobDetails",
-  components: { ProjectDescription, ProjectManageBlock },
+  components: { ProjectWorkflow, ProjectDescription, ProjectManageBlock },
   data() {
     return {
       job: null
     }
   },
   methods: {
-    async getJobsDetails(_stepId, _projectId, _vendorId) {
+    ...mapActions([ 'alertToggle' ]),
+    async setJobStatus(payload) {
+      const jobId = this.job._id
       try {
-        const result = await this.$axios.post(`/vendor/jobs-details`, {
-          _stepId,
-          _projectId,
-          _vendorId
-        })
+        let { status, targetFile } = payload
+
+        if (targetFile) {
+          let fileData = new FormData()
+          fileData.append('jobId', jobId)
+          for (let file of targetFile) fileData.append('targetFile', file)
+          await this.$axios.post('/vendor/step-target', fileData)
+        }
+        if (status === "Completed" && !targetFile) {
+          await this.$axios.post('/vendor/target-files', { stepId: jobId })
+        }
+        await this.$axios.post('/vendor/job', { jobId, status })
+      } catch (err) {
+        this.alertToggle({ message: "Error in Action!", isShow: true, type: "error" })
+      }
+      await this.getJobsDetails()
+    },
+    async getJobsDetails() {
+      const [ _stepId, _projectId ] = this.$route.params.id.split('_')
+      try {
+        const result = await this.$axios.post(`/vendor/jobs-details`, { _stepId, _projectId, _vendorId: this.vendor._id })
         this.job = result.data
-        console.log(this.job)
+
+        if (result.data.status === 'In progress' && result.data.payablesUnit.type === 'CAT Wordcount') {
+          await this.$axios.post('/vendor/update-progress', { token: this.token, projectId: _projectId, isCatTool: true })
+          const result = await this.$axios.post(`/vendor/jobs-details`, { _stepId, _projectId, _vendorId: this.vendor._id })
+          this.job = result.data
+        }
+        this.alertToggle({ message: "Data received", isShow: true, type: "success" })
+        console.log('START APP', this.job)
       } catch (err) {
       }
     }
   },
   computed: {
     ...mapGetters({
+      token: 'getToken',
       vendor: 'getVendor'
     })
   },
-  created() {
-    const [ _stepId, _projectId ] = this.$route.params.id.split('_')
-    this.getJobsDetails(_stepId, _projectId, this.vendor._id)
+  async created() {
+    await this.getJobsDetails()
   }
 }
 </script>

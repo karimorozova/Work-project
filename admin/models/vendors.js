@@ -65,6 +65,11 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	memoqUserName: {
+		type: String,
+		default: '',
+		trim: true
+	},
 	companyName: {
 		type: String,
 		default: '',

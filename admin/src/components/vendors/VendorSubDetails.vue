@@ -23,6 +23,10 @@
           @uncheck="setTest(false)"
         )
 
+    .sub-information__row(v-if="vendor.memoqUserName" )
+      .row__title Memoq Username:
+      .row__data {{ vendor.memoqUserName }}
+
 </template>
 
 <script>

@@ -618,7 +618,7 @@ const assignMemoqTranslator = async (vendorId, stepId, projectId) => {
 	} else {
 		if (currentProjectUsers.hasOwnProperty('User')) assignPM(currentProjectUsers)
 	}
-	const memoqUser = users.find(user => user.email === vendor.email)
+	const memoqUser = users.find(user => user.id === vendor.guid || user.userName === vendor.memoqUserName || user.email === vendor.email)
 	if (memoqUser) projectUsers.push({ id: memoqUser.id, isPm: false })
 
 	const areUsersSet = await setMemoqProjectUsers(memoqProjectId, Array.from(new Set(projectUsers.filter((el, i, self) => self.map(item => item.id).indexOf(el.id) === i))))
@@ -724,9 +724,8 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 		return arrIds.reduce((acc, curr) => {
 			const { deadline, memoqAssignmentRole, vendor: vendorId } = steps.find(item => item.stepId === curr)
 
-			const { email } = allVendors.find(({ _id }) => _id.toString() === vendorId.toString())
-
-			const user = users.find(item => item.email === email)
+			const vendor = allVendors.find(({ _id }) => _id.toString() === vendorId.toString())
+			const user = users.find(user => user.id === vendor.guid || user.userName === vendor.memoqUserName || user.email === vendor.email)
 
 			acc = acc + `
 					<ns:TranslationDocumentUserRoleAssignment>

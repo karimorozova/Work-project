@@ -345,11 +345,11 @@ function sendMemoqCredentials(obj) {
                 </header>
                 <div class="main" style="padding:25px;" >
                 		<p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Hello ${ obj.firstName }</span></p>
-										<p style="font-weight: 400;">Your account on Memoq has been created.</p>
+										<p style="font-weight: 400;">Your account on MemoQ has been created.</p>
 										<p style="font-weight: 400;">
-											<div>Your credentials:</div>
-											<div>Login: ${ obj.firstName } ${ obj.surname || '' }</div>
-											<div>Password: 1234</div>
+											<p>Your credentials</p>
+											<p>Login: <b>${ obj.firstName.substr(0, 4) } ${ obj.surname.substr(0, 4) }</b></p>
+											<p>Password: <b>LetMeInNow12345!</b></p>
                     </p>
                 </div>
                 <footer>

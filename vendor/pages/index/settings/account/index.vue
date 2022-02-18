@@ -222,7 +222,6 @@ export default {
         formData.append("info", JSON.stringify(fieldForSave))
         if (this.password) formData.append("password", this.password)
         if (this.photoFile.length) formData.append("photo", this.photoFile[0])
-
         const result = await this.$axios.post(`/vendor/info`, formData)
         this.setCurrentVendor(result.data)
         this.setDefault()

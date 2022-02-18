@@ -3,7 +3,11 @@
     .header
       .header__left
         .header__title {{job.step.title}}
-        .header__status {{job.status}}
+        .header__status {{ job.status}}
+        .header__extraStatus(v-if="job.status === 'Approved'" ) Waiting for customer confirmation...
+      .header__right(v-if="job.status === 'In progress' && job.payablesUnit.type === 'CAT Wordcount'" )
+        .refresh-icon(@click="updateProgress")
+          i(class="fas fa-refresh")
 
     .cards
       .card
@@ -71,6 +75,9 @@ export default {
     }
   },
   methods: {
+    updateProgress(){
+      this.$emit('updateProgress')
+    },
     customFormatter(date) {
       return moment(date).format('MMM D, HH:mm')
     }
@@ -81,8 +88,20 @@ export default {
 <style lang="scss" scoped>
 @import "assets/scss/colors";
 
+.wrapper {
+  width: 740px;
+  background-color: white;
+  padding: 25px;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: $box-shadow;
+  margin-bottom: 15px;
+}
+
 .header {
   padding-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
 
   &__title {
     font-size: 18px;
@@ -113,7 +132,7 @@ export default {
   padding: 10px;
   border: 1px solid $light-border;
   border-radius: 4px;
-  width: 163px;
+  width: 168px;
   box-sizing: border-box;
   border-top-right-radius: 20px;
   border-bottom-left-radius: 20px;
@@ -146,14 +165,6 @@ export default {
   }
 }
 
-.wrapper {
-  width: 720px;
-  background-color: white;
-  padding: 25px;
-  border-radius: 4px;
-  background-color: white;
-  box-shadow: $box-shadow;
-}
 
 .descriptions {
   display: flex;
@@ -161,11 +172,11 @@ export default {
   margin-top: 20px;
 
   &__Rside {
-    width: 345px;
+    width: 365px;
   }
 
   &__Lside {
-    width: 345px;
+    width: 365px;
   }
 }
 
@@ -177,16 +188,31 @@ export default {
 
   &__key {
     color: $dark-border;
-    width: 125px;
+    width: 130px;
   }
 
   &__val {
-    width: 210px;
+    width: 225px;
   }
 }
 
 .currency {
   color: $dark-border;
   margin-right: 2px;
+}
+
+.refresh-icon {
+  width: fit-content;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 5px;
+  transition: .2s ease-out;
+  color: $dark-border;
+
+  &:hover {
+    color: $text !important;
+  }
 }
 </style>

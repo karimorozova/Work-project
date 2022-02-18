@@ -176,7 +176,7 @@ async function setMemoqTranlsators(memoqProjectId, steps) {
 
 		const assignedSteps = steps.filter(item => item.vendor)
 		let projectUsers = assignedSteps.map(item => {
-			const memoqUser = users.find(user => user.email === item.vendor.email)
+			const memoqUser = users.find(user => user.id === item.vendor.guid || user.userName === item.vendor.memoqUserName || user.email === item.vendor.email)
 			if (!memoqUser) throw new Error(`No such memoq user - ${ item.vendor.firstName } ${ item.vendor.surname }`)
 			return { id: memoqUser.id, isPm: false }
 		})

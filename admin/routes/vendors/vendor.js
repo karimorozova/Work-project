@@ -262,8 +262,10 @@ router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (r
 			info.photo = await getPhotoLink(id, photoFile)
 			await removeOldVendorFile(oldPath, info.photo)
 		}
-		const vendor = await getVendorAfterUpdate({ "_id": id }, { ...info })
-		res.send(Buffer.from(JSON.stringify(vendor)).toString('base64'))
+		await getVendorAfterUpdate({ "_id": id }, { ...info })
+
+		const vendor = await getVendorForPortal({ "_id": id })
+		res.send(vendor)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on saving data. Try later.")
@@ -318,11 +320,12 @@ router.post("/create-memoq-vendor", checkVendor, async (req, res) => {
 	const { vendorId } = jwt.verify(token, secretKey)
 	const vendor = await Vendors.findOne({ _id: vendorId })
 	const guid = await createMemoqUser(vendor, true)
+
 	if (guid) {
 		const message = sendMemoqCredentials(vendor)
 		const subject = `MemoQ account`
 		await sendEmail({ to: vendor.email, subject }, message)
-		await Vendors.updateOne({ _id: vendorId }, { guid })
+		await Vendors.updateOne({ _id: vendorId }, { guid, memoqUserName: `${ vendor.firstName.substr(0, 4) } ${ vendor.surname.substr(0, 4) }` })
 		res.status(200).send('Saved')
 	} else {
 		res.status(500).send('Error on creating vendor in memoQ')
@@ -376,8 +379,9 @@ router.post("/rewrite-quid-for-translator", checkVendor, async (req, res) => {
 	try {
 		const { vendorId } = jwt.verify(token, secretKey)
 		const vendor = await Vendors.findOne({ "_id": vendorId })
-		const { id } = memoqUsers.find(item => item.email === vendor.email)
+		const { id, userName } = memoqUsers.find(item => item.email === vendor.email || item.userName === vendor.memoqUserName)
 		vendor.guid = id
+		vendor.memoqUserName = userName
 		await Vendors.updateOne({ _id: vendorId }, vendor)
 		res.status(200).send('Updated!')
 	} catch (err) {

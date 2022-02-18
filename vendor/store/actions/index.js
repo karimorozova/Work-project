@@ -15,7 +15,7 @@ export const alertToggle = ({ commit }, payload) => {
 	commit('ALERTING_MESSAGE', payload)
 	setTimeout(() => {
 		commit('ALERTING_MESSAGE', { message: "", isShow: false, type: "success" })
-	}, 5000)
+	}, 4000)
 }
 
 export const addRequest = ({ commit }) => {

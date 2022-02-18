@@ -203,7 +203,9 @@ const getVendorForPortal = async (query) => {
 				gender: 1,
 				skype: 1,
 				availability: 1,
-				password: 1
+				password: 1,
+				memoqUserName: 1,
+				guid: 1
 			}).populate('native')
 	)
 }
