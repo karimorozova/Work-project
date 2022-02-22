@@ -50,6 +50,19 @@
         template(v-for="field in jobFilesOnlineCatFake_fields" :slot="field.headerKey" slot-scope="{ field }")
           .table__header {{ field.label }}
 
+        template(slot="fileName" slot-scope="{ row, index }")
+          .table__data {{ row.fileName }}
+        template(slot="option" slot-scope="{ row, index }")
+          .table__data {{ row.option }}
+        template(slot="progress" slot-scope="{ row, index }")
+          .table__data
+            span {{ getProgress(row.fullName) }}
+            span.symbol %
+        template(slot="editor" slot-scope="{ row, index }")
+          .table__icons
+            .icon(@click="goToMemoqEditor(row.fullName)")
+              i(class="fa-solid fa-arrow-right-to-bracket")
+
 
 </template>
 
@@ -81,10 +94,13 @@ export default {
         { label: "Option", headerKey: "h2", key: "option", style: { width: "34%" } },
         { label: "Progress", headerKey: "h3", key: "progress", style: { width: "11%" } },
         { label: "", headerKey: "h4", key: "path", style: { width: "10%" } },
-        { label: "Editor", headerKey: "h5", key: "editor", style: { width: "11%" } },
+        { label: "Editor", headerKey: "h5", key: "editor", style: { width: "11%" } }
       ],
       jobFilesOnlineCatFake_fields: [
-        { label: "Source File", headerKey: "h1", key: "fileName", style: { width: "22%" } }
+        { label: "Source File", headerKey: "h1", key: "fileName", style: { width: "39%" } },
+        { label: "Option", headerKey: "h2", key: "option", style: { width: "39%" } },
+        { label: "Progress", headerKey: "h3", key: "progress", style: { width: "11%" } },
+        { label: "Editor", headerKey: "h4", key: "editor", style: { width: "11%" } }
       ]
     }
   },
@@ -127,7 +143,7 @@ export default {
               : this.generateSourceFilesFakeCat(memoqDocs)
         } else {
           sourceFiles.length
-              ? this.generateSourceFilesCat(targetFiles)
+              ? this.generateSourceFilesCat(targetFiles, true)
               : this.generateSourceFilesFakeCat(memoqDocs)
         }
       } else {
@@ -136,7 +152,7 @@ export default {
           this.generateSourceFilesNonCat(sourceFiles)
         } else {
           if (prevStep.hasOwnProperty("status") && prevStep.status === "Completed") {
-            this.generateSourceFilesNonCat(targetFiles)
+            this.generateSourceFilesNonCat(targetFiles.map(i => './dist' + i.path))
           }
         }
       }
@@ -152,16 +168,30 @@ export default {
         })
       }
     },
-    generateSourceFilesCat(files) {
-      for (let file of files) {
-        let fileName = file.split('/').pop()
-        fileName = fileName.length > 22 ? fileName.substr(22, fileName.length) : fileName
-        this.jobFilesOnlineCat.push({
-          fileName,
-          path: this.domain + file.split('./dist')[1],
-          fullName: fileName,
-          option: 'Memoq system workflow, enter editor to change.'
-        })
+    generateSourceFilesCat(files, isTargetFiles) {
+      if (isTargetFiles) {
+        const { sourceFiles } = this.job
+        for (let file of sourceFiles) {
+          let fileName = file.split('/').pop()
+          fileName = fileName.length > 22 ? fileName.substr(22, fileName.length) : fileName
+          this.jobFilesOnlineCat.push({
+            fileName,
+            path: this.domain + files.find(i => i.path.includes(fileName)).path,
+            fullName: fileName,
+            option: 'Memoq system workflow, enter editor to change.'
+          })
+        }
+      } else {
+        for (let file of files) {
+          let fileName = file.split('/').pop()
+          fileName = fileName.length > 22 ? fileName.substr(22, fileName.length) : fileName
+          this.jobFilesOnlineCat.push({
+            fileName,
+            path: this.domain + file.split('./dist')[1],
+            fullName: fileName,
+            option: 'Memoq system workflow, enter editor to change.'
+          })
+        }
       }
     },
     generateSourceFilesFakeCat(memoqDocs) {

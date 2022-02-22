@@ -3,7 +3,7 @@
     .header
       .header__left
         .header__title {{job.step.title}}
-        .header__status {{ job.status}}
+        .header__status(:style="{'background-color': getColorByStatus(job.status).background, 'color': getColorByStatus(job.status).color}") {{ job.status }}
         .header__extraStatus(v-if="job.status === 'Approved'" ) Waiting for customer confirmation...
       .header__right(v-if="job.status === 'In progress' && job.payablesUnit.type === 'CAT Wordcount'" )
         .refresh-icon(@click="updateProgress")
@@ -75,7 +75,29 @@ export default {
     }
   },
   methods: {
-    updateProgress(){
+    getColorByStatus(status) {
+      switch (status) {
+        case 'Ready to Start':
+        case 'In progress':
+        case 'Completed':
+          return {
+            color: '#4caf50',
+            background: '#e8f5e9'
+          }
+        case 'Rejected':
+        case 'Cancelled Halfway':
+          return {
+            color: '#f44336',
+            background: '#ffebee'
+          }
+        default:
+          return {
+            color: '#546e7a',
+            background: '#eceff1'
+          }
+      }
+    },
+    updateProgress() {
       this.$emit('updateProgress')
     },
     customFormatter(date) {
@@ -111,14 +133,12 @@ export default {
   }
 
   &__status {
-    background-color: darkgray;
-    color: white;
-    padding: 4px 15px 3px;
+    padding: 4px 15px 4px;
   }
 
   &__left {
     display: flex;
-    gap: 25px;
+    gap: 20px;
     align-items: center;
   }
 }

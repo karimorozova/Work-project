@@ -1,10 +1,37 @@
 <template lang="pug">
-  .wrapper(v-if="isShowActionWrapper" )
+  .wrapper
 
     .files(v-if="job.status === 'Ready to Start' || job.status === 'In progress'" )
       ProjectFiles(
         :job="job"
       )
+
+    .block(v-if="job.status === 'In progress' && !isCAT" )
+      .upload__text
+        .upload__text-title(v-if="!targetFiles.length")
+          span
+            i(class="fa-solid fa-cloud-arrow-up")
+          span Choose files to Upload or Drag and Drop here
+        .upload__text-files(v-else) {{ filesNames() }}
+      .upload-area
+        input.upload-area__input(type="file" @change="setDeliverables" :disabled="isWithoutFile" :class="{'no-drop-cursor': isWithoutFile}" multiple)
+      .upload__withoutFiles
+        CheckBox(
+          :isDisabled="!!targetFiles.length"
+          :isChecked="isWithoutFile"
+          @check="(e) => toggleFile(true)"
+          @uncheck="(e) => toggleFile(false)"
+        )
+        .upload__withoutFiles-text Close without files
+
+    .block(v-if="job.status === 'In progress' && !isCAT && (targetFiles.length || isWithoutFile)" style="margin-top: 15px;")
+      .action-buttons
+        Button(value="Complete Job" :isDisabled="!!currentRequests" @clicked="completeJob()" )
+
+    .block(v-if="job.status === 'In progress' && isCAT && abilityToCompleteCAT" style="margin-top: 15px;")
+      .action-buttons
+        Button(value="Complete Job" :isDisabled="!!currentRequests" @clicked="completeJob()" )
+
 
     .block(v-if="job.status === 'Request Sent'" )
       .action-buttons
@@ -25,10 +52,11 @@
 import Button from "../../general/Button"
 import { mapActions, mapGetters } from "vuex"
 import ProjectFiles from "./ProjectFiles"
+import CheckBox from "../../general/CheckBox"
 
 export default {
   name: "ProjectWorkflow",
-  components: { ProjectFiles, Button },
+  components: { CheckBox, ProjectFiles, Button },
   props: {
     job: {
       type: Object
@@ -36,13 +64,49 @@ export default {
   },
   data() {
     return {
-      emailAlert: false
+      emailAlert: false,
+      targetFiles: [],
+      isWithoutFile: false,
+      wrongFilesFormat: [ 'exe', 'js' ]
     }
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
     quoteAction(status) {
       this.$emit('setJobStatus', { status })
+    },
+    toggleFile(bool) {
+      this.isWithoutFile = bool
+    },
+    setDeliverables(e) {
+      this.targetFiles = Array.from(e.target.files).filter(file =>
+          !this.wrongFilesFormat.includes(file.name.split('.').pop().toString())
+          && file.size < 50000000
+      )
+    },
+    filesNames() {
+      return `${ this.targetFiles.length } file(s) uploaded`
+      // return this.targetFiles.reduce((a, c) => {
+      //   a = a + c.name + ', '
+      //   return a
+      // }, '')
+    },
+    async completeJob() {
+      const typeCAT = this.job.payablesUnit.type === 'CAT Wordcount'
+      try {
+        if (typeCAT) {
+          this.$emit('setJobStatus', { status: "Completed", targetFile: undefined })
+          await this.$axios.post('/vendor/set-workFlowStatus', { token: this.getToken, stepId: this.job.stepId, stepAction: 'Finish' })
+        } else {
+          this.$emit('setJobStatus', { status: "Completed", targetFile: this.targetFiles })
+        }
+        this.$emit('updateProgress')
+        this.targetFiles = []
+        this.isWithoutFile = false
+      } catch (err) {
+        console.log(err)
+        this.alertToggle({ message: "Error closing, job. Please inform the project manager!", isShow: true, type: "error" })
+      }
     },
     async startJob() {
       // if (!this.job.isVendorRead) alert('Please don\'t forget to confirm that you have read and downloaded all the reference files, by ticking the box')
@@ -105,17 +169,24 @@ export default {
       vendor: 'getVendor',
       token: 'getToken'
     }),
-    isShowActionWrapper() {
-      return true
-      // return this.job.status === 'Request Sent'
-      //   || this.job.status === 'Approved'
-      //   || this.job.status === 'Rejected'
-      //   || this.job.status === 'Request Sent'
-      //   || this.job.status === 'Ready to Start'
-      //   || this.job.status === 'Ready to Start'
-      //   || this.job.status === 'Ready to Start'
-      //
-      // { $in: [ 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ] },
+    isCAT() {
+      return this.job.payablesUnit.type === 'CAT Wordcount'
+    },
+    abilityToCompleteCAT() {
+      if (this.isCAT) {
+        const { memoqDocs, step: { title } } = this.job
+        const filesSegmentsCompletedStatus = []
+        for (const file of memoqDocs) {
+          if (title === 'Translation') {
+            filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.ConfirmedSegmentCount)
+          }
+          if (title === 'Revising') {
+            filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.Reviewer1ConfirmedSegmentCount)
+          }
+        }
+        return filesSegmentsCompletedStatus.length && filesSegmentsCompletedStatus.every(Boolean)
+      }
+      return false
     }
   }
 }
@@ -124,12 +195,55 @@ export default {
 <style lang="scss" scoped>
 @import "assets/scss/colors";
 
+.upload__withoutFiles {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.upload__text {
+  z-index: 10;
+  position: absolute;
+  color: $dark-border;
+  width: 100%;
+  text-align: center;
+
+  &-title {
+    margin-top: 20px;
+  }
+
+  &-files {
+    margin-top: 25px;
+  }
+
+  .fa-cloud-arrow-up {
+    font-size: 20px;
+    margin-right: 10px;
+  }
+}
+
+.upload-area {
+  border: 1px dotted $border;
+  position: relative;
+  z-index: 22;
+
+  &__input {
+    width: 100%;
+    height: 60px;
+    opacity: 0;
+    cursor: pointer;
+    background-color: chocolate;
+  }
+}
+
 .block {
   width: 740px;
   background-color: white;
   padding: 25px;
   border-radius: 4px;
   background-color: white;
+  position: relative;
   box-shadow: $box-shadow;
 }
 
@@ -159,6 +273,10 @@ export default {
   &:hover {
     color: $text;
   }
+}
+
+.no-drop-cursor {
+  cursor: no-drop !important;
 }
 
 </style>
