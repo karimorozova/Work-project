@@ -2,7 +2,7 @@
   .reset-pass
     .reset-pass__block
       .login__text.center
-        .text__title Set new password
+        .text__title New password
         .text__welcome Enter a new password for your account
       .reset-pass__email-block
         .input__block
@@ -15,8 +15,8 @@
 
         input.action-button__button( type="button" value="Reset password" @click="sendRequest")
 
-        .reset-pass__login.center
-          router-link(to="/login") Back to Login
+        router-link(to="/login")
+          .back Back to Login
 
 
   //input(v-model="pass" type="password")
@@ -31,12 +31,12 @@ export default {
   data() {
     return {
       pass: '',
-      passRepeat: '',
+      passRepeat: ''
     }
   },
   methods: {
     ...mapActions({
-      alertToggle: "alertToggle",
+      alertToggle: "alertToggle"
     }),
     async sendRequest() {
       try {
@@ -54,6 +54,13 @@ export default {
 <style scoped lang="scss">
 @import "../assets/scss/colors";
 
+.back {
+  text-decoration: none;
+  color: $dark-border;
+  text-align: center;
+  margin-top: 20px;
+}
+
 .reset-pass {
   background-image: url("../assets/images/signin-background.jpg");
   display: flex;
@@ -66,7 +73,7 @@ export default {
   &__block {
     background-color: $white;
     border-radius: 4px;
-    padding: 40px;
+    padding: 30px;
     box-shadow: $box-shadow;
   }
 
@@ -84,12 +91,12 @@ export default {
 
   &__login {
     margin-top: 20px;
-    color: #ccc;
+    color: $dark-border;
   }
 
   .input {
     &__block {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     &__title {
@@ -97,12 +104,14 @@ export default {
       margin-bottom: 5px;
       display: flex;
       justify-content: space-between;
-      color: #ccc;
+      color: $dark-border;
       letter-spacing: 0.2px;
 
     }
 
     &__field {
+      font-size: 14px;
+      font-family: Myriad400;
       box-sizing: border-box;
       border: 1px solid $light-border;
       outline: none;
@@ -137,6 +146,7 @@ export default {
     letter-spacing: 0.2px;
     cursor: pointer;
     transition: .05s ease-out;
+    margin-top: 10px;
 
     &:hover {
       filter: brightness(0.96);
@@ -156,5 +166,9 @@ a {
   &:hover {
     text-decoration: underline;
   }
+}
+
+::placeholder {
+  opacity: 0.4;
 }
 </style>

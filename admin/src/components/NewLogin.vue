@@ -29,8 +29,8 @@
         .icons
           .icon
             i(class="fa-brands fa-google" @click="singInGoogle")
-          .icon
-            i(class="fa-brands fa-facebook-f")
+          //.icon
+          //  i(class="fa-brands fa-facebook-f")
 
 </template>
 
@@ -71,86 +71,86 @@ export default {
       try {
 
         debugger
-        const googleUser = await this.$gAuth.signIn();
+        const googleUser = await this.$gAuth.signIn()
         if (!googleUser) {
-          return null;
+          return null
         }
 
-        this.isAllFieldsError = false;
-        const data = await this.$http.post('/login-with-google', {idToken: googleUser.getAuthResponse().id_token});
-        console.log( googleUser)
-        const loginResult =  data.body
+        this.isAllFieldsError = false
+        const data = await this.$http.post('/login-with-google', { idToken: googleUser.getAuthResponse().id_token })
+        console.log(googleUser)
+        const loginResult = data.body
         console.log(loginResult)
-        if(loginResult.status === 'success') {
-          await this.loggingIn(loginResult);
-          this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
+        if (loginResult.status === 'success') {
+          await this.loggingIn(loginResult)
+          this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
           this.$router.push("/")
 
-          this.isSignIn = this.$gAuth.isAuthorized;
-        }else {
+          this.isSignIn = this.$gAuth.isAuthorized
+        } else {
           this.signOutGoogle()
-          this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
+          this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
         }
 
       } catch (error) {
         console.log(error)
         //on fail do something
-        this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
-        return null;
+        this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+        return null
       }
     },
     async signOutGoogle() {
       try {
-        await this.$gAuth.signOut();
-        this.isSignIn = this.$gAuth.isAuthorized;
-        console.log("isSignIn", this.$gAuth.isAuthorized);
+        await this.$gAuth.signOut()
+        this.isSignIn = this.$gAuth.isAuthorized
+        console.log("isSignIn", this.$gAuth.isAuthorized)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
     },
     async logInWithFacebook() {
-      await this.loadFacebookSDK(document, "script", "facebook-jssdk");
-      await this.initFacebook();
-      window.FB.login(function(response) {
+      await this.loadFacebookSDK(document, "script", "facebook-jssdk")
+      await this.initFacebook()
+      window.FB.login(function (response) {
         if (response.authResponse) {
-          alert("You are logged in &amp; cookie set!");
+          alert("You are logged in &amp; cookie set!")
           // Now you can redirect the user or do an AJAX request to
           // a PHP script that grabs the signed request from the cookie.
         } else {
-          alert("User cancelled login or did not fully authorize.");
+          alert("User cancelled login or did not fully authorize.")
         }
-      });
-      return false;
+      })
+      return false
     },
     async initFacebook() {
-      window.fbAsyncInit = function() {
+      window.fbAsyncInit = function () {
         window.FB.init({
           appId: "8220179XXXXXXXXX", //You will need to change this
           cookie: true, // This is important, it's not enabled by default
           version: "v13.0"
-        });
-      };
+        })
+      }
     },
     async loadFacebookSDK(d, s, id) {
       var js,
-          fjs = d.getElementsByTagName(s)[0];
+          fjs = d.getElementsByTagName(s)[0]
       if (d.getElementById(id)) {
-        return;
+        return
       }
-      js = d.createElement(s);
-      js.id = id;
-      js.src = "https://connect.facebook.net/en_US/sdk.js";
-      fjs.parentNode.insertBefore(js, fjs);
+      js = d.createElement(s)
+      js.id = id
+      js.src = "https://connect.facebook.net/en_US/sdk.js"
+      fjs.parentNode.insertBefore(js, fjs)
     }
 
   },
   created() {
-    let that = this;
+    let that = this
     let checkGauthLoad = setInterval(function () {
-      that.isInit = that.$gAuth.isInit;
-      that.isSignIn = that.$gAuth.isAuthorized;
-      if (that.isInit) clearInterval(checkGauthLoad);
-    }, 1000);
+      that.isInit = that.$gAuth.isInit
+      that.isSignIn = that.$gAuth.isAuthorized
+      if (that.isInit) clearInterval(checkGauthLoad)
+    }, 1000)
 
   }
 }
@@ -167,18 +167,19 @@ export default {
 
 .icon {
   cursor: pointer;
-  color: $border;
-  transition: .2s ease-out;
-  font-size: 18px;
-  //box-shadow: $box-shadow;
-  border: 1px solid $border;
-  padding: 5px 7px;
+  color: $dark-border;
+  transition: .1s ease-out;
+  font-size: 16px;
+  border: 1px solid $light-border;
   border-radius: 4px;
-  width: 18px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
 
   &:hover {
-    color: $dark-border
+    color: $text
   }
 }
 
@@ -203,23 +204,21 @@ export default {
       top: 18px;
       left: 110px;
       padding: 5px;
-      color: #ccc;
+      color: $dark-border;
     }
   }
 
   &__block {
     background-color: $white;
     border-radius: 4px;
-    padding: 40px;
+    padding: 30px;
     box-shadow: $box-shadow;
   }
 
 
-
-
   &__forget {
     text-decoration: none;
-    color: #ccc;
+    color: $dark-border;
     text-align: center;
   }
 
@@ -231,7 +230,7 @@ export default {
     }
 
     &__welcome {
-      color: $dark-border;
+      color: $border-focus;
       padding: 10px 0 25px;
     }
   }
@@ -246,7 +245,7 @@ export default {
       margin-bottom: 5px;
       display: flex;
       justify-content: space-between;
-      color: #ccc;
+      color: $dark-border;
       letter-spacing: 0.2px;
 
     }
@@ -308,5 +307,9 @@ a {
   &:hover {
     text-decoration: underline;
   }
+}
+
+::placeholder {
+  opacity: 0.4;
 }
 </style>

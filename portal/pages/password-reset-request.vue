@@ -7,13 +7,12 @@
       .reset-request__email-block
         .input__block
           .input__title E-mail
-          input.input__field(v-model='email' placeholder="Enter your email" v-on:keyup.enter="sendRequest")
+          input.input__field(v-model='email' placeholder="Enter your email" @keyup.enter="sendRequest")
 
         input.action-button__button( type="button" value="Reset password" @click="sendRequest")
 
-        .reset-request__login.center
-          router-link(to="/login") Back to Login
-
+        router-link(to="/login")
+          .back Back to Login
 
 </template>
 
@@ -28,14 +27,14 @@ export default {
   },
   methods: {
     ...mapActions({
-      alertToggle: "alertToggle",
+      alertToggle: "alertToggle"
     }),
     async sendRequest() {
       try {
-        await this.$axios.post('/pass-generate-mail', {email: this.email, portal: 'portal'})
-        this.alertToggle({ message: 'Success', isShow: true, type: "success" })
+        await this.$axios.post('/pass-generate-mail', { email: this.email, portal: 'portal' })
+        this.alertToggle({ message: 'Instruction sent', isShow: true, type: "success" })
         await this.$router.push('/login')
-      }catch (e) {
+      } catch (e) {
 
         this.alertToggle({ message: 'Something went wrong', isShow: true, type: "error" })
         console.log(e)
@@ -48,6 +47,14 @@ export default {
 
 <style scoped lang="scss">
 @import "../assets/scss/colors";
+
+.back {
+  text-decoration: none;
+  color: $dark-border;
+  text-align: center;
+  margin-top: 20px;
+}
+
 .reset-request {
   background-image: url("../assets/images/signin-background.jpg");
   display: flex;
@@ -60,7 +67,7 @@ export default {
   &__block {
     background-color: $white;
     border-radius: 4px;
-    padding: 40px;
+    padding: 30px;
     box-shadow: $box-shadow;
   }
 
@@ -71,19 +78,19 @@ export default {
     }
 
     &__welcome {
-      color: $dark-border;
+      color: $border-focus;
       padding: 10px 0 25px;
     }
   }
 
   &__login {
     margin-top: 20px;
-    color: #ccc;
+    color: $dark-border;
   }
 
   .input {
     &__block {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     &__title {
@@ -91,12 +98,14 @@ export default {
       margin-bottom: 5px;
       display: flex;
       justify-content: space-between;
-      color: #ccc;
+      color: $dark-border;
       letter-spacing: 0.2px;
 
     }
 
     &__field {
+      font-family: Myriad400;
+      font-size: 14px;
       box-sizing: border-box;
       border: 1px solid $light-border;
       outline: none;

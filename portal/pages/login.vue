@@ -29,9 +29,8 @@
         .icons
           .icon
             i(class="fa-brands fa-google" @click="singInGoogle")
-          .icon
-            i(class="fa-brands fa-facebook-f")
-
+          //.icon
+          //  i(class="fa-brands fa-facebook-f")
 
   //.login
   //  .login__main
@@ -54,57 +53,57 @@
 </template>
 
 <script>
-	import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex"
 
-	export default {
-		data() {
-			return {
-				form: {
-					logemail: "",
-					logpassword: ""
-				},
-				isAllFieldsError: false
-			};
-		},
-		methods: {
-		  async singInGoogle() {
-
+export default {
+  data() {
+    return {
+      form: {
+        logemail: "",
+        logpassword: ""
       },
-			async sendForm() {
-				try {
-					this.isAllFieldsError = false;
-					const result = await this.$axios.$post("/portal/auth", {
-						...this.form
-					});
-					this.login(result.clientToken);
+      isAllFieldsError: false
+    }
+  },
+  methods: {
+    async singInGoogle() {
 
-					!!result.clientToken && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
-							this.$router.push(this.getPreviousLink) :
-							this.$router.push('/dashboard')
+    },
+    async sendForm() {
+      try {
+        this.isAllFieldsError = false
+        const result = await this.$axios.$post("/portal/auth", {
+          ...this.form
+        })
+        this.login(result.clientToken)
 
-					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
-				} catch (err) {
-					let message = err.message;
-					if(err.response && err.response.data) {
-						message = err.response.data;
-					}
-					this.alertToggle({ message, isShow: true, type: "error" });
-				}
-			},
-			forget() {
-				this.forgotLink = !this.forgotLink;
-			},
-			...mapActions({
-				alertToggle: "alertToggle",
-				login: "login",
-			})
-		},
-		computed: {
-			...mapGetters({
-				getPreviousLink: 'getPreviousLink'
-      })
-		}
-	};
+        !!result.clientToken && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
+            this.$router.push(this.getPreviousLink) :
+            this.$router.push('/dashboard')
+
+        this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+      } catch (err) {
+        let message = err.message
+        if (err.response && err.response.data) {
+          message = err.response.data
+        }
+        this.alertToggle({ message, isShow: true, type: "error" })
+      }
+    },
+    forget() {
+      this.forgotLink = !this.forgotLink
+    },
+    ...mapActions({
+      alertToggle: "alertToggle",
+      login: "login"
+    })
+  },
+  computed: {
+    ...mapGetters({
+      getPreviousLink: 'getPreviousLink'
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -118,18 +117,19 @@
 
 .icon {
   cursor: pointer;
-  color: $border;
-  transition: .2s ease-out;
-  font-size: 18px;
-  //box-shadow: $box-shadow;
-  border: 1px solid $border;
-  padding: 5px 7px;
+  color: $dark-border;
+  transition: .1s ease-out;
+  font-size: 16px;
+  border: 1px solid $light-border;
   border-radius: 4px;
-  width: 18px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
 
   &:hover {
-    color: $dark-border
+    color: $text
   }
 }
 
@@ -154,23 +154,21 @@
       top: 18px;
       left: 110px;
       padding: 5px;
-      color: #ccc;
+      color: $dark-border;
     }
   }
 
   &__block {
     background-color: $white;
     border-radius: 4px;
-    padding: 40px;
+    padding: 30px;
     box-shadow: $box-shadow;
   }
 
 
-
-
   &__forget {
     text-decoration: none;
-    color: #ccc;
+    color: $dark-border;
     text-align: center;
   }
 
@@ -182,7 +180,7 @@
     }
 
     &__welcome {
-      color: $dark-border;
+      color: $border-focus;
       padding: 10px 0 25px;
     }
   }
@@ -197,7 +195,7 @@
       margin-bottom: 5px;
       display: flex;
       justify-content: space-between;
-      color: #ccc;
+      color: $dark-border;
       letter-spacing: 0.2px;
 
     }
@@ -212,9 +210,8 @@
       transition: .1s ease-out;
       box-shadow: 0 0 0 30px white inset !important;
       padding: 0px 10px;
-
-      color: $text;
       font-size: 14px;
+      color: $text;
 
       &:focus {
         border: 1px solid $border;
@@ -260,5 +257,9 @@ a {
   &:hover {
     text-decoration: underline;
   }
+}
+
+::placeholder {
+  opacity: 0.4;
 }
 </style>
