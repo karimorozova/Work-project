@@ -1,8 +1,8 @@
 <template lang="pug">
   .wrapper(v-if="isLoad" )
     .navbar
-      //.navbar__logo
-      //  img(src="../assets/images/navbar/navbar-logo.svg")
+      .navbar__logo
+        img(src="../assets/images/navbar/navbar-logo.svg")
       .navbar__menu
         .menu(v-for="(item, index) in navbarList" :key="index" )
           router-link(v-if="!item.isGroup" class="item" tag="div" :to="item.path" )
