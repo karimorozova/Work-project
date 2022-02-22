@@ -223,12 +223,9 @@ router.post('/pass-reset', async (req, res, next) => {
 	const { pass, passRepeat, token } = req.body
 	try {
 		const result = await changePass(token, pass, passRepeat)
-		if (result.status === "success") {
-			return res.status(200).json(result)
-		}
-		res.status(400).json(result)
+		res.status(200).send(result)
 	} catch (err) {
-		res.status(400).json({ status: "error", message: 'Something went wrong'})
+		res.status(200).send({ status: "error", message: 'Something went wrong'})
 	}
 })
 

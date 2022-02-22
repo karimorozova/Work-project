@@ -61,7 +61,7 @@ const changePass = async (token, pass, repeatPass) => {
 		const encryptedPass = await bcrypt.hash(pass, 10)
 		switch (type) {
 			case "admin":
-				await setNewPassToAdmin(email, encryptedPass)
+				setNewPassToAdmin(email, encryptedPass)
 				break;
 			case 'portal':
 				setNewPassToPortal(email, encryptedPass)
