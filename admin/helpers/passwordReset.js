@@ -1,6 +1,6 @@
 const { sendEmail } =  require("../utils/mailTemplate")
 const { getMessageResetPassword } =  require("../emailMessages/internalCommunication")
-const { User } = require('../models')
+const { User, Vendors } = require('../models')
 const jwt =  require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const secret = "DAdkalsld"
@@ -23,22 +23,22 @@ const setNewPassToAdmin = async (email, newPass) => {
 
 }
 
-const setNewPassToVendor = (email, newPass) => {
-
+const setNewPassToVendor = async (email, newPass) => {
+	await Vendors.updateOne({email: email}, {password: newPass} )
 }
 
-const setNewPassToPortal = (email, newPass) => {
-
+const setNewPassToPortal = async (email, newPass) => {
+	await Clients.updateOne({'contacts.email': email}, {'contacts[i].password': newPass}, { arrayFilters:  { 'i.email': email }  })
 }
 
 const sendMail = async (email, token, type) => {
 	const urlsByType = {
-		admin: 'http://localhost:3001/password-reset',
-		portal: '',
-		vendor: ''
+		admin: `http://localhost:3001/password-reset/token/${token}`,
+		portal: `http://localhost:3000/password-reset?token=${token}`,
+		vendor: `http://localhost:3002/password-reset?token=${token}`
 	}
 
-	const message =  getMessageResetPassword(token, urlsByType[type])
+	const message =  getMessageResetPassword(urlsByType[type])
 
 	await sendEmail({to: email, subject: 'Password Reset' }, message)
 }

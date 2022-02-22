@@ -1,6 +1,6 @@
 import { ALERTING_MESSAGE } from "./alerts";
 import { SET_TOKEN } from "./auth";
-import { INCREASE_REQUEST, DECREASE_REQUEST } from "./requests";
+import { INCREASE_REQUEST, DECREASE_REQUEST, SET_REQUEST_ZERO } from "./requests";
 import { SET_CLIENT_REQUESTS } from "./clientRequests";
 import { REPLACE_QUOTE, SET_PROJECT } from "./projects";
 import { SET_PREVIOUS_LINK } from "./helpers"
@@ -58,4 +58,5 @@ export {
 	REMOVE_FILE,
 	SET_PREVIOUS_LINK,
   SET_CLIENT_REQUESTS,
+	SET_REQUEST_ZERO,
 };

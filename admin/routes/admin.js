@@ -169,8 +169,8 @@ router.get('/reps', requiresLogin, (req, res) => {
 
 router.post('/login', (req, res, next) => {
 	let {email, password} = req.body
+	email = email.toLowerCase().trim()
 	if (email && password) {
-		email = email.toLowerCase()
 		User.authenticate(email, password, async (error, user) => {
 			if (error || (!user || (user?.isActive === undefined ? false : !user.isActive))) {
 				const err = new Error('Wrong email or password.')

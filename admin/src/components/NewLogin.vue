@@ -15,7 +15,7 @@
           .input__title
             span Password
 
-          input.input__field(v-model='form.password' type="password" placeholder="Enter your password")
+          input.input__field(v-model='form.password' type="password" placeholder="Enter your password" v-on:keyup.enter="login")
 
         router-link(to="/password-reset-request")
           .login__forget Forgot password
@@ -28,9 +28,9 @@
       .login__oauth
         .icons
           .icon
-            i(class="fa-solid fa-user")
+            i(class="fa-brands fa-google" @click="singInGoogle")
           .icon
-            i(class="fa-solid fa-user")
+            i(class="fa-brands fa-facebook-f")
 
 </template>
 
@@ -65,7 +65,92 @@ export default {
         this.alertToggle({ message: err.body, isShow: true, type: "error" })
 
       }
+    },
+
+    async singInGoogle() {
+      try {
+
+        debugger
+        const googleUser = await this.$gAuth.signIn();
+        if (!googleUser) {
+          return null;
+        }
+
+        this.isAllFieldsError = false;
+        const data = await this.$http.post('/login-with-google', {idToken: googleUser.getAuthResponse().id_token});
+        console.log( googleUser)
+        const loginResult =  data.body
+        console.log(loginResult)
+        if(loginResult.status === 'success') {
+          await this.loggingIn(loginResult);
+          this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
+          this.$router.push("/")
+
+          this.isSignIn = this.$gAuth.isAuthorized;
+        }else {
+          this.signOutGoogle()
+          this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
+        }
+
+      } catch (error) {
+        console.log(error)
+        //on fail do something
+        this.alertToggle({message: "No such user in system", isShow: true, type: "error"})
+        return null;
+      }
+    },
+    async signOutGoogle() {
+      try {
+        await this.$gAuth.signOut();
+        this.isSignIn = this.$gAuth.isAuthorized;
+        console.log("isSignIn", this.$gAuth.isAuthorized);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async logInWithFacebook() {
+      await this.loadFacebookSDK(document, "script", "facebook-jssdk");
+      await this.initFacebook();
+      window.FB.login(function(response) {
+        if (response.authResponse) {
+          alert("You are logged in &amp; cookie set!");
+          // Now you can redirect the user or do an AJAX request to
+          // a PHP script that grabs the signed request from the cookie.
+        } else {
+          alert("User cancelled login or did not fully authorize.");
+        }
+      });
+      return false;
+    },
+    async initFacebook() {
+      window.fbAsyncInit = function() {
+        window.FB.init({
+          appId: "8220179XXXXXXXXX", //You will need to change this
+          cookie: true, // This is important, it's not enabled by default
+          version: "v13.0"
+        });
+      };
+    },
+    async loadFacebookSDK(d, s, id) {
+      var js,
+          fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {
+        return;
+      }
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
     }
+
+  },
+  created() {
+    let that = this;
+    let checkGauthLoad = setInterval(function () {
+      that.isInit = that.$gAuth.isInit;
+      that.isSignIn = that.$gAuth.isAuthorized;
+      if (that.isInit) clearInterval(checkGauthLoad);
+    }, 1000);
 
   }
 }
@@ -85,6 +170,12 @@ export default {
   color: $border;
   transition: .2s ease-out;
   font-size: 18px;
+  //box-shadow: $box-shadow;
+  border: 1px solid $border;
+  padding: 5px 7px;
+  border-radius: 4px;
+  width: 18px;
+  text-align: center;
 
   &:hover {
     color: $dark-border
@@ -123,16 +214,7 @@ export default {
     box-shadow: $box-shadow;
   }
 
-  &__text {
-    //margin-bottom: 10px;
-    //p {
-    //  margin: 5px 0;
-    //}
-  }
 
-  //&__logo img{
-  //  width: 60px;
-  //}
 
 
   &__forget {
@@ -179,6 +261,8 @@ export default {
       transition: .1s ease-out;
       box-shadow: 0 0 0 30px white inset !important;
       padding: 0px 10px;
+      font-size: 14px;
+      color: $text;
 
       &:focus {
         border: 1px solid $border;

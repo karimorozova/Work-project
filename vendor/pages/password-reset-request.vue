@@ -1,31 +1,24 @@
 <template lang="pug">
-  .reset-pass
-    .reset-pass__block
+  .reset-request
+    .reset-request__block
       .login__text.center
-        .text__title Set new password
-        .text__welcome Enter a new password for your account
-      .reset-pass__email-block
+        .text__title Forgot password
+        .text__welcome No worries, we'll send you reset instructions.
+      .reset-request__email-block
         .input__block
-          .input__title Password
-          input.input__field(v-model='pass' placeholder="Enter your password"  type="password")
-
-        .input__block
-          .input__title Confirm password
-          input.input__field(v-model='passRepeat' placeholder="Confirm your password" type="password" v-on:keyup.enter="sendRequest")
+          .input__title E-mail
+          input.input__field(v-model='email' placeholder="Enter your email" v-on:keyup.enter="sendRequest" )
 
         input.action-button__button( type="button" value="Reset password" @click="sendRequest")
 
-        .reset-pass__login.center
+        .reset-request__login.center
           router-link(to="/login") Back to Login
 
 
-  //input(v-model="pass" type="password")
-  //  input(v-model="passRepeat" type="password")
-  //  Button(value="Reset" @clicked="sendRequest")
 </template>
 
 <script>
-import Button from "./Button"
+import Button from "../components/general/Button"
 import { mapActions } from "vuex"
 
 export default {
@@ -34,8 +27,7 @@ export default {
   },
   data() {
     return {
-      pass: '',
-      passRepeat: '',
+      email: ''
     }
   },
   methods: {
@@ -44,12 +36,15 @@ export default {
     }),
     async sendRequest() {
       try {
-        const { status, message } = (await this.$http.post('/pass-reset', { pass: this.pass, passRepeat: this.passRepeat, token: this.$route.params.token })).data
-        this.alertToggle({ message, isShow: true, type: status })
+        await this.$axios.post('/pass-generate-mail', {email: this.email, portal: 'vendor'})
+        this.alertToggle({ message: 'Success', isShow: true, type: "success" })
         await this.$router.push('/login')
-      } catch (e) {
-        this.alertToggle({ message: e.body.message, isShow: true, type: "error" })
+      }catch (e) {
+
+        this.alertToggle({ message: 'Something went wrong', isShow: true, type: "error" })
+        console.log(e)
       }
+
     }
   }
 }
@@ -57,8 +52,7 @@ export default {
 
 <style scoped lang="scss">
 @import "../assets/scss/colors";
-
-.reset-pass {
+.reset-request {
   background-image: url("../assets/images/signin-background.jpg");
   display: flex;
   justify-content: center;
@@ -77,7 +71,7 @@ export default {
   .text {
     &__title {
       font-size: 24px;
-      font-family: Myriad600;
+      font-family: Roboto600;
     }
 
     &__welcome {

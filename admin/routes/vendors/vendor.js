@@ -174,8 +174,9 @@ router.post('/invoice-reload', checkVendor, upload.fields([ { name: 'invoiceFile
 })
 
 router.post("/login", async (req, res, next) => {
-	if (req.body.logemail) {
-		Vendors.authenticate(req.body.logemail, req.body.logpassword, async (error, vendor) => {
+	const email = req.body.logemail.toLowerCase().trim()
+	if (email) {
+		Vendors.authenticate(email, req.body.logpassword, async (error, vendor) => {
 			if (error || !vendor) {
 				let err = new Error('Wrong email or password.')
 				err.status = 401

@@ -503,7 +503,7 @@ function pmAssignInRequest(request) {
             </div>`
 }
 
-function getMessageResetPassword(token, url) {
+function getMessageResetPassword( url) {
 	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
                 <header style="background-color:#efefef;text-align:center;" >
                     <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
@@ -518,7 +518,7 @@ function getMessageResetPassword(token, url) {
 										</p>	
 										
 										<p style="font-weight: 400;">
-										<a href="${ url }/token/${ token }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">Reset Password</a>
+										<a href="${ url }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">Reset Password</a>
 										</p>
                 </div>
                 <footer>
