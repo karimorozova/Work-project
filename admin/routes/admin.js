@@ -211,15 +211,9 @@ router.post('/login-with-google', async (req, res, next) => {
 		if (!user || !user.isActive) res.send({ status: "error" })
 
 		const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
-
 		res.statusCode = 200
-		const loggedUser = Object.keys(user).reduce((init, cur) => {
-			if (cur !== "__v" && cur !== "password") {
-				init[cur] = user[cur]
-			}
-			return { ...init }
-		}, {})
-		res.send({ status: "success", token, ...loggedUser })
+		res.cookie('admin', token, { maxAge: 12 * 60 * 60 * 1000, httpOnly: true })
+		res.status(200).send({status: "success",})
 	} catch (err) {
 		res.send({ status: "error" })
 	}

