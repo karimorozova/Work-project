@@ -6,6 +6,12 @@
       :isAbsolute="true"
       @closeErrors="closeErrors"
     )
+
+    .modalRow
+      .modalRow__key Payment Method Name:
+      .modalRow__value
+        input(v-model="currentName" placeholder="Value")
+
     .modalRow
       .modalRow__key Payment Method Type:
       .modalRow__value
@@ -16,10 +22,6 @@
             :selectedOption="currentType"
             @chooseOption="setPaymentType"
           )
-    .modalRow(v-if="isAvailableExtraFields")
-      .modalRow__key Payment Method Name:
-      .modalRow__value
-        input(v-model="currentName" placeholder="Value")
 
     .modalRow(v-if="isAvailableExtraFields" v-for="item in getKeys" )
       .modalRow__key {{item}}:
@@ -77,14 +79,13 @@ export default {
       if (!values.length) this.errors.push('All fields are required')
       if (values.some(i => !i)) this.errors.push('All fields are required')
       if (!this.currentName) this.errors.push("Please, enter a payment method name")
-
       if (this.errors.length) return
 
       this.$emit('savePaymentMethod', {
-        type: this.currentType,
+        paymentType: this.currentType,
         name: this.currentName,
         minimumAmount: this.currentMinimumAmount < 0 ? 0 : this.currentMinimumAmount,
-        ...this.rest
+        otherStatement: this.rest
       })
     },
     closeErrors() {
@@ -98,7 +99,6 @@ export default {
       const { minimumAmount, keys } = this.paymentMethods.find(item => item.name === option)
       this.currentMinimumAmount = minimumAmount
       this.rest = {}
-      this.currentName = ''
       keys.forEach(elem => this.rest[elem.key] = '')
     },
     async getPaymentsMethods() {
@@ -111,11 +111,11 @@ export default {
     },
     setEditableDefaultData() {
       if (this.editablePaymentMethod.name) {
-        const { type, name, minimumAmount, ...rest } = this.editablePaymentMethod
-        this.currentType = type
+        const { paymentType, name, minimumAmount, otherStatement } = this.editablePaymentMethod
+        this.currentType = paymentType
         this.currentName = name
         this.currentMinimumAmount = minimumAmount
-        this.rest = rest
+        this.rest = otherStatement
       }
     }
   },
@@ -160,7 +160,8 @@ export default {
   margin-bottom: 10px;
 
   &__key {
-    width: 180px;
+    width: 190px;
+    margin-right: 10px;
   }
 }
 

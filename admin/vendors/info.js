@@ -7,8 +7,8 @@ const ObjectId = require('mongodb').ObjectID
 
 const managePaymentMethods = async ({ vendorId, paymentTypeObj, index }) => {
 	const Q = { _id: vendorId }
-	if (index !== null) return await getVendorAfterUpdate(Q, { $set: { [`billingInfo.paymentMethod.${ index }`]: paymentTypeObj } })
-	return await getVendorAfterUpdate(Q, { $push: { "billingInfo.paymentMethod": paymentTypeObj } })
+	if (index !== null) return await getVendorAfterUpdate(Q, { $set: { [`billingInfo.paymentMethods.${ index }`]: paymentTypeObj } })
+	return await getVendorAfterUpdate(Q, { $push: { "billingInfo.paymentMethods": paymentTypeObj } })
 }
 
 async function saveVendorDocumentDefault({ vendorId, category }) {

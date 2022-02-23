@@ -181,10 +181,28 @@ const VendorSchema = new mongoose.Schema({
 			trim: true,
 			default: ''
 		},
-		paymentMethod: {
-			type: Array,
-			default: []
-		},
+		paymentMethods: [ {
+			name: {
+				type: String,
+				trim: true,
+				default: '',
+				required: true
+			},
+			paymentType: {
+				type: String,
+				trim: true,
+				default: '',
+				required: true
+			},
+			minimumAmount: {
+				type: Number,
+				default: 0
+			},
+			otherStatement: {
+				type: Object,
+				default: {}
+			}
+		} ],
 		paymentTerm: {
 			type: Object,
 			default: {}
@@ -192,9 +210,6 @@ const VendorSchema = new mongoose.Schema({
 		address: {
 			type: String,
 			default: ''
-		},
-		vendorPaymentBenchmark: {
-			type: Number
 		}
 	},
 	profExperiences: {

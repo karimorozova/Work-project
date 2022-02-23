@@ -72,7 +72,7 @@
           Add(@add="isModal = true")
 
       .payment-methods__body
-        .item(v-for="(item, index) in currentFullVendor.billingInfo.paymentMethod")
+        .item(v-for="(item, index) in currentFullVendor.billingInfo.paymentMethods")
           .item__header
 
             .item__header--icons(v-if="deletingIndex === null && editingIndex === null")
@@ -86,7 +86,7 @@
               .item__header--icon
                 i(class="fas fa-trash")
 
-          .item__body(v-for="[ key, value ] in Object.entries(item)")
+          .item__body(v-for="[key, value] in Object.entries(allFieldsOutput(item))" )
             .item__body--key {{ replaceKeyName(key) }}:
             .item__body--value {{ value }}
 
@@ -120,6 +120,20 @@ export default {
       alertToggle: 'alertToggle',
       storeCurrentVendor: "storeCurrentVendor"
     }),
+    allFieldsOutput(item, result = {}) {
+      for (const key in item) {
+        if (typeof item[key] === 'object') {
+          return this.allFieldsOutput(item[key], result)
+        } else {
+          result = {
+            ...result,
+            [key]: item[key]
+          }
+        }
+      }
+      delete result._id
+      return result
+    },
     async savePaymentMethod(paymentMethod) {
       try {
         const result = await this.$http.post("/vendorsapi/manage-payment-methods", {
@@ -151,23 +165,23 @@ export default {
       }
     },
     isPaymentMethodInInvoice({ name }) {
-      const reports = this.reports.filter(item => item.paymentDetails.paymentMethod)
-      if (!reports.length) return false
-      return reports.some(item => item.paymentDetails.paymentMethod.name === name)
+      // const reports = this.reports.filter(item => item.paymentDetails.paymentMethod)
+      // if (!reports.length) return false
+      // return reports.some(item => item.paymentDetails.paymentMethod.name === name)
     },
     openApproveModal(item, index) {
-      if (this.isPaymentMethodInInvoice(item)) {
-        alert('Payment method in invoice!')
-        return
-      }
+      // if (this.isPaymentMethodInInvoice(item)) {
+      //   alert('Payment method in invoice!')
+      //   return
+      // }
       this.deletingIndex = index
       this.isDeletingModal = true
     },
     openModalForEdition(item, index) {
-      if (this.isPaymentMethodInInvoice(item)) {
-        alert('Payment method in invoice!')
-        return
-      }
+      // if (this.isPaymentMethodInInvoice(item)) {
+      //   alert('Payment method in invoice!')
+      //   return
+      // }
       this.editablePaymentMethod = item
       this.isModal = true
       this.editingIndex = index
@@ -189,7 +203,7 @@ export default {
       }
     },
     replaceKeyName(key) {
-      if (key === 'type') return 'Type'
+      if (key === 'paymentType ') return 'Payment Type '
       if (key === 'minimumAmount') return 'Minimum Payment Amount'
       if (key === 'name') return 'Name'
       return key
@@ -276,7 +290,7 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -49%);
   background: white;
   box-shadow: $box-shadow;
   z-index: 20;
@@ -291,7 +305,7 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -49%);
   }
 }
 

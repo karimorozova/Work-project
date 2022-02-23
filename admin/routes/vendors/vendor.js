@@ -468,8 +468,8 @@ router.post('/manage-payment-methods', async (req, res) => {
 router.post('/manage-payment-methods/:_id/:index/delete', async (req, res) => {
 	try {
 		const { _id, index } = req.params
-		await getVendorAfterUpdate({ _id }, { $unset: { [`billingInfo.paymentMethod.${ index }`]: 1 } })
-		const updatedVendor = await getVendorAfterUpdate({ _id }, { $pull: { "billingInfo.paymentMethod": null } })
+		await getVendorAfterUpdate({ _id }, { $unset: { [`billingInfo.paymentMethods.${ index }`]: 1 } })
+		const updatedVendor = await getVendorAfterUpdate({ _id }, { $pull: { "billingInfo.paymentMethods": null } })
 		res.send(updatedVendor)
 	} catch (err) {
 		console.log(err)
