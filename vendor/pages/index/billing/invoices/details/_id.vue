@@ -39,6 +39,7 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
                 span(v-html="'&euro;'")
 
+          // invoice ==>>
           .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Ready' || reportDetailsInfo.status === 'Invoice on-hold'")
             .row
               .row__title Invoice:
@@ -58,7 +59,7 @@
               .row__valueDrops
                 SelectSingle(
                   :isDisabled="!!invoiceFile"
-                  :options="vendor.billingInfo.paymentMethod",
+                  :options="vendorExtra.billingInfo.paymentMethods",
                   placeholder="Option",
                   :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod.name",
                   @chooseOption="resetPaymentMethod"
@@ -69,8 +70,10 @@
 
             .row
               .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
+                Button.center(style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="reSubmitPaymentMethod")
 
             Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="submitFile")
+          // <<== invoice
 
           .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Partially Paid'")
             //.row
@@ -99,7 +102,6 @@
             //
             //Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
 
-
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
             Button.button-center( value="Approve report" @clicked="approveReport" )
 
@@ -115,7 +117,7 @@
               .row__title Payment method:
               .row__valueDrops
                 SelectSingle(
-                  :options="vendor.billingInfo.paymentMethod",
+                  :options="vendorExtra.billingInfo.paymentMethods",
                   placeholder="Option",
                   :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod ? reportDetailsInfo.paymentDetails.paymentMethod.name : ''",
                   @chooseOption="setPaymentMethod"
@@ -198,6 +200,7 @@ export default {
       errors: [],
       reportDetailsInfo: {},
       reports: [],
+      vendorExtra: null,
       fields: [
         {
           label: "Step ID",
@@ -254,9 +257,12 @@ export default {
         elem.value = ''
       }
     },
-    resetPaymentMethod({ option }) {
+    async resetPaymentMethod({ option }) {
+      await this.getReport()
       if (this.reportDetailsInfo.paymentDetails.paymentMethod.name === option.name) {
         this.isPaymentMethodChanging = false
+        this.submissionAlertMessage = ''
+        this.isSubmissionAlert = false
         return
       }
       const paymentMethod = option
@@ -304,6 +310,21 @@ export default {
         this.alertToggle({ message: "Invoice reloaded!", isShow: true, type: "success" })
       } catch (err) {
         console.log(err)
+      }
+    },
+    async reSubmitPaymentMethod() {
+      this.isRequestNow = true
+      try {
+        await this.$axios.post(`/vendor/invoice-paymentMethod-resubmission`, {
+          reportId: this.$route.params.id,
+          vendorId: this.vendor._id,
+          paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod
+        })
+        await this.getReport()
+      } catch (err) {
+        this.alertToggle({ message: "Error sending invoice, please try again later", isShow: true, type: "error" })
+      } finally {
+        this.isRequestNow = false
       }
     },
     async submitReport() {
@@ -355,6 +376,7 @@ export default {
         const result = await this.$axios.get(`/vendor/get-report?reportId=${ this.$route.params.id }`)
         const decode = window.atob(result.data)
         this.reportDetailsInfo = JSON.parse(decode)[0]
+        console.log(this.reportDetailsInfo)
       } catch (e) {
       }
     },
@@ -365,9 +387,17 @@ export default {
         this.reports = JSON.parse(decode)
       } catch (err) {
       }
+    },
+    async getVendorExtra() {
+      try {
+        const result = await this.$axios.get(`/vendor/portal-vendor-extra-info?token=${ this.$store.state.token }`)
+        this.vendorExtra = result.data
+      } catch (err) {
+      }
     }
   },
   async created() {
+    await this.getVendorExtra()
     await this.getVendorReports()
     await this.getReport()
     this.domain = process.env.domain
@@ -380,10 +410,10 @@ export default {
       vendor: "getVendor"
     }),
     isVendorDontHaveBI() {
-      return !this.vendor.hasOwnProperty('billingInfo') || !this.vendor.billingInfo.paymentMethod.length
+      return !this.vendorExtra.hasOwnProperty('billingInfo') || !this.vendorExtra.billingInfo.paymentMethods.length
     },
     isVendorHavePaymentMethod() {
-      return this.vendor.hasOwnProperty('billingInfo') && this.vendor.billingInfo.paymentMethod.length
+      return this.vendorExtra.hasOwnProperty('billingInfo') && this.vendorExtra.billingInfo.paymentMethods.length
     }
   }
 }
@@ -404,17 +434,18 @@ export default {
 
 .submission-alert {
   margin-top: 20px;
+  width: 100%;
 }
 
 .cards {
   display: flex;
-  width: 1035px;
+  width: 1200px;
   flex-wrap: wrap;
 }
 
 .details {
   &__user {
-    width: 350px;
+    width: 370px;
     background: $light-background;
     box-sizing: border-box;
     padding: 25px;
@@ -424,7 +455,7 @@ export default {
   }
 
   &__info {
-    width: 350px;
+    width: 370px;
     background: $light-background;
     box-sizing: border-box;
     padding: 25px;
@@ -493,6 +524,7 @@ export default {
   &__title {
     width: 130px;
     color: $dark-border;
+    margin-right: 20px;
   }
 
   &__valueDrops {
@@ -540,11 +572,11 @@ export default {
   }
 
   &__details {
-    width: 350px;
+    width: 370px;
   }
 
   &__table {
-    width: 600px;
+    width: 750px;
   }
 }
 
@@ -557,7 +589,7 @@ export default {
   box-shadow: $box-shadow;
   padding: 25px;
   border-radius: 4px;
-  width: 1025px;
+  width: 1200px;
   box-sizing: border-box;
   background-color: white;
 

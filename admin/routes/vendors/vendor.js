@@ -34,6 +34,7 @@ const {
 	clearPayablesStepsPrivateKeys,
 	invoiceSubmission,
 	invoiceReloadFile,
+	invoicePaymentMethodResubmission,
 	createBill,
 	updatePayable,
 	addFile,
@@ -110,6 +111,18 @@ router.post('/invoice-submission', checkVendor, upload.fields([ { name: 'invoice
 		const { invoiceFile } = req.files
 		const { reportId, paymentMethod, vendorId } = req.body
 		await invoiceSubmission({ reportId, vendorId, invoiceFile, paymentMethod })
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error / Cannot add invoice file (invoice-submission)')
+	}
+})
+
+router.post('/invoice-paymentMethod-resubmission', checkVendor, async (req, res) => {
+	try {
+		const { reportId, paymentMethod, vendorId } = req.body
+		await invoicePaymentMethodResubmission({ reportId, vendorId, paymentMethod })
+		res.send('Done!')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error / Cannot add invoice file (invoice-submission)')

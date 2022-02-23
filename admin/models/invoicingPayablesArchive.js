@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 	reportId: {
@@ -35,7 +35,8 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 	},
 	paymentDetails: {
 		paymentMethod: {
-			type: Object,
+			type: Schema.Types.ObjectId,
+			ref: "Vendors.billingInfo.paymentMethods",
 			default: null
 		},
 		file: {
@@ -83,8 +84,8 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	}
-});
+})
 
-const InvoicingPayablesArchive = mongoose.model('InvoicingPayablesArchive', InvoicingPayablesArchiveSchema);
+const InvoicingPayablesArchive = mongoose.model('InvoicingPayablesArchive', InvoicingPayablesArchiveSchema)
 
-module.exports = InvoicingPayablesArchive;
+module.exports = InvoicingPayablesArchive

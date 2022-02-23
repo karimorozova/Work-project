@@ -192,7 +192,7 @@ export default {
   padding: 25px;
   margin-bottom: 50px;
   border-radius: 4px;
-  width: 1000px;
+  width: 1200px;
   box-sizing: border-box;
   background-color: white;
 }

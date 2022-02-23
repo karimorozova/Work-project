@@ -12,6 +12,7 @@ const {
 	setPayablesNextStatus,
 	invoiceSubmission,
 	invoiceReloadFile,
+	invoicePaymentMethodResubmission,
 } = require('./updatePayables')
 
 const {
@@ -53,6 +54,7 @@ const {
 } = require("./notification")
 
 module.exports = {
+	invoicePaymentMethodResubmission,
 	getVendorAndCheckPaymentTerms,
 	invoiceFileUploading,
 	notifyVendorReportsIsSent,

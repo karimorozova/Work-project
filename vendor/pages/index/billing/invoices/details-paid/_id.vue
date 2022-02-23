@@ -202,13 +202,13 @@ export default {
 
 .cards {
   display: flex;
-  width: 1035px;
+  width: 1200px;
   flex-wrap: wrap;
 }
 
 .details {
   &__user {
-    width: 350px;
+    width: 370px;
     background: $light-background;
     box-sizing: border-box;
     padding: 25px;
@@ -218,7 +218,7 @@ export default {
   }
 
   &__info {
-    width: 350px;
+    width: 370px;
     background: $light-background;
     box-sizing: border-box;
     padding: 25px;
@@ -287,6 +287,7 @@ export default {
   &__title {
     width: 130px;
     color: $dark-border;
+    margin-right: 20px;
   }
 
   &__valueDrops {
@@ -330,11 +331,11 @@ export default {
   }
 
   &__details {
-    width: 350px;
+    width: 370px;
   }
 
   &__table {
-    width: 600px;
+    width: 750px;
   }
 }
 
@@ -347,7 +348,7 @@ export default {
   box-shadow: $box-shadow;
   padding: 25px;
   border-radius: 4px;
-  width: 1025px;
+  width: 1200px;
   box-sizing: border-box;
   background-color: white;
 

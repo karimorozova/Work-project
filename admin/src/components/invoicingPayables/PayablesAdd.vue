@@ -273,7 +273,8 @@ export default {
     toggleCheck(index, val) {
       this.steps[index].isCheck = val
     },
-    toggleAll(val) {
+    async toggleAll(val) {
+      if (val) await this.getSteps(1e6)
       this.steps = this.steps.reduce((acc, cur) => {
         acc.push({ ...cur, isCheck: val })
         return acc
@@ -289,11 +290,11 @@ export default {
         console.log(e)
       }
     },
-    async getSteps() {
+    async getSteps(countToGet = 100) {
       this.steps = (
           await this.$http.post('/invoicing-payables/not-selected-steps-list', {
             countToSkip: 0,
-            countToGet: 100,
+            countToGet,
             filters: this.allFilters
           })
       ).data.map(i => ({ ...i, isCheck: false }))

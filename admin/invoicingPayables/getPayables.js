@@ -1,6 +1,6 @@
 const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
-const { InvoicingPayables, Projects } = require("../models")
+const { InvoicingPayables, Projects, Vendors } = require("../models")
 
 
 const getPayablesDateRange = (steps) => {
@@ -104,7 +104,22 @@ const getPayable = async (id) => {
 					}
 				},
 				{
+					$lookup: {
+						from: "vendors",
+						let: {
+							'paymentMethod': '$paymentDetails.paymentMethod'
+						},
+						pipeline: [
+							{ "$unwind": "$billingInfo.paymentMethods" },
+							{ "$match": { "$expr": { "$eq": [ "$billingInfo.paymentMethods._id", "$$paymentMethod" ] } } },
+							{ '$replaceRoot': { newRoot: '$billingInfo.paymentMethods' } }
+						],
+						as: "paymentDetails.paymentMethod"
+					}
+				},
+				{
 					$addFields: {
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] },
 						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
 						paidAmount: { $sum: "$paymentInformation.paidAmount" }
 					}
@@ -116,7 +131,11 @@ const getPayable = async (id) => {
 				}
 			]
 	)
-	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
+	return (await InvoicingPayables.populate(invoicingReports, [
+				// { path: 'paymentDetails.paymentMethod', select: [ 'paymentType' ], model: Vendors },
+				{ path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }
+			]
+	))
 }
 
 const getAllPayableByDefaultQuery = async (query = {}) => {
@@ -175,7 +194,22 @@ const getPayableByVendorId = async (id) => {
 					}
 				},
 				{
+					$lookup: {
+						from: "vendors",
+						let: {
+							'paymentMethod': '$paymentDetails.paymentMethod'
+						},
+						pipeline: [
+							{ "$unwind": "$billingInfo.paymentMethods" },
+							{ "$match": { "$expr": { "$eq": [ "$billingInfo.paymentMethods._id", "$$paymentMethod" ] } } },
+							{ '$replaceRoot': { newRoot: '$billingInfo.paymentMethods' } }
+						],
+						as: "paymentDetails.paymentMethod"
+					}
+				},
+				{
 					$addFields: {
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] },
 						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
 					}
 				},
