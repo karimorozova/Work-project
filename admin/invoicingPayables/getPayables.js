@@ -157,7 +157,7 @@ const getAllPayableByDefaultQuery = async (query = {}) => {
 
 
 const getPayableByVendorId = async (id) => {
-	return await InvoicingPayables.aggregate([
+	return (await InvoicingPayables.aggregate([
 				{ $match: { "vendor": ObjectId(id), "status": { $ne: 'Created' } } },
 				{
 					$lookup: {
@@ -175,6 +175,11 @@ const getPayableByVendorId = async (id) => {
 					}
 				},
 				{
+					$addFields: {
+						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
+					}
+				},
+				{
 					$unset: [
 						"steps.finance",
 						"steps.nativeFinance.Price.receivables",
@@ -188,7 +193,7 @@ const getPayableByVendorId = async (id) => {
 					]
 				}
 			]
-	)
+	))
 }
 
 const getPayablesProjectsAndSteps = async (id) => {

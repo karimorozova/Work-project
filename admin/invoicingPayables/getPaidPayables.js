@@ -52,7 +52,7 @@ const getPaidReport = async (id) => {
 }
 
 const getReportPaidByVendorId = async (id) => {
-	return await InvoicingPayablesArchive.aggregate([
+	return InvoicingPayablesArchive.aggregate([
 				{ $match: { "vendor": ObjectId(id) } },
 				{
 					$lookup: {

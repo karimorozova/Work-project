@@ -70,10 +70,25 @@
                 .text__title Report ID:
                 .text__value {{reportDetailsInfo.reportId}}
 
-              .text__block
+              .text__block.fixed-height
                 .text__title Status:
-                .text__value {{reportDetailsInfo.status}}
+                .text__value
+                  .text__select(v-if="isStatusEdit")
+                    SelectSingle(
+                      :selectedOption="''"
+                      :options="statuses"
+                      placeholder="Option"
+                    )
+                  span(v-else) {{reportDetailsInfo.status}}
 
+                IconButton(
+                  :hasPopup="true"
+                  popupBg="#758d8d"
+                  popupTextColor="#232d2d"
+                  popupText="My pop up testing"
+                  @clicked="showChangingStatus"
+                )
+                  i(class="fas fa-pen" )
               .text__block
                 .text__title Created On:
                 .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
@@ -219,12 +234,27 @@ import { mapActions } from "vuex"
 import getBgColor from "../../mixins/getBgColor"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
+import IconButton from "../IconButton"
 
 export default {
   name: "InvoicingDetails",
   mixins: [ getBgColor ],
+  components: {
+    Button,
+    GeneralTable,
+    PayablesAddStepsTo,
+    ApproveModal,
+    SelectSingle,
+    DatepickerWithTime,
+    CheckBox,
+    PayablesPaymentInformationCard,
+    DatePicker,
+    IconButton,
+  },
   data() {
     return {
+
+      isStatusEdit: false,
       isNotes: false,
       isPaymentCard: false,
       domain: '',
@@ -302,6 +332,9 @@ export default {
           key = 'Account Name'
       }
       return key[0].toUpperCase() + key.substr(1)
+    },
+    showChangingStatus() {
+      this.isStatusEdit = !this.isStatusEdit
     },
     copyDetailsInfo(str) {
       navigator.clipboard.writeText(str.trim())
@@ -470,6 +503,36 @@ export default {
           && this.amount > 0
           && this.amount <= this.getUnpaidAmount
     },
+    statuses() {
+      const currentStatus = this.reportDetailsInfo.status
+      let statuses = []
+          // ['Created', 'Sent', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
+
+      switch (currentStatus) {
+        case 'Created':
+          statuses = ['Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
+          break;
+        case 'Sent':
+          statuses = ['Created', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
+          break;
+        case 'Approved':
+          statuses = ['Created', 'Sent', 'Invoice Ready / Invoice on-hold', 'Paid']
+          break;
+        case 'Invoice Ready':
+          statuses = ['Created',  'Sent', 'Approved']
+          break;
+        case 'Invoice on-hold':
+          statuses = ['Created',  'Sent', 'Approved']
+          break;
+        case 'Paid':
+          statuses = ['Created']
+          break;
+      }
+
+
+
+      return statuses
+    },
 
     //Todo: show status "Invoice Received" and "Partially Paid"1
     getPaymentRemainder() {
@@ -490,17 +553,6 @@ export default {
     this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
     this.domain = this.$domains.admin
   },
-  components: {
-    Button,
-    GeneralTable,
-    PayablesAddStepsTo,
-    ApproveModal,
-    SelectSingle,
-    DatepickerWithTime,
-    CheckBox,
-    PayablesPaymentInformationCard,
-    DatePicker
-  }
 }
 </script>
 
@@ -677,7 +729,9 @@ textarea {
     }
   }
 }
-
+.fixed-height {
+  height: 30px;
+}
 .invoicing-details {
   position: relative;
   width: 1530px;
@@ -712,7 +766,7 @@ textarea {
     width: 380px;
     background: $light-background;
     box-sizing: border-box;
-    padding: 25px;
+    padding: 25px 15px 25px 25px;
     height: fit-content;
     border-radius: 4px;
     border-bottom: 1px solid $light-border;
@@ -747,6 +801,12 @@ textarea {
     &:last-child {
       margin-bottom: 0px;
     }
+  }
+
+  &__select {
+    position: relative;
+    width: 160px;
+    height: 30px;
   }
 
   &__title {

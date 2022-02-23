@@ -17,7 +17,6 @@
               .user__description
                 .user__name {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
                 .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
-
           .details__info
             .row
               .row__title Report Id:
@@ -40,12 +39,12 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
                 span(v-html="'&euro;'")
 
-          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Received' || reportDetailsInfo.status === 'Partially Paid'")
+          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Ready' || reportDetailsInfo.status === 'Invoice on-hold'")
             .row
               .row__title Invoice:
-              .row__value2(v-if="reportDetailsInfo.status === 'Invoice Received'" )
-                input.file-button(type="file" @change="uploadFile")
-                .file-fake-button
+              .row__value2
+                input.file-button(type="file" :disabled="isPaymentMethodChanging" @change="uploadFile" )
+                .file-fake-button(:class="{'file-button-disabled': isPaymentMethodChanging}")
                   i(class="fa-solid fa-upload")
 
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
@@ -53,34 +52,66 @@
 
                 span.file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
                 span.file-name2(v-else) {{ reportDetailsInfo.paymentDetails.file.fileName }}
-              .row__value2(v-else)
-                .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-                  i(class="fa-solid fa-download")
-                span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
 
             .row
               .row__title Payment Method:
-              .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+              .row__valueDrops
+                SelectSingle(
+                  :isDisabled="!!invoiceFile"
+                  :options="vendor.billingInfo.paymentMethod",
+                  placeholder="Option",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod.name",
+                  @chooseOption="resetPaymentMethod"
+                )
             .row
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
 
-            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
+            .row
+              .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
 
-          .div(v-if="notEnoughMoney" style="margin-top: 20px; text-align: center;") You cannot confirm the report and upload invoice, because you have not reached the minimum payment amount!
+            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="submitFile")
+
+          .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Partially Paid'")
+            //.row
+            //  .row__title Invoice:
+            //  .row__value2(v-if="reportDetailsInfo.status === 'Invoice Received'" )
+            //    input.file-button(type="file" @change="uploadFile")
+            //    .file-fake-button
+            //      i(class="fa-solid fa-upload")
+            //
+            //    .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+            //      i(class="fa-solid fa-download")
+            //
+            //    span.file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
+            //    span.file-name2(v-else) {{ reportDetailsInfo.paymentDetails.file.fileName }}
+            //  .row__value2(v-else)
+            //    .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+            //      i(class="fa-solid fa-download")
+            //    span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
+            //
+            //.row
+            //  .row__title Payment Method:
+            //  .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+            //.row
+            //  .row__title Expected payment date:
+            //  .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
+            //
+            //Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice" @clicked="submitFile")
+
+
           .body__approve(v-if="reportDetailsInfo.status === 'Sent'")
-            Button.button-center( value="Approve report" @clicked="approveReport" :isDisabled="notEnoughMoney")
-
+            Button.button-center( value="Approve report" @clicked="approveReport" )
 
           .body__submission(v-if="reportDetailsInfo.status === 'Approved'")
-            .row
+            .row(v-if="isVendorHavePaymentMethod")
               .row__title Upload invoice:
               .row__value
                 input.file-button(type="file" @change="uploadFile")
                 .file-fake-button
                   i(class="fas fa-upload")
                 .file-name(v-if="invoiceFile") {{ invoiceFile.name }}
-            .row(v-if="vendor.hasOwnProperty('billingInfo') && vendor.billingInfo.paymentMethod.length"  )
+            .row(v-if="isVendorHavePaymentMethod")
               .row__title Payment method:
               .row__valueDrops
                 SelectSingle(
@@ -89,11 +120,15 @@
                   :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod ? reportDetailsInfo.paymentDetails.paymentMethod.name : ''",
                   @chooseOption="setPaymentMethod"
                 )
-            .row(v-if="!vendor.hasOwnProperty('billingInfo') || !vendor.billingInfo.paymentMethod.length" )
-              span Enter your billing information and payment method.
-              router-link(v-bind:to="'/billing/billing-information'" style="margin-left: 8px;") Here
+            .row.center(v-if="isVendorDontHaveBI")
+              span To be able to submit your invoice, you must first enter your billing information and payment method. Click on the button below to start.
+            .bill-button(v-if="isVendorDontHaveBI")
+              router-link(v-bind:to="'/billing/billing-information'")
+                Button(value="Billing & Payment Info")
+            div(v-else)
+              .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
 
-            Button(:isDisabled="isRequestNow" style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
+              Button(:isDisabled="isRequestNow" v-if="!isVendorDontHaveBI" style="margin-top: 25px; display: flex; justify-content: center;" value="Submit" @clicked="submitReport")
 
         .body__table
           GeneralTable(
@@ -153,11 +188,16 @@ export default {
   components: { PaymentInformationCard, ValidationErrors, SelectSingle, Button, GeneralTable },
   data() {
     return {
+      isSubmissionAlert: false,
+      submissionAlertMessage: '',
+
+      isPaymentMethodChanging: false,
       isRequestNow: false,
       domain: '',
       invoiceFile: null,
       errors: [],
       reportDetailsInfo: {},
+      reports: [],
       fields: [
         {
           label: "Step ID",
@@ -214,25 +254,48 @@ export default {
         elem.value = ''
       }
     },
+    resetPaymentMethod({ option }) {
+      if (this.reportDetailsInfo.paymentDetails.paymentMethod.name === option.name) {
+        this.isPaymentMethodChanging = false
+        return
+      }
+      const paymentMethod = option
+      this.isPaymentMethodChanging = true
+      this.submissionAlertMessage = 'CHECKS ALERTS!!'
+      this.isSubmissionAlert = true
+
+      this.mutatePaymentMethod(paymentMethod)
+    },
     setPaymentMethod({ option }) {
+      const paymentMethod = option
+
+      const { status, totalPrice } = this.reportDetailsInfo
+      const isOnHoldStatusOne = status === 'Approved'
+          && totalPrice < paymentMethod.minimumAmount
+
+      switch (true) {
+        case isOnHoldStatusOne: {
+          this.submissionAlertMessage = 'GO TO HOLD'
+          this.isSubmissionAlert = true
+          break
+        }
+      }
+      this.mutatePaymentMethod(paymentMethod)
+    },
+    mutatePaymentMethod(paymentMethod) {
       this.reportDetailsInfo = Object.assign({}, this.reportDetailsInfo, {
         ...this.reportDetailsInfo,
         paymentDetails: {
           ...this.reportDetailsInfo.paymentDetails,
-          paymentMethod: option
+          paymentMethod
         }
       })
     },
     async submitFile() {
       const fileData = new FormData()
-      const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
-      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
-      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
-      fileData.append("expectedPaymentDate", expectedPaymentDate)
       fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
-
       try {
         await this.$axios.post(`/vendor/invoice-reload`, fileData)
         this.clearInputFiles(".file-button")
@@ -242,7 +305,6 @@ export default {
       } catch (err) {
         console.log(err)
       }
-
     },
     async submitReport() {
       this.errors = []
@@ -251,50 +313,23 @@ export default {
       if (this.errors.length) return
       this.isRequestNow = true
 
-      try {
-        const paymentMethod = { ...this.reportDetailsInfo.paymentDetails.paymentMethod }
-        delete paymentMethod.name
-        const notes = Object.entries(paymentMethod).reduce((acc, curr) => {
-          acc = acc + `${ replaceKey(curr[0]) }: ${ curr[1] }\n`
-          return acc
-        }, '')
-
-        await this.$axios.post(`/vendor/zoho-bill-creation`, {
-          paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
-          reportsIds: [ this.reportDetailsInfo._id.toString() ],
-          notes
-        })
-        await this.getReport()
-      } catch (err) {
-        console.log(err)
-        this.isRequestNow = false
-        return
-      }
       const fileData = new FormData()
       fileData.append("invoiceFile", this.invoiceFile)
       fileData.append("reportId", this.$route.params.id)
-      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
+      fileData.append("vendorId", this.vendor._id)
+      fileData.append("paymentMethod", JSON.stringify(this.reportDetailsInfo.paymentDetails.paymentMethod))
       try {
         await this.$axios.post(`/vendor/invoice-submission`, fileData)
         this.clearInputFiles(".file-button")
         this.invoiceFile = null
         await this.getReport()
       } catch (err) {
-        console.log(err)
+        this.alertToggle({ message: "Error sending invoice, please try again later", isShow: true, type: "error" })
+      } finally {
         this.isRequestNow = false
-      }
-      this.isRequestNow = false
-
-      function replaceKey(key) {
-        switch (key) {
-          case 'accountName':
-            key = 'Account Name'
-        }
-        return key[0].toUpperCase() + key.substr(1)
       }
     },
     async approveReport() {
-      if(this.notEnoughMoney) return
       try {
         const result = await this.$axios.post(`/vendor/approve-report`, { nextStatus: 'Approved', reportsIds: [ this.reportDetailsInfo._id.toString() ] })
         const decode = window.atob(result.data)
@@ -322,9 +357,18 @@ export default {
         this.reportDetailsInfo = JSON.parse(decode)[0]
       } catch (e) {
       }
+    },
+    async getVendorReports() {
+      try {
+        const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
+        const decode = window.atob(result.data)
+        this.reports = JSON.parse(decode)
+      } catch (err) {
+      }
     }
   },
   async created() {
+    await this.getVendorReports()
     await this.getReport()
     this.domain = process.env.domain
   },
@@ -335,8 +379,11 @@ export default {
     ...mapGetters({
       vendor: "getVendor"
     }),
-    notEnoughMoney() {
-      return this.reportDetailsInfo.totalPrice < 50
+    isVendorDontHaveBI() {
+      return !this.vendor.hasOwnProperty('billingInfo') || !this.vendor.billingInfo.paymentMethod.length
+    },
+    isVendorHavePaymentMethod() {
+      return this.vendor.hasOwnProperty('billingInfo') && this.vendor.billingInfo.paymentMethod.length
     }
   }
 }
@@ -344,6 +391,20 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../../../assets/scss/colors";
+
+.bill-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.center {
+  text-align: center;
+}
+
+.submission-alert {
+  margin-top: 20px;
+}
 
 .cards {
   display: flex;
@@ -590,5 +651,10 @@ export default {
   cursor: pointer;
   font-size: 16px;
   margin-right: 10px;
+}
+
+.file-button-disabled {
+  background: #F8F8F8;
+  cursor: default !important;
 }
 </style>

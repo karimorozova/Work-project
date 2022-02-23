@@ -5,16 +5,16 @@ const { removeDir } = require("./PayablesFilesAndDirecrory")
 
 const payableDeleteStep = async (reportId, stepId) => {
 	try {
-		await InvoicingPayables.updateOne({_id: reportId },{$pull: {'steps': stepId} })
+		await InvoicingPayables.updateOne({ _id: reportId }, { $pull: { 'steps': stepId } })
 		const currentReport = (await getPayablesProjectsAndSteps(reportId)).pop()
 
 		const { firstPaymentDate, lastPaymentDate } = getPayablesDateRange(currentReport.steps)
 
-		await InvoicingPayables.updateOne({_id: reportId },
-				{$set: {firstPaymentDate, lastPaymentDate}})
+		await InvoicingPayables.updateOne({ _id: reportId },
+				{ $set: { firstPaymentDate, lastPaymentDate } })
 
 		await Projects.updateOne(
-				{ 'steps._id': stepId  },
+				{ 'steps._id': stepId },
 				{ 'steps.$[i].isInReportPayables': false },
 				{ arrayFilters: [ { 'i._id': stepId } ] })
 
@@ -25,15 +25,15 @@ const payableDeleteStep = async (reportId, stepId) => {
 
 const payableDelete = async (reportId) => {
 	const DIR = './dist/vendorReportsFiles/'
-	const reporotInfo = await InvoicingPayables.findOne({ _id: reportId })
-	const steps = reporotInfo ? reporotInfo.steps : []
+	const reportInfo = await InvoicingPayables.findOne({ _id: reportId })
+	const steps = reportInfo ? reportInfo.steps : []
 	await Projects.updateMany(
-			{ 'steps._id': {$in: steps}  },
+			{ 'steps._id': { $in: steps } },
 			{ 'steps.$[i].isInReportPayables': false },
-			{ arrayFilters: [ { 'i._id': {$in: steps} } ] })
+			{ arrayFilters: [ { 'i._id': { $in: steps } } ] })
 
-	await InvoicingPayables.deleteOne({_id: reportId})
+	await InvoicingPayables.deleteOne({ _id: reportId })
 	await removeDir(DIR, reportId)
 
 }
-module.exports = {  payableDeleteStep, payableDelete }
+module.exports = { payableDeleteStep, payableDelete }

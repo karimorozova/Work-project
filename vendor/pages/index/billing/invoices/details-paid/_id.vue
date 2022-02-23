@@ -54,23 +54,6 @@
             .row
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
-          //.body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Received' || reportDetailsInfo.status === 'Partially Paid'")
-          //  .row
-          //    .row__title Invoice:
-          //    .row__value2
-          //      input.file-button(type="file" @change="uploadFile" v-if="reportDetailsInfo.status === 'Invoice Received'")
-          //      .file-fake-button(v-if="reportDetailsInfo.status === 'Invoice Received'")
-          //        i(class="fas fa-upload")
-          //      .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
-          //        i(class="fas fa-download")
-          //      .file-name2(v-if="invoiceFile") {{ invoiceFile.name }}
-          //  .row
-          //    .row__title Payment method:
-          //    .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod }}
-          //
-          //  .row
-          //    .row__title Expected payment date:
-          //    .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
 
         .body__table
           GeneralTable(
@@ -104,8 +87,6 @@
               .table__data
                 span.currency(v-html="'&euro;'")
                 span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
-
-
 
     .payments
       .cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation")
@@ -178,86 +159,6 @@ export default {
       link.href = this.domain + href
       link.target = "_blank"
       link.click()
-    },
-    uploadFile(e) {
-      const files = e.target.files
-      const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 40)
-      if (filteredFiles.length) {
-        this.invoiceFile = files[0]
-      }
-      if (!filteredFiles.length) this.clearInputFiles(".file-button")
-    },
-    clearInputFiles(str) {
-      let inputFiles = document.querySelectorAll(str)
-      for (let elem of inputFiles) {
-        elem.value = ''
-      }
-    },
-    setPaymentMethod({ option }) {
-      this.reportDetailsInfo = Object.assign({}, this.reportDetailsInfo, {
-        ...this.reportDetailsInfo,
-        paymentDetails: {
-          ...this.reportDetailsInfo.paymentDetails,
-          paymentMethod: option
-        }
-      })
-    },
-    async submitFile() {
-      const fileData = new FormData()
-      const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
-      fileData.append("invoiceFile", this.invoiceFile)
-      fileData.append("reportId", this.$route.params.id)
-      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
-      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
-      fileData.append("expectedPaymentDate", expectedPaymentDate)
-      fileData.append("oldPath", this.reportDetailsInfo.paymentDetails.file.path)
-
-      try {
-        await this.$axios.post(`/vendor/invoice-reload`, fileData)
-        this.clearInputFiles(".file-button")
-        this.invoiceFile = null
-        await this.getReport()
-        this.alertToggle({ message: "Invoice reloaded!", isShow: true, type: "success" })
-      } catch (err) {
-        console.log(err)
-      }
-
-    },
-    async submitReport() {
-      this.errors = []
-      if (!this.invoiceFile) this.errors.push('Please upload invoice file')
-      if (!this.reportDetailsInfo.paymentDetails.paymentMethod) this.errors.push('Please set payment method')
-      if (this.errors.length) return
-
-      const fileData = new FormData()
-      const expectedPaymentDate = moment().add(21, 'days').format('DD-MM-YYYY, HH:mm')
-      fileData.append("invoiceFile", this.invoiceFile)
-      fileData.append("reportId", this.$route.params.id)
-      fileData.append("paymentMethod", this.reportDetailsInfo.paymentDetails.paymentMethod)
-      fileData.append("zohoBillingId", this.reportDetailsInfo.zohoBillingId)
-      fileData.append("vendorName", this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname)
-      fileData.append("expectedPaymentDate", expectedPaymentDate)
-
-      try {
-        await this.$axios.post(`/vendor/invoice-submission`, fileData)
-        this.clearInputFiles(".file-button")
-        this.invoiceFile = null
-        await this.getReport()
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async approveReport() {
-      try {
-        const result = await this.$axios.post(`/vendor/approve-report`, {
-          reportsIds: [ this.reportDetailsInfo._id.toString() ],
-          nextStatus: 'Approved'
-        })
-        const decode = window.atob(result.data)
-        const data = JSON.parse(decode)
-        await this.getReport(data)
-      } catch (err) {
-      }
     },
     formattedDate(date) {
       return moment(date).format('MMM D, HH:mm')
