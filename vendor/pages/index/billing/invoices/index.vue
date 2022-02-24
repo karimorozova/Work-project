@@ -22,6 +22,14 @@
         template(slot="status" slot-scope="{ row, index }")
           .table__data {{ row.status }}
 
+        template(slot="name" slot-scope="{ row, index }")
+          .table__data
+            router-link(:to="'/billing/billing-information'")
+              span {{ row.paymentDetails.paymentMethod.name }}
+
+        template(slot="type" slot-scope="{ row, index }")
+          .table__data {{ row.paymentDetails.paymentMethod.paymentType }}
+
         template(slot="jobs" slot-scope="{ row, index }")
           .table__data {{ row.steps.length }}
 
@@ -32,6 +40,12 @@
 
         template(slot="created" slot-scope="{ row, index }")
           .table__data {{ formattedDate( row.createdAt) }}
+
+        template(slot="icon" slot-scope="{ row, index }")
+          .table__icons
+            router-link(:to="'/billing/invoices/details/' + row._id")
+              .table__icon
+                i(class="fa-solid fa-arrow-right-to-bracket")
 
     .reports
       .title Paid Invoices
@@ -54,6 +68,14 @@
         template(slot="status" slot-scope="{ row, index }")
           .table__data {{ row.status }}
 
+        template(slot="name" slot-scope="{ row, index }")
+          .table__data
+            router-link(:to="'/billing/billing-information'")
+              span {{ row.paymentDetails.paymentMethod.name }}
+
+        template(slot="type" slot-scope="{ row, index }")
+          .table__data {{ row.paymentDetails.paymentMethod.paymentType }}
+
         template(slot="jobs" slot-scope="{ row, index }")
           .table__data {{ row.steps.length }}
 
@@ -64,6 +86,12 @@
 
         template(slot="created" slot-scope="{ row, index }")
           .table__data {{ formattedDate( row.createdAt) }}
+
+        template(slot="icon" slot-scope="{ row, index }")
+          .table__icons
+            router-link(:to="'/billing/invoices/details-paid/' + row._id")
+              .table__icon
+                i(class="fa-solid fa-arrow-right-to-bracket")
 
 </template>
 
@@ -82,37 +110,55 @@ export default {
           label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "20%" }
+          style: { width: "12%" }
         },
         {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { width: "15%" }
+          style: { width: "12%" }
+        },
+        {
+          label: "Payment Name",
+          headerKey: "header1",
+          key: "name",
+          style: { width: "16%" }
+        },
+        {
+          label: "Payment Type",
+          headerKey: "header2",
+          key: "type",
+          style: { width: "12%" }
         },
         {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "15%" }
+          style: { width: "7%" }
         },
         {
           label: "Date Range",
           headerKey: "headerDateRange",
           key: "dateRange",
-          style: { width: "20%" }
+          style: { width: "14%" }
         },
         {
           label: "Created On",
           headerKey: "headerCreated",
           key: "created",
-          style: { width: "15%" }
+          style: { width: "12%" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { width: "15%" }
+          style: { width: "10%" }
+        },
+        {
+          label: "",
+          headerKey: "headerIcon",
+          key: "icon",
+          style: { width: "5%" }
         }
       ]
     }
@@ -180,10 +226,19 @@ export default {
     display: flex;
     justify-content: center;
     width: 100%;
+    font-size: 17px;
   }
 
   &__data {
     padding: 0 7px;
+  }
+
+  &__icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
   }
 }
 

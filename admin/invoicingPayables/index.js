@@ -20,7 +20,8 @@ const {
 	invoiceFileUploading,
 	getVendorAndCheckPaymentTerms,
 	paidOrAddPaymentInfo,
-	updatePayableReport
+	updatePayableReport,
+	getReportsTotal
 } = require('./helpers')
 
 const {
@@ -54,6 +55,7 @@ const {
 } = require("./notification")
 
 module.exports = {
+	getReportsTotal,
 	invoicePaymentMethodResubmission,
 	getVendorAndCheckPaymentTerms,
 	invoiceFileUploading,

@@ -9,10 +9,12 @@ const {
 } = require("./zohoBilling")
 
 const moment = require("moment")
+const _ = require('lodash')
 const {
 	invoiceFileUploading,
 	getVendorAndCheckPaymentTerms,
-	updatePayableReport
+	updatePayableReport,
+	getReportsTotal
 } = require("./helpers")
 const ObjectId = require("mongodb").ObjectID
 
@@ -27,7 +29,7 @@ const invoiceReloadFile = async ({ reportId, invoiceFile, oldPath }) => {
 	const { status, zohoBillingId } = await InvoicingPayables.findOneAndUpdate({ _id: reportId }, {
 		'paymentDetails.file': { fileName, path: newPath }
 	})
-	// TODO ZOHO API
+	// TODO ZOHO API (soon)
 	// if (status === 'Invoice Ready' && !!zohoBillingId) {
 	// 	await removeFile(zohoBillingId)
 	// 	await addFile(zohoBillingId, newPath)
@@ -36,9 +38,46 @@ const invoiceReloadFile = async ({ reportId, invoiceFile, oldPath }) => {
 
 const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMethod }) => {
 	let vendorReportsAll = await getPayableByVendorId(vendorId)
-	const [ { paymentDetails, totalPrice } ] = await getPayable(reportId)
 
-	console.log(vendorReportsAll)
+	const [ { paymentDetails: currentPaymentDetails } ] = await getPayable(reportId)
+
+	let sameVendorReports = vendorReportsAll.filter(({ status, _id, paymentDetails }) =>
+			(status === 'Invoice on-hold' || status === 'Invoice Ready')
+			&& `${ reportId }` !== `${ _id }`
+			&& currentPaymentDetails.paymentMethod.name === paymentDetails.paymentMethod.name
+	)
+
+	await InvoicingPayables.updateMany({ _id: { $in: [ reportId, ...sameVendorReports.map(i => `${ i._id }`) ] } }, { "paymentDetails.paymentMethod": paymentMethod })
+
+	vendorReportsAll = (await getPayableByVendorId(vendorId)).filter(({ status }) => status === 'Invoice on-hold' || status === 'Invoice Ready')
+
+	const groupedReportsByPaymentName = _.groupBy(vendorReportsAll, 'paymentDetails.paymentMethod.name')
+
+	for await (const paymentGroup of Object.values(groupedReportsByPaymentName)) {
+		const status = getReportsTotal(paymentGroup) >= paymentGroup[0].paymentDetails.paymentMethod.minimumAmount ? 'Invoice Ready' : 'Invoice on-hold'
+		await InvoicingPayables.updateMany({ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } }, { status })
+	}
+
+	// vendorReportsAll = vendorReportsAll
+	//
+	// // vendorReportsAll
+	// console.log(vendorReportsAll)
+
+
+	// console.log(vendorReports)
+	// switch (true) {
+	// 	case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) < paymentMethod.minimumAmount): {
+	// 		console.log('всем ставим статус холд и всем меняем пеймент')
+	// 	}
+	// 		break
+	// 	case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) > paymentMethod.minimumAmount): {
+	// 		console.log('всем ставим статус РЕди и всем меняем пеймент')
+	// 	}
+	// 		break
+	//
+	// }
+
+	// console.log(vendorReportsAll)
 	// console.log(reportId, vendorId, paymentMethod)
 
 }
@@ -65,7 +104,7 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 
 	switch (true) {
 		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +totalPrice):
-		case (vendorReports.length && (holdReportsSum(vendorReports) + +totalPrice) < paymentDetails.paymentMethod.minimumAmount): {
+		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) < paymentDetails.paymentMethod.minimumAmount): {
 			await updatePayableReport(reportId, { status: 'Invoice on-hold', paymentDetails })
 			console.log('set to HOLD')
 			break
@@ -75,7 +114,7 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 			console.log('set to Ready')
 			break
 		}
-		case (vendorReports.length && (holdReportsSum(vendorReports) + +totalPrice) > paymentDetails.paymentMethod.minimumAmount): {
+		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) > paymentDetails.paymentMethod.minimumAmount): {
 			await updatePayableReport(reportId, { paymentDetails })
 			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
 				await updatePayableReport(id, { status: 'Invoice Ready' })
@@ -84,13 +123,9 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 			break
 		}
 	}
-
-	function holdReportsSum(arr) {
-		return arr.reduce((acc, curr) => acc + +curr.totalPrice, 0)
-	}
 }
 
-// TODO ZOHO API
+// TODO ZOHO API (soon)
 // const zohoBillCreation = async (_id) => {
 // 	const [ { vendor, reportId: billNumber, totalPrice, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } } } ] = await getPayable(_id)
 // 	const vendorName = vendor.firstName + ' ' + vendor.surname

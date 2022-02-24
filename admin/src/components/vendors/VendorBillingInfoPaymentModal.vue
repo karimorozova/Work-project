@@ -17,6 +17,7 @@
       .modalRow__value
         .selectSingle
           SelectSingle(
+            :isDisabled="reports.some(item => item.paymentDetails.paymentMethod.name === editablePaymentMethod.name)"
             placeholder="Option"
             :options="paymentMethods.map(i => i.name)"
             :selectedOption="currentType"
@@ -55,6 +56,10 @@ export default {
     editablePaymentMethod: {
       type: Object,
       default: () => ({})
+    },
+    reports: {
+      type: Array,
+      default: () => []
     }
   },
   data() {

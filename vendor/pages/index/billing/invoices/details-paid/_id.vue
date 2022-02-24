@@ -27,7 +27,7 @@
               .row__value {{ reportDetailsInfo.status }}
             .row
               .row__title Created on:
-              .row__value(v-if="reportDetailsInfo.firstPaymentDate") {{ formattedDate(reportDetailsInfo.createdAt) }}
+                .row__value(v-if="reportDetailsInfo.createAt") {{ formattedDate(reportDetailsInfo.createAt) }}
             .row
               .row__title Date range:
               .row__value(v-if="reportDetailsInfo.firstPaymentDate") {{ formattedDateRange(reportDetailsInfo.firstPaymentDate) + ' / ' + formattedDateRange(reportDetailsInfo.lastPaymentDate)  }}

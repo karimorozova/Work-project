@@ -16,6 +16,7 @@
         :editablePaymentMethod="editablePaymentMethod"
         @closePaymentMethod="closeModal"
         @savePaymentMethod="savePaymentMethod"
+        :reports="reports"
       )
 
     .billing-info(v-if="currentVendor.billingInfo")
@@ -185,16 +186,16 @@ export default {
         this.closeApproveModal()
       }
     },
-    // isPaymentMethodInInvoice({ name }) {
-    //   const reports = this.reports.filter(item => item.paymentDetails.paymentMethod)
-    //   if (!reports.length) return false
-    //   return reports.some(item => item.paymentDetails.paymentMethod.name === name)
-    // },
+    isPaymentMethodInInvoice({ name }) {
+      const reports = this.reports.filter(item => item.paymentDetails.paymentMethod)
+      if (!reports.length) return false
+      return reports.some(item => item.paymentDetails.paymentMethod.name === name)
+    },
     openApproveModal(item, index) {
-      // if (this.isPaymentMethodInInvoice(item)) {
-      //   alert('Payment method in invoice!')
-      //   return
-      // }
+      if (this.isPaymentMethodInInvoice(item)) {
+        alert('Payment method in invoice!')
+        return
+      }
       this.deletingIndex = index
       this.isDeletingModal = true
     },

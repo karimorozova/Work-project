@@ -26,7 +26,7 @@
               .row__value {{ reportDetailsInfo.status }}
             .row
               .row__title Created on:
-              .row__value(v-if="reportDetailsInfo.firstPaymentDate") {{ formattedDate(reportDetailsInfo.createdAt) }}
+              .row__value(v-if="reportDetailsInfo.createAt") {{ formattedDate(reportDetailsInfo.createAt) }}
             .row
               .row__title Date range:
               .row__value(v-if="reportDetailsInfo.firstPaymentDate") {{ formattedDateRange(reportDetailsInfo.firstPaymentDate) + ' / ' + formattedDateRange(reportDetailsInfo.lastPaymentDate)  }}
@@ -39,7 +39,8 @@
                 span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
                 span(v-html="'&euro;'")
 
-          // invoice ==>>
+
+          // Invoice ==>>
           .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Invoice Ready' || reportDetailsInfo.status === 'Invoice on-hold'")
             .row
               .row__title Invoice:
@@ -73,7 +74,8 @@
                 Button.center(style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="reSubmitPaymentMethod")
 
             Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="submitFile")
-          // <<== invoice
+          // <<== Invoice
+
 
           .body__invoiceReceived(v-if="reportDetailsInfo.status === 'Partially Paid'")
             //.row
@@ -260,9 +262,7 @@ export default {
     async resetPaymentMethod({ option }) {
       await this.getReport()
       if (this.reportDetailsInfo.paymentDetails.paymentMethod.name === option.name) {
-        this.isPaymentMethodChanging = false
-        this.submissionAlertMessage = ''
-        this.isSubmissionAlert = false
+        this.clearResetsPaymentMethod()
         return
       }
       const paymentMethod = option
@@ -271,6 +271,11 @@ export default {
       this.isSubmissionAlert = true
 
       this.mutatePaymentMethod(paymentMethod)
+    },
+    clearResetsPaymentMethod() {
+      this.isPaymentMethodChanging = false
+      this.submissionAlertMessage = ''
+      this.isSubmissionAlert = false
     },
     setPaymentMethod({ option }) {
       const paymentMethod = option
@@ -320,6 +325,7 @@ export default {
           vendorId: this.vendor._id,
           paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod
         })
+        this.clearResetsPaymentMethod()
         await this.getReport()
       } catch (err) {
         this.alertToggle({ message: "Error sending invoice, please try again later", isShow: true, type: "error" })

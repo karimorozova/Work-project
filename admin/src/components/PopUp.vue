@@ -1,14 +1,15 @@
 <template lang="pug">
   .test
     #popcorn
-       slot
+      slot
     #tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
       span {{text}}
       #arrow( data-popper-arrow)
 </template>
 
 <script>
-import { createPopper } from '@popperjs/core';
+import { createPopper } from '@popperjs/core'
+
 export default {
   name: "PopUp",
   props: {
@@ -31,7 +32,7 @@ export default {
     side: {
       type: String,
       default: 'top'
-    },
+    }
   },
   // computed: {
   //   cssProps() {
@@ -48,31 +49,31 @@ export default {
           {
             name: 'offset',
             options: {
-              offset: [0, 10],
-            },
-          },
-        ],
+              offset: [ 0, 10 ]
+            }
+          }
+        ]
 
-      });
+      })
     },
-    addListeners(popup, tooltip, element ) {
-      const showEvents = ['mouseenter', 'focus'];
-      const hideEvents = ['mouseleave', 'blur'];
+    addListeners(popup, tooltip, element) {
+      const showEvents = [ 'mouseenter', 'focus' ]
+      const hideEvents = [ 'mouseleave', 'blur' ]
 
       showEvents.forEach((event) => {
-        element.addEventListener(event, () => this.show(tooltip, popup));
-      });
+        element.addEventListener(event, () => this.show(tooltip, popup))
+      })
 
       hideEvents.forEach((event) => {
-        element.addEventListener(event, () => this.hide(tooltip));
-      });
+        element.addEventListener(event, () => this.hide(tooltip))
+      })
     },
     show(tooltip, popup) {
       tooltip.setAttribute('data-show', '')
-      popup.update();
+      popup.update()
     },
     hide(tooltip) {
-      tooltip.removeAttribute('data-show');
+      tooltip.removeAttribute('data-show')
     }
   },
   mounted() {
@@ -83,7 +84,6 @@ export default {
       const popup = this.initPopup(popcorn, tooltip)
       this.addListeners(popup, tooltip, popcorn)
     }
-
   }
 }
 </script>
@@ -92,10 +92,14 @@ export default {
 
 #tooltip {
   display: none;
-  font-weight: bold;
-  padding: 5px 10px;
-  font-size: 13px;
+  position: absolute;
+  inset: auto auto 0px 0px;
+  margin: 0px;
+  width: 220px;
+  text-align: center;
   border-radius: 4px;
+  padding: 5px;
+  z-index: 100000;
 }
 
 #arrow,
@@ -115,7 +119,6 @@ export default {
   content: '';
   transform: rotate(45deg);
 }
-
 
 
 #tooltip[data-show] {

@@ -4,6 +4,10 @@ const { PaymentTerms, InvoicingPayables } = require("../models")
 const { ObjectID: ObjectId } = require("mongodb")
 const { getPayable } = require("./getPayables")
 
+const getReportsTotal = (reportsList) => {
+	return reportsList.reduce((acc, curr) => acc + +curr.totalPrice, 0)
+}
+
 const clearPayablesStepsPrivateKeys = async (reports) => {
 	const privateKeys = [
 		'finance',
@@ -105,5 +109,6 @@ module.exports = {
 	invoiceFileUploading,
 	getVendorAndCheckPaymentTerms,
 	paidOrAddPaymentInfo,
-	updatePayableReport
+	updatePayableReport,
+	getReportsTotal
 }
