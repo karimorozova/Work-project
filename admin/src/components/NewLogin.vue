@@ -27,22 +27,18 @@
 
       .login__oauth
         .icons
-          .icon
-            i(class="fa-brands fa-google" @click="singInGoogle")
+          .icon(@click="singInGoogle")
+            i(class="fa-brands fa-google" )
           //.icon
           //  i(class="fa-brands fa-facebook-f")
 
 </template>
 
 <script>
-import Button from './Button'
 import { mapActions } from "vuex"
 
 export default {
   name: "NewLogin",
-  components: {
-    Button
-  },
   data() {
     return {
       form: {
@@ -70,19 +66,17 @@ export default {
     async singInGoogle() {
       try {
 
-        debugger
         const googleUser = await this.$gAuth.signIn()
         if (!googleUser) {
           return null
         }
 
         this.isAllFieldsError = false
-        const data = await this.$http.post('/login-with-google', { idToken: googleUser.getAuthResponse().id_token })
-        console.log(googleUser)
+        const data = await this.$http.post('/login-with-google', { idToken: googleUser.getAuthResponse().id_token, portal: 'admin'})
         const loginResult = data.body
         console.log(loginResult)
         if (loginResult.status === 'success') {
-          await this.loggingIn(loginResult)
+          // await this.loggingIn(loginResult)
           this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
           this.$router.push("/")
 

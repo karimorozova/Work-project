@@ -8,7 +8,7 @@ const { secretKey } = require('../configs')
 const { setNewPassword } = require('../users')
 const { OAuth2Client } = require('google-auth-library')
 const { sendResetToken, changePass } = require("../helpers/passwordReset")
-const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com")
+const { googleOAuth } = require("../helpers/oAuth")
 
 router.get('/logout', (req, res, next) => {
 	// if (req.cookies.admin) {
@@ -196,24 +196,11 @@ router.post('/login', (req, res, next) => {
 })
 
 router.post('/login-with-google', async (req, res, next) => {
-	const { idToken } = req.body
+	const { idToken, portal} = req.body
 	try {
-		const ticket = await client.verifyIdToken({
-			idToken: idToken,
-			audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com"
-		})
-
-		const { email, picture } = ticket.getPayload()
-
-		await User.updateOne({ email: email }, { $set: { photo: picture } })
-		const user = await User.findOne({ email: email }).populate("group")
-
-		if (!user || !user.isActive) res.send({ status: "error" })
-
-		const token = await jwt.sign({ user }, secretKey, { expiresIn: '12h' })
-		res.statusCode = 200
-		res.cookie('admin', token, { maxAge: 12 * 60 * 60 * 1000, httpOnly: true })
-		res.status(200).send({status: "success",})
+		const { status, token } = await googleOAuth(idToken, portal)
+		res.cookie(portal, token, { maxAge: 12 * 60 * 60 * 1000, httpOnly: true })
+		res.status(200).send({status: "success", token})
 	} catch (err) {
 		res.send({ status: "error" })
 	}

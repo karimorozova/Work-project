@@ -13,7 +13,7 @@ import GAuth from 'vue-google-oauth2'
 import io from 'socket.io-client'
 
 const gauthOption = {
-  clientId: '1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com',
+  clientId: '685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com',
 }
 
 // const io = require("socket.io-client");

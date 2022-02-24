@@ -27,8 +27,8 @@
 
       .login__oauth
         .icons
-          .icon
-            i(class="fa-brands fa-google" @click="singInGoogle")
+          .icon(@click="singInGoogle")
+            i(class="fa-brands fa-google" )
           //.icon
           //  i(class="fa-brands fa-facebook-f")
   //.login
@@ -69,7 +69,43 @@ export default {
       this.sendForm()
     },
     async singInGoogle() {
+      try {
+        const googleUser = await this.$gAuth.signIn()
+        if (!googleUser) {
+          return null
+        }
+        console.log('testtttauth')
 
+        this.isAllFieldsError = false
+        const data = await this.$http.post('/login-with-google', { idToken: googleUser.getAuthResponse().id_token, portal: 'vendor'})
+        const loginResult = data.body
+        console.log(loginResult)
+        if (loginResult.status === 'success') {
+          // await this.loggingIn(loginResult)
+          this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+          this.$router.push("/")
+
+          this.isSignIn = this.$gAuth.isAuthorized
+        } else {
+          this.signOutGoogle()
+          this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+        }
+
+      } catch (error) {
+        console.log(error)
+        //on fail do something
+        this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+        return null
+      }
+    },
+    async signOutGoogle() {
+      try {
+        await this.$gAuth.signOut()
+        this.isSignIn = this.$gAuth.isAuthorized
+        console.log("isSignIn", this.$gAuth.isAuthorized)
+      } catch (error) {
+        console.error(error)
+      }
     },
     async sendForm() {
       try {
@@ -100,6 +136,14 @@ export default {
       alertToggle: "alertToggle",
       login: "login"
     })
+  },
+  created() {
+    let checkGauthLoad = setInterval(function () {
+      this.isInit = this.$gAuth.isInit
+      this.isSignIn = this.$gAuth.isAuthorized
+      if (this.isInit) clearInterval(checkGauthLoad)
+    }, 1000)
+
   }
 }
 </script>

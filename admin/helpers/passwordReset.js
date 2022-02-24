@@ -33,9 +33,9 @@ const setNewPassToPortal = async (email, newPass) => {
 
 const sendMail = async (email, token, type) => {
 	const urlsByType = {
-		admin: `http://localhost:3001/password-reset/token/${token}`,
-		portal: `http://localhost:3000/password-reset?token=${token}`,
-		vendor: `http://localhost:3002/password-reset?token=${token}`
+		admin: `${process.env.ADMIN_URL}/password-reset/token/${token}`,
+		portal: `${process.env.PORTAL_URL}/password-reset?token=${token}`,
+		vendor: `${process.env.VENDOR_URL}/password-reset?token=${token}`
 	}
 
 	const message =  getMessageResetPassword(urlsByType[type])

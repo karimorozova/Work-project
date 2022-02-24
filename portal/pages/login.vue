@@ -27,8 +27,8 @@
 
       .login__oauth
         .icons
-          .icon
-            i(class="fa-brands fa-google" @click="singInGoogle")
+          .icon( @click="singInGoogle")
+            i(class="fa-brands fa-google")
           //.icon
           //  i(class="fa-brands fa-facebook-f")
 
@@ -54,6 +54,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex"
+// import gapii from "vue-google-oauth2"
 
 export default {
   data() {
@@ -66,9 +67,86 @@ export default {
     }
   },
   methods: {
+
+
+    start() {
+      const gapi = window.gapi
+      // 2. Initialize the JavaScript client library.
+      gapi.auth2.init({
+        'clientId': '685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com',
+      }).then(() => {
+        this.GoogleAuth = gapi.auth2.getAuthInstance();
+        gapi.auth2.getAuthInstance()
+        this.GoogleAuth.signIn().then((data)=> {
+          console.log(data.wc.id_token)
+          this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'portal'}, { withCredentials: true }).then(( data ) => {
+            console.log({data})
+            const loginResult = data
+            console.log({ loginResult })
+            if (loginResult.status === 'success') {
+              // await this.loggingIn(loginResult)
+              this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+              this.$router.push("/")
+
+              // this.isSignIn = this.$gAuth.isAuthorized
+            } else {
+              // this.signOutGoogle()
+              this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+            }
+          })
+
+        })
+
+      })
+    },
+
     async singInGoogle() {
 
+      window.gapi.load('auth2', this.start);
     },
+
+    // async singInGoogle() {
+    //   console.log("clicked")
+    //   try {
+    //     gapi.load('client', loadSDK);
+    //     await this.loadSDK(document, "script", "googless")
+    //     // const googleUser = await this.$gAuth.signIn()
+    //     // if (!googleUser) {
+    //     //   return null
+    //     // }
+    //     // console.log('testtttauth')
+    //     //
+    //     // this.isAllFieldsError = false
+    //     // const data = await this.$http.post('/login-with-google', { idToken: googleUser.getAuthResponse().id_token, portal: 'vendor'})
+    //     // const loginResult = data.body
+    //     // console.log(loginResult)
+    //     // if (loginResult.status === 'success') {
+    //     //   // await this.loggingIn(loginResult)
+    //     //   this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+    //     //   this.$router.push("/")
+    //     //
+    //     //   this.isSignIn = this.$gAuth.isAuthorized
+    //     // } else {
+    //     //   this.signOutGoogle()
+    //     //   this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+    //     // }
+    //
+    //   } catch (error) {
+    //     console.log(error)
+    //     //on fail do something
+    //     this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+    //     return null
+    //   }
+    // },
+    // async signOutGoogle() {
+    //   try {
+    //     await this.$gAuth.signOut()
+    //     this.isSignIn = this.$gAuth.isAuthorized
+    //     console.log("isSignIn", this.$gAuth.isAuthorized)
+    //   } catch (error) {
+    //     console.error(error)
+    //   }
+    // },
     async sendForm() {
       try {
         this.isAllFieldsError = false
@@ -90,13 +168,26 @@ export default {
         this.alertToggle({ message, isShow: true, type: "error" })
       }
     },
-    forget() {
-      this.forgotLink = !this.forgotLink
+    async loadSDK(d, s, id) {
+      let js,
+          fjs = d.getElementsByTagName(s)[0]
+      console.log(fjs)
+      console.log(d.getElementById(id))
+      if (d.getElementById(id)) {
+        return
+      }
+      js = d.createElement(s)
+      js.id = id
+      js.src = "https://apis.google.com/js/api.js"
+      fjs.parentNode.insertBefore(js, fjs)
     },
     ...mapActions({
       alertToggle: "alertToggle",
       login: "login"
     })
+  },
+  async mounted() {
+    await this.loadSDK(document, "script", "googless")
   },
   computed: {
     ...mapGetters({
