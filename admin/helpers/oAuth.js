@@ -15,7 +15,7 @@ const getUserAuthAdmin = async (email, picture) => {
 
 const getUserAuthVendor = async (email, picture) => {
 	await Vendors.updateOne({ email: email }, { $set: { photo: picture } })
-	const vendor = await User.findOne({ email: email })
+	const vendor = await Vendors.findOne({ email: email })
 	return { vendorId: vendor._id }
 
 	// const token = await jwt.sign({ vendorId: vendor._id }, secretKey, { expiresIn: '12h' })

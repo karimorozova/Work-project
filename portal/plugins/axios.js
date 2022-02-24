@@ -12,8 +12,6 @@ export default async function ({ store, $axios, route }) {
 
 	$axios.onResponse(response => {
 		store.dispatch('delRequest')
-
-		console.log(response.headers)
 		if (response && response.config && response.config.progress === false) {
 
 			return

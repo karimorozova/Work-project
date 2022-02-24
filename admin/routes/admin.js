@@ -199,7 +199,7 @@ router.post('/login-with-google', async (req, res, next) => {
 	const { idToken, portal} = req.body
 	try {
 		const { status, token } = await googleOAuth(idToken, portal)
-		res.cookie(portal, token, { maxAge: 12 * 60 * 60 * 1000, httpOnly: true })
+		res.cookie(portal, token, { maxAge: 12 * 60 * 60 * 1000 })
 		res.status(200).send({status: "success", token})
 	} catch (err) {
 		res.send({ status: "error" })

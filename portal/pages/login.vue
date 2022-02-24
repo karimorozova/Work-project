@@ -79,17 +79,17 @@ export default {
         gapi.auth2.getAuthInstance()
         this.GoogleAuth.signIn().then((data)=> {
           console.log(data.wc.id_token)
-          this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'portal'}, { withCredentials: true }).then(( data ) => {
+          this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'portal'}, { withCredentials: true }).then(({ data } ) => {
             console.log({data})
             const loginResult = data
             console.log({ loginResult })
+
             if (loginResult.status === 'success') {
-              // await this.loggingIn(loginResult)
+              this.login(data.token)
               this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
               this.$router.push("/")
-
-              // this.isSignIn = this.$gAuth.isAuthorized
             } else {
+              this.GoogleAuth.signOut()
               // this.signOutGoogle()
               this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
             }
