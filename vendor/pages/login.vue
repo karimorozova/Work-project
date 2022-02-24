@@ -49,31 +49,31 @@ export default {
     }
   },
   methods: {
-    start() {
+    async start() {
       const gapi = window.gapi
       // 2. Initialize the JavaScript client library.
-      gapi.auth2.init({
+      await gapi.auth2.init({
         'clientId': '685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com',
-      }).then(() => {
-        this.GoogleAuth = gapi.auth2.getAuthInstance();
-        gapi.auth2.getAuthInstance()
-        this.GoogleAuth.signIn().then((data)=> {
-          this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'vendor'}, { withCredentials: true }).then(({ data } ) => {
-            const loginResult = data
-
-            if (loginResult.status === 'success') {
-              this.login(data.token)
-              this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
-              this.$router.push('/dashboard')
-            } else {
-              this.GoogleAuth.signOut()
-              this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
-            }
-          })
-
-        })
-
       })
+
+      this.GoogleAuth = gapi.auth2.getAuthInstance();
+
+      const data = await this.GoogleAuth.signIn()
+      const response = (await this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'vendor' }, { withCredentials: true })).data
+      const {status, token} = response
+      if (status === 'success') {
+        this.login(token)
+        this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+        this.$router.push('/dashboard')
+      } else {
+        this.GoogleAuth.signOut()
+        this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+      }
+
+
+
+
+
     },
 
     async singInGoogle() {
