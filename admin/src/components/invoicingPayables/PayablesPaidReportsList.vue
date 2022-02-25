@@ -85,7 +85,7 @@
           template(slot="amount" slot-scope="{ row, index }")
             .table__data
               span.currency(v-html="'&euro;'")
-              span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
+              span {{ +(getStepsPayables(row.stepFinance)).toFixed(2) }}
 
           template(slot="created" slot-scope="{ row, index }")
             .table__data {{ getTime( row.createdAt) }}

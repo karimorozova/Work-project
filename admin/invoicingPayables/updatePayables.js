@@ -97,7 +97,7 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 	}
 
 	let vendorReports = vendorReportsAll.filter(({ status, _id, paymentDetails: paymentDetailsReport }) =>
-			status === 'Invoice on-hold'
+			(status === 'Invoice on-hold' || status === 'Invoice Ready')
 			&& `${ reportId }` !== `${ _id }`
 			&& paymentDetailsReport.paymentMethod.name === paymentDetails.paymentMethod.name
 	)

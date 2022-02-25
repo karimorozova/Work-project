@@ -21,7 +21,8 @@ const {
 	getVendorAndCheckPaymentTerms,
 	paidOrAddPaymentInfo,
 	updatePayableReport,
-	getReportsTotal
+	getReportsTotal,
+	rollBackFromPaidToDraft
 } = require('./helpers')
 
 const {
@@ -55,6 +56,7 @@ const {
 } = require("./notification")
 
 module.exports = {
+	rollBackFromPaidToDraft,
 	getReportsTotal,
 	invoicePaymentMethodResubmission,
 	getVendorAndCheckPaymentTerms,

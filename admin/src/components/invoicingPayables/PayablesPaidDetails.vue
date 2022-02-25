@@ -2,6 +2,17 @@
   .invoicing-details
     .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
 
+      ApproveModal(
+        v-if="isDoubleApproveForceStatus"
+        class="absolute-middle"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approveForceStatus"
+        @close="toggleForceStatusEdition"
+        @notApprove="toggleForceStatusEdition"
+      )
+
       .invoicing-details__details
         .invoicing-details__body(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
           .invoicing-details__details
@@ -22,10 +33,29 @@
                 .text__value {{reportDetailsInfo.reportId}}
               .text__block
                 .text__title Status:
-                .text__value {{reportDetailsInfo.status}}
+                .text__value
+                  .text__edit
+                    IconButton(
+                      :hasPopup="true"
+                      popupText="Rollback"
+                      @clicked="toggleForceStatusEdition"
+                    )
+                      i(class="fas fa-pen" v-if="!isStatusEdit" )
+                      i(class="fa-solid fa-xmark" v-else )
+
+                  .text__select(v-if="isStatusEdit")
+                    SelectSingle(
+                      :selectedOption="forceStatus"
+                      :options="['Created']"
+                      placeholder="Option"
+                      @chooseOption="jumpOrRollbackStatus"
+                    )
+                  span(v-else) {{reportDetailsInfo.status}}
+
+              //{{reportDetailsInfo.status}}
               .text__block
                 .text__title Created On:
-                .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
+                .text__value {{ formattedDate(reportDetailsInfo.createAt) }}
               .text__block
                 .text__title Date Range:
                 .text__value
@@ -44,16 +74,23 @@
               .text__block
                 .text__title Invoice:
                 .text__value
-                  .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                  IconButton(
+                    @clicked="downloadFile(reportDetailsInfo.paymentDetails.file.path)"
+                  )
                     i(class="fa-solid fa-download")
                   span.file-name {{ reportDetailsInfo.paymentDetails.file ? reportDetailsInfo.paymentDetails.file.fileName : '' }}
 
               .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
                 .text__title Payment method:
-                .text__value(style="display:flex; gap: 10px; align-items: center;")
-                  span.toggle-details(@click="togglePaymentDetails")
+                .text__value
+                  IconButton(
+                    :hasPopup="true"
+                    popupText="Payment Details"
+                    @clicked="togglePaymentDetails"
+                  )
                     i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
                     i( v-else class="fa-solid fa-xmark")
+
                   span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
 
               .text__block
@@ -67,7 +104,7 @@
 
 
             .payment-details(v-if="isShowPaymentDetails" )
-              .payment-details__row(v-for="[key, val] in Object.entries(reportDetailsInfo.paymentDetails.paymentMethod)" v-if="key !== 'name'" )
+              .payment-details__row(v-for="[key, val] in Object.entries(allFieldsOutput(reportDetailsInfo.paymentDetails.paymentMethod))" v-if="key !== 'name'" )
                 .payment-details__key {{ replaceKey(key) }}:
                 .payment-details__value
                   span.details-icon(@click="copyDetailsInfo(val)")
@@ -113,7 +150,7 @@
                   span.currency(v-html="'&euro;'")
                   span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
 
-    .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
+    .invoicing-details__cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
       .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
         PayablesPaymentInformationCard(
           :cardInfo="cardInfo"
@@ -131,12 +168,16 @@ import DatepickerWithTime from "../DatepickerWithTime"
 import CheckBox from "../CheckBox"
 import PayablesPaymentInformationCard from "./PayablesPaymentInformationCard"
 import getBgColor from "../../mixins/getBgColor"
+import IconButton from "../IconButton"
 
 export default {
-  name: "InvoicingDetails",
   mixins: [ getBgColor ],
   data() {
     return {
+      isStatusEdit: false,
+      forceStatus: '',
+      isDoubleApproveForceStatus: false,
+
       reportDetailsInfo: {},
       domain: '',
       isShowPaymentDetails: false,
@@ -183,11 +224,49 @@ export default {
           key: "payables",
           style: { width: "11%" }
         }
-      ],
-      amount: 0
+      ]
     }
   },
   methods: {
+    async approveForceStatus() {
+      try {
+        await this.$http.post('/invoicing-payables/rollback-invoiceReport-from-paid', { reportsIds: [ this.$route.params.id ] })
+        await this.$router.push('/pangea-finance/invoicing-payables/reports/' + this.reportDetailsInfo._id)
+      } catch (error) {
+        this.alertToggle({ message: "Error on Reports Status Editing", isShow: true, type: "error" })
+      } finally {
+        this.toggleForceStatusEdition()
+      }
+    },
+    jumpOrRollbackStatus({ option }) {
+      this.forceStatus = option
+      this.isDoubleApproveForceStatus = true
+    },
+    toggleForceStatusEdition() {
+      this.forceStatus = this.reportDetailsInfo.status
+      this.isDoubleApproveForceStatus = false
+      this.isStatusEdit = !this.isStatusEdit
+    },
+    allFieldsOutput(item, result = {}) {
+      for (const key in item) {
+        if (typeof item[key] === 'object') {
+          return this.allFieldsOutput(item[key], result)
+        } else {
+          result = {
+            ...result,
+            [key]: item[key]
+          }
+        }
+      }
+      delete result._id
+      return result
+    },
+    downloadFile(path) {
+      let link = document.createElement('a')
+      link.href = this.$domains.admin + '/' + path
+      link.target = "_blank"
+      link.click()
+    },
     replaceKey(key) {
       switch (key) {
         case 'accountName':
@@ -237,6 +316,7 @@ export default {
     this.domain = this.$domains.admin
   },
   components: {
+    IconButton,
     Button,
     GeneralTable,
     ApproveModal,
@@ -493,14 +573,26 @@ textarea {
     }
   }
 
+  &__select {
+    width: 160px;
+    height: 32px;
+    background: white;
+    border-radius: 4px;
+    position: relative;
+  }
+
   &__title {
     width: 140px;
     color: $dark-border;
+    position: relative;
   }
 
   &__value {
-    width: 180px;
+    width: 200px;
     position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 
     a {
       color: inherit;
@@ -680,6 +772,7 @@ textarea {
   &__key {
     width: 110px;
     color: $dark-border;
+    margin-right: 10px;
   }
 
   &__value {

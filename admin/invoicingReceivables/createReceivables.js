@@ -46,7 +46,8 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 			if (_tmpIndex === -1) {
 				temp.push({
 					...getFirstReportStructureFromElement(element),
-					reportId: 'RPT_v' + (++lastIntIndex + '').padStart(6, "0"),
+					// reportId: 'RPT_v' + (++lastIntIndex ),
+					reportId: '??',
 					createdBy: createdBy,
 					updatedBy: createdBy
 				})
@@ -80,7 +81,8 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 			if (_tmpIndex === -1) {
 				temp.push({
 					...getFirstReportStructureFromElement(element),
-					reportId: 'RPT_v' + (++lastIntIndex + '').padStart(6, "0"),
+					// reportId: 'RPT_v' + (++lastIntIndex ),
+					reportId: '???',
 					createdBy: createdBy,
 					updatedBy: createdBy
 				})

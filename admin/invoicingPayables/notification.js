@@ -27,9 +27,7 @@ const notifyVendorReportsIsSent = async (reportsIds) => {
 }
 
 const notifyVendorReportsIsPaid = async (isFull, { reportId: _id }) => {
-	let [ { vendor, reportId } ] = isFull
-			? await getPaidReport(_id)
-			: await getPayable(_id)
+	let [ { vendor, reportId } ] = isFull ? await getPaidReport(_id) : await getPayable(_id)
 
 	vendor = vendor.hasOwnProperty('_doc') ? vendor._doc : vendor
 	const subject = `Your Invoice ${ reportId } has been ${ isFull ? 'paid' : 'partially paid' }  (V013.0)`

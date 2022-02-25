@@ -35,9 +35,10 @@ const addStepsToPayables = async (projects, createdBy) => {
 	const lastIndex = await InvoicingPayables.findOne().sort({ 'reportId': -1 })
 	const lastIndexInArchive = await InvoicingPayablesArchive.findOne().sort({ 'reportId': -1 })
 
+
 	const lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_v').pop()) : 100
-	const lastIntIndexFromArchive = lastIndexInArchive != null ? parseInt(lastIndexInArchive.reportId.split('_v').pop()) : 0
-	let lastMaxIndex = Math.max(lastIntIndexFromArchive, lastIntIndex)
+	const lastIntIndexFromArchive = lastIndexInArchive != null ? parseInt(lastIndexInArchive.reportId.split('_v').pop()) : 100
+	let lastMaxIndex = Math.max(isNaN(lastIntIndexFromArchive) ? 100 : lastIntIndexFromArchive, isNaN(lastIntIndex) ? 100 : lastIntIndex)
 
 	let allSteps = []
 	for (const project of projects) {

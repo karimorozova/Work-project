@@ -51,7 +51,7 @@
         template(slot="payables" slot-scope="{ row, index }")
           .table__data
             span.currency(v-html="'&euro;'")
-            span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit}}
+            span {{ +(row.steps.nativeFinance.Price.payables).toFixed(2) }}
 
       .table__empty(v-if="!steps.length") Nothing found...
 

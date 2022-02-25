@@ -129,7 +129,7 @@
           template(slot="amount" slot-scope="{ row, index }")
             .table__data
               span.currency(v-html="'&euro;'")
-              span {{ getStepsPayables(row.stepFinance) | roundTwoDigit }}
+              span {{ +(getStepsPayables(row.stepFinance)).toFixed(2) }}
 
           template(slot="created" slot-scope="{ row, index }")
             .table__data {{ getTime( row.createAt) }}
@@ -444,7 +444,7 @@ export default {
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
         this.isDataRemain = result.data.length === 50
       }
-    },
+    }
     // TODO Zoho (soon)
     // async updatePayablesStateFromZoho() {
     //   try {

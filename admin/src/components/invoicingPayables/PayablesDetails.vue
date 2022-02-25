@@ -2,6 +2,43 @@
   .invoicing-details
     .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
 
+
+      ValidationErrors(v-if="errors.length" :errors="errors" @closeErrors="closeErrors" isAbsolute)
+
+      .paymentMethodAndFileModal(v-if="isShowUploadInvoice" )
+        .paymentMethodAndFileModal__close(@click="closeUploadModal") &#215;
+        .files-upload
+          .files-upload__title Invoice File:
+          .files-upload__value
+            UploadFileButton
+              input.file-input(type="file" @change='uploadFile')
+            .file-name-invoice(v-if="invoiceFile") {{ invoiceFile.name }}
+        .files-upload
+          .files-upload__title Payment Method:
+          .files-upload__value
+            .drop
+              SelectSingle(
+                :selectedOption="invoicePaymentMethod.name || ''"
+                :options="reportDetailsInfo.vendor.billingInfo.paymentMethods.length ? reportDetailsInfo.vendor.billingInfo.paymentMethods : []"
+                placeholder="Option"
+                @chooseOption="setPaymentMethodInvoiceFile"
+              )
+        .files-upload-buttons
+          Button(value="Submit" @clicked="confirmInvoiceUploading")
+          Button(value="Cancel" :outline="true" @clicked="closeUploadModal")
+
+      ApproveModal(
+        v-if="isDoubleApproveForceStatus"
+        class="absolute-middle"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approveForceStatus"
+        @close="toggleForceStatusEdition"
+        @notApprove="toggleForceStatusEdition"
+      )
+
+
       .payment-card(v-if="isPaymentCard")
         .payment-card__close(@click="closePaymentCard") &#215;
         .payment-card__title Payment
@@ -41,8 +78,8 @@
           .payment-card__body-block
             .drop-title Unpaid Amount:
             input(:value="getUnpaidAmount" :class="'payment-card__input'" :disabled="true")
-          .payment-card__body-block
-            .payment-card__link(@click="approvePaidFull") Pay Full Amount
+          //.payment-card__body-block
+          //  .payment-card__link(@click="approvePaidFull") Pay Full Amount
         .payment-card__buttons
           Button(
             :isDisabled="!abilityToSubmitPayment"
@@ -73,30 +110,32 @@
               .text__block.fixed-height
                 .text__title Status:
                 .text__value
+                  .text__edit(v-if="reportDetailsInfo.status !== 'Partially Paid'" )
+                    IconButton(
+                      :hasPopup="true"
+                      popupText="Rollback & Jump"
+                      @clicked="toggleForceStatusEdition"
+                    )
+                      i(class="fas fa-pen" v-if="!isStatusEdit" )
+                      i(class="fa-solid fa-xmark" v-else )
                   .text__select(v-if="isStatusEdit")
                     SelectSingle(
-                      :selectedOption="''"
+                      :selectedOption="forceStatus"
                       :options="statuses"
                       placeholder="Option"
+                      @chooseOption="jumpOrRollbackStatus"
                     )
                   span(v-else) {{reportDetailsInfo.status}}
 
-                //IconButton(
-                //  :hasPopup="true"
-                //  popupText="Rollback & Jump"
-                //  @clicked="showChangingStatus"
-                //)
-                //  i(class="fas fa-pen" )
-
               .text__block
                 .text__title Created On:
-                .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
+                .text__value {{ formattedDate(reportDetailsInfo.createAt) }}
 
               .text__block
                 .text__title Date Range:
                 .text__value
                   span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
-                  span(style="color:#999; margin: 0 4px;") /
+                  span /
                   span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
 
               .text__block
@@ -108,19 +147,26 @@
                 .text__value
                   a(target="_blank" :href="`https://books.zoho.com/app#/bills/${reportDetailsInfo.zohoBillingId}?filter_by=Status.All&per_page=25&sort_column=created_time&sort_order=D`") Bill
 
-              .text__block(v-if="this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid' ")
+              .text__block(v-if="reportDetailsInfo.paymentDetails.file")
                 .text__title Invoice:
                 .text__value
-                  .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
+                  IconButton(
+                    @clicked="downloadFile(reportDetailsInfo.paymentDetails.file.path)"
+                  )
                     i(class="fa-solid fa-download")
                   span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
 
               .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
                 .text__title Payment method:
-                .text__value(style="display:flex; gap: 10px; align-items: center;")
-                  span.toggle-details(@click="togglePaymentDetails")
+                .text__value
+                  IconButton(
+                    :hasPopup="true"
+                    popupText="Payment Details"
+                    @clicked="togglePaymentDetails"
+                  )
                     i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
                     i( v-else class="fa-solid fa-xmark")
+
                   span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
 
               .text__block(v-if="reportDetailsInfo.paymentDetails.expectedPaymentDate" )
@@ -130,11 +176,11 @@
               .text__block
                 .text__title Total Amount:
                 .text__value
-                  span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
+                  span {{ +(getStepsPayables(reportDetailsInfo.steps)).toFixed(2) }}
                   span(v-html="'&euro;'")
 
             .payment-details(v-if="isShowPaymentDetails" )
-              .payment-details__row(v-for="[key, val] in Object.entries(reportDetailsInfo.paymentDetails.paymentMethod)" v-if="key !== 'name'" )
+              .payment-details__row(v-for="[key, val] in Object.entries(allFieldsOutput(reportDetailsInfo.paymentDetails.paymentMethod))" v-if="key !== 'name'" )
                 .payment-details__key {{ replaceKey(key) }}:
                 .payment-details__value
                   span.details-icon(@click="copyDetailsInfo(val)")
@@ -145,7 +191,7 @@
               Button(v-if='!toggleAddSteps && reportDetailsInfo.status === "Created"' value="Send" @clicked="changeReportStatus")
               Button(v-if='!toggleAddSteps && (reportDetailsInfo.status === "Created" || reportDetailsInfo.status === "Sent")' value="Add Jobs" @clicked="changeToggleAddSteps")
 
-            .payment-button(v-if="!isPaymentCard && (this.reportDetailsInfo.status === 'Invoice Received' || this.reportDetailsInfo.status === 'Partially Paid')" )
+            .payment-button(v-if="!isPaymentCard && (this.reportDetailsInfo.status === 'Invoice Ready' || this.reportDetailsInfo.status === 'Partially Paid')" )
               Button(value="Add Payment" @clicked="openPaymentCard" :isDisabled="isRequestNow")
 
           .invoicing-details__table
@@ -195,7 +241,7 @@
               template(slot="payables" slot-scope="{ row, index }")
                 .table__data
                   span.currency(v-html="'&euro;'")
-                  span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
+                  span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
 
               template(slot="icons", slot-scope="{ row, index }")
                 .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
@@ -210,7 +256,7 @@
           @closeTable="changeToggleAddSteps"
         )
 
-    .invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation.length")
+    .invoicing-details__cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
       .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
         PayablesPaymentInformationCard(
           :cardInfo="cardInfo"
@@ -234,11 +280,15 @@ import getBgColor from "../../mixins/getBgColor"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
 import IconButton from "../IconButton"
+import UploadFileButton from "../UploadFileButton"
+import ValidationErrors from "../ValidationErrors"
 
 export default {
   name: "InvoicingDetails",
   mixins: [ getBgColor ],
   components: {
+    ValidationErrors,
+    UploadFileButton,
     Button,
     GeneralTable,
     PayablesAddStepsTo,
@@ -318,22 +368,136 @@ export default {
       amount: 0,
       notes: '',
 
-      // showDeleteRequestModal: false,
-      // showSendModal: false,
+      errors: [],
 
-      isShowPaymentDetails: false
+      invoiceFile: null,
+      invoicePaymentMethod: {},
+
+      forceStatus: '',
+      isShowPaymentDetails: false,
+      isShowUploadInvoice: false,
+      isDoubleApproveForceStatus: false
     }
   },
   methods: {
+    allFieldsOutput(item, result = {}) {
+      for (const key in item) {
+        if (typeof item[key] === 'object') {
+          return this.allFieldsOutput(item[key], result)
+        } else {
+          result = {
+            ...result,
+            [key]: item[key]
+          }
+        }
+      }
+      delete result._id
+      return result
+    },
+    async approveForceStatus() {
+      if (this.forceStatus === 'Invoice Ready / Invoice on-hold') {
+        const fileData = new FormData()
+        fileData.append("invoiceFile", this.invoiceFile)
+        fileData.append("reportId", this.$route.params.id)
+        fileData.append("vendorId", this.reportDetailsInfo.vendor._id)
+        fileData.append("paymentMethod", JSON.stringify(this.invoicePaymentMethod))
+        try {
+          await this.$http.post('/invoicing-payables/invoice-submission', fileData)
+          await this.refreshReports()
+        } catch (err) {
+          this.alertToggle({ message: "Error on Reports Status Editing", isShow: true, type: "error" })
+        } finally {
+          this.toggleForceStatusEdition()
+        }
+      } else if (this.forceStatus === 'Paid') {
+        try {
+          const data = {
+            paidAmount: this.getUnpaidAmount,
+            unpaidAmount: 0,
+            paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
+            paymentDate: new Date(),
+            notes: this.notes
+          }
+          const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
+          if (res === "Moved") await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+          else await this.refreshReports()
+        } catch (err) {
+          this.alertToggle({ message: "Error on Reports Status Editing", isShow: true, type: "error" })
+        } finally {
+          this.toggleForceStatusEdition()
+        }
+      } else {
+        try {
+          await this.$http.post('/invoicing-payables/manage-report-status', { reportsIds: [ this.$route.params.id ], nextStatus: this.forceStatus })
+          await this.refreshReports()
+        } catch (error) {
+          this.alertToggle({ message: "Error on Reports Status Editing", isShow: true, type: "error" })
+        } finally {
+          this.toggleForceStatusEdition()
+        }
+      }
+    },
+    closeErrors() {
+      this.errors = []
+    },
+    confirmInvoiceUploading() {
+      this.errors = []
+      if (!this.invoiceFile) this.errors.push('Please upload invoice file')
+      if (!this.invoicePaymentMethod.name) this.errors.push('Please set payment method')
+      if (this.errors.length) return
+
+      this.isDoubleApproveForceStatus = true
+    },
+    setPaymentMethodInvoiceFile({ option }) {
+      this.invoicePaymentMethod = option
+    },
+    closeUploadModal() {
+      this.invoicePaymentMethod = {}
+      this.isShowUploadInvoice = false
+      this.clearInvoiceFileInput()
+      this.invoiceFile = null
+      this.isStatusEdit = false
+    },
+    uploadFile(e) {
+      const files = e.target.files
+      const filteredFiles = Array.from(files).filter(item => item.size / 1000000 <= 40)
+      if (filteredFiles.length) {
+        this.invoiceFile = files[0]
+      }
+      if (!filteredFiles.length) this.clearInvoiceFileInput()
+    },
+    clearInvoiceFileInput() {
+      let inputFiles = document.querySelectorAll(".file-input")
+      for (let elem of inputFiles) {
+        elem.value = ''
+      }
+    },
+    jumpOrRollbackStatus({ option }) {
+      if (option === 'Invoice Ready / Invoice on-hold') {
+        this.isShowUploadInvoice = true
+        this.forceStatus = option
+        return
+      }
+      this.forceStatus = option
+      this.isDoubleApproveForceStatus = true
+    },
+    toggleForceStatusEdition() {
+      this.isDoubleApproveForceStatus = false
+      if (this.isStatusEdit) {
+        this.closeUploadModal()
+        this.forceStatus = ''
+        return
+      }
+      this.forceStatus = this.reportDetailsInfo.status
+      this.isStatusEdit = !this.isStatusEdit
+      this.clearInvoiceFileInput()
+    },
     replaceKey(key) {
       switch (key) {
         case 'accountName':
           key = 'Account Name'
       }
       return key[0].toUpperCase() + key.substr(1)
-    },
-    showChangingStatus() {
-      this.isStatusEdit = !this.isStatusEdit
     },
     copyDetailsInfo(str) {
       navigator.clipboard.writeText(str.trim())
@@ -345,6 +509,7 @@ export default {
     openPaymentCard() {
       this.isPaymentCard = true
       this.paymentDate = new Date()
+      this.amount = this.getUnpaidAmount
     },
     closePaymentCard() {
       this.isPaymentCard = false
@@ -366,7 +531,7 @@ export default {
       }, 0)
     },
     setPaymentMethod({ option }) {
-      this.paymentMethod = this.reportDetailsInfo.vendor.billingInfo.paymentMethod.find(item => item.name === option)
+      this.paymentMethod = this.reportDetailsInfo.vendor.billingInfo.paymentMethods.find(item => item.name === option)
     },
     setFromDate(e) {
       this.paymentDate = e
@@ -382,10 +547,10 @@ export default {
         unpaidAmount: +(this.getUnpaidAmount - amount).toFixed(2),
         paymentMethod: this.paymentMethod,
         paymentDate: this.paymentDate,
-        zohoBillingId: this.reportDetailsInfo.zohoBillingId,
-        vendorName: this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname,
-        vendorEmail: this.reportDetailsInfo.vendor.email,
         notes: this.notes
+        // zohoBillingId: this.reportDetailsInfo.zohoBillingId,
+        // vendorName: this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname,
+        // vendorEmail: this.reportDetailsInfo.vendor.email,
       }
       this.closePaymentCard()
       const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
@@ -412,9 +577,9 @@ export default {
     selectInput() {
       this.$refs.input.select()
     },
-    approvePaidFull() {
-      this.amount = this.getUnpaidAmount
-    },
+    // approvePaidFull() {
+    //   this.amount = this.getUnpaidAmount
+    // },
     formattedDate(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -442,17 +607,10 @@ export default {
           nextStatus: 'Sent'
         })
         await this.refreshReports()
-        // this.closeSendRequest()
       } catch (error) {
         this.alertToggle({ message: "Error on Reports sending", isShow: true, type: "error" })
       }
     },
-    // showModalSendRequest() {
-    //   this.showSendModal = true
-    // },
-    // closeSendRequest() {
-    //   this.showSendModal = false
-    // },
     async deleteStep() {
       const { reportId, stepId } = this.deleteInfo
       this.closeModalStep()
@@ -506,30 +664,24 @@ export default {
     statuses() {
       const currentStatus = this.reportDetailsInfo.status
       let statuses = []
-      // ['Created', 'Sent', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
 
       switch (currentStatus) {
         case 'Created':
-          statuses = [ 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid' ]
+          statuses = [ 'Sent', 'Approved', 'Invoice Ready / Invoice on-hold' ]
           break
         case 'Sent':
-          statuses = [ 'Created', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid' ]
+          statuses = [ 'Created', 'Approved', 'Invoice Ready / Invoice on-hold' ]
           break
         case 'Approved':
-          statuses = [ 'Created', 'Sent', 'Invoice Ready / Invoice on-hold', 'Paid' ]
+          statuses = [ 'Created', 'Sent', 'Invoice Ready / Invoice on-hold' ]
           break
         case 'Invoice Ready':
-          statuses = [ 'Created', 'Sent', 'Approved' ]
+          statuses = [ 'Created', 'Sent', 'Approved', 'Paid' ]
           break
         case 'Invoice on-hold':
           statuses = [ 'Created', 'Sent', 'Approved' ]
           break
-        case 'Paid':
-          statuses = [ 'Created' ]
-          break
       }
-
-
       return statuses
     },
 
@@ -548,6 +700,7 @@ export default {
   },
   async created() {
     await this.openDetails(this.$route.params.id)
+    // TODO Zoho (soon)
     // await this.updatePayableStateFromZoho(this.$route.params.id)
     this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
     this.domain = this.$domains.admin
@@ -557,6 +710,71 @@ export default {
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
+
+.paymentMethodAndFileModal {
+  position: absolute;
+  z-index: 4;
+  padding: 25px;
+  background: white;
+  box-shadow: $box-shadow;
+  top: 50%;
+  left: 485px;
+  transform: translate(0%, -50%);
+
+  .files-upload-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  &__close {
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    font-size: 24px;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-family: Myriad600;
+    opacity: 0.8;
+    transition: ease 0.2s;
+
+    &:hover {
+      opacity: 1
+    }
+  }
+
+  .files-upload {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+
+    &__title {
+      width: 120px;
+    }
+
+    &__value {
+      position: relative;
+      width: 220px;
+      display: flex;
+    }
+  }
+
+  .file-name-invoice {
+    position: absolute;
+    width: 130px;
+    top: 10px;
+    left: 80px;
+    opacity: 0.6;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
 
 textarea {
   width: 100%;
@@ -672,14 +890,14 @@ textarea {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 22px;
+    font-size: 24px;
     cursor: pointer;
-    height: 22px;
-    width: 22px;
+    height: 24px;
+    width: 24px;
     justify-content: center;
     display: flex;
     align-items: center;
-    font-family: Myriad900;
+    font-family: Myriad600;
     opacity: 0.8;
     transition: ease 0.2s;
 
@@ -805,19 +1023,25 @@ textarea {
   }
 
   &__select {
-    position: relative;
     width: 160px;
-    height: 30px;
+    height: 32px;
+    background: white;
+    border-radius: 4px;
+    position: relative;
   }
 
   &__title {
     width: 140px;
     color: $dark-border;
+    position: relative;
   }
 
   &__value {
-    width: 180px;
+    width: 200px;
     position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 
     a {
       color: inherit;
@@ -997,6 +1221,7 @@ textarea {
   &__key {
     width: 110px;
     color: $dark-border;
+    margin-right: 10px;
   }
 
   &__value {

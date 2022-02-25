@@ -17,7 +17,7 @@
       .modalRow__value
         .selectSingle
           SelectSingle(
-            :isDisabled="reports.some(item => item.paymentDetails.paymentMethod.name === editablePaymentMethod.name)"
+            :isDisabled="reports.some(item => item.paymentDetails.paymentMethod && item.paymentDetails.paymentMethod.name === editablePaymentMethod.name)"
             placeholder="Option"
             :options="paymentMethods.map(i => i.name)"
             :selectedOption="currentType"

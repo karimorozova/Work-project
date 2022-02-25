@@ -1,6 +1,6 @@
 const { moveProjectFile } = require("../utils/movingFile")
 const { getVendorAfterUpdate, getVendor } = require("../vendors")
-const { PaymentTerms, InvoicingPayables } = require("../models")
+const { PaymentTerms, InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 const { ObjectID: ObjectId } = require("mongodb")
 const { getPayable } = require("./getPayables")
 
@@ -91,11 +91,32 @@ const paidOrAddPaymentInfo = async (reportId, data, zohoPaymentId = '') => {
 				}
 			}
 		])
-		await InvoicingPayables.remove({ _id: reportId })
+		await InvoicingPayables.deleteOne({ _id: reportId })
 		return "Moved"
 	}
 
 	return 'Success'
+}
+
+const rollBackFromPaidToDraft = async (reportIds) => {
+
+	for await (let reportId of reportIds) {
+		await InvoicingPayablesArchive.updateOne({ _id: ObjectId(reportId) }, { $set: { status: 'Created', paymentInformation: [] } })
+
+		await InvoicingPayablesArchive.aggregate([
+			{ "$match": { "_id": ObjectId(reportId) } },
+			{
+				"$merge": {
+					"into": {
+						"db": "pangea",
+						"coll": "invoicingpayables"
+					}
+				}
+			}
+		])
+		await InvoicingPayablesArchive.deleteOne({ _id: ObjectId(reportId) })
+	}
+
 }
 
 const updatePayableReport = async (reportId, obj) => {
@@ -110,5 +131,6 @@ module.exports = {
 	getVendorAndCheckPaymentTerms,
 	paidOrAddPaymentInfo,
 	updatePayableReport,
-	getReportsTotal
+	getReportsTotal,
+	rollBackFromPaidToDraft
 }

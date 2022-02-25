@@ -20,25 +20,55 @@ const {
 	updatePayablesFromZoho,
 	getPayableByVendorId,
 	notifyVendorReportsIsSent,
-	notifyVendorReportsIsPaid
+	notifyVendorReportsIsPaid,
+	invoiceSubmission,
+	rollBackFromPaidToDraft
 } = require('../invoicingPayables')
 
 const { ObjectID: ObjectId } = require("mongodb")
+const upload = require("../utils/uploads")
 
 router.post("/manage-report-status", async (req, res) => {
 	const { nextStatus } = req.body
 	try {
+		const { reportsIds } = req.body
 		switch (nextStatus) {
 			case "Sent":
-				const { reportsIds } = req.body
 				await setPayablesNextStatus(reportsIds, nextStatus)
 				await notifyVendorReportsIsSent(reportsIds)
 				break
+			case "Approved":
+			case "Created":
+				await setPayablesNextStatus(reportsIds, nextStatus)
+				break
 		}
-		res.send('foo')
+		res.send('Done!')
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on manage-report-status')
+	}
+})
+
+router.post("/rollback-invoiceReport-from-paid", async (req, res) => {
+	try {
+		const { reportsIds } = req.body
+		await rollBackFromPaidToDraft(reportsIds)
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on manage-report-status')
+	}
+})
+
+router.post('/invoice-submission', upload.fields([ { name: 'invoiceFile' } ]), async (req, res) => {
+	try {
+		const { invoiceFile } = req.files
+		const { reportId, paymentMethod, vendorId } = req.body
+		await invoiceSubmission({ reportId, vendorId, invoiceFile, paymentMethod })
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error / Cannot add invoice file (invoice-submission)')
 	}
 })
 
