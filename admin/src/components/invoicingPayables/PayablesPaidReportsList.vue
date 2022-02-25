@@ -73,6 +73,11 @@
               router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
                 span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
 
+          template(slot="type" slot-scope="{ row, index }")
+            .table__data
+              div.type {{ row.paymentDetails.paymentMethod.paymentType }}
+              div.name {{ row.paymentDetails.paymentMethod.name }}
+
           template(slot="status" slot-scope="{ row, index }")
             .table__data {{ row.status }}
 
@@ -127,55 +132,61 @@ export default {
           label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "170px" }
+          style: { width: "150px" }
         },
         {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "220px" }
+          style: { width: "200px" }
+        },
+        {
+          label: "Type / Name",
+          headerKey: "headerType",
+          key: "type",
+          style: { width: "150px" }
         },
         {
           label: "Date Range",
           headerKey: "headerDateRange",
           key: "dateRange",
-          style: { width: "210px" }
+          style: { width: "185px" }
         },
         {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { width: "145px" }
+          style: { width: "140px" }
         },
         {
           label: "Projects",
           headerKey: "headerProject",
           key: "project",
-          style: { width: "110px" }
+          style: { width: "100px" }
         },
         {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "110px" }
+          style: { width: "100px" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { width: "140px" }
+          style: { width: "120px" }
         },
         {
           label: "Created On",
           headerKey: "headerCreated",
           key: "created",
-          style: { width: "180px" }
+          style: { width: "160px" }
         },
         {
           label: "Updated On",
           headerKey: "headerUpdated",
           key: "updated",
-          style: { width: "180px" }
+          style: { width: "160px" }
         }
       ],
       isDataRemain: true,
@@ -516,5 +527,13 @@ input {
   position: absolute;
   right: 54px !important;
   top: 27px !important;
+}
+
+.name {
+  opacity: 0.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 131px;
 }
 </style>

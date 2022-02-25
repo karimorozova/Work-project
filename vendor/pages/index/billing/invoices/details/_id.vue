@@ -267,7 +267,7 @@ export default {
       }
       const paymentMethod = option
       this.isPaymentMethodChanging = true
-      this.submissionAlertMessage = 'CHECKS ALERTS!!'
+      this.submissionAlertMessage = ''
       this.isSubmissionAlert = true
 
       this.mutatePaymentMethod(paymentMethod)
@@ -286,7 +286,7 @@ export default {
 
       switch (true) {
         case isOnHoldStatusOne: {
-          this.submissionAlertMessage = 'GO TO HOLD'
+          this.submissionAlertMessage = ''
           this.isSubmissionAlert = true
           break
         }

@@ -37,7 +37,7 @@
           .filter__input
             SelectSingle(
               :selectedOption="selectedStatus"
-              :options="['Created', 'Sent', 'Approved', 'Invoice Received', 'Partially Paid']"
+              :options="['Created', 'Sent', 'Approved', 'Invoice on-hold', 'Invoice Ready', 'Partially Paid']"
               placeholder="Option"
               @chooseOption="setStatus"
               :isRemoveOption="true"
@@ -117,6 +117,11 @@
               router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
                 span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
 
+          template(slot="type" slot-scope="{ row, index }")
+            .table__data
+              div.type {{ row.paymentDetails.paymentMethod.paymentType || '-' }}
+              div.name {{ row.paymentDetails.paymentMethod.name || '-' }}
+
           template(slot="status" slot-scope="{ row, index }")
             .table__data {{ row.status }}
 
@@ -181,19 +186,25 @@ export default {
           label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "150px" }
+          style: { width: "140px" }
         },
         {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "219px" }
+          style: { width: "199px" }
+        },
+        {
+          label: "Type / Name",
+          headerKey: "headerType",
+          key: "type",
+          style: { width: "150px" }
         },
         {
           label: "Date Range",
           headerKey: "headerDateRange",
           key: "dateRange",
-          style: { width: "210px" }
+          style: { width: "175px" }
         },
         {
           label: "Status",
@@ -205,37 +216,37 @@ export default {
           label: "Projects",
           headerKey: "headerProject",
           key: "project",
-          style: { width: "90px" }
+          style: { width: "80px" }
         },
         {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "90px" }
+          style: { width: "80px" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { width: "120px" }
+          style: { width: "100px" }
         },
         {
           label: "Created On",
           headerKey: "headerCreated",
           key: "created",
-          style: { width: "180px" }
+          style: { width: "160px" }
         },
         {
           label: "Updated On",
           headerKey: "headerUpdated",
           key: "updated",
-          style: { width: "180px" }
+          style: { width: "160px" }
         },
         {
           label: "",
           headerKey: "headerIcon",
           key: "icon",
-          style: { width: "57px" }
+          style: { width: "52px" }
         }
       ],
       isDataRemain: true,
@@ -711,5 +722,13 @@ input {
   position: absolute;
   right: 54px !important;
   top: 27px !important;
+}
+
+.name {
+  opacity: 0.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 131px;
 }
 </style>

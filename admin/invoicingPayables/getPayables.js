@@ -60,6 +60,7 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 
 const getAllPayables = async (countToSkip, countToGet, query) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
+				{ $match: { ...query } },
 				{
 					$lookup: {
 						from: "projects",
@@ -74,7 +75,25 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 						as: "stepFinance"
 					}
 				},
-				{ $match: { ...query } },
+				{
+					$lookup: {
+						from: "vendors",
+						let: {
+							'paymentMethod': '$paymentDetails.paymentMethod'
+						},
+						pipeline: [
+							{ "$unwind": "$billingInfo.paymentMethods" },
+							{ "$match": { "$expr": { "$eq": [ "$billingInfo.paymentMethods._id", "$$paymentMethod" ] } } },
+							{ '$replaceRoot': { newRoot: '$billingInfo.paymentMethods' } }
+						],
+						as: "paymentDetails.paymentMethod"
+					}
+				},
+				{
+					$addFields: {
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
+					}
+				},
 				{ $sort: { reportId: -1 } },
 				{ $skip: countToSkip },
 				{ $limit: countToGet }
