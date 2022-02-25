@@ -53,7 +53,7 @@ export default {
       const gapi = window.gapi
       // 2. Initialize the JavaScript client library.
       await gapi.auth2.init({
-        'clientId': '685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com',
+        'clientId': '1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com',
       })
 
       this.GoogleAuth = gapi.auth2.getAuthInstance();

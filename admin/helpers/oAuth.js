@@ -2,7 +2,7 @@ const { User, Vendors, Clients } = require("../models")
 const jwt = require("jsonwebtoken")
 const { secretKey } = require("../configs")
 const { OAuth2Client } = require("google-auth-library")
-const client = new OAuth2Client("685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com")
+const client = new OAuth2Client("1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com")
 
 const getUserAuthAdmin = async (email, picture) => {
 	// await User.updateOne({ email: email }, { $set: { photo: picture } })
@@ -37,7 +37,7 @@ const googleOAuth = async (idToken, portal) => {
 	console.log(idToken)
 	const ticket = await client.verifyIdToken({
 		idToken: idToken,
-		audience: "685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com"
+		audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com"
 	})
 
 	const { email, picture } = ticket.getPayload()

@@ -54,7 +54,7 @@ export default {
     async start() {
       const gapi = window.gapi
       await gapi.auth2.init({
-        'clientId': '685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com',
+        'clientId': '1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com',
       })
       this.GoogleAuth = gapi.auth2.getAuthInstance()
       const data = await this.GoogleAuth.signIn()
