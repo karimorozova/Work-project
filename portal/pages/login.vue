@@ -32,29 +32,11 @@
           //.icon
           //  i(class="fa-brands fa-facebook-f")
 
-  //.login
-  //  .login__main
-  //    .login__logo
-  //      img.login__image(src="../assets/images/new-logo.png")
-  //    form.login__form(@submit.prevent="checkFields")
-  //      .login__required-message(v-if="isAllFieldsError") All fields are required!
-  //      .login__email
-  //        input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
-  //      .login__password
-  //        input.login__input(type="password" v-model='form.logpassword' placeholder='Password' :class="{'login_shadow': form.logpassword}")
-  //      .login__textrow
-  //        .login__checkbox
-  //          input.login__checkbox-input(type="checkbox")
-  //          label.login__checkbox-label Remember me
-  //        .login__fogotContainer
-  //          nuxt-link.login__forgot(to="/forgot") Forgot Your Password?
-  //      button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
 
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex"
-// import gapii from "vue-google-oauth2"
 
 export default {
   data() {
@@ -69,84 +51,33 @@ export default {
   methods: {
 
 
-    start() {
+    async start() {
       const gapi = window.gapi
-      // 2. Initialize the JavaScript client library.
-      gapi.auth2.init({
+      await gapi.auth2.init({
         'clientId': '685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com',
-      }).then(() => {
-        this.GoogleAuth = gapi.auth2.getAuthInstance();
-        gapi.auth2.getAuthInstance()
-        this.GoogleAuth.signIn().then((data)=> {
-          console.log(data.wc.id_token)
-          this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'portal'}, { withCredentials: true }).then(({ data } ) => {
-            console.log({data})
-            const loginResult = data
-            console.log({ loginResult })
-
-            if (loginResult.status === 'success') {
-              this.login(data.token)
-              this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
-              this.$router.push("/")
-            } else {
-              this.GoogleAuth.signOut()
-              // this.signOutGoogle()
-              this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
-            }
-          })
-
-        })
-
       })
+      this.GoogleAuth = gapi.auth2.getAuthInstance()
+      const data = await this.GoogleAuth.signIn()
+
+      const { status, token } = (await this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'portal' }, { withCredentials: true })).data
+
+      if (status === 'success') {
+        this.login(token)
+        this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+        this.$router.push("/")
+      } else {
+        this.GoogleAuth.signOut()
+        this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+      }
+
+
     },
 
     async singInGoogle() {
-
       window.gapi.load('auth2', this.start);
     },
 
-    // async singInGoogle() {
-    //   console.log("clicked")
-    //   try {
-    //     gapi.load('client', loadSDK);
-    //     await this.loadSDK(document, "script", "googless")
-    //     // const googleUser = await this.$gAuth.signIn()
-    //     // if (!googleUser) {
-    //     //   return null
-    //     // }
-    //     // console.log('testtttauth')
-    //     //
-    //     // this.isAllFieldsError = false
-    //     // const data = await this.$http.post('/login-with-google', { idToken: googleUser.getAuthResponse().id_token, portal: 'vendor'})
-    //     // const loginResult = data.body
-    //     // console.log(loginResult)
-    //     // if (loginResult.status === 'success') {
-    //     //   // await this.loggingIn(loginResult)
-    //     //   this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
-    //     //   this.$router.push("/")
-    //     //
-    //     //   this.isSignIn = this.$gAuth.isAuthorized
-    //     // } else {
-    //     //   this.signOutGoogle()
-    //     //   this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
-    //     // }
-    //
-    //   } catch (error) {
-    //     console.log(error)
-    //     //on fail do something
-    //     this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
-    //     return null
-    //   }
-    // },
-    // async signOutGoogle() {
-    //   try {
-    //     await this.$gAuth.signOut()
-    //     this.isSignIn = this.$gAuth.isAuthorized
-    //     console.log("isSignIn", this.$gAuth.isAuthorized)
-    //   } catch (error) {
-    //     console.error(error)
-    //   }
-    // },
+
     async sendForm() {
       try {
         this.isAllFieldsError = false
@@ -168,11 +99,10 @@ export default {
         this.alertToggle({ message, isShow: true, type: "error" })
       }
     },
+
     async loadSDK(d, s, id) {
       let js,
           fjs = d.getElementsByTagName(s)[0]
-      console.log(fjs)
-      console.log(d.getElementById(id))
       if (d.getElementById(id)) {
         return
       }
