@@ -5,7 +5,7 @@ const { OAuth2Client } = require("google-auth-library")
 const client = new OAuth2Client("685135225652-b1hhjrvjrvsl488b6eklkc5rdhnparoh.apps.googleusercontent.com")
 
 const getUserAuthAdmin = async (email, picture) => {
-	await User.updateOne({ email: email }, { $set: { photo: picture } })
+	// await User.updateOne({ email: email }, { $set: { photo: picture } })
 	const client = await User.findOne({ email: email, isActive: {$ne: false}}).populate("group")
 	const user = {email: client.email, _id: client._id}
 	return { user }
@@ -14,7 +14,7 @@ const getUserAuthAdmin = async (email, picture) => {
 }
 
 const getUserAuthVendor = async (email, picture) => {
-	await Vendors.updateOne({ email: email }, { $set: { photo: picture } })
+	// await Vendors.updateOne({ email: email }, { $set: { photo: picture } })
 	const vendor = await Vendors.findOne({ email: email })
 	return { vendorId: vendor._id }
 
@@ -22,7 +22,7 @@ const getUserAuthVendor = async (email, picture) => {
 }
 
 const getUserAuthPortal = async (email, picture) => {
-	await Clients.updateOne({'contacts.email': email}, {'contacts.$[i].photo': picture}, { arrayFilters:  [{ 'i.email': email }]  })
+	// await Clients.updateOne({'contacts.email': email}, {'contacts.$[i].photo': picture}, { arrayFilters:  [{ 'i.email': email }]  })
 	const [client] = await Clients.aggregate([
 		{$match: {'contacts.email': email}},
 		{$unwind: '$contacts'},

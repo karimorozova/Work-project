@@ -25,10 +25,12 @@
         template(slot="name" slot-scope="{ row, index }")
           .table__data
             router-link(:to="'/billing/billing-information'")
-              span {{ row.paymentDetails.paymentMethod.name }}
+              span(v-if="row.paymentDetails.paymentMethod" ) {{ row.paymentDetails.paymentMethod.name }}
+              span.grey-tone(v-else) After invoice upload
 
         template(slot="type" slot-scope="{ row, index }")
-          .table__data {{ row.paymentDetails.paymentMethod.paymentType }}
+          .table__data(v-if="row.paymentDetails.paymentMethod") {{ row.paymentDetails.paymentMethod.paymentType }}
+          .table__data.grey-tone(v-else) After invoice upload
 
         template(slot="jobs" slot-scope="{ row, index }")
           .table__data {{ row.steps.length }}
@@ -206,6 +208,10 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors";
+
+.grey-tone {
+  opacity: 0.4;
+}
 
 .fa-chalkboard-teacher {
   font-size: 15px;

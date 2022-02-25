@@ -35,8 +35,8 @@ const addStepsToPayables = async (projects, createdBy) => {
 	const lastIndex = await InvoicingPayables.findOne().sort({ 'reportId': -1 })
 	const lastIndexInArchive = await InvoicingPayablesArchive.findOne().sort({ 'reportId': -1 })
 
-	const lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_').pop()) : 100
-	const lastIntIndexFromArchive = lastIndexInArchive != null ? parseInt(lastIndexInArchive.reportId.split('_').pop()) : 0
+	const lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_v').pop()) : 100
+	const lastIntIndexFromArchive = lastIndexInArchive != null ? parseInt(lastIndexInArchive.reportId.split('_v').pop()) : 0
 	let lastMaxIndex = Math.max(lastIntIndexFromArchive, lastIntIndex)
 
 	let allSteps = []
@@ -74,7 +74,7 @@ const addStepsToPayables = async (projects, createdBy) => {
 			const lastPaymentDate = moment.max(moment(foundInDB.lastPaymentDate), moment(report.lastPaymentDate)).toISOString()
 			await InvoicingPayables.updateOne({ _id: foundInDB._id }, { $set: { lastPaymentDate, firstPaymentDate }, $push: { steps: { $each: report.steps } } })
 		} else {
-			const { _id } = await InvoicingPayables.create({ ...report, reportId: 'RPT_' + (++lastMaxIndex + '').padStart(6, "0") })
+			const { _id } = await InvoicingPayables.create({ ...report, reportId: 'RPT_v' + (++lastMaxIndex + '').padStart(6, "0") })
 			await createDir(DIR, _id.toString())
 		}
 

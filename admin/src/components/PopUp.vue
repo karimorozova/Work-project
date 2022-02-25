@@ -1,10 +1,10 @@
 <template lang="pug">
   .test
-    #popcorn
+    .popcorn
       slot
-    #tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
+    .tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
       span {{text}}
-      #arrow( data-popper-arrow)
+      .arrow( data-popper-arrow)
 </template>
 
 <script>
@@ -19,7 +19,7 @@ export default {
     },
     backgroundColor: {
       type: String,
-      default: '#fcabae'
+      default: '#f7f7f7'
     },
     text: {
       type: String,
@@ -27,7 +27,7 @@ export default {
     },
     color: {
       type: String,
-      default: '#c62e2e'
+      default: '#666666'
     },
     side: {
       type: String,
@@ -78,8 +78,8 @@ export default {
   },
   mounted() {
     if (!this.isDisabled) {
-      const popcorn = document.querySelector('#popcorn')
-      const tooltip = document.querySelector('#tooltip')
+      const popcorn = document.querySelector('.popcorn')
+      const tooltip = document.querySelector('.tooltip')
 
       const popup = this.initPopup(popcorn, tooltip)
       this.addListeners(popup, tooltip, popcorn)
@@ -90,38 +90,41 @@ export default {
 
 <style scoped lang="scss">
 
-#tooltip {
+.tooltip {
   display: none;
   position: absolute;
   inset: auto auto 0px 0px;
-  margin: 0px;
-  width: 220px;
+  min-width: 100px;
+  max-width: 220px;
   text-align: center;
   border-radius: 4px;
-  padding: 5px;
+  padding: 6px;
   z-index: 100000;
+  margin-left: -4px !important;
+  text-align: center;
 }
 
-#arrow,
-#arrow::before {
+.arrow,
+.arrow::before {
   position: absolute;
   width: 8px;
   height: 8px;
   background: inherit;
+  margin-top: 1px;
 }
 
-#arrow {
+.arrow {
   visibility: hidden;
 }
 
-#arrow::before {
+.arrow::before {
   visibility: visible;
   content: '';
   transform: rotate(45deg);
 }
 
 
-#tooltip[data-show] {
+.tooltip[data-show] {
   display: block;
 }
 

@@ -2,14 +2,27 @@
   .action
     .action__title Actions
     .action__icons
-      .action__icon
-        i.fa.fa-envelope(@click="openPreview")
-      .action__icon(@click="goToVendor")
+      IconButton(
+        :hasPopup="true"
+        popupText="Enter to vendor.portal"
+        @clicked="goToVendor"
+      )
         i.fas.fa-sign-in-alt
+
+      IconButton(
+        :hasPopup="true"
+        popupText="Send email"
+        @clicked="openPreview"
+      )
+        i.fa.fa-envelope
+
 
 </template>
 <script>
+import IconButton from "../IconButton"
+
 export default {
+  components: { IconButton },
   methods: {
     openPreview() {
       this.$emit("openPreview")

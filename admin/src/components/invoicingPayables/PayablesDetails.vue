@@ -11,7 +11,7 @@
             .drop
               SelectSingle(
                 :selectedOption="paymentMethod.name || ''"
-                :options="reportDetailsInfo.vendor.billingInfo.paymentMethod.length ? reportDetailsInfo.vendor.billingInfo.paymentMethod.map(i => i.name) : []"
+                :options="reportDetailsInfo.vendor.billingInfo.paymentMethods.length ? reportDetailsInfo.vendor.billingInfo.paymentMethods.map(i => i.name) : []"
                 placeholder="Option"
                 @chooseOption="setPaymentMethod"
               )
@@ -81,14 +81,13 @@
                     )
                   span(v-else) {{reportDetailsInfo.status}}
 
-                IconButton(
-                  :hasPopup="true"
-                  popupBg="#758d8d"
-                  popupTextColor="#232d2d"
-                  popupText="My pop up testing"
-                  @clicked="showChangingStatus"
-                )
-                  i(class="fas fa-pen" )
+                //IconButton(
+                //  :hasPopup="true"
+                //  popupText="Rollback & Jump"
+                //  @clicked="showChangingStatus"
+                //)
+                //  i(class="fas fa-pen" )
+
               .text__block
                 .text__title Created On:
                 .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
@@ -249,7 +248,7 @@ export default {
     CheckBox,
     PayablesPaymentInformationCard,
     DatePicker,
-    IconButton,
+    IconButton
   },
   data() {
     return {
@@ -476,24 +475,25 @@ export default {
       this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
       console.log('steps', this.steps)
     },
-    async updatePayableStateFromZoho(id) {
-      try {
-        let acceptedStatuses = [ 'Partially Paid', "Invoice Received" ]
-        if (!acceptedStatuses.includes(this.reportDetailsInfo.status)) return
-
-        const result = await this.$http.get('/invoicing-payables/update-state-from-zoho/' + id)
-        const { type, message, isMovedToArchive } = result.data
-        this.alertToggle({ message, isShow: true, type })
-        if (isMovedToArchive) {
-          await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-        } else {
-          await this.openDetails(this.$route.params.id)
-        }
-      } catch (err) {
-        console.log(err)
-        this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
-      }
-    },
+    // TODO Zoho (soon)
+    // async updatePayableStateFromZoho(id) {
+    //   try {
+    //     let acceptedStatuses = [ 'Partially Paid', "Invoice Received" ]
+    //     if (!acceptedStatuses.includes(this.reportDetailsInfo.status)) return
+    //
+    //     const result = await this.$http.get('/invoicing-payables/update-state-from-zoho/' + id)
+    //     const { type, message, isMovedToArchive } = result.data
+    //     this.alertToggle({ message, isShow: true, type })
+    //     if (isMovedToArchive) {
+    //       await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+    //     } else {
+    //       await this.openDetails(this.$route.params.id)
+    //     }
+    //   } catch (err) {
+    //     console.log(err)
+    //     this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
+    //   }
+    // },
     ...mapActions([ 'alertToggle' ])
   },
   computed: {
@@ -506,29 +506,28 @@ export default {
     statuses() {
       const currentStatus = this.reportDetailsInfo.status
       let statuses = []
-          // ['Created', 'Sent', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
+      // ['Created', 'Sent', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
 
       switch (currentStatus) {
         case 'Created':
-          statuses = ['Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
-          break;
+          statuses = [ 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid' ]
+          break
         case 'Sent':
-          statuses = ['Created', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid']
-          break;
+          statuses = [ 'Created', 'Approved', 'Invoice Ready / Invoice on-hold', 'Paid' ]
+          break
         case 'Approved':
-          statuses = ['Created', 'Sent', 'Invoice Ready / Invoice on-hold', 'Paid']
-          break;
+          statuses = [ 'Created', 'Sent', 'Invoice Ready / Invoice on-hold', 'Paid' ]
+          break
         case 'Invoice Ready':
-          statuses = ['Created',  'Sent', 'Approved']
-          break;
+          statuses = [ 'Created', 'Sent', 'Approved' ]
+          break
         case 'Invoice on-hold':
-          statuses = ['Created',  'Sent', 'Approved']
-          break;
+          statuses = [ 'Created', 'Sent', 'Approved' ]
+          break
         case 'Paid':
-          statuses = ['Created']
-          break;
+          statuses = [ 'Created' ]
+          break
       }
-
 
 
       return statuses
@@ -549,10 +548,10 @@ export default {
   },
   async created() {
     await this.openDetails(this.$route.params.id)
-    await this.updatePayableStateFromZoho(this.$route.params.id)
+    // await this.updatePayableStateFromZoho(this.$route.params.id)
     this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
     this.domain = this.$domains.admin
-  },
+  }
 }
 </script>
 
@@ -729,9 +728,11 @@ textarea {
     }
   }
 }
+
 .fixed-height {
   height: 30px;
 }
+
 .invoicing-details {
   position: relative;
   width: 1530px;

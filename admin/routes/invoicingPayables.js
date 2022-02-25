@@ -14,16 +14,16 @@ const {
 	payableDelete,
 	paidOrAddPaymentInfo,
 	getAllPaidPayables,
-	getPaidPayables,
+	getPaidReport,
 	createNewPayable,
 	updatePayableFromZoho,
 	updatePayablesFromZoho,
 	getPayableByVendorId,
 	notifyVendorReportsIsSent,
-	notifyVendorReportsIsPaid,
+	notifyVendorReportsIsPaid
 } = require('../invoicingPayables')
 
-const ObjectId = require("mongodb").ObjectID
+const { ObjectID: ObjectId } = require("mongodb")
 
 router.post("/manage-report-status", async (req, res) => {
 	const { nextStatus } = req.body
@@ -55,26 +55,27 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	}
 })
 
-router.get("/update-all-state-from-zoho", async (req, res) => {
-	try {
-		const statusAction = await updatePayablesFromZoho()
-		res.send(statusAction)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Something wrong on getting steps')
-	}
-})
+// TODO Zoho (soon)
+// router.get("/update-all-state-from-zoho", async (req, res) => {
+// 	try {
+// 		const statusAction = await updatePayablesFromZoho()
+// 		res.send(statusAction)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Something wrong on getting steps')
+// 	}
+// })
 
-router.get("/update-state-from-zoho/:id", async (req, res) => {
-	const { id } = req.params
-	try {
-		const result = await updatePayableFromZoho(id)
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Something wrong on getting steps')
-	}
-})
+// router.get("/update-state-from-zoho/:id", async (req, res) => {
+// 	const { id } = req.params
+// 	try {
+// 		const result = await updatePayableFromZoho(id)
+// 		res.send(result)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Something wrong on getting steps')
+// 	}
+// })
 
 router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 	const { vendor } = req.params
@@ -114,12 +115,12 @@ router.post("/paid-reports", async (req, res) => {
 
 router.post("/reports-final-status", async (req, res) => {
 	const data = req.body
-
 	try {
 		for await (let [ reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId } ] of Object.entries(data)) {
 			paidAmount = paidAmount.toFixed(2)
-			const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
-			await paidOrAddPaymentInfo(reportId, zohoPaymentId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+			// TODO Zoho (soon)
+			// const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
+			await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
 			await notifyVendorReportsIsPaid(true, { reportId })
 		}
 		res.send('success')
@@ -134,8 +135,9 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 	const { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, zohoBillingId, vendorName, vendorEmail } = req.body
 
 	try {
-		const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
-		const result = await paidOrAddPaymentInfo(reportId, zohoPaymentId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+		// TODO Zoho (soon)
+		// const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
+		const result = await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
 
 		result === 'Success'
 				? await notifyVendorReportsIsPaid(false, { reportId })
@@ -162,7 +164,7 @@ router.post("/report/:id", async (req, res) => {
 router.post("/paid-report/:id", async (req, res) => {
 	const { id } = req.params
 	try {
-		const report = await getPaidPayables(id)
+		const report = await getPaidReport(id)
 		res.send(report)
 	} catch (err) {
 		console.log(err)

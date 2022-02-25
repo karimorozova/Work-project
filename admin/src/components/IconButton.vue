@@ -1,8 +1,8 @@
 <template lang="pug">
   .button-wrapper
     PopUp(
-      :backgroundColor="popupBg"
-      :color="popupTextColor"
+      :backgroundColor="backgroundColor"
+      :color="color"
       :text="popupText"
       :side="popupSide"
       :isDisabled="!hasPopup"
@@ -29,13 +29,11 @@ export default {
       type: Boolean,
       default: false
     },
-    popupBg: {
+    backgroundColor: {
       type: String,
-      default: '#ffffff'
     },
-    popupTextColor: {
+    color: {
       type: String,
-      default: '#666666'
     },
     popupText: {
       type: String
@@ -71,6 +69,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: white;
 
   -webkit-touch-callout: none;
   -webkit-user-select: none;

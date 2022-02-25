@@ -73,7 +73,7 @@
           .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
 
         .options__button(v-else)
-          Button(value="Zoho sync." :outline="true" @clicked="updatePayablesStateFromZoho()" style="margin-right: 10px;")
+          //Button(value="Zoho sync." :outline="true" @clicked="updatePayablesStateFromZoho()" style="margin-right: 10px;")
           router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-payables/create-reports`}")
             Button(value="Add Reports")
 
@@ -378,7 +378,8 @@ export default {
       if (this.isActionModal) return
       this.reports[index].isCheck = val
     },
-    toggleAll(val) {
+    async toggleAll(val) {
+      if (val) await this.getReports(1e6)
       if (this.isActionModal) return
       this.reports = this.reports.reduce((acc, cur) => {
         acc.push({ ...cur, isCheck: val })
@@ -425,10 +426,10 @@ export default {
     closeDeleteRequestModal() {
       this.deleteRequestId = ''
     },
-    async getReports() {
+    async getReports(countToGet = 100) {
       this.reports = (await this.$http.post('/invoicing-payables/reports', {
         countToSkip: 0,
-        countToGet: 100,
+        countToGet,
         filters: this.allFilters
       })).data.map(i => ({ ...i, isCheck: false }))
       this.vendorsList = (await this.$http.get('/pm-manage/vendors-for-options')).data
@@ -444,16 +445,17 @@ export default {
         this.isDataRemain = result.data.length === 50
       }
     },
-    async updatePayablesStateFromZoho() {
-      try {
-        const result = await this.$http.get('/invoicing-payables/update-all-state-from-zoho')
-        await this.getReports()
-        const { type, message } = result.data
-        this.alertToggle({ message, isShow: true, type })
-      } catch (e) {
-        console.log(e)
-      }
-    }
+    // TODO Zoho (soon)
+    // async updatePayablesStateFromZoho() {
+    //   try {
+    //     const result = await this.$http.get('/invoicing-payables/update-all-state-from-zoho')
+    //     await this.getReports()
+    //     const { type, message } = result.data
+    //     this.alertToggle({ message, isShow: true, type })
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // }
   },
   computed: {
     ...mapGetters({

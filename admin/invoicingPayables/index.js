@@ -12,7 +12,7 @@ const {
 	setPayablesNextStatus,
 	invoiceSubmission,
 	invoiceReloadFile,
-	invoicePaymentMethodResubmission,
+	invoicePaymentMethodResubmission
 } = require('./updatePayables')
 
 const {
@@ -37,7 +37,7 @@ const {
 const {
 	getAllPaidPayables,
 	getPaidReport,
-	getPayablePaidByVendorId
+	getReportPaidByVendorId
 } = require('./getPaidPayables')
 
 const {
@@ -70,15 +70,15 @@ module.exports = {
 	getPayable,
 	payablesAddSteps,
 	payableDeleteStep,
-	payableDelete: payableDelete,
+	payableDelete,
 	getAllSteps,
 	addStepsToPayables,
 	stepsFiltersQuery,
 	payablesFiltersQuery,
 	paidOrAddPaymentInfo,
 	getAllPaidPayables,
-	getPaidPayables: getPaidReport,
-	getPayablePaidByVendorId,
+	getPaidReport,
+	getReportPaidByVendorId,
 	createBillZohoRequest,
 	addFile,
 	updatePayableReport,

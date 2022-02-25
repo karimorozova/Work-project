@@ -45,6 +45,25 @@ const getPaidReport = async (id) => {
 						],
 						as: "steps"
 					}
+				},
+				{
+					$lookup: {
+						from: "vendors",
+						let: {
+							'paymentMethod': '$paymentDetails.paymentMethod'
+						},
+						pipeline: [
+							{ "$unwind": "$billingInfo.paymentMethods" },
+							{ "$match": { "$expr": { "$eq": [ "$billingInfo.paymentMethods._id", "$$paymentMethod" ] } } },
+							{ '$replaceRoot': { newRoot: '$billingInfo.paymentMethods' } }
+						],
+						as: "paymentDetails.paymentMethod"
+					}
+				},
+				{
+					$addFields: {
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
+					}
 				}
 			]
 	)
@@ -71,6 +90,25 @@ const getReportPaidByVendorId = async (id) => {
 					}
 				},
 				{
+					$lookup: {
+						from: "vendors",
+						let: {
+							'paymentMethod': '$paymentDetails.paymentMethod'
+						},
+						pipeline: [
+							{ "$unwind": "$billingInfo.paymentMethods" },
+							{ "$match": { "$expr": { "$eq": [ "$billingInfo.paymentMethods._id", "$$paymentMethod" ] } } },
+							{ '$replaceRoot': { newRoot: '$billingInfo.paymentMethods' } }
+						],
+						as: "paymentDetails.paymentMethod"
+					}
+				},
+				{
+					$addFields: {
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
+					}
+				},
+				{
 					$unset: [
 						"steps.finance",
 						"steps.nativeFinance.Price.receivables",
@@ -90,6 +128,5 @@ const getReportPaidByVendorId = async (id) => {
 module.exports = {
 	getAllPaidPayables,
 	getPaidReport,
-	getPayablePaidByVendorId: getReportPaidByVendorId
-
+	getReportPaidByVendorId
 }

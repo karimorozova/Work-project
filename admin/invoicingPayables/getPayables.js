@@ -132,7 +132,6 @@ const getPayable = async (id) => {
 			]
 	)
 	return (await InvoicingPayables.populate(invoicingReports, [
-				// { path: 'paymentDetails.paymentMethod', select: [ 'paymentType' ], model: Vendors },
 				{ path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }
 			]
 	))

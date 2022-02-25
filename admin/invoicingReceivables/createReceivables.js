@@ -7,7 +7,7 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 	const lastIndex = await InvoicingReceivables.findOne().sort({ 'reportId': -1 })
 
 	let lastIntIndex = lastIndex != null
-			? parseInt(lastIndex.reportId.split('_').pop())
+			? parseInt(lastIndex.reportId.split('_v').pop())
 			: 1
 
 	await setUsedStatusToSteps(checkedSteps.filter(i => i.type === 'Classic'), checkedSteps.filter(i => i.type === 'Extra'))
@@ -46,7 +46,7 @@ const produceReportManyProjects = (jobs, reportsDB, lastIntIndex, createdBy) => 
 			if (_tmpIndex === -1) {
 				temp.push({
 					...getFirstReportStructureFromElement(element),
-					reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0"),
+					reportId: 'RPT_v' + (++lastIntIndex + '').padStart(6, "0"),
 					createdBy: createdBy,
 					updatedBy: createdBy
 				})
@@ -80,7 +80,7 @@ const produceReportPerProject = (jobs, reportsDB, lastIntIndex, createdBy) => {
 			if (_tmpIndex === -1) {
 				temp.push({
 					...getFirstReportStructureFromElement(element),
-					reportId: 'RPT_' + (++lastIntIndex + '').padStart(6, "0"),
+					reportId: 'RPT_v' + (++lastIntIndex + '').padStart(6, "0"),
 					createdBy: createdBy,
 					updatedBy: createdBy
 				})

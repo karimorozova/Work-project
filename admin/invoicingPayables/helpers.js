@@ -74,7 +74,7 @@ const getVendorAndCheckPaymentTerms = async (vendorId) => {
 	return vendor
 }
 
-const paidOrAddPaymentInfo = async (reportId, zohoPaymentId, data) => {
+const paidOrAddPaymentInfo = async (reportId, data, zohoPaymentId = '') => {
 	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 
 	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data, zohoPaymentId } } })
