@@ -482,7 +482,7 @@ export default {
         if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created' || i.status === 'Sent')) {
           availableOptions.push('Delete')
         }
-        if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Invoice Received')) {
+        if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Invoice Ready')) {
           availableOptions.push('Paid')
         }
         return availableOptions
