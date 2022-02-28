@@ -190,7 +190,7 @@ export default {
           label: "Status",
           headerKey: "headerID2",
           key: "status",
-          style: { "width": "130px" }
+          style: { "width": "120px" }
         },
         {
           label: "Service",

@@ -9,7 +9,8 @@
         template(v-for="field in jobFilesOffline_fields" :slot="field.headerKey" slot-scope="{ field }")
           .table__header {{ field.label }}
         template(slot="fileName" slot-scope="{ row, index }")
-          .table__data {{ row.fileName }}
+          .table__data
+            .short {{ row.fileName }}
         template(slot="option" slot-scope="{ row, index }")
           .table__data {{ row.option }}
         template(slot="path" slot-scope="{ row, index }")
@@ -53,7 +54,8 @@
           .table__header {{ field.label }}
 
         template(slot="fileName" slot-scope="{ row, index }")
-          .table__data {{ row.fileName }}
+          .table__data
+            .short {{ row.fileName }}
         template(slot="option" slot-scope="{ row, index }")
           .table__data {{ row.option }}
         template(slot="progress" slot-scope="{ row, index }")
