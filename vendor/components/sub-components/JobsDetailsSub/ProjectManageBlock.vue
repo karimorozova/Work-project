@@ -23,7 +23,8 @@
           .table__header {{ field.label }}
 
         template(slot="file" slot-scope="{ row, index }")
-          .table__data {{ row.fileName }}
+          .table__data
+            .short {{ row.fileName }}
         template(slot="icon" slot-scope="{ row, index }")
           .table__icons(v-if="row.path" @click="download(row.path)")
             .icon
@@ -105,6 +106,13 @@ export default {
 
 <style lang="scss" scoped>
 @import "assets/scss/colors";
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 170px;
+}
 
 .files-area {
   width: 320px;

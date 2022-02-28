@@ -25,13 +25,14 @@
         template(v-for="field in jobFilesOnlineCat_fields" :slot="field.headerKey" slot-scope="{ field }")
           .table__header {{ field.label }}
         template(slot="fileName" slot-scope="{ row, index }")
-          .table__data {{ row.fileName }}
+          .table__data
+            .short {{ row.fileName }}
         template(slot="option" slot-scope="{ row, index }")
           .table__data {{ row.option }}
         template(slot="progress" slot-scope="{ row, index }")
           .table__data
-            //span {{ getProgress(row.fullName) }}
-            //span.symbol %
+            span {{ getProgress(row.fullName) }}
+            span.symbol %
         template(slot="path" slot-scope="{ row, index }")
           .table__icons(v-if="row.path" @click="download(row.path)")
             .icon
@@ -111,6 +112,7 @@ export default {
       return +value
     },
     goToMemoqEditor(fileName) {
+      console.log(fileName)
       const { TotalWordCount, Reviewer1ConfirmedWordCount, WorkflowStatus, WebTransUrl, DocumentGuid } =
           this.job.memoqDocs.find(item => item.DocumentName === fileName && item.TargetLangCode === this.job.memoqTarget)
 
@@ -160,7 +162,6 @@ export default {
     generateSourceFilesNonCat(files) {
       for (let file of files) {
         let fileName = file.split('/').pop()
-        fileName = fileName.length > 22 ? fileName.substr(22, fileName.length) : fileName
         this.jobFilesOffline.push({
           fileName,
           path: this.domain + file.split('./dist')[1],
@@ -173,7 +174,6 @@ export default {
         const { sourceFiles } = this.job
         for (let file of sourceFiles) {
           let fileName = file.split('/').pop()
-          fileName = fileName.length > 22 ? fileName.substr(22, fileName.length) : fileName
           this.jobFilesOnlineCat.push({
             fileName,
             path: this.domain + files.find(i => i.path.includes(fileName)).path,
@@ -184,7 +184,6 @@ export default {
       } else {
         for (let file of files) {
           let fileName = file.split('/').pop()
-          fileName = fileName.length > 22 ? fileName.substr(22, fileName.length) : fileName
           this.jobFilesOnlineCat.push({
             fileName,
             path: this.domain + file.split('./dist')[1],
@@ -196,7 +195,7 @@ export default {
     },
     generateSourceFilesFakeCat(memoqDocs) {
       memoqDocs.forEach(elem => {
-        const fileName = elem.DocumentName > 22 ? elem.DocumentName.substr(22, elem.DocumentName.length) : elem.DocumentName
+        const fileName = elem.DocumentName
         this.jobFilesOnlineCatFake.push({
           fileName,
           option: 'Memoq system workflow, enter editor to change.',
@@ -223,6 +222,13 @@ export default {
 
 <style lang="scss" scoped>
 @import "assets/scss/colors";
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 200px;
+}
 
 .symbol {
   color: $dark-border;

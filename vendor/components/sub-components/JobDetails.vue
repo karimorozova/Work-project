@@ -63,7 +63,7 @@ export default {
           const result = await this.$axios.post(`/vendor/jobs-details`, { _stepId, _projectId, _vendorId: this.vendor._id })
           this.job = result.data
         }
-        console.log('START APP', this.job)
+        // console.log('START APP', this.job)
 
         this.alertToggle({ message: "Data received", isShow: true, type: "success" })
       } catch (err) {
