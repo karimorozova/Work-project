@@ -6,7 +6,7 @@
         @updateProgress="getJobsDetails"
       )
       ProjectInstructions(
-        v-if="job.status === 'Ready to Start' || job.status === 'In progress'"
+        v-if="job.status === 'Waiting to Start' || job.status === 'Ready to Start' || job.status === 'In progress'"
         :job="job"
       )
       ProjectWorkflow(
