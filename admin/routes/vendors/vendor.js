@@ -143,7 +143,7 @@ router.post('/invoice-reload', checkVendor, upload.fields([ { name: 'invoiceFile
 })
 
 router.post("/login", async (req, res, next) => {
-	const email = req.body.logemail.toLowerCase().trim()
+	const email = req.body.logemail
 	if (email) {
 		Vendors.authenticate(email, req.body.logpassword, async (error, vendor) => {
 			if (error || !vendor) {

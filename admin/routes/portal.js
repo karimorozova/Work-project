@@ -81,7 +81,7 @@ router.post('/delete-service-request', checkClientContact, async (req, res) => {
 })
 
 router.post("/auth", async (req, res, next) => {
-	const email = req.body.logemail.toLowerCase().trim()
+	const email = req.body.logemail
 	const password = req.body.logpassword
 	if (email && password) {
 		Clients.authenticate(email, password, async (error, data) => {
