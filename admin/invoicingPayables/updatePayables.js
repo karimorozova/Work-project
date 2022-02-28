@@ -58,28 +58,6 @@ const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMet
 		await InvoicingPayables.updateMany({ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } }, { status })
 	}
 
-	// vendorReportsAll = vendorReportsAll
-	//
-	// // vendorReportsAll
-	// console.log(vendorReportsAll)
-
-
-	// console.log(vendorReports)
-	// switch (true) {
-	// 	case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) < paymentMethod.minimumAmount): {
-	// 		console.log('всем ставим статус холд и всем меняем пеймент')
-	// 	}
-	// 		break
-	// 	case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) > paymentMethod.minimumAmount): {
-	// 		console.log('всем ставим статус РЕди и всем меняем пеймент')
-	// 	}
-	// 		break
-	//
-	// }
-
-	// console.log(vendorReportsAll)
-	// console.log(reportId, vendorId, paymentMethod)
-
 }
 
 const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMethod }) => {
@@ -106,12 +84,10 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +totalPrice):
 		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) < paymentDetails.paymentMethod.minimumAmount): {
 			await updatePayableReport(reportId, { status: 'Invoice on-hold', paymentDetails })
-			console.log('set to HOLD')
 			break
 		}
 		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount <= +totalPrice): {
 			await updatePayableReport(reportId, { status: 'Invoice Ready', paymentDetails })
-			console.log('set to Ready')
 			break
 		}
 		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) > paymentDetails.paymentMethod.minimumAmount): {
@@ -119,7 +95,6 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
 				await updatePayableReport(id, { status: 'Invoice Ready' })
 			}
-			console.log('all from Hold to Ready')
 			break
 		}
 	}
