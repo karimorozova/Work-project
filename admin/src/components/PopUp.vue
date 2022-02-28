@@ -60,6 +60,9 @@ export default {
       const showEvents = [ 'mouseenter', 'focus' ]
       const hideEvents = [ 'mouseleave', 'blur' ]
 
+      tooltip.classList.add('seted')
+      element.classList.add('seted')
+
       showEvents.forEach((event) => {
         element.addEventListener(event, () => this.show(tooltip, popup))
       })
@@ -78,8 +81,8 @@ export default {
   },
   mounted() {
     if (!this.isDisabled) {
-      const popcorn = document.querySelector('.popcorn')
-      const tooltip = document.querySelector('.tooltip')
+      const popcorn = document.querySelector('.popcorn:not(.seted)')
+      const tooltip = document.querySelector('.tooltip:not(.seted)')
 
       const popup = this.initPopup(popcorn, tooltip)
       this.addListeners(popup, tooltip, popcorn)
