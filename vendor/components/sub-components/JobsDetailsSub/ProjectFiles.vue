@@ -141,7 +141,6 @@ export default {
     },
     listOfSourceFiles() {
       const { prevStep, stepNumber, sourceFiles, targetFiles, memoqDocs } = this.job
-
       if (this.isCAT) {
         if (stepNumber === 1) {
           sourceFiles.length
@@ -149,7 +148,9 @@ export default {
               : this.generateSourceFilesFakeCat(memoqDocs)
         } else {
           sourceFiles.length
-              ? this.generateSourceFilesCat(targetFiles, true)
+              ? (prevStep.hasOwnProperty("status") && prevStep.status === "Completed")
+                  ? this.generateSourceFilesCat(targetFiles, true)
+                  : this.generateSourceFilesCat(sourceFiles)
               : this.generateSourceFilesFakeCat(memoqDocs)
         }
       } else {
