@@ -30,8 +30,8 @@
           .table__data {{ row.option }}
         template(slot="progress" slot-scope="{ row, index }")
           .table__data
-            span {{ getProgress(row.fullName) }}
-            span.symbol %
+            //span {{ getProgress(row.fullName) }}
+            //span.symbol %
         template(slot="path" slot-scope="{ row, index }")
           .table__icons(v-if="row.path" @click="download(row.path)")
             .icon
@@ -56,8 +56,8 @@
           .table__data {{ row.option }}
         template(slot="progress" slot-scope="{ row, index }")
           .table__data
-            span {{ getProgress(row.fullName) }}
-            span.symbol %
+            //span {{ getProgress(row.fullName) }}
+            //span.symbol %
         template(slot="editor" slot-scope="{ row, index }")
           .table__icons
             .icon(@click="goToMemoqEditor(row.fullName)")
