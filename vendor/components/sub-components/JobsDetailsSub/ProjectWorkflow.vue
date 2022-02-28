@@ -100,7 +100,7 @@ export default {
         } else {
           this.$emit('setJobStatus', { status: "Completed", targetFile: this.targetFiles })
         }
-        this.$emit('updateProgress')
+        // this.$emit('updateProgress')
         this.targetFiles = []
         this.isWithoutFile = false
       } catch (err) {

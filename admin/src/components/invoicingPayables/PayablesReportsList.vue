@@ -390,7 +390,7 @@ export default {
       this.reports[index].isCheck = val
     },
     async toggleAll(val) {
-      if (val) await this.getReports(1e6)
+      // if (val) await this.getReports(1e6)
       if (this.isActionModal) return
       this.reports = this.reports.reduce((acc, cur) => {
         acc.push({ ...cur, isCheck: val })

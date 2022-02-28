@@ -47,10 +47,13 @@ export default {
           await this.$axios.post('/vendor/target-files', { stepId: jobId })
         }
         await this.$axios.post('/vendor/job', { jobId, status })
+
+        const [ _stepId, _projectId ] = this.$route.params.id.split('_')
+        const result = await this.$axios.post(`/vendor/jobs-details`, { _stepId, _projectId, _vendorId: this.vendor._id })
+        this.job = result.data
       } catch (err) {
         this.alertToggle({ message: "Error in Action!", isShow: true, type: "error" })
       }
-      await this.getJobsDetails()
     },
     async getJobsDetails() {
       const [ _stepId, _projectId ] = this.$route.params.id.split('_')

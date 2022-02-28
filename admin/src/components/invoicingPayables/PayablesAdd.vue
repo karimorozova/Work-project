@@ -274,7 +274,7 @@ export default {
       this.steps[index].isCheck = val
     },
     async toggleAll(val) {
-      if (val) await this.getSteps(1e6)
+      // if (val) await this.getSteps(1e6)
       this.steps = this.steps.reduce((acc, cur) => {
         acc.push({ ...cur, isCheck: val })
         return acc
