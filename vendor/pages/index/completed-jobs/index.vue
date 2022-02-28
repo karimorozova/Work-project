@@ -678,7 +678,7 @@ input {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 90%;
+  max-width: 170px;
 }
 
 .currency {
