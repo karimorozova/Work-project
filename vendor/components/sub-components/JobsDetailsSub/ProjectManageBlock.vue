@@ -14,36 +14,36 @@
               i(class="far fa-envelope")
             .email__text Send a message
 
-    .files-area(v-if="job.refFiles.length && (job.status === 'Ready to Start' || job.status === 'In progress')" )
-      GeneralTable(
-        :fields="fieldsFiles"
-        :tableData="getFiles"
-      )
-        template(v-for="field in fieldsFiles" :slot="field.headerKey" slot-scope="{ field }")
-          .table__header {{ field.label }}
-
-        template(slot="file" slot-scope="{ row, index }")
-          .table__data
-            .short {{ row.fileName }}
-        template(slot="icon" slot-scope="{ row, index }")
-          .table__icons(v-if="row.path" @click="download(row.path)")
-            .icon
-              i(class="fa-solid fa-download")
-
-    .brief-area(v-if="(job.brief || job.vendorBrief) && (job.status === 'Ready to Start' || job.status === 'In progress')" )
-      .brief(v-if="job.brief" )
-        .brief-area__title General Instruction
-        .brief-area__description(v-html="job.brief")
-      .brief(v-if="job.vendorBrief" )
-        .brief-area__title Individual Instruction
-        .brief-area__description(v-html="job.vendorBrief")
-
+    .descriptions
+      .block
+        .block__key Start Date & Time:
+        .block__val {{customFormatter(job.start)}}
+      .block
+        .block__key Source Language:
+        .block__val {{job.fullSourceLanguage.lang}}
+      .block
+        .block__key Target Language:
+        .block__val {{job.fullTargetLanguage.lang}}
+      .block
+        .block__key Industry:
+        .block__val {{job.industry.name}}
+      .block
+        .block__key Project ID:
+        .block__val {{job.projectId}}
+      .block
+        .block__key Job ID:
+        .block__val {{job.stepId}}
+      .block
+        .block__key Project Name:
+        .block__val
+          .short {{ job.projectName}}
 
 </template>
 
 <script>
 import getBgColor from "../../../mixins/getBgColor"
 import GeneralTable from "../../general/GeneralTable"
+import moment from "moment"
 
 export default {
   name: "ProjectManagerBlock",
@@ -74,48 +74,35 @@ export default {
     }
   },
   methods: {
-    download(path) {
-      let link = document.createElement('a')
-      link.href = path
-      link.target = "_blank"
-      link.click()
+    customFormatter(date) {
+      return moment(date).format('MMM D, HH:mm')
     }
-  },
-  computed: {
-    getFiles() {
-      if (this.job.refFiles.length) {
-        const files = []
-        for (const file of this.job.refFiles) {
-          let fileName = file.split('/').pop()
-          fileName = fileName.length > 16 ? fileName.substr(16, fileName.length) : fileName
-          files.push({
-            fileName: `Reference - ${ fileName }`,
-            path: this.domain + file.split('./dist')[1]
-          })
-        }
-        return files
-      }
-      return []
-    }
-  },
-  mounted() {
-    this.domain = process.env.domain
   }
+
 }
 </script>
 
 <style lang="scss" scoped>
 @import "assets/scss/colors";
 
-.short {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 170px;
+.block {
+  display: flex;
+  gap: 10px;
+  height: 34px;
+  align-items: center;
+
+  &__key {
+    color: $dark-border;
+    width: 130px;
+  }
+
+  &__val {
+    width: 170px;
+  }
 }
 
-.files-area {
-  width: 320px;
+.descriptions {
+  width: 360px;
   box-sizing: border-box;
   background-color: white;
   border-radius: 4px;
@@ -124,32 +111,8 @@ export default {
   margin-bottom: 25px;
 }
 
-.brief-area {
-  width: 320px;
-  box-sizing: border-box;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: $box-shadow;
-  padding: 25px 25px 1px 25px;
-
-  &__title {
-    text-align: center;
-    font-family: Roboto600;
-    margin-bottom: 5px;
-  }
-
-  &__description {
-    border: 1px solid $light-border;
-    border-radius: 4px;
-    padding: 0px 15px;
-    overflow-y: auto;
-    max-height: 85px;
-    margin-bottom: 25px;
-  }
-}
-
 .pm-area {
-  width: 320px;
+  width: 360px;
   box-sizing: border-box;
   background-color: white;
   border-radius: 4px;
@@ -218,34 +181,10 @@ a {
   }
 }
 
-.table {
-  width: 740px;
-  background-color: white;
-  padding: 25px;
-  border-radius: 4px;
-  background-color: white;
-  box-shadow: $box-shadow;
-  margin-bottom: 15px;
-
-  &__header {
-    padding: 0 0 0 7px;
-  }
-
-  &__icons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: 8px;
-  }
-
-  &__data {
-    padding: 0 7px;
-  }
-}
-
-.icon {
-  font-size: 15px;
-  cursor: pointer;
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 170px;
 }
 </style>

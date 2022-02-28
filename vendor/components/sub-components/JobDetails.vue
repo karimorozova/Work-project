@@ -5,6 +5,10 @@
         :job="job"
         @updateProgress="getJobsDetails"
       )
+      ProjectInstructions(
+        v-if="job.status === 'Ready to Start' || job.status === 'In progress'"
+        :job="job"
+      )
       ProjectWorkflow(
         :job="job"
         @setJobStatus="setJobStatus"
@@ -21,10 +25,11 @@ import { mapActions, mapGetters } from "vuex"
 import ProjectManageBlock from "./JobsDetailsSub/ProjectManageBlock"
 import ProjectDescription from "./JobsDetailsSub/ProjectDescription"
 import ProjectWorkflow from "./JobsDetailsSub/ProjectWorkflow"
+import ProjectInstructions from "./JobsDetailsSub/ProjectInstructions"
 
 export default {
   name: "JobDetails",
-  components: { ProjectWorkflow, ProjectDescription, ProjectManageBlock },
+  components: { ProjectInstructions, ProjectWorkflow, ProjectDescription, ProjectManageBlock },
   data() {
     return {
       job: null

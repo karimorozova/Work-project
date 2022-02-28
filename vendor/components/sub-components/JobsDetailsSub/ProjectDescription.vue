@@ -8,7 +8,6 @@
       .header__right(v-if="job.status === 'In progress' && job.payablesUnit.type === 'CAT Wordcount'" )
         .refresh-icon(@click="updateProgress")
           i(class="fas fa-refresh")
-
     .cards
       .card
         .card__icon
@@ -33,38 +32,11 @@
           span {{ +(job.nativeFinance.Price.payables).toFixed(2) }}
         .card__description Payable
 
-    .descriptions
-      .descriptions__Rside
-        .block
-          .block__key Start Date & Time:
-          .block__val {{customFormatter(job.start)}}
-        .block
-          .block__key Source Language:
-          .block__val {{job.fullSourceLanguage.lang}}
-        .block
-          .block__key Target Language:
-          .block__val {{job.fullTargetLanguage.lang}}
-        .block
-          .block__key Industry:
-          .block__val {{job.industry.name}}
-
-      .descriptions__Lside
-        .block
-          .block__key Project ID:
-          .block__val {{job.projectId}}
-        .block
-          .block__key Job ID:
-          .block__val {{job.stepId}}
-        .block
-          .block__key Project Name:
-          .block__val {{ job.projectName}}
-
-
 </template>
 
 <script>
-import moment from "moment"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import moment from "moment"
 
 export default {
   name: "ProjectDescription",
@@ -75,6 +47,9 @@ export default {
     }
   },
   methods: {
+    customFormatter(date) {
+      return moment(date).format('MMM D, HH:mm')
+    },
     getColorByStatus(status) {
       switch (status) {
         case 'Ready to Start':
@@ -99,9 +74,6 @@ export default {
     },
     updateProgress() {
       this.$emit('updateProgress')
-    },
-    customFormatter(date) {
-      return moment(date).format('MMM D, HH:mm')
     }
   }
 }
@@ -117,7 +89,7 @@ export default {
   border-radius: 4px;
   background-color: white;
   box-shadow: $box-shadow;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 }
 
 .header {
@@ -186,35 +158,20 @@ export default {
 }
 
 
-.descriptions {
-  display: flex;
-  gap: 30px;
-  margin-top: 20px;
+//.descriptions {
+//  display: flex;
+//  gap: 30px;
+//  margin-top: 20px;
+//
+//  &__Rside {
+//    width: 365px;
+//  }
+//
+//  &__Lside {
+//    width: 365px;
+//  }
+//}
 
-  &__Rside {
-    width: 365px;
-  }
-
-  &__Lside {
-    width: 365px;
-  }
-}
-
-.block {
-  display: flex;
-  gap: 20px;
-  height: 36px;
-  align-items: center;
-
-  &__key {
-    color: $dark-border;
-    width: 130px;
-  }
-
-  &__val {
-    width: 225px;
-  }
-}
 
 .currency {
   color: $dark-border;

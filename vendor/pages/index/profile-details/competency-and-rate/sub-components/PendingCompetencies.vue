@@ -50,6 +50,9 @@
           .table__icons
             img.table__icon(v-for="(icon, key) in manageIcons" :src="icon.icon" @click="makeActions(index, key)")
 
+    router-link(to="/settings/new-competency")
+      Button(value="Add Competency" style="margin-top: 25px;")
+
 </template>
 
 <script>

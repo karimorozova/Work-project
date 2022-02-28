@@ -1,7 +1,7 @@
 <template lang="pug">
   .files-wrapper
-
     .table(v-if="jobFilesOffline.length" )
+      ProjectReferenceFiles(:job="job" v-if="job.refFiles.length")
       GeneralTable(
         :fields="jobFilesOffline_fields"
         :tableData="jobFilesOffline"
@@ -18,6 +18,7 @@
               i(class="fa-solid fa-download")
 
     .table(v-if="jobFilesOnlineCat.length" )
+      ProjectReferenceFiles(:job="job" v-if="job.refFiles.length")
       GeneralTable(
         :fields="jobFilesOnlineCat_fields"
         :tableData="jobFilesOnlineCat"
@@ -57,8 +58,8 @@
           .table__data {{ row.option }}
         template(slot="progress" slot-scope="{ row, index }")
           .table__data
-            //span {{ getProgress(row.fullName) }}
-            //span.symbol %
+            span {{ getProgress(row.fullName) }}
+            span.symbol %
         template(slot="editor" slot-scope="{ row, index }")
           .table__icons
             .icon(@click="goToMemoqEditor(row.fullName)")
@@ -69,10 +70,11 @@
 
 <script>
 import GeneralTable from "../../general/GeneralTable"
+import ProjectReferenceFiles from "./ProjectReferenceFiles"
 
 export default {
   name: "ProjectFiles",
-  components: { GeneralTable },
+  components: { ProjectReferenceFiles, GeneralTable },
   props: {
     job: {
       type: Object
@@ -205,10 +207,6 @@ export default {
     }
   },
   computed: {
-    // isSourceFilesOrMemoq() {
-    //   const { sourceFiles, memoqDocIds } = this.job
-    //   return !!sourceFiles.length || !!memoqDocIds.length
-    // },
     isCAT() {
       return this.job.payablesUnit.type === 'CAT Wordcount'
     }
@@ -242,7 +240,7 @@ export default {
   border-radius: 4px;
   background-color: white;
   box-shadow: $box-shadow;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
 
   &__header {
     padding: 0 0 0 7px;

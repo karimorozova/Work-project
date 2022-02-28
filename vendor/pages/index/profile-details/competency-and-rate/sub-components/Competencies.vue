@@ -29,14 +29,18 @@
         template(slot="step", slot-scope="{ row, index }")
           .table__data {{ row.step.title }}
 
+    router-link(to="/settings/new-competency")
+      Button(value="Add Competency" style="margin-top: 25px;")
+
 </template>
 
 <script>
 import tableSortAndFilter from "../../../../../mixins/tableSortAndFilter"
 import GeneralTable from "../../../../../components/general/GeneralTable"
+import Button from "../../../../../components/general/Button"
 
 export default {
-  components: { GeneralTable },
+  components: { Button, GeneralTable },
   mixins: [ tableSortAndFilter ],
   props: [ 'arr' ],
   data() {

@@ -1,6 +1,5 @@
 <template lang="pug">
   .wrapper
-
     .files(v-if="job.status === 'Ready to Start' || job.status === 'In progress'" )
       ProjectFiles(
         :job="job"
@@ -24,11 +23,11 @@
         )
         .upload__withoutFiles-text Close without files
 
-    .block(v-if="job.status === 'In progress' && !isCAT && (targetFiles.length || isWithoutFile)" style="margin-top: 15px;")
+    .block(v-if="job.status === 'In progress' && !isCAT && (targetFiles.length || isWithoutFile)" style="margin-top: 25px;")
       .action-buttons
         Button(value="Complete Job" :isDisabled="!!currentRequests" @clicked="completeJob()" )
 
-    .block(v-if="job.status === 'In progress' && isCAT && abilityToCompleteCAT" style="margin-top: 15px;")
+    .block(v-if="job.status === 'In progress' && isCAT && abilityToCompleteCAT" style="margin-top: 25px;")
       .action-buttons
         Button(value="Complete Job" :isDisabled="!!currentRequests" @clicked="completeJob()" )
 
@@ -199,7 +198,7 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 25px;
 }
 
 .upload__text {
