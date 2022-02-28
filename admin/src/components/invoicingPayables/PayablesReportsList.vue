@@ -287,7 +287,7 @@ export default {
     },
     async paidChecked() {
       const data = this.reports.filter(i => i.isCheck).reduce((acc, { _id, zohoBillingId, stepFinance, paymentDetails, vendor }) => {
-        const amount = stepFinance.reduce((acc, { payables }) => acc += payables, 0)
+        const amount = stepFinance.reduce((acc, { payables }) => acc += payables)
         acc[_id] = {
           paidAmount: amount,
           unpaidAmount: 0,

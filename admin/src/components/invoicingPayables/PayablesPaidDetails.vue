@@ -99,7 +99,7 @@
               .text__block
                 .text__title Total Amount:
                 .text__value
-                  span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps) | roundTwoDigit }}
+                  span(style="margin-right: 4px;") {{ +(getStepsPayables(reportDetailsInfo.steps)).toFixed(2) }}
                   span(v-html="'&euro;'")
 
 
@@ -148,7 +148,7 @@
               template(slot="payables" slot-scope="{ row, index }")
                 .table__data
                   span.currency(v-html="'&euro;'")
-                  span {{ row.nativeFinance.Price.payables | roundTwoDigit}}
+                  span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
 
     .invoicing-details__cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
       .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")

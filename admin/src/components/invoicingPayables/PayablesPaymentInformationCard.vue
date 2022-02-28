@@ -11,7 +11,7 @@
         .row__value {{ customFormatter(cardInfo.paymentDate) }}
 
     .body
-      .row.margin
+      .row.margin(v-if="cardInfo.paymentMethod" )
         .row__title Payment Method
         .row__value {{ cardInfo.paymentMethod.name }}
       .row.margin

@@ -47,7 +47,7 @@
             .drop-title Payment Method:
             .drop
               SelectSingle(
-                :selectedOption="paymentMethod.name || ''"
+                :selectedOption="paymentMethod && paymentMethod.name || ''"
                 :options="reportDetailsInfo.vendor.billingInfo.paymentMethods.length ? reportDetailsInfo.vendor.billingInfo.paymentMethods.map(i => i.name) : []"
                 placeholder="Option"
                 @chooseOption="setPaymentMethod"
@@ -363,7 +363,7 @@ export default {
       deleteInfo: {},
       isDeletingStep: false,
       steps: [],
-      paymentMethod: '',
+      paymentMethod: {},
       paymentDate: new Date(),
       amount: 0,
       notes: '',

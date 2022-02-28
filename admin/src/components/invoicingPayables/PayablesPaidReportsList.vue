@@ -75,8 +75,8 @@
 
           template(slot="type" slot-scope="{ row, index }")
             .table__data
-              div.type {{ row.paymentDetails.paymentMethod.paymentType }}
-              div.name {{ row.paymentDetails.paymentMethod.name }}
+              div.type(v-if="row.paymentDetails.paymentMethod" ) {{ row.paymentDetails.paymentMethod.paymentType  }}
+              div.name(v-if="row.paymentDetails.paymentMethod" ) {{ row.paymentDetails.paymentMethod.name }}
 
           template(slot="status" slot-scope="{ row, index }")
             .table__data {{ row.status }}

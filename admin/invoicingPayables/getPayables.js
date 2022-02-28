@@ -66,8 +66,10 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 						from: "projects",
 						let: { 'steps': '$steps' },
 						pipeline: [
+							// { $match: { isTest: false, "steps.nativeFinance.Price": { $gt: 0 } } },
+							// { "$project": { 'steps.nativeFinance': 1 } },
 							{ "$unwind": "$steps" },
-							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+							{ "$match": { "$expr": { "$eq": [ "$steps._id", "$$steps" ] } } },
 							{ "$addFields": { "steps.nativeFinance.Price.projectName": '$projectName' } },
 							{ "$addFields": { "steps.deadline": '$deadline' } },
 							{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
