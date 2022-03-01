@@ -5,20 +5,20 @@ const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 const getAllPaidPayables = async (countToSkip, countToGet, query) => {
 	const invoicingReports = await InvoicingPayablesArchive.aggregate([
 				{ $match: { ...query } },
-				{
-					$lookup: {
-						from: "projects",
-						let: { 'steps': '$steps' },
-						pipeline: [
-							// { $match: { isTest: false, "steps.nativeFinance.Price": { $gt: 0 } } },
-							{ "$unwind": "$steps" },
-							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-							{ "$addFields": { "steps.nativeFinance.Price.projectNativeId": '$_id' } },
-							{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
-						],
-						as: "stepFinance"
-					}
-				},
+				// {
+				// 	$lookup: {
+				// 		from: "projects",
+				// 		let: { 'steps': '$steps' },
+				// 		pipeline: [
+				// 			// { $match: { isTest: false, "steps.nativeFinance.Price": { $gt: 0 } } },
+				// 			{ "$unwind": "$steps" },
+				// 			{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+				// 			{ "$addFields": { "steps.nativeFinance.Price.projectNativeId": '$_id' } },
+				// 			{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
+				// 		],
+				// 		as: "stepFinance"
+				// 	}
+				// },
 				{
 					$lookup: {
 						from: "vendors",

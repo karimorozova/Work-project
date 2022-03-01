@@ -11,16 +11,21 @@ const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles')
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmarkCost } = require('./reports')
 
 
-// const { getAllSteps, addStepsToPayables } = require('./invoicingPayables')
-// const autoCreationPayablesReports = async () => {
-// 	const allSteps = await getAllSteps(0, 999999, {})
-// 	try {
-// 		await addStepsToPayables(allSteps, null)
-// 	}catch (e) {
-// 		console.log(e)
-// 	}
-// 	console.log(allSteps.length)
-// }
+const { getAllSteps, addStepsToPayables } = require('./invoicingPayables')
+const autoCreationPayablesReports = async () => {
+	const allSteps = await getAllSteps(0, 999999, {
+		"deadline": {
+			$gt: new Date('2022-02-01T00:00:00.000Z'),
+			$lt: new Date('2022-02-28T24:00:00.000Z')
+		}
+	}, false)
+	try {
+		await addStepsToPayables(allSteps, null)
+	} catch (e) {
+		console.log(e)
+	}
+	console.log(allSteps.length)
+}
 // autoCreationPayablesReports()
 
 

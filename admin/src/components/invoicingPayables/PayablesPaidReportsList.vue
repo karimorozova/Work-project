@@ -74,23 +74,24 @@
                 span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
 
           template(slot="type" slot-scope="{ row, index }")
-            .table__data
-              div.type(v-if="row.paymentDetails.paymentMethod" ) {{ row.paymentDetails.paymentMethod.paymentType  }}
-              div.name(v-if="row.paymentDetails.paymentMethod" ) {{ row.paymentDetails.paymentMethod.name }}
+            .table__data(v-if="row.paymentDetails.paymentMethod" )
+              div.type {{ row.paymentDetails.paymentMethod.paymentType  }}
+              div.name {{ row.paymentDetails.paymentMethod.name }}
+            .table__data(v-else) -
 
           template(slot="status" slot-scope="{ row, index }")
             .table__data {{ row.status }}
 
-          template(slot="project" slot-scope="{ row, index }")
-            .table__data {{getProjectCount(row.stepFinance) }}
+          //template(slot="project" slot-scope="{ row, index }")
+          //  .table__data {{getProjectCount(row.stepFinance) }}
 
           template(slot="jobs" slot-scope="{ row, index }")
             .table__data {{ row.steps.length }}
 
-          template(slot="amount" slot-scope="{ row, index }")
-            .table__data
-              span.currency(v-html="'&euro;'")
-              span {{ +(getStepsPayables(row.stepFinance)).toFixed(2) }}
+          //template(slot="amount" slot-scope="{ row, index }")
+          //  .table__data
+          //    span.currency(v-html="'&euro;'")
+          //    span {{ +(getStepsPayables(row.stepFinance)).toFixed(2) }}
 
           template(slot="created" slot-scope="{ row, index }")
             .table__data {{ getTime( row.createdAt) }}
@@ -158,24 +159,24 @@ export default {
           key: "status",
           style: { width: "140px" }
         },
-        {
-          label: "Projects",
-          headerKey: "headerProject",
-          key: "project",
-          style: { width: "100px" }
-        },
+        // {
+        //   label: "Projects",
+        //   headerKey: "headerProject",
+        //   key: "project",
+        //   style: { width: "100px" }
+        // },
         {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
           style: { width: "100px" }
         },
-        {
-          label: "Amount",
-          headerKey: "headerAmount",
-          key: "amount",
-          style: { width: "120px" }
-        },
+        // {
+        //   label: "Amount",
+        //   headerKey: "headerAmount",
+        //   key: "amount",
+        //   style: { width: "120px" }
+        // },
         {
           label: "Created On",
           headerKey: "headerCreated",
@@ -242,15 +243,15 @@ export default {
         }
       })
     },
-    getStepsPayables(stepFinance) {
-      return stepFinance.reduce((sum, finance) => {
-        sum += finance.payables || 0
-        return sum
-      }, 0)
-    },
-    getProjectCount(stepFinance) {
-      return [ ...new Set(stepFinance.map(({ projectNativeId }) => projectNativeId)) ].length
-    },
+    // getStepsPayables(stepFinance) {
+    //   return stepFinance.reduce((sum, finance) => {
+    //     sum += finance.payables || 0
+    //     return sum
+    //   }, 0)
+    // },
+    // getProjectCount(stepFinance) {
+    //   return [ ...new Set(stepFinance.map(({ projectNativeId }) => projectNativeId)) ].length
+    // },
     openDetails(id) {
       this.$emit('openDetails', id)
     },

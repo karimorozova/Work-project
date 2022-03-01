@@ -68,15 +68,16 @@ const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, a
 }
 
 const updatePayablesFromZoho = async () => {
-	try {
-		let allPayables = (await getAllPayableByDefaultQuery({ zohoBillingId: { $ne: '' } }))
-		for (let { _id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId, paymentDetails: { paymentMethod } } of allPayables) {
-			await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount })
-		}
-		return { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
-	} catch (err) {
-		return { type: 'error', message: err.message, isMovedToArchive: false }
-	}
+	// TODO soon...
+	// try {
+	// 	let allPayables = (await getAllPayableByDefaultQuery({ zohoBillingId: { $ne: '' } }))
+	// 	for (let { _id: reportId, paymentInformation, unpaidAmount, zohoBillingId: zohoId, paymentDetails: { paymentMethod } } of allPayables) {
+	// 		await syncPayableWithZoho(reportId, paymentMethod, { zohoId, paymentInformation, unpaidAmount })
+	// 	}
+	// 	return { type: 'success', message: 'Updated from Zoho', isMovedToArchive: false }
+	// } catch (err) {
+	// 	return { type: 'error', message: err.message, isMovedToArchive: false }
+	// }
 }
 
 const updatePayableFromZoho = async (reportId) => {

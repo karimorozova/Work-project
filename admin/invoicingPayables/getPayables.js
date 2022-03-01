@@ -61,22 +61,22 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 const getAllPayables = async (countToSkip, countToGet, query) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
 				{ $match: { ...query } },
-				{
-					$lookup: {
-						from: "projects",
-						let: { 'steps': '$steps' },
-						pipeline: [
-							// { $match: { isTest: false, "steps.nativeFinance.Price": { $gt: 0 } } },
-							// { "$project": { 'steps.nativeFinance': 1 } },
-							{ "$unwind": "$steps" },
-							{ "$match": { "$expr": { "$eq": [ "$steps._id", "$$steps" ] } } },
-							{ "$addFields": { "steps.nativeFinance.Price.projectName": '$projectName' } },
-							{ "$addFields": { "steps.deadline": '$deadline' } },
-							{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
-						],
-						as: "stepFinance"
-					}
-				},
+				// {
+				// 	$lookup: {
+				// 		from: "projects.as",
+				// 		let: { 'steps': '$steps' },
+				// 		pipeline: [
+				// 			// { $match: { isTest: false, "steps.nativeFinance.Price": { $gt: 0 } } },
+				// 			// { "$project": { 'steps.nativeFinance': 1 } },
+				// 			{ "$unwind": "$steps" },
+				// 			{ "$match": { "$expr": { "$eq": [ "$steps._id", "$$steps" ] } } },
+				// 			{ "$addFields": { "steps.nativeFinance.Price.projectName": '$projectName' } },
+				// 			{ "$addFields": { "steps.deadline": '$deadline' } },
+				// 			{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
+				// 		],
+				// 		as: "stepFinance"
+				// 	}
+				// },
 				{
 					$lookup: {
 						from: "vendors",
@@ -159,39 +159,40 @@ const getPayable = async (id) => {
 }
 
 const getAllPayableByDefaultQuery = async (query = {}) => {
-	const invoicingReports = await InvoicingPayables.aggregate([
-				{ $match: query },
-				{
-					$lookup: {
-						from: "projects",
-						let: {
-							'steps': '$steps'
-						},
-						pipeline: [
-							{ "$unwind": "$steps" },
-							{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-							{ "$addFields": { "steps.projectNativeId": '$_id' } },
-							{ "$addFields": { "steps.projectName": '$projectName' } },
-							{ "$addFields": { "steps.deadline": '$deadline' } },
-							{ '$replaceRoot': { newRoot: '$steps' } }
-						],
-						as: "steps"
-					}
-				},
-				{
-					$addFields: {
-						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
-						paidAmount: { $sum: "$paymentInformation.paidAmount" }
-					}
-				},
-				{
-					$addFields: {
-						unpaidAmount: { $subtract: [ "$totalPrice", "$paidAmount" ] }
-					}
-				}
-			]
-	)
-	return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
+	// TODO soon...
+	// const invoicingReports = await InvoicingPayables.aggregate([
+	// 			{ $match: query },
+	// 			{
+	// 				$lookup: {
+	// 					from: "projects",
+	// 					let: {
+	// 						'steps': '$steps'
+	// 					},
+	// 					pipeline: [
+	// 						{ "$unwind": "$steps" },
+	// 						{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+	// 						{ "$addFields": { "steps.projectNativeId": '$_id' } },
+	// 						{ "$addFields": { "steps.projectName": '$projectName' } },
+	// 						{ "$addFields": { "steps.deadline": '$deadline' } },
+	// 						{ '$replaceRoot': { newRoot: '$steps' } }
+	// 					],
+	// 					as: "steps"
+	// 				}
+	// 			},
+	// 			{
+	// 				$addFields: {
+	// 					totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
+	// 					paidAmount: { $sum: "$paymentInformation.paidAmount" }
+	// 				}
+	// 			},
+	// 			{
+	// 				$addFields: {
+	// 					unpaidAmount: { $subtract: [ "$totalPrice", "$paidAmount" ] }
+	// 				}
+	// 			}
+	// 		]
+	// )
+	// return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
 
@@ -275,7 +276,7 @@ const getPayablesProjectsAndSteps = async (id) => {
 	return (await InvoicingPayables.populate(invoicingReports, [ 'vendor' ]))
 }
 
-const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
+const getAllSteps = async (countToSkip, countToGet, queryForStep, isSort = true) => {
 	const queryPipeline = [
 		{ $unwind: "$steps" },
 		{
@@ -305,10 +306,12 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				'currentVendor': { $arrayElemAt: [ "$steps.vendor", 0 ] }
 			}
 		},
-		{ $sort: { deadline: 1 } },
 		{ $unset: [ 'steps.vendor', 'currentVendor.rates' ] },
 		{ $skip: countToSkip }
 	]
+	if (isSort) {
+		queryPipeline.push({ $sort: { deadline: 1 } })
+	}
 	if (countToGet > 0) {
 		queryPipeline.push({ $limit: countToGet })
 	}
