@@ -4,7 +4,10 @@
       .header__left
         .header__title {{job.step.title}}
         .header__status(:style="{'background-color': getColorByStatus(job.status).background, 'color': getColorByStatus(job.status).color}") {{ job.status }}
-        .header__extraStatus(v-if="job.status === 'Approved'" ) Waiting for customer confirmation...
+
+        .header__extraStatus(v-if="job.status === 'Approved' && isShowStatusPopup" ) Waiting for customer confirmation...
+          .header__extraStatus-close(@click="closeAlert") &#215;
+
       .header__right(v-if="job.status === 'In progress' && job.payablesUnit.type === 'CAT Wordcount'" )
         .refresh-icon(@click="updateProgress")
           i(class="fas fa-refresh")
@@ -46,7 +49,15 @@ export default {
       type: Object
     }
   },
+  data() {
+    return {
+      isShowStatusPopup: true
+    }
+  },
   methods: {
+    closeAlert() {
+      this.isShowStatusPopup = false
+    },
     customFormatter(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -96,6 +107,39 @@ export default {
   padding-bottom: 25px;
   display: flex;
   justify-content: space-between;
+
+  &__extraStatus {
+    position: absolute;
+    background: white;
+    padding: 50px 100px;
+    border-radius: 4px;
+    font-family: Roboto600;
+    background-color: white;
+    box-shadow: $box-shadow;
+    z-index: 222;
+    top: 24%;
+    left: 11%;
+
+    &-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      height: 24px;
+      width: 24px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Roboto400;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
 
   &__title {
     font-size: 18px;

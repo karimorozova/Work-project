@@ -101,6 +101,7 @@ export default {
 <style lang="scss" scoped>
 .job-details {
   display: flex;
+  position: relative;
 
   &__Lside {
     margin-right: 50px;
