@@ -456,7 +456,7 @@ export default {
           countToGet: 100
         })
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
-        this.isDataRemain = result.data.length === 50
+        this.isDataRemain = result.data.length === 100
       }
     }
   },

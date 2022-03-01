@@ -19,7 +19,7 @@ export default {
     },
     backgroundColor: {
       type: String,
-      default: '#f7f7f7'
+      default: '#eceff1'
     },
     text: {
       type: String,
@@ -97,6 +97,7 @@ export default {
   display: none;
   position: absolute;
   inset: auto auto 0px 0px;
+  word-break: break-word;
   min-width: 100px;
   max-width: 220px;
   text-align: center;
