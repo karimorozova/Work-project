@@ -47,7 +47,7 @@ router.get("/reports", checkVendor, async (req, res) => {
 	const { token, steps } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getPayableByVendorId(verificationResult.vendorId, { steps })
+		const reports = await getPayableByVendorId(verificationResult.vendorId, steps ? { steps } : {})
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -59,7 +59,7 @@ router.get("/paid-reports", checkVendor, async (req, res) => {
 	const { token, steps } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getReportPaidByVendorId(verificationResult.vendorId, { steps })
+		const reports = await getReportPaidByVendorId(verificationResult.vendorId, steps ? { steps } : {})
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)

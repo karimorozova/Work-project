@@ -102,12 +102,12 @@ export default {
   }
 
   &__val {
-    width: 170px;
+    width: 180px;
   }
 }
 
 .descriptions {
-  width: 360px;
+  width: 370px;
   box-sizing: border-box;
   background-color: white;
   border-radius: 4px;
@@ -117,7 +117,7 @@ export default {
 }
 
 .pm-area {
-  width: 360px;
+  width: 370px;
   box-sizing: border-box;
   background-color: white;
   border-radius: 4px;
@@ -190,6 +190,6 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 170px;
+  max-width: 180px;
 }
 </style>

@@ -1,12 +1,20 @@
 <template lang="pug">
   .wrapper
-    .header
+    .header(v-if="!isLoading")
       .col
         .col__title Added to Report:
-        .col__value 1221
+        .col__value(v-if="report" )
+          router-link(v-if="report.status !== 'Paid'" class="link-to" :to="{ path: `/billing/invoices/details/${report._id}`}")
+            span {{ report.reportId }}
+          router-link(v-else class="link-to" :to="{ path: `/billing/invoices/details-paid/${report._id}`}")
+            span {{ report.reportId }}
+
+        .col__value(v-else) {{  'Not in the report...' }}
       .col
-        .col__title
-        .col__value
+        .col__title Status:
+        .col__value(v-if="report" ) {{ report.status }}
+        .col__value(v-else) {{  'Not in the report...' }}
+    .header(v-else) Loading...
 
 </template>
 
@@ -20,6 +28,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       report: null
     }
   },
@@ -30,12 +39,13 @@ export default {
 
         const result = await this.$axios.get(`/vendor/reports/?token=${ this.$store.state.token }&steps=${ _stepId }`)
         const result2 = await this.$axios.get(`/vendor/paid-reports/?token=${ this.$store.state.token }&steps=${ _stepId }`)
+        const decode = JSON.parse(window.atob(result.data))
+        const decode2 = JSON.parse(window.atob(result2.data))
 
-        const decode = window.atob(result.data)
-        const decode2 = window.atob(result2.data)
-
-        console.log(decode, decode2)
+        this.report = decode.length && decode[0] || decode2.length && decode2[0]
       } catch (err) {
+      } finally {
+        this.isLoading = false
       }
     }
   },
@@ -56,5 +66,29 @@ export default {
   background-color: white;
   position: relative;
   box-shadow: $box-shadow;
+}
+
+.header {
+  display: flex;
+  gap: 100px;
+}
+
+.col {
+  display: flex;
+  gap: 15px;
+
+  &__title {
+    color: $dark-border;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>
