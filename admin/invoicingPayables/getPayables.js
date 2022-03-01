@@ -195,9 +195,16 @@ const getAllPayableByDefaultQuery = async (query = {}) => {
 }
 
 
-const getPayableByVendorId = async (id) => {
+const getPayableByVendorId = async (id, reportQuery = {}) => {
+	if ('steps' in reportQuery) reportQuery.steps = ObjectId(reportQuery.steps)
+
 	return (await InvoicingPayables.aggregate([
-				{ $match: { "vendor": ObjectId(id), "status": { $ne: 'Created' } } },
+				{
+					$match: {
+						"vendor": ObjectId(id), "status": { $ne: 'Created' },
+						...reportQuery
+					}
+				},
 				{
 					$lookup: {
 						from: "projects",

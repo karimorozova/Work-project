@@ -1,5 +1,5 @@
 <template lang="pug">
-  .table_ref
+  .table_ref(v-if="job.refFiles.length" )
     GeneralTable(
       :fields="fieldsFiles"
       :tableData="getFiles"
@@ -29,6 +29,7 @@ export default {
   },
   data() {
     return {
+      domain: '',
       fieldsFiles: [
         {
           label: "Reference File",
@@ -67,6 +68,9 @@ export default {
       }
       return []
     }
+  },
+  mounted() {
+    this.domain = process.env.domain
   }
 }
 </script>
@@ -76,16 +80,23 @@ export default {
 
 .table_ref {
   margin-bottom: 25px;
-}
-
-.table {
   width: 740px;
   background-color: white;
   padding: 25px;
   border-radius: 4px;
   background-color: white;
+  position: relative;
   box-shadow: $box-shadow;
-  margin-bottom: 15px;
+}
+
+.table {
+  //width: 740px;
+  //background-color: white;
+  //padding: 25px;
+  //border-radius: 4px;
+  //background-color: white;
+  //box-shadow: $box-shadow;
+  //margin-bottom: 15px;
 
   &__header {
     padding: 0 0 0 7px;

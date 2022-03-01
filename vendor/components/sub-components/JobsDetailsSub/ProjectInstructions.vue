@@ -1,7 +1,6 @@
 <template lang="pug">
   .instructions(v-if="(job.brief || job.vendorBrief)" )
     .brief-area
-
       .brief(v-if="job.brief" )
         .brief-area__title General Instruction
         .brief-area__description(v-html="job.brief")

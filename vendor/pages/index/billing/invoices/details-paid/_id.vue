@@ -27,7 +27,7 @@
               .row__value {{ reportDetailsInfo.status }}
             .row
               .row__title Created on:
-                .row__value(v-if="reportDetailsInfo.createAt") {{ formattedDate(reportDetailsInfo.createAt) }}
+              .row__value(v-if="reportDetailsInfo.createAt") {{ formattedDate(reportDetailsInfo.createAt) }}
             .row
               .row__title Date range:
               .row__value(v-if="reportDetailsInfo.firstPaymentDate") {{ formattedDateRange(reportDetailsInfo.firstPaymentDate) + ' / ' + formattedDateRange(reportDetailsInfo.lastPaymentDate)  }}
@@ -47,7 +47,7 @@
                 .file-fake-button(style="cursor: pointer" @click="downloadFile(reportDetailsInfo.paymentDetails.file.path)")
                   i(class="fa-solid fa-download")
                 span.file-name {{ reportDetailsInfo.paymentDetails.file.fileName }}
-            .row
+            .row(v-if="reportDetailsInfo.paymentDetails.paymentMethod" )
               .row__title Payment method:
               .row__value {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
 
@@ -88,6 +88,12 @@
                 span.currency(v-html="'&euro;'")
                 span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
 
+            template(slot="icon" slot-scope="{ row, index }")
+              .table__icons
+                router-link(class="link-to" target="_blank" :to="{path: `/completed-jobs/job-details/${row._id}_${row.projectNativeId}`}")
+                  .icon
+                    i(class="fa-solid fa-arrow-right-to-bracket")
+
     .payments
       .cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation")
         .card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
@@ -123,7 +129,7 @@ export default {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "35%" }
+          style: { width: "29%" }
         },
         {
           label: "Step",
@@ -148,6 +154,12 @@ export default {
           headerKey: "headerPayables",
           key: "payables",
           style: { width: "11%" }
+        },
+        {
+          label: "",
+          headerKey: "headerIcon",
+          key: "icon",
+          style: { width: "6%" }
         }
       ]
     }
@@ -202,7 +214,7 @@ export default {
 
 .cards {
   display: flex;
-  width: 1200px;
+  width: 1250px;
   flex-wrap: wrap;
 }
 
@@ -335,7 +347,7 @@ export default {
   }
 
   &__table {
-    width: 750px;
+    width: 780px;
   }
 }
 
@@ -348,7 +360,7 @@ export default {
   box-shadow: $box-shadow;
   padding: 25px;
   border-radius: 4px;
-  width: 1200px;
+  width: 1250px;
   box-sizing: border-box;
   background-color: white;
 
@@ -368,6 +380,19 @@ export default {
   &__data {
     padding: 0 7px;
   }
+
+  &__icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+  }
+}
+
+.icon {
+  font-size: 17px;
+  cursor: pointer;
 }
 
 .currency {
@@ -442,5 +467,15 @@ export default {
   cursor: pointer;
   font-size: 16px;
   margin-right: 10px;
+}
+
+a {
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

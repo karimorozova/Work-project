@@ -34,9 +34,14 @@
         .block__key Job ID:
         .block__val {{job.stepId}}
       .block
+        .block__key Project Deadline:
+        .block__val
+          .short {{customFormatter(job.projectDeadline)}}
+      .block
         .block__key Project Name:
         .block__val
           .short {{ job.projectName}}
+
 
 </template>
 

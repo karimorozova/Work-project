@@ -566,6 +566,7 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/styles/settingsTable.scss";
+  @import "../../../assets/scss/colors";
 
   a {
     color: #d66f58;
@@ -573,7 +574,7 @@
 
   .vendorTests {
     width: 1200px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     position: relative !important;
     margin: 50px;
     box-sizing: border-box;

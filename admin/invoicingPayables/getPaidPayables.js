@@ -90,9 +90,16 @@ const getPaidReport = async (id) => {
 	return (await InvoicingPayablesArchive.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
-const getReportPaidByVendorId = async (id) => {
+const getReportPaidByVendorId = async (id, reportQuery = {}) => {
+	if ('steps' in reportQuery) reportQuery.steps = ObjectId(reportQuery.steps)
+
 	return InvoicingPayablesArchive.aggregate([
-				{ $match: { "vendor": ObjectId(id) } },
+				{
+					$match: {
+						"vendor": ObjectId(id),
+						...reportQuery
+					}
+				},
 				{
 					$lookup: {
 						from: "projects",

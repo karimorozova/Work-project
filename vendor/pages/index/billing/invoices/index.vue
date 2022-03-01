@@ -71,12 +71,12 @@
           .table__data {{ row.status }}
 
         template(slot="name" slot-scope="{ row, index }")
-          .table__data
+          .table__data(v-if="row.paymentDetails.paymentMethod" )
             router-link(:to="'/billing/billing-information'")
               span {{ row.paymentDetails.paymentMethod.name }}
 
         template(slot="type" slot-scope="{ row, index }")
-          .table__data {{ row.paymentDetails.paymentMethod.paymentType }}
+          .table__data(v-if="row.paymentDetails.paymentMethod" ) {{ row.paymentDetails.paymentMethod.paymentType }}
 
         template(slot="jobs" slot-scope="{ row, index }")
           .table__data {{ row.steps.length }}

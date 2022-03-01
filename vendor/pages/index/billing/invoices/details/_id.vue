@@ -62,7 +62,7 @@
                   :isDisabled="!!invoiceFile"
                   :options="vendorExtra.billingInfo.paymentMethods",
                   placeholder="Option",
-                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod.name",
+                  :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod ? reportDetailsInfo.paymentDetails.paymentMethod.name : ''",
                   @chooseOption="resetPaymentMethod"
                 )
             .row
@@ -167,6 +167,12 @@
                 span.currency(v-html="'&euro;'")
                 span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
 
+            template(slot="icon" slot-scope="{ row, index }")
+              .table__icons
+                router-link(class="link-to" :to="{path: `/completed-jobs/job-details/${row._id}_${row.projectNativeId}`}")
+                  .icon
+                    i(class="fa-solid fa-arrow-right-to-bracket")
+
     .payments
       .cards(v-if="reportDetailsInfo && reportDetailsInfo.paymentInformation && reportDetailsInfo.paymentInformation.length")
         .card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
@@ -208,7 +214,7 @@ export default {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "35%" }
+          style: { width: "29%" }
         },
         {
           label: "Step",
@@ -233,6 +239,12 @@ export default {
           headerKey: "headerPayables",
           key: "payables",
           style: { width: "11%" }
+        },
+        {
+          label: "",
+          headerKey: "headerIcon",
+          key: "icon",
+          style: { width: "6%" }
         }
       ]
     }
@@ -382,7 +394,6 @@ export default {
         const result = await this.$axios.get(`/vendor/get-report?reportId=${ this.$route.params.id }`)
         const decode = window.atob(result.data)
         this.reportDetailsInfo = JSON.parse(decode)[0]
-        console.log(this.reportDetailsInfo)
       } catch (e) {
       }
     },
@@ -445,7 +456,7 @@ export default {
 
 .cards {
   display: flex;
-  width: 1200px;
+  width: 1250px;
   flex-wrap: wrap;
 }
 
@@ -551,6 +562,11 @@ export default {
   }
 }
 
+.icon {
+  font-size: 17px;
+  cursor: pointer;
+}
+
 .body {
   display: flex;
   justify-content: space-between;
@@ -582,7 +598,7 @@ export default {
   }
 
   &__table {
-    width: 750px;
+    width: 780px;
   }
 }
 
@@ -595,7 +611,7 @@ export default {
   box-shadow: $box-shadow;
   padding: 25px;
   border-radius: 4px;
-  width: 1200px;
+  width: 1250px;
   box-sizing: border-box;
   background-color: white;
 
@@ -614,6 +630,14 @@ export default {
 
   &__data {
     padding: 0 7px;
+  }
+
+  &__icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
   }
 }
 
@@ -694,5 +718,15 @@ export default {
 .file-button-disabled {
   background: #F8F8F8;
   cursor: default !important;
+}
+
+a {
+  color: $text;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

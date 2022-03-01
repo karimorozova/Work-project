@@ -1,6 +1,6 @@
 <template lang="pug">
   .wrapper
-    .files(v-if="job.status === 'Ready to Start' || job.status === 'In progress'" )
+    .files(v-if="job.status === 'In progress'" )
       ProjectFiles(
         :job="job"
       )
@@ -99,7 +99,6 @@ export default {
         } else {
           this.$emit('setJobStatus', { status: "Completed", targetFile: this.targetFiles })
         }
-        // this.$emit('updateProgress')
         this.targetFiles = []
         this.isWithoutFile = false
       } catch (err) {
@@ -108,8 +107,6 @@ export default {
       }
     },
     async startJob() {
-      // if (!this.job.isVendorRead) alert('Please don\'t forget to confirm that you have read and downloaded all the reference files, by ticking the box')
-      // if (!this.job.isVendorRead) return
       const typeCAT = this.job.payablesUnit.type === 'CAT Wordcount'
       try {
         if (typeCAT) {
@@ -123,13 +120,10 @@ export default {
               (!guid && !memoqUserName && !isEmailInclude && !isUserNameInclude)
               || (!isGuidInclude && !isEmailInclude && !isUserNameInclude)
           ) {
-            console.log(1)
             await this.createMemoqTranslator()
           } else if (!guid && (isEmailInclude || isUserNameInclude)) {
-            console.log(2)
             await this.rewriteGuidAndUserName(memoqData)
           } else if (!memoqUserName && isGuidInclude) {
-            console.log(3)
             await this.rewriteGuidAndUserName(memoqData)
           }
 

@@ -162,7 +162,7 @@
       padding: 50px 20px 20px 20px;
       background: white;
       z-index: 25;
-      box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+      box-shadow: $box-shadow;
     }
 
     &__mainIcon {

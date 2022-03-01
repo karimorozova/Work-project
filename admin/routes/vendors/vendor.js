@@ -43,12 +43,11 @@ const {
 const moment = require("moment")
 
 
-
 router.get("/reports", checkVendor, async (req, res) => {
-	const { token } = req.query
+	const { token, steps } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getPayableByVendorId(verificationResult.vendorId)
+		const reports = await getPayableByVendorId(verificationResult.vendorId, { steps })
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)
@@ -57,10 +56,10 @@ router.get("/reports", checkVendor, async (req, res) => {
 })
 
 router.get("/paid-reports", checkVendor, async (req, res) => {
-	const { token } = req.query
+	const { token, steps } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const reports = await getReportPaidByVendorId(verificationResult.vendorId)
+		const reports = await getReportPaidByVendorId(verificationResult.vendorId, { steps })
 		res.send(Buffer.from(JSON.stringify(reports)).toString('base64'))
 	} catch (err) {
 		console.log(err)

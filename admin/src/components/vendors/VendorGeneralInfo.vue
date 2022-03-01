@@ -242,7 +242,6 @@ export default {
 
 .gen-info {
   box-sizing: border-box;
-  box-shadow: $box-shadow;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

@@ -1,7 +1,7 @@
 <template lang="pug">
   .files-wrapper
-    .table(v-if="jobFilesOffline.length" )
-      ProjectReferenceFiles(:job="job" v-if="job.refFiles.length")
+
+    .table(v-if="jobFilesOffline.length")
       GeneralTable(
         :fields="jobFilesOffline_fields"
         :tableData="jobFilesOffline"
@@ -18,8 +18,8 @@
             .icon( @click="download(row.path)")
               i(class="fa-solid fa-download")
 
+
     .table(v-if="jobFilesOnlineCat.length" )
-      ProjectReferenceFiles(:job="job" v-if="job.refFiles.length")
       GeneralTable(
         :fields="jobFilesOnlineCat_fields"
         :tableData="jobFilesOnlineCat"
@@ -67,16 +67,14 @@
             .icon(@click="goToMemoqEditor(row.fullName)")
               i(class="fa-solid fa-arrow-right-to-bracket")
 
-
 </template>
 
 <script>
 import GeneralTable from "../../general/GeneralTable"
-import ProjectReferenceFiles from "./ProjectReferenceFiles"
 
 export default {
   name: "ProjectFiles",
-  components: { ProjectReferenceFiles, GeneralTable },
+  components: { GeneralTable },
   props: {
     job: {
       type: Object
@@ -116,7 +114,6 @@ export default {
       return +value
     },
     goToMemoqEditor(fileName) {
-      console.log(fileName)
       const { TotalWordCount, Reviewer1ConfirmedWordCount, WorkflowStatus, WebTransUrl, DocumentGuid } =
           this.job.memoqDocs.find(item => item.DocumentName === fileName && item.TargetLangCode === this.job.memoqTarget)
 

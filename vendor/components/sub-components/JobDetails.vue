@@ -6,13 +6,21 @@
         @updateProgress="getJobsDetails"
       )
       ProjectInstructions(
-        v-if="job.status === 'Waiting to Start' || job.status === 'Ready to Start' || job.status === 'In progress'"
+        v-if="job.status !== 'Completed' && job.status  !== 'Request Sent'"
+        :job="job"
+      )
+      ProjectReferenceFiles(
+        v-if="job.status !== 'Completed' && job.status  !== 'Request Sent'"
         :job="job"
       )
       ProjectWorkflow(
         :job="job"
         @setJobStatus="setJobStatus"
         @updateProgress="getJobsDetails"
+      )
+      ProjectInvoicingStatus(
+        v-if="job.status === 'Completed'"
+        :job="job"
       )
     .job-details__Lside
       ProjectManageBlock(
@@ -26,10 +34,12 @@ import ProjectManageBlock from "./JobsDetailsSub/ProjectManageBlock"
 import ProjectDescription from "./JobsDetailsSub/ProjectDescription"
 import ProjectWorkflow from "./JobsDetailsSub/ProjectWorkflow"
 import ProjectInstructions from "./JobsDetailsSub/ProjectInstructions"
+import ProjectReferenceFiles from "./JobsDetailsSub/ProjectReferenceFiles"
+import ProjectInvoicingStatus from "./JobsDetailsSub/ProjectInvoicingStatus"
 
 export default {
   name: "JobDetails",
-  components: { ProjectInstructions, ProjectWorkflow, ProjectDescription, ProjectManageBlock },
+  components: { ProjectInvoicingStatus, ProjectReferenceFiles, ProjectInstructions, ProjectWorkflow, ProjectDescription, ProjectManageBlock },
   data() {
     return {
       job: null
@@ -71,8 +81,6 @@ export default {
           const result = await this.$axios.post(`/vendor/jobs-details`, { _stepId, _projectId, _vendorId: this.vendor._id })
           this.job = result.data
         }
-        // console.log('START APP', this.job)
-
         this.alertToggle({ message: "Data received", isShow: true, type: "success" })
       } catch (err) {
       }
