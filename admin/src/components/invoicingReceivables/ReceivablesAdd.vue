@@ -251,8 +251,8 @@ export default {
       clients: '',
       sourceLanguages: '',
       targetLanguages: '',
-      billingDateFrom: '',
-      billingDateTo: '',
+      deadlineDateFrom: '',
+      deadlineDateTo: '',
       step: '',
 
       clientsList: [],
@@ -261,8 +261,8 @@ export default {
         'clients',
         'sourceLanguages',
         'targetLanguages',
-        'billingDateFrom',
-        'billingDateTo',
+        'deadlineDateFrom',
+        'deadlineDateTo',
         'step'
       ]
     }
@@ -291,18 +291,18 @@ export default {
       let query = this.$route.query
       this.$router.replace({
         path: this.$route.path,
-        query: { ...query, billingDateFrom: '', billingDateTo: '' }
+        query: { ...query, deadlineDateFrom: '', deadlineDateTo: '' }
       })
     },
     setBillingDateRange(e) {
       let query = this.$route.query
-      delete query.billingDateFrom
-      delete query.billingDateTo
+      delete query.deadlineDateFrom
+      delete query.deadlineDateTo
       this.$router.replace({
         path: this.$route.path,
         query: {
-          ...query, billingDateFrom: new Date(e[0]).getTime(),
-          billingDateTo: new Date(e[1]).getTime()
+          ...query, deadlineDateFrom: new Date(e[0]).getTime(),
+          deadlineDateTo: new Date(e[1]).getTime()
         }
       })
     },
@@ -458,8 +458,8 @@ export default {
       return this.$route.query.step || ''
     },
     selectedBillingDateRange() {
-      return this.$route.query.billingDateFrom
-          ? [ new Date(+this.$route.query.billingDateFrom), new Date(+this.$route.query.billingDateTo) ]
+      return this.$route.query.deadlineDateFrom
+          ? [ new Date(+this.$route.query.deadlineDateFrom), new Date(+this.$route.query.deadlineDateTo) ]
           : [ null, null ]
     },
     isAllSelected() {
