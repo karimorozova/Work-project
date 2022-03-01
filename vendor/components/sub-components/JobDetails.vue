@@ -6,11 +6,11 @@
         @updateProgress="getJobsDetails"
       )
       ProjectInstructions(
-        v-if="job.status !== 'Completed' && job.status  !== 'Request Sent'"
+        v-if="job.status !== 'Completed'"
         :job="job"
       )
       ProjectReferenceFiles(
-        v-if="job.status !== 'Completed' && job.status  !== 'Request Sent'"
+        v-if="job.status !== 'Completed'"
         :job="job"
       )
       ProjectWorkflow(
