@@ -1,4 +1,5 @@
 import Vue from "vue"
+import { Cookies } from "nodemailer/lib/fetch"
 
 export const incrementRequestCounter = ({ commit }) => commit('startRequest')
 export const decrementRequestCounter = ({ commit }) => commit('endRequest')
@@ -28,32 +29,32 @@ export const getServices = async ({ commit, dispatch }) => {
 		commit('endRequest')
 	}
 }
-export const setVendorsForOption = async ({ commit, dispatch }) => {
-	commit('startRequest')
-	try {
-		const result = await Vue.http.get('/pm-manage/vendors-for-options')
-		let allVendors = result.data
-		allVendors.sort((a, b) => `${ a.firstName } ${ a.surname }`.localeCompare(`${ b.firstName } ${ b.surname }`))
-		commit('storeVendorsForOptions', allVendors)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
-	} finally {
-		commit('endRequest')
-	}
-}
+// export const setVendorsForOption = async ({ commit, dispatch }) => {
+// 	commit('startRequest')
+// 	try {
+// 		const result = await Vue.http.get('/pm-manage/vendors-for-options')
+// 		let allVendors = result.data
+// 		allVendors.sort((a, b) => `${ a.firstName } ${ a.surname }`.localeCompare(`${ b.firstName } ${ b.surname }`))
+// 		commit('storeVendorsForOptions', allVendors)
+// 	} catch (err) {
+// 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
+// 	} finally {
+// 		commit('endRequest')
+// 	}
+// }
 
-export const setClientsForOption = async ({ commit, dispatch }) => {
-	commit('startRequest')
-	try {
-		const result = await Vue.http.get('/pm-manage/clients-for-options')
-		const customers = result.data.sort((a, b) => a.name.localeCompare(b.name))
-		commit('storeClientsForOptions', customers)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
-	} finally {
-		commit('endRequest')
-	}
-}
+// export const setClientsForOption = async ({ commit, dispatch }) => {
+// 	commit('startRequest')
+// 	try {
+// 		const result = await Vue.http.get('/pm-manage/clients-for-options')
+// 		const customers = result.data.sort((a, b) => a.name.localeCompare(b.name))
+// 		commit('storeClientsForOptions', customers)
+// 	} catch (err) {
+// 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
+// 	} finally {
+// 		commit('endRequest')
+// 	}
+// }
 
 export const getSteps = async ({ commit, dispatch }) => {
 	commit('startRequest')
@@ -108,18 +109,18 @@ export const setStepsStatus = async ({ commit, dispatch, state }, payload) => {
 		commit('endRequest')
 	}
 }
-export const setStepVendors = async ({ commit, dispatch, state }, payload) => {
-	commit('startRequest')
-	try {
-		const { projectId, stepsVendors } = payload
-		const updatedProject = await Vue.http.post('/pm-manage/vendor-assigment', { projectId, stepsVendors })
-		await commit('storeCurrentProject', updatedProject.data)
-	} catch (err) {
-		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
-	} finally {
-		commit('endRequest')
-	}
-}
+// export const setStepVendors = async ({ commit, dispatch, state }, payload) => {
+// 	commit('startRequest')
+// 	try {
+// 		const { projectId, stepsVendors } = payload
+// 		const updatedProject = await Vue.http.post('/pm-manage/vendor-assigment', { projectId, stepsVendors })
+// 		await commit('storeCurrentProject', updatedProject.data)
+// 	} catch (err) {
+// 		dispatch('alertToggle', { message: err.body, isShow: true, type: "error" })
+// 	} finally {
+// 		commit('endRequest')
+// 	}
+// }
 
 export const updateMatrix = async ({ commit, dispatch }, payload) => {
 	commit('startRequest')
@@ -213,31 +214,30 @@ export const alertToggle = ({ commit }, payload) => {
 	commit('alertingMessage', payload)
 	setTimeout(() => {
 		commit('alertingMessage', { message: "", isShow: false, type: "success" })
-	}, 5000)
+	}, 4000)
 }
 
-export const login = ({ commit, state }, payload) => {
-	commit('startRequest')
-	return new Promise(resolve => {
-		const { token, group, firstName, lastName, photo } = payload
-		state.userGroup = group
-		state.user = { firstName, lastName, photo }
-		setTimeout(() => {
-			let currentDate = Date.now()
-			let expiryTime = currentDate + 60000 * 120
-			let object = { value: token, timestamp: expiryTime }
-			localStorage.setItem("token", JSON.stringify(object))
-			commit('endRequest')
-			resolve()
-		}, 1000)
-	})
-}
+// export const login = ({ commit, state }, payload) => {
+// 	// commit('startRequest')
+// 	return new Promise(resolve => {
+// 		state.userGroup = group
+// 		console.log({payload})
+// 		state.user = payload
+// 		// setTimeout(() => {
+// 		// 	let currentDate = Date.now()
+// 		// 	let expiryTime = currentDate + 60000 * 120
+// 		// 	let object = { value: token, timestamp: expiryTime }
+// 		// 	localStorage.setItem("token", JSON.stringify(object))
+// 		// 	// commit('endRequest')
+// 		// 	resolve()
+// 		// }, 1000)
+// 	})
+// }
 
 export const setUser = async ({ commit, state, dispatch }) => {
 	commit('startRequest')
 	try {
-		const key = JSON.parse(localStorage.getItem("token"))
-		const result = await Vue.http.get(`/user?key=${ key.value }`)
+		const result = await Vue.http.get(`/user`)
 		state.user = result.data
 		state.userGroup = result.data.group
 	} catch (err) {

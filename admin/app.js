@@ -5,44 +5,37 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo")(session);
 const bodyParser = require("body-parser");
-const config = require('./server-config.json');
 const mongoose = require('mongoose');
-const port = config.server.port;
 const db = mongoose.connection;
 const { checkRoutes } = require('./middleware/index');
 const history = require('connect-history-api-fallback');
 let logger = require('morgan');
 const { checkCollections } = require('./helpers/dbSetDefault');
 require('./schedule');
+const env = process.env
 
 //NEW DB
-// checkCollections()
 
+checkCollections()
 
 const allowedOrigins = [
-	"https://admin.pangea.global",
-	"https://vendor.pangea.global",
-	"https://portal.pangea.global",
-	"http://localhost:3000",
-	"http://localhost:3002",
-	"http://localhost:8081",
-	"https://testadmin.pangea.global",
-	"http://testvendor.pangea.global",
-	"http://testportal.pangea.global",
-	"http://95.216.165.38"
+	env.ADMIN_URL,
+	env.PORTAL_URL,
+	env.VENDOR_URL,
+	env.WORDPRESS_URL,
 ];
 
-mongoose.connect(config.mongoDB.url, {
+mongoose.connect(env.MONGO_URL, {
 	useNewUrlParser: true,
 	useFindAndModify: false,
 	useUnifiedTopology: true,
 	useCreateIndex: true
 });
 
-app.use(logger('dev'));
+app.use(logger(env.LOGGER_FORMAT));
 app.use(
 		session({
-			secret: "Cookies Very Much secret key!",
+			secret: env.SESSION_SECRET,
 			resave: true,
 			saveUninitialized: false,
 			store: new MongoStore({
@@ -51,7 +44,7 @@ app.use(
 		})
 );
 
-app.use(express.static("dist"));
+app.use(express.static(env.EXPRESS_STATIC));
 app.use(bodyParser.json({ limit: '50mb', extended: true }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
@@ -82,7 +75,7 @@ const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "https://admin.pangea.global:*, http://localhost:*",
+    origin: env.ADMIN_URL + ":*",
     methods: ["GET", "POST"]
   },
   secure: true,
@@ -105,6 +98,6 @@ io.on('connection', socket => {
   })
 })
 
-httpServer.listen(port, () => {
-	console.log('\x1b[32m', `✈  Server is working on: ${ port }`, '\x1b[0m');
+httpServer.listen(env.EXPRESS_PORT, () => {
+	console.log('\x1b[32m', `✈  Server is working on: ${ env.EXPRESS_PORT }`, '\x1b[0m');
 });

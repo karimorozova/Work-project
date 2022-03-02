@@ -3,18 +3,7 @@
     .project__all-info
       .project__info-row
         input.project__name(v-if="existProjectAccessChangeName" type="text" v-model="project.projectName" @change="changeProjectName(project.projectName)" placeholder="Project Name")
-        .project__name(style="border: 1px solid white;" v-else) {{ project.projectName }}
-
-        .textCheckbox(v-if="!isProjectFinished")
-          CheckBox(
-            :isChecked="project.isTest"
-            :isWhite="true"
-            @check="() => setTest(true)"
-            @uncheck="() => setTest(false)"
-          )
-          .textCheckbox__label Test
-        .textCheckbox(v-else)
-          .textCheckbox__label {{ project.isTest  ? 'Test project' : '' }}
+        .project__name(style="border: 1px solid white; padding: 0;" v-else) {{ project.projectName }}
 
       .project__detailsRow
         .project__detailsRow-client
@@ -34,7 +23,19 @@
               .project__detailsRow-client-title
                 router-link(class="link-to" :to="{path: `/pangea-clients/all/details/${ project.customer._id }`}" target="_blank")
                   span {{ project.customer.name }}
-              .project__detailsRow-client-subtitle {{ project.clientBillingInfo.name }}
+
+              .project__detailsRow-client-subtitle(
+                v-if="isInReceivablesInvoicing || project.customer.billingInfo.length === 1"
+              ) {{ project.clientBillingInfo.name }}
+              .project__detailsRow-client-drop(v-else)
+                .drop
+                  SelectSingle(
+                    placeholder="Choose BillingInfo"
+                    :selectedOption="project.clientBillingInfo && project.clientBillingInfo.name || ''"
+                    :options="billingInfoList.map(({name}) => name)"
+                    @chooseOption="choseBillingInfo"
+                  )
+
               .project__detailsRow-client-text {{ project.industry.name }}
               .project__detailsRow-client-text Start at {{ customFormatter( project.startDate ) }}
 
@@ -88,7 +89,6 @@
               :clearable="false"
               :confirm="true"
               confirm-text="Set date"
-              :disabled-date="notBeforeStartDate"
               :disabled="isProjectFinished"
               prefix-class="xmx"
             )
@@ -111,7 +111,7 @@
       .project__block-row.project_no-margin
         .project__block
           .block__header(@click="toggleBlock('isBrief')")
-            .title Project Brief
+            .title Project Instructions
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
             .icon(v-else)
@@ -140,7 +140,6 @@ import SelectSingle from "../SelectSingle"
 import SelectMulti from "../SelectMulti"
 import ValidationErrors from "../ValidationErrors"
 import Datepicker from "../Datepicker"
-import LabelValue from "./LabelValue"
 import Button from "../Button"
 import CheckBox from "../CheckBox"
 import moment from "moment"
@@ -180,7 +179,7 @@ export default {
         ],
         removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
         uiColor: "#ffffff",
-        height: 240
+        height: 280
       },
       isBilling: false,
       isTest: false,
@@ -219,9 +218,11 @@ export default {
     // notBeforeToday(date) {
     //   return date < new Date(new Date().setHours(0, 0, 0, 0));
     // },
-    notBeforeStartDate(date) {
-      return date < new Date(this.project.startDate)
-    },
+    // notBeforeStartDate(date) {
+    //   let d = new Date()
+    //   d.setDate(d.getDate() - 1)
+    //   return date < d
+    // },
     async updateBrief() {
       if (this.isProjectFinished) return
       await this.setProjectProp({ prop: 'brief', value: this.project.brief })
@@ -246,25 +247,8 @@ export default {
       return moment(date).format('DD-MM-YYYY, HH:mm')
     },
     async updateProjectDate(e, prop) {
-      if (this.project._id) {
-        if (prop === 'deadline') {
-          const date = { ['billingDate']: e }
-          await this.setDate('billingDate', date)
-        }
-        const date = { [prop]: e }
-        await this.setDate(prop, date)
-      } else {
-        if (prop === 'deadline') {
-          this.project.billingDate = e
-        }
-      }
-    },
-    async setDate(prop, date) {
-      if (prop === 'startDate' && this.project.tasks.length) return
+      const date = { [prop]: e }
       await this.setProjectDate({ date, projectId: this.project._id })
-    },
-    async setTest(bool) {
-      await this.setProjectProp({ prop: 'isTest', value: bool })
     },
     // async setSameDate(e) {
     // 	this.isBilling = e.target.checked
@@ -296,11 +280,17 @@ export default {
     // 	}
     // 	this.$emit('setValue', { option, prop: 'customer' })
     // },
-    // async choseBillingInfo({ option }) {
-    // 	const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-    //   await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
-    //   await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
-    // },
+    async choseBillingInfo({ option }) {
+      const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+
+      const notStartedStatuses = [ 'Draft', 'Cost Quote', 'Quote sent', 'Rejected' ]
+      if (billingInfo.paymentType === 'PPP' && notStartedStatuses.includes(this.project.status)) {
+        await this.setProjectProp({ prop: 'inPause', value: true })
+      }
+
+      await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
+      await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })
+    },
     // setBillingInfo(billingInfo) {
     // 	this.$emit('setValue', { option: billingInfo, prop: 'clientBillingInfo' })
     // },
@@ -327,7 +317,6 @@ export default {
       }
       try {
         await this.createProject()
-        await this.clientCreateProjectDate()
       } catch (err) {
         this.alertToggle({ message: "Server error on creating a new Project", isShow: true, type: "error" })
       }
@@ -398,6 +387,9 @@ export default {
     isProjectFinished() {
       const { status } = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    },
+    isInReceivablesInvoicing() {
+      return false
     }
   },
   components: {
@@ -406,7 +398,6 @@ export default {
     SelectSingle,
     SelectMulti,
     Datepicker,
-    LabelValue,
     Button,
     CheckBox,
     ValidationErrors,
@@ -464,13 +455,10 @@ export default {
 
 .block {
   width: 100px;
-  border: 1px dotted $light-border;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6px 0px 4px 0px;
-  border-radius: 4px;
-  display: flex;
-  margin: 10px 5px;
+  padding: 8px 0px;
 
   &__value {
     display: flex;
@@ -527,6 +515,10 @@ export default {
         font-family: 'Myriad900';
         margin-bottom: 7px;
         margin-top: 7px;
+      }
+
+      &-drop {
+        margin-bottom: 7px;
       }
 
       &-subtitle {
@@ -619,7 +611,7 @@ export default {
     font-size: 18px;
     padding: 0 10px;
     height: 44px;
-    width: 880px;
+    width: 100%;
     border-radius: 4px;
     border: 1px solid $light-border;
     outline: none;
@@ -834,6 +826,12 @@ a {
   width: 90px;
   height: 90px;
   border-radius: 50%;
+}
+
+.drop {
+  height: 32px;
+  width: 220px;
+  position: relative;
 }
 
 </style>

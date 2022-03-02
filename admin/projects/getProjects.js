@@ -1,9 +1,11 @@
-const { Projects, Clients, Languages, Services, ClientRequest } = require('../models/')
-const { getFilterdProjectsQuery } = require('./filter')
+const { Projects, Languages, Services, ClientRequest, Step } = require('../models/')
+const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery, getFilteredVendorPortalProjectsQuery } = require('./filter')
+const { filterNotQuoteStepsInStartedProjectForClientPortal, filterQuoteStepsInStartedProjectForClientPortal } = require('./helpers')
+const { ObjectID: ObjectId } = require("mongodb")
 
 
 async function getProjectsForVendorPortal(obj) {
-	return await Projects.find(obj)
+	return (await Projects.find(obj)
 			.populate('industry')
 			.populate('customer')
 			.populate('service')
@@ -18,11 +20,11 @@ async function getProjectsForVendorPortal(obj) {
 			.populate('steps.fullTargetLanguage')
 			.populate('tasks.service')
 			.populate('tasks.fullSourceLanguage')
-			.populate('tasks.fullTargetLanguage')
+			.populate('tasks.fullTargetLanguage'))
 }
 
 async function getProjects(obj) {
-	return await Projects.find(obj)
+	return (await Projects.find(obj)
 			.populate('industry')
 			.populate('customer')
 			.populate('service')
@@ -38,40 +40,108 @@ async function getProjects(obj) {
 			.populate('tasks.service')
 			.populate('tasks.fullSourceLanguage')
 			.populate('tasks.fullTargetLanguage')
-			.populate('requestId', [ 'projectId' ])
-
+			.populate('requestId', [ 'projectId' ]))
 }
 
-async function getProjectsForPortal(obj) {
-	return (await Projects.find(
-			obj,
+async function getProjectsForVendorPortalAll({ filters }) {
+	const allLanguages = await Languages.find()
+	const allSteps = await Step.find()
+	const query = getFilteredVendorPortalProjectsQuery(filters, allLanguages, allSteps)
+
+	const projects = await Projects.aggregate([
+		{
+			$unwind: "$steps"
+		},
+		{
+			$match: {
+				isTest: false,
+				'steps.vendor': ObjectId(filters.vendor),
+				'steps.status': filters.stepsStatuses || {},
+				...(filters.isFilterZeroFinance && { "steps.nativeFinance.Price.payables": { $gt: 0 } }),
+				...query
+			}
+		},
+		{
+			$project: {
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				startDate: 1,
+				deadline: 1,
+				brief: 1,
+				projectManager: 1,
+				steps: 1
+			}
+		},
+		{
+			$unset: [
+				'steps.finance',
+				'steps.defaultStepPrice',
+				'steps.clientRate',
+				'steps.nativeFinance.Price.receivables'
+			]
+		},
+		{
+			$sort: {
+				startDate: -1
+			}
+		},
+		{
+			$limit: filters.isLimit ? 25 : 9999
+		}
+	])
+	return Projects.populate(projects, [
+		'steps.step',
+		'steps.payablesUnit',
+		'steps.fullSourceLanguage',
+		'steps.fullTargetLanguage',
+		{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] }
+	])
+}
+
+async function getProjectsForPortalAll({ filters }) {
+	const allLanguages = await Languages.find()
+	const allServices = await Services.find()
+	const query = getFilteredPortalProjectsQuery(filters, allLanguages, allServices)
+
+	const projects = await Projects.find(
+			{
+				'isTest': 'false',
+				'customer': filters.customer,
+				...query
+			},
 			{
 				projectId: 1,
 				projectName: 1,
 				status: 1,
-				clientContacts: 1,
-				tasks: 1,
-				steps: 1,
 				startDate: 1,
 				deadline: 1,
-				finance: 1,
 				createdBy: 1,
-				tasksDeliverables: 1,
-				tasksDR2: 1,
-				projectCurrency: 1
+				accountManager: 1,
+				additionsSteps: 1,
+				projectCurrency: 1,
+				minimumCharge: 1,
+				"steps.taskId": 1,
+				"steps.finance.Price.receivables": 1,
+				"finance.Price.receivables": 1,
+				"tasks.taskId": 1,
+				"tasks.status": 1
 			}
 	)
-			.populate('industry')
-			.populate('service')
-			.populate('steps.vendor', [ 'firstName', 'surname', 'email', 'guid', 'photo' ])
-			.populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ]))
+			.sort({ startDate: -1 })
+			.limit(25)
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+
+	for (let i = 0; i < projects.length; i++) {
+		projects[i].steps = filterNotQuoteStepsInStartedProjectForClientPortal(projects[i])
+		projects[i].steps = projects[i].steps.filter(({ status }) => status !== 'Cancelled')
+	}
+
+	return projects
 }
 
 async function getProjectsForPortalList(obj) {
-	return (await Projects.find(
-					obj,
-					{
+	return (await Projects.find(obj, {
 						projectId: 1,
 						projectName: 1,
 						status: 1,
@@ -80,19 +150,87 @@ async function getProjectsForPortalList(obj) {
 						"steps.progress": 1,
 						startDate: 1,
 						deadline: 1,
-						finance: 1,
-						createdBy: 1
-						// tasksDeliverables: 1,
-						// tasksDR2: 1,
-						// projectCurrency: 1
+						"finance.Price.receivables": 1,
+						createdBy: 1,
+						accountManager: 1,
+						minimumCharge: 1,
+						additionsSteps: 1,
+						projectCurrency: 1,
+						"tasks.taskId": 1,
+						"tasks.status": 1,
+						"steps.taskId": 1,
+						"steps.finance.Price.receivables": 1
 					}
 			)
-			// .populate('industry')
-			// .populate('service')
-			// .populate('steps.vendor', [ 'firstName', 'surname', 'email' ])
-			// .populate('projectManager', [ 'firstName', 'lastName', 'photo', 'email' ])
-			// .populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
+}
+
+async function getProjectForClientPortal(obj) {
+	const project = await Projects.findOne(obj,
+			{
+				projectId: 1,
+				projectName: 1,
+				status: 1,
+				PO: 1,
+				"finance.Price.receivables": 1,
+				industry: 1,
+				startDate: 1,
+				deadline: 1,
+				accountManager: 1,
+				additionsSteps: 1,
+				projectCurrency: 1,
+				minimumCharge: 1,
+				discounts: 1,
+				tasksDeliverables: 1,
+				tasksDR2: 1,
+				clientContacts: 1,
+				"steps.finance.Price.receivables": 1,
+				"steps.finance.Wordcount.receivables": 1,
+				"steps.finance.Quantity.receivables": 1,
+				"steps.step": 1,
+				"steps.taskId": 1,
+				"steps.progress": 1,
+				"steps.receivablesUnit": 1,
+				"steps.sourceLanguage": 1,
+				"steps.targetLanguage": 1,
+				"steps.fullSourceLanguage": 1,
+				"steps.fullTargetLanguage": 1,
+				"steps.clientRate": 1,
+				"steps.status": 1,
+				"steps.totalWords": 1,
+				"tasks.sourceLanguage": 1,
+				"tasks.targetLanguage": 1,
+				"tasks.taskId": 1,
+				"tasks.status": 1
+
+			}
+	)
+			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
+			.populate('industry')
+			.populate('steps.step')
+			.populate('steps.service')
+			.populate('steps.fullSourceLanguage')
+			.populate('steps.fullTargetLanguage')
+			.populate('steps.receivablesUnit')
+
+	project._doc.steps = project._doc.steps.length
+			? project._doc.steps.map(item => {
+						return {
+							...item._doc,
+							price: item._doc.finance.Price.receivables,
+							quantity: +item._doc.finance.Wordcount.receivables
+									? +item._doc.finance.Wordcount.receivables
+									: +item._doc.finance.Quantity.receivables || 0
+						}
+					}
+			).filter(({ status }) => status !== 'Cancelled')
+			: []
+
+	project._doc.incomingSteps = filterQuoteStepsInStartedProjectForClientPortal(project, false)
+	project._doc.steps = filterNotQuoteStepsInStartedProjectForClientPortal(project)
+
+	return project
 }
 
 async function getProject(obj) {
@@ -253,6 +391,25 @@ async function getFilteredProjects(filters) {
 				...query
 			}
 		},
+		// {
+		// 	$lookup:
+		// 			{
+		// 				from: "invoicingpayables",
+		// 				localField: 'steps._id',
+		// 				foreignField: 'steps',
+		// 				as:'rawInvoicingInfo'
+		// 			}
+		// },
+		// {
+		// 	$lookup:
+		// 			{
+		// 				from: "invoicingpayablesarchives",
+		// 				localField: 'steps._id',
+		// 				foreignField: 'steps',
+		// 				as:'rawInvoicingInfoArchive'
+		// 			}
+		// },
+		// {$addFields: {invoicing: {$concatArrays: ['$rawInvoicingInfo', '$rawInvoicingInfoArchive'] }}},
 		{ $unwind: "$customer" }
 	]).sort({ startDate: -1 }).limit(25)
 	try {
@@ -262,6 +419,7 @@ async function getFilteredProjects(filters) {
 			{ path: 'projectManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'accountManager', select: [ 'firstName', 'lastName', 'photo', 'email' ] },
 			{ path: 'steps.vendor', select: [ 'firstName', 'surname', 'email', 'guid', 'photo' ] },
+			{ path: 'tasks.service', select: [ 'title' ] },
 			{ path: 'requestId', select: [ 'projectId' ] }
 		])
 	} catch (err) {
@@ -270,4 +428,15 @@ async function getFilteredProjects(filters) {
 	}
 }
 
-module.exports = { getProject, getProjects, getProjectsForPortal, updateProject, getFilteredProjects, getProjectAfterUpdate, getProjectsForVendorPortal, getProjectsForPortalList }
+module.exports = {
+	getProject,
+	getProjects,
+	getProjectsForPortalAll,
+	updateProject,
+	getFilteredProjects,
+	getProjectAfterUpdate,
+	getProjectsForVendorPortal,
+	getProjectsForPortalList,
+	getProjectForClientPortal,
+	getProjectsForVendorPortalAll
+}

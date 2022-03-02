@@ -4,6 +4,7 @@ const axios = require("axios")
 
 const { writeFileSync, readFileSync, createReadStream } = require('fs')
 const csv = require('csv-parser')
+const { getProject } = require("./index")
 
 const apiDomain = "https://pangea.s.xtrf.eu/home-api/"
 const token = "YnMTG15t9lCKQWRuv7bZvWMHR9"
@@ -116,7 +117,8 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			tasks,
 			accountManager,
 			isTest
-		} = await Projects.findOne({ _id: vendorId }).populate('steps.vendor').populate('customer').populate("accountManager")
+
+		} = await getProject({ _id: vendorId })
 
 		const currentServices = getServices(tasks, steps)
 
@@ -129,8 +131,8 @@ const createXtrfProjectWithFinance = async (vendorId) => {
 			return { isSuccess: false, message: errorMessages['cannotFindClient'] }
 		}
 
-		const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
-			name: `${ projectId }: ${ projectName }`,
+		const xtrfProjectInfo = await sendRequest('post', 'v2/projects/', {
+			name: `Png ${ projectId }: ${ projectName }`,
 			clientId: customers.id,
 			serviceId: currentServices.id
 		})
@@ -363,7 +365,7 @@ const updateFianceXTRF = async (id) => {
 		xtrfLink,
 		steps,
 		tasks
-	} = await Projects.findOne({ _id: id }).populate('steps.vendor')
+	} = await getProject({ _id: id })
 
 
 	const re = /ProjectId=(.*)#/.exec(xtrfLink)

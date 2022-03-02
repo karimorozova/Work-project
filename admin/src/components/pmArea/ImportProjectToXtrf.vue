@@ -2,9 +2,9 @@
   .projectToXtrf
     .projectToXtrf__buttons
       .margin-bottom
-        Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink" :isFullMainClass="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
+        Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink && canSendToXtrf" :isFullMainClass="true" value="Send project to XTRF" @clicked="sendTo" :isDisabled="isDisable")
         Button.button(v-if="!project.isSendToXtrf && !project.xtrfLink" :isFullMainClass="true" :outline="true" value="Send manual" @clicked="check" :isDisabled="isDisable")
-      span(v-else) Xtrf : &nbsp;
+      span(v-if="project.isSendToXtrf && project.xtrfLink" ) Xtrf : &nbsp;
         a( target="_blank" :href="project.xtrfLink")
           i(class="fas fa-link")
         | &nbsp;&nbsp;
@@ -34,7 +34,7 @@
 <script>
 import Button from "../Button"
 import axios from "axios"
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import CheckBox from "../CheckBox"
 import { setCurrentProject } from "../../vuex/general/actions"
 import ProjectDiscounts from "../clients/pricelists/ProjectDiscounts"
@@ -123,6 +123,26 @@ export default {
           .finally(() => this.isDisable = false)
     }
   },
+  computed: {
+    ...mapGetters({
+      currentProject: 'getCurrentProject',
+    }),
+    canSendToXtrf() {
+      const { status, tasks } = this.currentProject
+
+      const closedCheck = tasks.length && (
+          tasks.every(({ service }) => service.title === 'Translation')
+          || tasks.every(({ service }) => service.title === 'TransCreation')
+          || (tasks.every(({ service }) => service.title === 'Copywriting') && tasks.length === 1)
+          || (tasks.every(({ service }) => service.title === 'Newsletter' || service.title === "SMS") && tasks.length === 2)
+          || tasks.every(({ service }) => service.title === 'Certified Translation')
+          || tasks.every(({ service }) => service.title === 'Translation Plain')
+          || tasks.every(({ service }) => service.title === 'Editing')
+      )
+
+    		return closedCheck && (status === 'Closed' || status === 'In progress' || status === 'Approved')
+    },
+  },
   components: { ProjectDiscounts, CheckBox, Button }
 }
 </script>
@@ -156,7 +176,7 @@ export default {
   }
 
   .red {
-    color: #d15f45;
+    color: #d66f58;
     margin-bottom: 3px;
   }
 

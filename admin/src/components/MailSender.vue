@@ -117,8 +117,6 @@ export default {
   mounted() {
     this.template = 'Blank'
     this.from = this.user.email
-    console.log(this.user)
-    console.log(this.users)
   },
   computed: {
     ...mapGetters({
@@ -147,7 +145,7 @@ export default {
 }
 
 .sender {
-  width: 750px;
+  width: 755px;
   background: white;
   padding: 25px;
   box-sizing: border-box;

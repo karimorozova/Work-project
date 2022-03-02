@@ -1,5 +1,18 @@
-const mailTransporter = require("../services/mailTransporter")
 const { User } = require('../models')
+
+const nodemailer = require('nodemailer')
+
+const env = process.env
+
+const mailTransporter = nodemailer.createTransport({
+	host: env.SMTP_HOST,
+	port: env.SMTP_PORT,
+	secure: JSON.parse(env.SMTP_SECURE),
+	auth: {
+		user: env.SMTP_USER,
+		pass: env.SMTP_PASS
+	}
+})
 
 const getUserFullName = async (id) => {
 	id = id._id !== null ? id : id._id
@@ -8,6 +21,8 @@ const getUserFullName = async (id) => {
 }
 
 const sendEmailFromUser = async function (from, obj, msg) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
+	if (process.env.EMAIL_NOTIFICATIONS_TO) obj.to = process.env.EMAIL_NOTIFICATIONS_TO
 	const sender = await getUserFullName(from)
 	return new Promise((res, rej) => {
 		let mailOptions = {
@@ -39,6 +54,8 @@ const sendEmailFromUser = async function (from, obj, msg) {
 }
 
 const sendEmail = function (obj, msg, withoutImage = false) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
+	if (process.env.EMAIL_NOTIFICATIONS_TO) obj.to = process.env.EMAIL_NOTIFICATIONS_TO
 	return new Promise((res, rej) => {
 		let mailOptions = {
 			from: 'translation@pangea.global', // sender address
@@ -72,9 +89,11 @@ const sendEmail = function (obj, msg, withoutImage = false) {
 }
 
 const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
+	if (process.env.EMAIL_NOTIFICATIONS_TO) mailSettings.to = process.env.EMAIL_NOTIFICATIONS_TO
 	return new Promise((res, rej) => {
 		let mailOptions = {
-			from: mailSettings.from, // sender address
+			from: `${ mailSettings.nickName } ${ mailSettings.from }`, // sender address
 			to: `${ mailSettings.to }`, // pm@pangea.global list of receivers
 			subject: `${ mailSettings.subject }`, // Subject line
 			text: "", // plain text body
@@ -105,6 +124,8 @@ const sendFlexibleEmail = function (mailSettings, msg, withoutImage = false) {
 }
 
 const sendEmailCandidates = function (obj, msg, withoutImage = false) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
+	if (process.env.EMAIL_NOTIFICATIONS_TO) obj.to = process.env.EMAIL_NOTIFICATIONS_TO
 	return new Promise((res, rej) => {
 		let mailOptions = {
 			from: 'career@pangea.global', // sender address
@@ -138,6 +159,8 @@ const sendEmailCandidates = function (obj, msg, withoutImage = false) {
 }
 
 const clientQuoteToEmails = async function (from, obj, message) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
+	if (process.env.EMAIL_NOTIFICATIONS_TO) obj.email = process.env.EMAIL_NOTIFICATIONS_TO
 	const sender = await getUserFullName(from)
 	return new Promise((res, rej) => {
 		let mailOptions = {
@@ -167,7 +190,9 @@ const clientQuoteToEmails = async function (from, obj, message) {
 }
 
 const clientQuoteEmail = function (obj, msg) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
 	const contact = !obj.contact ? obj.contacts.find(item => item.leadContact) : obj.contact
+	if (process.env.EMAIL_NOTIFICATIONS_TO) contact.email = process.env.EMAIL_NOTIFICATIONS_TO
 	return new Promise((res, rej) => {
 		let mailOptions = {
 			from: 'Michal <michal@pangea.global>',
@@ -196,6 +221,8 @@ const clientQuoteEmail = function (obj, msg) {
 }
 
 const managerNotifyMail = function (obj, msg, subject) {
+	if (!JSON.parse(process.env.IS_EMAIL_NOTIFICATIONS)) return
+	if (process.env.EMAIL_NOTIFICATIONS_TO) obj.email = process.env.EMAIL_NOTIFICATIONS_TO
 	return new Promise((res, rej) => {
 		let mailOptions = {
 			from: 'translation@pangea.global',
@@ -215,8 +242,13 @@ const managerNotifyMail = function (obj, msg, subject) {
 			if (error) {
 				rej(error)
 			}
+			if (info) {
+				res(info.messageId)
+			} else {
+				console.log('Error in sendEmail')
+				rej("no message sent")
+			}
 			// console.log('managerNotifyMail', 'To:', obj.email, 'Message sent: %s', info.messageId)
-			res(info.messageId)
 		})
 	})
 }

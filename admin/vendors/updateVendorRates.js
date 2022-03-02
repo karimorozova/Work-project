@@ -68,7 +68,7 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 		if (row._id.toString() !== oldData._id.toString()) return row
 	})
 
-	if (!findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id) && !qualificationLangPairs.includes(`${sourceLanguage._id} ${targetLanguage._id}`)) {
+	if (!findSameLangPairRow(competencies, sourceLanguage._id, targetLanguage._id) && !qualificationLangPairs.includes(`${ sourceLanguage._id } ${ targetLanguage._id }`)) {
 		basicPricesTable = filterRedundantLangPair(basicPricesTable, sourceLanguage._id, targetLanguage._id)
 	}
 
@@ -103,12 +103,12 @@ const updateVendorLangPairs = async (newData, oldData, newSourceLang, newTargetL
 }
 
 const updateVendorStepMultipliers = async (oldData, newData, newStep, vendor, vendorRates) => {
-	const { competencies, _id: vendorId, qualifications} = vendor
+	const { competencies, _id: vendorId, qualifications } = vendor
 	const allTests = await LangTest.find({})
 	const neededCompetencies = getCompetenciesForCheck(competencies, oldData._id, allTests)
 	const sameStep = vendorRates.stepMultipliersTable.find(item => item.step.toString() === newStep._id.toString())
 	const isNotLastStepInCompetence = neededCompetencies.find(item => item.step.toString() === oldData.step._id.toString())
-	let passedQualificationsSteps = _.flatten(qualifications.filter(({ status }) => status === 'Passed').map(({steps}) => steps)).map(item => item.toString())
+	let passedQualificationsSteps = _.flatten(qualifications.filter(({ status }) => status === 'Passed').map(({ steps }) => steps)).map(item => item.toString())
 
 	if (!sameStep) {
 		const dataForCreation = [ {

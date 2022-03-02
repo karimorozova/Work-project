@@ -1,230 +1,107 @@
-const unirest = require('unirest');
-const { zohoCreds } = require('../configs');
-const { Zoho, ZohoReport, User } = require('../models');
-const moment = require('moment');
+// const unirest = require('unirest');
+const { zohoCreds } = require('../configs')
+const { Zoho, ZohoReport, User } = require('../models')
+const axios = require("axios")
+const { returnMessageAndType } = require("../invoicingReceivables/helper")
 
-const tokensUrl = 'https://accounts.zoho.com';
-const dataUrl = 'https://www.zohoapis.com/crm/v2';
-
-const grades = {
-    "F": {min: 0, max: 59},
-    "D": {min: 60, max: 69},
-    "C": {min: 70, max: 76},
-    "C+": {min: 77, max: 79},
-    "B-": {min: 80, max: 82},
-    "B": {min: 83, max: 86},
-    "B+": {min: 87, max: 89},
-    "A-": {min: 90, max: 92},
-    "A": {min: 93, max: 96},
-    "A+": {min: 97, max: 100}
-}
-
-const standard = {leads: 30, calls: 30, communications: 50, meetings: 1};
-
-async function getCurrentToken() {
-    try {
-        const token = await Zoho.find();
-        return token[0].access_token;
-    } catch(err) {
-        console.log(err);
-        console.log("Error on getCurrentToken ZOHO from DB")
-    }
-}
+const baseUrl = 'https://books.zoho.com/api/v3/'
+const tokensUrl = 'https://accounts.zoho.com'
+const dataUrl = 'https://www.zohoapis.com/crm/v2'
 
 async function getTokens(code) {
-    return new Promise((resolve,reject) => {
-        unirest.post(`${tokensUrl}/oauth/v2/token`)
-        .header('Accept', 'application/json')
-        .field('grant_type', 'authorization_code')
-        .field('client_id', zohoCreds.client_id)
-        .field('client_secret', zohoCreds.client_secret)
-        .field('redirect_uri', zohoCreds.redirect_uri)
-        .field('code', code)
-        .end( (res) => {
-            if(res.error) {
-                return reject(res.error)
-            }
-            resolve(res.body);
-        })
-    })
+	return (await axios({
+		headers: {
+			'Accept': `application/json`
+		},
+		method: "post",
+		url: `${ tokensUrl }/oauth/v2/token`,
+		params: {
+			'grant_type': 'authorization_code',
+			'client_id': zohoCreds.client_id,
+			'client_secret': zohoCreds.client_secret,
+			'redirect_uri': zohoCreds.redirect_uri,
+			'code': code
+		}
+	})).data
 }
-
-// async function refreshToken() {
-//     return new Promise((resolve,reject) => {
-//         unirest.post(`${tokensUrl}/oauth/v2/token`)
-//         .header('Accept', 'application/json')
-//         .field('grant_type', 'refresh_token')
-//         .field('refresh_token', '1000.7963cfec29ec47370f975ee7e3033186.ba2acd9ed645dc106b3f10af0a69ceef')
-//         .field('client_id', zohoCreds.client_id)
-//         .field('client_secret', zohoCreds.client_secret)
-//         .end( (res) => {
-//             if(res.error) {
-//                 return reject(res.error)
-//             }
-//             resolve(res.body);
-//         })
-//     })
-// }
 
 async function refreshToken(refreshToken) {
-    return new Promise((resolve,reject) => {
-        unirest.post(`${tokensUrl}/oauth/v2/token`)
-        .header('Accept', 'application/json')
-        .field('grant_type', 'refresh_token')
-        .field('refresh_token', refreshToken)
-        .field('client_id', zohoCreds.client_id)
-        .field('client_secret', zohoCreds.client_secret)
-        .end( (res) => {
-            if(res.error) {
-                return reject(res.error)
-            }
-            resolve(res.body);
-        })
-    })
+	return (await axios({
+		headers: {
+			'Accept': `application/json`
+		},
+		method: "post",
+		url: `${ tokensUrl }/oauth/v2/token`,
+		params: {
+			'grant_type': 'refresh_token',
+			'refresh_token': refreshToken,
+			'client_id': zohoCreds.client_id,
+			'client_secret': zohoCreds.client_secret
+		}
+	})).data
 }
 
-async function getRecords(user) {
-    try {
-        const leads = await getLeads(user);
-        const activities = await getActivities(user);
-        const calls = getCallsCount(activities);
-        const meetings = getMeetings(activities);
-        const communications = getCommunications(activities);
-        return { leads, calls, meetings, communications }
-    } catch(err) {
-        console.log(err);
-        console.log("Error in getRecords(Zoho)");
-        throw err;
-    }
+async function getCurrentToken() {
+	try {
+		const token = await Zoho.findOne()
+		return token.access_token
+	} catch (err) {
+		console.log(err)
+		console.log("Error on getCurrentToken ZOHO from DB")
+	}
 }
 
-async function getLeads(user) {
-    const currentToken = await getCurrentToken();
-    const date = moment().hours(0);
-    const isoDate = date.toISOString().split(".")[0];
-    return new Promise((resolve,reject) => {
-        unirest.get(`${dataUrl}/Leads`)
-        .header('Authorization', `Zoho-oauthtoken ${currentToken}`)
-        .header('If-Modified-Since', `${isoDate}+02:00`)
-        .end( (res) => {
-            if(res.error) {
-                return reject(res.error)
-            }
-            let result = res.body ? res.body.data.filter(item => item.Owner.name === user): "";
-            resolve(result);
-        })
-    })
+const setNewTokenFromRefresh = async () => {
+	try {
+		const { _id, refresh_token } = await Zoho.findOne()
+		const { access_token = '' } = await refreshToken(refresh_token)
+		if (access_token === '') return returnMessageAndType("test", 'error')
+		await Zoho.updateOne({ _id: _id }, { access_token })
+		return access_token
+	} catch (e) {
+		return false
+	}
 }
 
-async function getActivities(user) {
-    const currentToken = await getCurrentToken();
-    // const date = moment().hours(0);
-    // const isoDate = date.toISOString().split(".")[0];
-    return new Promise((resolve,reject) => {
-        unirest.get(`https://books.zoho.com/api/v3/invoices?organization_id=630935724`)
-        .header('Authorization', `Bearer ${currentToken}`)
-        // .header('If-Modified-Since', `${isoDate}+02:00`)
-        .end( (res) => {
-            if(res.error) {
-
-                return reject(res.error)
-            }
-            let result = res.body
-            console.log(result)
-            resolve(result);
-        })
-    })
+const zohoRequest = async (link, data, token, method = "GET", header = {}, additional = {}) => {
+	return (await axios({
+		headers: {
+			'Authorization': `Bearer  ${ token }`,
+			"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+			...header
+		},
+		method,
+		url: baseUrl + link,
+		data,
+		...(additional)
+	}))
 }
 
-function getCallsCount(data) {
-    if(!data) return "";
-    const result = data.filter(item => {
-        return item.Activity_Type === "Calls"
-    });
-    return result;
+const sendRequestToZoho = async (link, data = {}, method = "GET", header = {}, additional = {}) => {
+	let token = await getCurrentToken()
+	try {
+		return await zohoRequest(link, data, token, method, header, additional)
+	} catch (err) {
+		try {
+			if (err.response || err.response.data.code === 57) {
+				token = await setNewTokenFromRefresh()
+				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
+				return await zohoRequest(link, data, token, method, header, additional)
+			}
+		} catch (err) {
+			returnMessageAndType(err.message, 'error')
+		}
+
+		returnMessageAndType(err.message, 'error')
+	}
 }
 
-function getMeetings(data) {
-    if(!data) return "";
-    const result = data.filter(item => {
-        return item.Subject === "Meeting setup"
-    });
-    return result;
+module.exports = {
+	// getTokens, refreshToken,
+	// getRecords,
+	// getLeads, getActivities,
+	// getCallsCount, saveRecords,
+	refreshToken,
+	sendRequestToZoho,
+	getTokens
 }
-
-function getCommunications(data) {
-    if(!data) return "";
-    const subjects = ["Email Comm", "Linkedin Comm", "Facebook Comm"];
-    const result = data.filter(item => {
-        return item.Activity_Type === 'Tasks' && subjects.indexOf(item.Subject) !== -1;
-    })
-    return result;
-}
-
-async function saveRecords(records, user) {
-    const newRecords = parseRecords(records);
-    const today = moment().hours(2);
-    try {
-        const recordsUser = await User.findOne({firstName: user.split(" ")[0], lastName: user.split(" ")[1]});
-        const lastRecord = await ZohoReport.findOne({user: recordsUser.id, date: {$gte: today}});
-        if(lastRecord) {
-            console.log("updating")
-            await ZohoReport.updateOne({_id: lastRecord.id}, { ...newRecords })
-        } else {
-            console.log("creating");
-            await ZohoReport.create({ ...newRecords, user: recordsUser._id })
-        }
-    } catch(err) {
-        console.log(err);
-        console.log("Error in saveRecords (Zoho)");
-        throw err
-    }
-}
-
-function parseRecords(records) {
-    return {
-        date: new Date(),
-        leads: records.leads.length,
-        calls: records.calls.length,
-        communications: records.communications.length,
-        meetings: records.meetings.length,
-        percent: Math.round(+getDayAverage(records)),
-        grade: getDayGrade(records),
-        notes: ""
-    }
-}
-
-function getDayAverage(records) {
-    const totals = getAverage(records);
-    let total = Object.keys(totals).reduce((init, cur) => {
-        return init + totals[cur];
-    }, 0);
-    return total ? (total / 4).toFixed(2) : 0;
-}
-
-function getAverage(obj) {
-    return Object.keys(obj).reduce((init, cur) => {
-        init[cur] = obj[cur].length / standard[cur] * 100;
-        return {...init};
-    }, {})
-}
-
-function getDayGrade(obj) {
-    const percent = +getDayAverage(obj);
-    return gradeLetter(percent);
-}
-
-function gradeLetter(percent) {
-    let result = "F";
-    Object.keys(grades).forEach(key => {
-        if(Math.round(percent) >= grades[key].min && Math.round(percent) <= grades[key].max) {
-            result = key;
-        }
-    })
-    if(percent > 100) {
-        result = "A+"
-    }
-    return result;
-}
-
-module.exports = { getTokens, refreshToken, getRecords, getLeads, getActivities, getCallsCount, saveRecords }

@@ -1,11 +1,11 @@
 import Vue from 'vue'
-import jwt from 'jsonwebtoken'
-import secretKey from '../../configs/jwtkey'
 import Router from 'vue-router'
 import Login from '@/components/Login'
+import NewLogin from '@/components/NewLogin'
+import PasswordReset from '../components/PasswordReset'
+import PasswordResetRequest from '../components/PasswordResetRequest'
 import PasswordRestore from '@/components/PasswordRestore'
 import ProjectInfo from '@/components/pmArea/ProjectInfo'
-import OtherProjectInfo from '@/components/pmArea/otherProjects/OtherProjectInfo'
 import Pricelists from '@/components/finance/Pricelists'
 import PricelistSettingsLayout from '@/components/finance/PricelistSettingsLayout'
 import TableLeadsources from '@/components/Table/TableLeadsources'
@@ -23,15 +23,15 @@ import NewClientInfo from '@/components/clients/new-client/NewClientInfo'
 import ClientInfo from '@/components/clients/ClientInfo'
 import NewVendor from '@/components/vendors/NewVendor'
 import AccountInfo from '@/components/account/AccountInfo'
-import CreateProject from '@/components/pmArea/CreateProject'
 import ZohoCode from '@/components/ZohoCode'
 import TierReport from '@/components/reports/langPair/TierReport'
 import BenchmarkReport from '@/components/reports/benchmark/BenchmarkReport'
 import LqaReport from '@/components/reports/lqa/LqaReport'
 import LqaVendors from '@/components/reports/upcomingLqas/LqaVendors'
-// import Xtrf from '@/components/reports/Xtrf'
+import StepsDashboard from '@/components/dashboard/StepsDashboard'
 import OverallView from '@/components/dashboard/OverallView'
 import Activity from '@/components/dashboard/Activity'
+import Finance from '@/components/dashboard/Finance'
 import SalesPerformance from '@/components/dashboard/SalesPerformance'
 import IndustryLqa from '@/components/Table/IndustryLqa'
 import TableClientApiSetting from "../components/Table/TableClientApiSetting"
@@ -39,14 +39,13 @@ import Navbar from "../components/Navbar"
 import clearRouterView from "../components/clearRouterView"
 import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
 import QuoteDecision from '../components/pmArea/QuoteDecision'
+import CreationLayout from "../components/pmArea/creationProject/CreationLayout"
+import PaymentMethodsLayout from "../components/Table/PaymentMethods/Layout"
 
 
 // LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
 import Requests from '@/components/pmArea/lists/Requests'
-import OpenOtherProjects from '@/components/pmArea/lists/OpenOtherProjects'
-import ClosedOtherProjects from '@/components/pmArea/lists/ClosedOtherProjects'
-import QuoteOtherProjects from '@/components/pmArea/lists/QuoteOtherProjects'
 
 import Allclients from '@/components/clients/lists/Allclients'
 import ActiveClients from '@/components/clients/lists/ActiveClients'
@@ -67,12 +66,13 @@ import PayablesDetails from "../components/invoicingPayables/PayablesDetails"
 import PayablesAdd from "../components/invoicingPayables/PayablesAdd"
 import PayablesPaidDetails from "../components/invoicingPayables/PayablesPaidDetails"
 
-
 import ReceivablesReportsList from "../components/invoicingReceivables/ReceivablesReportsList"
 import ReceivablesPaidReportsList from "../components/invoicingReceivables/ReceivablesPaidReportsList"
 import ReceivablesDetails from "../components/invoicingReceivables/ReceivablesDetails"
 import ReceivablesAdd from "../components/invoicingReceivables/ReceivablesAdd"
 import ReceivablesPaidDetails from "../components/invoicingReceivables/ReceivablesPaidDetails"
+import axios from "axios"
+import cookie from "../../../vendor/plugins/vue-cookie"
 // =====================================================================================================
 
 
@@ -81,15 +81,20 @@ Vue.use(Router)
 const router = new Router({
 	mode: 'history',
 	routes: [
-		// {
-		//     path: '/xtrf',
-		//     name: 'xtrf',
-		//     component: Xtrf
-		// },
 		{
 			path: '/login',
 			name: 'login',
-			component: Login
+			component: NewLogin
+		},
+		{
+			path: '/password-reset/token/:token',
+			name: 'password-reset',
+			component: PasswordReset
+		},
+		{
+			path: '/password-reset-request',
+			name: 'password-reset-request',
+			component: PasswordResetRequest
 		},
 		{
 			path: '/forgot',
@@ -107,19 +112,11 @@ const router = new Router({
 			redirect: '/pangea-dashboard/overall-view',
 			component: Navbar,
 			props: true,
-			// beforeEnter: (to, from, next) => {
-			// 	const token = localStorage.getItem("token")
-			// 	if (token) {
-			// 		next()
-			// 	} else {
-			// 		next('/login')
-			// 	}
-			// },
 			children: [
 				{
-				    path: '/pangea-zoho-code',
-				    name: 'zoho',
-				    component: ZohoCode
+					path: '/pangea-zoho-code',
+					name: 'zoho',
+					component: ZohoCode
 				},
 				{
 					path: 'pangea-account',
@@ -137,6 +134,11 @@ const router = new Router({
 							component: OverallView
 						},
 						{
+							path: 'pipeline',
+							name: 'pipeline',
+							component: StepsDashboard
+						},
+						{
 							path: 'sales-perfomance',
 							name: 'sales-perfomance',
 							component: SalesPerformance
@@ -145,6 +147,11 @@ const router = new Router({
 							path: 'activities',
 							name: 'activities',
 							component: Activity
+						},
+						{
+							path: 'finance',
+							name: 'finance',
+							component: Finance
 						}
 
 					]
@@ -219,6 +226,11 @@ const router = new Router({
 							path: 'industry-lqas',
 							name: 'industry-lqas',
 							component: IndustryLqa
+						},
+						{
+							path: 'payment-methods',
+							name: 'payment-methods',
+							component: PaymentMethodsLayout
 						},
 						{
 							path: 'users',
@@ -532,53 +544,9 @@ const router = new Router({
 							]
 						},
 						{
-							path: 'xtrf',
-							name: 'xtrf',
-							component: clearRouterView,
-							props: true,
-							children: [
-								{
-									path: 'open-other-projects',
-									name: 'open-other-projects',
-									component: OpenOtherProjects,
-									props: true
-								},
-								{
-									path: 'open-other-projects/details/:id',
-									name: 'open-other-projects-details',
-									component: OtherProjectInfo,
-									props: true
-								},
-								{
-									path: 'closed-other-projects',
-									name: 'closed-other-projects',
-									component: ClosedOtherProjects,
-									props: true
-								},
-								{
-									path: 'closed-other-projects/details/:id',
-									name: 'closed-other-projects-details',
-									component: OtherProjectInfo,
-									props: true
-								},
-								{
-									path: 'quote-other-projects',
-									name: 'quote-other-projects',
-									component: QuoteOtherProjects,
-									props: true
-								},
-								{
-									path: 'quote-other-projects/details/:id',
-									name: 'quote-other-projects-details',
-									component: OtherProjectInfo,
-									props: true
-								}
-							]
-						},
-						{
 							path: 'create-project',
 							name: 'create-project',
-							component: CreateProject
+							component: CreationLayout
 						}
 					]
 				},
@@ -642,7 +610,7 @@ const router = new Router({
 							path: 'invoicing-receivables/create-reports',
 							name: 'invoicing-receivables',
 							component: ReceivablesAdd
-						},
+						}
 
 					]
 				},
@@ -685,25 +653,21 @@ const router = new Router({
 	]
 })
 
-router.beforeEach((to, from, next) => {
-	const date = Date.now()
-	const token = localStorage.getItem("token")
+router.beforeEach( async (to, from, next) => {
+	// const token = localStorage.getItem("token")
 	try {
-		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/forgot' || to.name === 'quote-decision') return next()
-		if (!!token) {
-			const jwtObj = jwt.verify(JSON.parse(token).value, secretKey)
-			if (jwtObj) {
-				if (date > new Date(jwtObj.timestamp)) exit()
+		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/password-reset-request' || to.name === 'password-reset' || to.name === 'quote-decision') return next()
+			const { status } = await axios.post('/check-jwt')
+			if (status === 200) {
 				return next()
 			}
-		}
 		next('/login')
 	} catch (e) {
 		exit()
 	}
 
 	function exit() {
-		localStorage.removeItem("token")
+		cookie.delete('admin')
 		return next('/login')
 	}
 })

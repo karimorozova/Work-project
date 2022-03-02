@@ -8,7 +8,6 @@ export const alertMessage = state => state.alertMessage;
 
 // ===>
 export const getUsers = state => state.users;
-export const getActiveUsers = state => state.users;
 export const getUser = state => state.user;
 export const getAllLanguages = state => state.languages;
 export const getAllIndustries= state => state.industries;
@@ -17,13 +16,11 @@ export const getAllUnits = state => state.units
 export const getAllServices = state => state.services
 
 // export const getAllVendorsForProject = state => state.vendorsForProject
-export const getAllVendorsForOptions = state => state.vendorsForOptions
-export const getAllClientsForOptions = state => state.clientsForOptions
+// export const getAllVendorsForOptions = state => state.vendorsForOptions
+// export const getAllClientsForOptions = state => state.clientsForOptions
 // ===>
 
 export const getClients = state => state.customers;
 export const getVendors = state => state.vendors;
-export const getRatesDuo = state => state.duoRates;
-export const getAllProjects = state => state.projects;
 export const getCurrentProject = state => state.currentProject;
 export const getTiersInfo = state => state.tiersInfo;

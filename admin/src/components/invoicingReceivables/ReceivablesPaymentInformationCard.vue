@@ -48,7 +48,7 @@
   .paid {
     position: absolute;
     right: 20px;
-    color: $green-approve;
+    color: $green;
     font-size: 12px;
     border: 2px solid;
     padding: 5px;

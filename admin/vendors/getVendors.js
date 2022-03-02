@@ -118,7 +118,7 @@ async function getVendorStepDetails(id, stepInfo) {
 	const groupStepInfoWithoutUnit = `${ stepInfo.source }-${ stepInfo.target }-${ stepInfo.step }-${ stepInfo.industry }`
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	let vendor = await Vendors.findOne(
-			{ status: "Active", _id: id },
+			{ _id: id },
 			{
 				"firstName": 1,
 				"surname": 1,
@@ -139,14 +139,20 @@ async function getVendorStepDetails(id, stepInfo) {
 		const currentInfo = `${ sourceLanguage._id }-${ targetLanguage._id }-${ step._id }-${ unit._id }-${ industry._id }`
 		return groupStepInfo === currentInfo
 	})
+	const stepInfoForBenchmark = {
+		sourceLanguage: { _id: stepInfo.source },
+		targetLanguage: { _id: stepInfo.target },
+		step: { _id: stepInfo.step },
+		unit: { _id: stepInfo.unit },
+		industry: { _id: stepInfo.industry }
+	}
 
 	if (!priceListTable) return {
 		name: vendor.firstName + ' ' + vendor.surname || '',
 		photo: vendor.photo,
 		email: vendor.email,
 		tqi: 0,
-		benchmark: 0,
-		benchmarkMargin: 0,
+		...getBenchmarkAdditions(stepInfoForBenchmark, basicPricesTable, stepMultipliersTable, industryMultipliersTable),
 		lqa1: 0,
 		lqa2: 0,
 		lqa3: 0
@@ -180,12 +186,75 @@ async function getVendorStepDetails(id, stepInfo) {
 		lqa1,
 		lqa2,
 		lqa3,
-		...getBenchmarkAdditions(priceListTable, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
+		...getBenchmarkAdditions(stepInfoForBenchmark, basicPricesTable, stepMultipliersTable, industryMultipliersTable)
 	}
 }
 
+const getVendorForPortal = async (query) => {
+	return (await Vendors.findOne(query, {
+				photo: 1,
+				firstName: 1,
+				status: 1,
+				surname: 1,
+				email: 1,
+				phone: 1,
+				timezone: 1,
+				native: 1,
+				gender: 1,
+				skype: 1,
+				availability: 1,
+				password: 1,
+				memoqUserName: 1,
+				guid: 1
+			}).populate('native')
+	)
+}
+
+const getVendorExtraForPortal = async (query) => {
+	return (await Vendors.findOne(query, {
+				documents: 1,
+				profExperiences: 1,
+				educations: 1,
+				matrix: 1,
+				competencies: 1,
+				qualifications: 1,
+				assessments: 1,
+				pendingCompetencies: 1,
+				rates: 1,
+				billingInfo: 1
+			})
+					.populate('qualifications.source', [ 'lang' ])
+					.populate('qualifications.target', [ 'lang' ])
+					.populate('qualifications.industries', [ 'name' ])
+					.populate('qualifications.steps', [ 'title' ])
+					.populate('assessments.sourceLanguage', [ 'lang' ])
+					.populate('assessments.targetLanguage', [ 'lang' ])
+					.populate("assessments.industries.industry", [ 'name' ])
+					.populate("assessments.industries.steps.step", [ 'title' ])
+					.populate('competencies.sourceLanguage', [ 'lang' ])
+					.populate('competencies.targetLanguage', [ 'lang' ])
+					.populate('competencies.industry', [ 'name' ])
+					.populate('competencies.step', [ 'title' ])
+					.populate('competencies.step.calculationUnit', [ 'type' ])
+					.populate('rates.basicPricesTable.sourceLanguage', [ 'lang', 'iso1' ])
+					.populate('rates.basicPricesTable.targetLanguage', [ 'lang', 'iso1' ])
+					.populate('rates.stepMultipliersTable.step', [ 'title' ])
+					.populate('rates.stepMultipliersTable.unit', [ 'type' ])
+					.populate('rates.industryMultipliersTable.industry', [ 'name', 'icon' ])
+					.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
+					.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
+					.populate('rates.pricelistTable.step', [ 'title' ])
+					.populate('rates.pricelistTable.unit', [ 'type' ])
+					.populate('rates.pricelistTable.industry', [ 'name' ])
+					.populate('pendingCompetencies.sourceLanguage', [ 'lang' ])
+					.populate('pendingCompetencies.targetLanguage', [ 'lang' ])
+					.populate('pendingCompetencies.industry', [ 'name' ])
+					.populate('pendingCompetencies.step', [ 'title' ])
+	)
+}
+
 async function getVendor(query) {
-	return await Vendors.findOne(query)
+	return (await Vendors.findOne(query)
 			.populate('native')
 			.populate('industries', [ 'name', 'icon' ])
 			.populate('languagePairs.source')
@@ -216,7 +285,7 @@ async function getVendor(query) {
 			.populate('pendingCompetencies.sourceLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.targetLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.industry', [ 'name' ])
-			.populate('pendingCompetencies.step', [ 'title' ])
+			.populate('pendingCompetencies.step', [ 'title' ]))
 }
 
 async function hasVendorCompetenciesAndPending(vendorId) {
@@ -225,7 +294,7 @@ async function hasVendorCompetenciesAndPending(vendorId) {
 }
 
 async function getVendors(query) {
-	return await Vendors.find(query)
+	return (await Vendors.find(query)
 			.populate('native')
 			.populate('industries', [ 'name', 'icon' ])
 			.populate('languagePairs.source')
@@ -252,11 +321,11 @@ async function getVendors(query) {
 			.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
 			.populate('rates.pricelistTable.step', [ 'title' ])
 			.populate('rates.pricelistTable.unit', [ 'type' ])
-			.populate('rates.pricelistTable.industry', [ 'name' ])
+			.populate('rates.pricelistTable.industry', [ 'name' ]))
 }
 
 async function getVendorAfterUpdate(query, update) {
-	return await Vendors.findOneAndUpdate(query, update, { new: true })
+	return (await Vendors.findOneAndUpdate(query, update, { new: true })
 			.populate("native")
 			.populate('industries', [ 'name', 'icon' ])
 			.populate("languagePairs.source")
@@ -287,7 +356,7 @@ async function getVendorAfterUpdate(query, update) {
 			.populate('pendingCompetencies.sourceLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.targetLanguage', [ 'lang' ])
 			.populate('pendingCompetencies.industry', [ 'name' ])
-			.populate('pendingCompetencies.step', [ 'title' ])
+			.populate('pendingCompetencies.step', [ 'title' ]))
 }
 
 async function getFilteredVendors(filters) {
@@ -307,6 +376,8 @@ async function getFilteredVendors(filters) {
 				.populate("native")
 				.populate('pendingCompetencies.sourceLanguage')
 				.populate('pendingCompetencies.targetLanguage')
+				.populate('competencies.sourceLanguage')
+				.populate('competencies.targetLanguage')
 	} catch (err) {
 		console.log(err)
 		console.log("Error on filtering vendors")
@@ -379,6 +450,7 @@ module.exports = {
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential,
 	getVendorsForSteps,
-	getVendorStepDetails
-
+	getVendorStepDetails,
+	getVendorForPortal,
+	getVendorExtraForPortal
 }

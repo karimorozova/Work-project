@@ -47,7 +47,9 @@
   @import "../../assets/scss/colors.scss";
 
   .upload-file {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     &__button {
       overflow: hidden;

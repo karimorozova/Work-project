@@ -1,40 +1,68 @@
 const {
 	payablesAddSteps,
-	addStepsToPayables,
+	addStepsToPayables
 } = require('./createPayables')
 
 const {
 	payableDeleteStep,
-	payableDelete,
+	payableDelete
 } = require('./deletePayables')
 
 const {
 	setPayablesNextStatus,
-	paidOrAddPaymentInfo,
 	invoiceSubmission,
 	invoiceReloadFile,
+	invoicePaymentMethodResubmission
 } = require('./updatePayables')
 
 const {
 	clearPayablesStepsPrivateKeys,
+	invoiceFileUploading,
+	getVendorAndCheckPaymentTerms,
+	paidOrAddPaymentInfo,
+	updatePayableReport,
+	getReportsTotal,
+	rollBackFromPaidToDraft
 } = require('./helpers')
 
 const {
 	getAllPayables,
 	getPayable,
+	getAllPayableByDefaultQuery,
 	getAllSteps,
 	stepsFiltersQuery,
 	payablesFiltersQuery,
-	getPayableByVendorId,
+	getPayableByVendorId
 } = require('./getPayables')
 
 const {
 	getAllPaidPayables,
 	getPaidReport,
-	getPayablePaidByVendorId,
+	getReportPaidByVendorId
 } = require('./getPaidPayables')
 
+const {
+	createBillZohoRequest,
+	addFile,
+	removeFile,
+	createNewPayable,
+	updatePayableFromZoho,
+	updatePayablesFromZoho
+} = require('./zohoBilling')
+
+const {
+	notifyVendorReportsIsSent,
+	notifyVendorReportsIsPaid
+} = require("./notification")
+
 module.exports = {
+	rollBackFromPaidToDraft,
+	getReportsTotal,
+	invoicePaymentMethodResubmission,
+	getVendorAndCheckPaymentTerms,
+	invoiceFileUploading,
+	notifyVendorReportsIsSent,
+	notifyVendorReportsIsPaid,
 	invoiceReloadFile,
 	invoiceSubmission,
 	clearPayablesStepsPrivateKeys,
@@ -44,13 +72,21 @@ module.exports = {
 	getPayable,
 	payablesAddSteps,
 	payableDeleteStep,
-	payableDelete: payableDelete,
+	payableDelete,
 	getAllSteps,
 	addStepsToPayables,
 	stepsFiltersQuery,
 	payablesFiltersQuery,
 	paidOrAddPaymentInfo,
 	getAllPaidPayables,
-	getPaidPayables: getPaidReport,
-	getPayablePaidByVendorId,
+	getPaidReport,
+	getReportPaidByVendorId,
+	createBillZohoRequest,
+	addFile,
+	updatePayableReport,
+	removeFile,
+	createNewPayable,
+	updatePayableFromZoho,
+	updatePayablesFromZoho,
+	getAllPayableByDefaultQuery
 }

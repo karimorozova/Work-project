@@ -1,7 +1,7 @@
 <template lang="pug">
   .drop-select(
     v-click-outside="outOptions"
-    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu, 'disableOverFlow': isSelectedWithIcon, 'disabled': isDisabled}, customClass]"
+    :class="[{'z-index': isDropped, 'table-drop-menu': isTableDropMenu, 'disableOverFlow': isSelectedWithIcon}, customClass]"
   )
     .select
 
@@ -79,10 +79,6 @@
 				type: Boolean,
 				default: false
 			},
-      isDisabled: {
-			  type: Boolean,
-        default: false
-      },
 			isRemoveOption: {
 				type: Boolean,
 				default: false
@@ -110,7 +106,6 @@
 				this.$nextTick(() => this.$refs.search.focus())
 			},
 			toggleOptions() {
-			  if(this.isDisabled) return
 				this.isDropped = !this.isDropped
 				this.searchValue = ""
 				if (this.isDropped && this.hasSearch) {
@@ -160,17 +155,10 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors";
+  @import '../../assets/scss/colors.scss';
 
   .disableOverFlow {
     overflow: unset !important;
-  }
-  .drop-select.disabled {
-    background-color: $light-border;
-    .arrow-button,
-    .select{
-      cursor: default;
-    }
   }
 
   .controlOptions {
@@ -218,7 +206,7 @@
   }
 
   i {
-    font-size: 20px;
+    font-size: 19px;
     color: $border;
   }
 
@@ -324,10 +312,6 @@
       .project-info__tasks & {
         max-height: 170px;
       }
-
-      .filters & {
-        max-height: 200px;
-      }
     }
 
     .filters & {
@@ -427,7 +411,7 @@
     .tooltipData {
       visibility: hidden;
       font-size: 14px;
-      width: 240px;
+      width: max-content;
       background: white;
       border-radius: 4px;
       right: 25px;

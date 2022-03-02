@@ -22,7 +22,7 @@ const {
 const { upload } = require('../utils');
 const { getFilteredJson, fillXtrfLqa, fillXtrfPrices } = require("../services");
 const { XtrfTier, XtrfReportLang, XtrfVendor, XtrfLqa, XtrfLqaGrouped, LangTier } = require("../models");
-convertExcel = require('excel-as-json').processFile;
+// convertExcel = require('excel-as-json').processFile;
 
 router.get('/languages', async (req, res) => {
 	try {
@@ -35,21 +35,22 @@ router.get('/languages', async (req, res) => {
 });
 
 router.post('/xtrf-tier', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
-	const { start, end, industry } = req.body;
-	const { reportFiles } = req.files;
-	convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
-		if(err) {
-			res.send(err);
-		}
-		const languages = getFilteredJson(data);
-		try {
-			await XtrfTier.create({ languages, start: new Date(start), end: new Date(end), industry });
-		} catch (err) {
-			console.log(err);
-			res.status(500).send("Error on saving xtrf tier");
-		}
-		res.send(data);
-	});
+	res.send('Err')
+	// const { start, end, industry } = req.body;
+	// const { reportFiles } = req.files;
+	// convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
+	// 	if(err) {
+	// 		res.send(err);
+	// 	}
+	// 	const languages = getFilteredJson(data);
+	// 	try {
+	// 		await XtrfTier.create({ languages, start: new Date(start), end: new Date(end), industry });
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 		res.status(500).send("Error on saving xtrf tier");
+	// 	}
+	// 	res.send(data);
+	// });
 });
 
 router.post('/xtrf-tier-report', async (req, res) => {
@@ -69,18 +70,19 @@ router.post('/xtrf-tier-report', async (req, res) => {
 router.post('/xtrf-lqa', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
 	const { reportFiles } = req.files;
 	try {
-		convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
-			if(err) {
-				res.send(err);
-			}
-			try {
-				await fillXtrfLqa(data);
-			} catch (err) {
-				console.log(err);
-				res.status(500).send("Error on filling xtrf LQA reports");
-			}
-			res.send(data);
-		});
+		// convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
+		// 	if(err) {
+		// 		res.send(err);
+		// 	}
+		// 	try {
+		// 		await fillXtrfLqa(data);
+		// 	} catch (err) {
+		// 		console.log(err);
+		// 		res.status(500).send("Error on filling xtrf LQA reports");
+		// 	}
+		// 	res.send(data);
+		// });
+		res.send('Err')
 	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on filling xtrf LQA reports");
@@ -158,18 +160,19 @@ router.post('/xtrf-upcoming-lqa-report', async (req, res) => {
 router.post('/xtrf-prices', upload.fields([{ name: 'reportFiles' }]), async (req, res) => {
 	const { reportFiles } = req.files;
 	try {
-		convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
-			if(err) {
-				res.send(err);
-			}
-			try {
-				await fillXtrfPrices(data);
-			} catch (err) {
-				console.log(err);
-				res.status(500).send("Error on filling xtrf prices");
-			}
-			res.send(data);
-		});
+		res.send('Err');
+		// convertExcel(reportFiles[0].path, undefined, null, async (err, data) => {
+		// 	if(err) {
+		// 		res.send(err);
+		// 	}
+		// 	try {
+		// 		await fillXtrfPrices(data);
+		// 	} catch (err) {
+		// 		console.log(err);
+		// 		res.status(500).send("Error on filling xtrf prices");
+		// 	}
+		// 	res.send(data);
+		// });
 	} catch (err) {
 		console.log(err);
 		res.status(500).send("Error on getting reports");

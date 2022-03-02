@@ -964,7 +964,7 @@
     position: absolute;
     z-index: 100;
     background: #fff;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     border-radius: 4px;
   }
 
@@ -989,7 +989,7 @@
   }
 
   .vdp-datepicker__calendar header .up {
-    color: #D15F45;
+    color: #d66f58;
     font-size: 16px;
     font-family: 'Myriad900';
   }
@@ -1005,7 +1005,7 @@
   }
 
   .vdp-datepicker__calendar header .prev:after {
-    border-right: 10px solid #D15F45;
+    border-right: 10px solid #d66f58;
     margin-left: -5px;
   }
 
@@ -1014,7 +1014,7 @@
   }
 
   .vdp-datepicker__calendar header .next:after {
-    border-left: 10px solid #D15F45;
+    border-left: 10px solid #d66f58;
     margin-left: 5px;
   }
 
@@ -1065,11 +1065,11 @@
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).day:hover,
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).month:hover,
   .vdp-datepicker__calendar .cell:not(.blank):not(.disabled).year:hover {
-    border: 1px solid #D15F45;
+    border: 1px solid #d66f58;
   }
 
   .vdp-datepicker__calendar .cell.selected {
-    color: #d15f45;
+    color: #d66f58;
     font-family: 'Myriad600';
   }
 
@@ -1086,7 +1086,7 @@
   }
 
   .vdp-datepicker__calendar .cell.today {
-    background-color: #D15F45;
+    background-color: #d66f58;
     color: #FFF !important;
     font-family: Myriad600;
   }
@@ -1110,7 +1110,7 @@
   .vdp-datepicker__calendar .cell.day-header {
     white-space: no-wrap;
     cursor: inherit;
-    background-color: #d15f45;
+    background-color: #d66f58;
     cursor: default;
     color: white;
   }
@@ -1151,13 +1151,13 @@
     }
 
     .cell.today {
-      color: #d15f45 !important;
+      color: #d66f58 !important;
       background-color: #fff !important;
       font-weight: bold;
     }
 
     .selected {
-      background-color: #D15F45 !important;
+      background-color: #d66f58 !important;
       color: #fff !important;
     }
   }
@@ -1328,7 +1328,7 @@
   .calendar-custom {
     width: 260px;
     right: 0;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
   }
 
   .calendar-custom .cell,
@@ -1365,7 +1365,7 @@
   }
 
   .time-select i {
-    color: #d15f45;
+    color: #d66f58;
   }
 
   .time-select span {

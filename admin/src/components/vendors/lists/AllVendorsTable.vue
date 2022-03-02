@@ -54,6 +54,7 @@
 
 			scrollBodyToTop() {
 				let tbody = document.querySelector(".vendors-table__body")
+        if (!tbody) return
 				tbody.scrollTop = 0
 			},
 			async bottomScrolled() {
@@ -96,7 +97,7 @@
 						}
 					})
 					this.setFilteredVendors(mappedResult)
-					this.lastId = result.body && result.body.length ? result.body[result.body.length - 1]._id : ""
+					this.lastId = result.data && result.data.length ? result.data[result.data.length - 1]._id : ""
 					this.scrollBodyToTop()
 				} catch (err) {
 					this.alertToggle({ message: "Error on getting vendors", isShow: true, type: "error" })

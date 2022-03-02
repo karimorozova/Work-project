@@ -7,7 +7,7 @@ const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>
                         xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays"
                         xmlns:mem="http://schemas.datacontract.org/2004/07/MemoQServices">
                     <soapenv:Header>
-                    <ApiKey>YKb66gpENslgRYoMO8rlJXFoss8mv6X5WODD58fE</ApiKey>
+                    <ApiKey>${process.env.MEMOQ_SECRET_KEY}</ApiKey>
                     </soapenv:Header>`;
 
 function getHeaders(endpoint) {

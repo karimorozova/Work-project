@@ -1,105 +1,133 @@
 <template lang="pug">
-  .wrapper
-    .paid PAID
-    .card
-      .card__price € {{ cardInfo.paidAmount }}
-      .card__date {{ customFormatter(cardInfo.paymentDate) }}
+  .receipt
+    .receipt__title RECEIPT
+    .receipt__number
+      span #
+      span {{ cardInfo._id }}
+
+    .header
       .row
-        .row__title Payment method:
-        .row__value {{ cardInfo.paymentMethod }}
-      .row
-        .row__title Currency:
+        .row__title Payment Date
+        .row__value {{ customFormatter(cardInfo.paymentDate) }}
+
+    .body
+      .row.margin(v-if="cardInfo.paymentMethod" )
+        .row__title Payment Method
+        .row__value {{ cardInfo.paymentMethod.name }}
+      .row.margin
+        .row__title Currency
         .row__value EUR
-      .row
-        .row__title Unpaid amount:
-        .row__value {{ cardInfo.unpaidAmount }} €
-      .row
-        .row__title Expected payment date:
+      .row.margin
+        .row__title Expected Payment Date
         .row__value {{ customFormatter(paymentDetails.expectedPaymentDate) }}
+      .row
+        .row__title Unpaid Amount
+        .row__value € {{ cardInfo.unpaidAmount }}
 
-      .card__notes(v-if="cardInfo.notes") {{ cardInfo.notes }}
+    .footer
+      .row
+        .row__title.total-key TOTAL
+        .row__value.total-key € {{ cardInfo.paidAmount }}
 
+    .notes(v-if="cardInfo.notes") {{ cardInfo.notes }}
 
 </template>
 
 <script>
-	import moment from "moment"
+import moment from "moment"
 
-	export default {
-		props: {
-			cardInfo: {
-				type: Object
-			},
-			paymentDetails: {
-				type: Object
-			}
-		},
-		methods: {
-			customFormatter(date) {
-				return moment(date).format('DD-MM-YYYY, HH:mm')
-			}
-		}
-	}
+export default {
+  props: {
+    cardInfo: {
+      type: Object
+    },
+    paymentDetails: {
+      type: Object
+    }
+  },
+  methods: {
+    customFormatter(date) {
+      return moment(date).format('MMM D, HH:mm')
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../../assets/scss/colors";
+@import "../../assets/scss/colors";
 
-  .paid {
-    position: absolute;
-    right: 20px;
-    color: $green-approve;
-    font-size: 12px;
-    border: 2px solid;
-    padding: 5px;
-    border-radius: 4px;
-    font-family: 'Myriad600';
-    top: 26.5px;
+.receipt {
+  padding: 25px;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  height: fit-content;
+  margin: 25px 25px 0 0;
+  background-color: white;
+  width: 320px;
+  box-sizing: border-box;
+
+  &__title {
+    text-align: center;
+    font-family: 'Myriad900';
   }
 
-  .row {
+  &__number {
+    text-align: center;
+    opacity: .4;
+    margin-top: 4px;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &:last-child {
+    margin-bottom: 0px;
+  }
+
+  &__title {
+    width: 150px;
+  }
+
+  &__value {
+    width: 110px;
     display: flex;
-    margin: 10px 0;
-
-    &__title {
-      font-family: 'Myriad600';
-      width: 170px;
-    }
-
-    &__value {
-      width: 130px;
-    }
+    justify-content: end;
   }
+}
 
-  .card {
-    &__notes {
-      padding-top: 15px;
-      border-top: 1px solid $border;
-      margin-top: 15px;
-      color: $border-focus;
-    }
+.header {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-top: 1px dotted $border;
+  border-bottom: 1px dotted $border;
+}
 
-    &__price {
-      font-size: 28px;
-      font-family: 'Myriad900';
-    }
+.footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dotted $border;
+}
 
-    &__date {
-      font-size: 17px;
-      margin-bottom: 20px;
-      margin-top: 2px;
-      font-family: 'Myriad300';
-    }
+.total {
+  &-key {
+    font-family: Myriad600;
   }
+}
 
-  .wrapper {
-    width: 300px;
-    margin-top: 40px;
-    margin-right: 40px;
-    background: white;
-    border-radius: 4px;
-    padding: 20px;
-    position: relative;
-    box-shadow: $box-shadow;
-  }
+.notes {
+  margin-top: 12px;
+  text-align: center;
+  border-top: 1px dotted $border;
+  padding-top: 12px;
+  font-family: 'Myriad300';
+}
+
+.margin {
+  margin-bottom: 12px;
+}
 </style>

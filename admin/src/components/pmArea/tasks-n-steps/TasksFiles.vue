@@ -82,14 +82,17 @@ export default {
       refFiles: [],
       isSourceFilesShow: false,
       isRefFilesShow: false,
+      // forbiddenExtensions: [
+      //   'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
+      //   'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
+      //   'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
+      //   'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
+      // ],
       forbiddenExtensions: [
-        'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
-        'm4v', 'avi', 'wmv', 'mov', 'qt', 'flv', 'swf', 'avchd', 'jpeg',
-        'png', 'gif', 'bmp', 'tiff', 'ppm', 'pgm', 'jpg', 'svg', 'bat',
-        'mp3', 'aac', '3gp', 'aa', 'aax', 'aiff', 'alac', 'm4p', 'mpc'
+
       ],
       showFileSizeWarning: false,
-      warnings: [ 'File is too big. The max size of a file cannot exceed 2 MB' ],
+      warnings: [ 'File is too big. The max size of a file cannot exceed 55 MB' ],
       isUploadModal: false
     }
   },
@@ -134,14 +137,16 @@ export default {
       return sizesSum / 1000000 <= 100
     },
     uploadSourceFiles({ files }) {
-      const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 20)
+      // const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 20)
+      const filesBiggerThan2MB = Array.from(files).filter(item => item.size / 1000000 > 55)
       if (filesBiggerThan2MB.length) {
         this.showFileSizeWarning = true
       }
       const filteredFiles = Array.from(files).filter(item => {
         const { size, name } = item
         const extension = name.split('.').pop()
-        return size / 1000000 <= 20 && this.forbiddenExtensions.indexOf(extension) === -1
+        // return size / 1000000 <= 20 && this.forbiddenExtensions.indexOf(extension) === -1
+        return size / 1000000 <= 55 && this.forbiddenExtensions.indexOf(extension) === -1
       })
       if (filteredFiles.length && this.checkFilesSource(filteredFiles)) {
         for (let file of filteredFiles) {

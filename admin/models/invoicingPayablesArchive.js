@@ -1,8 +1,13 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 	reportId: {
+		type: String,
+		default: '',
+		trim: true
+	},
+	zohoBillingId: {
 		type: String,
 		default: '',
 		trim: true
@@ -16,10 +21,10 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	steps: [{
+	steps: [ {
 		type: Schema.Types.ObjectId,
 		ref: 'Projects.steps'
-	}],
+	} ],
 	firstPaymentDate: {
 		type: Date,
 		default: new Date()
@@ -30,8 +35,9 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 	},
 	paymentDetails: {
 		paymentMethod: {
-			type: String,
-			default: ''
+			type: Schema.Types.ObjectId,
+			ref: "Vendors.billingInfo.paymentMethods",
+			default: null
 		},
 		file: {
 			type: Object,
@@ -39,27 +45,31 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		},
 		expectedPaymentDate: {
 			type: Date
-		},
+		}
 	},
-	paymentInformation: [{
+	paymentInformation: [ {
+		zohoPaymentId: {
+			type: String
+		},
 		paidAmount: {
-			type: Number,
+			type: Number
 		},
 		unpaidAmount: {
 			type: Number
 		},
 		paymentMethod: {
-			type: String,
+			type: Object,
+			default: null
 		},
 		paymentDate: {
 			type: Date,
-			default: new Date()
+			default: ''
 		},
 		notes: {
 			type: String,
 			default: ""
 		}
-	}],
+	} ],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
@@ -74,8 +84,8 @@ const InvoicingPayablesArchiveSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	}
-});
+})
 
-const InvoicingPayablesArchive = mongoose.model('InvoicingPayablesArchive', InvoicingPayablesArchiveSchema);
+const InvoicingPayablesArchive = mongoose.model('InvoicingPayablesArchive', InvoicingPayablesArchiveSchema)
 
-module.exports = InvoicingPayablesArchive;
+module.exports = InvoicingPayablesArchive

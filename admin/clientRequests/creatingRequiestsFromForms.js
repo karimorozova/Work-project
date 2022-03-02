@@ -6,7 +6,6 @@ const { managerNotifyMail } = require('../utils/mailTemplate')
 
 
 const translationServiceRequest = async (formData, client) => {
-	//TODO: refactor | Client PaymentType
 	const {  paymentType: paymentProfile , _id } = client
 	const { deadline, projectName, brief, startOption } = formData
 
@@ -44,7 +43,6 @@ const translationServiceRequest = async (formData, client) => {
 }
 
 const newClientServiceRequest = async (formData, client) => {
-	//TODO: refactor | Client PaymentType
 	const {  paymentType: paymentProfile , _id } = client
 	const { deadline, projectName, notes,startOption, service } = formData
 

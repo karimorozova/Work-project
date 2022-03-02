@@ -1,8 +1,7 @@
 const {
 	getAllSteps,
 	reportsFiltersQuery,
-	getAllReports,
-	getReportById
+	getAllReportsFromDb
 } = require('./getReceivables')
 
 const {
@@ -31,6 +30,7 @@ const {
 const {
 	getAllPaidReceivables,
 	getPaidReceivables,
+	getAllPaidReceivablesFromDbWithProject,
 } = require('./getPaidReceivables')
 
 const {
@@ -47,6 +47,7 @@ const {
 
 
 module.exports = {
+	getAllReportsFromDb,
 	updateReportStateFromZoho,
 	setInvoiceStatus,
 	updateReportsStateFromZoho,
@@ -57,8 +58,6 @@ module.exports = {
 	updateInvoiceReceivablesStatus,
 	paidOrAddPaymentInfo,
 	deleteStepFromReport,
-	getReportById,
-	getAllReports,
 	reportsFiltersQuery,
 	createReports,
 	getAllSteps,
@@ -67,4 +66,5 @@ module.exports = {
 	getAllPaidReceivables,
 	getPaidReceivables,
 	createCustomerPayment,
+	getAllPaidReceivablesFromDbWithProject,
 }

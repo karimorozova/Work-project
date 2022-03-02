@@ -1,71 +1,71 @@
 <template lang="pug">
-.loading(v-show="loading || currentRequests > 0")
-    .loading__message
-        span.loading__text Loading 
-        .loading__spinner
+  .loading
+    transition(name="slide-fade")
+      .alert-message(v-show="!!currentRequests")
+        .myIcon.myIcon__loading
+          i(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
+        .text Loading
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from "vuex"
 
 export default {
-    data: () => ({
-        loading: false
-    }),
-    methods: {
-        start() {
-            this.loading = true;
-        },
-        finish() {
-            this.loading = false;
-        }
-    },
-    computed: {
-        ...mapGetters({
-            currentRequests: "getRequestsCount"
-        })
-    }
+  computed: {
+    ...mapGetters({
+      currentRequests: "getRequestsCount"
+    })
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.loading {
-    position: fixed;
-    top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    z-index: 10000;
-    &__message {
-        position: fixed;
-        top: 0;
-        left: 50%;
-        margin-left: -125px;
-        padding: 30px 0;
-        width: 250px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #FFF;
-        box-shadow: 0 0 8px #68573E;
-    }
-    &__text {
-        color: #68573E;
-        font-size: 16px;
-        margin-right: 20px;
-    }
-    &__spinner {
-        border: 7px solid #d8d8d8;
-        border-top: 7px solid #68573E;
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        animation: spin 1.2s linear infinite;    
-    }
+@import "../assets/scss/colors";
+
+.alert-message {
+  position: fixed;
+  z-index: 90000;
+  right: 50px;
+  top: 60px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  display: flex;
+  padding: 10px 20px 10px 12px;
+  align-items: center;
+  gap: 12px;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.myIcon {
+  background: $table-list;
+  height: 25px;
+  width: 25px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__loading {
+    color: $dark-border;
+    font-size: 16px !important;
+  }
+}
+
+.slide-fade-enter-active {
+  transition: all 0.2s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+.text {
+  letter-spacing: 0.2px;
 }
 </style>

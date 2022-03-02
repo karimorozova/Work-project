@@ -2,88 +2,30 @@ const { Step, Units } = require('../models')
 const ObjectId = require('mongodb').ObjectID
 const fs = require('fs')
 
-// const gatherServiceStepInfo = async (serviceStep) => {
-// 	const { stepId, title, unitId } = typeof serviceStep.step === 'string'
-// 			? await getStepAndUnitEntity(serviceStep, 'title', 'type')
-// 			: await getStepAndUnitEntity(serviceStep, '_id', '_id')
-//
-// 	serviceStep.step = ObjectId(stepId)
-// 	serviceStep.unit = ObjectId(unitId)
-// 	serviceStep.title = title
-// 	return serviceStep
-//
-// 	async function getStepAndUnitEntity(serviceStep, stepKey, unitKey) {
-// 		const { _id: stepId, title } = await Step.findOne({ [stepKey]: serviceStep.step })
-// 		const { _id: unitId } = await Units.findOne({ [unitKey]: serviceStep.unit })
-// 		return { stepId, title, unitId }
-// 	}
-// }
+const filterNotQuoteStepsInStartedProjectForClientPortal = (project) => {
+	const { steps, status, tasks, minimumCharge } = project
 
-function getProjectFinance(tasks, projectFinance, minimumCharge) {
-	return {
-		fiance: {
-			Price: { receivables: 12, payables: 13 }
+	if ((status === 'In progress' || status === 'Approved') && !minimumCharge.isUsed) {
+		const createdTasks = tasks.filter(({ status }) => status !== 'Quote sent' && status !== 'Created')
+
+		if (createdTasks.length) {
+			const tasksIds = createdTasks.map(i => i.taskId).filter(Boolean)
+			return steps.filter(({ taskId }) => tasksIds.includes(taskId))
 		}
 	}
-	// const currentReceivables = projectFinance.Price.receivables || 0;
-	// const currentPayables = projectFinance.Price.payables || 0;
-	// const receivables = +(
-	//   tasks.reduce((acc, cur) => acc + +cur.finance.Price.receivables, 0) +
-	//   +currentReceivables
-	// ).toFixed(2);
-	// const payables = +(
-	//   tasks.reduce((acc, cur) => acc + +cur.finance.Price.payables, 0) +
-	//   +currentPayables
-	// ).toFixed(2);
-	// let roi = payables ? ((receivables - payables) / payables).toFixed(2) : 0;
-	// if (minimumCharge) {
-	//   const { value, toIgnore } = minimumCharge;
-	//   if (!toIgnore && value > receivables) {
-	//     roi = payables ? ((value - payables) / payables).toFixed(2) : 0
-	//   }
-	// }
-	// return {
-	//   projectFinance: {
-	//     Price: { receivables, payables },
-	//     Wordcount: { ...projectFinance.Wordcount }
-	//   },
-	//   roi
-	// };
+	return steps
 }
 
+const filterQuoteStepsInStartedProjectForClientPortal = (project) => {
+	const { steps, status, tasks, minimumCharge } = project
 
-// function getFinanceForCustomUnits (task, steps) {
-//   const taskSteps = steps.filter(
-//     item => item.taskId === task.taskId || item.taskId === `${item.taskId} S01`
-//   );
-//   const receivables = +taskSteps
-//     .reduce((acc, cur) => {
-//       acc += +cur.finance.Price.receivables;
-//       return acc;
-//     }, 0)
-//     .toFixed(2);
-//   const payables = +taskSteps
-//     .reduce((acc, cur) => {
-//       acc += +cur.finance.Price.payables;
-//       return acc;
-//     }, 0)
-//     .toFixed(2);
-//   return {
-//     ...task,
-//     finance: {
-//       Price: { receivables, payables },
-//       Wordcount: { receivables: '', payables: '' }
-//     }
-//   };
-// }
+	if ((status === 'In progress' || status === 'Approved') && !minimumCharge.isUsed) {
+		const createdTasks = tasks.filter(({ status }) => status === 'Quote sent')
 
-function getModifiedFiles(files) {
-	if (files && files.length) {
-		return files.map(item => {
-			item.path = `./dist${ item.path }`
-			item.filename = item.fileName
-			return item
-		})
+		if (createdTasks.length) {
+			const tasksIds = createdTasks.map(i => i.taskId).filter(Boolean)
+			return steps.filter(({ taskId }) => tasksIds.includes(taskId))
+		}
 	}
 	return []
 }
@@ -96,16 +38,6 @@ function createProjectFolder(projectId) {
 		})
 	})
 }
-
-// const setTaskFinance = (steps, prop) => {
-// 	return steps.reduce((acc, cur) => {
-// 		const receivables = +cur.finance[prop].receivables
-// 		const payables = +cur.finance[prop].payables
-// 		acc.receivables = acc.receivables ? +(acc.receivables + receivables).toFixed(2) : receivables
-// 		acc.payables = acc.payables ? +(acc.payables + payables).toFixed(2) : payables
-// 		return acc
-// 	}, {})
-// }
 
 const getPriceAfterApplyingDiscounts = (clientDiscounts, price) => {
 	let finalPrice = +price
@@ -125,18 +57,15 @@ const getPriceAfterApplyingDiscounts = (clientDiscounts, price) => {
 
 const manageProjectName = (tasksInfo) => {
 	tasksInfo.nativeProjectName = tasksInfo.nativeProjectName.replace(/( *[^\w\s\.]+ *)+/g, ' ').trim()
-	if (!tasksInfo.nativeProjectName.trim().length) tasksInfo.nativeProjectName = "Png"
-	if (Number.isInteger(+tasksInfo.nativeProjectName.charAt(0))) tasksInfo.nativeProjectName = 'Png ' + tasksInfo.nativeProjectName
+	if (!tasksInfo.nativeProjectName.trim().length) tasksInfo.nativeProjectName = "P"
+	if (Number.isInteger(+tasksInfo.nativeProjectName.charAt(0))) tasksInfo.nativeProjectName = 'P ' + tasksInfo.nativeProjectName
 	return tasksInfo
 }
 
 module.exports = {
+	filterQuoteStepsInStartedProjectForClientPortal,
+	filterNotQuoteStepsInStartedProjectForClientPortal,
 	manageProjectName,
-	// gatherServiceStepInfo,
-	getProjectFinance,
-	// getFinanceForCustomUnits,
-	getModifiedFiles,
 	createProjectFolder,
-	// setTaskFinance,
 	getPriceAfterApplyingDiscounts
 }

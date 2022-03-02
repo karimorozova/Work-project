@@ -4,7 +4,6 @@ const { getPriceAfterApplyingDiscounts } = require('../projects/helpers')
 const { rateExchangeVendorOntoProject, rateExchangeProjectOntoVendor } = require('../helpers/commonFunctions')
 const { getProject, updateProject } = require('../projects/getProjects')
 const { setTaskMetrics } = require("../сalculations/wordcount")
-const { getProjectAfterUpdate } = require("../projects/getProjects")
 
 const setUpdatedFinanceData = async (data) => {
 	const { projectId, stepId, quantityReceivables, quantityPayables, rateReceivables, ratePayables, totalReceivables, totalPayables } = data
@@ -37,50 +36,42 @@ const setUpdatedFinanceData = async (data) => {
 	}
 
 	await Projects.updateOne({ "_id": projectId }, { steps })
-	// await recalculateStepFinance(projectId)
 	return await calculateProjectTotal(projectId)
 }
 
+//FINANCE FN #2 USED FOR PROJECT TOTAL ==>
 const calculateProjectTotal = async (projectId) => {
 	const { steps } = await Projects.findOne({ "_id": projectId })
-
 	const finance = {
 		"Price": {
 			receivables: 0,
 			payables: 0
 		}
 	}
-
 	steps.forEach(step => {
 		const { finance: { Price } } = step
 		finance.Price.receivables += +Price.receivables
 		finance.Price.payables += +Price.payables
 	})
-
 	return await updateProject({ '_id': projectId }, { finance })
 }
 
-const getClientDiscount = async (clientDiscountsIds) => {
-	const allDiscounts = await Discounts.find().lean()
-	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
-}
-
+//FINANCE FN #1 USED FOR STEPS  ==>
 const recalculateStepFinance = async (projectId) => {
-	const { steps, discounts, minimumCharge, customer} = await getProject({ _id: projectId })
-	// let newDiscounts = !discounts.length ? await getClientDiscount( customer.discounts ) : discounts
-	let newDiscounts =  discounts
-	// console.log({disco: await getClientDiscount( customer.discounts )})
+	const { steps, discounts, minimumCharge, customer } = await getProject({ _id: projectId })
+	let newDiscounts = discounts
 	const newSteps = updateStepsFinanceWithDiscounts(steps, newDiscounts)
 	let queryToUpdateSteps = { steps: newSteps }
 	const sum = newSteps.reduce((acc, curr) => acc += curr.finance.Price.receivables, 0)
 
-	const isUsedMinimumCharge = !minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2))
+	const isUsedMinimumCharge = !minimumCharge.toIgnore && (+sum.toFixed(2) <= +minimumCharge.value.toFixed(2) && minimumCharge.value > 0)
+
 	if (isUsedMinimumCharge) {
 		newDiscounts = []
 		queryToUpdateSteps = await updateStepsWithMinimal(steps, minimumCharge)
 	}
 
-	await Projects.updateOne({ _id: projectId }, {"discounts": newDiscounts, "minimumCharge.isUsed": isUsedMinimumCharge,...queryToUpdateSteps })
+	await Projects.updateOne({ _id: projectId }, { "discounts": newDiscounts, "minimumCharge.isUsed": isUsedMinimumCharge, ...queryToUpdateSteps })
 }
 
 const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
@@ -101,7 +92,19 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 }
 
 const updateStepsWithMinimal = async (steps, minimumCharge) => {
-	return { '$set': {  'steps.$[].finance.Price.receivables': minimumCharge.value / steps.length } }
+	const minimumCost = minimumCharge.value / steps.filter(({ status }) => status !== 'Cancelled').length
+	const newSteps = steps.map((step) => {
+		if (step.status !== "Cancelled") {
+			step.finance.Price.receivables = minimumCost
+		}
+		return step
+	})
+	return { 'steps': newSteps }
+}
+
+const getClientDiscount = async (clientDiscountsIds) => {
+	const allDiscounts = await Discounts.find().lean()
+	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
 }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {
@@ -129,7 +132,7 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 	if (isMemoqCatUnit) {
 		task.metrics = setTaskMetrics({ metrics: task.metrics, matrix: vendor.matrix, prop: "vendor" })
-		step.finance.Wordcount.payables = +getRelativeQuantity(task.metrics, 'vendor')
+		step.finance.Wordcount.payables = step.nativeFinance.Wordcount.payables = step.step.title === 'Translation' ? +getRelativeQuantity(task.metrics, 'vendor') : task.metrics.totalWords
 	}
 
 	const quantity = isMemoqCatUnit ? step.finance.Wordcount.payables : step.finance.Quantity.payables
@@ -160,10 +163,6 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 	const nativeFinance = stepFinance()
 	const defaultStepPrice = finance.Price.receivables
 
-	// if (discounts.length) {
-	// 	const { Price: { receivables } } = finance
-	// 	finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
-	// }
 
 	function stepFinance() {
 		return {
@@ -172,11 +171,15 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 				payables: payablesQuantity
 			},
 			Wordcount: {
-				receivables: isMemoq ? +getRelativeQuantity(metrics, 'client') : 0,
+				receivables: isMemoq
+						? step.title === 'Translation' ? +getRelativeQuantity(metrics, 'client') : metrics.totalWords
+						: 0,
 				payables: 0
 			},
 			Price: {
-				receivables: isMemoq ? +(clientRate * +getRelativeQuantity(metrics, 'client')).toFixed(2) : +(clientRate * receivablesQuantity).toFixed(2),
+				receivables: isMemoq
+						? step.title === 'Translation' ? +(clientRate * +getRelativeQuantity(metrics, 'client')).toFixed(2) : +(clientRate * +metrics.totalWords).toFixed(2)
+						: +(clientRate * receivablesQuantity).toFixed(2),
 				payables: 0
 			}
 		}
@@ -190,109 +193,6 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 		nativeFinance,
 		defaultStepPrice
 	}
-}
-
-const getStepFinanceData = async (projectData, forWords = false) => {
-	// const { customer, serviceStep, industry, task, vendorId, quantity, discounts, projectId } = projectData
-	// // const { crossRate, projectCurrency } = await Projects.findOne({ "_id": projectId })
-	// const { metrics, sourceLanguage, targetLanguage } = task
-	//
-	// // const client = await Clients.findOne({ _id: customer })
-	// // const { rates, defaultPricelist, currency } = client
-	// // const currencyRatio = await CurrencyRatio.findOne()
-	// // const pricelist = await Pricelist.findOne({ _id: defaultPricelist })
-	// // const { _id: sourceId } = await Languages.findOne({ symbol: sourceLanguage })
-	// // const { _id: targetId } = await Languages.findOne({ symbol: targetLanguage })
-	// const { step, unit, size, title } = serviceStep
-	// const fullUnit = await Units.findOne({ _id: unit })
-	//
-	// let vendor
-	// if (vendorId) vendor = await Vendors.findOne({ _id: vendorId })
-	//
-	// const dataForComparison = {
-	// 	sourceLanguage: sourceId,
-	// 	targetLanguage: targetId,
-	// 	step,
-	// 	unit,
-	// 	size: size ? size : 1,
-	// 	industry: industry._id
-	// }
-	//
-	// let clientPrice = getPriceFromPersonRates(rates.pricelistTable, dataForComparison) || getPriceFromPricelist(pricelist, dataForComparison, currency, currencyRatio)
-	// let vendorPrice = vendor ? getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) : 0
-	//
-	// vendorPrice = (vendorPrice !== undefined) ? vendorPrice : getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio)
-	//
-	// const clientRate = {
-	// 	value: clientPrice,
-	// 	active: true
-	// }
-	//
-	// let vendorRate = ""
-	// let nativeVendorRate = ""
-	//
-	// if (!!vendor) {
-	// 	vendorRate = { value: rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate), active: true }
-	// 	nativeVendorRate = { value: +vendorPrice, active: true }
-	// }
-	//
-	// const finance = stepFinance(false)
-	// const nativeFinance = stepFinance(true)
-	//
-	// const defaultStepPrice = finance.Price.receivables
-	// if (discounts.length) {
-	// 	const { Price: { receivables } } = finance
-	// 	finance.Price.receivables = getPriceAfterApplyingDiscounts(discounts, receivables)
-	// }
-	//
-	// return {
-	// 	clientRate,
-	// 	vendorRate,
-	// 	nativeVendorRate,
-	// 	vendor: vendor ? vendor._id : null,
-	// 	finance,
-	// 	nativeFinance,
-	// 	defaultStepPrice
-	// }
-	//
-	// function stepFinance(isNative) {
-	// 	return {
-	// 		Quantity: {
-	// 			receivables: quantity.receivables,
-	// 			payables: quantity.payables
-	// 		},
-	// 		Wordcount: {
-	// 			receivables: getRelativeWordCountByEntity('client', quantity.receivables),
-	// 			payables: getRelativeWordCountByEntity('vendor', quantity.payables)
-	// 		},
-	// 		Price: {
-	// 			receivables: getTotalStepPriceClient(),
-	// 			payables: getTotalStepPriceVendor()
-	// 		}
-	// 	}
-	//
-	// 	function getTotalStepPriceClient() {
-	// 		return +clientRate.value * getRelativeWordCountByEntity('client', quantity.receivables)
-	// 	}
-	//
-	// 	function getTotalStepPriceVendor() {
-	// 		if (vendor) {
-	// 			const rateValue = isNative ? nativeVendorRate.value : vendorRate.value
-	// 			return +rateValue * getRelativeWordCountByEntity('vendor', quantity.payables)
-	// 		}
-	// 		return 0
-	// 	}
-	//
-	// 	function getRelativeWordCountByEntity(entity, quantity) {
-	// 		quantity = quantity || 0
-	// 		if (forWords) return title === 'Translation' && fullUnit.type === 'CAT Wordcount'
-	// 				? +getRelativeQuantity(metrics, entity)
-	// 				: +quantity
-	//
-	// 		return +quantity
-	// 	}
-	// }
-
 }
 
 const getPriceFromPersonRates = (pricelistTable, data) => {
@@ -343,7 +243,6 @@ const getCorrectBasicPrice = (basicPriceRow, currency) => {
 
 module.exports = {
 	setUpdatedFinanceData,
-	getStepFinanceData,
 	getPriceFromPersonRates,
 	getPriceFromPricelist,
 	getCorrectBasicPrice,

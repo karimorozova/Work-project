@@ -13,6 +13,7 @@
     .tasks__fileDetails(v-if="isFilesDetailsModal && fileDetailsIndex !== null")
       Files(
         @close="hideFileDetails"
+        @reImportFinalFilesFromMemoq="reImportFinalFilesFromMemoq"
         :task="finalData[fileDetailsIndex]"
       )
     .tasks__preview(v-if="isEditAndSendQuote")
@@ -89,8 +90,11 @@
         .table__data(v-html="getPair(row)")
 
       template(slot="status" slot-scope="{ row }")
-        .table__data
+        .table__dataIcons
           .status {{ row.status }}
+          .tooltip(v-if="row.reason" )
+            .tooltipData(v-html="row.reason")
+            i.fas.fa-info-circle
 
       template(slot="receivables" slot-scope="{ row }")
         .table__data
@@ -130,6 +134,7 @@
         :task="reviewTask"
         :deliveryTask="currentProject.tasksDR1.find(({taskId}) => taskId === reviewTask.taskId)"
         @close="closeReview"
+        @reImportFinalFilesFromMemoq="reImportFinalFilesFromMemoq"
       )
 </template>
 
@@ -201,6 +206,36 @@ export default {
       "alertToggle",
       "setCurrentProject"
     ]),
+    async reImportFinalFilesFromMemoq(tasksIds) {
+      try {
+        const updatedProject = await this.$http.post('/pm-manage/reimport-files-from-memoq', {
+          tasksIds,
+          projectId: this.currentProject._id
+        })
+        await this.setCurrentProject(updatedProject.data)
+        this.alertToggle({ message: "Files imported", isShow: true, type: "success" })
+      } catch (e) {
+        this.alertToggle({ message: "Server error / Cannot import files", isShow: true, type: "error" })
+      } finally {
+        this.closeReview()
+        this.hideFileDetails()
+        this.selectedAction = ""
+        this.toggleAll(false)
+      }
+    },
+    async generateAndDownloadTargetFile(tasksIds) {
+      const result = (await this.$http.post('/pm-manage/generate-file-from-memoq', {
+        tasksIds,
+        projectId: this.currentProject._id
+      })).data
+      if (result.status === 'success') {
+        window.open(this.$domains.admin + result.data, '_blank')
+      } else {
+        this.alertToggle({ ...data, type: data.status, isShow: true })
+      }
+      this.selectedAction = ""
+      this.toggleAll(false)
+    },
     marginCalcPercent(task) {
       const [ receivables, payables ] = [ this.getReceivables(task), this.getPayables(task) ]
       let percent = NaN
@@ -267,7 +302,7 @@ export default {
     },
     async approveCancelAction() {
       if (!this.checkedTasks.length) return this.closeApproveModal()
-      const validCancelStatuses = [ 'Created', 'Approved', 'Rejected', 'Quote Sent', 'In progress' ]
+      const validCancelStatuses = [ 'Created', 'Approved', 'Rejected', 'Quote sent', 'In progress' ]
       const filteredTasks = this.checkedTasks.filter(item => validCancelStatuses.indexOf(item.status) !== -1)
       if (filteredTasks.length) {
         try {
@@ -396,12 +431,28 @@ export default {
       this.selectedAction = option
 
       switch (this.selectedAction) {
-        case 'Approve [DR1]':
+        case 'Pass Approve [DR1]':
           if (this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').length) {
             this.reviewTasksMulti = this.checkedTasks.filter(({ status }) => status === 'Pending Approval [DR1]').map(i => i.taskId)
             this.isDeliveryReviewMulti = true
           }
           break
+        case 'Reimport Files [Memoq] [DR1]': {
+          const checkedAndSorted = this.checkedTasks.filter(({ status, memoqDocs }) => memoqDocs.length && status === 'Pending Approval [DR1]')
+          if (checkedAndSorted.length) {
+            const tasksIds = checkedAndSorted.map(i => i._id)
+            await this.reImportFinalFilesFromMemoq(tasksIds)
+          }
+          break
+        }
+        case 'Generate .xlsx [Memoq] [DR1]': {
+          const checkedAndSorted = this.checkedTasks.filter(({ status, memoqDocs }) => memoqDocs.length && status === 'Pending Approval [DR1]' || status === 'Completed')
+          if (checkedAndSorted.length) {
+            const tasksIds = checkedAndSorted.map(i => i._id)
+            await this.generateAndDownloadTargetFile(tasksIds)
+          }
+          break
+        }
         case 'Send a Quote':
           await this.getSendQuoteMessage()
           break
@@ -480,11 +531,11 @@ export default {
       if (!this.checkedTasks.length) return []
 
       const isSendStatus = this.currentProject.status === 'In progress' || this.currentProject.status === 'Approved'
-          ? [ 'Mark as Approved', 'Send a Quote',  ]
+          ? [ 'Mark as Approved', 'Send a Quote' ]
           : []
 
-      // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel', 'Delete' ]
-      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Approve [DR1]', 'Cancel']
+      // return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Cancel', 'Delete' ]
+      return [ ...isSendStatus, 'Assign Manager [DR1]', 'Pass Approve [DR1]', 'Reimport Files [Memoq] [DR1]', 'Generate .xlsx [Memoq] [DR1]', 'Cancel' ]
 
     },
     // finalData() {
@@ -503,6 +554,10 @@ export default {
       if (this.users) {
         return this.users.filter(item => item.group.name === 'Project Managers').map(item => `${ item.firstName } ${ item.lastName }`)
       }
+    },
+    isProjectFinished() {
+      const { status } = this.currentProject
+      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     }
   },
   components: {
@@ -637,6 +692,25 @@ export default {
 .table {
   width: 100%;
 
+  &__dataIcons {
+    padding: 0 7px;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    i {
+      color: $dark-border;
+      cursor: help;
+      transition: .2s ease-out;
+      font-size: 15px;
+    }
+
+    i:hover {
+      color: $text;
+    }
+  }
+
   &__data {
     padding: 0 7px;
   }
@@ -715,5 +789,44 @@ input {
 
 .red-color {
   color: $red;
+}
+
+.tooltip {
+  position: relative;
+  display: flex;
+
+  .tooltipData {
+    visibility: hidden;
+    font-size: 14px;
+    width: max-content;
+    background: white;
+    border-radius: 4px;
+    right: 25px;
+    padding: 7px 7px 5px 7px;
+    position: absolute;
+    z-index: 555;
+    opacity: 0;
+    transition: opacity .3s;
+    border: 1px solid $text;
+    top: -2px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      right: -12px;
+      transform: rotate(270deg);
+      border-width: 6px;
+      border-style: solid;
+      border-color: $text transparent transparent;
+    }
+  }
+
+  &:hover {
+    .tooltipData {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
 }
 </style>

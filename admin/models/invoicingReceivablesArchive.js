@@ -29,6 +29,10 @@ const InvoicingReceivablesArchiveSchema = new mongoose.Schema({
 		step: {
 			type: Schema.Types.ObjectId,
 			ref: 'Projects.steps'
+		},
+		type: {
+			type: String,
+			default: ''
 		}
 	} ],
 	firstPaymentDate: {
@@ -40,10 +44,12 @@ const InvoicingReceivablesArchiveSchema = new mongoose.Schema({
 		default: new Date()
 	},
 	createdBy: {
-		type: Schema.Types.ObjectId, ref: 'user'
+		type: Schema.Types.ObjectId, ref: 'user',
+		default: null
 	},
 	updatedBy: {
-		type: Schema.Types.ObjectId, ref: 'user'
+		type: Schema.Types.ObjectId, ref: 'user',
+		default: null
 	},
 	createAt: {
 		type: Date,
@@ -77,23 +83,29 @@ const InvoicingReceivablesArchiveSchema = new mongoose.Schema({
 			trim: true
 		}
 	} ],
-	paymentInformation: [{
+	paymentInformation: [ {
+		zohoPaymentId: {
+			type: String
+		},
 		paidAmount: {
-			type: Number,
+			type: Number
 		},
 		unpaidAmount: {
 			type: Number
 		},
-		// paymentMethod: {
-		// 	type: String,
-		// },
+		paymentMethod: {
+			type: Object,
+			default: null
+		},
 		paymentDate: {
 			type: Date,
+			default: ''
 		},
 		notes: {
 			type: String,
+			default: ""
 		}
-	}],
+	} ],
 	externalIntegration: {
 		_id: {
 			type: String,

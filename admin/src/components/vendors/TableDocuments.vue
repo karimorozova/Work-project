@@ -101,7 +101,7 @@
 				deleteIndex: -1,
 				isTableDropMenu: true,
 				currentActive: -1,
-				domain: "http://localhost:3001"
+				domain: this.$domains.admin
 			}
 		},
 		methods: {
@@ -309,7 +309,7 @@
 			}
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__
+			this.domain = this.$domains.admin
 		}
 	}
 </script>
@@ -384,6 +384,6 @@
     }
   }
   a{
-    color: #D15F45;
+    color: #d66f58;
   }
 </style>

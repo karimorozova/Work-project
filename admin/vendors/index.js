@@ -5,7 +5,9 @@ const {
 	getFilteredVendors,
 	getFilteredVendorsWithCustomFilters,
 	hasVendorCompetenciesAndPending,
-	getFilteredVendorsPotential
+	getFilteredVendorsPotential,
+	getVendorForPortal,
+	getVendorExtraForPortal
 } = require('./getVendors')
 
 const {
@@ -22,13 +24,18 @@ const {
 	managePaymentMethods
 } = require('./info')
 
-const { getJobs, updateStepProp } = require('./jobs')
+const {
+	// getJobs,
+	getJobDetails,
+	updateStepProp
+} = require('./jobs')
+
 const { manageNewApplication } = require('./application')
 const { notifyTestStatus, sendMessageToVendor } = require('./emails')
 const {
 	updateVendorCompetencies,
 	deleteVendorCompetencies,
-	generateCompetenciesCombinations,
+	generateCompetenciesCombinations
 } = require('./competencies')
 
 const { updateVendorMatrix, syncVendorMatrix } = require('./vendorMatrix')
@@ -48,20 +55,28 @@ const {
 	deletePendingCompetence
 } = require('./pendingCompetencies')
 
+const {
+	createVendor
+} = require("./createVendor")
+
 module.exports = {
+	getJobDetails,
+	getVendorExtraForPortal,
+	getVendorForPortal,
+	createVendor,
 	managePaymentMethods,
 	getVendor,
 	getVendors,
 	getVendorAfterUpdate,
 	getFilteredVendors,
-  getFilteredVendorsWithCustomFilters,
+	getFilteredVendorsWithCustomFilters,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
 	removeVendorDoc,
 	saveHashedPassword,
 	getPhotoLink,
 	removeOldVendorFile,
-	getJobs,
+	// getJobs,
 	updateStepProp,
 	manageNewApplication,
 	updateVendorEducation,
@@ -81,12 +96,12 @@ module.exports = {
 	getVendorAssessmentsWordCount,
 	updateVendorMatrix,
 	syncVendorMatrix,
-  getFilteredVendorsPendingCompetencies,
+	getFilteredVendorsPendingCompetencies,
 	extendVendorsPendingCompetencies,
 	approvePendingCompetence,
 	setRatePriceAfterPassedTest,
 	sendVendorTestAndUpdateQualification,
-  hasVendorCompetenciesAndPending,
+	hasVendorCompetenciesAndPending,
 	rejectedPendingCompetence,
 	deletePendingCompetence,
 	getFilteredVendorsPotential,

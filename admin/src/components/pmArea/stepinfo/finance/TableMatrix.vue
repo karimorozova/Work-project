@@ -31,6 +31,9 @@ export default {
     },
     selectedTab: {
       type: String
+    },
+    task: {
+      type: Object
     }
   },
   data() {
@@ -68,11 +71,11 @@ export default {
     GeneralTable
   },
   methods: {
-    findCurrentTask() {
-      return this.currentProject.tasks.find(task => task.taskId === this.step.taskId)
-    },
+    // findCurrentTask() {
+    //   return this.currentProject.tasks.find(task => task.taskId === this.step.taskId)
+    // },
     getStepMetrics() {
-      const { metrics } = this.findCurrentTask()
+      const { metrics } = this.task
       return metrics
     },
     changeFormatForMetrics() {
@@ -101,9 +104,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      currentProject: "getCurrentProject"
-    })
+    // ...mapGetters({
+    //   currentProject: "getCurrentProject"
+    // })
   },
   mounted() {
     this.buildMatrixArray()

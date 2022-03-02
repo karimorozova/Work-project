@@ -12,22 +12,6 @@
     .sub-information__row
       .row__title Project Status:
       .row__data {{ project.status }}
-    .sub-information__row
-      .row__title Payment Profile:
-      //.row__data(v-if="!isProjectFinished")
-        //SelectSingle.drop(
-        //  placeholder="Select",
-        //  :selectedOption="project.paymentProfile",
-        //  :options="['PPP', 'Pre-Payment', 'Monthly', '50%/50%']",
-        //  @chooseOption="setPayment"
-        //)
-      .row__data {{ project.paymentProfile || 'Not assigned' }}
-    .sub-information__row
-      .row__title Urgent:
-      .row__data
-        .checkbox
-          input#urgent(type="checkbox", :disabled="isProjectFinished" :checked="project.isUrgent", @change="setUrgentStatus")
-          label(for="urgent")
 
     .sub-information__row(v-if="project.requestId")
       .row__title Request:
@@ -36,6 +20,54 @@
           router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${project.requestId._id}`}")
             span {{ project.requestId.projectId }}
 
+    .sub-information__row
+      .row__title Test:
+      .row__data
+        CheckBox(:isChecked="project.isTest", :isDisabled="isProjectFinished" @check="() => setTest(true)",  @uncheck="() => setTest(false)")
+
+    .sub-information__row
+      .row__title Urgent:
+      .row__data
+        CheckBox(:isChecked="project.isUrgent", :isDisabled="isProjectFinished" @check="() => setUrgentStatus(true)", @uncheck="() => setUrgentStatus(false)")
+
+    .sub-information__row
+      .row__title Pause:
+      .row__dataFlex
+        CheckBox(:isChecked="project.inPause", :isDisabled="isProjectFinished || projectInProgress" @check="() => setPause(true)",  @uncheck="() => setPause(false)")
+        span(v-if="!isHideForLoading" )
+          Button(v-if="projectInProgress && project.inPause && !project.isPaid" value="Paid" :isDisabled="!isAm && !isPm && !isAdmin" @clicked="markAsPaid" :outline="true")
+
+    .sub-information__row(v-if="project.clientBillingInfo && project.clientBillingInfo.paymentType" )
+      .row__title Payment Type:
+      .row__data {{ project.clientBillingInfo.paymentType }}
+
+    .sub-information__row
+      .row__title PO:
+      .row__dataFlex
+        CheckBox(
+          :isChecked="isOpenPOInput || !!project.PO",
+          :isDisabled="!!project.PO"
+          @check="() => togglePOInput(true)",
+          @uncheck="() => togglePOInput(false)"
+        )
+        input(
+          v-if="isOpenPOInput || !!project.PO"
+          :value="project.PO || ''"
+          class="PO-input"
+          placeholder="Value"
+          @change="setPO"
+          @keyup.13="setPO"
+          :disabled="isProjectFinished"
+        )
+
+    //.sub-information__row
+    //  .row__title Payment Status:
+    //  .row__data(v-if="project.isPaid") Paid
+    //  .row__data(v-else) Soon ...
+    //
+    //.sub-information__row
+    //  .row__title Invoicing Report:
+    //  .row__data Soon ...
 
     .client-table
       GeneralTable(
@@ -84,13 +116,16 @@
 </template>
 
 <script>
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import Add from "../Add"
 import scrollDrop from "@/mixins/scrollDrop"
 import crudIcons from "@/mixins/crudIcons"
 import SelectSingle from "@/components/SelectSingle"
 import WYSIWYG from "../vendors/WYSIWYG"
 import GeneralTable from "../GeneralTable"
+import CheckBox from "../CheckBox"
+import Button from "../Button"
+import { getUser } from "../../vuex/general/getters"
 
 export default {
   mixins: [ scrollDrop, crudIcons ],
@@ -124,7 +159,9 @@ export default {
       errors: [],
       isDeleting: false,
       currentActive: -1,
-      isEditAndSend: false
+      isEditAndSend: false,
+      isHideForLoading: false,
+      isOpenPOInput: false
     }
   },
   methods: {
@@ -132,23 +169,48 @@ export default {
       alertToggle: "alertToggle",
       setCurrentProject: "setCurrentProject"
     }),
+    async setPO(e) {
+      await this.setProjectProp({ prop: 'PO', value: e.target.value })
+    },
+    togglePOInput() {
+      this.isOpenPOInput = !this.isOpenPOInput
+    },
+    async markAsPaid() {
+      try {
+        this.isHideForLoading = true
+        const result = await this.$http.post("/pm-manage/mark-project-paid", { projectId: this.project._id })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project paid", isShow: true, type: "success" })
+        this.isHideForLoading = false
+      } catch (err) {
+        this.isHideForLoading = false
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
+    async setPause(bool) {
+      await this.setProjectProp({ prop: 'inPause', value: bool })
+    },
+    async setTest(bool) {
+      await this.setProjectProp({ prop: 'isTest', value: bool })
+    },
+    async setProjectProp({ prop, value }) {
+      try {
+        const result = await this.$http.put("/pm-manage/project-prop", { projectId: this.project._id, prop, value })
+        await this.setCurrentProject(result.body)
+        this.alertToggle({ message: "Project updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
+      }
+    },
     copyId() {
       let id = document.getElementById('id')
       let elementText = id.textContent
       navigator.clipboard.writeText(elementText)
       try {
         document.execCommand('copy')
-        this.alertToggle({
-          message: "Text copied successfully",
-          isShow: true,
-          type: "success"
-        })
+        this.alertToggle({ message: "Text copied successfully", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({
-          message: "Text not copied",
-          isShow: true,
-          type: "error"
-        })
+        this.alertToggle({ message: "Text not copied", isShow: true, type: "error" })
       }
     },
     openWYSIWYG(index) {
@@ -311,29 +373,9 @@ export default {
     setClientContact({ option }) {
       this.currentClientContact = this.project.customer.contacts.find((item) => `${ item.firstName } ${ item.surname || '' }` === option)
     },
-    // async setPayment({ option }) {
-    // 	try {
-    // 		const result = await this.$http.post("/pm-manage/payment-profile", {
-    // 			projectId: this.project._id,
-    // 			paymentProfile: option
-    // 		})
-    // 		this.project.paymentProfile = result.data.paymentProfile
-    // 		this.alertToggle({
-    // 			message: "Project payment profile updated",
-    // 			isShow: true,
-    // 			type: "success"
-    // 		})
-    // 	} catch (err) {
-    // 		this.alertToggle({
-    // 			message: "Cannot update project payment profile",
-    // 			isShow: true,
-    // 			type: "error"
-    // 		})
-    // 	}
-    // },
-    async setUrgentStatus(event) {
+    async setUrgentStatus(bool) {
       try {
-        const result = await this.$http.post("/pm-manage/urgent", { projectId: this.project._id, isUrgent: event.target.checked })
+        const result = await this.$http.post("/pm-manage/urgent", { projectId: this.project._id, isUrgent: bool })
         this.setCurrentProject(result.data)
         this.alertToggle({ message: "Urgent status updated", isShow: true, type: "success" })
       } catch (err) {
@@ -345,6 +387,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      user: "getUser"
+    }),
     clientData() {
       if (this.project) {
         return this.project.customer.contacts.map((i) => `${ i.firstName } ${ i.surname || '' }`)
@@ -353,12 +398,30 @@ export default {
     isProjectFinished() {
       const { status } = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    },
+    projectInProgress() {
+      const { status } = this.project
+      return status === 'Approved' || status === 'In progress'
+    },
+    isPm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.projectManager._id === this.user._id
+    },
+    isAm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.accountManager._id === this.user._id
+    },
+    isAdmin() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
     }
   },
   created() {
     this.project && this.getClientContacts()
   },
   components: {
+    Button,
+    CheckBox,
     GeneralTable,
     Add,
     SelectSingle,
@@ -441,7 +504,9 @@ export default {
   &__row {
     width: 100%;
     display: flex;
-    height: 40px;
+    height: 32px;
+    align-items: center;
+    margin-bottom: 10px;
   }
 
   .row {
@@ -452,6 +517,14 @@ export default {
     &__data {
       width: 220px;
       position: relative;
+    }
+
+    &__dataFlex {
+      width: 220px;
+      position: relative;
+      display: flex;
+      gap: 20px;
+      align-items: center;
     }
   }
 
@@ -488,64 +561,6 @@ export default {
   width: 0;
 }
 
-.checkbox {
-  display: flex;
-  height: 30px;
-
-  input[type="checkbox"] {
-    opacity: 0;
-
-    + {
-      label {
-        &::after {
-          content: none;
-        }
-      }
-    }
-
-    &:checked {
-      + {
-        label {
-          &::after {
-            content: "";
-          }
-        }
-      }
-    }
-  }
-
-  label {
-    position: relative;
-    display: inline-block;
-    padding-left: 22px;
-    padding-top: 4px;
-
-    &::before {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 16px;
-      width: 16px;
-      border: 1px solid $border;
-      left: 0px;
-      top: 3px;
-    }
-
-    &::after {
-      position: absolute;
-      content: "";
-      display: inline-block;
-      height: 5px;
-      width: 9px;
-      border-left: 2px solid;
-      border-bottom: 2px solid;
-      transform: rotate(-45deg);
-      left: 4px;
-      top: 7px;
-    }
-  }
-}
-
 .icon {
   display: flex;
   justify-content: center;
@@ -566,6 +581,23 @@ export default {
     &:hover {
       text-decoration: underline;
     }
+  }
+}
+
+.PO-input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  width: 100%;
+  height: 32px;
+  transition: .1s ease-out;
+
+  &:focus {
+    border: 1px solid $border-focus;
   }
 }
 </style>

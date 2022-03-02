@@ -44,7 +44,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: #33333370;
+      color: #3333;
     }
 
     &_brown {

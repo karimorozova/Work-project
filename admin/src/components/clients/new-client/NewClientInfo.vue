@@ -223,7 +223,7 @@
 				this.clearErrors()
 				const emailValidRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 				if (!this.client.name) this.errors.push('Company name cannot be empty.')
-				if (this.clientType !== "Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
+				// if (this.clientType !== "Individual" && !this.client.contacts.length) this.errors.push('Please, add at least one contact.')
 				if (!this.client.currency.length) this.errors.push('Please, add currency.')
 				if (this.client.defaultPricelist === '') this.errors.push('Please, add pricelist.')
 				if (this.clientType !== "Individual" && !this.contactLeadError()) this.errors.push('Please set Lead Contact of the Client.')
@@ -310,19 +310,6 @@
           },
           notes: '',
           reports: [],
-          contacts: [
-            {
-              leadContact: true,
-              firstName: this.client.name,
-              surname: "",
-              email: this.client.email,
-              gender: "",
-              position: "Manager",
-              phone: "",
-              country: "",
-              notes: ""
-            }
-          ],
         }
 
 				sendData.append('client', JSON.stringify(this.client))
@@ -364,7 +351,6 @@
           },
           notes: '',
           reports: [],
-          contacts: this.client.contacts,
         }
 				delete this.client.paymentType
 

@@ -39,7 +39,7 @@
         @notApprove="doNotDelete"
       )
     .delete-button
-      Button(color="#d15f45" :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
+      Button(color="#d66f58" :outline="true" class="button-m-top" @clicked="isDeleteRequest" value="Delete Request")
 
 </template>
 
@@ -71,6 +71,7 @@ export default {
       this.deleteCurrentRequest = true
     },
     async deleteRequest() {
+      if (!this.canUpdateRequest) return
       const { id } = this.$route.params
       await this.$http.post(`/clients-requests/${ id }/delete`)
       if (window.history.length > 2) {
@@ -113,6 +114,7 @@ export default {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
           || this.project.projectManager._id === this.user._id
+          || this.project.accountManager._id === this.user._id
     },
     projManagers() {
       let result = []
@@ -147,6 +149,8 @@ export default {
   padding-top: 10px;
   margin-top: 10px;
   border-top: 1px solid $light-border;
+  display: flex;
+  justify-content: center;
 }
 
 .button-m-top {

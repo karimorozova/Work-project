@@ -12,31 +12,21 @@ const {
 } = require('../../models')
 
 const {
-	getClient
-} = require('../../clients')
-
-const {
-	updateProjectCosts
-} = require('../../сalculations/wordcount')
-
-const {
 	assignVendorToStep
 } = require('../../сalculations/updates')
 
 const {
 	getProject,
 	createProject,
+	createProjectFromMemoq,
+	createProjectFromXTMFile,
 	createTasks,
 	createTasksForWordcount,
 	updateProject,
 	getProjectAfterCancelTasks,
 	updateProjectStatus,
-	// setStepsStatus,
 	setApprovedStepStatus,
-	getAfterReopenSteps,
-	getProjectAfterFinanceUpdated,
 	updateProjectProgress,
-	updateNonWordsTaskTargetFiles,
 	storeFiles,
 	notifyStepReopened,
 	notifyVendorStepStart,
@@ -46,7 +36,6 @@ const {
 	assignProjectManagers,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
-	updateProjectFinanceOnDiscountsUpdate,
 	generateAndSaveCertificate,
 	getFilteredProjects,
 	createRequestTasks,
@@ -57,9 +46,12 @@ const {
 	setStepDeadlineProjectAndMemoq,
 	autoCreatingTranslationTaskInProject,
 	cancelProjectInMemoq,
-	updateWithApprovedTasks
-	// addPaymentAdditions,
-	// deletePaymentAddition
+	updateWithApprovedTasks,
+	autoCreatingTranslationTaskInProjectByMemoqLink,
+	autoCreatingTranslationTaskInProjectByXTMFile,
+	createProjectIndividual,
+	reImportFilesFromMemoq,
+	generateTargetFileFromMemoq
 } = require('../../projects')
 
 const {
@@ -69,32 +61,24 @@ const {
 
 const {
 	upload,
-	clientQuoteEmail,
 	stepVendorsRequestSending,
-	sendEmailToContact,
-	stepReassignedNotification,
 	sendEmail,
 	notifyClientProjectCancelled,
 	notifyClientTasksCancelled,
-	sendFlexibleEmail
+	sendFlexibleEmail,
+	sendQuoteToVendorsAfterProjectAccepted
 } = require('../../utils')
 
 const {
-	getStepsWithFinanceUpdated,
 	reassignVendor,
 	removeVendorFromStep
 } = require('../../projectSteps')
-
-const {
-	getTasksWithFinanceUpdated
-} = require('../../projectTasks')
 
 const {
 	getClientRequestById
 } = require('../../clientRequests')
 
 const {
-	updateMemoqProjectUsers,
 	cancelMemoqDocs
 } = require('../../services/memoqs/projects')
 
@@ -124,9 +108,65 @@ const {
 	getVendorStepDetails
 } = require('../../vendors/getVendors')
 
-const { setUpdatedFinanceData, calculateProjectTotal, recalculateStepFinance } = require('../../сalculations/finance')
+const {
+	setUpdatedFinanceData,
+	calculateProjectTotal,
+	recalculateStepFinance
+} = require('../../сalculations/finance')
+
 const { getEmailBackbone } = require("../../emailMessages/otherCommunication")
 
+// XTRF ==>
+const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
+const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
+
+router.post('/build-TnS-from-memoq-link', async (req, res) => {
+	const {
+		memoqLink,
+		projectId,
+		memoqWorkFlow,
+		creatorUserId,
+		internalProjectId,
+		startDate,
+		deadline
+	} = req.body
+
+	try {
+		const result = await autoCreatingTranslationTaskInProjectByMemoqLink({
+			memoqLink,
+			projectId,
+			memoqWorkFlow,
+			creatorUserId,
+			internalProjectId,
+			startDate,
+			deadline
+		})
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('/build-TnS-from-memoq-link')
+	}
+})
+
+
+router.post('/build-TnS-from-xtm-file', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	const { projectId, internalProjectId, startDate, deadline } = req.body
+	const { file } = req.files
+	try {
+		const result = await autoCreatingTranslationTaskInProjectByXTMFile({ projectId, internalProjectId, startDate, deadline, file: file[0] })
+		fs.access(file[0].path, (error) => {
+			if (!error) {
+				fs.unlink(file[0].path, (err) => {
+					if (err) return console.log(err)
+				})
+			}
+		})
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
+	}
+})
 
 router.post('/send-email-from-to', async (req, res) => {
 	const { message, to, from, subject } = req.body
@@ -162,16 +202,28 @@ router.get('/project', async (req, res) => {
 	}
 })
 
-// router.get('/request', async (req, res) => {
-// 	const { id } = req.query
-// 	try {
-// 		const request = await getClientRequest({ '_id': id })
-// 		res.send(request)
-// 	} catch (err) {
-// 		console.log(err)
-// 		console.log('Error on getting Request')
-// 	}
-// })
+
+router.post('/reimport-files-from-memoq', async (req, res) => {
+	let { tasksIds, projectId } = req.body
+	try {
+		const updatedProject = await reImportFilesFromMemoq({ tasksIds, projectId })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/generate-file-from-memoq', async (req, res) => {
+	let { tasksIds, projectId } = req.body
+	try {
+		const link = await generateTargetFileFromMemoq({ tasksIds, projectId })
+		res.send(link)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
+	}
+})
 
 router.post('/new-project', async (req, res) => {
 	let { project, user } = req.body
@@ -181,6 +233,51 @@ router.post('/new-project', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/new-project-individual', async (req, res) => {
+	let { project, client, user } = req.body
+	try {
+		const result = await createProjectIndividual({ project, client, user })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/new-project-from-memoq', async (req, res) => {
+	let { project, memoqLink, selectedMemoqWorkflow, user } = req.body
+	try {
+		const result = await createProjectFromMemoq({ project, memoqLink, selectedMemoqWorkflow, user })
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on creating a project!')
+	}
+})
+
+router.post('/new-project-from-xtmFile', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	let { user, industry, project } = req.body
+	const { file: files } = req.files
+	try {
+		user = JSON.parse(user)
+		project = JSON.parse(project)
+		const result = await createProjectFromXTMFile({ files, user, industry, project })
+		for (const file of files) {
+			fs.access(file.path, (error) => {
+				if (!error) {
+					fs.unlink(file.path, (err) => {
+						if (err) return console.log(err)
+					})
+				}
+			})
+		}
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
 	}
 })
 
@@ -368,54 +465,9 @@ router.post('/update-progress', async (req, res) => {
 		res.send(result)
 	} catch (err) {
 		console.log(err)
-		res.status(500).send('Error on getting metrics ')
+		res.status(500).send('Error on getting metrics')
 	}
 })
-
-// router.post('/update-matrix', async (req, res) => {
-// 	const { projectId, taskId, step, key, value, prop } = req.body
-// 	const { rate, costName } = prop === 'client' ? { rate: step.clientRate, costName: 'receivables' }
-// 			: { rate: step.vendorRate, costName: 'payables' }
-// 	try {
-// 		let project = await getProject({ '_id': projectId })
-// 		let taskIndex = project.tasks.findIndex(item => {
-// 			return item.taskId === taskId
-// 		})
-// 		let stepIndex = project.steps.findIndex(item => {
-// 			return item.name === step.name && item.taskId === step.taskId
-// 		})
-// 		let tasks = [ ...project.tasks ]
-// 		let steps = [ ...project.steps ]
-// 		tasks[taskIndex].metrics[key][prop] = +value / 100
-// 		const cost = calcCost(tasks[taskIndex].metrics, prop, rate)
-// 		steps[stepIndex].finance.Price[costName] = cost
-// 		tasks[taskIndex].finance.Price[costName] = steps.filter(item => item.taskId === taskId).reduce((init, cur) => {
-// 			return init + +cur.finance.Price[costName]
-// 		}, 0)
-// 		let updatedProject = { ...project._doc, id: projectId, tasks, steps }
-// 		const result = await updateProjectCosts(updatedProject)
-// 		res.send(result)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on updating value of matrix')
-// 	}
-// function calcCost(metrics, field, rate) {
-// 	let cost = 0
-// 	let wordsSum = 0
-// 	const rateValue = rate ? rate.value : 0
-// 	for (let key in metrics) {
-// 		if (key !== 'totalWords') {
-// 			cost += metrics[key].value * metrics[key][field] * rateValue
-// 			wordsSum += metrics[key].value
-// 		}
-// 	}
-// 	cost += (metrics.totalWords - wordsSum) * rateValue
-// 	if (rate && cost < rate.min) {
-// 		cost = rate.min
-// 	}
-// 	return cost
-// }
-// })
 
 router.get('/all-managers', async (req, res) => {
 	const { groupFilters } = req.query
@@ -426,6 +478,19 @@ router.get('/all-managers', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on getting managers ')
+	}
+})
+
+router.post('/mark-project-paid', async (req, res) => {
+	const { projectId } = req.body
+	try {
+		const project = await getProject({ "_id": projectId })
+		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
+		const updatedProject = await updateProject({ "_id": projectId }, { steps, isPaid: true, inPause: false })
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Internal server error / Cannot mark Project "Is Paid"')
 	}
 })
 
@@ -678,7 +743,6 @@ router.post('/step-status', async (req, res) => {
 	const { id, status, steps } = req.body
 	let project = await getProject({ '_id': id })
 	let allSteps = project.steps
-
 	try {
 		if (status === 'Approved') {
 			for await (const step of steps) {
@@ -706,7 +770,8 @@ router.post('/steps-reopen', async (req, res) => {
 	const { steps } = req.body
 	try {
 		const project = await getProject({ 'steps._id': steps[0]._id })
-		const updateProject = await getAfterReopenSteps(steps, project)
+		//SOOn
+		// const updateProject = await getAfterReopenSteps(steps, project)
 		await notifyStepReopened(steps, project.projectId)
 		res.send(updateProject)
 	} catch (err) {
@@ -747,20 +812,6 @@ router.post('/generate-certificate', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on generate certificate')
-	}
-})
-
-router.post('/step-finance', async (req, res) => {
-	const { step } = req.body
-	try {
-		const project = await getProject({ 'steps._id': step._id })
-		const steps = await getStepsWithFinanceUpdated(step, project)
-		const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
-		const updatedProject = await getProjectAfterFinanceUpdated({ project, steps, tasks })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on changing Step finance')
 	}
 })
 
@@ -805,8 +856,8 @@ router.post('/making-cancel-message', async (req, res) => {
 	const { accManager, contact } = getAccManagerAndContact(req.body)
 	try {
 		const message = cancelStatus === 'Cancelled Halfway' ?
-				await projectMiddleCancelledMessage({ ...req.body, accManager, contact })
-				: await projectCancelledMessage({ ...req.body, accManager, contact })
+				projectMiddleCancelledMessage({ ...req.body, accManager, contact })
+				: projectCancelledMessage({ ...req.body, accManager, contact })
 		res.send({ message })
 	} catch (err) {
 		console.log(err)
@@ -818,7 +869,7 @@ router.post('/making-tasks-cancel-message', async (req, res) => {
 	const { project, tasks, reason, isPay } = req.body
 	const { accManager, contact } = getAccManagerAndContact(project)
 	try {
-		const message = await tasksMiddleCancelledMessage({ project, tasks, accManager, contact, reason, isPay })
+		const message = tasksMiddleCancelledMessage({ project, tasks, accManager, contact, reason, isPay })
 		res.send({ message })
 	} catch (err) {
 		console.log(err)
@@ -1015,7 +1066,7 @@ router.post('/update-project-discounts', async (req, res) => {
 router.post('/update-project-additions', async (req, res) => {
 	const { _id, additionsSteps } = req.body
 	try {
-		const updatedProject = await Projects.updateOne({ _id }, { additionsSteps })
+		const updatedProject = await updateProject({ _id }, { additionsSteps })
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
@@ -1042,11 +1093,6 @@ router.post('/remove-vendor-from-step', async (req, res) => {
 		await removeVendorFromStep({ stepId, projectId })
 		const updatedProject = await calculateProjectTotal(projectId)
 		res.send(updatedProject)
-		// const project = await getProject({ '_id': projectId })
-		// const steps = await getStepsWithFinanceUpdated(step, project)
-		// const tasks = getTasksWithFinanceUpdated(step, { ...project._doc, steps })
-		// const updatedProject = await updateProject({ '_id': projectId }, { steps, tasks })
-		// res.send(updatedProject)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on remove-vendor-from-step!')
@@ -1085,20 +1131,6 @@ router.post('/step-vendor-brief', async (req, res) => {
 	}
 })
 
-// router.get('/vendors-for-project', async (req, res) => {
-// 	try {
-// 		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1, "rates.pricelistTable": 1 })
-// 				.populate('rates.pricelistTable.sourceLanguage', [ 'lang' ])
-// 				.populate('rates.pricelistTable.targetLanguage', [ 'lang' ])
-// 				.populate('rates.pricelistTable.step', [ 'title' ])
-// 				.populate('rates.pricelistTable.unit', [ 'type' ])
-// 				.populate('rates.pricelistTable.industry', [ 'name' ])
-// 		res.send(result)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Error on vendors-for-project!')
-// 	}
-// })
 router.get('/vendors-for-options', async (req, res) => {
 	try {
 		const result = await Vendors.find({ status: "Active" }, { "firstName": 1, "surname": 1 })
@@ -1144,9 +1176,7 @@ router.post('/step-finance-edit/:projectId', async (req, res) => {
 })
 
 
-// XTRF API ==================================================================
-const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
-const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
+//XTRF ==>>
 
 router.get('/createXtrfProjectWithFinance/:projectId', async (req, res) => {
 	const { projectId } = req.params

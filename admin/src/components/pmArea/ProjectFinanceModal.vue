@@ -1,19 +1,19 @@
 <template lang="pug">
   .finance
-    .finance__title Finance
     .finance__close(@click.stop="cancelEditing") &#215;
-
+    .tabs(style="margin-top: 5px;")
+      Tabs(
+        :tabs="mainTabs"
+        selectedTab="Finance"
+        @setTab="showMainTab"
+      )
     .info
-      .info__link(@click="openDetailsModal") Go to details
-      .info__link2(v-if="step.vendor" @click="openVendorModal") Go to vendor
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
       .info__right
         span Discount/Surcharge:
         span(style="margin-left: 5px;") {{discounts}}%
-
-      .info__value(v-if="step.vendor") {{ step.vendor.firstName }} {{  step.vendor.surname || '' }}
 
     .stats
       .multi-graph
@@ -27,13 +27,13 @@
         .details__row
           .details__row-color2
           .details__row-title Payables:
-          .details__row-value {{ getPayables }}%
+          .details__row-value {{ getPayables }} %
       .stats__details
         .details__row
           .details__row-title Profit:
           .details__row-value
             span {{ getProfit }}
-            span(v-html="returnIconCurrencyByStringCode(projectCurrency)")
+            span(style="margin-left: 4px;" v-html="returnIconCurrencyByStringCode(projectCurrency)")
         .details__row
           .details__row-title ROI:
           .details__row-value {{ getROI }} %
@@ -53,13 +53,13 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables" :disabled="isProjectFinished")
+              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables" :disabled="isInReceivablesInvoicing")
               span(v-else) -
 
           template(slot="payables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.payables }}
             .table__data(v-else)
-              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor || isProjectFinished")
+              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor || isInPayablesInvoicing")
               span(v-else) -
 
     .finance__buttons
@@ -73,6 +73,7 @@ import GeneralTable from "../GeneralTable"
 import Button from "../Button"
 import { mapActions, mapGetters } from "vuex"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
+import Tabs from "../Tabs"
 
 export default {
   name: "ProjectFinanceModal",
@@ -88,6 +89,10 @@ export default {
     projectCurrency: {
       type: String,
       default: 'EUR'
+    },
+    currentProject: {
+      type: Object,
+      default: {}
     }
   },
   data() {
@@ -109,7 +114,16 @@ export default {
     }
   },
   methods: {
-    ...mapActions([ 'setCurrentProject' ]),
+    showMainTab({ index }) {
+      switch (this.mainTabs[index]) {
+        case 'Step Information':
+          this.openDetailsModal()
+          break
+        case 'Vendor Details':
+          this.openVendorModal()
+          break
+      }
+    },
     openDetailsModal() {
       const { closeFinanceEditing, showStepDetails } = this.$parent
       closeFinanceEditing()
@@ -130,8 +144,8 @@ export default {
         totalReceivables: this.totalReceivables,
         totalPayables: this.totalPayables
       }
-      const updatedProject = await this.$http.post(`/pm-manage/step-finance-edit/${ this.$route.params.id }`, data)
-      this.setCurrentProject(updatedProject.data)
+      const updatedProject = await this.$http.post(`/pm-manage/step-finance-edit/${ this.currentProject._id }`, data)
+      this.$emit('approve', updatedProject.data)
       this.cancelEditing()
     },
     cancelEditing() {
@@ -191,36 +205,20 @@ export default {
       }
     }
   },
-  watch: {
-    // quantityReceivables: function (val) {
-    //   this.totalReceivables = +(+this.rateReceivables * +val).toFixed(2)
-    // },
-    // rateReceivables: function (val) {
-    //   this.totalReceivables = +(+this.quantityReceivables * +val).toFixed(2)
-    // },
-    // totalReceivables: function (val) {
-    //   if (this.quantityReceivables === 0 ) return
-    //   this.rateReceivables = +(+val / +this.quantityReceivables).toFixed(4)
-    // },
-    // quantityPayables: function (val) {
-    //   this.totalPayables = +(+this.ratePayables * +val).toFixed(2)
-    // },
-    // ratePayables: function (val) {
-    //   this.totalPayables = +(+this.quantityPayables * +val).toFixed(2)
-    // },
-    // totalPayables: function (val) {
-    //   if (this.quantityPayables === 0 ) return
-    //   this.ratePayables = +(+val / +this.quantityPayables).toFixed(4)
-    // }
-  },
   computed: {
-    ...mapGetters({
-      units: "getAllUnits",
-      currentProject: "getCurrentProject"
-    }),
-    isProjectFinished() {
-      const { status } = this.currentProject
-      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    mainTabs() {
+      if (!Object.keys(this.step).length) return []
+      return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.step.vendor ? i !== 'Vendor Details' : true)
+    },
+    // isProjectFinished() {
+    //   const { status } = this.currentProject
+    //   return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
+    // },
+    isInReceivablesInvoicing() {
+      return false
+    },
+    isInPayablesInvoicing() {
+      return false
     },
     isMinimumChargeUsed() {
       return this.currentProject.minimumCharge.isUsed
@@ -273,6 +271,7 @@ export default {
     this.setFinanceData()
   },
   components: {
+    Tabs,
     GeneralTable,
     Button
   }
@@ -289,7 +288,7 @@ export default {
     align-items: center;
 
     &-value {
-      width: 70px;
+      width: 80px;
     }
 
     &-title {
@@ -320,7 +319,7 @@ export default {
 
   &__details {
     margin-top: 20px;
-    width: 130px;
+    width: 140px;
   }
 }
 
@@ -375,10 +374,9 @@ export default {
 }
 
 .info {
-  border-radius: 4px;
-  padding: 12px 20px;
+  padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid $light-border;
+  border: 1px solid $border;
   position: relative;
 
   &__link {
@@ -410,14 +408,14 @@ export default {
 
   &__right {
     position: absolute;
-    right: 12px;
-    bottom: 12px;
+    right: 15px;
+    bottom: 15px;
   }
 
   &__title {
-    font-size: 20px;
-    color: $red;
+    font-size: 18px;
     margin-bottom: 10px;
+    font-family: 'Myriad600';
   }
 
   &__value {
@@ -428,6 +426,13 @@ export default {
 }
 
 .finance {
+  box-sizing: border-box;
+  background-color: white;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  width: 600px;
+  padding: 25px;
+
   &__title {
     font-size: 18px;
     font-family: Myriad600;

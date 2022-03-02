@@ -14,70 +14,45 @@ const { updateMemoqProjectUsers } = require('../services/memoqs/projects')
 const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs')
 
-async function getJobs(id) {
-	const allLanguages = await Languages.find()
-	try {
-		let jobs = []
-		const projects = await getProjectsForVendorPortal({ 'steps.vendor': id })
-		for (let project of projects) {
-			const steps = getSteps(project, id, allLanguages)
-			jobs.push(...steps)
-		}
-		return jobs
-	} catch (err) {
-		console.log(err)
-		console.log("Error in getJobs")
-	}
-}
+const getJobDetails = async (_stepId, _projectId, _vendorId) => {
+	const { projectName, projectId, steps, _id, status, brief, deadline, industry, tasks, projectManager } = await getProject({ _id: _projectId })
+	let step = steps.find(({ _id, vendor }) => `${ _id }` === `${ _stepId }` && `${ vendor._id }` === `${ _vendorId }`)
+	step = step._doc
+	const stepTask = tasks.find(item => item.taskId === step.taskId)
+	const prevStep = getPrevStepData(stepTask, steps, step)
 
-function getSteps(project, id, allLanguages) {
-	try {
-		const { steps, tasks } = project
-		let assignedSteps = []
-		let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id)
+	delete step.finance
+	delete step.clientRate
+	delete step.defaultStepPrice
+	step.nativeFinance.Price.receivables = 0
 
-		for (let step of filteredSteps) {
-			// if (step.name !== 'invalid') {
-			const stepTask = tasks.find(item => item.taskId === step.taskId)
-			const prevStep = getPrevStepData(stepTask, steps, step)
-			const { targetLanguage, sourceLanguage } = step._doc
-			assignedSteps.push({
-				...step._doc,
-				currentTask: stepTask,
-				project_Id: project._id,
-				projectId: project.projectId,
-				projectName: project.projectName,
-				projectStatus: project.status,
-				brief: project.brief,
-				manager: project.projectManager,
-				industry: project.industry,
-				memoqDocs: stepTask.memoqDocs,
-				sourceFiles: stepTask.sourceFiles,
-				refFiles: stepTask.refFiles,
-				targetFiles: stepTask.targetFiles,
-				taskTargetFiles: stepTask.targetFiles,
-				fullSourceLanguage: getLangBySymbol(sourceLanguage),
-				fullTargetLanguage: getLangBySymbol(targetLanguage),
-				prevStep
-			})
-			// }
-		}
-		return assignedSteps
-
-		function getLangBySymbol(symbol) {
-			return allLanguages.find(({ symbol: s }) => s === symbol)
-		}
-	} catch (err) {
-		console.log(err)
+	return {
+		...step,
+		currentTask: stepTask,
+		_projectId: _id,
+		projectId: projectId,
+		projectName: projectName,
+		projectStatus: status,
+		projectDeadline: deadline,
+		brief: brief,
+		industry,
+		memoqDocs: stepTask.memoqDocs,
+		sourceFiles: stepTask.sourceFiles,
+		refFiles: stepTask.refFiles,
+		targetFiles: stepTask.targetFiles,
+		prevStep,
+		projectManager
 	}
 }
 
 function getPrevStepData(stepTask, steps, step) {
-
-	const brotherlySteps = steps.filter(item => item.taskId === stepTask.taskId)
-	const prevStep = brotherlySteps.find(item => item.stepNumber === step.stepNumber - 1)
+	const brotherlySteps = steps.filter(i => i.taskId === stepTask.taskId)
+	const prevStep = brotherlySteps.find(i => i.stepNumber === step.stepNumber - 1)
 	if (!prevStep) return false
-	const prevProgress = isNaN(prevStep.progress) ? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2) : prevStep.progress
+
+	const prevProgress = isNaN(prevStep.progress)
+			? +(prevStep.progress.wordsDone / prevStep.progress.totalWordCount * 100).toFixed(2)
+			: prevStep.progress
 
 	return {
 		status: prevStep.status,
@@ -85,10 +60,68 @@ function getPrevStepData(stepTask, steps, step) {
 	}
 }
 
+// async function getJobs(id) {
+// 	const allLanguages = await Languages.find()
+// 	try {
+// 		let jobs = []
+// 		const projects = await getProjectsForVendorPortal({ 'steps.vendor': id })
+// 		for (let project of projects) {
+// 			const steps = getSteps(project, id, allLanguages)
+// 			jobs.push(...steps)
+// 		}
+// 		return jobs
+// 	} catch (err) {
+// 		console.log(err)
+// 		console.log("Error in getJobs")
+// 	}
+// }
+
+// function getSteps(project, id, allLanguages) {
+// 	try {
+// 		const { steps, tasks } = project
+// 		let assignedSteps = []
+// 		let filteredSteps = steps.filter(item => item.vendor && item.vendor.id === id)
+//
+// 		for (let step of filteredSteps) {
+// 			// if (step.name !== 'invalid') {
+// 			const stepTask = tasks.find(item => item.taskId === step.taskId)
+// 			const prevStep = getPrevStepData(stepTask, steps, step)
+// 			const { targetLanguage, sourceLanguage } = step._doc
+// 			assignedSteps.push({
+// 				...step._doc,
+// 				currentTask: stepTask,
+// 				project_Id: project._id,
+// 				projectId: project.projectId,
+// 				projectName: project.projectName,
+// 				projectStatus: project.status,
+// 				brief: project.brief,
+// 				manager: project.projectManager,
+// 				industry: project.industry,
+
+
+// 				targetFiles: stepTask.targetFiles,
+// 				taskTargetFiles: stepTask.targetFiles,
+// 				fullSourceLanguage: getLangBySymbol(sourceLanguage),
+// 				fullTargetLanguage: getLangBySymbol(targetLanguage),
+// 				prevStep
+// 			})
+// 			// }
+// 		}
+// 		return assignedSteps
+//
+// 		function getLangBySymbol(symbol) {
+// 			return allLanguages.find(({ symbol: s }) => s === symbol)
+// 		}
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// }
+
+
 async function updateStepProp({ jobId, prop, value }) {
+
 	try {
 		const project = await getProject({ 'steps._id': jobId })
-
 		const steps = project.steps.map(item => {
 			if (item.id === jobId) {
 				item.status = value
@@ -155,14 +188,22 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 			await pushTasksToDR1(project, task, step)
 			await taskCompleteNotifyPM(project, task)
 		} else {
-			const nextStep = steps
-					.filter(({ status, taskId }) => status !== 'Cancelled' && status !== 'Cancelled Halfway' && taskId === task.taskId)
-					.find(item => item.stepNumber === step.stepNumber + 1)
+			//TODO: Need to refactor error translation second step canceled and stepNumber need to be +2
+
+			const actualSteps = steps
+					.filter(({ status, taskId }) => (status !== 'Cancelled' || status !== 'Cancelled Halfway') && taskId === task.taskId)
+			let nextStep = actualSteps.find(item => item.stepNumber === step.stepNumber + 1)
+			// nextStep = !!nextStep ?  actualSteps.find(item => item.stepNumber === step.stepNumber + 2) : undefined
 
 			if (nextStep) {
 				tasks[taskIndex].status = 'In progress'
-				const updatedSteps = setApprovedStepStatus({ project, step: nextStep, steps })
-				await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
+
+				if ([ 'Approved', 'Ready to Start', 'Waiting to Start' ].includes(nextStep.status)) {
+					const updatedSteps = setApprovedStepStatus({ project, step: nextStep, steps })
+					await Projects.updateOne({ "steps._id": jobId }, { steps: updatedSteps, tasks })
+				} else {
+					await Projects.updateOne({ "steps._id": jobId }, { steps, tasks })
+				}
 				await nextVendorCanStartWorkNotification({ nextStep })
 			}
 		}
@@ -283,7 +324,13 @@ function isAllStepsCompleted({ steps, task }) {
 			.filter(item => item.taskId === task.taskId)
 			.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
 
-	return !taskSteps.length ? false : taskSteps.every(item => item.status === 'Completed')
+	return taskSteps.length ? taskSteps.every(item => item.status === 'Completed') : false
 }
 
-module.exports = { getJobs, updateStepProp, setRejectedStatus, manageStatuses }
+module.exports = {
+	// getJobs,
+	updateStepProp,
+	setRejectedStatus,
+	manageStatuses,
+	getJobDetails
+}

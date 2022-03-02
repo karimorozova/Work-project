@@ -2,14 +2,14 @@ import { getClientTokenFromHeaders, getClientTokenFromDocument } from "~/utils/a
 import { setPreviousLink } from "../store/actions"
 
 export default function ({ store, req, redirect, route }) {
-    if(route.name === "request-quote" || route.name === "forgot") return
+    if(route.name === "request-quote" || route.name === "password-reset" || route.name === "password-reset-request") return
     if(process.server && !req) return
     const token = process.server ? getClientTokenFromHeaders(req) : getClientTokenFromDocument();
     store.commit("SET_TOKEN", token);
     if(!token) {
         if(route.path === "/login") {
         } else {
-            setPreviousLink(store, route.path)
+            !route.path.includes('robot') && setPreviousLink(store, route.path)
             return redirect("/login")
         }
     }

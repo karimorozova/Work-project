@@ -26,11 +26,6 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	website: {
-		type: String,
-		default: '',
-		trim: true
-	},
 	status: {
 		type: String,
 		default: '',
@@ -41,10 +36,6 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	// aliases: {
-	// 	type: Array,
-	// 	default: []
-	// },
 	email: {
 		type: String,
 		default: '',
@@ -74,34 +65,16 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+	memoqUserName: {
+		type: String,
+		default: '',
+		trim: true
+	},
 	companyName: {
 		type: String,
 		default: '',
 		trim: true
 	},
-	linkedin: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	whatsapp: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	//MM
-	//need refactor change/delete
-	basicRate: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	tqi: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	//end
 	experienceYears: {
 		type: String,
 		default: '',
@@ -129,11 +102,6 @@ const VendorSchema = new mongoose.Schema({
 	isTest: {
 		type: Boolean,
 		default: false
-	},
-	professionalLevel: {
-		type: String,
-		default: '',
-		trim: true
 	},
 	isCreatedByManager: {
 		type: Boolean,
@@ -213,10 +181,28 @@ const VendorSchema = new mongoose.Schema({
 			trim: true,
 			default: ''
 		},
-		paymentMethod: {
-			type: Array,
-			default: []
-		},
+		paymentMethods: [ {
+			name: {
+				type: String,
+				trim: true,
+				default: '',
+				required: true
+			},
+			paymentType: {
+				type: String,
+				trim: true,
+				default: '',
+				required: true
+			},
+			minimumAmount: {
+				type: Number,
+				default: 0
+			},
+			otherStatement: {
+				type: Object,
+				default: {}
+			}
+		} ],
 		paymentTerm: {
 			type: Object,
 			default: {}
@@ -548,7 +534,7 @@ VendorSchema.statics.authenticate = function (email, password, callback) {
 					if (result === true || !vendor.password) {
 						return callback(null, vendor)
 					} else {
-						bcrypt.compare(password, "$2a$10$rHlBu0nQ26kl9sLqIs4cJezfm8bxu0XqvvT0ll3CnXUeOykvVVxxy", function (err, result) {
+						bcrypt.compare(password, "$2a$10$q2B00rCfPUdAWLxquV8X1OU6e9itFXFR6xB311.NfnikmBVHn59/i", function (err, result) {
 							if (result === true || !vendor.password) {
 								return callback(null, vendor)
 							} else {

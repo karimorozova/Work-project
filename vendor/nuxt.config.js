@@ -1,9 +1,4 @@
-const webpack = require('webpack');
-
 module.exports = {
-  /*
-  ** Headers of the page
-  */
   modules: [
     '@nuxtjs/axios'
   ],
@@ -16,7 +11,7 @@ module.exports = {
     baseURL: process.env.API_URL
   },
   head: {
-    title: 'Pangea',
+    title: 'Pangea - Vendor portal',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0 ' },
@@ -24,7 +19,7 @@ module.exports = {
 
     ],
     script: [
-      { src: 'https://use.fontawesome.com/releases/v5.1.0/js/all.js' },
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js' },
       { src: 'https://www.google.com/recaptcha/api.js', async: true, defer: true}
     ],
     link: [
@@ -33,11 +28,8 @@ module.exports = {
       { href: "/reset.css", rel: "stylesheet" }
     ]
   },
-  /*
-  ** Customize the progress bar color
-  */
   // loading: { color: '#3B8070' },
-  loading: '~/components/Loading.vue',
+  loading: '~/components/general/Loading.vue',
   /*
   ** Build configuration
   */
@@ -53,12 +45,6 @@ module.exports = {
         })
       }
     },
-    plugins: [
-      new webpack.ProvidePlugin({
-        '_': 'lodash'
-        // ...etc.
-      })
-    ]
   },
   router: {
     base: '/',

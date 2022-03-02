@@ -1,61 +1,129 @@
 const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
-const { moveProjectFile } = require('../utils/movingFile')
 const fs = require('fs')
+const { getPayable, getPayableByVendorId } = require("./getPayables")
+
+const {
+	removeFile,
+	addFile,
+	createBillZohoRequest
+} = require("./zohoBilling")
+
+const moment = require("moment")
+const _ = require('lodash')
+const {
+	invoiceFileUploading,
+	getVendorAndCheckPaymentTerms,
+	updatePayableReport,
+	getReportsTotal
+} = require("./helpers")
 const ObjectId = require("mongodb").ObjectID
 
 const setPayablesNextStatus = async (reportsIds, nextStatus) => {
 	await InvoicingPayables.updateMany({ _id: { $in: reportsIds } }, { status: nextStatus })
 }
-
-const invoiceReloadFile = async ({ reportId, paymentMethod, expectedPaymentDate, invoiceFile, oldPath }) => {
+const invoiceReloadFile = async ({ reportId, invoiceFile, oldPath }) => {
 	await fs.unlink(`./dist${ oldPath }`, (err) => {
 		if (err) console.log("Error in removeOldInvoiceFile")
 	})
-	await invoiceSubmission({ reportId, paymentMethod, expectedPaymentDate, invoiceFile })
-}
-
-const invoiceSubmission = async ({ reportId, paymentMethod, expectedPaymentDate, invoiceFile }) => {
-	const fileName = `${ Math.floor(Math.random() * 1000000) }-${ invoiceFile[0].filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
-	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
-	await moveProjectFile(invoiceFile[0], `./dist${ newPath }`)
-
-
-	await InvoicingPayables.updateOne({ _id: reportId }, {
-		status: 'Invoice Received',
-		paymentDetails: {
-			paymentMethod,
-			//expectedPaymentDate: new Date(expectedPaymentDate),
-			expectedPaymentDate: new Date(),
-			file: {
-				fileName,
-				path: newPath
-			}
-		}
+	const { fileName, newPath } = await invoiceFileUploading(invoiceFile[0], reportId)
+	const { status, zohoBillingId } = await InvoicingPayables.findOneAndUpdate({ _id: reportId }, {
+		'paymentDetails.file': { fileName, path: newPath }
 	})
+	// TODO ZOHO API (soon)
+	// if (status === 'Invoice Ready' && !!zohoBillingId) {
+	// 	await removeFile(zohoBillingId)
+	// 	await addFile(zohoBillingId, newPath)
+	// }
 }
 
-const paidOrAddPaymentInfo = async (reportId, data) => {
-	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
+const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMethod }) => {
+	let vendorReportsAll = await getPayableByVendorId(vendorId)
 
-	await InvoicingPayables.updateOne({ _id: reportId }, {$set: {status: status}, $push: { paymentInformation: data } })
+	const [ { paymentDetails: currentPaymentDetails } ] = await getPayable(reportId)
 
-	if ("Paid" === status) {
-		await InvoicingPayables.aggregate([
-			{	"$match": {"_id" : ObjectId(reportId) } },
-			{
-				"$merge" : {
-					"into" : {
-						"db" : "pangea",
-						"coll" : "invoicingpayablesarchives"
-					}
-				}
-			}
-		])
-		await InvoicingPayables.remove({_id: reportId})
-		return "Moved"
+	let sameVendorReports = vendorReportsAll.filter(({ status, _id, paymentDetails }) =>
+			(status === 'Invoice on-hold' || status === 'Invoice Ready')
+			&& `${ reportId }` !== `${ _id }`
+			&& paymentDetails.paymentMethod
+			&& currentPaymentDetails.paymentMethod.name === paymentDetails.paymentMethod.name
+	)
+
+	await InvoicingPayables.updateMany({ _id: { $in: [ reportId, ...sameVendorReports.map(i => `${ i._id }`) ] } }, { "paymentDetails.paymentMethod": paymentMethod })
+
+	vendorReportsAll = (await getPayableByVendorId(vendorId)).filter(({ status }) => status === 'Invoice on-hold' || status === 'Invoice Ready')
+
+	const groupedReportsByPaymentName = _.groupBy(vendorReportsAll, 'paymentDetails.paymentMethod.name')
+
+	for await (const paymentGroup of Object.values(groupedReportsByPaymentName)) {
+		const status = getReportsTotal(paymentGroup) >= paymentGroup[0].paymentDetails.paymentMethod.minimumAmount ? 'Invoice Ready' : 'Invoice on-hold'
+		await InvoicingPayables.updateMany({ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } }, { status })
 	}
 
-	return 'Success'
-
 }
-module.exports = { setPayablesNextStatus, paidOrAddPaymentInfo, invoiceSubmission, invoiceReloadFile }
+
+const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMethod }) => {
+	let vendorReportsAll = await getPayableByVendorId(vendorId)
+
+	const [ { paymentDetails, totalPrice } ] = await getPayable(reportId)
+
+	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
+	const { fileName, newPath: path } = await invoiceFileUploading(invoiceFile[0], reportId)
+
+	{
+		paymentDetails.paymentMethod = typeof paymentMethod === 'string' ? JSON.parse(paymentMethod) : paymentMethod
+		paymentDetails.expectedPaymentDate = new Date(moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD'))
+		paymentDetails.file = { fileName, path }
+	}
+
+	let vendorReports = vendorReportsAll.filter(({ status, _id, paymentDetails: paymentDetailsReport }) =>
+			(status === 'Invoice on-hold' || status === 'Invoice Ready')
+			&& `${ reportId }` !== `${ _id }`
+			&& paymentDetailsReport.paymentMethod
+			&& paymentDetailsReport.paymentMethod.name === paymentDetails.paymentMethod.name
+	)
+
+	switch (true) {
+		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +totalPrice):
+		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) < paymentDetails.paymentMethod.minimumAmount): {
+			await updatePayableReport(reportId, { status: 'Invoice on-hold', paymentDetails })
+			break
+		}
+		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount <= +totalPrice): {
+			await updatePayableReport(reportId, { status: 'Invoice Ready', paymentDetails })
+			break
+		}
+		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) > paymentDetails.paymentMethod.minimumAmount): {
+			await updatePayableReport(reportId, { paymentDetails })
+			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
+				await updatePayableReport(id, { status: 'Invoice Ready' })
+			}
+			break
+		}
+	}
+}
+
+// TODO ZOHO API (soon)
+// const zohoBillCreation = async (_id) => {
+// 	const [ { vendor, reportId: billNumber, totalPrice, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } } } ] = await getPayable(_id)
+// 	const vendorName = vendor.firstName + ' ' + vendor.surname
+// 	const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
+//
+// 	const lineItems = [ {
+// 		"name": `TS ${ monthAndYear }`,
+// 		"account_id": "335260000002330131",
+// 		"rate": totalPrice,
+// 		"quantity": 1
+// 	} ]
+//
+// 	const { bill } = await createBillZohoRequest(expectedPaymentDate, vendorName, vendor.email, billNumber, lineItems)
+// 	const zohoBillingId = bill.bill_id
+// 	await updatePayableReport(_id, { zohoBillingId })
+// 	await addFile(zohoBillingId, path)
+// }
+
+module.exports = {
+	setPayablesNextStatus,
+	invoiceSubmission,
+	invoiceReloadFile,
+	invoicePaymentMethodResubmission
+}

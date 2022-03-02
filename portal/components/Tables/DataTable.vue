@@ -283,7 +283,7 @@
   }
 
   .review-body {
-    max-height: 800px;
+    max-height: 790px;
 
     .table__body-row {
       cursor: default;

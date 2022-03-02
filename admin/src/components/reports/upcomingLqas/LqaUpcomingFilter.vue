@@ -139,8 +139,8 @@ export default {
     font-size: 14px;
     border-radius: 4px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, .4);
-    background-color: #D15F45;
-    border: 1px solid #D15F45;
+    background-color: #d66f58;
+    border: 1px solid #d66f58;
     cursor: pointer;
     outline: 0;
     line-height: 32px;

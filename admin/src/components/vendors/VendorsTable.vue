@@ -1,33 +1,34 @@
 <template lang="pug">
   .vendors-table
-    DataTable(
+    LayoutsTable(
       :fields="fields"
       :tableData="vendors"
-      :bodyCellClass="'vendor-table-cell'"
-      :bodyClass="['vendors-table__body',{'tbody_visible-overflow': vendors.length < 6}]"
-      :tableheadRowClass="vendors.length < 6 ? 'tbody_visible-overflow' : ''"
-      @onRowClicked="onRowClicked"
       @bottomScrolled="bottomScrolled"
     )
       template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
-        span.vendors-table__header-label {{ field.label }}
+        span.vendors-table__header {{ field.label }}
+
 
       template(slot="vendorName" slot-scope="{ row }")
-        .vendors-table__data {{ getFullName(row) }}
+        .vendors-table__data
+          router-link(class="link-to" :to="{path: `/pangea-vendors/all/details/${row._id}`}")
+            span {{ getFullName(row) }}
       template(slot="status" slot-scope="{ row, index }")
         .vendors-table__drop-menu(v-if="currentEditingIndex === index")
           SelectSingle(
             :options="statuses"
-            :selectedOption="selectedStatus"
+            :selectedOption="selectedStatus || row.status"
             @chooseOption="setStatus"
           )
         .vendors-table__no-drop.vendors-table__status(v-else) {{ row.status }}
 
       template(slot="languagePair" slot-scope="{ row }")
-        .vendors-table__combinations(v-html="formateLanguagesPairs(getLanguagePairs(row).duoLanguagesPairs) ")
+        //.table__data(v-html="row.langsTest")
+        .vendors-table__combinations(v-html="getDuoLang(row) ")
 
       template(slot="monLanguage" slot-scope="{ row }")
-        .vendors-table__combinations(v-html="formateLanguagesPairs(getLanguagePairs(row).monoLanguagesPairs)")
+        //.table__data(v-html="projectLanguages(row, 'mono')")
+        .vendors-table__combinations(v-html="formateLanguagesPairs(getMonoLang(row).monoLanguagesPairs)")
 
       template(slot="native" slot-scope="{ row, index }")
         .vendors-table__no-drop.vendors-table__native(v-if="row.native") {{ row.native.lang }}
@@ -61,9 +62,11 @@
       //  .vendors-table__no-drop(v-else)
       //    span.vendors-table__data {{ row.tqi }}
       template(slot="test" slot-scope="{ row, index }")
-        .checkbox(@click.stop="")
-          input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
-          label(:for="'test' + (index + 1)")
+        CheckBox(:isChecked="!!row.isTest" @check="() => setTest(row._id, true)" @uncheck="() => setTest(row._id, false)")
+
+        //.checkbox(@click.stop="")
+          //  input(type="checkbox" :id="'test' + (index + 1)"  :checked="row.isTest"  @click.stop="setTest(row._id)")
+          //  label(:for="'test' + (index + 1)")
       template(slot="icons" slot-scope="{ row, index }")
         span.vendors-table__icons
           img.vendors-table__icon(@click.stop="makeAction(index, key)" v-for="(icon, key) in icons" :src="icon.icon" :class="{'vendors-table_opacity': isIconClass(index, key)}")
@@ -78,38 +81,50 @@
 </template>
 
 <script>
-	import DataTable from "../DataTable";
+	// import DataTable from "../DataTable";
+	import LayoutsTable from "../LayoutsTable";
+	import CheckBox from "../CheckBox";
 	import Button from "../Button";
 	import scrollDrop from "@/mixins/scrollDrop";
 	import { mapGetters, mapActions } from "vuex";
   import SelectSingle from "../SelectSingle"
   import SelectMulti from "../SelectMulti"
+  import _ from "lodash"
 
 	export default {
 		mixins: [scrollDrop],
+    components: {
+      SelectMulti,
+      SelectSingle,
+      LayoutsTable,
+      // DataTable,
+      CheckBox,
+      Button,
+
+    },
 		data() {
 			return {
 				fields: [
-					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", width: "27%", padding: "0" },
-					{ label: "Status", headerKey: "headerStatus", key: "status", width: "12%", padding: "0" },
-					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair", width: "15%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", width: "15%", cellClass: "vendors-table_scroll-y" },
-					{ label: "Native Language", headerKey: "headerNative", key: "native", width: "15%", padding: "0" },
-					{ label: "Test", headerKey: "headerTest", key: "test", width: "4%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "3px" },
+					{ label: "Vendor Name", headerKey: "headerVendorName", key: "vendorName", style: {width: "300px"} },
+					{ label: "Status", headerKey: "headerStatus", key: "status",  style: {width: "100px"} },
+					{ label: "Language Pair", headerKey: "headerLanguagePair", key: "languagePair",  style: {width: "300px"}, cellClass: "vendors-table_scroll-y" },
+					{ label: "Mono Language", headerKey: "headerMonoLanguage", key: "monLanguage", style: {width: "150px"}, cellClass: "vendors-table_scroll-y" },
+					{ label: "Native Language", headerKey: "headerNative", key: "native", style: {width: "150px"}, },
+					{ label: "Test", headerKey: "headerTest", key: "test",style: {width: "40px"}, },
+					{ label: "", headerKey: "headerIcons", key: "icons", style: {width: "120px"}, },
 				],
 				icons: {
-					save: { icon: require('../../assets/images/Other/save-icon-qa-form.png') },
-					edit: { icon: require('../../assets/images/Other/edit-icon-qa.png') },
-					cancel: { icon: require('../../assets/images/cancel-icon.png') },
-					delete: { icon: require('../../assets/images/Other/delete-icon-qa-form.png') }
+					save: { icon: require('../../assets/images/latest-version/i-save.png') },
+					edit: { icon: require('../../assets/images/latest-version/i-edit.png') },
+					cancel: { icon: require('../../assets/images/latest-version/i-cancel.png') },
+					delete: { icon: require('../../assets/images/latest-version/i-delete.png') }
 				},
 				currentEditingIndex: -1,
 				deletingVendorIndex: -1,
 				currentBasicRate: "",
 				currentTqi: "",
 				industrySelected: [],
-				selectedNative: {},
+				selectedNative: null,
 				selectedStatus: "",
 				isErrorShow: false,
 				isDeleteMessageShow: false,
@@ -120,18 +135,18 @@
 		methods: {
 			...mapActions({
 				alertToggle: "alertToggle",
-				updateVendorProp: "updateVendorProp",
-				storeVendors: "vendorsSetting",
+				// updateVendorProp: "updateVendorProp",
+				// storeVendors: "vendorsSetting",
 				updateCurrentVendor: "updateCurrentVendor",
-				storeCurrentVendor: "storeCurrentVendor",
-				updateIndustry: "updateIndustry",
+				// storeCurrentVendor: "storeCurrentVendor",
+				// updateIndustry: "updateIndustry",
 				deleteCurrentVendor: "deleteCurrentVendor",
 				updateVendorStatus: "updateVendorStatus"
 			}),
-			async setTest(vendorId) {
+			async setTest(vendorId, status) {
 				const vendor = {
 					id: vendorId,
-					isTest: event.target.checked
+					isTest: status
 				}
 				try {
 					await this.updateVendorStatus(vendor);
@@ -159,10 +174,9 @@
 			formateLanguagesPairs(arr) {
 				return arr.reduce((acc, curr) => acc + curr + '<br>', '')
 			},
-			getLanguagePairs(vendor) {
+			getMonoLang(vendor) {
 				const isId = vendor.competencies.length && vendor.competencies[0].sourceLanguage.hasOwnProperty('_id');
-				return {
-					duoLanguagesPairs: returnLangPairs('duo', this.getAllLanguages),
+        return {
 					monoLanguagesPairs: returnLangPairs('mono', this.getAllLanguages)
 				};
 
@@ -172,10 +186,9 @@
 									.map(({ sourceLanguage, targetLanguage }) => {
 										return isId ? { sourceLanguage: sourceLanguage._id, targetLanguage: targetLanguage._id } : { sourceLanguage, targetLanguage }
 									})
-									.filter(({ sourceLanguage, targetLanguage }) => condition === 'duo' ? sourceLanguage !== targetLanguage : sourceLanguage === targetLanguage)
+									.filter(({ sourceLanguage, targetLanguage }) =>  sourceLanguage === targetLanguage)
 									.map(({ sourceLanguage, targetLanguage }) => {
-										return condition === 'duo' ? `${ findSymbolOrLang(sourceLanguage, condition, allLanguages) } >> ${ findSymbolOrLang(targetLanguage, condition, allLanguages) }` :
-												`${ findSymbolOrLang(sourceLanguage, condition, allLanguages) }`
+										return `${ findSymbolOrLang(sourceLanguage, condition, allLanguages) }`
 									})
 					)];
 
@@ -185,6 +198,23 @@
 					}
 				}
 			},
+
+      findSymbolOrLang(_idItem, condition) {
+        const { symbol, lang } =  this.getAllLanguages.find(({ _id }) => _id.toString() === _idItem.toString());
+        return condition === 'duo' ? symbol : lang;
+      },
+      getDuoLang(vendor) {
+        const filter = vendor.competencies
+            .filter(({sourceLanguage, targetLanguage}) => sourceLanguage._id !== targetLanguage._id)
+        const groupedLang = Object.entries(_.groupBy(filter,'sourceLanguage._id'))
+        const groupedUniqueLang = groupedLang.reduce((acc, item) => {
+          const targetLang = [...new Set(item[1].map(({targetLanguage}) =>  this.langMapped[targetLanguage._id]))].join('; ')
+          acc += `${this.langMapped[item[0]]} <span style="font-size: 12px;color: #9c9c9c;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ${targetLang} <br/>`
+          return acc
+        }, '')
+
+        return groupedUniqueLang || '-'
+      },
 			isIconClass(index, key) {
 				if(this.currentEditingIndex !== index) {
 					return key === 'save' || key === 'cancel';
@@ -210,7 +240,7 @@
 				this.currentTqi = "";
 				this.industrySelected = [];
 				this.selectedStatus = "";
-				this.selectedNative = {};
+				this.selectedNative = null;
 				const tbody = document.querySelector('.table__tbody');
 				tbody.style.minHeight = this.currentTableHeight + 'px';
 			},
@@ -222,7 +252,7 @@
 					tqi: this.currentTqi,
 					industries: this.industrySelected,
 					status: this.selectedStatus,
-					native: this.selectedNative
+					native: this.selectedNative || this.vendors[index].native
 				}
 				sendData.append('vendor', JSON.stringify(updatingVendor));
 				try {
@@ -309,6 +339,18 @@
 				getAllLanguages: "getAllLanguages",
         getAllIndustries: "getAllIndustries",
       }),
+      // addedLangInfo() {
+			//   return this.vendors.map(item => {
+      //     item.langsTest = this.projectLanguages(item, 'duo')
+      //     return item
+      //   })
+      // },
+      langMapped() {
+			  return this.getAllLanguages.reduce((acc, {symbol, _id}) => {
+			    acc[_id] = symbol
+          return acc
+			  }, {})
+      },
       filteredLanguages() {
         let result = this.getAllLanguages;
         if(this.addAll) {
@@ -329,20 +371,41 @@
 				return result;
 			}
 		},
-		components: {
-      SelectMulti,
-      SelectSingle,
-			DataTable,
-			Button
-		}
 	}
 </script>
 
 <style lang="scss" scoped>
   @import "../../assets/scss/colors.scss";
-
   .vendors-table {
+
     position: relative;
+
+    //margin-top: 25px;
+
+    //&__projectName {
+    //  width: 100%;
+    //  display: flex;
+    //  justify-content: space-between;
+    //}
+    //
+    //&__empty {
+    //  margin-top: 10px;
+    //  color: $dark-border;
+    //}
+
+    &__header {
+      padding: 0 0 0 7px;
+    }
+    //
+    //&__dataImage {
+    //  width: 100%;
+    //  display: flex;
+    //  justify-content: center;
+    //}
+    //
+    //&__data {
+    //  width: 100%;
+    //}
 
     &__combinations {
       padding: 8px 5px;
@@ -357,13 +420,13 @@
     &__industry {
       padding: 5px;
     }
-
-    &__status,
-    &__native,
-    &__data {
-      margin: 6px 5px;
-      padding: 2px 0;
-    }
+    //
+    //&__status,
+    //&__native,
+    //&__data {
+    //  margin: 6px 5px;
+    //  padding: 2px 0;
+    //}
 
     &__no-drop, &__data {
       display: flex;
@@ -373,10 +436,12 @@
     }
 
     &__icons {
-      margin-right: 16px;
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
       align-items: center;
+      gap: 6px;
+      width: 100%;
+      height: 40px;
     }
 
     &__icon {
@@ -389,6 +454,8 @@
 
     &__drop-menu {
       position: relative;
+      width: 100%;
+      height: 31px;
     }
 
     &__active {
@@ -475,9 +542,11 @@
     .checkbox {
       display: inline-flex;
       align-items: center;
+      padding: 4px;
 
       input[type="checkbox"] {
         opacity: 0;
+        position: absolute;
 
         + {
           label {
@@ -528,6 +597,15 @@
           top: 7px;
         }
       }
+    }
+  }
+  a {
+    color: $text;
+    text-decoration: none;
+    transition: .2s ease-out;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 </style>

@@ -58,7 +58,7 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Server Error / Cannot update Project", isShow: true, type: "error" })
       }
-    },
+    }
 
     // sendTo() {
     //   this.isDisable = true
@@ -129,7 +129,7 @@ export default {
   }
 
   .red {
-    color: #d15f45;
+    color: #d66f58;
     margin-bottom: 3px;
   }
 
@@ -137,6 +137,7 @@ export default {
     text-decoration: none;
     color: inherit;
   }
+
   .button {
     width: 175px;
   }
@@ -147,12 +148,15 @@ export default {
     justify-content: space-between;
   }
 }
+
 .inputs {
   margin-bottom: 7px;
+
   div {
     margin-bottom: 3px;
   }
 }
+
 input {
   font-size: 14px;
   color: $text;

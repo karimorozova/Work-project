@@ -31,16 +31,13 @@ const {
 
 const { getProject } = require("./getProjects")
 const { getService } = require("../services/getServices")
-const { User, Units, Step, Languages, Services, Projects } = require("../models")
+const { User, Units, Step, Languages, Projects } = require("../models")
 
 const {
-	getDeliverablesLink,
 	createArchiveForDeliverableItem,
-	getProjectDeliverables,
 	getPdf
 } = require("./files")
 
-const { flatten } = require('lodash')
 const fs = require('fs')
 
 async function stepCancelNotifyVendor(steps) {
@@ -152,32 +149,12 @@ function dynamicClientName(message, contactEmail, project) {
 	}
 }
 
-// async function getQuoteInfo(projectId, tasksIds) {
-// 	try {
-// 		const project = await getProject({ '_id': projectId })
-// 		const service = await getService({ '_id': project.tasks[0].service })
-// 		let quote = { ...project._doc, id: project.id }
-// 		quote.selectedTasks = tasksIds.length ? project.tasks.filter(task => tasksIds.includes(task.taskId)) : []
-// 		quote.service = service.title
-// 		return quote
-// 	} catch (err) {
-// 		console.log(err)
-// 		console.log("Error in getQuoteInfo")
-// 	}
-// }
-
 async function stepCompletedNotifyPM(project, step) {
-	const { projectManager, accManager } = await getAMPMbyProject(project)
+	const { projectManager } = await getAMPMbyProject(project)
 	const subject = `Step completed: ${ step.stepId } - ${ step.name } - ${ project.projectName } (I003.0)`
 	const messagePM = stepCompletedMessage({ ...project._doc, step }, projectManager)
-
-	// TODO (refactoring later, temporary hide notification for AM)
-	// const messageAM = stepCompletedMessage({ ...project._doc, step }, accManager)
 	try {
 		await sendEmail({ to: project.projectManager.email, subject }, messagePM)
-
-		// TODO (refactoring later, temporary hide notification for AM)
-		// await sendEmail({ to: project.accountManager.email, subject }, messageAM)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in stepCompletedNotifyPM")
@@ -185,16 +162,10 @@ async function stepCompletedNotifyPM(project, step) {
 }
 
 async function taskCompleteNotifyPM(project, task) {
-	const { projectManager, accManager } = await getAMPMbyProject(project)
+	const { projectManager } = await getAMPMbyProject(project)
 	const messagePM = await getPMnotificationMessage(project, task, projectManager)
-
-	// TODO (refactoring later, temporary hide notification for AM)
-	// const messageAM = await getPMnotificationMessage(project, task, accManager)
 	try {
 		await managerNotifyMail({ email: project.projectManager.email }, messagePM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (I008.0)`)
-
-		// TODO (refactoring later, temporary hide notification for AM)
-		//await managerNotifyMail({ email: project.accountManager.email }, messageAM, `Task is ready for DR1: ${ task.taskId } - ${ project.projectName } (ID I008.0)`)
 	} catch (err) {
 		console.log(err)
 		console.log("Error in taskCompleteNotifyPM")
@@ -253,7 +224,6 @@ async function notifyClientDeliverablesReady({ project, contacts, type, entityId
 				const { lang: target } = allLanguages.find(({ symbol }) => `${ symbol }` === `${ curr.targetLanguage }`)
 				const langPair = source === target ? target : `${ source } >> ${ target }`
 				if (!acc.languages.includes(langPair)) acc.languages.push(langPair)
-				// if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
 				return acc
 			}, { languages: [] })
 
@@ -421,14 +391,6 @@ async function sendClientDeliveries({ projectId, type, entityId, user, contacts,
 		if (type === 'single') {
 			const deliverableObj = tasksDR2.singleLang.find(({ _id }) => `${ _id }` === `${ entityId }`)
 			const { deliveryInternalId, sourceLanguage, targetLanguage, files } = deliverableObj
-
-			// const tasks = [ ...new Set(files.map(item => item.taskId)) ]
-			// projectTasks = projectTasks.filter(item => tasks.includes(item.taskId))
-			// const languagesAndServices = projectTasks.reduce((acc, curr) => {
-			// 	if (!acc.services.includes(curr.service.title)) acc.services.push(curr.service.title)
-			// 	return acc
-			// }, { services: [] })
-
 			const { lang: source } = allLanguages.find(({ _id }) => `${ _id }` === `${ sourceLanguage }`)
 			const { lang: target } = allLanguages.find(({ _id }) => `${ _id }` === `${ targetLanguage }`)
 			const langPair = source === target ? target : `${ source } >> ${ target }`
@@ -493,21 +455,6 @@ async function sendClientDeliveries({ projectId, type, entityId, user, contacts,
 		console.log("Error in sendClientDeliveries")
 	}
 }
-
-// TODO check (I0010.0)
-// async function notifyDeliverablesDownloaded(taskId, project, user) {
-// 	try {
-// 		const { projectManager, accManager } = await getAMPMbyProject(project)
-// 		const messagePM = deliverablesDownloadedMessage({ manager: projectManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user)
-// 		const messageAM = deliverablesDownloadedMessage({ manager: accManager, taskId, projectName: project.projectName, project_id: project.projectId, _id: project._id }, user)
-// 		await managerNotifyMail({ email: project.projectManager.email, ...projectManager }, messagePM, `Task delivered: ${ taskId } - ${ project.projectName } (I0010.0)`)
-// 		await managerNotifyMail({ email: project.accountManager.email, ...accManager }, messageAM, `Task delivered: ${ taskId } - ${ project.projectName } (I0010.0)`)
-// 	} catch (err) {
-// 		console.log(err)
-// 		console.log("Error in notifyDeliverablesDownloaded")
-// 	}
-// }
-
 
 async function notifyManagerStepStarted(project, step) {
 	const { projectManager } = await getAMPMbyProject(project)
@@ -580,13 +527,12 @@ async function notifyVendorStepStart(steps, allSteps, project) {
 }
 
 const nextVendorCanStartWorkNotification = async ({ nextStep }) => {
-		if (!!nextStep.vendor) {
-			const message = vendorCanStartStartedSecondStep({ vendor: nextStep.vendor, step: nextStep })
-			const subject = `STEP-${ nextStep.step.title } is ready to start (V001.21)`
-			await sendEmail({ to: nextStep.vendor.email, subject }, message)
-		}
+	if (!!nextStep && !!nextStep.vendor) {
+		const message = vendorCanStartStartedSecondStep({ vendor: nextStep.vendor, step: nextStep })
+		const subject = `STEP-${ nextStep.step.title } is ready to start (V001.21)`
+		await sendEmail({ to: nextStep.vendor.email, subject }, message)
+	}
 }
-
 
 module.exports = {
 	nextVendorCanStartWorkNotification,
@@ -594,7 +540,6 @@ module.exports = {
 	taskCompleteNotifyPM,
 	notifyClientDeliverablesReady,
 	sendClientDeliveries,
-	// notifyDeliverablesDownloaded,
 	notifyManagerStepStarted,
 	stepCompletedNotifyPM,
 	notifyStepDecisionMade,

@@ -1,234 +1,286 @@
 <template lang="pug">
   .login
-    .login__main
-      .login__logo
-        img.login__image(src="../assets/images/new-logo.png")
-      form.login__form(@submit.prevent="checkFields")
-        .login__required-message(v-if="isAllFieldsError") All fields are required!
-        .login__email
-          input.login__input(v-model='form.logemail' placeholder='Email' :class="{'login_shadow': form.logemail}")
-        .login__password
-          input.login__input(type="password" v-model='form.logpassword' placeholder='Password' :class="{'login_shadow': form.logpassword}")
-        .login__textrow
-          .login__checkbox
-            input.login__checkbox-input(type="checkbox")
-            label.login__checkbox-label Remember me
-          .login__fogotContainer
-            nuxt-link.login__forgot(to="/forgot") Forgot Your Password?
-        button.login__button(type="submit" :class="{'login_button-backgr': form.logemail && form.logpassword}") Sign In
+    .login__block
+      //.login__logo.center
+      //  img(src="../../static/email-logo2.png")
+      .login__text.center
+        .text__title Sign in
+        .text__welcome Welcome back! Please login to your account.
+
+      .login__email-block
+        .input__block
+          .input__title E-mail
+          input.input__field(v-model='form.logemail' placeholder="Enter your email" )
+        .input__block
+          .input__title
+            span Password
+
+          input.input__field(v-model='form.logpassword' type="password" placeholder="Enter your password" v-on:keyup.enter="sendForm")
+
+        router-link(to="/password-reset-request")
+          .login__forget Forgot password
+
+        input.action-button__button( type="button" value="Sign in" @click="sendForm")
+
+      .login__splitter
+        .login__splitter-text or sign in with
+
+      .login__oauth
+        .icons
+          .icon( @click="singInGoogle")
+            i(class="fa-brands fa-google")
+          //.icon
+          //  i(class="fa-brands fa-facebook-f")
+
 
 </template>
 
 <script>
-	import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex"
 
-	export default {
-		data() {
-			return {
-				form: {
-					logemail: "",
-					logpassword: ""
-				},
-				isAllFieldsError: false
-			};
-		},
-		methods: {
-			async checkFields() {
-				if(!this.form.logemail || !this.form.logpassword) {
-					return this.isAllFieldsError = true;
-				}
-				await this.sendForm();
-			},
-			async sendForm() {
-				try {
-					this.isAllFieldsError = false;
-					const result = await this.$axios.$post("/portal/auth", {
-						...this.form
-					});
-					this.login(result.clientToken);
+export default {
+  data() {
+    return {
+      form: {
+        logemail: "",
+        logpassword: ""
+      },
+      isAllFieldsError: false
+    }
+  },
+  methods: {
 
-					!!result.clientToken && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
-							this.$router.push(this.getPreviousLink) :
-							this.$router.push('/dashboard')
 
-					this.alertToggle({ message: "You are logged in", isShow: true, type: "success" });
-				} catch (err) {
-					let message = err.message;
-					if(err.response && err.response.data) {
-						message = err.response.data;
-					}
-					this.alertToggle({ message, isShow: true, type: "error" });
-				}
-			},
-			forget() {
-				this.forgotLink = !this.forgotLink;
-			},
-			...mapActions({
-				alertToggle: "alertToggle",
-				login: "login",
-			})
-		},
-		computed: {
-			...mapGetters({
-				getPreviousLink: 'getPreviousLink'
+    async start() {
+      const gapi = window.gapi
+      await gapi.auth2.init({
+        'clientId': '1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com',
       })
-		}
-	};
+      this.GoogleAuth = gapi.auth2.getAuthInstance()
+      const data = await this.GoogleAuth.signIn()
+
+      const { status, token } = (await this.$axios.post('/login-with-google', { idToken: data.wc.id_token, portal: 'portal' }, { withCredentials: true })).data
+
+      if (status === 'success') {
+        this.login(token)
+        this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+        this.$router.push("/")
+      } else {
+        this.GoogleAuth.signOut()
+        this.alertToggle({ message: "No such user in system", isShow: true, type: "error" })
+      }
+
+
+    },
+
+    async singInGoogle() {
+      window.gapi.load('auth2', this.start);
+    },
+
+
+    async sendForm() {
+      try {
+        this.isAllFieldsError = false
+        const result = await this.$axios.$post("/portal/auth", {
+          ...this.form
+        })
+        this.login(result.clientToken)
+
+        !!result.clientToken && !!this.getPreviousLink && this.getPreviousLink !== '/login' ?
+            this.$router.push(this.getPreviousLink) :
+            this.$router.push('/dashboard')
+
+        this.alertToggle({ message: "You are logged in", isShow: true, type: "success" })
+      } catch (err) {
+        let message = err.message
+        if (err.response && err.response.data) {
+          message = err.response.data
+        }
+        this.alertToggle({ message, isShow: true, type: "error" })
+      }
+    },
+
+    async loadSDK(d, s, id) {
+      let js,
+          fjs = d.getElementsByTagName(s)[0]
+      if (d.getElementById(id)) {
+        return
+      }
+      js = d.createElement(s)
+      js.id = id
+      js.src = "https://apis.google.com/js/api.js"
+      fjs.parentNode.insertBefore(js, fjs)
+    },
+    ...mapActions({
+      alertToggle: "alertToggle",
+      login: "login"
+    })
+  },
+  async mounted() {
+    await this.loadSDK(document, "script", "googless")
+  },
+  computed: {
+    ...mapGetters({
+      getPreviousLink: 'getPreviousLink'
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../assets/scss/colors.scss";
+@import "../assets/scss/colors";
 
-  .login {
-    font-family: Myriad400;
-    background-image: url("/assets/images/signin-background.jpg");
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-size: cover;
+.icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
 
-    &__textrow {
-      display: flex;
-      width: 100%;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
+.icon {
+  cursor: pointer;
+  color: $dark-border;
+  transition: .1s ease-out;
+  font-size: 16px;
+  border: 1px solid $light-border;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 34px;
 
-    &__required-message {
+  &:hover {
+    color: $text
+  }
+}
+
+.login {
+  background-image: url("../assets/images/signin-background.jpg");
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: $text;
+  background-size: cover;
+
+  &__splitter {
+    padding-bottom: 30px;
+    border-bottom: 1px solid $light-border;
+    margin-bottom: 30px;
+    position: relative;
+
+    &-text {
       position: absolute;
-      top: 12px;
-      font-size: 16px;
-      color: #D15F45;
-    }
-
-    &__main {
-      position: absolute;
-      margin-left: -250px;
-      left: 50%;
-      top: 50%;
-      margin-top: -266px;
-      width: 476px;
-    }
-
-    &__logo {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-
-    &__form {
-      position: relative;
-      padding: 40px;
-      width: 100%;
-      background-color: #fff;
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      align-items: center;
-      box-sizing: border-box;
-    }
-
-    &__warning {
-      margin-bottom: 5px;
-      padding-top: 5px;
-    }
-
-    &__warning-message {
-      color: #ff0000;
-      padding-left: 20px;
-    }
-
-    &__email,
-    &__password {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    &__input {
-      box-sizing: border-box;
-      height: 40px;
-      width: 100%;
-      font-size: 18px;
-      color: #66563d;
-      padding-left: 10px;
-      padding-right: 10px;
-      border-radius: 4px;
-      border: 2px solid #dedede;
-
-      &::-webkit-input-placeholder {
-        opacity: 0.38;
-      }
-
-      &:focus {
-        border: 2px solid #dedede;
-        box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.01),
-        0px 0px 6px rgba(0, 0, 0, 0.2);
-        outline: none;
-      }
-    }
-
-    &__checkbox {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: center;
-
-      &-input {
-        width: 14px;
-        height: 14px;
-      }
-
-      &-label {
-        font-size: 16px;
-        color: #67573E;
-        margin-left: 6px;
-      }
-    }
-
-    &__button {
-      width: 165px;
-      height: 36px;
-      border-radius: 4px;
-      font-size: 18px;
-      background-color: $green;
-      color: $white;
-      opacity: 0.5;
-      outline: none;
-      border: none;
-      transition: .1s ease;
-      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-
-      &:active {
-        transform: scale(.98);
-      }
-
-      &:hover {
-        cursor: pointer;
-        box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
-      }
-    }
-
-    &__forgot {
-      color: $green;
-      font-size: 16px;
-      cursor: pointer;
-      align-self: flex-start;
-      text-decoration: none;
-      transition: .1s ease;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    &_shadow {
-      box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.01),
-      0px 0px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    &_button-backgr {
-      opacity: 1;
+      background-color: white;
+      top: 18px;
+      left: 110px;
+      padding: 5px;
+      color: $dark-border;
     }
   }
+
+  &__block {
+    background-color: $white;
+    border-radius: 4px;
+    padding: 30px;
+    box-shadow: $box-shadow;
+  }
+
+
+  &__forget {
+    text-decoration: none;
+    color: $dark-border;
+    text-align: center;
+  }
+
+
+  .text {
+    &__title {
+      font-size: 24px;
+      font-family: Myriad600;
+    }
+
+    &__welcome {
+      color: $border-focus;
+      padding: 10px 0 25px;
+    }
+  }
+
+  .input {
+    &__block {
+      margin-bottom: 15px;
+    }
+
+    &__title {
+      font-size: 14px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      color: $dark-border;
+      letter-spacing: 0.2px;
+
+    }
+
+    &__field {
+      box-sizing: border-box;
+      border: 1px solid $light-border;
+      outline: none;
+      width: 320px;
+      height: 40px;
+      border-radius: 4px;
+      transition: .1s ease-out;
+      box-shadow: 0 0 0 30px white inset !important;
+      padding: 0px 10px;
+      font-size: 14px;
+      color: $text;
+
+      &:focus {
+        border: 1px solid $border;
+      }
+    }
+  }
+}
+
+.action-button {
+  &__button {
+    height: 40px;
+    width: 100%;
+    color: $white;
+    font-size: 14px;
+    border-radius: 2px;
+    background-color: $red;
+    border: none;
+    outline: none;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: .05s ease-out;
+    margin-top: 15px;
+
+    &:hover {
+      filter: brightness(0.96);
+    }
+
+    &:active {
+      transform: scale(.97);
+    }
+  }
+}
+
+.center {
+  text-align: center;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+::placeholder {
+  opacity: 0.4;
+}
 </style>

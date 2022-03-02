@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const moment = require('moment')
 const { Projects } = require('../models')
 const { getProject, updateWithApprovedTasks } = require('../projects')
 const { getProjectManageToken } = require("../middleware")
@@ -11,6 +12,7 @@ const {
 const {
 	quoteEmitter
 } = require('../events/quote')
+const { recalculateStepFinance, calculateProjectTotal } = require("../сalculations/finance")
 
 router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 	let project = null
@@ -49,10 +51,23 @@ router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 	}
 	if (prop === 'reject') {
 		const tasks = allTasks.map(task => {
-			if (task.status === 'Quote sent') task.status = 'Rejected'
+			if (task.status === 'Quote sent') {
+				task.status = 'Cancelled'
+				task.reason = `Rejected by Client. At: ${ moment(new Date()).format('MMM D, HH:mm') } `
+			}
 			return task
 		})
-		await Projects.updateOne({ _id }, { $set: { tasks } })
+		const steps = project.steps.map(step => {
+			if (tasksIds.includes(step.taskId)) {
+				step.status = 'Cancelled'
+				step.finance.Price.receivables = step.finance.Quantity.receivables = step.finance.Wordcount.receivables = 0
+				step.finance.Price.payables = step.finance.Quantity.payables = step.finance.Wordcount = 0
+			}
+			return step
+		})
+		await Projects.updateOne({ _id }, { $set: { tasks, steps } })
+		await recalculateStepFinance(_id)
+		await calculateProjectTotal(_id)
 	}
 
 	quoteEmitter.emit('client-decide-tasks', project, prop, neededSteps)
@@ -92,7 +107,11 @@ router.get('/vendor-decide', getProjectManageToken, async (req, res) => {
 	}
 
 	quoteEmitter.emit('vendor-decide', prop, project, vendorId, stepId)
-	prop === 'accept' ? res.send({ code: -3 }) : res.send({ code: -2 })
+	prop === 'accept'
+			? res.send({ code: -5 })
+			// временно сделан редирект на вендор портал по коду - 5
+			// ? res.send({ code: -3 })
+			: res.send({ code: -4 })
 })
 
 router.get('/client-decide', getProjectManageToken, async (req, res) => {
@@ -126,15 +145,24 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 	if (prop === 'accept') {
 		let { tasks, steps } = updateWithApprovedTasks({ taskIds: allProjectTasks.map(i => i.taskId), project })
 		const newDeadline = +lengthThinkingTime + new Date(deadline).getTime()
-		steps = steps.map(item => {
-			const newDeadline = +lengthThinkingTime + new Date(item.deadline).getTime()
-			item.deadline = new Date(newDeadline).toISOString()
-			return item
+		// steps = steps.map(item => {
+		// 	const newDeadline = +lengthThinkingTime + new Date(item.deadline).getTime()
+		// 	item.deadline = new Date(newDeadline).toISOString()
+		// 	return item
+		// })
+		await Projects.updateOne({ _id }, {
+			$set: {
+				startDate: new Date(),
+				tasks,
+				steps,
+				deadline: new Date(newDeadline).toISOString(),
+				status: "Approved",
+				isClientOfferClicked: true
+			}
 		})
-		await Projects.updateOne({ _id }, { $set: { startDate: new Date(), tasks, steps, deadline: new Date(newDeadline).toISOString(), status: "Approved", isClientOfferClicked: true } })
 	}
 	if (prop === 'reject') {
-		const tasks = tasks.map(task => {
+		const tasks = allProjectTasks.map(task => {
 			if (task.status === 'Quote sent') task.status = 'Rejected'
 			return task
 		})
@@ -157,16 +185,22 @@ router.get('/get-success-message', async (req, res) => {
 			case '-1':
 				title = 'Thank you'
 				message = 'for accepting the quote'
-				footer = 'Go to <a style="margin-left: 3px;" href="https://portal.pangea.global/dashboard"> portal.pangea</a>'
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.PORTAL_URL }/dashboard"> portal.pangea</a>`
 				break
 			case '-2':
 				title = 'Quote rejected'
 				message = ''
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.PORTAL_URL }/dashboard"> portal.pangea</a>`
 				break
 			case '-3':
 				title = 'Thank you'
 				message = ''
-				footer = 'Go to <a style="margin-left: 3px;" href="https://vendor.pangea.global/dashboard"> vendor.pangea</a>'
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.VENDOR_URL }/dashboard"> vendor.pangea</a>`
+				break
+			case '-4':
+				title = 'Quote rejected'
+				message = ''
+				footer = `Go to <a style="margin-left: 3px;" href="${ process.env.VENDOR_URL }/dashboard"> vendor.pangea</a>`
 				break
 			default:
 				title = 'ERROR CODE 0'
@@ -248,7 +282,7 @@ router.get('/vendor-data-to-display', getProjectManageToken, async (req, res) =>
 			projectId,
 			industry,
 			deadline: currStep.deadline,
-			amount: (currStep.nativeFinance.Price.payables).toFixed(2),
+			amount: +(currStep.nativeFinance.Price.payables).toFixed(2),
 			services: currStep.step.title,
 			languages: currStep.sourceLanguage === currStep.targetLanguage ? currStep.targetLanguage : currStep.sourceLanguage + ' >> ' + currStep.targetLanguage,
 			projectCurrency: 'EUR'
@@ -271,7 +305,7 @@ router.get('/client-data-to-display', getProjectManageToken, async (req, res) =>
 			projectName,
 			projectId,
 			industry,
-			amount: finance.Price.receivables,
+			amount: +(finance.Price.receivables).toFixed(2),
 			services,
 			languages,
 			projectCurrency,

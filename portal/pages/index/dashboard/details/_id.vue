@@ -10,17 +10,16 @@
 </template>
 
 <script>
-	import MainInfo from "./MainInfo"
-	import OtherInfo from "./OtherInfo"
-	import { mapGetters, mapActions } from "vuex"
+import MainInfo from "./MainInfo"
+import OtherInfo from "./OtherInfo"
+import { mapActions, mapGetters } from "vuex"
 
-	export default {
+export default {
 		data() {
 			return {}
 		},
 		methods: {
 			...mapActions({
-				getProjectsAndRequests: "getProjectsAndRequests",
 				selectProject: "selectProject",
 				alertToggle: "alertToggle"
 			}),
@@ -38,10 +37,7 @@
 					// const currentProject = projectsAndRequests.find(item => item._id === id)
 
           const { project } = (await this.$axios.get('/portal/project/' + id + '?token=' + this.token)).data
-          const currentProject = JSON.parse(window.atob(project))
-
-
-					await this.selectProject(currentProject)
+          await this.selectProject(project)
 				} catch (err) {
 
 				}
@@ -50,8 +46,6 @@
 		computed: {
 			...mapGetters({
 				project: "getSelectedProject",
-				// allProjects: "getAllProjects",
-				// allRequests: "getAllRequests"
         token: "getToken"
 			}),
 			title() {

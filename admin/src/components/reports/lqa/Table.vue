@@ -73,7 +73,7 @@
           { label: "LQA 3", headerKey: "headerLqa3", key: "lqa3", width: "12%"},
           { label: "", headerKey: "headerLink", key: "link", width: "5%"},
         ],
-        domain: "http://localhost:3001",
+        domain: this.$domains.admin,
         isForm: false,
         currentAssessment: {}
       }
@@ -199,7 +199,7 @@
       }
     },
     mounted() {
-      this.domain = __WEBPACK__API_URL__;
+      this.domain = this.$domains.admin;
     },
     computed: {
 		  ...mapGetters({

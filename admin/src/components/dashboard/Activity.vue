@@ -95,7 +95,7 @@
     }
 
     .col {
-      width: 750px;
+      width: 755px;
       padding: 10px 20px 20px;
       box-shadow: $box-shadow;
       box-sizing: border-box;

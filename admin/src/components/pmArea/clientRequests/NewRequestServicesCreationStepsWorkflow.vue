@@ -135,14 +135,13 @@ import '../../../assets/scss/datepicker.scss'
 import moment from "moment"
 import SelectSingle from "../../SelectSingle"
 import draggable from "vuedraggable"
-import JobDescriptors from "../JobDescriptors"
 import Add from "../../Add"
 import CheckBox from "../../CheckBox"
 import Button from "../../Button"
 import ApproveModal from "../../ApproveModal"
 
 export default {
-  components: { Button, CheckBox, Add, JobDescriptors, SelectSingle, DatepickerWithTime, draggable, DatePicker, ApproveModal },
+  components: { Button, CheckBox, Add, SelectSingle, DatepickerWithTime, draggable, DatePicker, ApproveModal },
   props: {
     templates: {
       type: Array,
@@ -167,7 +166,9 @@ export default {
   },
   methods: {
     notBeforeToday(date) {
-      return date < new Date() || new Date(this.currentProject.deadline) < date
+      const start = new Date(this.currentProject.startDate)
+      start.setDate(start.getDate() - 1)
+      return date < start || new Date(this.currentProject.deadline) <= date
     },
     addStep() {
       const { service } = this.currentProject.requestForm
@@ -194,6 +195,12 @@ export default {
       this.newStep = ''
     },
     toggleBox() {
+      if (!this.isDisabledPayablesEdit) {
+        for (let i = 0; i < this.tasksData.stepsAndUnits.length; i++) {
+          this.tasksData.stepsAndUnits[i].payables = this.tasksData.stepsAndUnits[i].receivables
+        }
+        this.setDataValue({ prop: 'stepsAndUnits', value: this.tasksData.stepsAndUnits })
+      }
       this.isDisabledPayablesEdit = !this.isDisabledPayablesEdit
     },
     setTemplate({ option }) {
@@ -343,7 +350,7 @@ export default {
 
 .step {
   margin: 20px 0;
-  background: #f7f7f759;
+  background: $light-background;
   border: 1px solid $light-border;
   border-radius: 4px;
   padding: 10px 20px;

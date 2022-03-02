@@ -40,7 +40,7 @@
           Button(value="Cancel" :outline="true" @clicked="closeEditModal")
     .instructions__body
       .col
-        .instructions__title Options
+        .instructions__title Options:
         .instructions__cards
 
           .card(v-for="({id, title, description, isOpen = false}, index) of unselectedInstructions")
@@ -55,7 +55,7 @@
               .card__desctiption.animated(v-if="isOpen" v-html="description")
 
       .col
-        .instructions__title Selected Options
+        .instructions__title Selected Options:
         .instructions__cards
 
           .card(v-for="({ title, description, isOpen = false}, index) of selectedInstructions")
@@ -129,7 +129,6 @@ export default {
       this.$set(this.selectedInstructions[index], 'isOpen', !this.selectedInstructions[index].isOpen)
     },
     toggleDescriptionAll(index) {
-      console.log(!this.unselectedInstructions[index].isOpen)
       this.$set(this.unselectedInstructions[index], 'isOpen', !this.unselectedInstructions[index].isOpen)
     },
     setNewDescription(e) {
@@ -260,7 +259,7 @@ export default {
     }
     &__title{
       font-size: 14px;
-      margin-bottom: 8px;
+      margin-bottom: 15px;
       font-family: 'Myriad600';
     }
     .modal {

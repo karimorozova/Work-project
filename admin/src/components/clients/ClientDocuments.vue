@@ -84,7 +84,7 @@
 				deleteIndex: -1,
 				isTableDropMenu: true,
 				currentActive: -1,
-				domain: "http://localhost:3001",
+				domain: this.$domains.admin,
 
 				defaultDocuments: [
 					{ fileName: "", path: "", category: "NDA" },
@@ -212,7 +212,7 @@
 			Add
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__
+			this.domain = this.$domains.admin
 		}
 	}
 </script>

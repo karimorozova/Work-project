@@ -5,7 +5,7 @@ const { Vendors } = require("../models")
 
 async function assignVendorToStep({ projectId, stepsVendors }) {
 	try {
-		const { steps, industry, projectCurrency, crossRate, tasks } = await getProject({ '_id': projectId })
+		const { steps, industry, projectCurrency, crossRate, tasks, isSkipProgress } = await getProject({ '_id': projectId })
 
 		for (const stepId in stepsVendors) {
 			const vendorId = stepsVendors[stepId]._id.toString()
@@ -15,6 +15,7 @@ async function assignVendorToStep({ projectId, stepsVendors }) {
 			if (!steps[_idxS].vendor || `${ steps[_idxS].vendor._id }` !== vendorId) {
 				const vendor = await Vendors.findOne({ _id: vendorId })
 				steps[_idxS].vendor = vendor
+				steps[_idxS].status = isSkipProgress ? 'Completed' : 'Created'
 				steps[_idxS].vendorBrief = ''
 				steps[_idxS].extraPayables = []
 

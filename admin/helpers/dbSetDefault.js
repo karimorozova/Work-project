@@ -9,15 +9,16 @@ const {
 	LeadSource,
 	Group,
 	Step,
-	Clients,
-	Vendors,
 	Instruction,
 	CancelReason,
 	Units,
 	CurrencyRatio,
 	Discounts,
 	TierInfo,
-	IndustryTierInfo
+	IndustryTierInfo,
+	PaymentTerms,
+	PaymentMethods,
+	PaymentMethodsKeys
 } = require("../models")
 
 const {
@@ -39,6 +40,7 @@ const {
 	defaultTierInfo,
 	defaultIndustryTierInfo
 } = require("./defaults")
+const { Schema } = require("mongoose")
 
 async function fillInstructions() {
 	try {
@@ -276,80 +278,7 @@ function services() {
 	return Services.find({})
 			.then(async services => {
 				if (!services.length) {
-					const steps = await Step.find({}, { title: 1 })
 					for (const service of defaultServices) {
-						// switch (service.title) {
-						// 	case "Translation":
-						// 	case "Localization":
-						// 	case "Certified Translation":
-						// 	case "SEO Translation":
-						// 	case "Transcreation":
-						// 	case "Official Translation":
-						// 		const translationSteps = steps.filter(step => step.title === "Translation" || step.title === "Revising")
-						// 		for (let i = 0; i < translationSteps.length; i++) {
-						// 			service.steps.push({
-						// 				step: ObjectId(translationSteps[i]._id)
-						// 			})
-						// 		}
-						// 		break
-						// 	case "Voice Over":
-						// 	case "Audio":
-						// 		const recordingStep = steps.find(
-						// 				step => step.title === "Recording"
-						// 		)
-						// 		recordingStep &&
-						// 		service.steps.push({
-						// 			steps: ObjectId(recordingStep._id)
-						// 		})
-						// 		break
-						// 	case "DTP":
-						// 	case "Localized Graphic Design":
-						// 		const dtpAndGraphicDesignSteps = steps.filter(
-						// 				step => step.title === "Graphic Design" || step.title === "QA"
-						// 		)
-						// 		for (let i = 0; i < dtpAndGraphicDesignSteps.length; i++) {
-						// 			service.steps.push({
-						// 				step: ObjectId(dtpAndGraphicDesignSteps[i]._id)
-						// 			})
-						// 		}
-						// 		break
-						// 	case "Copywriting":
-						// 		const copywritingAndProofreadingSteps = steps.filter(
-						// 				step =>
-						// 						step.title === "Copywriting" || step.title === "Proofreading"
-						// 		)
-						// 		for (let i = 0; i < copywritingAndProofreadingSteps.length; i++) {
-						// 			service.steps.push({
-						// 				step: ObjectId(copywritingAndProofreadingSteps[i]._id)
-						// 			})
-						// 		}
-						// 		break
-						// 	case "Proofing":
-						// 		const revisingStep = steps.find(
-						// 				step => step.title === "Revising"
-						// 		)
-						// 		revisingStep &&
-						// 		service.steps.push({
-						// 			step: ObjectId(revisingStep._id)
-						// 		})
-						// 		break
-						// 	case "Linguistic QA":
-						// 		const icrStep = steps.find(step => step.title === "ICR")
-						// 		icrStep &&
-						// 		service.steps.push({
-						// 			step: ObjectId(icrStep._id)
-						// 		})
-						// 		break
-						// 	case "Subtitling":
-						// 		const subtitlingAndRevisingSteps = steps.filter(
-						// 				step => step.title === "Subtitling" || step.title === "Revising"
-						// 		)
-						// 		for (let i = 0; i < subtitlingAndRevisingSteps.length; i++) {
-						// 			service.steps.push({
-						// 				step: ObjectId(subtitlingAndRevisingSteps[i]._id)
-						// 			})
-						// 		}
-						// }
 						await new Services(service)
 								.save()
 								.then(service => {
@@ -495,6 +424,43 @@ async function fillIndustryTierInfo() {
 	}
 }
 
+async function fillPaymentTerms() {
+	const industryTierCount = await PaymentTerms.countDocuments()
+	if (industryTierCount > 0) return
+	try {
+		await PaymentTerms.create({ "name": "30 Days", "value": 30, "isActive": true })
+		await PaymentTerms.create({ "name": "21 Days", "value": 21, "isActive": true })
+		await PaymentTerms.create({ "name": "Due on receipt", "value": 1, "isActive": true })
+	} catch (e) {
+	}
+}
+
+async function fillPaymentMethods() {
+	const methods = await PaymentMethods.countDocuments()
+	const methodsKeys = await PaymentMethodsKeys.countDocuments()
+
+	if (!methodsKeys && !methods) {
+		await PaymentMethodsKeys.create({ "key": "Email" })
+		await PaymentMethodsKeys.create({ "key": "IBAN" })
+		await PaymentMethodsKeys.create({ "key": "SWIFT/BIC" })
+		await PaymentMethodsKeys.create({ "key": "Bank Account Name" })
+
+		const keys = await PaymentMethodsKeys.find()
+		await PaymentMethods.create({
+			name: 'PayPal',
+			minimumAmount: 50,
+			isActive: true,
+			keys: keys.filter(item => item.key === 'Email')
+		})
+		await PaymentMethods.create({
+			name: 'Bank Details',
+			minimumAmount: 100,
+			isActive: true,
+			keys: keys
+		})
+	}
+}
+
 async function checkCollections() {
 	await fillInstructions()
 	await fillCancelReasons()
@@ -515,6 +481,8 @@ async function checkCollections() {
 	await fillPricelist()
 	await fillTierInfo()
 	await fillIndustryTierInfo()
+	await fillPaymentTerms()
+	await fillPaymentMethods()
 }
 
 module.exports = {

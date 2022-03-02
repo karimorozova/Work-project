@@ -13,7 +13,6 @@ const LeadSource = require('./leadSource');
 const Group = require('./group');
 const Step = require('./step');
 const Zoho = require('./zoho');
-const ZohoReport = require('./zohoReport');
 const ClientRequest = require('./clientRequest');
 const Instruction = require('./instruction');
 const CancelReason = require('./cancelReason');
@@ -45,6 +44,8 @@ const InvoicingPayablesArchive = require('./invoicingPayablesArchive')
 const PaymentTerms = require('./paymentTerms')
 const InvoicingReceivables = require('./invoicingReceivables')
 const invoicingReceivablesArchive = require('./invoicingReceivablesArchive')
+const PaymentMethods = require('./PaymentMethods')
+const PaymentMethodsKeys = require('./PaymentMethodsKeys')
 
 const Models = {
   InvoicingReceivables,
@@ -65,7 +66,6 @@ const Models = {
   Clients,
   Vendors,
   Zoho,
-  ZohoReport,
   ClientRequest,
   Instruction,
   CancelReason,
@@ -94,6 +94,8 @@ const Models = {
   InvoicingPayables,
   InvoicingPayablesArchive,
   PaymentTerms,
+  PaymentMethods,
+  PaymentMethodsKeys,
 };
 
 module.exports = Models;

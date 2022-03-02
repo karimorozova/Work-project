@@ -1,11 +1,13 @@
 const router = require('express').Router()
 const { getProjectsFinanceInfo } = require('../dashboard/overallView/projectFinance')
 const { getProjectsForDashboard } = require('../dashboard/pmAmOrAdmin')
+const { getProjectsForPipeline } = require('../dashboard/pipeline')
 const { getClientsRequestsForDashboard } = require('../dashboard/incomingRequests')
 const { sendRequest } = require("../projects/xtrfApi")
 const axios = require("axios")
 const { Projects, ClientsTasks, ClientsNotes} = require("../models")
 const moment = require("moment")
+const { getAllProjectFinanceStats } = require("../dashboard/projectsStats")
 
 
 router.post("/finance-view", async (req, res) => {
@@ -35,6 +37,16 @@ router.get("/all-client-requests", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on Finance getting')
+	}
+})
+
+router.get("/projects-finance", async (req, res) => {
+	try {
+	  const financeStats =  await	getAllProjectFinanceStats()
+		res.json(financeStats)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on Finance Stats getting')
 	}
 })
 
@@ -138,6 +150,67 @@ router.get("/finance", async (req, res) => {
 	}
 })
 
+
+router.get("/finance-by-client", async (req, res) => {
+	try {
+		const currencyNormalize = {
+			'[&euro;]': 'EUR',
+			'[$]': 'USD'
+		}
+		let todayClientsAmount = {}
+		let monthClientsAmount = {}
+
+		const reportsLink = await sendRequest('get', 'reports/136/result/printerFriendly')
+		const xtrfPayments = (await axios({
+			method: 'get',
+			url: reportsLink.data.url
+		}))
+
+		const reportsLinkMonth = await sendRequest('get', 'reports/137/result/printerFriendly')
+		const xtrfPaymentsMonth = (await axios({
+			method: 'get',
+			url: reportsLinkMonth.data.url
+		}))
+
+		const matchStrings = xtrfPayments.data.matchAll(/xtrf-financial-report-body.*?:center\;\"\>(.*?)<.*?(\[\$\]|\[\&euro\;\]).*?center;">(.*?)</gm) || []
+
+		for await (let [_, name, currency, amount] of matchStrings) {
+			if (!todayClientsAmount.hasOwnProperty(name)) {
+				todayClientsAmount[name] = {
+					name,
+					currencyNormalized: currencyNormalize[currency],
+					amount: parseFloat(amount)
+				}
+			}else {
+				todayClientsAmount[name].amount += parseFloat(amount)
+			}
+
+
+		}
+		const matchStringsMonth = xtrfPaymentsMonth.data.matchAll(/xtrf-financial-report-body.*?:center\;\"\>(.*?)<.*?(\[\$\]|\[\&euro\;\]).*?center;">(.*?)</gm) || []
+
+		for await (let [_, name, currency, amount] of matchStringsMonth || []) {
+			if (!monthClientsAmount.hasOwnProperty(name)) {
+				monthClientsAmount[name] = {
+					name,
+					currencyNormalized: currencyNormalize[currency],
+					amount: parseFloat(amount)
+				}
+			}else {
+				monthClientsAmount[name].amount += parseFloat(amount)
+			}
+		}
+
+		todayClientsAmount = Object.values(todayClientsAmount).sort((a, b) => a.name.localeCompare(b.name))
+		monthClientsAmount = Object.values(monthClientsAmount).sort((a, b) => a.name.localeCompare(b.name))
+
+		res.json({ todayClientsAmount, monthClientsAmount })
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on Finance getting')
+	}
+})
+
 router.get("/all-client-activity", async (req, res) => {
 	try {
 		const clientsTasks = await ClientsTasks.find({status: {$ne: 'Completed'}}, {"associatedTo.password": 0}).populate(  'assignedTo',  ['firstName', 'lastName']).populate( 'client', ['name'])
@@ -155,6 +228,19 @@ router.delete("/activity/task/:id/delete", async (req, res) => {
 		await ClientsTasks.deleteOne({ _id: id })
 		res.send('success')
 	} catch (e) {
+		res.status(500).send('Error on client delete')
+	}
+
+})
+
+router.post("/pipeline", async (req, res) => {
+	try {
+		const {page, limit} = req.query
+		const {filters} = req.body
+		const pipeline = await getProjectsForPipeline(page, limit,filters)
+		res.json(pipeline)
+	} catch (e) {
+		console.log(e)
 		res.status(500).send('Error on client delete')
 	}
 

@@ -1,372 +1,374 @@
 <template lang="pug">
-  .wrapper
+  .wrapper(v-if="isLoad" )
     .navbar
       .navbar__logo
         img(src="../assets/images/navbar/navbar-logo.svg")
       .navbar__menu
-        .item(v-for="(item, index) in navbarList" :key="index" @click="switchSection(index)" :class="{'active__item': item.active}")
-          .item__image
-            img(:src="item.img")
-          .item__title {{ item.title }}
-      .navbar__name VENDOR PORTAL
+        .menu(v-for="(item, index) in navbarList" :key="index" )
+          router-link(v-if="!item.isGroup" class="item" tag="div" :to="item.path" )
+            .item__image
+              img(:src="item.img")
+            .item__title {{ item.title }}
+          .item__group(v-else )
+            .item__drop-down( @click="() => toggleDropDown(item)")
+              .item__icon(:class="{'open': item.active}")
+                i(class="fas fa-chevron-right")
+              .drop-down__title {{ item.title }}
 
-    .content
+            template(v-if="item.active")
+              router-link(class="drop-down__item item" tag="div" :to="subItem.path" v-for="subItem in item.children" :key="item.children.path")
+                .item__image
+                  img(:src="subItem.img")
+                .item__title {{ subItem.title }}
+      .navbar__name
+        .navbar__name-title VENDOR PORTAL
+
+    .content(v-if="vendor._id" )
       Header
-      .content__body(v-if="unitsLength")
+      .content__body
         nuxt-child
-
-    //.vendor-portal__top
-      //.vendor-portal__admin-name
-        h2.vendor-portal__adminPortal VENDOR PORTAL
-        //h2.vendor-portal__adminPortal(v-if="vendorvendor.competencies || vendor.competencies.length") VENDOR PORTAL
-      //.vendor-portal__account(v-click-outside="hideAccountMenu")
-        .vendor-portal__photo-wrapper
-          img.vendor-portal__photo(v-if="!vendor.photo" src="../assets/images/client-icon_image.png")
-          img.vendor-portal__photo(v-else :src="domain+vendor.photo")
-          .vendor-portal__account-menu-wrapper(v-if="isAccountMenu")
-            .vendor-portal__account-block
-              .vendor-portal__info
-                .vendor-portal__icon
-                  img(src="../assets/images/man.png")
-                .vendor-portal__personal
-                  .vendor-portal__personal-data {{ vendor.firstName }}
-                  .vendor-portal__personal-data {{ vendor.email }}
-              //.vendor-portal__item(@click="showAccountInfo")
-                .vendor-portal__icon
-                  img(src="../assets/images/man.png")
-                .vendor-portal__list-label My Account
-              .vendor-portal__item(@click="signOut")
-                .vendor-portal__icon
-                  img(src="../assets/images/sign-out.png")
-                .vendor-portal__list-label Sign Out
-        .vendor-portal__arrow-block
-          .vendor-portal__arrow(@click="showAccountMenu")
-            img(v-if="!this.isAccountMenu" src="../assets/images/down-icon.png")
-            img(v-else src="../assets/images/up-icon.png")
-
-      //.vendor-portal__nav
-        .vendor-portal__sidebar
-          ul.vendor-portal__nav-menu
-            router-link(:to="note.path" v-for="(note, index) in navbarList" :key="index")
-              li.vendor-portal__nav-item(@click="switchSection(index)" :class="{'vendor-portal_active': note.active}")
-                .vendor-portal__image(v-if="!note.active && note.imgWhite")
-                  img.image.navbar_no-filter(:src="note.imgWhite")
-                .vendor-portal__image(v-else)
-                  img(:src="note.img")
-                .vendor-portal__nav-title
-                  span {{ note.title }}
-          .vendor-portal__balloons
-
 
 </template>
 
 <script>
 
-	import ClickOutside from "vue-click-outside"
-	import { mapGetters, mapActions } from "vuex"
-	import Header from "../components/pangea/Header"
-  import { testtt } from "../store/actions/vendors/info"
+import ClickOutside from "vue-click-outside"
+import { mapGetters, mapActions } from "vuex"
+import Header from "../components/Header"
+import { setCurrentVendor } from "../store/actions"
+import { getVendor } from "../store/getters"
 
-	export default {
-		components: { Header },
-		middleware: [ 'authenticated', 'new-user-redirect' ],
-		data() {
-			return {
-				navbarList: [
-					{
-						title: "Dashboard",
-						path: "/dashboard",
-						img: require("../assets/images/navbar/Dashboard.png"),
-						active: false
-					},
-					{
-						title: "Completed Jobs",
-						path: "/completed-jobs",
-						img: require("../assets/images/navbar/CompleteJobs.png"),
-						active: false
-					},
-					{
-						title: "Competencies & Rate",
-						path: "/competency-and-rate",
-						img: require("../assets/images/navbar/Competencies.png"),
-						active: false
-					},
-					{
-						title: "Assessment",
-						path: "/qualification-and-assessment",
-						img: require("../assets/images/navbar/Assessment.png"),
-						active: false
-					},
-					{
-						title: "Billing Information",
-						path: "/billing-information",
-						img: require("../assets/images/navbar/Invoices.png"),
-						active: false
-					},
-					{
-						title: "Experience & Education",
-						path: "/experience-and-education",
-						img: require("../assets/images/navbar/ExperienceEducation.png"),
-						active: false
-					},
-					{
-						title: "Documents",
-						path: "/documents",
-						img: require("../assets/images/navbar/Documents.png"),
-						active: false
-					},
-					{
-						title: "Invoices",
-						path: "/invoices",
-						img: require("../assets/images/navbar/Invoices.png"),
-
-						active: false
-					},
-					{
-						title: "Profile",
-						path: "/account",
-						img: require("../assets/images/navbar/Profile.png"),
-						active: false
-					}
-				],
-				isAccountMenu: false,
-				accountInfo: false,
-				domain: '',
-
-        unitsLength: 0
-			}
-		},
-		methods: {
-			...mapActions([
-				"alertToggle",
-				"logout",
-				"setOriginallyUnits",
-				"setReports",
-				"setReportsPaid",
-			]),
-
-			mainPageRender() {
-				this.toggleSideBar(true)
-			},
-			async getOriginallyUnits() {
-				try {
-					const result = await this.$axios.get("/api/units")
-					this.setOriginallyUnits(result.data)
-          this.unitsLength = result.data.length
-				} catch (err) {
-				}
-			},
-			async getVendorInfo() {
-				try {
-					const result = await this.$axios.get(`/vendor/info?token=${ this.$store.state.token }`)
-					const decode = window.atob(result.data)
-					const data = JSON.parse(decode)
-					this.$store.commit("SET_VENDOR", data)
-					this.$store.commit("SET_ACCOUNT_INFO")
-				} catch (err) {
-				  this.logout()
-          this.$router.push('/login')
-				}
-			},
-			async getVendorReports() {
-				try {
-					const result = await this.$axios.get(`/vendor/reports?token=${ this.$store.state.token }`)
-					const decode = window.atob(result.data)
-					const data = JSON.parse(decode)
-					this.setReports(data)
-				} catch (err) {
-				}
-			},
-			async getVendorPaidReports() {
-				try {
-					const result = await this.$axios.get(`/vendor/paid-reports?token=${ this.$store.state.token }`)
-					const decode = window.atob(result.data)
-					const data = JSON.parse(decode)
-					this.setReportsPaid(data)
-        } catch (err) {
-				}
-			},
-			async getAllIndustries() {
-				try {
-					let result = await this.$axios.$get("/api/industries")
-					result.sort((a, b) => {
-						if (a.lang < b.lang) return -1
-						if (a.lang > b.lang) return 1
-					})
-					this.$store.commit("SET_INDUSTRIES", result)
-				} catch (err) {
-				}
-			},
-			async getAllLanguages() {
-				try {
-					let result = await this.$axios.$get("/api/languages")
-					result.sort((a, b) => {
-						if (a.lang < b.lang) return -1
-						if (a.lang > b.lang) return 1
-					})
-					this.$store.commit('SET_LANGUAGES', result)
-				} catch (err) {
-				}
-			},
-			async getAllSteps() {
-				try {
-					let result = await this.$axios.$get("/api/steps")
-					result.sort((a, b) => {
-						if (a.title < b.title) return -1
-						if (a.title > b.title) return 1
-					})
-					this.$store.commit('SET_STEPS', result)
-				} catch (err) {
-
-				}
-			},
-			toggleSideBar(isFirstRender) {
-				for (let elem of this.navbarList) {
-					if (window.location.toString().indexOf(elem.path) !== -1) {
-						elem.active = true
-						if (isFirstRender) {
-							// this.$router.push(elem.path);
-						}
-					} else {
-						elem.active = false
-					}
-				}
-			},
-
-			switchSection(index) {
-				this.navbarList.forEach((item, i) => {
-					item.active = i === index
-				})
-				this.$router.push(this.navbarList[index].path)
-			},
-			showAccountMenu() {
-				this.isAccountMenu = !this.isAccountMenu
-			},
-			// showAccountInfo() {
-			// 	this.hideAccountMenu()
-			// 	this.$router.push('/account')
-			// },
-			hideAccountMenu() {
-				this.isAccountMenu = false
-			}
-			// setToken() {
-			// 	const vendorToken = this.$cookie.get("vendor")
-			// 	this.$store.commit("SET_TOKEN", vendorToken)
-			// }
-		},
-		computed: {
-			...mapGetters({
-				token: "getToken",
-				vendor: "getVendor",
-				steps: "getAllSteps"
-			})
-		},
-		async created() {
-      await this.getVendorInfo()
-      await this.getOriginallyUnits()
-			await this.getVendorReports()
-			await this.getVendorPaidReports()
-			await this.getAllIndustries()
-			await this.getAllLanguages()
-			await this.getAllSteps()
-			// // this.setToken()
-		},
-		updated() {
-			this.toggleSideBar(false)
-		},
-		mounted() {
-			this.domain = process.env.domain
-			this.mainPageRender()
-		},
-		directives: {
-			ClickOutside
-		}
-	}
+export default {
+  components: { Header },
+  middleware: [ 'authenticated', 'new-user-redirect' ],
+  data() {
+    return {
+      navbarList: [
+        {
+          title: "Open & Upcoming Jobs",
+          path: "/dashboard",
+          img: require("../assets/images/navbar/Jobs.svg"),
+          active: false
+        },
+        {
+          title: "Completed Jobs",
+          path: "/completed-jobs",
+          img: require("../assets/images/navbar/Projects.svg"),
+          active: false
+        },
+        {
+          title: "Profile",
+          path: "/profile-details",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Competencies & Rates",
+              path: "/profile-details/competency-and-rate",
+              img: require("../assets/images/navbar/Rate.svg"),
+              active: false
+            },
+            {
+              title: "Assessments",
+              path: "/profile-details/qualification-and-assessment",
+              img: require("../assets/images/navbar/Assessment.svg"),
+              active: false
+            },
+            {
+              title: "Experience & Documents",
+              path: "/profile-details/experience-and-document",
+              img: require("../assets/images/navbar/Education.svg"),
+              active: false
+            }
+          ]
+        },
+        {
+          title: "Billing",
+          path: "/billing",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Invoices",
+              path: "/billing/invoices",
+              img: require("../assets/images/navbar/Invoice.svg"),
+              active: false
+            },
+            {
+              title: "Billing Information",
+              path: "/billing/billing-information",
+              img: require("../assets/images/navbar/BI.svg"),
+              active: false
+            }
+          ]
+        },
+        {
+          title: "Settings",
+          path: "/settings",
+          active: false,
+          isGroup: true,
+          children: [
+            {
+              title: "Account",
+              path: "/settings/account",
+              img: require("../assets/images/navbar/Profile.svg"),
+              active: false
+            },
+            {
+              title: "New Competency",
+              path: "/settings/new-competency",
+              img: require("../assets/images/navbar/Add.svg"),
+              active: false
+            }
+          ]
+        }
+      ],
+      domain: '',
+      isLoad: false
+    }
+  },
+  computed: {
+    ...mapGetters({
+      vendor: 'getVendor'
+    })
+  },
+  methods: {
+    ...mapActions([
+      "alertToggle",
+      "logout",
+      "setCurrentVendor",
+      "setLanguages",
+      'setIndustries',
+      'setSteps',
+      'setUnits',
+      'setServices'
+    ]),
+    mainPageRender() {
+      this.toggleSideBar(true)
+    },
+    toggleDropDown(item) {
+      item.active = !item.active
+    },
+    toggleSideBar() {
+      for (let elem of this.navbarList) {
+        elem.active = window.location.toString().indexOf(elem.path) !== -1
+      }
+    },
+    async getVendor() {
+      try {
+        const result = await this.$axios.get(`/vendor/portal-vendor-info?token=${ this.$store.state.token }`)
+        this.setCurrentVendor(result.data)
+      } catch (err) {
+        this.logout()
+        this.$router.push('/login')
+      }
+    },
+    async getAllLanguages() {
+      try {
+        let result = await this.$axios.$get("/api/languages")
+        result.sort((a, b) => {
+          if (a.lang < b.lang) return -1
+          if (a.lang > b.lang) return 1
+        })
+        this.setLanguages(result)
+      } catch (err) {
+      }
+    },
+    async getAllUnits() {
+      try {
+        const result = await this.$axios.get("/api/units")
+        this.setUnits(result.data)
+      } catch (err) {
+      }
+    },
+    async getAllIndustries() {
+      try {
+        let result = await this.$axios.$get("/api/industries")
+        result.sort((a, b) => {
+          if (a.lang < b.lang) return -1
+          if (a.lang > b.lang) return 1
+        })
+        this.setIndustries(result)
+      } catch (err) {
+      }
+    },
+    async getAllSteps() {
+      try {
+        let result = await this.$axios.$get("/api/steps")
+        result.sort((a, b) => {
+          if (a.title < b.title) return -1
+          if (a.title > b.title) return 1
+        })
+        this.setSteps(result)
+      } catch (err) {
+      }
+    },
+    async getAllServices() {
+      try {
+        let result = await this.$axios.$get("/api/services")
+        result.sort((a, b) => {
+          if (a.title < b.title) return -1
+          if (a.title > b.title) return 1
+        })
+        this.setServices(result)
+      } catch (err) {
+      }
+    }
+  },
+  async mounted() {
+    this.mainPageRender()
+    this.domain = process.env.domain
+    this.isLoad = await new Promise(async (res) => {
+      if (document) {
+        this.$store.commit("SET_TOKEN", this.$cookie.get('vendor'))
+        res(true)
+      }
+    })
+    await this.getVendor()
+    await this.getAllLanguages()
+    await this.getAllUnits()
+    await this.getAllIndustries()
+    await this.getAllSteps()
+    await this.getAllServices()
+  },
+  directives: {
+    ClickOutside
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import "../assets/scss/colors";
+@import "../assets/scss/colors";
 
-  .active__item {
-    color: $green;
+.fa-chevron-right {
+  font-size: 17px;
+}
+
+.nuxt-link-active {
+  color: $red;
+}
+
+.item {
+  display: flex;
+  transition: .1s ease-in-out;
+  cursor: pointer;
+  padding: 10px 10px 10px 20px;
+  align-items: center;
+
+  &__image {
+    height: 20px;
+    width: 20px;
+
+    img {
+      width: 100%;
+    }
   }
 
-  .item {
-    display: flex;
-    transition: .1s ease-in-out;
-    cursor: pointer;
-    padding: 9px 12px 9px 20px;
-    align-items: center;
+  &__title {
+    font-family: Roboto600;
+    margin-left: 12px;
+    font-size: 14px;
+    margin-top: 1px;
+  }
 
-    &__title {
-      font-family: Myriad600;
-      margin-left: 10px;
-      font-size: 15px;
-    }
+  &__drop-down {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 10px 10px 25px;
 
     &:hover {
       background: $light-border;
     }
   }
 
-  .wrapper {
+  &__icon {
+    transition: transform .2s ease;
+  }
+
+
+  &:hover {
+    background: $light-border;
+  }
+
+}
+
+.drop-down {
+  &__title {
+    font-family: Roboto600;
+    margin-left: 20px;
+    font-size: 14px;
+    margin-top: 1px;
+  }
+
+  &__item {
     display: flex;
+    transition: .1s ease-in-out;
+    cursor: pointer;
+    padding: 10px 10px 10px 40px;
+    align-items: center;
+  }
+}
+
+.open {
+  transform: rotate(90deg);
+}
+
+.wrapper {
+  display: flex;
+}
+
+.navbar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 270px;
+  z-index: 99999;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: $box-shadow;
+
+  &__name {
+    text-align: center;
+    font-size: 19px;
+    border-top: 1px solid $border;
+    padding-top: 26px;
+    cursor: default;
+    position: relative;
   }
 
-  .navbar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 270px;
-    z-index: 99999;
-    box-sizing: border-box;
-    background: white;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
-
-    &__name {
-      text-align: center;
-      font-size: 20px;
-      font-family: Myriad900;
-      border-top: 1px solid $border;
-      padding-top: 22px;
-      cursor: default;
-      -moz-user-select: none;
-      -khtml-user-select: none;
-      -webkit-user-select: none;
-    }
-
-    &__menu {
-      height: calc(100vh - 170px);
-      overflow-y: auto;
-      scrollbar-width: none;
-      margin-top: 5px;
-    }
-
-    ::-webkit-scrollbar {
-      width: 0px;
-    }
-
-    &__logo {
-      margin: 0 auto;
-      padding: 20px 0 10px 0;
-      width: 200px;
-
-      img {
-        width: 100%;
-      }
-    }
+  &__menu {
+    height: calc(100vh - 170px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    margin-top: 5px;
   }
 
-  .content {
-    width: 100%;
-    min-width: fit-content;
-    margin-left: 270px;
+  ::-webkit-scrollbar {
+    width: 0px;
+  }
 
-    &__body {
-      padding: 50px 0px 50px 50px;
+  &__logo {
+    margin: 0 auto;
+    padding: 20px 0 10px 0;
+    width: 190px;
+
+    img {
+      width: 100%;
     }
   }
+}
+
+.content {
+  width: 100%;
+  min-width: fit-content;
+  margin-left: 270px;
+
+  &__body {
+    padding: 50px 0px 50px 50px;
+  }
+}
 
 </style>
 

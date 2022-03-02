@@ -1,11 +1,11 @@
 <template lang="pug">
   .steps
-
     .steps__vendorDetails(v-if="isVendorDetailsModal && vendorDetailsId")
       StepVendorDetails(
         :index="infoIndex"
         :vendorId="vendorDetailsId"
         :currentStep="currentStep"
+        :currentProject="currentProject"
         :currentIndustry="currentProject.industry"
         :projectCurrency="currentProject.projectCurrency"
         @close="closeVendorDetailsModal"
@@ -25,7 +25,9 @@
         :step="finalData[infoIndex]"
         :index="infoIndex"
         :projectCurrency="currentProject.projectCurrency"
+        :currentProject="currentProject"
         @closeFinanceEditing="closeFinanceEditing"
+        @approve="approveFinanceModal"
       )
 
     .steps__approve-action(v-if="isApproveActionShow")
@@ -66,11 +68,8 @@
     GeneralTable(
       :fields="fields"
       :tableData="finalData"
-
-
       :isFilterShow="true"
       :isFilterAbsolute="true"
-
       @addSortKey="addSortKey"
       @changeSortKey="changeSortKey"
       @removeSortKey="removeSortKey"
@@ -97,7 +96,8 @@
       template(slot="vendor" slot-scope="{ row, index }")
         .table__data(v-if="row.vendor")
           span.vendor__details(@click="openVendorDetailsModal(row.vendor, row, index)") {{ vendorName(row.vendor) }}
-        .table__data(v-else) -
+        .table__data(v-else)
+          .emptyVendor No vendor...
 
       template(slot="start" slot-scope="{ row, index }")
         .table__data
@@ -136,19 +136,19 @@
       template(slot="status" slot-scope="{ row, index }")
         .table__statusAndProgress
           .status {{ row.status }}
-          .progress
+          .progress(v-if="row.status !== 'Cancelled'" )
             ProgressLineStep(:progress="progress(row.progress)" :status="row.status" :lastProgress="lastProgress(row, index)")
 
 
       template(slot="receivables" slot-scope="{ row }")
         .table__finance
           span.currency(v-if="!currentProject.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span(v-if="row.finance.Price.receivables !== ''") {{ !currentProject.minimumCharge.isUsed ? (row.finance.Price.receivables).toFixed(2) : '-' }}
+          span(v-if="row.finance.Price.receivables !== ''") {{ !currentProject.minimumCharge.isUsed ? +(row.finance.Price.receivables).toFixed(2) : '-' }}
 
       template(slot="payables" slot-scope="{ row }")
         .table__finance
           span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
-          span(v-if="row.finance.Price.payables !== ''") {{ (row.finance.Price.payables).toFixed(2) }}
+          span(v-if="row.finance.Price.payables !== ''") {{ +(row.finance.Price.payables).toFixed(2) }}
 
       template(slot="margin" slot-scope="{ row, index }")
         .table__finance(:id="'margin'+index")
@@ -159,11 +159,9 @@
 
       template(slot="info" slot-scope="{row, index}")
         .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal")
-          img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: pointer;" @click="showStepDetails(index)")
-          img(src="../../../assets/images/latest-version/money.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
+          img(src="../../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showStepDetails(index)")
         .table__icons(v-else)
-          img(src="../../../assets/images/latest-version/view-details.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../../assets/images/latest-version/money.svg" style="cursor: default; filter: opacity(0.5);")
+          img(src="../../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
 </template>
 
 <script>
@@ -234,14 +232,14 @@ export default {
           style: { "width": "10%" }
         },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { "width": "12%" } },
-        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "11%" } },
-        { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "11%" } },
+        { label: "Vendor", headerKey: "headerVendor", key: "vendor", style: { "width": "12%" } },
+        { label: "Status", headerKey: "headerStatus", key: "status", sortInfo: { isSort: true, order: 'default' }, filterInfo: { isFilter: true }, style: { "width": "12%" } },
         { label: "Start", headerKey: "headerStart", key: "start", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
         { label: "Deadline", headerKey: "headerDeadline", key: "deadline", sortInfo: { isSort: true, order: 'default' }, style: { "width": "10%" } },
         { label: "Rec.", headerKey: "headerReceivables", key: "receivables", style: { "width": "8%" } },
         { label: "Pay.", headerKey: "headerPayables", key: "payables", style: { "width": "8%" } },
         { label: "Margin", headerKey: "headerMargin", key: "margin", style: { "width": "10%" } },
-        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "7%" } }
+        { label: "", headerKey: "headerInfo", key: "info", style: { "width": "5%" } }
       ]
     }
   },
@@ -251,6 +249,9 @@ export default {
       "setCurrentProject",
       "setStepsStatus"
     ]),
+    approveFinanceModal(data) {
+      this.setCurrentProject(data)
+    },
     closeVendorDetailsModal() {
       this.vendorDetailsId = null
       this.isVendorDetailsModal = false
@@ -289,7 +290,7 @@ export default {
       const { Price } = step.finance
       let margin = 0
       margin = +Price.receivables - +Price.payables
-      return margin.toFixed(2)
+      return +margin.toFixed(2)
     },
     marginCalcPercent(step) {
       const { Price } = step.finance
@@ -378,7 +379,8 @@ export default {
     },
     async completeJobs() {
       const steps = this.checkedSteps.filter(({ status }) => status === 'In progress')
-      if (steps.length) for (const step of steps) {
+      this.closeApproveModal()
+      if (steps.length) for await (const step of steps) {
         await this.completeJob(step)
       }
     },
@@ -393,17 +395,16 @@ export default {
           isCat
         })
         await this.setCurrentProject(updatedProject.data)
-        this.closeApproveModal()
       } catch (err) {
         this.alertToggle({ message: `Error at completing job`, isShow: true, type: 'error' })
       }
     },
     async startJobs() {
       const steps = this.checkedSteps.filter(({ status }) => status === 'Ready to Start')
-      if (steps.length) for (const step of steps) {
+      this.closeApproveModal()
+      if (steps.length) for await (const step of steps) {
         await this.startJob(step)
       }
-      this.closeApproveModal()
     },
     async startJob(step) {
       const { receivablesUnit: { type }, vendor, stepId } = step
@@ -460,6 +461,7 @@ export default {
     },
     async setDate(date, prop, stepId) {
       const step = this.currentProject.steps.find(item => item._id === stepId)
+      if (step.status === 'Completed') return
       step[prop] = new Date(date)
       const { type } = step.receivablesUnit
       await this.sendStepsDates({ _id: this.currentProject._id, step, stepId, type, prop })
@@ -470,7 +472,10 @@ export default {
       this.toggleAll(false)
     },
     async decideOnSteps(status, steps) {
-      if (!steps.length) return
+      if (!steps.length) {
+        this.closeApproveModal()
+        return
+      }
       try {
         steps = steps.filter(item => !!item.vendor)
         this.closeApproveModal()
@@ -488,7 +493,10 @@ export default {
       }
     },
     async requestConfirmation(steps) {
-      if (!steps.length) return
+      if (!steps.length) {
+        this.closeApproveModal()
+        return
+      }
       try {
         const checkedSteps = steps.filter(item => !!item.vendor)
         this.closeApproveModal()
@@ -523,6 +531,10 @@ export default {
     },
     rawData() {
       return this.currentProject.steps
+    },
+    isProjectFinished() {
+      const { status } = this.currentProject
+      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     }
   },
   components: {
@@ -564,39 +576,14 @@ export default {
     height: 32px;
   }
 
-  &__vendorDetails {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    width: 730px;
-  }
-
-  &__stepDetails {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-    box-shadow: $box-shadow;
-    background-color: #fff;
-    border-radius: 4px;
-    width: 600px;
-    padding: 25px;
-  }
-
+  &__vendorDetails,
+  &__stepDetails,
   &__stepFinance {
     position: absolute;
-    top: 50%;
+    top: -20px;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 0px);
     z-index: 9999;
-    box-shadow: $box-shadow;
-    background-color: #fff;
-    border-radius: 4px;
-    width: 560px;
-    padding: 25px;
   }
 
   &__approve-action {
@@ -677,7 +664,7 @@ export default {
     gap: 10px;
 
     img {
-      height: 18px;
+      height: 20px;
     }
   }
 
@@ -744,6 +731,10 @@ input {
   &:hover {
     text-decoration: underline;
   }
-
 }
+
+.emptyVendor {
+  opacity: .3;
+}
+
 </style>

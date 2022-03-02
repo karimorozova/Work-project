@@ -169,7 +169,7 @@
 				isDatepickers: false,
 				fromDate: new Date(),
 				toDate: new Date(),
-				domain: "http://localhost:3001"
+				domain: this.$domains.admin
 			}
 		},
 		methods: {
@@ -352,7 +352,7 @@
 			ClickOutside
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__
+			this.domain = this.$domains.admin
 		}
 	}
 </script>
@@ -448,6 +448,6 @@
     }
   }
   a{
-    color: #D15F45;
+    color: #d66f58;
   }
 </style>

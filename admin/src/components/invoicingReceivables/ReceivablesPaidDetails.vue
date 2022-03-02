@@ -263,7 +263,7 @@
 			},
       downloadFile(path) {
         let link = document.createElement('a')
-        link.href = __WEBPACK__API_URL__ + '/' + path
+        link.href = this.$domains.admin + '/' + path
         link.target = "_blank"
         link.click()
       },
@@ -513,7 +513,7 @@
 
     &__value {
       border-radius: 4px;
-      border: 1px solid #d15f4547;
+      border: 1px solid #d66f5847;
       padding: 0 7px;
       height: 32px;
       display: flex;

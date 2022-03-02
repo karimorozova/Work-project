@@ -13,28 +13,27 @@ emitter.on('vendor-decide', async (prop, project, vendorId, stepId) => {
 	const _idx = steps.findIndex(item => item._id.toString() === stepId.toString())
 
 	if (prop === 'accept') {
-		steps	= setApprovedStepStatus({ project, step: steps[_idx]._doc, steps })
-		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'accept' })
+		steps = setApprovedStepStatus({ project, step: steps[_idx]._doc, steps })
+		await notifyStepDecisionMade({ project, step: steps[_idx]._doc, decision: 'accept' })
+	} else {
+		steps[_idx]._doc.status = 'Rejected'
+		await notifyStepDecisionMade({ project, step: steps[_idx]._doc, decision: 'rejected' })
 	}
-	if (prop === 'reject') {
-		steps[_idx].status = 'Rejected'
-		await notifyStepDecisionMade({ project, step: steps[_idx], decision: 'rejected' })
-	}
-	steps[_idx].vendorsClickedOffer.push(vendorId)
-
-	await Projects.updateOne({ "_id": project.id }, { steps })
+	steps[_idx]._doc.vendorsClickedOffer.push(vendorId)
+	await Projects.updateOne({ "_id": project._id }, { steps })
 })
 
 emitter.on('client-decide', async (project, prop) => {
 	if (prop === 'accept') {
 		await notifyManagerProjectStarts(project)
-		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
-		await Projects.updateOne({ "_id": project._id }, { steps })
+		if (!project.inPause) {
+			const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
+			await Projects.updateOne({ "_id": project._id }, { steps })
+		}
 	}
 	if (prop === 'reject') {
 		await notifyManagerProjectRejected(project)
 	}
-	//
 	// if(project.paymentProfile === 'PPP' && !project.isTest) {
 	// 	const steps = await getAllSteps(0, 0, { _id: project._id })
 	// 	await createReports({checkedSteps: steps, createdBy: null})

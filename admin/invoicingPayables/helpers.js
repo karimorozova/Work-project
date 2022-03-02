@@ -1,3 +1,13 @@
+const { moveProjectFile } = require("../utils/movingFile")
+const { getVendorAfterUpdate, getVendor } = require("../vendors")
+const { PaymentTerms, InvoicingPayables, InvoicingPayablesArchive } = require("../models")
+const { ObjectID: ObjectId } = require("mongodb")
+const { getPayable } = require("./getPayables")
+
+const getReportsTotal = (reportsList) => {
+	return reportsList.reduce((acc, curr) => acc + +curr.totalPrice, 0)
+}
+
 const clearPayablesStepsPrivateKeys = async (reports) => {
 	const privateKeys = [
 		'finance',
@@ -13,11 +23,114 @@ const clearPayablesStepsPrivateKeys = async (reports) => {
 
 	return await reports.map(report => {
 		const steps = report.steps.map(step => {
-			for (let key of privateKeys) delete step[key]
+			for (let key of privateKeys) {
+				if (!key.includes('.')) {
+					delete step[key]
+				} else {
+					const newKeys = key.split('.')
+					switch (newKeys.length) {
+						case 2: {
+							const [ a, b ] = newKeys
+							delete step[a][b]
+						}
+							break
+						case 3: {
+							const [ a, b, c ] = newKeys
+							delete step[a][b][c]
+						}
+							break
+					}
+				}
+			}
 			return step
 		})
 		return { ...report, steps }
 	})
 }
 
-module.exports = { clearPayablesStepsPrivateKeys }
+const returnMessageAndType = (message, type) => {
+	return {
+		type,
+		message: message || 'Internal error'
+	}
+}
+
+const invoiceFileUploading = async (invoiceFile, reportId) => {
+	const fileName = `${ Math.floor(Math.random() * 1000000) }-${ invoiceFile.filename.replace(/( *[^\w\.]+ *)+/g, '_') }`
+	const newPath = `/vendorReportsFiles/${ reportId }/${ fileName }`
+	await moveProjectFile(invoiceFile, `./dist${ newPath }`)
+	return { fileName, newPath }
+}
+
+const getVendorAndCheckPaymentTerms = async (vendorId) => {
+	const vendor = await getVendor({ "_id": vendorId })
+	const allPaymentTerms = await PaymentTerms.find()
+
+	if (!vendor.billingInfo.hasOwnProperty('paymentTerm') || !vendor.billingInfo.paymentTerm._id) {
+		const { billingInfo } = vendor
+		billingInfo.paymentTerm = allPaymentTerms.find(item => item.name === '30 Days') || allPaymentTerms[0]
+		return await getVendorAfterUpdate({ "_id": vendorId }, { billingInfo })
+	}
+	return vendor
+}
+
+const paidOrAddPaymentInfo = async (reportId, data, zohoPaymentId = '') => {
+	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
+
+	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data, zohoPaymentId } } })
+
+	if ("Paid" === status) {
+		await InvoicingPayables.aggregate([
+			{ "$match": { "_id": ObjectId(reportId) } },
+			{
+				"$merge": {
+					"into": {
+						"db": "pangea",
+						"coll": "invoicingpayablesarchives"
+					}
+				}
+			}
+		])
+		await InvoicingPayables.deleteOne({ _id: reportId })
+		return "Moved"
+	}
+
+	return 'Success'
+}
+
+const rollBackFromPaidToDraft = async (reportIds) => {
+
+	for await (let reportId of reportIds) {
+		await InvoicingPayablesArchive.updateOne({ _id: ObjectId(reportId) }, { $set: { status: 'Created', paymentInformation: [] } })
+
+		await InvoicingPayablesArchive.aggregate([
+			{ "$match": { "_id": ObjectId(reportId) } },
+			{
+				"$merge": {
+					"into": {
+						"db": "pangea",
+						"coll": "invoicingpayables"
+					}
+				}
+			}
+		])
+		await InvoicingPayablesArchive.deleteOne({ _id: ObjectId(reportId) })
+	}
+
+}
+
+const updatePayableReport = async (reportId, obj) => {
+	await InvoicingPayables.updateOne({ _id: reportId }, obj)
+	return await getPayable(reportId)
+}
+
+module.exports = {
+	clearPayablesStepsPrivateKeys,
+	returnMessageAndType,
+	invoiceFileUploading,
+	getVendorAndCheckPaymentTerms,
+	paidOrAddPaymentInfo,
+	updatePayableReport,
+	getReportsTotal,
+	rollBackFromPaidToDraft
+}

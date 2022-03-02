@@ -2,18 +2,16 @@ const router = require('express').Router()
 const fs = require('fs')
 const jwt = require("jsonwebtoken")
 const { checkClientContact } = require('../middleware')
-const { getClient, getClientForPortal } = require('../clients')
+const { getClient, getClientForPortal, getClientServicesGroups, deleteClientServiceGroups, createClientServicesGroup, editClientServicesGroup } = require('../clients')
 const { getService } = require('../services')
 
 const {
 	getProject,
 	getProjects,
-	getProjectsForPortal,
-	updateProjectStatusForClientPortalProject,
-	getProjectsForPortalList
+	getProjectsForPortalAll,
+	getProjectsForPortalList,
+	getProjectForClientPortal
 } = require("../projects/")
-
-const { getProjectDeliverables } = require('../projects/files')
 
 const {
 	getClientsRequestsForPortal,
@@ -26,18 +24,22 @@ const {
 } = require('../clientRequests')
 
 const { getAfterTaskStatusUpdate } = require('../clients')
-const { getMemoqProjectsForClientPortal } = require('../services/memoqs/otherProjects')
 
 const {
 	Clients,
 	Projects,
-	Languages
+	Languages,
+	Industries
 } = require('../models')
 
 const { secretKey } = require('../configs')
 const { upload } = require('../utils/')
-const { setClientsContactNewPassword, updateAccountDetails } = require('../users')
-
+const {
+	setClientsContactNewPassword,
+	updateAccountDetails
+} = require('../users')
+const { ObjectId } = require("mongoose/lib/types")
+const { getAllReportsFromDb, getAllPaidReceivablesFromDbWithProject } = require("../invoicingReceivables")
 
 router.post('/translation-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
 	try {
@@ -45,7 +47,7 @@ router.post('/translation-service-request', checkClientContact, upload.fields([ 
 		let client = await getClient({ "_id": verificationResult.clientId })
 		const request = await translationServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
-		notifyAMsRequestCreated(request)
+		// notifyAMsRequestCreated(request)
 		res.send('Done')
 	} catch (err) {
 		console.log(err)
@@ -60,7 +62,7 @@ router.post('/new-client-service-request', checkClientContact, upload.fields([ {
 		const request = await newClientServiceRequest(req.body, client)
 		await createRequestFiles(request, req.files)
 		notifyAMsRequestCreated(request)
-		res.send({ id: request._id})
+		res.send({ id: request._id })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Server Error on incoming request")
@@ -79,8 +81,10 @@ router.post('/delete-service-request', checkClientContact, async (req, res) => {
 })
 
 router.post("/auth", async (req, res, next) => {
-	if (req.body.logemail && req.body.logpassword) {
-		Clients.authenticate(req.body.logemail, req.body.logpassword, async (error, data) => {
+	const email = req.body.logemail
+	const password = req.body.logpassword
+	if (email && password) {
+		Clients.authenticate(email, password, async (error, data) => {
 			if (error || !data) {
 				let err = new Error()
 				err.status = 401
@@ -152,16 +156,12 @@ router.post("/reset-pass", async (req, res) => {
 	}
 })
 
-router.get('/all-projects', checkClientContact, async (req, res) => {
+router.post('/all-projects', checkClientContact, async (req, res) => {
 	const { token } = req.query
-	const excludedStatuses = [ 'Draft' ]
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
-		const projects = await getProjectsForPortal({ $and: [ { status: { $nin: excludedStatuses } }, { 'customer': verificationResult.clientId } ] })
-
-		res.send({
-			projects: Buffer.from(JSON.stringify(projects)).toString('base64'),
-		})
+		// const verificationResult = jwt.verify(token, secretKey)
+		const projects = await getProjectsForPortalAll({ filters: req.body })
+		res.send(projects)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -170,14 +170,11 @@ router.get('/all-projects', checkClientContact, async (req, res) => {
 
 router.get('/open-projects', checkClientContact, async (req, res) => {
 	const { token } = req.query
-	const openStatuses = [ 'Started', 'Approved', 'In progress', 'Ready for Delivery' ]
+	const openStatuses = [ 'Approved', 'In progress' ]
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const projects = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses } }, { 'customer': verificationResult.clientId } ] })
-
-		res.send({
-			projects: Buffer.from(JSON.stringify(projects)).toString('base64'),
-		})
+		const projects = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		res.send(projects)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -185,16 +182,11 @@ router.get('/open-projects', checkClientContact, async (req, res) => {
 })
 
 router.get('/project/:id', checkClientContact, async (req, res) => {
-	const { token } = req.query
+	const { customer } = req.query
 	const { id } = req.params
-	const openStatuses = [ 'Draft' ]
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
-		const project = await getProject({ $and: [ { status: { $nin: openStatuses } }, {_id: id}  ] })
-
-		res.send({
-			project: Buffer.from(JSON.stringify(project)).toString('base64'),
-		})
+		const project = await getProjectForClientPortal({ "_id": id, customer })
+		res.send(project)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -205,15 +197,8 @@ router.get('/open-requests', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-
-		const requests = await getClientsRequestsForPortal({
-			'clientIdFilter': verificationResult.clientId,
-			status: { $ne: 'Closed' }
-		})
-
-		res.send({
-			requests: Buffer.from(JSON.stringify(requests)).toString('base64'),
-		})
+		const requests = await getClientsRequestsForPortal({ 'clientIdFilter': verificationResult.clientId, status: { $ne: 'Closed' } })
+		res.send(requests)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -225,17 +210,10 @@ router.get('/client-requests/:id', checkClientContact, async (req, res) => {
 	const { id } = req.params
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-
 		const requests = await getClientsRequestForPortal({
-			_id: id,
-			// 'clientIdFilter': verificationResult.clientId,
-			// status: { $ne: 'Closed' },
+			_id: id
 		})
-		console.log({ requests })
-
-		res.send({
-			requests: Buffer.from(JSON.stringify(requests)).toString('base64'),
-		})
+		res.send({ requests })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -243,15 +221,32 @@ router.get('/client-requests/:id', checkClientContact, async (req, res) => {
 })
 
 router.get('/open-quotes', checkClientContact, async (req, res) => {
-	console.log("test")
 	const { token } = req.query
-	const openStatuses = [ 'Quote sent', 'Requested' ]
+	const openStatuses = [ 'Quote sent', 'Cost Quote' ]
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses } }, { 'customer': verificationResult.clientId } ] })
-		res.send({
-			quotes: Buffer.from(JSON.stringify(quotes)).toString('base64'),
+		const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		res.send(quotes)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Projects.")
+	}
+})
+
+router.get('/extra-quotes', checkClientContact, async (req, res) => {
+	const { token } = req.query
+	const activeStatuses = [ 'Approved', 'In progress' ]
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		// const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: activeStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		const quotes = await getProjectsForPortalList({
+			$and: [ {
+				"tasks.status": 'Quote sent',
+				status: { $in: activeStatuses },
+				isTest: false
+			}, { 'customer': verificationResult.clientId } ]
 		})
+		res.send(quotes)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -259,15 +254,13 @@ router.get('/open-quotes', checkClientContact, async (req, res) => {
 })
 
 
-
 router.get('/client', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const client = await getClient({ '_id': verificationResult.clientId })
-		res.send({
-			client: Buffer.from(JSON.stringify(client)).toString('base64'),
-		})
+		const client = await getClientForPortal({ '_id': ObjectId(verificationResult.clientId) })
+		// for await (let key of [ 'rates' ]) delete client[key]
+		res.send({ client })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -277,7 +270,7 @@ router.get('/client', checkClientContact, async (req, res) => {
 router.get('/all-languages', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
-		const verificationResult = jwt.verify(token, secretKey)
+		// const verificationResult = jwt.verify(token, secretKey)
 		const languages = await Languages.find()
 		res.send({
 			languages
@@ -288,16 +281,26 @@ router.get('/all-languages', checkClientContact, async (req, res) => {
 	}
 })
 
+router.get('/all-industries', checkClientContact, async (req, res) => {
+	const { token } = req.query
+	try {
+		// const verificationResult = jwt.verify(token, secretKey)
+		const industries = await Industries.find()
+		res.send(industries)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Industries.")
+	}
+})
+
 router.get('/user', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const client = await getClientForPortal({ '_id': verificationResult.clientId })
+		const client = await Clients.findOne({ '_id': verificationResult.clientId }).lean()
 		const user = client.contacts.find(item => item.email === verificationResult.contactEmail)
-
-		res.send({
-			user: Buffer.from(JSON.stringify(user)).toString('base64'),
-		})
+		const { password, ...restUser } = user
+		res.send({ user: restUser })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting Projects.")
@@ -386,17 +389,6 @@ router.get('/clientinfo', checkClientContact, async (req, res) => {
 //     }
 // });
 
-router.post('/approve-reject', checkClientContact, async (req, res) => {
-	const { quote, key } = req.body
-	try {
-		const updatedQuote = await updateProjectStatusForClientPortalProject(quote._id, key)
-		res.send(updatedQuote)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on approving')
-	}
-})
-
 router.get('/reject', checkClientContact, async (req, res) => {
 	const id = req.query.quoteId
 	try {
@@ -429,17 +421,6 @@ router.get('/deliverables', checkClientContact, async (req, res) => {
 	// }
 })
 
-router.post('/project-deliverables', checkClientContact, async (req, res) => {
-	const { project } = req.body
-	try {
-		const result = await getProjectDeliverables(project)
-		res.send(result)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on downloading project deliverables")
-	}
-})
-
 router.post('/task-status', checkClientContact, async (req, res) => {
 	const { task, status } = req.body
 	try {
@@ -449,6 +430,190 @@ router.post('/task-status', checkClientContact, async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on task status update")
+	}
+})
+
+router.get('/service-templates/:clientId', checkClientContact, async (req, res) => {
+	const { clientId } = req.params
+	try {
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on task status update")
+	}
+})
+
+router.get('/service-templates/:clientId', checkClientContact, async (req, res) => {
+	const { clientId } = req.params
+	try {
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on task status update")
+	}
+})
+
+router.post('/service-template/delete/:clientId/:id', checkClientContact, async (req, res) => {
+	const { id, clientId } = req.params
+	try {
+		await deleteClientServiceGroups(clientId, id)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		console.log(servicesGroups)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/service-template/:clientId', checkClientContact, async (req, res) => {
+	const { clientId } = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await createClientServicesGroup({ clientId, groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/service-template/:clientId/:id', checkClientContact, async (req, res) => {
+	const { clientId, id } = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await editClientServicesGroup(clientId, id, { groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.get('/invoices', checkClientContact,async (req, res) => {
+	// const { clientId } = req.params
+	//
+	// let client = await getClient({ "_id": verificationResult.clientId })
+	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+		}
+
+		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
+		res.json(reportsList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
+	}
+})
+
+router.get('/invoices-paid', checkClientContact,async (req, res) => {
+	// const { clientId } = req.params
+	//
+	// let client = await getClient({ "_id": verificationResult.clientId })
+	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+		}
+
+		const reportsList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
+		res.json(reportsList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
+	}
+})
+
+router.get('/invoice/:invoiceId', checkClientContact,async (req, res) => {
+	const { invoiceId } = req.params
+
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+			"stepsAndProjects": 1,
+			"stepsWithProject.projectName": 1,
+			"stepsWithProject.projectId": 1,
+			"stepsWithProject.stepId": 1,
+			"stepsWithProject.type": 1,
+			"stepsWithProject.stepAndUnit": 1,
+			"stepsWithProject.title": 1,
+			"stepsWithProject.sourceLanguage": 1,
+			"stepsWithProject.targetLanguage": 1,
+			"stepsWithProject.deadline": 1,
+			"stepsWithProject.projectCurrency": 1,
+			"stepsWithProject.finance.Price": 1,
+			"stepsWithProject.projectNativeId": 1,
+			"invoice": 1,
+			"paymentInformation": 1,
+		}
+
+		const reportList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)}, projectFields)
+		res.json(reportList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
+	}
+})
+router.get('/invoice-paid/:invoiceId', checkClientContact,async (req, res) => {
+	const { invoiceId } = req.params
+
+	const  token  = req.headers['token-header']
+	const verificationResult = jwt.verify(token, secretKey)
+	try {
+		const projectFields = {
+			"reportId": 1,
+			"clientBillingInfo": 1,
+			"client": 1,
+			"status": 1,
+			"total": 1,
+			"stepsAndProjects": 1,
+			"stepsWithProject.projectName": 1,
+			"stepsWithProject.projectId": 1,
+			"stepsWithProject.stepId": 1,
+			"stepsWithProject.type": 1,
+			"stepsWithProject.stepAndUnit": 1,
+			"stepsWithProject.title": 1,
+			"stepsWithProject.sourceLanguage": 1,
+			"stepsWithProject.targetLanguage": 1,
+			"stepsWithProject.deadline": 1,
+			"stepsWithProject.projectCurrency": 1,
+			"stepsWithProject.finance.Price": 1,
+			"stepsWithProject.projectNativeId": 1,
+			"invoice": 1,
+			"paymentInformation": 1,
+		}
+
+		const reportList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)}, projectFields)
+		res.json(reportList)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on rollback-review')
 	}
 })
 

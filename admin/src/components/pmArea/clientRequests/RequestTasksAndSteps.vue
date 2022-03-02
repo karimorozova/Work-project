@@ -19,18 +19,13 @@
       ValidationErrors(v-if="areErrorsExist" :errors="errors" :isAbsolute="true" @closeErrors="closeErrorsBlock")
 
     .tasks-steps__tables
-      //.tasks__tabs
-        Tabs(:tabs="tabs" :selectedTab="selectedTab" @setTab="setTab")
-      .tasks__table(v-if="isTasksShow")
+      .tasks__table
         GeneralTable(
           :fields="fields1"
           :tableData="currentTasks"
         )
           template(v-for="field in fields1", :slot="field.headerKey", slot-scope="{ field }")
             .tasks__head-title {{ field.label }}
-
-          //template(slot="id" slot-scope="{ row, index }")
-          //  .tasks__data {{ row.taskId }}
           template(slot="language" slot-scope="{ row, index }")
             .tasks__data {{ row.language }}
           template(slot="service" slot-scope="{ row, index }")
@@ -52,35 +47,6 @@
               .tasks__icon
                 img(src="../../../assets/images/latest-version/lock.png")
 
-      //.tasks__table(v-if="isStepsShow")
-      //  GeneralTable(
-      //    :fields="fields2"
-      //    :tableData="currentSteps"
-      //    :bodyClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
-      //    :tableheadRowClass="currentSteps.length < 7 ? 'tbody_visible-overflow' : ''"
-      //    bodyRowClass="steps-table-row"
-      //  )
-      //    template(v-for="field in fields2", :slot="field.headerKey", slot-scope="{ field }")
-      //      .tasks__head-title(v-if="field.headerKey === 'headerSize'")
-      //        span(v-if="currentProject.requestForm.service.title === 'Compliance'") Quantity / Template
-      //        span(v-else) Quantity / Size
-      //      .tasks__head-title {{ field.label }}
-      //
-      //    template(slot="id" slot-scope="{ row, index }")
-      //      .tasks__data {{ row.stepId }}
-      //    template(slot="language" slot-scope="{ row, index }")
-      //      .tasks__data {{ row.language }}
-      //    template(slot="step" slot-scope="{ row, index }")
-      //      .tasks__data {{ row.step }}
-      //    template(slot="unit" slot-scope="{ row, index }")
-      //      .tasks__data {{ row.unit  }}
-      //    template(slot="quantity" slot-scope="{ row, index }")
-      //      .tasks__data {{ currentProject.requestForm.service.title === 'Translation' ? '-' : row.quantitySize }}
-      //    template(slot="start" slot-scope="{ row, index }")
-      //      .tasks__data {{ row.start }}
-      //    template(slot="deadline" slot-scope="{ row, index }")
-      //      .tasks__data {{ row.deadline }}
-
     .button(v-if="!isTaskData && currentTasks.length && canUpdateRequest")
       .button__convert
         Button(value="Convert into Project" :isDisabled="isButtonDisable" @clicked="convertIntoProject")
@@ -88,7 +54,6 @@
 </template>
 
 <script>
-import RequestTasksData from "./tasks-n-steps/RequestTasksData"
 import { mapGetters, mapActions } from 'vuex'
 import ValidationErrors from "../../ValidationErrors"
 import Tabs from "../../Tabs"
@@ -114,14 +79,9 @@ export default {
       errors: [],
       isTaskData: false,
       areErrorsExist: false,
-      tabs: [ 'Tasks and Steps' ],
-      isStepsShow: false,
-      isTasksShow: true,
-      selectedTab: 'Tasks and Steps',
       currentTaskIdForUpdate: '',
       isButtonDisable: false,
       fields1: [
-        // { label: "Task Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
         { label: "Service", headerKey: "headerService", key: "service", style: { width: "16%" } },
         { label: "Service steps", headerKey: "headerSteps", key: "steps", style: { width: "25%" } },
         { label: "Languages", headerKey: "headerLanguage", key: "language", style: { width: "25%" } },
@@ -129,16 +89,6 @@ export default {
         { label: "Source / Ref.", headerKey: "headerSteps", key: "filesCount", style: { width: "12%" } },
         { label: "", headerKey: "headerIcons", key: "icons", style: { width: "10%" } }
       ]
-
-      // fields2: [
-      //   { label: "Step Id", headerKey: "headerId", key: "id", style: { width: "19%" } },
-      //   { label: "Language", headerKey: "headerLanguage", key: "language", style: { width: "20%" } },
-      //   { label: "Step", headerKey: "headerStep", key: "step", style: { width: "12%" } },
-      //   { label: "Unit", headerKey: "headerUnit", key: "unit", style: { width: "12%" } },
-      //   { label: "", headerKey: "headerSize", key: "quantity", style: { width: "13%" } },
-      //   { label: "Start", headerKey: "headerStart", key: "start", style: { width: "12%" } },
-      //   { label: "Deadline", headerKey: "headerDeadline", key: "deadline", style: { width: "12%" } }
-      // ]
     }
   },
   methods: {
@@ -148,10 +98,10 @@ export default {
       "setCurrentClientRequest",
       "setTasksDataValueRequest"
     ]),
-    closeTaskDataAndClearTasksRequest() {
-      this.isTaskData = false
-      this.clearTasksDataRequest()
-    },
+    // closeTaskDataAndClearTasksRequest() {
+    //   this.isTaskData = false
+    //   this.clearTasksDataRequest()
+    // },
     checkTranslationSourceFiles(title, tasksAndSteps) {
       if (title === 'Translation') {
         if (tasksAndSteps.length) {
@@ -261,13 +211,7 @@ export default {
       if (!this.isTaskData) {
         this.clearTasksDataRequest()
       }
-    },
-    setTab({ index }) {
-      this.isTasksShow = index === 0
-      this.isStepsShow = !this.isTasksShow
-      this.selectedTab = this.tabs[index]
     }
-
   },
   computed: {
     ...mapGetters({
@@ -282,7 +226,6 @@ export default {
         const { targets, stepsAndUnits } = taskData
         const { requestForm: { sourceLanguage, service } } = this.currentProject
         return {
-          // taskId: taskId + ` (Task count: ${ targets.length })`,
           taskId,
           language: service.languageForm === 'Mono'
               ? `${ targets.map(i => i.symbol).join(', ') }`
@@ -296,31 +239,12 @@ export default {
         }
       })
     },
-    currentSteps() {
-      // return []
-      // let a = this.currentProject.tasksAndSteps.map(({ taskId, taskData, refFiles, sourceFiles }) => {
-      // 	let result = []
-      // 	const { source, targets, service, stepsDates, stepsAndUnits } = taskData
-      // 	for (let i = 0; i < stepsAndUnits.length; i++) {
-      // 		const item = stepsAndUnits[i]
-      // 		result.push({
-      // 			stepId: `${ taskId } S0${ i + 1 }`,
-      // 			language: `${ source.symbol } >> ${ targets.map(i => i.symbol).join(', ') }`,
-      // 			step: item.step,
-      // 			unit: item.unit,
-      // 			quantitySize: item.hasOwnProperty('hours') ? `${ item.hours } / ${ item.size }` : `${ item.quantity } / ${ item.size }`,
-      // 			start: moment(stepsDates[i].start).format('MMM D, HH:mm'),
-      // 			deadline: moment(stepsDates[i].deadline).format('MMM D, HH:mm')
-      // 		})
-      // 	}
-      // 	return result
-      // })
-      // return a.flat()
-    },
     canUpdateRequest() {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
-          || this.currentProject.projectManager._id === this.user._id
+          || this.currentProject.projectManager._id.toString() === this.user._id.toString()
+          || this.currentProject.accountManager._id.toString() === this.user._id.toString()
+          || (this.user.position === 'Compliance Coordinator' && this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && this.currentProject.projectManager._id.toString() === "60b4dee7f2611f5115701566")
     }
   },
   components: {
@@ -330,7 +254,6 @@ export default {
     DataTable,
     Tabs,
     ValidationErrors,
-    RequestTasksData
   },
   mounted() {
     this.setDefaultIsTaskData()

@@ -16,9 +16,9 @@ const GBP = {
 
 const financeExtract = {
 	receivables: { type: Number },
-	payables: { type: Number },
-	halfReceivables: { type: Number },
-	halfPayables: { type: Number }
+	payables: { type: Number }
+	// halfReceivables: { type: Number },
+	// halfPayables: { type: Number }
 }
 
 const stepFinance = {
@@ -42,16 +42,33 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	isUrgent: {
-		type: Boolean,
-		default: false
-	},
-	clientContacts: [],
-	paymentProfile: {
+	PO: {
 		type: String,
 		default: '',
 		trim: true
 	},
+	isSkipProgress: {
+		type: Boolean,
+		default: false
+	},
+	isUrgent: {
+		type: Boolean,
+		default: false
+	},
+	inPause: {
+		type: Boolean,
+		default: false
+	},
+	isPaid: {
+		type: Boolean,
+		default: false
+	},
+	clientContacts: [],
+	// paymentProfile: {
+	// 	type: String,
+	// 	default: '',
+	// 	trim: true
+	// },
 	clientBillingInfo: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients.billingInfo',
@@ -286,7 +303,9 @@ const ProjectsSchema = new mongoose.Schema({
 		refFiles: [],
 		targetFiles: [],
 		targetFilesStages: [],
-		metrics: {}
+		targetFilesFinalStage: [],
+		metrics: {},
+		reason: ""
 	} ],
 	steps: [ {
 		projectId: { type: String, trim: true },
@@ -309,8 +328,14 @@ const ProjectsSchema = new mongoose.Schema({
 		memoqTarget: "",
 		memoqDocIds: [],
 		totalWords: { type: Number },
-		start: {},
-		deadline: {},
+		start: {
+			type: Date,
+			default: Date.now
+		},
+		deadline: {
+			type: Date,
+			default: Date.now
+		},
 		progress: "",
 		status: {
 			type: String,
@@ -334,7 +359,7 @@ const ProjectsSchema = new mongoose.Schema({
 		projectId: { type: String, trim: true },
 		taskId: { type: String, trim: true },
 		title: { type: String, trim: true },
-		isInReportPayables: { type: Boolean, default: false },
+		isInReportReceivables: { type: Boolean, default: false },
 		finance: {
 			Price: {
 				receivables: { type: Number }
@@ -365,7 +390,7 @@ const ProjectsSchema = new mongoose.Schema({
 
 	status: {
 		type: String,
-		enum: [ 'Draft', 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'In progress', 'Closed' ],
+		enum: [ 'Draft', 'Cost Quote', 'Quote sent', 'Approved', 'Rejected', 'In progress', 'Cancelled', 'Closed' ],
 		default: 'Draft'
 	},
 	roi: {

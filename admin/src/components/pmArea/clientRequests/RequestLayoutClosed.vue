@@ -50,7 +50,7 @@
                     :isDisabled="true"
                   )
 
-          .form__title Files Preparation & Options
+          .form__title Files Preparation
           .form__table-box
             .form__table
               .approveModal(v-if="isDeleteModal")
@@ -85,7 +85,7 @@
         .project__block
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
-              span Project Brief
+              span Project Instructions
 
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
@@ -172,13 +172,13 @@ import IconButton from "../../IconButton"
 
 import CKEditor from "ckeditor4-vue"
 import '../../../assets/scss/ckeditor.scss'
-import { instructions } from "../../../../enums"
+// import { instructions } from "../../../../enums"
 
 export default {
   mixins: [ crudIcons ],
   data() {
     return {
-      instructions: instructions,
+      // instructions: instructions,
       isBrief: false,
       isNotes: false,
       clientRequest: {},
@@ -236,9 +236,9 @@ export default {
         this.alertToggle({ message: "Text not copied", isShow: true, type: "error" })
       }
     },
-    downloadFile(path, bool) {
+    downloadFile(path) {
       let link = document.createElement('a')
-      link.href = __WEBPACK__API_URL__ + path
+      link.href = this.$domains.admin + path
       link.target = "_blank"
       link.click()
     },
@@ -774,7 +774,7 @@ input[type="text"]:disabled {
   }
 
   &__subTitle {
-    width: 110px;
+    width: 150px;
   }
 
   &__title {
@@ -784,13 +784,14 @@ input[type="text"]:disabled {
 
   &__value {
     font-family: 'Myriad400';
+    min-width: 220px;
   }
 
   &__row {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 40px;
+    min-height: 40px;
   }
 
 }

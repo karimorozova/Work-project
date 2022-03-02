@@ -4,8 +4,8 @@
       img.checkbox__image(v-if="!isChecked" src="../assets/images/latest-version/checkbox-brown-0.svg" @click.stop="check")
       img.checkbox__image(v-else src="../assets/images/latest-version/checkbox-brown-1.svg" @click.stop="uncheck")
     .checkbox__brown(v-else)
-      img.checkbox__image(style="opacity: 0.6;" v-if="!isChecked" src="../assets/images/latest-version/checkbox-brown-0.svg")
-      img.checkbox__image(style="opacity: 0.6;" v-else src="../assets/images/latest-version/checkbox-brown-1.svg")
+      img.checkbox__image(style="opacity: 0.5; cursor: " v-if="!isChecked" src="../assets/images/latest-version/checkbox-brown-0.svg")
+      img.checkbox__image(style="opacity: 0.5; cursor: " v-else src="../assets/images/latest-version/checkbox-brown-1.svg")
 
 </template>
 
@@ -31,15 +31,13 @@ export default {
 <style lang="scss" scoped>
 
 .checkbox {
-
+  height: 18px;
+  width: 18px;
+  
   &__image {
     background-color: white;
     height: 18px;
     width: 18px;
-
-    //img {
-    //  width: 100%;
-    //}
   }
 }
 

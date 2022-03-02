@@ -40,9 +40,9 @@
         span.require *
       .block-item__drop(:class="{'general-info_error-shadow': isSaveClicked && !client.projectManager}")
         SelectSingle(
-          placeholder="Option",
-          :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)",
-          :selectedOption="getFullName(client.projectManager)",
+          placeholder="Option"
+          :options="users.filter(i => i.group.name === 'Project Managers').map(i => `${i.firstName} ${i.lastName}`)"
+          :selectedOption="getFullName(client.projectManager)"
           @chooseOption="(data) => setManager(data, 'projectManager')"
         )
 
@@ -86,7 +86,7 @@
 				this.client.status = option
 			},
 			getFullName(manager) {
-				return `${ manager.firstName || "" } ${ manager.lastName || "" }`
+				return (`${ manager.firstName || "" } ${ manager.lastName || "" }`).trim()
 			}
 		},
 		computed: {

@@ -1,12 +1,14 @@
 const {
 	getProject,
 	getProjects,
-	getProjectsForPortal,
+	getProjectsForPortalAll,
 	updateProject,
 	getFilteredProjects,
 	getProjectAfterUpdate,
 	getProjectsForVendorPortal,
 	getProjectsForPortalList,
+	getProjectForClientPortal,
+	getProjectsForVendorPortalAll,
 } = require('./getProjects')
 
 const {
@@ -27,17 +29,17 @@ const {
 	downloadCompletedFiles,
 	updateProjectProgress,
 	getAfterReopenSteps,
-	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
 	updateOtherProject,
 	assignMemoqTranslator,
 	checkProjectHasMemoqStep,
 	assignProjectManagers,
-	updateProjectStatusForClientPortalProject,
 	regainWorkFlowStatusByStepId,
 	setStepDeadlineProjectAndMemoq,
 	cancelProjectInMemoq,
-	setApprovedStepStatus
+	setApprovedStepStatus,
+	reImportFilesFromMemoq,
+	generateTargetFileFromMemoq
 } = require('./updates')
 
 const {
@@ -50,7 +52,7 @@ const {
 	notifyVendorStepStart,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
-	nextVendorCanStartWorkNotification,
+	nextVendorCanStartWorkNotification
 } = require('./emails')
 
 const {
@@ -60,23 +62,18 @@ const {
 	updateRequestTasks,
 	createProjectFromRequest,
 	autoCreatingTaskInProject,
-	autoCreatingTranslationTaskInProject
+	autoCreatingTranslationTaskInProject,
+	autoCreatingTranslationTaskInProjectByMemoqLink,
+	autoCreatingTranslationTaskInProjectByXTMFile,
+	createProjectFromMemoq,
+	createProjectFromXTMFile,
+	createProjectIndividual
 } = require('./create')
 
 
 const {
 	createTasksForWordcount
 } = require('./taskForWordcount')
-
-// const {
-// 	getProjectWithUpdatedFinance
-// } = require('./metrics')
-
-const {
-	getProjectAfterFinanceUpdated,
-	// addPaymentAdditions,
-	// deletePaymentAddition,
-} = require('./porjectFinance')
 
 const {
 	addDR2,
@@ -97,7 +94,7 @@ const {
 	approveFilesDR2,
 	changeManagersDR1,
 	saveCertificateTODR1Files,
-	changeNameLang,
+	changeNameLang
 } = require('./delivery')
 
 const {
@@ -105,7 +102,18 @@ const {
 	manageProjectName
 } = require('./helpers')
 
+
+//EXPORT  =============================>
 module.exports = {
+	getProjectsForVendorPortalAll,
+	generateTargetFileFromMemoq,
+	reImportFilesFromMemoq,
+	createProjectIndividual,
+	createProjectFromXTMFile,
+	createProjectFromMemoq,
+	autoCreatingTranslationTaskInProjectByXTMFile,
+	autoCreatingTranslationTaskInProjectByMemoqLink,
+	getProjectForClientPortal,
 	setApprovedStepStatus,
 	getProjectsForVendorPortal,
 	generateReceivablesReportsByTemplate,
@@ -150,12 +158,9 @@ module.exports = {
 	createProject,
 	createTasks,
 	taskCompleteNotifyPM,
-	// getProjectWithUpdatedFinance,
 	updateProjectProgress,
 	updateWithApprovedTasks,
 	getAfterReopenSteps,
-	getProjectAfterFinanceUpdated,
-	updateNonWordsTaskTargetFile,
 	updateNonWordsTaskTargetFiles,
 	createTasksForWordcount,
 	downloadCompletedFiles,
@@ -169,7 +174,6 @@ module.exports = {
 	assignMemoqTranslator,
 	checkProjectHasMemoqStep,
 	assignProjectManagers,
-	updateProjectStatusForClientPortalProject,
 	sendQuoteMessage,
 	sendCostQuoteMessage,
 	getPriceAfterApplyingDiscounts,
@@ -178,8 +182,6 @@ module.exports = {
 	addMultiLangDR2,
 	removeMultiDR2,
 	changeNameLang,
-	getProjectsForPortal,
-	getProjectsForPortalList,
-	// addPaymentAdditions,
-	// deletePaymentAddition,
+	getProjectsForPortalAll,
+	getProjectsForPortalList
 }

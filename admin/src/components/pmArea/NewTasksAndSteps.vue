@@ -20,7 +20,12 @@
 
 
     .modal(v-if="isModalOpen")
-      VendorManage(:steps="currentProject.steps" :industry="currentProject.industry" @closeVendorManage="toggleVendorManage")
+      VendorManage(
+        :steps="currentProject.steps"
+        :currentProject="currentProject"
+        @closeVendorManage="toggleVendorManage"
+        @updateCurrentProject="saveProject"
+      )
 
 
     transition(name="slide-fade")
@@ -52,6 +57,12 @@
       @setTab="setTab"
     )
 
+    //Invoicing(
+    //  v-if="selectedTabQuery === 'Invoicing'"
+    //  :tabs="tabs"
+    //  @setTab="setTab"
+    //)
+
 </template>
 
 <script>
@@ -62,13 +73,25 @@ import AdditionsSteps from "./tasks-n-steps/AdditionsSteps"
 import Tabs from "../Tabs"
 import Button from "../Button"
 import VendorManage from "./VendorManage"
+// import Invoicing from "./tasks-n-steps/Invoicing"
 import { mapActions, mapGetters } from "vuex"
 import { clearTasksData, foo, updateProgress } from "../../vuex/pmarea/actions"
 
 export default {
   name: "NewTaskAndSteps",
+  components: {
+    NewTasksData,
+    NewTasks,
+    NewSteps,
+    Tabs,
+    AdditionsSteps,
+    VendorManage,
+    Button,
+    // Invoicing,
+  },
   data() {
     return {
+      // tabs: [ 'Tasks', 'Steps', 'Additional Steps', 'Invoicing' ],
       tabs: [ 'Tasks', 'Steps', 'Additional Steps' ],
       isModalOpen: false,
       isTaskData: false
@@ -76,6 +99,9 @@ export default {
   },
   methods: {
     ...mapActions([ 'setCurrentProject', 'alertToggle', 'clearTasksData', 'updateProgress' ]),
+    saveProject(data) {
+      this.setCurrentProject(data)
+    },
     async refreshProject() {
       if (this.currentProject.tasks.length) {
         const isCatTool = this.currentProject.tasks.some(item => item.memoqDocs.length)
@@ -125,15 +151,6 @@ export default {
   mounted() {
     this.setDefaultIsTaskData()
   },
-  components: {
-    NewTasksData,
-    NewTasks,
-    NewSteps,
-    Tabs,
-    AdditionsSteps,
-    VendorManage,
-    Button
-  }
 }
 </script>
 

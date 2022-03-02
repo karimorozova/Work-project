@@ -1,9 +1,8 @@
 const { Projects, InvoicingReceivables } = require("../models")
-const moment = require('moment')
 const { ObjectID: ObjectId } = require('mongodb')
 
 
-const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
+const reportsFiltersQuery = ({ reportId, clients, billingDateTo, billingDateFrom, status }) => {
 	const q = {}
 	const reg = /[.*+?^${}()|[\]\\]/g
 
@@ -17,186 +16,182 @@ const reportsFiltersQuery = ({ reportId, clients, to, from, status }) => {
 	if (status) {
 		q["status"] = status
 	}
-	if (!to) to = moment().add(2, 'years').format('YYYY-MM-DD')
-	if (!from) from = '1970-01-01'
 
-	q['firstPaymentDate'] = { $gte: new Date(`${ from }T00:00:00.000Z`) }
-	q['lastPaymentDate'] = { $lt: new Date(`${ to }T24:00:00.000Z`) }
+	if (!!billingDateTo && !!billingDateFrom) {
+		q['firstPaymentDate'] = { $gte: new Date(+billingDateFrom) }
+		q['lastPaymentDate'] = { $lt: new Date(+billingDateTo) }
+	}
 
 	return q
 }
 
-
-const getReportByIdFromDb = async (id) => {
+const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields,  unsetFields = []) => {
 	const queryResult = await InvoicingReceivables.aggregate([
-		{ $match: { "_id": ObjectId(id) } },
-		{
-			$lookup: {
-				from: "projects",
-				let: { 'steps': '$stepsAndProjects.step' },
-				pipeline: [
-					{ "$unwind": "$steps" },
-					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ "$addFields": { "steps.projectNativeId": '$_id' } },
-					{ "$addFields": { "steps.projectId": '$projectId' } },
-					{ "$addFields": { "steps.projectName": '$projectName' } },
-					{ "$addFields": { "steps.projectCurrency": '$projectCurrency' } },
-					{ "$addFields": { "steps.paymentAdditions": '$paymentAdditions' } },
-					{ "$addFields": { "steps.minimumCharge": '$minimumCharge' } },
-					{ '$replaceRoot': { newRoot: '$steps' } }
-				],
-				as: "stepsWithProject"
-			}
-		},
-		{
-			$addFields: {
-				total: { $sum: "$stepsWithProject.finance.Price.receivables" }
-			}
-		}
-	])
-
-	return await InvoicingReceivables.populate(queryResult, [
-				{ path: 'client', select: [ 'name', 'billingInfo' ] }
-			]
-	)
-}
-
-const getReportById = async (id) => {
-	const report = await getReportByIdFromDb(id)
-	const { result, sumPaymentAdditions,  uniquePaymentAdditions} = getReceivableTotal(report[0])
-	report[0].total = result + sumPaymentAdditions
-	return report
-}
-
-const getAllReports = async (countToSkip, countToGet, query) => {
-	const reports = await getAllReportsFromDb(countToSkip, countToGet, query)
-	for (const report of reports) {
-		const { result, sumPaymentAdditions} = getReceivableTotal(report)
-		report.total = result + sumPaymentAdditions
-	}
-	return reports
-}
-
-
-const getReceivableTotal = (report) => {
-	const uniquePaymentAdditions = getUniquePaymentAdditions(report)
-	const test = getProjectMinimumChargeAndSumReceivables(report)
-	const result =  Object.values(test).reduce((acc, {receivables, minimumCharge}) => acc += minimumCharge > receivables ? minimumCharge : receivables  , 0)
-	return { result, sumPaymentAdditions:  uniquePaymentAdditions.reduce((acc, {value}) => acc += value, 0),  uniquePaymentAdditions}
-}
-
-const getUniquePaymentAdditions = (report) => {
-	let uniquePaymentAdditions = []
-	let countedProjectIds = []
-	if(!report) return []
-	for (const { projectNativeId, projectId ,paymentAdditions = [] } of report.stepsWithProject) {
-
-		if (!countedProjectIds.includes(projectNativeId.toString())) {
-			const paymentAdditionsWithProjId = paymentAdditions.map(item => {
-				item.projectId = projectId
-				return item
-			})
-			uniquePaymentAdditions.push(...paymentAdditions)
-			countedProjectIds.push(projectNativeId.toString())
-		}
-	}
-	return uniquePaymentAdditions
-}
-
-const getProjectMinimumChargeAndSumReceivables = (report) => {
-	let groupedReports = {}
-	if(!report) return {}
- 	for (const { projectNativeId, finance, minimumCharge = {toIgnore: true} } of report.stepsWithProject) {
-		if (Boolean(groupedReports[projectNativeId])) {
-			groupedReports[projectNativeId].receivables += finance.Price.receivables
-		} else {
-			groupedReports[projectNativeId] = { receivables: finance.Price.receivables, minimumCharge: !minimumCharge.toIgnore ? minimumCharge.value : 0 }
-		}
-	}
-	return groupedReports
-}
-
-const getAllReportsFromDb = async (countToSkip, countToGet, query) => {
-	const queryResult = await InvoicingReceivables.aggregate([
-		{
-			$lookup: {
-				from: "projects",
-				let: { 'steps': '$stepsAndProjects.step' },
-				pipeline: [
-					{ "$unwind": "$steps" },
-					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ "$addFields": { "steps.projectNativeId": '$_id' } },
-					{ "$addFields": { "steps.projectName": '$projectName' } },
-					{ "$addFields": { "steps.paymentAdditions": '$paymentAdditions' } },
-					{ "$addFields": { "steps.minimumCharge": '$minimumCharge' } },
-					{ '$replaceRoot': { newRoot: '$steps' } }
-				],
-				as: "stepsWithProject"
-			}
-		},
 		{ $match: { ...query } },
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'steps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ $unwind: "$steps" },
+					{ $match: { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ $addFields: { "steps.type": 'Classic' } },
+					...generateExtraFieldForSteps('steps'),
+					{ $replaceRoot: { newRoot: '$steps' } }
+				],
+				as: "stepsClassic"
+			}
+		},
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'additionsSteps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ $unwind: "$additionsSteps" },
+					{ $match: { "$expr": { "$in": [ "$additionsSteps._id", "$$additionsSteps" ] } } },
+					{ $addFields: { "additionsSteps.type": 'Extra' } },
+					...generateExtraFieldForSteps('additionsSteps'),
+					{ $replaceRoot: { newRoot: '$additionsSteps' } }
+				],
+				as: "stepsExtra"
+			}
+		},
+		{ $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
+		{ $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
+		{ $unset: [ 'stepsClassic', 'stepsExtra', ...unsetFields] },
+		...(!!projectFields ? [{$project:  projectFields}] : []),
 		{ $sort: { reportId: -1 } },
 		{ $skip: countToSkip },
 		{ $limit: countToGet }
 	])
 
 	return await InvoicingReceivables.populate(queryResult, [
-				{ path: 'client', select: [ 'name', 'billingInfo' ] }
+				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] }
 			]
 	)
+
+	function generateExtraFieldForSteps(key) {
+		return [
+			{ "$addFields": { [`${ key }` + ".projectNativeId"]: '$_id' } },
+			{ "$addFields": { [`${ key }` + ".projectName"]: '$projectName' } },
+			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
+			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
+			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } }
+		]
+	}
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
-	const queryPipeline = [
+	const match1 = {
+		$match: {
+			clientBillingInfo: { $exists: true, $ne: null }
+		}
+	}
+	const lookup = {
+		$lookup:
+				{
+					from: "clients",
+					localField: "customer",
+					foreignField: "_id",
+					as: "customer"
+				}
+	}
+	const addFields1 = getExtraFieldStructure('Classic')
+	const addFields2 = getExtraFieldStructure('Extra')
+	const unset = {
+		$unset: [
+			'customer.rates',
+			'customer.services',
+			'additionsSteps'
+		]
+	}
+	const neededFields = {
+		"projectId": 1,
+		'projectName': 1,
+		'deadline': 1,
+		'startDate': 1,
+		'billingDate': 1,
+		'projectCurrency': 1,
+		'clientBillingInfo': 1
+	}
+
+	const queryPipelineClassicSteps = [
+		match1,
+		lookup,
+		{
+			$project: {
+				'steps': 1,
+				...neededFields,
+				'customer': { $arrayElemAt: [ "$customer", 0 ] }
+			}
+		},
+		addFields1,
 		{ $unwind: "$steps" },
 		{
 			$match: {
-				clientBillingInfo: { $exists: true, $ne: null },
 				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
+				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway' ] },
+				"steps.finance.Price.receivables": { $gt: 0 },
+				...queryForStep
+			}
+		},
+		unset
+	]
+
+	const queryPipelineExtraSteps = [
+		match1,
+		lookup,
+		{
+			$project: {
+				'additionsSteps': 1,
+				...neededFields,
+				'customer': { $arrayElemAt: [ "$customer", 0 ] }
+			}
+		},
+		addFields2,
+		{ $unwind: "$additionsSteps" },
+		{
+			$match: {
+				$or: [ { "additionsSteps.isInReportReceivables": false }, { "additionsSteps.isInReportReceivables": { $exists: false } } ],
+				"additionsSteps.finance.Price.receivables": { $gt: 0 },
 				...queryForStep
 			}
 		},
 		{
-			$lookup:
-					{
-						from: "clients",
-						localField: "customer",
-						foreignField: "_id",
-						as: "customer"
-					}
-		},
-		{
-			$project: {
-				'steps': 1,
-				"projectId": 1,
-				'projectName': 1,
-				'deadline': 1,
-				'startDate': 1,
-				'billingDate': 1,
-				'projectCurrency': 1,
-				'paymentProfile': 1,
-				'clientBillingInfo': 1,
-				'customer': { $arrayElemAt: [ "$customer", 0 ] }
+			$addFields: {
+				"steps": "$additionsSteps"
 			}
 		},
-		{
-			$unset: [
-				'customer.rates',
-				'customer.services'
-			]
-		},
-		{ $skip: countToSkip }
+		unset
 	]
-	if (countToGet > 0) {
-		queryPipeline.push({ $limit: countToGet })
+
+	const classicSteps = await Projects.aggregate(queryPipelineClassicSteps)
+	const extraSteps = await Projects.aggregate(queryPipelineExtraSteps)
+
+	return classicSteps.concat(extraSteps).slice(countToSkip, countToSkip + countToGet)
+
+	function getExtraFieldStructure(type) {
+		return {
+			$addFields: {
+				"type": type,
+				"selectedBillingInfo": {
+					$arrayElemAt: [
+						{
+							$filter: {
+								input: "$customer.billingInfo",
+								cond: { $eq: [ "$$this._id", "$clientBillingInfo" ] }
+							}
+						},
+						0
+					]
+				}
+			}
+		}
 	}
-	return (await Projects.aggregate(queryPipeline))
 }
 
 module.exports = {
-	getReportById,
+	getAllReportsFromDb,
 	reportsFiltersQuery,
-	getAllSteps,
-	getAllReports,
-	getReceivableTotal,
+	getAllSteps
 }

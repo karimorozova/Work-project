@@ -23,20 +23,18 @@
                 Check(id="checkProject" @click="checkProjectName", :isApproved="currentClientRequest.checkedForm.isCheckProjectName")
               .form__projectDeadline
                 .input__title Suggested Deadline:
-                DatepickerWithTime(
-                  placeholder="Suggested Deadline"
-                  v-model="currentClientRequest.deadline"
-                  @selected="(e) => updateProjectDate(e)"
-                  monday-first=true
-                  inputClass="datepicker-custom-compliance"
-                  calendarClass="calendar-custom"
-                  :format="customFormatter"
-                  :disabledPicker="currentClientRequest.checkedForm.isCheckDeadline"
-                  :disabled="disabled"
+                DatePicker(
+                  :value="new Date(currentClientRequest.deadline)"
+                  @confirm="(e) => updateProjectDate(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  type="datetime"
                   ref="deadline"
+                  :clearable="false"
+                  :confirm="true"
+                  :disabled="currentClientRequest.checkedForm.isCheckDeadline"
+                  confirm-text="Set date"
+                  prefix-class="xmx"
                 )
-                span(id="calendar" @click="deadlineOpen")
-                  i.calendar.far.fa-calendar-alt
                 Check(id="checkDeadline" @click="checkProjectDeadline", :isApproved="currentClientRequest.checkedForm.isCheckDeadline")
 
 
@@ -63,19 +61,19 @@
                     @chooseOption="approveChangeAM"
                   )
 
-            .form__inputs
-              .form__assignedPm
-                .input__title Client Billing Info:
-                .drop-white
-                  SelectSingle(
-                    :hasSearch="true"
-                    placeholder="Option"
-                    :options="billingInfoList.map(({name}) => name)"
-                    :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
-                    @chooseOption="choseBillingInfo"
-                  )
+            //.form__inputs
+            //  .form__assignedPm
+            //    .input__title Client Billing Info:
+            //    .drop-white
+            //      SelectSingle(
+            //        :hasSearch="true"
+            //        placeholder="Option"
+            //        :options="billingInfoList.map(({name}) => name)"
+            //        :selectedOption="(currentClientRequest.clientBillingInfo && currentClientRequest.clientBillingInfo.name) || ''"
+            //        @chooseOption="choseBillingInfo"
+            //      )
 
-          .form__title Files Preparation & Options
+          .form__title Files Preparation
           .form__table-box
             .form__table
               .approveModal(v-if="isDeleteModal")
@@ -142,16 +140,18 @@
       .project__block-row.project_no-margin
         .project__block
           Check(id="checkBrief" @click="checkBrief", :isApproved="currentClientRequest.checkedForm.isCheckBrief")
+          #swapBrief(@click="copyNotesToBrief" v-if="!currentClientRequest.checkedForm.isCheckBrief" )
+            i(class="fas fa-arrow-circle-left")
           .block__header(@click="toggleBlock('isBrief')" )
             .title(style="display: flex;")
-              span Project Brief
-
+              span Project Instructions
             .icon(v-if="!isBrief")
               i.fas.fa-chevron-down
             .icon(v-else)
               i.fas.fa-chevron-right
           .block__data(v-if="isBrief && canUpdateRequest()")
-            ckeditor(v-model="currentClientRequest.brief" :config="editorConfig" @blur="changeBrief")
+            ckeditor(v-model="currentClientRequest.brief" ref="editor" :config="editorConfig" @blur="changeBrief")
+
         .project__block
           .block__header(@click="toggleBlock('isNotes')" )
             .title Project Notes
@@ -162,8 +162,13 @@
           .block__data(v-if="isNotes && canUpdateRequest()")
             ckeditor(v-model="currentClientRequest.notes" :config="editorConfig" @blur="changeNotes")
 
-      .form__button
-        Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length" value="Send to PM")
+
+      .optionsAndButton
+        .options
+          .options__item.border(:class="{'options_brown': isClassicConvert}" @click="(e) => toggleConvert(e, 'isClassicConvert')") Send to PM
+          .options__item(:class="{'options_brown': isPreCreatedProject}" @click="(e) => toggleConvert(e, 'isPreCreatedProject')") Generate T&S
+        .form__button
+          Button(@clicked="approveRequest" :isDisabled="!isAllChecked || !currentClientRequest.requestForm.targetLanguages.length || onRequestSending" value="Proceed")
 
     .side
       .side__info
@@ -229,7 +234,7 @@
                     @chooseOption="setContact"
                   )
 
-              .table__dataIcon(slot="icon" slot-scope="{ row, index }")
+              .table__dataIcon(v-if="canUpdateRequest()" slot="icon" slot-scope="{ row, index }")
                 span(@click="removeContact(row)" style="margin-top: 2px; cursor: pointer;")
                   i.fas.fa-trash
 
@@ -237,12 +242,12 @@
 
         .order__buttons
           Button(v-if="(isAdmin || isAm()) && !isAmSet()" class="button-m-top" @clicked="setCurrentAm" value="Get This Project" )
-          Button(v-if="isAdmin || isAm()" color="#d15f45" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
+          Button(v-if="isAdmin || isAm()" color="#d66f58" :outline="true" @clicked="isDeleteRequest" value="Delete Request" )
 
       .side__info()
         .form__wrapper(v-if="!canUpdateRequest()")
         .form__project
-          .form__project-title Languages control
+          .form__project-title Languages
         .order__row(v-if="currentClientRequest.requestForm.service.languageForm !== 'Mono'" )
           .order__subTitle Source:
           .order__value
@@ -285,18 +290,24 @@ import SelectMulti from "../../SelectMulti"
 import Instructions from "./Instructions"
 import IconButton from "../../IconButton"
 
+import DatePicker from 'vue2-datepicker'
+import '../../../assets/scss/datepicker.scss'
+
 
 import CKEditor from "ckeditor4-vue"
 import '../../../assets/scss/ckeditor.scss'
-import { instructions } from "../../../../enums"
+// import { instructions } from "../../../../enums"
 
 export default {
   mixins: [ crudIcons ],
   data() {
     return {
-      instructions: instructions,
-      isBrief: false,
-      isNotes: false,
+      isClassicConvert: true,
+      isPreCreatedProject: false,
+      onRequestSending: false,
+      // instructions: instructions,
+      isBrief: true,
+      isNotes: true,
       clientRequest: {},
       disabled: {
         to: moment().add(-1, 'day').endOf('day').toDate()
@@ -335,7 +346,7 @@ export default {
         ],
         removeButtons: 'Source,Save,NewPage,ExportPdf,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Find,Replace,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,ImageButton,HiddenField,Button,Superscript,Subscript,CopyFormatting,NumberedList,Blockquote,CreateDiv,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock,BidiLtr,BidiRtl,Language,Anchor,HorizontalRule,Table,Flash,PageBreak,Iframe,Styles,Format,Font,FontSize,ShowBlocks,Maximize,About',
         uiColor: "#ffffff",
-        height: 240
+        height: 280
       },
       // forbiddenExtensions: [
       // 	'webm', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'ogg', 'mp4', 'm4p',
@@ -362,6 +373,14 @@ export default {
       setCurrentClientRequest: "setCurrentClientRequest",
       alertToggle: "alertToggle"
     }),
+    toggleConvert(e, prop) {
+      this[prop] = true
+      if (prop === 'isClassicConvert') {
+        this.isPreCreatedProject = false
+      } else if (prop === 'isPreCreatedProject') {
+        this.isClassicConvert = false
+      }
+    },
     copyNotesToBrief() {
       this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.notes, 'notes': this.currentClientRequest.notes } })
     },
@@ -453,16 +472,113 @@ export default {
       const isAdmin = group === "Administrators" || group === "Developers"
       const currentAm = group === "Account Managers" && this.currentClientRequest.accountManager._id === this.user._id
 
-      return isAdmin || currentAm
-    },
+      const isCurrentClientCC = (
+          !!this.currentClientRequest.projectManager
+          && this.user._id.toString() === "61b359f25c9ee507f4aa7a14"
+          && this.currentClientRequest.projectManager._id === "60b4dee7f2611f5115701566"
+      )
 
-    approveRequest() {
+      return isAdmin || currentAm || isCurrentClientCC
+    },
+    async approveRequest() {
+      this.onRequestSending = true
       if (!this.canUpdateRequest()) return
       try {
-        this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
+        if (this.isClassicConvert) {
+          await this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "tasksAndSteps": [] } })
+          await this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
+          this.onRequestSending = false
+        } else if (this.isPreCreatedProject) {
+          await this.convertWithPreCreation()
+          await this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "status": 'Request Approved' } })
+          this.onRequestSending = false
+        }
         this.alertToggle({ message: "Project approved!", isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: "Project not approved!", isShow: true, type: "error" })
+        this.onRequestSending = false
+      }
+    },
+    async convertWithPreCreation() {
+      const { instructions, deadline, requestForm: { sourceFiles, refFiles, targetLanguages, service: { title, steps } } } = this.currentClientRequest
+
+      let quantity = 0
+      let tasksData = new FormData()
+      tasksData.append('requestId', this.currentClientRequest._id)
+      tasksData.append('targets', JSON.stringify(targetLanguages))
+      if (sourceFiles && sourceFiles.length) tasksData.append('sourceFilesVault', JSON.stringify(sourceFiles))
+      if (refFiles && refFiles.length) tasksData.append('refFilesVault', JSON.stringify(refFiles))
+
+      if (title === 'Translation') {
+        const templates = await this.getMemoqTemplates()
+        tasksData.append('template', JSON.stringify(templates[0]))
+      } else if (title === 'Compliance') {
+        quantity = sourceFiles && sourceFiles.length ? sourceFiles.length : 0
+        tasksData.append('template', null)
+      } else {
+        tasksData.append('template', null)
+        quantity = 1
+      }
+
+      if (title === 'Compliance' && instructions.length) {
+        for await (const complianceTemplate of instructions) {
+          const stepsAndUnits = []
+          tasksData.delete('stepsAndUnits')
+          for (const { step } of steps) {
+            const settingStep = this.allSteps.find(item => item._id.toString() === step.toString())
+            if (!settingStep) throw 'NO STEPS IN SERVICE'
+            const unit = settingStep.calculationUnit.find(item => item.type === hardcodeDetectComplianceUnit(complianceTemplate))
+            if (!unit) throw 'NO UNITS IN STEP'
+
+            stepsAndUnits.push({
+              step: settingStep,
+              start: new Date(),
+              deadline,
+              receivables: { unit, quantity },
+              payables: { unit, quantity }
+            })
+          }
+          tasksData.append('stepsAndUnits', JSON.stringify(stepsAndUnits))
+          await this.$http.post('/pm-manage/request-tasks', tasksData)
+        }
+      } else {
+        const stepsAndUnits = []
+        for (const { step } of steps) {
+          const settingStep = this.allSteps.find(item => item._id.toString() === step.toString())
+          if (!settingStep) throw 'NO STEPS IN SERVICE'
+          const unit = settingStep.calculationUnit[0]
+          if (!unit) throw 'NO UNITS IN STEP'
+
+          stepsAndUnits.push({
+            step: settingStep,
+            start: new Date(),
+            deadline,
+            receivables: { unit, quantity },
+            payables: { unit, quantity }
+          })
+        }
+        tasksData.append('stepsAndUnits', JSON.stringify(stepsAndUnits))
+        await this.$http.post('/pm-manage/request-tasks', tasksData)
+      }
+
+      function hardcodeDetectComplianceUnit({ title, isChanged }) {
+        const re = /\[(.*)\]/.exec(title)
+
+        if (isChanged) return 'Compliance Expert'
+        if (!re) return 'Compliance Basic'
+
+        const [ , num ] = re
+        return (num.toString() === '3' || num.toString() === '9' || num.toString() === '10')
+            ? 'Compliance Advance'
+            : 'Compliance Basic'
+      }
+    },
+    async getMemoqTemplates() {
+      try {
+        const result = await this.$http.get("/memoqapi/templates")
+        return result.data
+      } catch (err) {
+        return [ { name: 'No Templates' } ]
       }
     },
     openDeleteFileApprovalModal(type, path, bool) {
@@ -510,9 +626,9 @@ export default {
       if (!this.canUpdateRequest()) return
       try {
         this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { 'brief': this.currentClientRequest.brief } })
-        this.alertToggle({ message: "Project brief saved!", isShow: true, type: "success" })
+        this.alertToggle({ message: "Project Instructions saved!", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({ message: "Project brief not saved!", isShow: true, type: "error" })
+        this.alertToggle({ message: "Project Instructions not saved!", isShow: true, type: "error" })
       }
     },
     changeNotes() {
@@ -642,7 +758,7 @@ export default {
     downloadFile(path, bool) {
       if (bool) return
       let link = document.createElement('a')
-      link.href = __WEBPACK__API_URL__ + path
+      link.href = this.$domains.admin + path
       link.target = "_blank"
       link.click()
     },
@@ -661,10 +777,12 @@ export default {
     checkBrief(data) {
       if (!this.canUpdateRequest()) return
       try {
+        this.changeBrief()
+        this.changeNotes()
         this.updateClientsRequestsProps({ projectId: this.currentClientRequest._id, value: { "checkedForm.isCheckBrief": data } })
-        this.alertToggle({ message: "Project brief checked!", isShow: true, type: "success" })
+        this.alertToggle({ message: "Project Instructions checked!", isShow: true, type: "success" })
       } catch (err) {
-        this.alertToggle({ message: "Project brief not checked!", isShow: true, type: "error" })
+        this.alertToggle({ message: "Project Instructions not checked!", isShow: true, type: "error" })
       }
     },
     async checkFile(data, { path, type }) {
@@ -706,10 +824,10 @@ export default {
         ...refFiles.map(i => ({ ...i, type: 'Reference' }))
       ]
     },
-    deadlineOpen() {
-      if (!this.canUpdateRequest()) return
-      this.$refs.deadline.showCalendar()
-    },
+    // deadlineOpen() {
+    //   if (!this.canUpdateRequest()) return
+    //   this.$refs.deadline.showCalendar()
+    // },
     clearInputFiles(str) {
       if (!this.canUpdateRequest()) return
       let inputFiles = document.querySelectorAll(str)
@@ -807,20 +925,19 @@ export default {
         acc = acc + curr + '; '
         return acc
       }, '')
-    },
-
-    async choseBillingInfo({ option }) {
-      const billingInfo = this.billingInfoList.find(({ name }) => name === option)
-      try {
-        const updatedProject = await this.$http.post(`/clients-requests/manage-client-billing-info/${ this.currentClientRequest._id }`, {
-          billingInfoId: billingInfo._id
-        })
-        this.setCurrentClientRequest(updatedProject.data)
-        this.alertToggle({ message: "Project billing info changed!", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: "Project billing info not changed!", isShow: true, type: "error" })
-      }
     }
+    // async choseBillingInfo({ option }) {
+    //   const billingInfo = this.billingInfoList.find(({ name }) => name === option)
+    //   try {
+    //     const updatedProject = await this.$http.post(`/clients-requests/manage-client-billing-info/${ this.currentClientRequest._id }`, {
+    //       billingInfoId: billingInfo._id
+    //     })
+    //     this.setCurrentClientRequest(updatedProject.data)
+    //     this.alertToggle({ message: "Project billing info changed!", isShow: true, type: "success" })
+    //   } catch (err) {
+    //     this.alertToggle({ message: "Project billing info not changed!", isShow: true, type: "error" })
+    //   }
+    // }
   },
   mounted() {
     this.restructuredFiles(this.currentClientRequest)
@@ -833,6 +950,8 @@ export default {
       user: "getUser",
       users: "getUsers",
       languages: "getAllLanguages",
+      allSteps: "getAllSteps",
+      allUnits: "getAllUnits",
       currentClientRequest: "getCurrentClientRequest"
     }),
     billingInfoList() {
@@ -916,7 +1035,8 @@ export default {
     DatepickerWithTime,
     ckeditor: CKEditor.component,
     Instructions,
-    IconButton
+    IconButton,
+    DatePicker
   }
 }
 </script>
@@ -924,6 +1044,44 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/styles/settingsTable";
 @import "../../../assets/scss/colors";
+
+.border {
+  border-right: 1px solid $border;
+}
+
+.optionsAndButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  border: 1px solid $border;
+  background-color: $table-list;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+  width: fit-content;
+  overflow: hidden;
+  margin: 20px 0;
+
+  &__item {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #3333;
+  }
+
+  &_brown {
+    background-color: white;
+    color: $text;
+  }
+}
 
 .block {
   &__header {
@@ -1194,12 +1352,12 @@ input[type="text"]:disabled {
     justify-content: space-between;
     margin-bottom: 30px;
     padding: 25px;
-    border: 2px solid $light-border;
+    border: 1px solid $light-border;
     border-radius: 4px;
   }
 
   &__table-box {
-    border: 2px solid $light-border;
+    border: 1px solid $light-border;
     border-radius: 4px;
     padding: 25px;
     margin-bottom: 30px;
@@ -1236,7 +1394,7 @@ input[type="text"]:disabled {
     flex-grow: 1;
     position: relative;
     padding: 25px 25px 5px 25px;
-    border: 2px solid $light-border;
+    border: 1px solid $light-border;
     border-radius: 4px;
     height: fit-content;
   }
@@ -1396,9 +1554,10 @@ input[type="text"]:disabled {
 
 .order {
   &__buttons {
-    padding-top: 25px;
-    margin-top: 5px;
-    border-top: 1px solid $light-border;
+    padding-top: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
   }
 
   &__details {
@@ -1409,7 +1568,7 @@ input[type="text"]:disabled {
   }
 
   &__subTitle {
-    width: 110px;
+    width: 150px;
   }
 
   &__title {
@@ -1419,13 +1578,14 @@ input[type="text"]:disabled {
 
   &__value {
     font-family: 'Myriad400';
+    min-width: 220px;
   }
 
   &__row {
     display: flex;
     align-items: center;
     width: 100%;
-    height: 40px;
+    min-height: 40px;
   }
 
 }
@@ -1501,7 +1661,21 @@ input {
 #checkBrief {
   position: absolute;
   right: -23px;
-  top: 10px;
+  top: 0px;
+}
+
+#swapBrief {
+  position: absolute;
+  right: -23px;
+  top: 25px;
+  font-size: 16px;
+  color: $dark-border;
+  cursor: pointer;
+  transition: .2s ease-out;
+
+  &:hover {
+    color: $text;
+  }
 }
 
 .iconId {

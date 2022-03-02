@@ -1,5 +1,5 @@
 <template lang="pug">
-  .wrapper(v-if="vendorDetails")
+  .wrapperModal
     .wrapper__sender(v-if="isSender && toEmail" )
       MailSender(
         @close="closeSender"
@@ -7,27 +7,29 @@
         :subject="'Regarding: ' + `${ currentProject.projectId }` + ' - ' + `${ currentProject.projectName }`"
       )
 
-    .wrapper__title Vendor
     .wrapper__close(@click="close") &#215;
-
+    .tabs(style="margin-top: 5px;")
+      Tabs(
+        :tabs="mainTabs"
+        selectedTab="Vendor Details"
+        @setTab="showMainTab"
+      )
     .info
-      .info__link(@click="openFinanceModal") Go to finance
-      .info__link2(@click="openDetailsModal") Go to details
       .info__title {{ currentStep.step.title }}
       .info__value {{ currentStep.stepId }}
       .info__value {{ currentStep.sourceLanguage === currentStep.targetLanguage ? currentStep.fullTargetLanguage.lang : currentStep.fullSourceLanguage.lang + ' to ' + currentStep.fullTargetLanguage.lang }}
 
-    .vendor
+    .vendor(v-if="vendorDetails")
       .vendor__row1
         .vendor__user
           .user
             .user__image(v-if="vendorDetails.photo")
-              .circle1
-              .circle2
+              //.circle1
+              //.circle2
               img(:src="domain + vendorDetails.photo")
             .user__fakeImage(:style="{'--bgColor': getBgColor(vendorId)[0], '--color': getBgColor(vendorId)[1]}" v-else) {{ vendorDetails.name[0] }}
-              .circle1
-              .circle2
+              //.circle1
+              //.circle2
 
             .user__description
               .user__name
@@ -38,9 +40,6 @@
                 span
                   i(class="far fa-envelope")
                 span {{ vendorDetails.email }}
-              .buttons
-                .buttons__btn(@click="openBriefModal" ) Personal Instructions
-                .buttons__btn() Extra payables (Soon)
 
         .vendor__stats
           .stats__row.border-bottom
@@ -57,11 +56,11 @@
           .stats__row
             .stats__col.border-right
               .stats__col-smallValue {{vendorDetails.benchmark }}
-                span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                span.currency(v-html="returnIconCurrencyByStringCode(projectCurrency)")
               .stats__col-smallTitle B.MARK
             .stats__col
               .stats__col-smallValue {{ +(vendorDetails.benchmark - currentStep.vendorRate).toFixed(4) }}
-                span.currency(v-html="returnIconCurrencyByStringCode(currentProject.projectCurrency)")
+                span.currency(v-html="returnIconCurrencyByStringCode(projectCurrency)")
               .stats__col-smallTitle B.MARGIN
 
         .vendor__marks
@@ -78,11 +77,17 @@
             .marks__title LQA3
             .marks__value {{ vendorDetails.lqa3 }}
 
+      .vendor__row2
+        .buttons
+          .buttons__btn(@click="openBriefModal" ) Personal Instructions
+          .buttons__btn(@click="goToVendor") vendor.portal
+          .buttons__btn() Extra payables (Soon)
+
     .notes__modal(v-if="isShowBriefModal")
       .notes__body
         ckeditor(v-model="vendorBrief" :config="editorConfig")
       .notes__buttons
-        Button(value="Save" @clicked="changeVendorBrief")
+        Button(value="Save" :isDisabled="currentStep.status === 'Completed'" @clicked="changeVendorBrief")
         Button(value="Close" :outline="true" @clicked="closeBriefModal")
 </template>
 
@@ -93,6 +98,7 @@ import Button from "../../Button"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import getBgColor from "../../../mixins/getBgColor"
 import MailSender from "../../MailSender"
+import Tabs from "../../Tabs"
 
 export default {
   mixins: [ currencyIconDetected, getBgColor ],
@@ -103,7 +109,8 @@ export default {
     vendorId: { type: String },
     currentStep: { type: Object },
     currentIndustry: { type: Object },
-    projectCurrency: { type: String }
+    projectCurrency: { type: String },
+    currentProject: { type: Object }
   },
   data() {
     return {
@@ -111,7 +118,7 @@ export default {
         up: require("../../../assets/images/latest-version/up.png"),
         down: require("../../../assets/images/latest-version/down.png")
       },
-      domain: "http://localhost:3001",
+      domain: this.$domains.admin,
       isShowBriefModal: false,
       vendorDetails: null,
       vendorBrief: this.currentStep.vendorBrief,
@@ -142,6 +149,13 @@ export default {
     }
   },
   methods: {
+    async goToVendor() {
+      const { data } = await this.$http.post("/service-login/vendor", { vendorId: this.vendorId })
+      const domain = window.location.origin.indexOf('pangea') !== -1 ? '.pangea.global' : 'localhost'
+      const redirectTo = this.$domains.vendor
+      document.cookie = `vendor=${ data }; path=/; domain=${ domain }`
+      window.open(redirectTo, '_blank')
+    },
     openSender(to) {
       this.isSender = true
       this.toEmail = to
@@ -149,6 +163,16 @@ export default {
     closeSender() {
       this.isSender = false
       this.toEmail = null
+    },
+    showMainTab({ index }) {
+      switch (this.mainTabs[index]) {
+        case 'Step Information':
+          this.openDetailsModal()
+          break
+        case 'Finance':
+          this.openFinanceModal()
+          break
+      }
     },
     openDetailsModal() {
       const { closeVendorDetailsModal, showStepDetails } = this.$parent
@@ -175,9 +199,9 @@ export default {
     },
     async changeVendorBrief() {
       try {
-        const result = await this.$http.post('/pm-manage/step-vendor-brief', { projectId: this.$route.params.id, stepId: this.currentStep._id, vendorBrief: this.vendorBrief })
+        const result = await this.$http.post('/pm-manage/step-vendor-brief', { projectId: this.currentProject._id, stepId: this.currentStep._id, vendorBrief: this.vendorBrief })
         this.currentStep.vendorBrief = this.vendorBrief
-        this.setCurrentProject(result.data)
+        // this.setCurrentProject(result.data)
         this.closeBriefModal()
         this.alertToggle({ message: "Personal brief updated", isShow: true, type: 'success' })
       } catch (err) {
@@ -195,15 +219,16 @@ export default {
     }
   },
   mounted() {
-    this.domain = __WEBPACK__API_URL__
+    this.domain = this.$domains.admin
   },
   created() {
     this.getVendorDetails()
   },
   computed: {
-    ...mapGetters({
-      currentProject: "getCurrentProject"
-    }),
+    mainTabs() {
+      if (!Object.keys(this.currentStep).length) return []
+      return [ "Step Information", "Vendor Details", "Finance" ].filter(i => !this.currentStep.vendor ? i !== 'Vendor Details' : true)
+    },
     stepInfo() {
       return {
         source: this.currentStep.fullSourceLanguage._id,
@@ -215,6 +240,7 @@ export default {
     }
   },
   components: {
+    Tabs,
     MailSender,
     ckeditor: CKEditor.component,
     Button
@@ -235,10 +261,9 @@ export default {
 }
 
 .info {
-  border-radius: 4px;
-  padding: 12px 20px;
+  padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid $light-border;
+  border: 1px solid $border;
   position: relative;
 
   &__link {
@@ -270,9 +295,9 @@ export default {
 
 
   &__title {
-    font-size: 20px;
-    color: $red;
+    font-size: 18px;
     margin-bottom: 10px;
+    font-family: 'Myriad600';
   }
 
   &__value {
@@ -282,20 +307,22 @@ export default {
   }
 }
 
-.wrapper {
-  padding: 25px;
-  background: white;
-  border-radius: 4px;
+.wrapperModal {
+  box-sizing: border-box;
+  background-color: white;
   box-shadow: $box-shadow;
-  position: relative;
+  border-radius: 4px;
+  width: 600px;
+  padding: 25px;
+}
 
+.wrapper {
   &__sender {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -40%);
     z-index: 2000;
-    width: 750px;
   }
 
   &__title {
@@ -326,19 +353,24 @@ export default {
 }
 
 .vendor {
-  padding: 10px 15px;
-  border: 1px dotted $light-border;
-  margin-bottom: 10px;
+  padding: 15px;
+  border: 1px solid $light-border;
   border-radius: 4px;
 
   &__row1 {
     display: flex;
   }
 
+  &__row2 {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid $light-border;
+  }
+
   &__stats {
     border: 1px solid $light-border;
     height: fit-content;
-    margin-left: 15px;
+    margin-left: 10px;
   }
 
   &__marks {
@@ -433,10 +465,9 @@ export default {
 }
 
 .buttons {
-  margin-top: 6px;
   display: flex;
   justify-content: start;
-  gap: 12px;
+  gap: 15px;
 
   &__btn {
     transition: .2s ease-out;
@@ -462,11 +493,11 @@ export default {
 .user {
   display: flex;
   gap: 15px;
-  width: 400px;
+  width: 270px;
   align-items: center;
 
   &__description {
-    width: 320px;
+    width: 190px;
   }
 
   &__rating {
@@ -476,7 +507,7 @@ export default {
 
   &__name {
     font-family: Myriad600;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
 
   &__email {
@@ -497,9 +528,9 @@ export default {
   }
 
   &__fakeImage {
-    height: 65px;
-    width: 65px;
-    min-width: 65px;
+    height: 55px;
+    width: 55px;
+    min-width: 55px;
     border-radius: 8px;
     font-size: 28px;
     background: var(--bgColor);
@@ -511,9 +542,9 @@ export default {
   }
 
   &__image {
-    height: 65px;
-    width: 65px;
-    min-width: 65px;
+    height: 55px;
+    width: 55px;
+    min-width: 55px;
     position: relative;
 
     img {

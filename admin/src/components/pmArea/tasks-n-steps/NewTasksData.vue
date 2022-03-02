@@ -1,43 +1,87 @@
 <template lang="pug">
-  .taskData(v-if="allServices.length")
-    .taskData__errorModal
+  .container
+    .container__errorModal
       ValidationErrors(v-if="IsErrorModal" :errors="errors" :isAbsolute="true" @closeErrors="closeErrors")
-
-    .taskData__row-servicesLanguages
-      .service
-        .drop__title Service:
-        .drop
-          SelectSingle(
-            :selectedOption="tasksData.service ? tasksData.service.title : ''"
-            :options="mappedClientServices"
-            placeholder="Option"
-            @chooseOption="setService"
-          )
-
-        .extraServices
-          .extraServices__title Extra Services:
-          Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
-
-        .extraServicesTable(v-if="isAdditions")
-          StepsAdditions(
-            :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
-            @save="setAdditions"
-            @delete="setAdditions"
-          )
-
-      .language
-        TasksLangsDuo
-
-    .taskData__row
-      NewServicesCreationStepsWorkflow(
-        :templates="templates"
+    .tabs
+      Tabs(
+        :tabs="tabs"
+        :selectedTab="selectedTab"
+        @setTab="setTab"
       )
 
-    .taskData__files
-      TasksFiles
+    .option(v-if="selectedTab === 'XTM'")
+      .taskData
+        .taskData__xtm
+          .taskData__xtm-title XTM File:
+          .taskData__xtm-input(v-if="!xtmFile")
+            UploadFileButton
+              input.xtm-file-input(type="file" @change='uploadXTMFile' :multiple='false')
 
-    .taskData__button
-      Button(:value="'Add Tasks & Steps'" @clicked="saveTasksChecks")
+          .taskData__xtm-fileWrapper(v-else)
+            .taskData__xtm-fileName {{ xtmFile }}
+            .taskData__xtm-removeFile( @click="removeXTMFile") &#215;
+
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksXTM")
+
+    .option(v-if="selectedTab === 'Memoq'" )
+      .taskData
+        .taskData__memoqLink
+          .taskData__memoqLink-select
+            .drop__title Workflow:
+            .drop
+              SelectSingle(
+                :selectedOption="selectedMemoqWorkflow"
+                :options="['Translation & Revising', 'Translation Only']"
+                placeholder="Option"
+                @chooseOption="setMemoqWorkflow"
+              )
+          .taskData__memoqLink-input
+            .drop__title Memoq Project Name:
+            .drop__input
+              input(v-model="memoqLink" placeholder="Value")
+
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksMemoq")
+
+    .option(v-if="selectedTab === 'Classic' && allServices.length" )
+      .taskData
+        .taskData__row-servicesLanguages
+          .service
+            .drop__title Service:
+            .drop
+              SelectSingle(
+                :hasSearch="true"
+                :selectedOption="tasksData.service ? tasksData.service.title : ''"
+                :options="mappedClientServices"
+                placeholder="Option"
+                @chooseOption="setService"
+              )
+
+            .extraServices
+              .extraServices__title Extra Services:
+              Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
+
+            .extraServicesTable(v-if="isAdditions")
+              StepsAdditions(
+                :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
+                @save="setAdditions"
+                @delete="setAdditions"
+              )
+
+          .language
+            TasksLangsDuo
+
+        .taskData__row
+          NewServicesCreationStepsWorkflow(
+            :templates="templates"
+          )
+
+        .taskData__files
+          TasksFiles
+
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecks")
 
 </template>
 
@@ -51,6 +95,9 @@ import Toggler from "../../Toggler"
 import StepsAdditions from "./stepsAdditions"
 import Button from "../../Button"
 import ValidationErrors from "../../ValidationErrors"
+import { clearTasksData } from "../../../vuex/pmarea/actions"
+import Tabs from "../../Tabs"
+import UploadFileButton from "../../UploadFileButton"
 
 export default {
   name: "NewTasksData",
@@ -64,20 +111,110 @@ export default {
   },
   data() {
     return {
+      tabs: [ 'Classic', 'Memoq', 'XTM' ],
+      selectedTab: 'Classic',
+
+      memoqLink: '',
+      selectedMemoqWorkflow: '',
+
+      xtmFile: '',
+      xtmFileData: null,
+
       allServices: [],
       templates: [],
       isAdditions: false,
       IsErrorModal: false,
-      errors: []
+      errors: [],
+      isDisabledSaveButton: false
     }
   },
+  beforeDestroy() {
+    console.log('beforeDestroy')
+    this.setDataValue({})
+  },
   methods: {
+    removeXTMFile() {
+      let inputFiles = document.querySelectorAll('.xtm-file-input')
+      for (let elem of inputFiles) elem.value = ''
+      this.xtmFile = ''
+      this.xtmFileData = null
+    },
+    uploadXTMFile(e) {
+      const file = Array.from(e.target.files)[0]
+      this.xtmFile = file.name
+      this.xtmFileData = file
+    },
+    setTab({ index }) {
+      this.selectedTab = this.tabs[index]
+    },
+    setMemoqWorkflow({ option }) {
+      this.selectedMemoqWorkflow = option
+    },
+    async saveTasksChecksXTM() {
+      this.errors = []
+      if (!this.xtmFile) this.errors.push('Please upload a XTM file.')
+      if (this.errors.length) {
+        this.IsErrorModal = true
+        return
+      }
+      this.isDisabledSaveButton = true
+      const { _id: projectId, projectId: internalProjectId, startDate, deadline } = this.currentProject
+      const formData = new FormData()
+      formData.append('file', this.xtmFileData)
+      formData.append('projectId', projectId)
+      formData.append('internalProjectId', internalProjectId)
+      formData.append('startDate', startDate)
+      formData.append('deadline', deadline)
+
+      const res = await this.$http.post(`/pm-manage/build-TnS-from-xtm-file`, formData)
+      const { data } = res
+      if (data.status === 'success') {
+        const { data: project } = data
+        await this.setCurrentProject(project)
+        this.$parent.toggleTaskData()
+        this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
+      } else {
+        this.alertToggle({ message: data.message, isShow: true, type: "error" })
+      }
+      this.isDisabledSaveButton = false
+    },
+    async saveTasksChecksMemoq() {
+      this.errors = []
+      if (!this.memoqLink) this.errors.push('Please enter a Memoq project name.')
+      if (!this.selectedMemoqWorkflow) this.errors.push('Please enter a Memoq project name.')
+      if (this.errors.length) {
+        this.IsErrorModal = true
+        return
+      }
+      this.isDisabledSaveButton = true
+      const creatorUserId = await this.getCreatorUserId()
+      const { _id: projectId, projectId: internalProjectId, startDate, deadline } = this.currentProject
+      const res = await this.$http.post(`/pm-manage/build-TnS-from-memoq-link`, {
+        projectId,
+        memoqLink: this.memoqLink,
+        memoqWorkFlow: this.selectedMemoqWorkflow,
+        creatorUserId,
+        internalProjectId,
+        startDate,
+        deadline
+      })
+      const { data } = res
+      if (data.status === 'success') {
+        const { data: project } = data
+        await this.setCurrentProject(project)
+        this.$parent.toggleTaskData()
+        this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
+      } else {
+        this.alertToggle({ message: data.message, isShow: true, type: "error" })
+      }
+      this.isDisabledSaveButton = false
+    },
     saveTasksChecks() {
       this.errors = []
 
       const { service } = this.tasksData
-      if(service.title === 'Translation'){
-        if(!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation'){
+      if (service.title === 'Translation') {
+        if (!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation') {
           this.errors.push("Translation job should be the first step.")
         }
       }
@@ -119,21 +256,36 @@ export default {
       }
       this.saveTasks()
     },
+    async getCreatorUserId() {
+      try {
+        const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
+        const { creatorUserId } = memoqCreatorUser.data
+        if (!creatorUserId) throw new Error()
+        return creatorUserId
+      } catch (err) {
+        this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
+      }
+    },
     async saveTasks() {
+      this.isDisabledSaveButton = true
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (this.tasksData.template && this.tasksData.service.title === 'Translation' &&  this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
+        if (this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
+          const creatorUserId = await this.getCreatorUserId()
+          data.append('creatorUserId', creatorUserId)
           try {
-            const memoqCreatorUser = await this.$http.get(`/memoqapi/user?userId=${ this.currentProject.projectManager._id }`)
-            const { creatorUserId } = memoqCreatorUser.data
-            if (!creatorUserId) throw new Error()
-            data.append('creatorUserId', creatorUserId)
+            await this.addProjectWordsTasks(data)
           } catch (err) {
-            this.alertToggle({ message: 'PM in now exist in Memoq', isShow: true, type: "error" })
+            this.isDisabledSaveButton = false
+            this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
           }
-          await this.addProjectWordsTasks(data)
         } else {
-          await this.addProjectTasks(data)
+          try {
+            await this.addProjectTasks(data)
+          } catch (err) {
+            this.isDisabledSaveButton = false
+            this.alertToggle({ message: 'Error while creating T&S', isShow: true, type: "error" })
+          }
         }
         this.$parent.toggleTaskData()
         this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
@@ -180,9 +332,6 @@ export default {
       this.isAdditions = !this.isAdditions
     },
     async buildAutoData() {
-      console.log('this.allServices', this.allServices)
-      console.log('this.currentProject', this.currentProject)
-
       const service = this.activeClientServices()[0]
       this.setDataValue({ prop: "service", value: service })
 
@@ -197,7 +346,7 @@ export default {
     setStepsAndUnitByService(service) {
       const stepsAndUnits = []
       for (let { step } of service.steps) {
-        if(service.title !== 'Translation') step.calculationUnit = step.calculationUnit.filter(({type}) => type !== 'CAT Wordcount')
+        if (service.title !== 'Translation') step.calculationUnit = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
         stepsAndUnits.push({
           step,
           start: '',
@@ -215,10 +364,17 @@ export default {
       this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
     },
     getServiceSourceLanguages(service) {
-      const { customer: { services }, industry } = this.currentProject
+      const { customer: { services, clientType }, industry } = this.currentProject
+      if (clientType === 'Individual') {
+        const englishLanguageIndex = this.allLanguages.findIndex(item => item.lang === "English (United Kingdom)")
+        const firstElem = this.allLanguages.splice(englishLanguageIndex, 1)
+        this.allLanguages.unshift(firstElem[0])
+        return this.allLanguages
+      }
       const neededServices = services
           .filter(item => item.services[0] === service._id.toString() && item.industries[0] === industry._id)
           .map(item => item.sourceLanguage)
+
       return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
     },
     async setService({ option }) {
@@ -235,7 +391,10 @@ export default {
     },
     activeClientServices() {
       let finalServicesArr = []
-      const { industry, customer: { services, rates: { stepMultipliersTable } } } = this.currentProject
+      const { industry, customer: { services, clientType, rates: { stepMultipliersTable } } } = this.currentProject
+
+      if (clientType === 'Individual') return this.allServices
+
       const arrayOfClientServices = [ ...new Set(services.filter(({ industries }) => industries[0] === industry._id).map(({ services }) => services).flat()) ]
       const clientServices = this.allServices.filter((a) => arrayOfClientServices.some((b) => a._id.toString() === b))
 
@@ -279,7 +438,8 @@ export default {
       setDataValue: "setTasksDataValue",
       addProjectTasks: "addProjectTasks",
       addProjectWordsTasks: "addProjectWordsTasks",
-      setCurrentProject: "setCurrentProject"
+      setCurrentProject: "setCurrentProject",
+      clearTasksData: "clearTasksData"
     })
   },
   computed: {
@@ -304,7 +464,10 @@ export default {
     await this.getAllServices()
     await this.buildAutoData()
   },
-  components: { ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
+  destroyed() {
+    this.clearTasksData()
+  },
+  components: { UploadFileButton, Tabs, ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
 }
 
 </script>
@@ -312,15 +475,65 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
 
+.container {
+  position: relative;
+}
+
 .taskData {
   position: relative;
-  border: 2px solid $light-border;
-  border-radius: 4px;
+  border: 1px solid $light-border;
   padding: 25px;
   margin-bottom: 30px;
 
+  &__xtm {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+
+    &-fileWrapper {
+      height: 30px;
+      padding: 0 7px;
+      display: flex;
+      border: 1px solid $border;
+      align-items: center;
+      gap: 5px;
+      border-radius: 4px;
+    }
+
+    &-fileName {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 260px;
+      opacity: 0.5;
+    }
+
+    &-removeFile {
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
+
+  &__memoqLink {
+    display: flex;
+    gap: 25px;
+  }
+
   &__button {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     justify-content: center;
   }
@@ -351,6 +564,26 @@ export default {
   width: 220px;
   position: relative;
   height: 32px;
+
+  &__input {
+    input {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      height: 32px;
+      width: 690px;
+      font-family: 'Myriad400';
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
+    }
+  }
 
   &__title {
     margin-bottom: 3px;

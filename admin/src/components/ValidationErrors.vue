@@ -75,14 +75,14 @@
         position: absolute;
         top: 5px;
         right: 7px;
-        font-size: 22px;
+        font-size: 24px;
         cursor: pointer;
-        height: 22px;
-        width: 22px;
+        height: 24px;
+        width: 24px;
         justify-content: center;
         display: flex;
         align-items: center;
-        font-family: Myriad900;
+        font-family: Myriad600;
         opacity: 0.8;
         transition: ease 0.2s;
 
@@ -131,14 +131,14 @@
         position: absolute;
         top: 5px;
         right: 7px;
-        font-size: 22px;
+        font-size: 24px;
         cursor: pointer;
-        height: 22px;
-        width: 22px;
+        height: 24px;
+        width: 24px;
         justify-content: center;
         display: flex;
         align-items: center;
-        font-family: Myriad900;
+        font-family: Myriad600;
         opacity: 0.8;
         transition: ease 0.2s;
 

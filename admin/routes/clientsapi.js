@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const { upload } = require('../utils')
-let apiUrl = require('../helpers/apiurl')
-!apiUrl && (apiUrl = 'https://admin.pangea.global')
+let apiUrl = process.env.ADMIN_URL
 const fse = require('fs-extra')
 
 const {
@@ -24,12 +23,17 @@ const {
 	updateClientMatrix,
 	syncClientMatrix,
 	updateTaskDataByCondition,
-	updateClientRatesFromSettings
+	updateClientRatesFromSettings,
+	getClientServices
 } = require('../clients')
 
 const { getRatePricelist, changeMainRatePricelist, bindClientRates } = require('../pricelist')
 const { Clients, Pricelist, ClientRequest, Projects, ClientsTasks, ClientsNotes } = require('../models')
 const { getProject } = require('../projects')
+const { createClientServicesGroup, getClientServicesGroups, deleteClientServiceGroups, editClientServicesGroup } = require("../clients/clientService")
+const { createClient, getContactsIdsWithCreate } = require("../clients/createClient")
+const { updateClientContact, addClientContact, deleteClientContact } = require("../clients/clientContacts")
+const { addContactToBilling, removeContactToBilling } = require("../clients/clientBilling")
 
 router.get('/client', async (req, res) => {
 	let { id } = req.query
@@ -125,15 +129,14 @@ router.get("/unique-email", async (req, res) => {
 router.post('/update-client', upload.any(), async (req, res) => {
 	let client = JSON.parse(req.body.client)
 	let clientId = client._id
+	let result
 	try {
 		if (!client._id) {
-			const { discountChart } = await Pricelist.findOne({ _id: client.defaultPricelist })
-			client.matrix = discountChart
-			let result = await Clients.create(client)
-			clientId = result.id
+			result = await createClient({ client })
+		} else {
+			result = await updateClientInfo({ clientId, client, files: req.files })
 		}
-		const result = await updateClientInfo({ clientId, client, files: req.files })
-		res.send({ client: result })
+		res.send({ client: await getClientWithActions({ _id: result._id }) })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on updating/creating Client')
@@ -196,10 +199,55 @@ router.delete('/deleteclient/:id', async (req, res) => {
 	}
 })
 
-router.post('/deleteContact', async (req, res) => {
-	const { id, contacts } = req.body
+router.post('/addContact', upload.any(), async (req, res) => {
+	const { id, contact } = req.body
 	try {
-		const result = await getClientAfterUpdate({ "_id": id }, { contacts: contacts })
+		const result = await addClientContact(id, JSON.parse(contact), req.files)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/updateContact', upload.any(), async (req, res) => {
+	const { id, contact } = req.body
+	try {
+		const result = await updateClientContact(id, JSON.parse(contact), req.files)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/add-contact-to-bill', async (req, res) => {
+	const { clientId, billingId, contactsIds } = req.body
+	try {
+		console.log(clientId, billingId, contactsIds)
+		const result = await addContactToBilling(clientId, billingId, contactsIds)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/remove-contact-to-bill', async (req, res) => {
+	const { clientId, billingId, contactId } = req.body
+	try {
+		const result = await removeContactToBilling(clientId, billingId, contactId)
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on deleting contact of Client")
+	}
+})
+
+router.post('/deleteContact', async (req, res) => {
+	const { id, contactId } = req.body
+	try {
+		const result = await deleteClientContact(id, contactId)
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -245,8 +293,8 @@ router.post('/update-client-status', async (req, res) => {
 router.post('/update-client-leadContact', async (req, res) => {
 	const { id, contactId } = req.body
 	try {
-		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$[].leadContact': false })
-		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, {'contacts.$.leadContact': true  })
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, { 'contacts.$[].leadContact': false })
+		await Clients.updateOne({ "_id": id, 'contacts._id': contactId }, { 'contacts.$.leadContact': true })
 		const client = await Clients.findOne({ "_id": id }, { contacts: 1 })
 		res.send(client.contacts)
 	} catch (err) {
@@ -367,6 +415,69 @@ router.post('/updated-retest-from-settings', async (req, res) => {
 	}
 })
 
+
+router.get('/client-services/:id', async (req, res) => {
+	const { id } = req.params
+	try {
+		const services = await getClientServices(id)
+		res.send(services)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+router.get('/client-group/:clientId', async (req, res) => {
+	const { clientId } = req.params
+	try {
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		console.log(servicesGroups)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.delete('/client-group/:clientId/:id', async (req, res) => {
+	const { id, clientId } = req.params
+	try {
+		await deleteClientServiceGroups(clientId, id)
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		console.log(servicesGroups)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/client-group/:clientId', async (req, res) => {
+	const { clientId } = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await createClientServicesGroup({ clientId, groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
+
+router.post('/client-group/:clientId/:id', async (req, res) => {
+	const { clientId, id } = req.params
+	const { groupName, industry, service, source, target } = req.body
+
+	try {
+		await editClientServicesGroup(clientId, id, { groupName, industry, service, source, target })
+		const { servicesGroups = [] } = await getClientServicesGroups(clientId)
+		res.send(servicesGroups)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on saving Client services')
+	}
+})
 
 router.post('/services', async (req, res) => {
 	const { clientId, currentData, oldData } = req.body
@@ -637,29 +748,29 @@ router.delete('/activity/note/:id', async (req, res) => {
 // End Notes
 // End Activities
 
-router.post('/get-billing-info/:_id', async (req, res) => {
-	try {
-		const { _id } = req.params
-		const billingInfo = await Clients.findOne({ _id }, {billingInfo: 1})
-		res.send(billingInfo.billingInfo)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on get /deleting | payment-terms')
-	}
-})
+// router.post('/get-billing-info/:_id', async (req, res) => {
+// 	try {
+// 		const { _id } = req.params
+// 		const billingInfo = await getClientAfterUpdate() Clients.findOne({ _id }, { billingInfo: 1 })
+// 		res.send(billingInfo.billingInfo)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on get /deleting | payment-terms')
+// 	}
+// })
 
 
 router.post('/update-billing-info/:_id', async (req, res) => {
 	try {
 		const { _id } = req.params
-		const { billingInfo } = req.body
-		let updated
-		if(!billingInfo.hasOwnProperty("_id")) {
-			updated = await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo }})
-		} else  {
-			updated = await Clients.updateOne({_id}, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
+		let { billingInfo } = req.body
+
+		if (!billingInfo._id) {
+			await Clients.updateOne({ _id }, { $push: { billingInfo: billingInfo } })
+		} else {
+			await Clients.updateOne({ _id }, { $set: { "billingInfo.$[i]": { ...billingInfo } } }, { arrayFilters: [ { 'i._id': billingInfo._id } ] })
 		}
-		res.send(updated)
+		res.send(await getClientWithActions({ _id: _id }))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on get /deleting | payment-terms')
@@ -670,7 +781,7 @@ router.post('/delete-billing-info/:_id', async (req, res) => {
 	try {
 		const { _id } = req.params
 		const { billingInfoId } = req.body
-		const updated = await Clients.updateOne({ _id }, { $pull: { "billingInfo": {_id: billingInfoId } } })
+		const updated = await Clients.updateOne({ _id }, { $pull: { "billingInfo": { _id: billingInfoId } } })
 		res.send(updated)
 	} catch (err) {
 		console.log(err)

@@ -213,11 +213,11 @@
 				}
 				this.setDefaults()
 			},
-			checkToken() {
-				if (!localStorage.getItem("token")) {
-					this.$router.push("/login")
-				}
-			},
+			// checkToken() {
+			// 	if (!localStorage.getItem("token")) {
+			// 		this.$router.push("/login")
+			// 	}
+			// },
 			cancelEdition(index) {
 				if (!this.users[index]._id) {
 					this.users.splice(index, 1)

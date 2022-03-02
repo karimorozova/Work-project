@@ -18,6 +18,7 @@
       .project-action__drop-menuSend
         .project-action__dropBody
           SelectSingle(
+            :isDisabled="!isAm && !isPm && !isAdmin"
             :selectedOption="selectedAction"
             :options="filteredActions"
             placeholder="Select Action"
@@ -86,6 +87,7 @@
           .drops__label Account Manager:
           .drops__menu(v-if="!isProjectFinished")
             SelectSingle(
+              :isDisabled="!isAm && !isPm && !isAdmin"
               :options="accManagers"
               :selectedOption="selectedAccManager"
               @chooseOption="(e) => setManager(e, 'accountManager')"
@@ -95,6 +97,7 @@
           .drops__label Project Manager:
           .drops__menu(v-if="!isProjectFinished")
             SelectSingle(
+              :isDisabled="!isAm && !isPm && !isAdmin"
               :options="projManagers"
               :selectedOption="selectedProjManager"
               @chooseOption="(e) => setManager(e, 'projectManager')"
@@ -205,24 +208,9 @@ export default {
     openPreviewCostQuote() {
       this.isEditAndSendCostQuote = true
     },
-    getCancelStatus() {
-      if (
-          this.project.status === 'Draft' ||
-          this.project.status === "Quote sent" ||
-          this.project.status === "Approved" ||
-          this.project.status === "Rejected" ||
-          this.project.status === "Cost Quote" ||
-          this.project.status === "Requested"
-      ) {
-        return "Cancelled"
-      } else {
-        return "Cancelled Halfway"
-      }
-    },
     async getCancelMessage() {
-      let cancelStatus = this.getCancelStatus()
       try {
-        const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus, reason: this.selectedReason, isPay: this.isPay })
+        const template = await this.$http.post("/pm-manage/making-cancel-message", { ...this.project, cancelStatus: 'Cancelled', reason: this.selectedReason, isPay: this.isPay })
         this.previewMessage = template.data.message
         this.openPreviewCancel()
       } catch (err) {
@@ -270,9 +258,8 @@ export default {
       }
     },
     async sendMessageCancel(message) {
-      let cancelStatus = this.getCancelStatus()
       try {
-        await this.setProjectStatus({ id: this.$route.params.id, status: cancelStatus, reason: this.selectedReason || "" })
+        await this.setProjectStatus({ id: this.$route.params.id, status: "Cancelled", reason: this.selectedReason || "" })
         await this.sendCancelProjectMessage({ id: this.project._id, message, isNotify: true })
         this.alertToggle({ message: "Sent successfully", isShow: true, type: "success" })
       } catch (err) {
@@ -283,9 +270,8 @@ export default {
       }
     },
     async cancelProjectWithoutNotification() {
-      let cancelStatus = this.getCancelStatus()
       try {
-        await this.setProjectStatus({ id: this.$route.params.id, status: cancelStatus, reason: this.selectedReason || "" })
+        await this.setProjectStatus({ id: this.$route.params.id, status: "Cancelled", reason: this.selectedReason || "" })
         await this.sendCancelProjectMessage({ id: this.project._id, message: null, isNotify: false })
         this.alertToggle({ message: "Sent successfully", isShow: true, type: "success" })
       } catch (err) {
@@ -322,6 +308,10 @@ export default {
             await this.projectDetails(message)
             break
           case "Close Project":
+            if (!this.project.clientBillingInfo) {
+              alert('Set BI!')
+              return
+            }
             const updatedProject = await this.$http.post('/pm-manage/close-project', { projectId: this.project._id })
             await this.storeProject(updatedProject.data)
             break
@@ -442,6 +432,18 @@ export default {
       currentClient: 'getCurrentClient',
       user: 'getUser'
     }),
+    isPm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.projectManager._id === this.user._id
+    },
+    isAm() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.project.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && this.project.projectManager._id === "60b4dee7f2611f5115701566")
+    },
+    isAdmin() {
+      if (!this.user.hasOwnProperty('group')) return false
+      return this.user.group.name === 'Administrators' || this.user.group.name === 'Developers'
+    },
     isProjectFinished() {
       const { status } = this.project
       return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
@@ -499,7 +501,7 @@ export default {
         // const { tasks, tasksDR2 } = this.project
         // const isAllTasksCompleted = tasks.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway').every(({ status }) => status === 'Completed')
         // if (isAllTasksCompleted && this.isAllDeliveredTasks(tasksDR2)) result = [ "Close Project" ]
-         result = [ "Send Project Details", "Cancel", 'Close Project' ]
+        result = [ "Send Project Details", "Cancel", 'Close Project' ]
       }
 
       if (this.project.status === 'Closed') {
@@ -512,7 +514,7 @@ export default {
       }
 
       if (this.project.status === 'Cancelled' || this.project.status === 'Cancelled Halfway') {
-        result = [ 'ReOpen' ]
+        result = []
       }
 
       if (!result.includes('Delete') && this.project.status !== 'Closed') result.push('Delete')
@@ -539,6 +541,10 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
+
+.project-actions {
+  position: relative;
+}
 
 .project-action {
   padding: 25px;
@@ -673,7 +679,9 @@ export default {
 
 .approve-action {
   position: absolute;
-  margin-top: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .project-details {

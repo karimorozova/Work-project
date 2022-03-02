@@ -1,4 +1,4 @@
-const { invoicingReceivablesArchive } = require("../models")
+const { invoicingReceivablesArchive, InvoicingReceivables } = require("../models")
 const { ObjectID: ObjectId } = require("mongodb")
 const { getReceivableTotal } = require("./getReceivables")
 
@@ -47,6 +47,61 @@ const getPaidReceivables = async (id) => {
 	report[0].sumPaymentAdditions = sumPaymentAdditions
 
 	return report
+}
+const getAllPaidReceivablesFromDbWithProject = async (countToSkip, countToGet, query, projectFields,  unsetFields = []) => {
+	const queryResult = await invoicingReceivablesArchive.aggregate([
+		{ $match: { ...query } },
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'steps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ $unwind: "$steps" },
+					{ $match: { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ $addFields: { "steps.type": 'Classic' } },
+					...generateExtraFieldForSteps('steps'),
+					{ $replaceRoot: { newRoot: '$steps' } }
+				],
+				as: "stepsClassic"
+			}
+		},
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'additionsSteps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ $unwind: "$additionsSteps" },
+					{ $match: { "$expr": { "$in": [ "$additionsSteps._id", "$$additionsSteps" ] } } },
+					{ $addFields: { "additionsSteps.type": 'Extra' } },
+					...generateExtraFieldForSteps('additionsSteps'),
+					{ $replaceRoot: { newRoot: '$additionsSteps' } }
+				],
+				as: "stepsExtra"
+			}
+		},
+		{ $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
+		{ $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
+		{ $unset: [ 'stepsClassic', 'stepsExtra', ...unsetFields] },
+		...(!!projectFields ? [{$project:  projectFields}] : []),
+		{ $sort: { reportId: -1 } },
+		{ $skip: countToSkip },
+		{ $limit: countToGet }
+	])
+
+	return await invoicingReceivablesArchive.populate(queryResult, [
+				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] }
+			]
+	)
+
+	function generateExtraFieldForSteps(key) {
+		return [
+			{ "$addFields": { [`${ key }` + ".projectNativeId"]: '$_id' } },
+			{ "$addFields": { [`${ key }` + ".projectName"]: '$projectName' } },
+			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
+			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
+			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } }
+		]
+	}
 }
 
 
@@ -110,4 +165,4 @@ const getPaidReceivablesFromDb = async (id) => {
 	return (await invoicingReceivablesArchive.populate(invoicingReceivables, { path: 'client'} ))
 }
 
-module.exports = {getAllPaidReceivables, getPaidReceivables}
+module.exports = {getAllPaidReceivables, getPaidReceivables , getAllPaidReceivablesFromDbWithProject}

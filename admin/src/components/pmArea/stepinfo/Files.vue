@@ -29,12 +29,17 @@
             .table__data
               a.table__icon(:target="'_blank'" :href='row.path')
                 img.files__image(src="../../../assets/images/latest-version/download-file.png")
+
+    .files__buttons
+      .button(v-if="isAvailableReimportFile")
+        Button(value="Reimport Targets" :outline="true" @clicked="reImportFinalFilesFromMemoq")
+
 </template>
 
 <script>
-import StepInfoTitle from "./finance/StepInfoTitle"
 import { mapGetters, mapActions } from 'vuex'
 import GeneralTable from "../../GeneralTable"
+import Button from "../../Button"
 
 export default {
   props: {
@@ -59,6 +64,9 @@ export default {
       storeProject: "setCurrentProject",
       alertToggle: "alertToggle"
     }),
+    reImportFinalFilesFromMemoq() {
+      this.$emit('reImportFinalFilesFromMemoq', [ this.task._id ])
+    },
     close() {
       this.$emit('close')
     }
@@ -67,6 +75,10 @@ export default {
     ...mapGetters({
       currentProject: "getCurrentProject"
     }),
+    isAvailableReimportFile() {
+      const { memoqFiles, status } = this.task
+      return status === 'Pending Approval [DR1]' && memoqFiles.length
+    },
     fileList() {
       const files = []
       if (Object.keys(this.task).length && this.currentProject) {
@@ -91,13 +103,18 @@ export default {
             }
           })
         }
+        if (this.task.targetFilesFinalStage && this.task.targetFilesFinalStage.length) {
+          this.task.targetFilesFinalStage.forEach(elem => {
+            files.push({ fileName: `${ elem.fileName }`, path: `${ elem.path }`, stage: `Final`, category: 'Target' })
+          })
+        }
       }
       return files
     }
   },
   components: {
-    GeneralTable,
-    StepInfoTitle
+    Button,
+    GeneralTable
   }
 }
 </script>
@@ -110,12 +127,15 @@ export default {
   color: $dark-border;
 }
 
+.button {
+  margin-top: 15px;
+}
+
 .files {
   width: 800px;
 
   &__descriptions {
-    padding: 15px 10px 13px 10px;
-    background: $table-list;
+    margin-bottom: 15px;
     display: flex;
     justify-content: center;
   }

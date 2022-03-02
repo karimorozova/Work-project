@@ -1,8 +1,13 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 const InvoicingPayablesSchema = new mongoose.Schema({
 	reportId: {
+		type: String,
+		default: '',
+		trim: true
+	},
+	zohoBillingId: {
 		type: String,
 		default: '',
 		trim: true
@@ -13,13 +18,13 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 	},
 	status: {
 		type: String,
-		default: '',
-		trim: true
+		enum: [ 'Created', 'Sent', 'Approved', 'Invoice on-hold', 'Invoice Ready', 'Partially Paid', 'Paid' ],
+		default: 'Created'
 	},
-	steps: [{
+	steps: [ {
 		type: Schema.Types.ObjectId,
 		ref: 'Projects.steps'
-	}],
+	} ],
 	firstPaymentDate: {
 		type: Date,
 		default: new Date()
@@ -30,8 +35,9 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 	},
 	paymentDetails: {
 		paymentMethod: {
-			type: String,
-			default: ''
+			type: Schema.Types.ObjectId,
+			ref: 'Vendors.billingInfo.paymentMethods',
+			default: null
 		},
 		file: {
 			type: Object,
@@ -39,17 +45,21 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		},
 		expectedPaymentDate: {
 			type: Date
-		},
+		}
 	},
-	paymentInformation: [{
+	paymentInformation: [ {
+		zohoPaymentId: {
+			type: String
+		},
 		paidAmount: {
-			type: Number,
+			type: Number
 		},
 		unpaidAmount: {
 			type: Number
 		},
 		paymentMethod: {
-			type: String,
+			type: Object,
+			default: null
 		},
 		paymentDate: {
 			type: Date,
@@ -59,7 +69,7 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 			type: String,
 			default: ""
 		}
-	}],
+	} ],
 	createdBy: {
 		type: Schema.Types.ObjectId, ref: 'user'
 	},
@@ -74,8 +84,8 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	}
-});
+})
 
-const InvoicingPayables = mongoose.model('InvoicingPayables', InvoicingPayablesSchema);
+const InvoicingPayables = mongoose.model('InvoicingPayables', InvoicingPayablesSchema)
 
-module.exports = InvoicingPayables;
+module.exports = InvoicingPayables

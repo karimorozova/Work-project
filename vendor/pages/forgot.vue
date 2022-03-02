@@ -16,7 +16,7 @@
 </template>
 
 <script>
-	import ValidationErrors from "@/components/ValidationErrors";
+	import ValidationErrors from "../components/general/ValidationErrors";
 	import { mapActions } from "vuex";
 
 	export default {

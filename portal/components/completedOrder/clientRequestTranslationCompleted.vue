@@ -94,10 +94,8 @@
 		},
 		methods: {
 			...mapActions({
-				getProjectsAndRequests: "getProjectsAndRequests"
 			}),
 			goToMainPage() {
-				this.getProjectsAndRequests()
 				this.$router.push('/')
 			}
 		}
@@ -157,7 +155,7 @@
     }
 
     &__btn {
-      width: 100px;
+      width: 120px;
     }
 
     &__close {
@@ -193,7 +191,7 @@
       align-items: center;
       position: relative;
       margin-bottom: 7px;
-      color: #d15f45;
+      color: #d66f58;
       display: flex;
     }
 
@@ -218,7 +216,7 @@
 
     &__projectName {
       font-size: 16px;
-      color: #d15f45;
+      color: #d66f58;
       margin-top: 10px;
       font-family: 'Myriad600';
     }
@@ -357,7 +355,7 @@
       border-radius: 4px;
       box-shadow: $box-shadow;
       padding: 0 20px 20px 20px;
-      width: 800px;
+      width: 790px;
       background-color: white;
       position: relative;
     }

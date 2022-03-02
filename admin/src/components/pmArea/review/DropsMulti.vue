@@ -89,8 +89,7 @@
   .dropsManagers {
     margin-bottom: 20px;
     background: $table-list;
-    padding: 25px;
-    border-radius: 4px;
+    padding: 15px;
 
     &__body {
       display: flex;

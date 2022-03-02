@@ -118,6 +118,7 @@
         :isFilterShow="true"
         :activeField="currentActive"
         :isCoverBody="currentActive >= 0 || isDeleting || areErrors"
+        :isFilterAbsolute="true"
 
         @addSortKey="addSortKeyIfCan"
         @changeSortKey="changeSortKeyIfCan"

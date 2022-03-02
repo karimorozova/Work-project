@@ -265,7 +265,7 @@
 				isDeleting: false,
 				deleteIndex: -1,
 				isTableDropMenu: true,
-				domain: "http://localhost:3001",
+				domain: this.$domains.admin,
 				isPopup: false
 			}
 		},
@@ -545,7 +545,7 @@
 			}
 		},
 		mounted() {
-			this.domain = __WEBPACK__API_URL__
+			this.domain = this.$domains.admin
 		},
 		created() {
 			this.getTests()
@@ -566,14 +566,15 @@
 </script>
 <style lang="scss" scoped>
   @import "../../../assets/styles/settingsTable.scss";
+  @import "../../../assets/scss/colors";
 
   a {
-    color: #d15f45;
+    color: #d66f58;
   }
 
   .vendorTests {
     width: 1200px;
-    box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;
+    box-shadow: $box-shadow;
     position: relative !important;
     margin: 50px;
     box-sizing: border-box;

@@ -3,6 +3,7 @@ const axios = require("axios")
 
 
 const { readFileSync, createReadStream } = require('fs')
+const { getProject } = require("./index")
 
 
 const apiDomain = "https://pangea.s.xtrf.eu/home-api/"
@@ -20,17 +21,17 @@ const STEP_IDS = {
 	Compliance: {
 		services: 79,
 		calculationUnitId: 11,
-		jobTypeId: 67,
-	},
+		jobTypeId: 67
+	}
 }
 
 const createSendAllTasksToXtrf = async (projectId) => {
-	let { xtrfLinks, tasks } = await Projects.findOne({_id: projectId})
+	let { xtrfLinks, tasks } = await Projects.findOne({ _id: projectId })
 	const taskIds = tasks.map(item => item.taskId)
 	const notSentTasks = taskIds.filter(item => !xtrfLinks.map(item => item.taskId).includes(item))
 	for await (let taskId of notSentTasks) {
 		const sentTaskInfo = await createXtrf(projectId, taskId)
-		xtrfLinks.push( sentTaskInfo)
+		xtrfLinks.push(sentTaskInfo)
 	}
 
 	const isAllSend = taskIds.length === xtrfLinks.length
@@ -61,11 +62,12 @@ const createXtrf = async (projId, taskId) => {
 		steps,
 		tasks,
 		accountManager,
-		isTest,
-	} = await Projects.findOne({ _id: projId }).populate('steps.vendor').populate('customer').populate("accountManager")
+		isTest
+	} = await getProject({ _id: projId })
 
-	const currentServices = {name: 'Compliance', id: 79}
-	const currentStep = steps.find(item=> item.taskId === taskId  )
+
+	const currentServices = { name: 'Compliance', id: 79 }
+	const currentStep = steps.find(item => item.taskId === taskId)
 	const vendorId = currentStep.vendor ? vendors[currentStep.vendor.firstName + " " + currentStep.vendor.surname] : ''
 
 	const stepsSource = findLanguageId(allLanguages, "symbol", currentStep.sourceLanguage) ? findLanguageId(allLanguages, "symbol", currentStep.sourceLanguage).id : ''
@@ -76,7 +78,7 @@ const createXtrf = async (projId, taskId) => {
 			receivables: currentStep.finance.Price.receivables,
 			subInfo: {
 				payables: currentStep.nativeFinance.Price.payables,
-				vendor: vendorId ? vendorPriceProfileId[vendorId] : false,
+				vendor: vendorId ? vendorPriceProfileId[vendorId] : false
 			}
 		}
 	}
@@ -85,22 +87,22 @@ const createXtrf = async (projId, taskId) => {
 	let customers = findInXtrf(allCustomer, "name", customer.name)
 
 	if (!customers) {
-		customers = {id: 995}
+		customers = { id: 995 }
 	}
 
-	const xtrfProjectInfo = await sendRequest('Post', 'v2/projects', {
-		name: `${ projectId }: ${ projectName }`,
+	const xtrfProjectInfo = await sendRequest('post', 'v2/projects/', {
+		name: `Png ${ projectId }: ${ projectName }`,
 		clientId: customers.id,
 		serviceId: currentServices.id
 	})
 
 	// IS test true
-	await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: isTest })
+	await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Test Project`, { value: isTest })
 
 	// Set AM
 	try {
 		if (accountManager.firstName && accountManager.lastName) {
-			await sendRequest('Put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
+			await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/customFields/Account Manager1`, { value: accountManager.firstName + ' ' + accountManager.lastName })
 		}
 	} catch (e) {
 	}
@@ -110,12 +112,16 @@ const createXtrf = async (projId, taskId) => {
 	})
 
 	await sendRequest('put', `v2/projects/${ xtrfProjectInfo.data.projectId }/targetLanguages`, {
-		targetLanguageIds: [stepsTarget]
+		targetLanguageIds: [ stepsTarget ]
 	})
 
 	await setProjectFinance(xtrfProjectInfo.data.projectId, stepsInfo, currentServices.name)
 
-	return  {taskId, xtrfId: xtrfProjectInfo.data.projectId, link:`https://pangea.s.xtrf.eu/xtrf/faces/projectAssistant/projects/project.seam?assistedProjectId=${ xtrfProjectInfo.data.projectId }#/project` }
+	return {
+		taskId,
+		xtrfId: xtrfProjectInfo.data.projectId,
+		link: `https://pangea.s.xtrf.eu/xtrf/faces/projectAssistant/projects/project.seam?assistedProjectId=${ xtrfProjectInfo.data.projectId }#/project`
+	}
 }
 
 
@@ -154,7 +160,7 @@ async function setProjectFinance(xtrfProjectId, stepsInfo, currentServices) {
 		}
 		const receivablesData = {
 			...baseData,
-			"jobTypeId":  STEP_IDS[currentServices].jobTypeId,
+			"jobTypeId": STEP_IDS[currentServices].jobTypeId,
 			"rate": receivables,
 			"quantity": 1
 		}
@@ -186,7 +192,7 @@ function findInXtrf(response, field, value) {
 function findLanguageId(response, field, value) {
 	if (!value) return false
 	const langSymbolParts = value.split('-')
-	value = langSymbolParts[0] === 'spa' ? value.replace('spa','ES') : value
+	value = langSymbolParts[0] === 'spa' ? value.replace('spa', 'ES') : value
 	const found = response.data.filter((elem) => elem[field].toLowerCase().includes(value.toLowerCase()))
 	return Array.isArray(found) ? found[0] : found
 }
@@ -216,11 +222,11 @@ const updateTaskFianceXTRF = async (id, xtrfId, taskId) => {
 		xtrfLink,
 		steps,
 		tasks
-	} = await Projects.findOne({ _id: id }).populate('steps.vendor')
+	} = await getProject({ _id: id })
 
 
 	const xtrfProjectJobs = await sendRequest('get', `v2/projects/${ xtrfId }/jobs`)
-	await sendRequest('put', `v2/projects/${xtrfId}/clientDeadline`,{ "value": new Date(deadline).getTime() })
+	await sendRequest('put', `v2/projects/${ xtrfId }/clientDeadline`, { "value": new Date(deadline).getTime() })
 
 
 	for await (let jobId of xtrfProjectJobs.data.map(item => item.id)) await sendRequest('put', `v2/jobs/${ jobId }/dates`, {
@@ -228,7 +234,7 @@ const updateTaskFianceXTRF = async (id, xtrfId, taskId) => {
 		"deadline": new Date(deadline).getTime()
 	})
 
-	const currentStep = steps.find(item=> item.taskId === taskId  )
+	const currentStep = steps.find(item => item.taskId === taskId)
 	const vendorId = currentStep.vendor ? vendors[currentStep.vendor.firstName + " " + currentStep.vendor.surname] : ''
 
 	if (!!vendorId && !!vendorPriceProfileId[vendorId]) {
@@ -236,22 +242,22 @@ const updateTaskFianceXTRF = async (id, xtrfId, taskId) => {
 	}
 
 	for await (let jobId of xtrfProjectJobs.data.map(item => item.id))
-		for await (let status of ['ACCEPTED' , 'STARTED', 'READY'])
+		for await (let status of [ 'ACCEPTED', 'STARTED', 'READY' ])
 			await sendRequest('put', `v2/jobs/${ jobId }/status`, { status })
 
 	const finance = await sendRequest('get', `v2/projects/${ xtrfId }/finance`)
 	let { receivables, payables } = finance.data
 
 	receivables = receivables.map(item => {
-		if(item.rates == null) return item.id
+		if (item.rates == null) return item.id
 	}).filter(Boolean)
 
 	payables = payables.map(item => {
-		if(item.rates == null) return item.id
+		if (item.rates == null) return item.id
 	}).filter(Boolean)
 
-	for await (let id of payables) await sendRequest('delete', `v2/projects/${xtrfId}/finance/payables/${id}`)
-	for await (let id of receivables) await sendRequest('delete', `v2/projects/${xtrfId}/finance/receivables/${id}`)
+	for await (let id of payables) await sendRequest('delete', `v2/projects/${ xtrfId }/finance/payables/${ id }`)
+	for await (let id of receivables) await sendRequest('delete', `v2/projects/${ xtrfId }/finance/receivables/${ id }`)
 
 	const stepsSource = findLanguageId(allLanguages, "symbol", currentStep.sourceLanguage) ? findLanguageId(allLanguages, "symbol", currentStep.sourceLanguage).id : ''
 	const stepsTarget = findLanguageId(allLanguages, "symbol", currentStep.targetLanguage) ? findLanguageId(allLanguages, "symbol", currentStep.targetLanguage).id : ''
@@ -261,12 +267,12 @@ const updateTaskFianceXTRF = async (id, xtrfId, taskId) => {
 			receivables: currentStep.finance.Price.receivables,
 			subInfo: {
 				payables: currentStep.nativeFinance.Price.payables,
-				vendor: vendorId ? vendorPriceProfileId[vendorId] : false,
+				vendor: vendorId ? vendorPriceProfileId[vendorId] : false
 			}
 		}
 	}
 
-	const currentServices = {name: 'Compliance', id: 79}
+	const currentServices = { name: 'Compliance', id: 79 }
 
 
 	await setProjectFinance(xtrfId, stepsInfo, currentServices.name)
