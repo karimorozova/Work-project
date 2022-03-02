@@ -11,11 +11,6 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'Clients'
 	},
-	status: {
-		type: String,
-		default: '',
-		trim: true
-	},
 	clientBillingInfo: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients.billingInfo',
@@ -43,81 +38,26 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 		type: Date,
 		default: new Date()
 	},
-	createdBy: {
-		type: Schema.Types.ObjectId, ref: 'user',
-		default: null
+	total: {
+		type: Number,
+		default: 0
 	},
-	updatedBy: {
-		type: Schema.Types.ObjectId, ref: 'user',
-		default: null
-	},
-	createAt: {
-		type: Date,
-		default: new Date()
-	},
-	updatedAt: {
-		type: Date,
-		default: new Date()
-	},
-	invoice: {
-		filename: {
-			type: String,
-			default: '',
-			trim: true
-		},
-		path: {
-			type: String,
-			default: '',
-			trim: true
-		}
-	},
-	reportFiles: [ {
-		filename: {
-			type: String,
-			default: '',
-			trim: true
-		},
-		path: {
-			type: String,
-			default: '',
-			trim: true
-		}
-	} ],
-	paymentInformation: [ {
-		zohoPaymentId: {
-			type: String
-		},
-		paidAmount: {
-			type: Number
-		},
-		unpaidAmount: {
-			type: Number
-		},
-		paymentMethod: {
-			type: Object,
-			default: null
-		},
-		paymentDate: {
-			type: Date,
-			default: ''
-		},
-		notes: {
-			type: String,
-			default: ""
-		}
-	} ],
-	externalIntegration: {
-		_id: {
-			type: String,
-			trim: true,
-			default: ''
-		},
-		reportId: {
-			type: String,
-			trim: true,
-			default: ''
-		}
-	}
+	// createdBy: {
+	// 	type: Schema.Types.ObjectId, ref: 'user',
+	// 	default: null
+	// },
+	// updatedBy: {
+	// 	type: Schema.Types.ObjectId, ref: 'user',
+	// 	default: null
+	// },
+	// createAt: {
+	// 	type: Date,
+	// 	default: new Date()
+	// },
+	// updatedAt: {
+	// 	type: Date,
+	// 	default: new Date()
+	// },
 })
 
 const InvoicingReceivables = mongoose.model('InvoicingReceivables', InvoicingReceivablesSchema)
