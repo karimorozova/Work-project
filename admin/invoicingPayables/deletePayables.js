@@ -3,21 +3,28 @@ const { getPayablesProjectsAndSteps, getPayablesDateRange } = require("./getPaya
 const { removeDir } = require("./PayablesFilesAndDirecrory")
 
 
-const payableDeleteStep = async (reportId, stepId) => {
+const payableDeleteSteps = async (reportId, stepsId) => {
 	try {
-		await InvoicingPayables.updateOne({ _id: reportId }, { $pull: { 'steps': stepId } })
-		const currentReport = (await getPayablesProjectsAndSteps(reportId)).pop()
+		for (const stepId of stepsId) {
+			let { total, steps: reportSteps } = await InvoicingPayables.findOne({ _id: reportId })
+			const { steps } = await Projects.findOne({ 'steps._id': stepId }, { steps: 1 })
+			const { nativeFinance: { Price: { payables } } } = steps.find(({ _id }) => `${ _id }` === `${ stepId }`)
 
-		const { firstPaymentDate, lastPaymentDate } = getPayablesDateRange(currentReport.steps)
+			total = reportSteps.length === 1 ? 0 : +(total - payables).toFixed(2)
+			await InvoicingPayables.updateOne({ _id: reportId }, { $set: { total }, $pull: { 'steps': stepId } })
+		}
 
-		await InvoicingPayables.updateOne({ _id: reportId },
-				{ $set: { firstPaymentDate, lastPaymentDate } })
-
+		const [ updatedPayableReport ] = await getPayablesProjectsAndSteps(reportId)
+		const { firstPaymentDate, lastPaymentDate } = getPayablesDateRange(updatedPayableReport.steps)
+		await InvoicingPayables.updateOne(
+				{ _id: reportId },
+				{ $set: { firstPaymentDate, lastPaymentDate } }
+		)
 		await Projects.updateOne(
-				{ 'steps._id': stepId },
+				{ 'steps._id': { $in: stepsId } },
 				{ 'steps.$[i].isInReportPayables': false },
-				{ arrayFilters: [ { 'i._id': stepId } ] })
-
+				{ arrayFilters: [ { 'i._id': { $in: stepsId } } ] }
+		)
 	} catch (e) {
 		console.log(e)
 	}
@@ -30,10 +37,9 @@ const payableDelete = async (reportId) => {
 	await Projects.updateMany(
 			{ 'steps._id': { $in: steps } },
 			{ 'steps.$[i].isInReportPayables': false },
-			{ arrayFilters: [ { 'i._id': { $in: steps } } ] })
-
+			{ arrayFilters: [ { 'i._id': { $in: steps } } ] }
+	)
 	await InvoicingPayables.deleteOne({ _id: reportId })
 	await removeDir(DIR, reportId)
-
 }
-module.exports = { payableDeleteStep, payableDelete }
+module.exports = { payableDeleteSteps, payableDelete }

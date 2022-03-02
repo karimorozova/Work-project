@@ -231,7 +231,7 @@ export default {
     async approveForceStatus() {
       try {
         await this.$http.post('/invoicing-payables/rollback-invoiceReport-from-paid', { reportsIds: [ this.$route.params.id ] })
-        await this.$router.push('/pangea-finance/invoicing-payables/reports/' + this.reportDetailsInfo._id)
+        await this.$router.push('/pangea-finance/payables-reports/reports/' + this.reportDetailsInfo._id)
       } catch (error) {
         this.alertToggle({ message: "Error on Reports Status Editing", isShow: true, type: "error" })
       } finally {

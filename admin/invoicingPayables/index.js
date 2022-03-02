@@ -4,7 +4,7 @@ const {
 } = require('./createPayables')
 
 const {
-	payableDeleteStep,
+	payableDeleteSteps,
 	payableDelete
 } = require('./deletePayables')
 
@@ -71,7 +71,7 @@ module.exports = {
 	getAllPayables,
 	getPayable,
 	payablesAddSteps,
-	payableDeleteStep,
+	payableDeleteSteps,
 	payableDelete,
 	getAllSteps,
 	addStepsToPayables,

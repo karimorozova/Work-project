@@ -5,8 +5,8 @@ const { InvoicingPayables, Projects, Vendors } = require("../models")
 
 const getPayablesDateRange = (steps) => {
 	return steps.reduce((acc, { deadline }) => {
-		acc.firstPaymentDate = moment.min(moment(deadline.toString()), moment(acc.firstPaymentDate)).toISOString()
-		acc.lastPaymentDate = moment.max(moment(deadline.toString()), moment(acc.lastPaymentDate)).toISOString()
+		acc.firstPaymentDate = moment.min(moment(deadline), moment(acc.firstPaymentDate)).toISOString()
+		acc.lastPaymentDate = moment.max(moment(deadline), moment(acc.lastPaymentDate)).toISOString()
 		return acc
 	}, { firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20, 'years') })
 }

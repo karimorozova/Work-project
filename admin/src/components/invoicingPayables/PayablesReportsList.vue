@@ -106,7 +106,7 @@
 
           template(slot="reportId" slot-scope="{ row, index }" )
             .table__data
-              router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-payables/reports/${row._id}`}")
+              router-link(class="link-to" :to="{path: `/pangea-finance/payables-reports/reports/${row._id}`}")
                 span {{ row.reportId }}
 
           template(slot="dateRange" slot-scope="{ row, index }")

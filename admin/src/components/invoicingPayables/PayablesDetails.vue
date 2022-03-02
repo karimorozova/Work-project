@@ -614,7 +614,9 @@ export default {
     async deleteStep() {
       const { reportId, stepId } = this.deleteInfo
       this.closeModalStep()
-      await this.$http.post(`/invoicing-payables/report/${ reportId }/delete/${ stepId }`)
+      await this.$http.post(`/invoicing-payables/report/${ reportId }/delete`, {
+        stepsId: [ stepId ]
+      })
       await this.refreshReports()
 
     },

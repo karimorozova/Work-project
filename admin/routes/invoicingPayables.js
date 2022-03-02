@@ -5,7 +5,7 @@ const {
 	getAllPayables,
 	getPayable,
 	payablesAddSteps,
-	payableDeleteStep,
+	payableDeleteSteps,
 	getAllSteps,
 	addStepsToPayables,
 	stepsFiltersQuery,
@@ -227,10 +227,11 @@ router.post("/delete-reports", async (req, res) => {
 	}
 })
 
-router.post("/report/:reportId/delete/:stepId", async (req, res) => {
-	const { reportId, stepId } = req.params
+router.post("/report/:reportId/delete", async (req, res) => {
+	const { reportId } = req.params
+	const { stepsId } = req.body
 	try {
-		const report = await payableDeleteStep(reportId, stepId)
+		const report = await payableDeleteSteps(reportId, stepsId)
 		res.send(report)
 	} catch (err) {
 		console.log(err)

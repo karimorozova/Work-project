@@ -557,60 +557,55 @@ const router = new Router({
 					props: true,
 					children: [
 						{
-							path: 'finance',
-							name: 'finance',
-							component: clearRouterView
-						},
-						{
-							path: 'invoicing-payables/reports',
-							name: 'invoicing-payables',
+							path: 'payables-reports/reports',
+							name: 'payables-reports',
 							component: PayablesReportsList
 						},
 						{
-							path: 'invoicing-payables/paid-invoices',
-							name: 'invoicing-payables',
+							path: 'payables-reports/paid-reports',
+							name: 'payables-reports',
 							component: PayablesPaidReportsList
 						},
 						{
-							path: 'invoicing-payables/paid-invoices/:id',
-							name: 'invoicing-payables',
+							path: 'payables-reports/paid-reports/:id',
+							name: 'payables-reports',
 							component: PayablesPaidDetails
 						},
 						{
-							path: 'invoicing-payables/reports/:id',
-							name: 'invoicing-payables',
+							path: 'payables-reports/reports/:id',
+							name: 'payables-reports',
 							component: PayablesDetails
 						},
 						{
-							path: 'invoicing-payables/create-reports',
-							name: 'invoicing-payables',
+							path: 'payables-reports/create-reports',
+							name: 'payables-reports',
 							component: PayablesAdd
-						},
-						{
-							path: 'invoicing-receivables/reports',
-							name: 'invoicing-receivables',
-							component: ReceivablesReportsList
-						},
-						{
-							path: 'invoicing-receivables/paid-invoices',
-							name: 'invoicing-receivables',
-							component: ReceivablesPaidReportsList
-						},
-						{
-							path: 'invoicing-receivables/paid-invoices/:id',
-							name: 'invoicing-receivables',
-							component: ReceivablesPaidDetails
-						},
-						{
-							path: 'invoicing-receivables/reports/:id',
-							name: 'invoicing-receivables',
-							component: ReceivablesDetails
-						},
-						{
-							path: 'invoicing-receivables/create-reports',
-							name: 'invoicing-receivables',
-							component: ReceivablesAdd
 						}
+						// {
+						// 	path: 'invoicing-receivables/reports',
+						// 	name: 'invoicing-receivables',
+						// 	component: ReceivablesReportsList
+						// },
+						// {
+						// 	path: 'invoicing-receivables/paid-invoices',
+						// 	name: 'invoicing-receivables',
+						// 	component: ReceivablesPaidReportsList
+						// },
+						// {
+						// 	path: 'invoicing-receivables/paid-invoices/:id',
+						// 	name: 'invoicing-receivables',
+						// 	component: ReceivablesPaidDetails
+						// },
+						// {
+						// 	path: 'invoicing-receivables/reports/:id',
+						// 	name: 'invoicing-receivables',
+						// 	component: ReceivablesDetails
+						// },
+						// {
+						// 	path: 'invoicing-receivables/create-reports',
+						// 	name: 'invoicing-receivables',
+						// 	component: ReceivablesAdd
+						// }
 
 					]
 				},
@@ -653,14 +648,14 @@ const router = new Router({
 	]
 })
 
-router.beforeEach( async (to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 	// const token = localStorage.getItem("token")
 	try {
 		if (to.path === '/login' || to.path === '/pangea-zoho-code' || to.path === '/password-reset-request' || to.name === 'password-reset' || to.name === 'quote-decision') return next()
-			const { status } = await axios.post('/check-jwt')
-			if (status === 200) {
-				return next()
-			}
+		const { status } = await axios.post('/check-jwt')
+		if (status === 200) {
+			return next()
+		}
 		next('/login')
 	} catch (e) {
 		exit()
