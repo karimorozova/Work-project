@@ -291,7 +291,7 @@ export default {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 270px;
+  width: 255px;
   z-index: 99999;
   box-sizing: border-box;
   background: white;
@@ -331,7 +331,7 @@ export default {
 .content {
   width: 100%;
   min-width: fit-content;
-  margin-left: 270px;
+  margin-left: 255px;
 
   &__body {
     padding: 50px 0px 50px 50px;

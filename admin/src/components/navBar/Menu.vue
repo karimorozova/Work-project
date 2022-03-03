@@ -170,7 +170,7 @@ a {
     position: absolute;
     display: flex;
     justify-content: flex-end;
-    width: 250px;
+    width: 235px;
     font-family: Myriad300;
     letter-spacing: .7px;
   }
