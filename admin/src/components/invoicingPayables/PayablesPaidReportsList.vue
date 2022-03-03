@@ -88,10 +88,10 @@
           template(slot="jobs" slot-scope="{ row, index }")
             .table__data {{ row.steps.length }}
 
-          //template(slot="amount" slot-scope="{ row, index }")
-          //  .table__data
-          //    span.currency(v-html="'&euro;'")
-          //    span {{ +(getStepsPayables(row.stepFinance)).toFixed(2) }}
+          template(slot="amount" slot-scope="{ row, index }")
+            .table__data(v-if="row.total" )
+              span.currency(v-html="'&euro;'")
+              span {{ +(row.total).toFixed(2) }}
 
           template(slot="created" slot-scope="{ row, index }")
             .table__data {{ getTime( row.createdAt) }}
@@ -171,12 +171,12 @@ export default {
           key: "jobs",
           style: { width: "100px" }
         },
-        // {
-        //   label: "Amount",
-        //   headerKey: "headerAmount",
-        //   key: "amount",
-        //   style: { width: "120px" }
-        // },
+        {
+          label: "Amount",
+          headerKey: "headerAmount",
+          key: "amount",
+          style: { width: "120px" }
+        },
         {
           label: "Created On",
           headerKey: "headerCreated",

@@ -1,7 +1,7 @@
 const schedule = require("node-schedule")
 const moment = require('moment')
 const { deleteEmptyOrNotCreatedByManger, sendPreventDeleteNotActiveVendor } = require("./vendors/deleteVendor")
-const { XtrfLqa, Vendors, Clients, Projects } = require('./models')
+const { XtrfLqa, Vendors, Clients, Projects, InvoicingPayables } = require('./models')
 const { downloadFromMemoqProjectsData } = require("./services/memoqs/projects")
 const { downloadMemoqFile } = require("./services/memoqs/files")
 const { updateStatusesForOtherProjects, clearGarbageProjects } = require("./services/memoqs/otherProjects")
@@ -11,7 +11,7 @@ const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles')
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmarkCost } = require('./reports')
 
 
-const { getAllSteps, addStepsToPayables } = require('./invoicingPayables')
+const { getAllSteps, addStepsToPayables, getPayable } = require('./invoicingPayables')
 const autoCreationPayablesReports = async () => {
 	const allSteps = await getAllSteps(0, 999999, {
 		"deadline": {
@@ -27,6 +27,16 @@ const autoCreationPayablesReports = async () => {
 	console.log(allSteps.length)
 }
 // autoCreationPayablesReports()
+
+const generateTotal = async () => {
+	const list = await InvoicingPayables.find()
+	for await (const report of list) {
+		const [ { totalPrice } ] = await getPayable(report._id)
+		await InvoicingPayables.updateOne({ _id: report._id }, { total: +(totalPrice).toFixed(2) })
+	}
+	console.log('DONE')
+}
+// generateTotal()
 
 
 // downloadMemoqFile({memoqProjectId:'1443ab32-fa74-eb11-90ed-82bb18d08256', docId:'4c077bd7-e5e7-46a5-9e4e-2953ab86e913', path:'./dist/max.xlsx'} )
