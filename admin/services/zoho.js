@@ -2,7 +2,7 @@
 const { zohoCreds } = require('../configs')
 const { Zoho, ZohoReport, User } = require('../models')
 const axios = require("axios")
-const { returnMessageAndType } = require("../invoicingReceivables/helper")
+const { returnMessageAndType } = require("../invoicingReceivables-Old/helper")
 
 const baseUrl = 'https://books.zoho.com/api/v3/'
 const tokensUrl = 'https://accounts.zoho.com'

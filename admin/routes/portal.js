@@ -39,7 +39,7 @@ const {
 	updateAccountDetails
 } = require('../users')
 const { ObjectId } = require("mongoose/lib/types")
-const { getAllReportsFromDb, getAllPaidReceivablesFromDbWithProject } = require("../invoicingReceivables")
+const { getAllReportsFromDb, getAllPaidReceivablesFromDbWithProject } = require("../invoicingReceivables-Old")
 
 router.post('/translation-service-request', checkClientContact, upload.fields([ { name: 'refFiles' }, { name: 'sourceFiles' } ]), async (req, res) => {
 	try {

@@ -3,7 +3,7 @@ const emitter = new EventEmitter()
 const { Projects, InvoicingReceivables } = require('../models')
 const { notifyStepDecisionMade, setApprovedStepStatus } = require('../projects')
 const { notifyManagerProjectStarts, sendQuoteToVendorsAfterProjectAccepted, notifyManagerProjectRejected } = require('../utils')
-const { getAllSteps, createReports, createAndSendZohoInvoice } = require("../invoicingReceivables")
+const { getAllSteps, createReports, createAndSendZohoInvoice } = require("../invoicingReceivables-Old")
 const { createDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")
 const DIR = './dist/clientReportsFiles/'
 

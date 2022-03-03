@@ -60,6 +60,6 @@ const InvoicingReceivablesSchema = new mongoose.Schema({
 	// },
 })
 
-const InvoicingReceivables = mongoose.model('InvoicingReceivables', InvoicingReceivablesSchema)
+const InvoicingReceivables_old = mongoose.model('InvoicingReceivables', InvoicingReceivablesSchema)
 
-module.exports = InvoicingReceivables
+module.exports = InvoicingReceivables_old

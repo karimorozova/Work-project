@@ -16,10 +16,6 @@ const InvoiceSchema = new mongoose.Schema({
 		enum: [ 'Draft', 'Ready', 'Sent', 'Paid', 'Partially Paid', 'Overdue', 'Void' ],
 		default: 'Draft'
 	},
-	// reports: [{
-	// 	type: Schema.Types.ObjectId,
-	// 	ref: 'Reports'
-	// }],
 	items: [{
 		title: {
 			type: String,
@@ -35,18 +31,52 @@ const InvoiceSchema = new mongoose.Schema({
 		reportId: {
 			type: Schema.Types.ObjectId,
 			default: null,
-		}
+		},
+		quantity: {
+			type: Number,
+		},
+		rate: {
+			type: Number,
+		},
+		tax: {
+			type: Number,
+		},
 
-		// quantity: {
-		// 	type: Number,
-		// },
-		// rate: {
-		// 	type: Number,
-		// },
-		// tax: {
-		// 	type: Number,
-		// },
-	}]
+
+		vat: {
+			type: String,
+		},
+		discount: {
+			amount: {
+				type: Number,
+			},
+			type: {
+				type: String,
+				enum: [ 'Percent', 'Valet' ],
+			}
+		},
+	}],
+
+
+
+
+	invoicingId: {
+		type: String
+	},
+	createdAt: {
+		type: Date,
+		default: new Date()
+	},
+	dueDate: {
+		type: Date,
+		default: ''
+	},
+	// terms: {
+	// 	type: String,
+	// },
+
+
+
 })
 
 const Invoice = mongoose.model('Invoice', InvoiceSchema)

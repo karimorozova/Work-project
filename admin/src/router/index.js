@@ -66,13 +66,14 @@ import PayablesDetails from "../components/invoicingPayables/PayablesDetails"
 import PayablesAdd from "../components/invoicingPayables/PayablesAdd"
 import PayablesPaidDetails from "../components/invoicingPayables/PayablesPaidDetails"
 
-import ReceivablesReportsList from "../components/invoicingReceivables/ReceivablesReportsList"
-import ReceivablesPaidReportsList from "../components/invoicingReceivables/ReceivablesPaidReportsList"
-import ReceivablesDetails from "../components/invoicingReceivables/ReceivablesDetails"
-import ReceivablesAdd from "../components/invoicingReceivables/ReceivablesAdd"
-import ReceivablesPaidDetails from "../components/invoicingReceivables/ReceivablesPaidDetails"
+import ReceivablesDetails from "../components/invoicingReceivables_old/ReceivablesDetails"
+import ReceivablesAdd from "../components/invoicingReceivables_old/ReceivablesAdd"
 import axios from "axios"
 import cookie from "../../../vendor/plugins/vue-cookie"
+
+import AddReports from "../components/invoicingClientReports/AddReports"
+import ReportDetails from "../components/invoicingClientReports/ReportDetails"
+import ReportsList from "../components/invoicingClientReports/ReportsList"
 // =====================================================================================================
 
 
@@ -580,32 +581,23 @@ const router = new Router({
 							path: 'payables-reports/create-reports',
 							name: 'payables-reports',
 							component: PayablesAdd
+						},
+
+						{
+							path: 'receivables-reports/reports',
+							name: 'receivables-reports',
+							component: ReportsList
+						},
+						{
+							path: 'receivables-reports/reports/:id',
+							name: 'receivables-reports',
+							component: ReportDetails
+						},
+						{
+							path: 'receivables-reports/create-reports',
+							name: 'receivables-reports',
+							component: AddReports
 						}
-						// {
-						// 	path: 'invoicing-receivables/reports',
-						// 	name: 'invoicing-receivables',
-						// 	component: ReceivablesReportsList
-						// },
-						// {
-						// 	path: 'invoicing-receivables/paid-invoices',
-						// 	name: 'invoicing-receivables',
-						// 	component: ReceivablesPaidReportsList
-						// },
-						// {
-						// 	path: 'invoicing-receivables/paid-invoices/:id',
-						// 	name: 'invoicing-receivables',
-						// 	component: ReceivablesPaidDetails
-						// },
-						// {
-						// 	path: 'invoicing-receivables/reports/:id',
-						// 	name: 'invoicing-receivables',
-						// 	component: ReceivablesDetails
-						// },
-						// {
-						// 	path: 'invoicing-receivables/create-reports',
-						// 	name: 'invoicing-receivables',
-						// 	component: ReceivablesAdd
-						// }
 
 					]
 				},
