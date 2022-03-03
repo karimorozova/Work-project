@@ -34,7 +34,7 @@
         )
 
     .modalRow(v-if="isAvailableExtraFields")
-      .modalRow__key Minimum Payment Amount:
+      .modalRow__key Threshold amount:
       .modalRow__value
         input(:Value="currentMinimumAmount" :disabled="true" readonly type="number" placeholder="Value")
 

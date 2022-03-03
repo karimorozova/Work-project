@@ -31,7 +31,9 @@ async function assignVendorToStep({ projectId, stepsVendors }) {
 
 				steps[_idxS] = step
 				tasks[_idxT] = task
-				await stepReassignedNotification(steps[_idxS])
+				if (!isSkipProgress) {
+					await stepReassignedNotification(steps[_idxS])
+				}
 			}
 		}
 

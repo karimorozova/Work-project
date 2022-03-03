@@ -96,10 +96,11 @@
               .text__block
                 .text__title Expected payment date:
                 .text__value {{ formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate) }}
-              .text__block
+
+              .text__block(v-if="reportDetailsInfo.total" )
                 .text__title Total Amount:
                 .text__value
-                  span(style="margin-right: 4px;") {{ +(getStepsPayables(reportDetailsInfo.steps)).toFixed(2) }}
+                  span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
                   span(v-html="'&euro;'")
 
 
@@ -287,29 +288,23 @@ export default {
     formattedDateRange(date) {
       return moment(date).format('MMM D')
     },
-    getStepsPayables(stepFinance) {
-      return stepFinance.reduce((sum, step) => {
-        sum += step.nativeFinance.Price.payables || 0
-        return sum
-      }, 0)
-    },
     async openDetails(id) {
       this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/paid-report/' + id)).data[0]
     }
   },
   computed: {
     //Todo: show status "Invoice Received" and "Partially Paid"1
-    getPaymentRemainder() {
-      const { paymentInformation = [] } = this.reportDetailsInfo
-      return paymentInformation.reduce((sum, item) => {
-        sum += +item.paidAmount
-        return sum
-      }, 0)
-    },
-    getUnpaidAmount() {
-      const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder)
-      return +(parseFloat(rawUnpaidAmount)).toFixed(2)
-    }
+    // getPaymentRemainder() {
+    //   const { paymentInformation = [] } = this.reportDetailsInfo
+    //   return paymentInformation.reduce((sum, item) => {
+    //     sum += +item.paidAmount
+    //     return sum
+    //   }, 0)
+    // },
+    // getUnpaidAmount() {
+    //   const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder)
+    //   return +(parseFloat(rawUnpaidAmount)).toFixed(2)
+    // }
   },
   created() {
     this.openDetails(this.$route.params.id)
@@ -536,7 +531,7 @@ textarea {
     width: 380px;
     background: $light-background;
     box-sizing: border-box;
-    padding: 25px;
+    padding: 25px 15px 25px 25px;
     height: fit-content;
     border-radius: 4px;
     border-bottom: 1px solid $light-border;

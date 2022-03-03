@@ -5,7 +5,7 @@ const { ObjectID: ObjectId } = require("mongodb")
 const { getPayable } = require("./getPayables")
 
 const getReportsTotal = (reportsList) => {
-	return reportsList.reduce((acc, curr) => acc + +curr.totalPrice, 0)
+	return reportsList.reduce((acc, curr) => acc + +curr.total, 0)
 }
 
 const clearPayablesStepsPrivateKeys = async (reports) => {

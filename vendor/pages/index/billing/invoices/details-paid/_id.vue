@@ -37,7 +37,7 @@
             .row
               .row__title Total amount:
               .row__value(v-if="reportDetailsInfo.steps")
-                span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
+                span(style="margin-right: 4px;") {{ reportDetailsInfo.total }}
                 span(v-html="'&euro;'")
 
           .body__invoiceReceived

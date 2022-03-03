@@ -47,24 +47,37 @@ const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMet
 			&& paymentDetails.paymentMethod
 			&& currentPaymentDetails.paymentMethod.name === paymentDetails.paymentMethod.name
 	)
+	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
 
-	await InvoicingPayables.updateMany({ _id: { $in: [ reportId, ...sameVendorReports.map(i => `${ i._id }`) ] } }, { "paymentDetails.paymentMethod": paymentMethod })
+	await InvoicingPayables.updateMany(
+			{ _id: { $in: [ reportId, ...sameVendorReports.map(i => `${ i._id }`) ] } },
+			{ "paymentDetails.paymentMethod": paymentMethod }
+	)
 
 	vendorReportsAll = (await getPayableByVendorId(vendorId)).filter(({ status }) => status === 'Invoice on-hold' || status === 'Invoice Ready')
 
 	const groupedReportsByPaymentName = _.groupBy(vendorReportsAll, 'paymentDetails.paymentMethod.name')
 
 	for await (const paymentGroup of Object.values(groupedReportsByPaymentName)) {
-		const status = getReportsTotal(paymentGroup) >= paymentGroup[0].paymentDetails.paymentMethod.minimumAmount ? 'Invoice Ready' : 'Invoice on-hold'
-		await InvoicingPayables.updateMany({ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } }, { status })
-	}
+		const status = getReportsTotal(paymentGroup) >= paymentGroup[0].paymentDetails.paymentMethod.minimumAmount
+				? 'Invoice Ready'
+				: 'Invoice on-hold'
 
+		const expectedPaymentDate = status === 'Invoice Ready'
+				? new Date(moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD'))
+				: ''
+
+		await InvoicingPayables.updateMany(
+				{ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } },
+				{ status, "paymentDetails.expectedPaymentDate": expectedPaymentDate }
+		)
+	}
 }
 
 const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMethod }) => {
 	let vendorReportsAll = await getPayableByVendorId(vendorId)
 
-	const [ { paymentDetails, totalPrice } ] = await getPayable(reportId)
+	const [ { paymentDetails, total } ] = await getPayable(reportId)
 
 	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
 	const { fileName, newPath: path } = await invoiceFileUploading(invoiceFile[0], reportId)
@@ -83,16 +96,17 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 	)
 
 	switch (true) {
-		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +totalPrice):
-		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) < paymentDetails.paymentMethod.minimumAmount): {
+		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount > +total):
+		case (vendorReports.length && (getReportsTotal(vendorReports) + +total) < paymentDetails.paymentMethod.minimumAmount): {
+			paymentDetails.expectedPaymentDate = ''
 			await updatePayableReport(reportId, { status: 'Invoice on-hold', paymentDetails })
 			break
 		}
-		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount <= +totalPrice): {
+		case (!vendorReports.length && paymentDetails.paymentMethod.minimumAmount <= +total): {
 			await updatePayableReport(reportId, { status: 'Invoice Ready', paymentDetails })
 			break
 		}
-		case (vendorReports.length && (getReportsTotal(vendorReports) + +totalPrice) > paymentDetails.paymentMethod.minimumAmount): {
+		case (vendorReports.length && (getReportsTotal(vendorReports) + +total) > paymentDetails.paymentMethod.minimumAmount): {
 			await updatePayableReport(reportId, { paymentDetails })
 			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
 				await updatePayableReport(id, { status: 'Invoice Ready' })
@@ -104,14 +118,14 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 
 // TODO ZOHO API (soon)
 // const zohoBillCreation = async (_id) => {
-// 	const [ { vendor, reportId: billNumber, totalPrice, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } } } ] = await getPayable(_id)
+// 	const [ { vendor, reportId: billNumber, total, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } } } ] = await getPayable(_id)
 // 	const vendorName = vendor.firstName + ' ' + vendor.surname
 // 	const monthAndYear = moment(lastPaymentDate).format("MMMM YYYY")
 //
 // 	const lineItems = [ {
 // 		"name": `TS ${ monthAndYear }`,
 // 		"account_id": "335260000002330131",
-// 		"rate": totalPrice,
+// 		"rate": total,
 // 		"quantity": 1
 // 	} ]
 //

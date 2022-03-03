@@ -78,8 +78,8 @@
           .payment-card__body-block
             .drop-title Unpaid Amount:
             input(:value="getUnpaidAmount" :class="'payment-card__input'" :disabled="true")
-          //.payment-card__body-block
-          //  .payment-card__link(@click="approvePaidFull") Pay Full Amount
+          .payment-card__body-block
+            .payment-card__link(@click="approvePaidFull") Pay Full Amount
         .payment-card__buttons
           Button(
             :isDisabled="!abilityToSubmitPayment"
@@ -176,7 +176,7 @@
               .text__block
                 .text__title Total Amount:
                 .text__value
-                  span {{ +(getStepsPayables(reportDetailsInfo.steps)).toFixed(2) }}
+                  span {{ +(reportDetailsInfo.total).toFixed(2) }}
                   span(v-html="'&euro;'")
 
             .payment-details(v-if="isShowPaymentDetails" )
@@ -419,7 +419,7 @@ export default {
             notes: this.notes
           }
           const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-          if (res === "Moved") await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+          if (res === "Moved") await this.$router.push('/pangea-finance/payables-reports/paid-reports/' + this.reportDetailsInfo._id)
           else await this.refreshReports()
         } catch (err) {
           this.alertToggle({ message: "Error on Reports Status Editing", isShow: true, type: "error" })
@@ -524,12 +524,6 @@ export default {
       link.target = "_blank"
       link.click()
     },
-    getStepsPayables(stepFinance) {
-      return stepFinance.reduce((sum, step) => {
-        sum += +step.nativeFinance.Price.payables || 0
-        return sum
-      }, 0)
-    },
     setPaymentMethod({ option }) {
       this.paymentMethod = this.reportDetailsInfo.vendor.billingInfo.paymentMethods.find(item => item.name === option)
     },
@@ -555,7 +549,7 @@ export default {
       this.closePaymentCard()
       const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
       if (res === "Moved") {
-        await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
+        await this.$router.push('/pangea-finance/payables-reports/paid-reports/' + this.reportDetailsInfo._id)
       } else {
         await this.refreshReports()
       }
@@ -577,9 +571,9 @@ export default {
     selectInput() {
       this.$refs.input.select()
     },
-    // approvePaidFull() {
-    //   this.amount = this.getUnpaidAmount
-    // },
+    approvePaidFull() {
+      this.amount = this.getUnpaidAmount
+    },
     formattedDate(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -633,7 +627,6 @@ export default {
     },
     async getSteps() {
       this.steps = (await this.$http.post('/invoicing-payables/not-selected-steps-list/' + this.reportDetailsInfo.vendor._id)).data.map(i => ({ ...i, isCheck: false }))
-      console.log('steps', this.steps)
     },
     // TODO Zoho (soon)
     // async updatePayableStateFromZoho(id) {
@@ -696,7 +689,7 @@ export default {
       }, 0)
     },
     getUnpaidAmount() {
-      const rawUnpaidAmount = this.getStepsPayables(this.reportDetailsInfo.steps) - (+this.getPaymentRemainder)
+      const rawUnpaidAmount = +this.reportDetailsInfo.total - +this.getPaymentRemainder
       return +(parseFloat(rawUnpaidAmount)).toFixed(2)
     }
   },

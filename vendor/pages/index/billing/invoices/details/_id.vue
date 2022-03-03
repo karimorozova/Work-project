@@ -23,7 +23,14 @@
               .row__value {{ reportDetailsInfo.reportId }}
             .row
               .row__title Status:
-              .row__value {{ reportDetailsInfo.status }}
+              .row__value
+                div {{ reportDetailsInfo.status }}
+                .row__info(v-if="reportDetailsInfo.status === 'Invoice on-hold'" )
+                  i(class="fa-solid fa-circle-info" style="margin-right: 5px;")
+                  span Threshold amount {{ reportDetailsInfo.paymentDetails.paymentMethod.minimumAmount }}
+                  span(v-html="'&euro;'" style="margin-left: 4px;")
+
+
             .row
               .row__title Created on:
               .row__value(v-if="reportDetailsInfo.createAt") {{ formattedDate(reportDetailsInfo.createAt) }}
@@ -36,7 +43,7 @@
             .row
               .row__title Total amount:
               .row__value(v-if="reportDetailsInfo.steps")
-                span(style="margin-right: 4px;") {{ getStepsPayables(reportDetailsInfo.steps).toFixed(2) }}
+                span(style="margin-right: 4px;") {{ reportDetailsInfo.total }}
                 span(v-html="'&euro;'")
 
 
@@ -65,13 +72,13 @@
                   :selectedOption="reportDetailsInfo.paymentDetails.paymentMethod ? reportDetailsInfo.paymentDetails.paymentMethod.name : ''",
                   @chooseOption="resetPaymentMethod"
                 )
-            .row
+            .row(v-if="reportDetailsInfo.status === 'Invoice Ready'")
               .row__title Expected payment date:
               .row__value {{formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate)}}
 
             .row
               .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
-                Button.center(style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="reSubmitPaymentMethod")
+                Button.center(style="margin-top: 20px; display: flex; justify-content: center;" value="Submit Payment Method" @clicked="reSubmitPaymentMethod")
 
             Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="submitFile")
           // <<== Invoice
@@ -383,17 +390,12 @@ export default {
     formattedDateRange(date) {
       return moment(date).format('MMM D')
     },
-    getStepsPayables(steps) {
-      return steps.reduce((sum, finance) => {
-        sum += finance.nativeFinance.Price.payables || 0
-        return sum
-      }, 0)
-    },
     async getReport() {
       try {
         const result = await this.$axios.get(`/vendor/get-report?reportId=${ this.$route.params.id }`)
         const decode = window.atob(result.data)
         this.reportDetailsInfo = JSON.parse(decode)[0]
+        console.log(this.reportDetailsInfo)
       } catch (e) {
       }
     },
@@ -538,8 +540,13 @@ export default {
     margin-bottom: 0px;
   }
 
+  &__info {
+    margin-top: 6px;
+    color: $red;
+  }
+
   &__title {
-    width: 130px;
+    width: 120px;
     color: $dark-border;
     margin-right: 20px;
   }
@@ -551,7 +558,7 @@ export default {
   }
 
   &__value {
-    width: 170px;
+    width: 180px;
     position: relative;
   }
 

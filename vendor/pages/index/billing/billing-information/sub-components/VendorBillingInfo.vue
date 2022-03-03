@@ -152,7 +152,7 @@ export default {
     },
     replaceKeyName(key) {
       if (key === 'paymentType') return 'Payment Type'
-      if (key === 'minimumAmount') return 'Minimum Payment Amount'
+      if (key === 'minimumAmount') return 'Threshold amount'
       if (key === 'name') return 'Name'
       return key
     },
