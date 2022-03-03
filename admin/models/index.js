@@ -42,13 +42,13 @@ const ClientsApiSetting = require('./clientsApiSetting')
 const InvoicingPayables = require('./invoicingPayables')
 const InvoicingPayablesArchive = require('./invoicingPayablesArchive')
 const PaymentTerms = require('./paymentTerms')
-const InvoicingReceivables = require('./invoicingReceivables')
+// const InvoicingReceivables = require('./invoicingReceivables')
 const invoicingReceivablesArchive = require('./invoicingReceivablesArchive')
 const PaymentMethods = require('./PaymentMethods')
 const PaymentMethodsKeys = require('./PaymentMethodsKeys')
 
 const Models = {
-  InvoicingReceivables,
+  // InvoicingReceivables,
   invoicingReceivablesArchive,
   Languages,
   Discounts,
