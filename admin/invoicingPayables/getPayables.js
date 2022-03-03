@@ -141,10 +141,10 @@ const getPayable = async (id) => {
 				{
 					$addFields: {
 						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] },
-						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
+						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
 						// paidAmount: { $sum: "$paymentInformation.paidAmount" }
 					}
-				},
+				}
 				// {
 				// 	$addFields: {
 				// 		unpaidAmount: { $subtract: [ "$totalPrice", "$paidAmount" ] }
@@ -237,7 +237,7 @@ const getPayableByVendorId = async (id, reportQuery = {}) => {
 				},
 				{
 					$addFields: {
-						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] },
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
 						// totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
 					}
 				},

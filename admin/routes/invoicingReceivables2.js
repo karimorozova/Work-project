@@ -75,18 +75,7 @@ router.post("/reports", async (req, res) => {
 	}
 })
 
-router.post("/not-selected-steps-list", async (req, res) => {
-	const { countToSkip, countToGet, filters } = req.body
-	const allLanguages = await Languages.find()
-	try {
-		const query = stepsFiltersQuery(filters, allLanguages)
-		const steps = await getAllSteps(countToSkip, countToGet, { ...query })
-		res.send(steps)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Something wrong on getting Tasks!')
-	}
-})
+
 
 router.post("/not-selected-steps-list-mono-project", async (req, res) => {
 	const { projectId, clientBillingInfo } = req.body

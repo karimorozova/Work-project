@@ -1,6 +1,64 @@
 <template lang="pug">
   .invoicing-payables-add
     .invoicing-payables-add__container
+      .invoicing-payables-add__table
+        LayoutsTable(
+          :fields="fields",
+          :tableData="steps",
+          @bottomScrolled="bottomScrolled"
+        )
+          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+            .table__header(v-if="field.headerKey === 'headerCheck'")
+              CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+            .table__header(v-else) {{ field.label }}
+
+          template(slot="check" slot-scope="{ row, index }")
+            .table__data
+              CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+
+          template(slot="project" slot-scope="{ row, index }")
+            .table__data
+              router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+                .short {{ row.projectName }}
+
+          template(slot="stepId" slot-scope="{ row, index }")
+            .table__data {{ row.steps.stepId }}
+
+          template(slot="vendorName" slot-scope="{ row, index }")
+            .table__data(v-if="row.currentVendor != null")
+              router-link(class="link-to" :to="{path: `?vendors=${row.currentVendor._id}`}")
+                span {{ row.currentVendor.firstName  +' '+ row.currentVendor.surname || '' }}
+            .table__data(v-else) n/a
+
+          template(slot="startDate" slot-scope="{ row, index }")
+            .table__data {{ formattedDate(row.startDate) }}
+
+          template(slot="deadline" slot-scope="{ row, index }")
+            .table__data {{ formattedDate(row.deadline) }}
+
+          template(slot="service" slot-scope="{ row, index }")
+            .table__data {{ row.steps.stepAndUnit.step.title }}
+
+          template(slot="jobStatus" slot-scope="{ row, index }")
+            .table__data {{ row.steps.status }}
+
+          template(slot="langPair" slot-scope="{ row, index }")
+            .table__data {{ row.steps.sourceLanguage}}
+              span(style="font-size: 12px;color: #9c9c9c;margin: 0 4px;")
+                i(class="fas fa-angle-double-right")
+              | {{ row.steps.targetLanguage }}
+
+          template(slot="payables" slot-scope="{ row, index }")
+            .table__data
+              span.currency(v-html="'&euro;'")
+              span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit }}
+
+      .footer
+        .footer__button
+          Button(value="Generate Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
+        .footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndVendors }}
+
+    .invoicing-payables-add__filters
       .filter
         .filter__item
           label Vendors:
@@ -52,7 +110,7 @@
               :isRemoveOption="true"
               @removeOption="removeSettingStep"
             )
-        .filter__itemLong
+        .filter__item
           label Deadline Date Range:
           .filter__input
             DatePicker.range-with-one-panel(
@@ -64,72 +122,10 @@
               :clearable="false"
               type="datetime"
               range
-              placeholder="Select datetime range"
+              placeholder="Datetime range"
             )
           .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
             i.fas.fa-backspace.backspace-long
-
-      .invoicing-payables-add__table
-        LayoutsTable(
-          :fields="fields",
-          :tableData="steps",
-          :customNumberOfFilterRows="2"
-          @bottomScrolled="bottomScrolled"
-        )
-
-          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-            .table__header(v-if="field.headerKey === 'headerCheck'")
-              CheckBox(:isChecked="isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-            .table__header(v-else) {{ field.label }}
-
-          template(slot="check" slot-scope="{ row, index }")
-            .table__data
-              CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
-
-          template(slot="project" slot-scope="{ row, index }")
-            .table__data
-              router-link(class="link-to" target='_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-                .short {{ row.projectName }}
-
-          template(slot="stepId" slot-scope="{ row, index }")
-            .table__data {{ row.steps.stepId }}
-
-          template(slot="vendorName" slot-scope="{ row, index }")
-            .table__data(v-if="row.currentVendor != null")
-              router-link(class="link-to" :to="{path: `?vendors=${row.currentVendor._id}`}")
-                span {{ row.currentVendor.firstName  +' '+ row.currentVendor.surname || '' }}
-            .table__data(v-else) n/a
-
-          template(slot="startDate" slot-scope="{ row, index }")
-            .table__data {{ formattedDate(row.startDate) }}
-
-          template(slot="deadline" slot-scope="{ row, index }")
-            .table__data {{ formattedDate(row.deadline) }}
-
-          template(slot="service" slot-scope="{ row, index }")
-            .table__data {{ row.steps.stepAndUnit.step.title }}
-
-          template(slot="jobStatus" slot-scope="{ row, index }")
-            .table__data {{ row.steps.status }}
-
-          template(slot="langPair" slot-scope="{ row, index }")
-            .table__data {{ row.steps.sourceLanguage}}
-              span(style="font-size: 12px;color: #9c9c9c;margin: 0 4px;")
-                i(class="fas fa-angle-double-right")
-              | {{ row.steps.targetLanguage }}
-
-          template(slot="payables" slot-scope="{ row, index }")
-            .table__data
-              span.currency(v-html="'&euro;'")
-              span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit }}
-
-        .table__empty(v-if="!steps.length") Nothing found...
-
-      .footer
-        .footer__button
-          Button(value="Generate Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
-        .footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndVendors }}
-
 
 </template>
 
@@ -476,47 +472,46 @@ export default {
   display: flex;
   flex-wrap: wrap;
 
-  &__itemLong {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 342.5px;
-  }
-
   &__item {
     position: relative;
     margin-bottom: 15px;
-    margin-right: 25px;
     width: 220px;
   }
 
   &__input {
     position: relative;
     height: 32px;
+    width: 220px;
   }
 }
 
 .invoicing-payables-add {
-  width: 1530px;
-  margin: 50px 0 0 50px;
-  background: #fff;
+  display: flex;
 
   &__container {
     border-radius: 4px;
     padding: 25px;
     box-sizing: border-box;
     box-shadow: $box-shadow;
+    width: 1270px;
+    background: white;
+    margin: 50px 25px 0px 50px;
+    height: fit-content;
+  }
+
+  &__filters {
+    border-radius: 4px;
+    padding: 25px;
+    box-sizing: border-box;
+    box-shadow: $box-shadow;
+    width: 270px;
+    background: white;
+    margin-top: 50px;
+    height: fit-content;
   }
 
   &__table {
-    margin-top: 15px;
     margin-bottom: 25px;
-  }
-
-  &__title {
-    display: flex;
-    justify-content: end;
-    margin-bottom: 10px;
   }
 }
 
@@ -605,7 +600,12 @@ a {
 
 .backspace-long {
   position: absolute;
-  right: 54px !important;
+  right: 30px !important;
   top: 27px !important;
+  background: white;
+}
+
+.range-with-one-panel {
+  width: 220px !important;
 }
 </style>
