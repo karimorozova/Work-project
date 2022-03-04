@@ -30,10 +30,10 @@ export default {
       default: false
     },
     backgroundColor: {
-      type: String,
+      type: String
     },
     color: {
-      type: String,
+      type: String
     },
     popupText: {
       type: String
@@ -60,11 +60,11 @@ export default {
 }
 
 .button {
-  height: 32px;
-  width: 32px;
+  height: 30px;
+  width: 30px;
   box-sizing: border-box;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   transition: .2s ease-out;
   display: flex;
   justify-content: center;

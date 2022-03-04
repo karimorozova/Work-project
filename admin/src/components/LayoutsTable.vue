@@ -1,5 +1,8 @@
 <template lang="pug">
-  .layoutTable(@scroll="bottomScrolled" :style="{ 'max-height': getUserHeight + 'px' }")
+  .layoutTable(
+    @scroll="bottomScrolled"
+    :style="{ 'max-height': innerHeight - 145 - minusExtraHeight  + 'px' }"
+  )
     .th__modals
       ApproveModal(
         v-if="isApproveModal"
@@ -46,13 +49,13 @@ export default {
       type: Array,
       default: () => []
     },
-    customNumberOfFilterRows: {
-      type: Number,
-      default: 0
-    },
     isApproveModal: {
       type: Boolean,
       default: false
+    },
+    minusExtraHeight: {
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -92,20 +95,7 @@ export default {
   computed: {
     ...mapGetters({
       user: "getUser"
-    }),
-    getUserHeight() {
-      console.log(this.innerHeight)
-      return this.innerHeight - 220
-      // if (this.customNumberOfFilterRows > 0) {
-      //   const height =  Math.floor(this.innerHeight - (66 * this.customNumberOfFilterRows) - 185)
-      //   return height > 1200 ? 1200 : height
-      // }
-      // if (Object.keys(this.user).length) {
-      // 	const { layoutsSettings: { project: { filters } } } = this.user
-      // 	const height =  Math.floor(this.innerHeight - (66 * Math.ceil(filters.length / 6)) - 185)
-      // 	return height > 1200 ? 1200 : height
-      // }
-    }
+    })
   },
   components: {
     ApproveModal
@@ -118,7 +108,7 @@ export default {
 
 .layoutTable {
   overflow: auto;
-  border: 1px solid $border;
+  border: 1px solid $light-border;
 }
 
 %iconsStyle {
@@ -159,14 +149,14 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 40px;
+    height: 45px;
   }
 }
 
 .td {
   &__data {
-    min-height: 40px;
-    padding: 7px;
+    min-height: 45px;
+    padding: 4px 8px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -193,8 +183,6 @@ table tr th {
   position: sticky;
   top: 0;
   z-index: 9;
-  background: #fff;
-  box-shadow: inset -1px -1px 0 $border;
 }
 
 table {
@@ -204,16 +192,25 @@ table {
 
 th {
   box-sizing: border-box;
-  padding: 0;
+  padding: 0 0 0 7px;
+  background: $table-header !important;
 }
 
 table td {
   padding: 0;
   box-shadow: inset -1px 0 0 $light-border;
+
+  &:last-child {
+    box-shadow: none;
+  }
 }
 
 table th {
   box-shadow: inset -1px 0 0 $border;
+
+  &:last-child {
+    box-shadow: none;
+  }
 }
 
 td {
@@ -243,5 +240,15 @@ tbody tr {
 tbody tr:hover td {
   background-color: $table-list-hover !important;
   cursor: default;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: .2s ease-out;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

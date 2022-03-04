@@ -1,0 +1,46 @@
+@import "colors";
+
+.filter {
+  label {
+    font-family: Myriad600;
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  &__item {
+    position: relative;
+    margin-bottom: 15px;
+    width: 220px;
+  }
+
+  &__input {
+    position: relative;
+    height: 32px;
+    width: 220px;
+  }
+}
+
+.fa-backspace {
+  font-size: 16px;
+  transition: .2s ease-out;
+  color: $dark-border;
+  cursor: pointer;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+
+  &:hover {
+    color: $text;
+  }
+}
+
+.backspace {
+  position: absolute;
+  right: 30px !important;
+  top: 27px !important;
+  background: white;
+}
+
+.range-with-one-panel {
+  width: 220px !important;
+}

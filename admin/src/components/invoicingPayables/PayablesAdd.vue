@@ -1,7 +1,16 @@
 <template lang="pug">
   .invoicing-payables-add
-    .invoicing-payables-add__container
-      .invoicing-payables-add__table
+    .add-button
+      Button(value="Generate Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks" :outline="true")
+
+    LayoutsListWrapper(
+      :hasFilterButton="true"
+      :hasClearButton="true"
+      :isFilterActive="isFilterActive"
+      @toggleFilters="toggleFilters"
+      @clearFilters="clearFilters"
+    )
+      template(slot="table")
         LayoutsTable(
           :fields="fields",
           :tableData="steps",
@@ -53,79 +62,77 @@
               span.currency(v-html="'&euro;'")
               span {{ row.steps.nativeFinance.Price.payables | roundTwoDigit }}
 
-      .footer
-        .footer__button
-          Button(value="Generate Report" :isDisabled="!isOptionToCreateReport" @clicked="sendTasks")
+      //.footer
         .footer__description(v-if="isOptionToCreateReport") {{ calculatingJobsAndVendors }}
 
-    .invoicing-payables-add__filters
-      .filter
-        .filter__item
-          label Vendors:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedVendors"
-              :options="allVendors"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="setVendors"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeVendors"
-            )
-        .filter__item
-          label Source Languages:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedSourceLanguages"
-              :options="mappedLanguages | firstEnglishLanguage"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="chooseSourceLanguages"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeSourceLanguages"
-            )
-        .filter__item
-          label Target Languages:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedTargetLanguages"
-              :options="mappedLanguages"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="chooseTargetLanguages"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeTargetLanguages"
-            )
-        .filter__item
-          label Step:
-          .filter__input
-            SelectSingle(
-              :selectedOption="selectedStep"
-              :options="allSettingSteps"
-              placeholder="Option"
-              @chooseOption="setSettingStep"
-              :isRemoveOption="true"
-              @removeOption="removeSettingStep"
-            )
-        .filter__item
-          label Deadline Date Range:
-          .filter__input
-            DatePicker.range-with-one-panel(
-              :value="selectedDeadlineDateRange"
-              @input="(e) => setDeadlineDateRange(e)"
-              format="DD-MM-YYYY, HH:mm"
-              prefix-class="xmx"
-              range-separator=" - "
-              :clearable="false"
-              type="datetime"
-              range
-              placeholder="Datetime range"
-            )
-          .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
-            i.fas.fa-backspace.backspace-long
+      template(slot="filters")
+        .filter
+          .filter__item
+            label Vendors:
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedVendors"
+                :options="allVendors"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="setVendors"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeVendors"
+              )
+          .filter__item
+            label Source Languages:
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedSourceLanguages"
+                :options="mappedLanguages | firstEnglishLanguage"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="chooseSourceLanguages"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeSourceLanguages"
+              )
+          .filter__item
+            label Target Languages:
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedTargetLanguages"
+                :options="mappedLanguages"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="chooseTargetLanguages"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeTargetLanguages"
+              )
+          .filter__item
+            label Step:
+            .filter__input
+              SelectSingle(
+                :selectedOption="selectedStep"
+                :options="allSettingSteps"
+                placeholder="Option"
+                @chooseOption="setSettingStep"
+                :isRemoveOption="true"
+                @removeOption="removeSettingStep"
+              )
+          .filter__item
+            label Deadline Date Range:
+            .filter__input
+              DatePicker.range-with-one-panel(
+                :value="selectedDeadlineDateRange"
+                @input="(e) => setDeadlineDateRange(e)"
+                format="DD-MM-YYYY, HH:mm"
+                prefix-class="xmx"
+                range-separator=" - "
+                :clearable="false"
+                type="datetime"
+                range
+                placeholder="Datetime range"
+              )
+            .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
+              i.fas.fa-backspace.backspace-long
 
 </template>
 
@@ -142,8 +149,11 @@ import DatepickerWithTime from "../DatepickerWithTime"
 
 import '../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
+import LayoutsListWrapper from "../LayoutsListWrapper"
+import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
 
 export default {
+  mixins: [ LayoutsListWrapperLogic ],
   data() {
     return {
       highlighted: {
@@ -428,6 +438,7 @@ export default {
     }
   },
   components: {
+    LayoutsListWrapper,
     DatepickerWithTime,
     LayoutsTable,
     SelectSingle,
@@ -457,133 +468,10 @@ export default {
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
-
-.footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  &__description {
-    opacity: 0.5;
-  }
-}
-
-.filter {
-  display: flex;
-  flex-wrap: wrap;
-
-  &__item {
-    position: relative;
-    margin-bottom: 15px;
-    width: 220px;
-  }
-
-  &__input {
-    position: relative;
-    height: 32px;
-    width: 220px;
-  }
-}
+@import "../../assets/scss/LayoutFilters";
 
 .invoicing-payables-add {
-  display: flex;
-
-  &__container {
-    border-radius: 4px;
-    padding: 25px;
-    box-sizing: border-box;
-    box-shadow: $box-shadow;
-    width: 1270px;
-    background: white;
-    margin: 50px 25px 0px 50px;
-    height: fit-content;
-  }
-
-  &__filters {
-    border-radius: 4px;
-    padding: 25px;
-    box-sizing: border-box;
-    box-shadow: $box-shadow;
-    width: 270px;
-    background: white;
-    margin-top: 50px;
-    height: fit-content;
-  }
-
-  &__table {
-    margin-bottom: 25px;
-  }
-}
-
-.table__header {
-  padding: 0 0 0 7px;
-}
-
-.table__empty {
-  margin-top: 10px;
-}
-
-.icon-button {
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: .2s ease-out;
-  justify-content: center;
-  color: $dark-border;
-
-  &:hover {
-    color: $text;
-
-  }
-}
-
-label {
-  display: block;
-  margin-bottom: 3px;
-  font-family: 'Myriad600';
-}
-
-input {
-  font-size: 14px;
-  color: $text;
-  border: 1px solid $border;
-  border-radius: 4px;
-  box-sizing: border-box;
-  padding: 0 7px;
-  outline: none;
-  height: 32px;
-  transition: .1s ease-out;
-  width: 220px;
-  font-family: 'Myriad400';
-
-  &:focus {
-    border: 1px solid $border-focus;
-  }
-}
-
-.fa-backspace {
-  font-size: 16px;
-  transition: .2s ease-out;
-  color: $dark-border;
-  cursor: pointer;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-
-  &:hover {
-    color: $text;
-  }
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: .2s ease-out;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  position: relative;
 }
 
 .currency {
@@ -595,17 +483,12 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 186px;
+  max-width: 161px;
 }
 
-.backspace-long {
+.add-button {
   position: absolute;
-  right: 30px !important;
-  top: 27px !important;
-  background: white;
-}
-
-.range-with-one-panel {
-  width: 220px !important;
+  left: 130px;
+  top: -40px;
 }
 </style>

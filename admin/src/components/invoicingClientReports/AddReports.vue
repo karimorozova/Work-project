@@ -1,7 +1,16 @@
 <template lang="pug">
   .invoicing-payables-add
-    .invoicing-payables-add__container
-      .invoicing-payables-add__table
+    .add-button
+      Button(value="Create Report" :isDisabled="!isOptionToCreateReport" @clicked="sendSteps" :outline="true")
+
+    LayoutsListWrapper(
+      :hasFilterButton="true"
+      :hasClearButton="true"
+      :isFilterActive="isFilterActive"
+      @toggleFilters="toggleFilters"
+      @clearFilters="clearFilters"
+    )
+      template(slot="table")
         LayoutsTable(
           :fields="fields",
           :tableData="steps",
@@ -64,80 +73,77 @@
           template(slot="price" slot-scope="{ row, index }")
             .table__data
               span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-              span {{ row.steps.finance.Price.receivables | roundTwoDigit }}
+              span {{ +(row.steps.finance.Price.receivables).toFixed(2) }}
 
-      .footer
-        .footer__button
-          Button(value="Create Report" :isDisabled="!isOptionToCreateReport" @clicked="sendSteps")
-    .invoiving-payables-add__filter
-      .filter
-        .filter__item
-          label Clients:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedClients"
-              :options="allClients"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="setClient"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeClients"
-            )
-        .filter__item
-          label Source Languages:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedSourceLanguages"
-              :options="mappedLanguages | firstEnglishLanguage"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="chooseSourceLanguages"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeSourceLanguages"
-            )
-        .filter__item
-          label Target Languages:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedTargetLanguages"
-              :options="mappedLanguages"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="chooseTargetLanguages"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeTargetLanguages"
-            )
-        .filter__item
-          label Step:
-          .filter__input
-            SelectSingle(
-              :selectedOption="selectedStep"
-              :options="allSettingSteps"
-              placeholder="Option"
-              @chooseOption="setSettingStep"
-              :isRemoveOption="true"
-              @removeOption="removeSettingStep"
-            )
+      template(slot="filters")
+        .filter
+          .filter__item
+            label Clients
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedClients"
+                :options="allClients"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="setClient"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeClients"
+              )
+          .filter__item
+            label Source Languages
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedSourceLanguages"
+                :options="mappedLanguages | firstEnglishLanguage"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="chooseSourceLanguages"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeSourceLanguages"
+              )
+          .filter__item
+            label Target Languages
+            .filter__input
+              SelectMulti(
+                :selectedOptions="selectedTargetLanguages"
+                :options="mappedLanguages"
+                :hasSearch="true"
+                placeholder="Options"
+                @chooseOptions="chooseTargetLanguages"
+                :isSelectedWithIcon="true"
+                :isRemoveOption="true"
+                @removeOption="removeTargetLanguages"
+              )
+          .filter__item
+            label Step
+            .filter__input
+              SelectSingle(
+                :selectedOption="selectedStep"
+                :options="allSettingSteps"
+                placeholder="Option"
+                @chooseOption="setSettingStep"
+                :isRemoveOption="true"
+                @removeOption="removeSettingStep"
+              )
 
-        .filter__itemLong
-          label Billing Date Range:
-          .filter__input
-            DatePicker.range-with-one-panel(
-              :value="selectedBillingDateRange"
-              @input="(e) => setBillingDateRange(e)"
-              format="DD-MM-YYYY, HH:mm"
-              prefix-class="xmx"
-              range-separator=" - "
-              :clearable="false"
-              type="datetime"
-              range
-              placeholder="Datetime range"
-            )
-          .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
-            i.fas.fa-backspace.backspace-long
+          .filter__item
+            label Deadline Date Range
+            .filter__input
+              DatePicker.range-with-one-panel(
+                :value="selectedBillingDateRange"
+                @input="(e) => setBillingDateRange(e)"
+                format="DD-MM-YYYY, HH:mm"
+                prefix-class="xmx"
+                range-separator=" - "
+                :clearable="false"
+                type="datetime"
+                range
+                placeholder="Datetime range"
+              )
+            .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+              i.fas.fa-backspace.backspace
 </template>
 
 <script>
@@ -152,10 +158,12 @@ import LayoutsTable from "../LayoutsTable"
 import CheckBox from '../CheckBox'
 import Button from '../Button'
 import DatepickerWithTime from "../DatepickerWithTime"
+import LayoutsListWrapper from "../LayoutsListWrapper"
+import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
 
 export default {
   name: "AddReports",
-  mixins: [ currencyIconDetected ],
+  mixins: [ currencyIconDetected, LayoutsListWrapperLogic ],
   data() {
     return {
       fields: [
@@ -163,7 +171,7 @@ export default {
           label: "",
           headerKey: "headerCheck",
           key: "check",
-          style: { width: "36px" }
+          style: { width: "27px" }
         },
         {
           label: "Project",
@@ -229,7 +237,7 @@ export default {
           label: "Status",
           headerKey: "headerJobStatus",
           key: "jobStatus",
-          style: { width: "90px" }
+          style: { width: "80px" }
         },
         {
           label: "Fee",
@@ -457,6 +465,7 @@ export default {
     }
   },
   components: {
+    LayoutsListWrapper,
     DatepickerWithTime,
     LayoutsTable,
     SelectSingle,
@@ -470,133 +479,16 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors";
-
-.footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  &__description {
-    opacity: 0.5;
-  }
-}
-
-.filter {
-  display: flex;
-  flex-wrap: wrap;
-
-  &__itemLong {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 342.5px;
-  }
-
-  &__item {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 220px;
-  }
-
-  &__input {
-    position: relative;
-    height: 32px;
-  }
-}
+@import "../../assets/scss/LayoutFilters";
 
 .invoicing-payables-add {
-  //width: 1000px;
-  //margin: 50px 0 0 50px;
-  //background: #fff;
-
-  &__container {
-    border-radius: 4px;
-    padding: 25px;
-    box-sizing: border-box;
-    box-shadow: $box-shadow;
-  }
-
-  &__table {
-    margin-bottom: 25px;
-  }
-
-  &__title {
-    display: flex;
-    justify-content: end;
-    margin-bottom: 10px;
-  }
+  position: relative;
 }
 
-.table__header {
-  padding: 0 0 0 7px;
-}
-
-.table__empty {
-  margin-top: 10px;
-}
-
-.icon-button {
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: .2s ease-out;
-  justify-content: center;
-  color: $dark-border;
-
-  &:hover {
-    color: $text;
-
-  }
-}
-
-label {
-  display: block;
-  margin-bottom: 3px;
-  font-family: 'Myriad600';
-}
-
-input {
-  font-size: 14px;
-  color: $text;
-  border: 1px solid $border;
-  border-radius: 4px;
-  box-sizing: border-box;
-  padding: 0 7px;
-  outline: none;
-  height: 32px;
-  transition: .1s ease-out;
-  width: 220px;
-  font-family: 'Myriad400';
-
-  &:focus {
-    border: 1px solid $border-focus;
-  }
-}
-
-.fa-backspace {
-  font-size: 16px;
-  transition: .2s ease-out;
-  color: $dark-border;
-  cursor: pointer;
+.add-button {
   position: absolute;
-  right: 8px;
-  top: 8px;
-
-  &:hover {
-    color: $text;
-  }
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: .2s ease-out;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  left: 130px;
+  top: -40px;
 }
 
 .currency {
@@ -609,16 +501,5 @@ a {
   white-space: nowrap;
   overflow: hidden;
   max-width: 161px;
-}
-
-.backspace-long {
-  position: absolute;
-  right: 30px !important;
-  top: 27px !important;
-  background: white;
-}
-
-.range-with-one-panel {
-  width: 220px !important;
 }
 </style>
