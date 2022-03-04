@@ -594,7 +594,7 @@ export default {
     z-index: 9999;
     box-shadow: $box-shadow;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__change-deadline {
@@ -605,7 +605,7 @@ export default {
     z-index: 9999;
     box-shadow: $box-shadow;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 30px 0 0 0;
     width: 250px;
 
@@ -653,7 +653,7 @@ export default {
     margin: 0 7px;
     width: 100%;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__icons {
@@ -692,7 +692,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

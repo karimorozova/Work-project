@@ -549,7 +549,7 @@ export default {
 
   &__wrapper {
     position: relative;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 25px;
     box-sizing: border-box;
     box-shadow: $box-shadow;
@@ -670,7 +670,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

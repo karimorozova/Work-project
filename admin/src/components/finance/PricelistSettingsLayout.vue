@@ -255,7 +255,7 @@
     position: relative;
     width: 1120px;
     margin: 50px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .new__languages {
@@ -284,7 +284,7 @@
     box-shadow: $box-shadow;
     position: relative;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
 
     &__editIcons {
       display: flex;

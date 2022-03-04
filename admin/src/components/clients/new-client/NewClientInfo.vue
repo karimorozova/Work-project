@@ -411,7 +411,7 @@
       box-shadow: $box-shadow;
       margin-left: 40px;
       background: white;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     &__date {
@@ -419,10 +419,10 @@
       width: 390px;
       height: 270px;
       background: white;
-      border-radius: 4px;
+      border-radius: 2px;
       box-shadow: $box-shadow;
       background: white;
-      border-radius: 4px;
+      border-radius: 2px;
     }
   }
 
@@ -463,7 +463,7 @@
       box-sizing: border-box;
       margin-bottom: 25px;
       position: relative;
-      border-radius: 4px;
+      border-radius: 2px;
       background-color: white;
     }
 
@@ -472,7 +472,7 @@
       margin-bottom: 25px;
       box-shadow: $box-shadow;
       position: relative;
-      border-radius: 4px;
+      border-radius: 2px;
       background-color: white;
     }
 

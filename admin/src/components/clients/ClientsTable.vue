@@ -402,7 +402,7 @@ export default {
         top: 45%;
         padding: 5px;
         border: 1px solid $orange;
-        border-radius: 4px;
+        border-radius: 2px;
         color: $orange;
         font-weight: 700;
         z-index: 10;

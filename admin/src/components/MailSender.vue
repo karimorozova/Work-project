@@ -150,7 +150,7 @@ export default {
   padding: 25px;
   box-sizing: border-box;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   position: relative;
 
   &__title {
@@ -216,7 +216,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

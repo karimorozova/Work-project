@@ -53,7 +53,7 @@ export default {
 
   width: 900px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   margin: 50px;
 }
 

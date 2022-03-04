@@ -283,7 +283,7 @@ export default {
     background-color: white;
     color: $text;
     text-align: center;
-    border-radius: 4px;
+    border-radius: 2px;
     bottom: -1px;
     padding: 7px 12px;
     position: absolute;

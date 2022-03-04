@@ -205,7 +205,7 @@
     &__text {
       outline: none;
       border: 1px solid #c1bbb1;
-      border-radius: 4px;
+      border-radius: 2px;
       box-sizing: border-box;
       padding: 5px;
       color: $main-color;

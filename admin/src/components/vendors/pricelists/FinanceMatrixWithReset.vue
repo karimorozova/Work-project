@@ -138,7 +138,7 @@
       background-color: white;
       color: $text;
       text-align: center;
-      border-radius: 4px;
+      border-radius: 2px;
       right: 28px;
       bottom: -7px;
       padding: 7px 12px;

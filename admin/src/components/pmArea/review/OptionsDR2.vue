@@ -32,7 +32,7 @@
     align-items: center;
     border: 1px solid $border;
     background-color: $table-list;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     font-size: 14px;
     overflow: hidden;

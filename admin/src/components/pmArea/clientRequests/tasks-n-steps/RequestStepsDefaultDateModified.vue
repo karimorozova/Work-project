@@ -220,7 +220,7 @@
     &__drop-menu {
       position: relative;
       width: 220px;
-      border-radius: 4px;
+      border-radius: 2px;
       height: 32px;
       background: #fff;
     }

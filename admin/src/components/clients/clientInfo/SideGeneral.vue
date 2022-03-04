@@ -119,7 +119,7 @@
   .block-items {
     padding: 20px;
     border: 2px solid $light-border;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .title {

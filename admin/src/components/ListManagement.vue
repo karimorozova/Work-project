@@ -62,7 +62,7 @@
 
     &__button {
       background: #fff;
-      border-radius: 4px;
+      border-radius: 2px;
       height: 30px;
       width: 30px;
       display: flex;
@@ -86,7 +86,7 @@
     width: 220px;
     box-sizing: border-box;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 117px;
     overflow-y: auto;
 

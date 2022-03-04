@@ -313,7 +313,7 @@ export default {
 .item {
   width: 307px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-top: 20px;
   border: 1px solid $light-border;
   height: fit-content;
@@ -346,7 +346,7 @@ export default {
 
     &--icon {
       font-size: 14px;
-      border-radius: 4px;
+      border-radius: 2px;
       height: 30px;
       width: 30px;
       display: flex;
@@ -411,7 +411,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
@@ -430,7 +430,7 @@ textarea {
   height: 80px;
   width: 310px;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   outline: none;
   transition: .1s ease-out;
   padding: 5px;

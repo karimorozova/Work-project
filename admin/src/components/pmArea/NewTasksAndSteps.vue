@@ -163,7 +163,7 @@ export default {
   box-shadow: $box-shadow;
   width: 1040px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-top: 50px;
 
   &__buttons {
@@ -180,7 +180,7 @@ export default {
   &__refresh {
     font-size: 15px;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 30px;
     width: 30px;
     display: flex;
@@ -200,7 +200,7 @@ export default {
     padding: 0 7px;
     font-size: 16px;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 30px;
     display: flex;
     align-items: center;
@@ -230,7 +230,7 @@ export default {
     padding: 25px;
     box-shadow: $box-shadow;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
     z-index: 30000;
   }
 }

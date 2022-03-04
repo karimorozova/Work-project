@@ -75,7 +75,7 @@ export default {
   min-width: 420px;
   width: 420px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   background: white;
   margin-left: 50px;
   height: fit-content;
@@ -117,7 +117,7 @@ export default {
     position: relative;
     width: 220px;
     background-color: white;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__vendor {

@@ -131,7 +131,7 @@ export default {
     top: 60px;
     width: 200px;
     z-index: 5555;
-    border-radius: 4px;
+    border-radius: 2px;
     box-shadow: $box-shadow;
   }
 }

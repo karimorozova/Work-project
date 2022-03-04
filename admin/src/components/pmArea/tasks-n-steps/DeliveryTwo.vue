@@ -485,7 +485,7 @@ export default {
 
 .field__name {
   border: none;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
@@ -527,7 +527,7 @@ export default {
 
   &__textarea {
     border: 2px solid #c5bfb5;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 100%;
     heigth: 60px;
   }
@@ -542,7 +542,7 @@ export default {
   background-color: $white;
   position: relative;
   width: 1040px;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__delivery-name {
     display: flex;
@@ -787,7 +787,7 @@ export default {
     bottom: 45px;
     width: 140px;
     height: 30px;
-    border-radius: 4px;
+    border-radius: 2px;
     font-size: 14px;
     background-color: #fff;
     outline: none;

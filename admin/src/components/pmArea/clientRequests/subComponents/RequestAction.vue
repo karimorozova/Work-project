@@ -166,7 +166,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  border-radius: 4px;
+  border-radius: 2px;
   background: white;
   position: relative;
 
@@ -198,7 +198,7 @@ export default {
   &__text-input {
     width: 200px;
     margin-top: 5px;
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid $border;
     padding: 5px;
     color: $text;

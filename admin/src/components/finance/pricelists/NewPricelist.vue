@@ -160,7 +160,7 @@
       height: 32px;
       color: #66563d;
       font-size: 14px;
-      border-radius: 4px;
+      border-radius: 2px;
       box-shadow: $box-shadow;
       background-color: #DDD3C8;
       border: 1px solid #DDD3C8;
@@ -220,7 +220,7 @@
       font-size: 14px;
       color: $text;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;

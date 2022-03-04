@@ -63,7 +63,7 @@ export default {
     background-color: white;
     font-size: 14px;
     padding: 2px 4px;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 50px;
     text-align: center;
     margin-top: -3px;

@@ -862,7 +862,7 @@ export default {
   &__mainIcon {
     background: #fff;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
     transition: .2s ease-out;
     z-index: 20;
@@ -923,7 +923,7 @@ export default {
     box-shadow: $box-shadow;
     margin-left: 40px;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
 
   }
 
@@ -942,7 +942,7 @@ export default {
     transition: .2s ease;
     align-items: center;
     letter-spacing: 0.2px;
-    border-radius: 4px;
+    border-radius: 2px;
 
     &-grey {
       background-color: white;
@@ -972,7 +972,7 @@ export default {
     margin-bottom: 20px;
     box-shadow: $box-shadow;
     position: relative;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
   }
 
@@ -987,7 +987,7 @@ export default {
 
   &__notes {
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     box-shadow: $box-shadow;
   }

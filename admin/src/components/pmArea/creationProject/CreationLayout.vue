@@ -116,7 +116,7 @@ export default {
   box-shadow: $box-shadow;
   position: relative;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   height: fit-content;
 

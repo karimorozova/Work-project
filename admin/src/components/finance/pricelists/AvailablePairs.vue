@@ -67,7 +67,7 @@ export default {
         justify-content: center;
         align-items: center;
       box-shadow: $box-shadow;
-        border-radius: 4px;
+        border-radius: 2px;
         background-color: #FFF;
         width: 400px;
     }

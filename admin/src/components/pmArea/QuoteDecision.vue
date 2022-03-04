@@ -164,7 +164,7 @@ export default {
 
 .block {
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   width: 560px;
   box-shadow: $box-shadow;
 

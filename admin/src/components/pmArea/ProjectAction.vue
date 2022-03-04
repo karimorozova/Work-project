@@ -556,7 +556,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__buttonRow {
     display: flex;
@@ -589,7 +589,7 @@ export default {
   &__text-input {
     width: 220px;
     margin-top: 5px;
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid $border;
     padding: 5px;
     color: $text;

@@ -59,14 +59,14 @@ export default {
   box-shadow: $box-shadow;
   box-sizing: border-box;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 2px;
   //position: relative;
   align-self: baseline;
 
   &__title {
     padding: 15px 20px;
     background: $table-list;
-    border-radius: 4px;
+    border-radius: 2px;
     font-family: Roboto700;
   }
 

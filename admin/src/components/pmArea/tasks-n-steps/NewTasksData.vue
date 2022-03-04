@@ -498,7 +498,7 @@ export default {
       border: 1px solid $border;
       align-items: center;
       gap: 5px;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     &-fileName {
@@ -570,7 +570,7 @@ export default {
       font-size: 14px;
       color: $text;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;

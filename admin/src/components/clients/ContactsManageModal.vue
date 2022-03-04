@@ -262,7 +262,7 @@
   .wrapper {
     box-shadow: $box-shadow;
     background-color: white;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 510px;
   }
 
@@ -389,7 +389,7 @@
       font-size: 14px;
       color: $text;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;
@@ -406,7 +406,7 @@
       position: relative;
       width: 220px;
       background: white;
-      border-radius: 4px;
+      border-radius: 2px;
       height: 32px;
     }
 
@@ -421,7 +421,7 @@
     height: 50px;
     width: 444px;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     outline: none;
     transition: .1s ease-out;
     padding: 7px;

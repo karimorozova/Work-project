@@ -429,7 +429,7 @@ export default {
   box-sizing: border-box;
   background-color: white;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   width: 600px;
   padding: 25px;
 
@@ -489,7 +489,7 @@ export default {
 //    margin: 10px 0;
 //    padding: 10px;
 //    border: 2px solid $light-border;
-//    border-radius: 4px;
+//    border-radius: 2px;
 //
 //    gap: 30px;
 //  }

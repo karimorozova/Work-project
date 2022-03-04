@@ -231,7 +231,7 @@
   .discounts {
     @extend %setting-table;
     width: 700px;
-    border-radius: 4px;
+    border-radius: 2px;
     margin: 50px;
 
     &__data {

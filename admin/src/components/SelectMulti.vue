@@ -219,7 +219,7 @@
     position: absolute;
     width: 100%;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     overflow: hidden;
     flex-direction: column;
     box-sizing: border-box;
@@ -324,7 +324,7 @@
   }
 
   .select {
-    border-radius: 4px;
+    border-radius: 2px;
     width: 100%;
     height: 30px;
     display: flex;
@@ -413,7 +413,7 @@
       font-size: 14px;
       width: max-content;
       background: white;
-      border-radius: 4px;
+      border-radius: 2px;
       right: 25px;
       padding: 7px 7px 5px 7px;
       position: absolute;

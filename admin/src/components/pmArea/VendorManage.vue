@@ -1021,7 +1021,7 @@ export default {
   padding: 10px 15px;
   border: 1px dotted $light-border;
   margin-bottom: 10px;
-  border-radius: 4px;
+  border-radius: 2px;
   //transition: .2s ease-out;
 
   //&:hover {
@@ -1531,7 +1531,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
@@ -1562,7 +1562,7 @@ input {
   position: relative;
   width: 220px;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .drop2 {
@@ -1570,7 +1570,7 @@ input {
   position: relative;
   width: 200px;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .fade-enter-active, .fade-leave-active {

@@ -152,7 +152,7 @@
       padding: 0 5px;
       outline: none;
       border: 1px solid #c1bbb1;
-      border-radius: 4px;
+      border-radius: 2px;
       margin-left: 5px;
     }
 

@@ -135,7 +135,7 @@ export default {
   position: relative;
   width: 220px;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .data {
@@ -152,7 +152,7 @@ export default {
       border: 1px solid $border;
       align-items: center;
       gap: 5px;
-      border-radius: 4px;
+      border-radius: 2px;
       margin-bottom: 8px;
 
       &:last-child {

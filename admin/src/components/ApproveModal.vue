@@ -73,7 +73,7 @@
     background-color: $white;
     max-width: 300px;
     font-size: 14px;
-    border-radius: 4px;
+    border-radius: 2px;
 
     &__text {
       text-align: center;

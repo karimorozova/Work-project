@@ -156,7 +156,7 @@ export default {
   position: relative;
   width: 220px;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .create-btn {
@@ -169,7 +169,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

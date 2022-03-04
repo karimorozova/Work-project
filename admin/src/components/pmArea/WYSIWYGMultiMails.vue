@@ -101,7 +101,7 @@
     top: 45%;
     left: 50%;
     transform: translate(-50%,-50%);
-    border-radius: 4px;
+    border-radius: 2px;
     box-shadow: $box-shadow;
 
     &__mails {

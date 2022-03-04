@@ -77,7 +77,7 @@ export default {
 
   &__block {
     background-color: $white;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 30px;
     box-shadow: $box-shadow;
   }
@@ -120,7 +120,7 @@ export default {
       outline: none;
       width: 320px;
       height: 40px;
-      border-radius: 4px;
+      border-radius: 2px;
       transition: .1s ease-out;
       box-shadow: 0 0 0 30px white inset !important;
       padding: 0px 10px;

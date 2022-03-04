@@ -189,7 +189,7 @@
       bottom: 45px;
       width: 140px;
       height: 30px;
-      border-radius: 4px;
+      border-radius: 2px;
       font-size: 14px;
       background-color: #fff;
       outline: none;
@@ -251,7 +251,7 @@
       min-width: 360px;
       background: $table-list;
       margin-left: 20px;
-      border-radius: 4px;
+      border-radius: 2px;
       position: relative;
     }
 

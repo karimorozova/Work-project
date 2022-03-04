@@ -607,7 +607,7 @@ export default {
 //
 //textarea {
 //  width: 100%;
-//  border-radius: 4px;
+//  border-radius: 2px;
 //  border: 1px solid $border;
 //  padding: 5px;
 //  color: $text;
@@ -653,7 +653,7 @@ export default {
 //  height: 30px;
 //  width: 40px;
 //  background-color: $red;
-//  border-radius: 4px;
+//  border-radius: 2px;
 //  display: flex;
 //  align-items: center;
 //  justify-content: center;
@@ -676,7 +676,7 @@ export default {
 //  }
 //
 //  &__value {
-//    border-radius: 4px;
+//    border-radius: 2px;
 //    border: 1px solid #d66f5847;
 //    padding: 0 7px;
 //    height: 32px;
@@ -695,7 +695,7 @@ export default {
 //  background: white;
 //  border: 2px solid $border;
 //  margin-top: 20px;
-//  border-radius: 4px;
+//  border-radius: 2px;
 //
 //
 //  &__notes {
@@ -741,7 +741,7 @@ export default {
 //    height: 32px;
 //    width: 185px;
 //    background-color: white;
-//    border-radius: 4px;
+//    border-radius: 2px;
 //  }
 //
 //  &__title {
@@ -752,7 +752,7 @@ export default {
 //  &__input {
 //    font-size: 14px;
 //    border: 1px solid $border;
-//    border-radius: 4px;
+//    border-radius: 2px;
 //    box-sizing: border-box;
 //    padding: 0 7px;
 //    outline: none;
@@ -809,7 +809,7 @@ export default {
 //  }
 //
 //  &__wrapper {
-//    border-radius: 4px;
+//    border-radius: 2px;
 //    padding: 25px;
 //    box-sizing: border-box;
 //    box-shadow: $box-shadow;
@@ -827,7 +827,7 @@ export default {
 //    box-sizing: border-box;
 //    padding: 25px;
 //    height: fit-content;
-//    border-radius: 4px;
+//    border-radius: 2px;
 //    border-bottom: 1px solid $light-border;
 //  }
 //
@@ -835,7 +835,7 @@ export default {
 //    padding: 25px;
 //    background: $light-background;
 //    margin-bottom: 15px;
-//    border-radius: 4px;
+//    border-radius: 2px;
 //    width: 380px;
 //    box-sizing: border-box;
 //    border-bottom: 1px solid $light-border;
@@ -973,7 +973,7 @@ export default {
 
 textarea {
   width: 100%;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid $border;
   padding: 5px;
   color: $text;
@@ -1000,7 +1000,7 @@ textarea {
   }
 
   &__value {
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid #d66f5847;
     padding: 0 7px;
     height: 32px;
@@ -1016,7 +1016,7 @@ textarea {
   background-color: white;
   padding: 25px;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   height: fit-content;
   z-index: 500;
   width: 510px;
@@ -1036,7 +1036,7 @@ textarea {
   &__input {
     font-size: 14px;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1107,7 +1107,7 @@ textarea {
   position: relative;
   width: 220px;
   background-color: white;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &-title {
     margin-bottom: 3px;
@@ -1159,7 +1159,7 @@ textarea {
   }
 
   &__wrapper {
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 25px;
     box-sizing: border-box;
     box-shadow: $box-shadow;
@@ -1178,7 +1178,7 @@ textarea {
     box-sizing: border-box;
     padding: 25px;
     height: fit-content;
-    border-radius: 4px;
+    border-radius: 2px;
     border-bottom: 1px solid $light-border;
   }
 
@@ -1186,7 +1186,7 @@ textarea {
     padding: 25px;
     background: $light-background;
     margin-bottom: 15px;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 380px;
     box-sizing: border-box;
     border-bottom: 1px solid $light-border;
@@ -1384,7 +1384,7 @@ textarea {
   background: white;
   box-sizing: border-box;
   padding: 25px;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid $light-border;
   margin-top: 15px;
 
@@ -1422,7 +1422,7 @@ textarea {
 
 .toggle-details {
   font-size: 15px;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 30px;
   width: 30px;
   display: flex;
@@ -1442,7 +1442,7 @@ textarea {
 .file-fake-button {
   height: 30px;
   width: 30px;
-  border-radius: 4px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;

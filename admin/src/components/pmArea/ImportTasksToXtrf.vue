@@ -167,7 +167,7 @@ export default {
   min-width: 420px;
   width: 420px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 25px;
 
 
@@ -196,7 +196,7 @@ a {
   min-width: 400px;
   width: 400px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 40px;
 
 
@@ -231,7 +231,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

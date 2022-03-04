@@ -227,7 +227,7 @@
         font-size: 14px;
         color: #66563d;
         border: 1px solid #c1bbb1;
-        border-radius: 4px;
+        border-radius: 2px;
         box-sizing: border-box;
         padding: 0 5px;
         outline: none;

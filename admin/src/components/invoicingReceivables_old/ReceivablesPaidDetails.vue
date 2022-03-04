@@ -430,7 +430,7 @@
 
   textarea {
     width: 100%;
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid $border;
     padding: 5px;
     color: $text;
@@ -489,7 +489,7 @@
     height: 30px;
     width: 40px;
     background-color: $red;
-    border-radius: 4px;
+    border-radius: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -512,7 +512,7 @@
     }
 
     &__value {
-      border-radius: 4px;
+      border-radius: 2px;
       border: 1px solid #d66f5847;
       padding: 0 7px;
       height: 32px;
@@ -543,7 +543,7 @@
     background: white;
     border: 2px solid $border;
     margin-top: 20px;
-    border-radius: 4px;
+    border-radius: 2px;
 
 
     &__notes {
@@ -606,7 +606,7 @@
       height: 32px;
       width: 185px;
       background-color: white;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     &__title {
@@ -617,7 +617,7 @@
     &__input {
       font-size: 14px;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;
@@ -665,7 +665,7 @@
     }
 
     &__wrapper {
-      border-radius: 4px;
+      border-radius: 2px;
       padding: 20px;
       box-sizing: border-box;
       box-shadow: 0 1px 2px 0 rgba(99, 99, 99, .3), 0 1px 3px 1px rgba(99, 99, 99, .15);
@@ -678,7 +678,7 @@
       max-height: 600px;
       overflow: auto;
       padding: 25px;
-      border-radius: 4px;
+      border-radius: 2px;
       border: 2px solid #bfbfbf;
     }
 

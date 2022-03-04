@@ -470,7 +470,7 @@ export default {
   top: 48px;
   background: #fff;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   padding: 5px;
   transition: .2s ease-out;

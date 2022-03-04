@@ -444,7 +444,7 @@
       color: $text;
       border: 1px solid $text;
       text-align: center;
-      border-radius: 4px;
+      border-radius: 2px;
       padding: 6px;
       position: absolute;
       z-index: 1;

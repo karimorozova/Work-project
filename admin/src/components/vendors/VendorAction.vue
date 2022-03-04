@@ -45,7 +45,7 @@ export default {
   align-items: flex-start;
   min-width: 420px;
   width: 420px;
-  border-radius: 4px;
+  border-radius: 2px;
   background: white;
   margin-left: 50px;
   margin-top: 25px;
@@ -66,7 +66,7 @@ export default {
 
   &__icon {
     font-size: 15px;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 30px;
     width: 30px;
     display: flex;

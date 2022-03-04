@@ -28,7 +28,7 @@ export default {
   right: 50px;
   top: 120px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   box-shadow: $box-shadow;
   display: flex;
   padding: 10px 20px 10px 12px;

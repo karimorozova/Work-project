@@ -155,7 +155,7 @@
     background: white;
 
     &__table {
-      border-radius: 4px;
+      border-radius: 2px;
       padding: 20px;
       box-sizing: border-box;
       box-shadow: $box-shadow;
@@ -195,7 +195,7 @@
       font-size: 14px;
       color: $text;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       box-sizing: border-box;
       padding: 0 7px;
       outline: none;
@@ -240,7 +240,7 @@
     height: 32px;
     color: #fff;
     font-size: 14px;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: #d66f58;
     border: none;
     transition: .1s ease;

@@ -86,7 +86,7 @@
 
     &_error-shadow {
       box-shadow: 0 0 5px red;
-      border-radius: 4px;
+      border-radius: 2px;
     }
   }
 

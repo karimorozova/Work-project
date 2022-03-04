@@ -21,7 +21,7 @@ export default {
   width: 25px;
   height: 25px;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   margin-top: 10px;
   transition: .2s ease-out;

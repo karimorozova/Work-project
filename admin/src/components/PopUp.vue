@@ -101,7 +101,7 @@ export default {
   min-width: 100px;
   max-width: 220px;
   text-align: center;
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 6px;
   z-index: 100000;
   margin-left: -4px !important;

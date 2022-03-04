@@ -98,8 +98,8 @@ function requestMessageForVendor(obj) {
 	const acceptHref = `${ apiUrl }/quote-decision?vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ obj._id }&from=${ date }&t=${ token }&type=vendor&prop=accept`
 	const declineHref = `${ apiUrl }/quote-decision?vendorId=${ obj.vendor.id }&projectId=${ obj.projectId }&stepId=${ obj._id }&from=${ date }&t=${ token }&type=vendor&prop=reject`
 
-	let acceptQuote = `<a href="${ acceptHref }" style="background: #4ba5a5;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">I accept ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
-	let declineQuote = `<a href="${ declineHref }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">I reject ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	let acceptQuote = `<a href="${ acceptHref }" style="background: #4ba5a5;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 2px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">I accept ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
+	let declineQuote = `<a href="${ declineHref }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 2px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">I reject ${ +(obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</a>`
 
 	const start = moment(obj.start).format('DD-MM-YYYY, HH:mm')
 	const deadline = moment(obj.deadline).format('DD-MM-YYYY, HH:mm')

@@ -112,12 +112,12 @@
       background: white;
       width: 100%;
       z-index: 9000;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     &__body {
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       max-height: 260px;
       overflow-y: auto;
     }
@@ -191,7 +191,7 @@
       padding: 6px 12px;
       margin-left: 15px;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       min-height: 12px;
       margin-top: 12px;
       width: fit-content;

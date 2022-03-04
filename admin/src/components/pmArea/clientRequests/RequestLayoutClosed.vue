@@ -297,7 +297,7 @@ export default {
     transition: .2s ease;
     align-items: center;
     letter-spacing: .2px;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 36px;
 
     &-grey {
@@ -328,7 +328,7 @@ export default {
     box-sizing: border-box;
     border: 1px solid $light-border;
     position: relative;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
     width: 482px;
 
@@ -423,7 +423,7 @@ input[type="text"]:disabled {
 .drop-white {
   height: 32px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .button-m-top {
@@ -462,7 +462,7 @@ input[type="text"]:disabled {
     width: 420px;
     box-sizing: border-box;
     margin-left: 50px;
-    border-radius: 4px;
+    border-radius: 2px;
     background: white;
     margin-bottom: 25px;
   }
@@ -475,7 +475,7 @@ input[type="text"]:disabled {
   max-width: 1040px;
   box-sizing: border-box;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   background: white;
   height: fit-content;
 
@@ -483,7 +483,7 @@ input[type="text"]:disabled {
     box-sizing: border-box;
     border: 1px solid $light-border;
     position: relative;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
     width: 482px;
 
@@ -560,12 +560,12 @@ input[type="text"]:disabled {
     margin-bottom: 30px;
     padding: 25px;
     border: 2px solid $light-border;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__table-box {
     border: 2px solid $light-border;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 25px;
     margin-bottom: 30px;
   }
@@ -602,7 +602,7 @@ input[type="text"]:disabled {
     position: relative;
     padding: 25px 25px 5px 25px;
     border: 2px solid $light-border;
-    border-radius: 4px;
+    border-radius: 2px;
     height: fit-content;
   }
 
@@ -814,7 +814,7 @@ input[type="text"]:disabled {
 
 textarea {
   width: 100%;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid $border;
   padding: 5px;
   color: $text;
@@ -832,7 +832,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
@@ -872,7 +872,7 @@ input {
 
 .iconId {
   font-size: 15px;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 30px;
   width: 30px;
   display: flex;

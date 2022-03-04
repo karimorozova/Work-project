@@ -93,7 +93,7 @@ export default {
   &__input {
     padding-top: 4px;
     border: 1px solid $cell-border;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 220px;
     height: 32px;
     box-sizing: border-box;

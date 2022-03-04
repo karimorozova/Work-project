@@ -325,13 +325,13 @@ export default {
 
 .card {
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: $white;
   margin-bottom: 10px;
 
   &__header {
     border: 1px solid $light-border;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -369,7 +369,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid $light-border;
   cursor: pointer;
 
@@ -377,7 +377,7 @@ export default {
     font-size: 16px;
     padding: 10px;
     border: 1px solid $light-border;
-    border-radius: 4px;
+    border-radius: 2px;
     margin-bottom: 4px;
   }
 }
@@ -386,14 +386,14 @@ export default {
   padding: 20px;
   box-shadow: $box-shadow;
   background-color: $white;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

@@ -91,7 +91,7 @@
 
     width: 1040px;
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 2px;
     margin: 50px;
   }
 

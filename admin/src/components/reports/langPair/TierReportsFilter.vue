@@ -99,7 +99,7 @@ export default {
     height: 32px;
     color: $white;
     font-size: 14px;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: $orange;
     border: none;
     transition: .1s ease;
@@ -139,7 +139,7 @@ export default {
     padding: 0 5px;
     outline: none;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     margin-left: 5px;
   }
 

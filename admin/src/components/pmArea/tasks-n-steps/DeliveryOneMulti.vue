@@ -508,7 +508,7 @@
 
     &__textarea {
       border: 2px solid #c5bfb5;
-      border-radius: 4px;
+      border-radius: 2px;
       width: 100%;
       heigth: 60px;
     }
@@ -524,7 +524,7 @@
     position: relative;
     width: 1040px;
     min-width: 1040px;
-    border-radius: 4px;
+    border-radius: 2px;
 
 
     &__button-certificate {
@@ -721,7 +721,7 @@
       bottom: 45px;
       width: 140px;
       height: 30px;
-      border-radius: 4px;
+      border-radius: 2px;
       font-size: 14px;
       background-color: #fff;
       outline: none;

@@ -148,7 +148,7 @@ export default {
     box-sizing: border-box;
     margin-top: 40px;
     margin-bottom: 40px;
-    border-radius: 4px;
+    border-radius: 2px;
     background: white;
   }
 }
@@ -172,7 +172,7 @@ export default {
   max-width: 1040px;
   box-sizing: border-box;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   background: white;
 
   &__project {

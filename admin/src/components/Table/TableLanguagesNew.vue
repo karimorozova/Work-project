@@ -562,7 +562,7 @@
     width: 1040px;
     margin: 50px;
     padding: 20px;
-    border-radius: 4px;
+    border-radius: 2px;
     box-shadow: $box-shadow;
     margin: 50px;
 

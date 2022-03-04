@@ -288,7 +288,7 @@ export default {
   background: white;
   padding: 20px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__form {
     width: 70%;

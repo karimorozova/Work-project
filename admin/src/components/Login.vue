@@ -142,7 +142,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      border-radius: 4px;
+      border-radius: 2px;
       box-shadow: $box-shadow;
     }
 
@@ -153,7 +153,7 @@
       padding: 10px;
       display: flex;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: 2px;
       transition: .15s ease;
 
       &:hover {
@@ -202,7 +202,7 @@
       flex-direction: column;
       align-items: center;
       box-sizing: border-box;
-      border-radius: 4px;
+      border-radius: 2px;
       box-shadow: $box-shadow;
     }
 
@@ -230,7 +230,7 @@
       color: $text;
       padding-left: 10px;
       padding-right: 10px;
-      border-radius: 4px;
+      border-radius: 2px;
       border: 2px solid #dedede;
 
       &::-webkit-input-placeholder {
@@ -267,7 +267,7 @@
     &__button {
       width: 165px;
       height: 36px;
-      border-radius: 4px;
+      border-radius: 2px;
       font-size: 19px;
       background-color: $green;
       color: $white;

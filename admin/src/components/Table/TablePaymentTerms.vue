@@ -238,7 +238,7 @@ export default {
   padding: 20px;
   margin: 50px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   box-shadow: $box-shadow;
 }
 
@@ -294,7 +294,7 @@ input {
 .discounts {
   @extend %setting-table;
   width: 700px;
-  border-radius: 4px;
+  border-radius: 2px;
   margin: 50px;
 
   &__data {

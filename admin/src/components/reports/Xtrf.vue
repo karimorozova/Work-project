@@ -115,7 +115,7 @@
 
     &__text {
       border: 1px solid black;
-      border-radius: 4px;
+      border-radius: 2px;
       margin: 5px 0;
       padding: 5px;
       box-sizing: border-box;

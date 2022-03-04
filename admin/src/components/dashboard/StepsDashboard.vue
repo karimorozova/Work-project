@@ -783,7 +783,7 @@ export default {
   background: #fff;
   padding: 25px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   box-shadow: $box-shadow;
 
   &__stepsActions {
@@ -836,7 +836,7 @@ export default {
     z-index: 9999;
     box-shadow: $box-shadow;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__change-deadline {
@@ -847,7 +847,7 @@ export default {
     z-index: 9999;
     box-shadow: $box-shadow;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 30px 0 0 0;
     width: 250px;
 
@@ -916,7 +916,7 @@ a {
     max-width: 280px;
     min-width: 140px;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
     right: 15px;
     top: -7px;
     padding: 7px 7px 5px 7px;
@@ -1011,7 +1011,7 @@ a {
   padding: 25px;
   box-shadow: $box-shadow;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   z-index: 30000;
 }
 
@@ -1043,7 +1043,7 @@ a {
   top: 48px;
   background: #fff;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
   padding: 5px;
   transition: .2s ease-out;

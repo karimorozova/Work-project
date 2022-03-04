@@ -171,7 +171,7 @@
       top: 10px;
       background: #fff;
       border: 1px solid $border;
-      border-radius: 4px;
+      border-radius: 2px;
       cursor: pointer;
       padding: 5px;
       transition: .2s ease-out;
@@ -189,7 +189,7 @@
       padding: 9px;
       border: 1px solid $border;
       margin-bottom: 4px;
-      border-radius: 4px;
+      border-radius: 2px;
       justify-content: space-between;
       align-items: center;
 

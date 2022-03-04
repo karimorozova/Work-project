@@ -157,7 +157,7 @@
   .tierlqas {
     @extend %setting-table;
     width: 600px;
-    border-radius: 4px;
+    border-radius: 2px;
     margin: 50px;
 
     &__data, &__editing-data {

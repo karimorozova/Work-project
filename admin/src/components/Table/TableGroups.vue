@@ -172,7 +172,7 @@
   .groups {
     @extend %setting-table;
     width: 400px;
-    border-radius: 4px;
+    border-radius: 2px;
     margin: 50px;
 
     &__data {

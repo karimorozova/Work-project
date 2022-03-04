@@ -340,7 +340,7 @@
       background-color: #66563d;
       color: #fff;
       text-align: center;
-      border-radius: 4px;
+      border-radius: 2px;
       padding: 5px;
       position: absolute;
       z-index: 1;

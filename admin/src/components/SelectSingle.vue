@@ -193,7 +193,7 @@ i {
   position: absolute;
   width: 100%;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
   flex-direction: column;
   box-sizing: border-box;

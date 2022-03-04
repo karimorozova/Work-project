@@ -311,7 +311,7 @@ export default {
   box-sizing: border-box;
   background-color: white;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   width: 600px;
   padding: 25px;
 }
@@ -355,7 +355,7 @@ export default {
 .vendor {
   padding: 15px;
   border: 1px solid $light-border;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__row1 {
     display: flex;

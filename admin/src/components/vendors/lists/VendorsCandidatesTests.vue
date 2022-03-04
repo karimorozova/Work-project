@@ -578,7 +578,7 @@
     position: relative !important;
     margin: 50px;
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 20px;
     background: white;
 
@@ -688,7 +688,7 @@
         font-size: 14px;
         color: #66563d;
         border: 1px solid #c1bbb1;
-        border-radius: 4px;
+        border-radius: 2px;
         padding: 0 5px;
         outline: none;
         width: 277px;

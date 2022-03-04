@@ -284,7 +284,7 @@
       margin: 0 7px;
       width: 100%;
       background: white;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     &__icons {
@@ -314,7 +314,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;

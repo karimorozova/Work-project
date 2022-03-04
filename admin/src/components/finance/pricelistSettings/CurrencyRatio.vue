@@ -116,7 +116,7 @@
   input {
     color: $text;
     height: 30px;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 55px;
     border: 1px solid $border;
     padding: 0 8px;

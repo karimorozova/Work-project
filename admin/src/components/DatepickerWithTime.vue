@@ -967,7 +967,7 @@
     z-index: 100;
     background: #fff;
     box-shadow: $box-shadow;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   .vdp-datepicker__calendar header {
@@ -1168,7 +1168,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1185,7 +1185,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1203,7 +1203,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1220,7 +1220,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1265,7 +1265,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1282,7 +1282,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1300,7 +1300,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -1318,7 +1318,7 @@
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;

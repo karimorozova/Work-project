@@ -208,7 +208,7 @@ export default {
   padding: 25px;
   box-shadow: $box-shadow;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__titleFinance {
     font-size: 18px;
@@ -268,7 +268,7 @@ export default {
   &__dashboard {
     display: flex;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     align-items: center;
     margin-bottom: 20px;
   }
@@ -328,7 +328,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

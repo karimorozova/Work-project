@@ -280,13 +280,13 @@ export default {
   box-shadow: $box-shadow;
   position: relative;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__addTask,
   &__closeAddTask {
     font-size: 16px;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 30px;
     width: 30px;
     display: flex;

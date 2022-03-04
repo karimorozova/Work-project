@@ -518,7 +518,7 @@ function getMessageResetPassword( url) {
 										</p>	
 										
 										<p style="font-weight: 400;">
-										<a href="${ url }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 4px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">Reset Password</a>
+										<a href="${ url }" style="background: #d66f58;color: #fff;padding: 6px 20px;text-decoration: none;border-radius: 2px;cursor: pointer;margin: 7px 10px 0px 0;display: inline-block;">Reset Password</a>
 										</p>
                 </div>
                 <footer>

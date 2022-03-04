@@ -276,7 +276,7 @@ export default {
     transition: .2s ease;
     align-items: center;
     letter-spacing: .2px;
-    border-radius: 4px;
+    border-radius: 2px;
     height: 36px;
 
     &-grey {
@@ -311,7 +311,7 @@ export default {
     box-sizing: border-box;
     border: 1px solid $light-border;
     position: relative;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
     width: 482px;
 
@@ -372,7 +372,7 @@ export default {
     padding: 0 10px;
     height: 44px;
     width: 970px;
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid $light-border;
     outline: none;
     color: $text;
@@ -408,7 +408,7 @@ export default {
     box-shadow: $box-shadow;
     position: relative;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__info-row {
@@ -459,7 +459,7 @@ export default {
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -476,7 +476,7 @@ export default {
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -496,7 +496,7 @@ export default {
   &__text {
     width: 100%;
     margin-top: 4px;
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid $border;
     padding: 5px;
     color: $text;

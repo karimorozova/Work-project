@@ -255,7 +255,7 @@ export default {
     margin: 0 7px;
     width: 100%;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__opacity {

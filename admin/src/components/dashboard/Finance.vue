@@ -186,7 +186,7 @@ export default {
     box-shadow: $box-shadow;
     box-sizing: border-box;
     background-color: white;
-    border-radius: 4px;
+    border-radius: 2px;
     position: relative;
     align-self: flex-start;
   }

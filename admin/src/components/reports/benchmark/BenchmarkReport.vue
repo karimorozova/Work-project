@@ -155,7 +155,7 @@
     background: white;
     padding: 20px;
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: 2px;
 
     &__text {
       margin: 10px 0 5px;

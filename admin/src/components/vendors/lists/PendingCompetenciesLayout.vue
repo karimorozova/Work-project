@@ -259,7 +259,7 @@
       box-shadow: $box-shadow;
       position: relative;
       box-sizing: border-box;
-      border-radius: 4px;
+      border-radius: 2px;
     }
 
     &__data {

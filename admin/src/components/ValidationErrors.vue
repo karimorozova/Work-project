@@ -50,7 +50,7 @@
         z-index: 9999;
         box-shadow: $box-shadow;
         background-color: white;
-        border-radius: 4px;
+        border-radius: 2px;
         border-left: 2px solid $red;
       }
 
@@ -63,7 +63,7 @@
       &__messages {
         background-color: white;
         padding: 20px;
-        border-radius: 4px;
+        border-radius: 2px;
       }
 
       &__error {
@@ -106,7 +106,7 @@
         z-index: 9999;
         box-shadow: $box-shadow;
         background-color: white;
-        border-radius: 4px;
+        border-radius: 2px;
         border-left: 2px solid $red;
       }
 
@@ -119,7 +119,7 @@
       &__messages {
         background-color: white;
         padding: 20px;
-        border-radius: 4px;
+        border-radius: 2px;
       }
 
       &__error {

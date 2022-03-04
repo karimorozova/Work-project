@@ -42,7 +42,7 @@
       height: 20px;
       font-size: 14px;
       line-height: 20px;
-      border-radius: 4px;
+      border-radius: 2px;
       margin-right: 5px;
       border: 1px solid $border;
     }
@@ -68,7 +68,7 @@
   #myInput {
     height: 18px;
     font-size: 14px;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 65px;
     border: 1px solid $border;
     background: transparent;

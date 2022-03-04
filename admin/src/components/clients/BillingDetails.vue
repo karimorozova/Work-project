@@ -396,7 +396,7 @@ export default {
   padding: 25px;
   background: white;
   z-index: 15;
-  border-radius: 4px;
+  border-radius: 2px;
   box-shadow: $box-shadow;
 
   &__title {
@@ -422,7 +422,7 @@ export default {
   height: 32px;
   box-sizing: border-box;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 0px 10px;
   cursor: pointer;
   align-items: center;
@@ -440,7 +440,7 @@ export default {
   margin-bottom: 60px;
   box-shadow: $box-shadow;
   position: relative;
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: white;
   padding: 25px;
   width: 786px;
@@ -545,7 +545,7 @@ export default {
     font-size: 14px;
     color: $text;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     box-sizing: border-box;
     padding: 0 7px;
     outline: none;
@@ -575,7 +575,7 @@ textarea {
   min-width: 220px;
   max-width: 220px;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   outline: none;
   transition: .1s ease-out;
   padding: 7px;
@@ -590,7 +590,7 @@ textarea {
 .item {
   width: 358px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid $light-border;
   height: fit-content;
 

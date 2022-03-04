@@ -303,7 +303,7 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 
   &__close {

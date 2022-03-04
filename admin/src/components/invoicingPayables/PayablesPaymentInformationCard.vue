@@ -59,7 +59,7 @@ export default {
 .receipt {
   padding: 25px;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   height: fit-content;
   margin: 25px 25px 0 0;
   background-color: white;

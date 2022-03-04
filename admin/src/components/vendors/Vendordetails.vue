@@ -713,7 +713,7 @@ export default {
   &__mainIcon {
     background: #fff;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     cursor: pointer;
     transition: .2s ease-out;
     z-index: 20;
@@ -793,7 +793,7 @@ export default {
     width: 350px;
     box-shadow: $box-shadow;
     margin-left: 40px;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
   }
 
@@ -809,7 +809,7 @@ export default {
     transition: .2s ease;
     align-items: center;
     letter-spacing: 0.2px;
-    border-radius: 4px;
+    border-radius: 2px;
 
     &-grey {
       background-color: white;
@@ -841,7 +841,7 @@ export default {
     margin-bottom: 20px;
     box-shadow: $box-shadow;
     position: relative;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
   }
 
@@ -904,7 +904,7 @@ export default {
 
   &_error-shadow {
     box-shadow: $box-shadow;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 }
 
@@ -986,7 +986,7 @@ export default {
   height: 32px;
   color: $white;
   font-size: 14px;
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: $orange;
   border: none;
   transition: .1s ease;
@@ -1017,7 +1017,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 2px;
 
   .photo-image {
     max-width: 100%;

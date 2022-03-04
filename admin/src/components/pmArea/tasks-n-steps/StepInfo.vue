@@ -165,7 +165,7 @@ export default {
   box-sizing: border-box;
   background-color: white;
   box-shadow: $box-shadow;
-  border-radius: 4px;
+  border-radius: 2px;
   width: 600px;
   padding: 25px;
   position: relative;

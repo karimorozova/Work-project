@@ -396,7 +396,7 @@ export default {
   min-width: 420px;
   width: 420px;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
 
   &__row {
     width: 100%;
@@ -561,7 +561,7 @@ export default {
 
 .iconId {
   font-size: 15px;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 30px;
   width: 30px;
   display: flex;

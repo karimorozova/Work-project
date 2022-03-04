@@ -94,7 +94,7 @@
       max-height: 45vh;
       overflow-y: auto;
       padding: 10px;
-      border-radius: 4px;
+      border-radius: 2px;
       border: 2px solid $light-border;
       box-sizing: border-box;
     }
@@ -116,7 +116,7 @@
     align-items: center;
     padding: 10px;
     border: 1px solid $border;
-    border-radius: 4px;
+    border-radius: 2px;
     margin-top: 0px;
     transition: .1s ease;
     margin-bottom: 10px;

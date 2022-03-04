@@ -52,7 +52,7 @@
     font-size: 12px;
     border: 2px solid;
     padding: 5px;
-    border-radius: 4px;
+    border-radius: 2px;
     font-family: 'Myriad600';
     top: 26.5px;
   }
@@ -97,7 +97,7 @@
     margin-top: 40px;
     margin-right: 40px;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 20px;
     position: relative;
     box-shadow: $box-shadow;

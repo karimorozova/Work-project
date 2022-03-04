@@ -141,7 +141,7 @@
 
     &__textarea {
       border: 2px solid #c5bfb5;
-      border-radius: 4px;
+      border-radius: 2px;
       width: 100%;
       heigth: 60px;
     }

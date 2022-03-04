@@ -305,7 +305,7 @@ export default {
     background: white;
     box-shadow: $box-shadow;
     padding: 25px;
-    border-radius: 4px;
+    border-radius: 2px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -352,7 +352,7 @@ export default {
   margin: 20px 0;
   background: $light-background;
   border: 1px solid $light-border;
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 10px 20px;
 
   &__icons {
@@ -373,7 +373,7 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 4px;
+    border-radius: 2px;
 
     &:hover {
       color: $text;
@@ -443,7 +443,7 @@ export default {
 
 .drop {
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   width: 210px;
   height: 32px;
   position: relative;
@@ -453,7 +453,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;

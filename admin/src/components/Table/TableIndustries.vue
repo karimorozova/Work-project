@@ -285,7 +285,7 @@
 
   .industries {
     @extend %setting-table;
-    border-radius: 4px;
+    border-radius: 2px;
     width: 900px;
     margin: 50px;
 

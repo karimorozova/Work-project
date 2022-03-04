@@ -160,7 +160,7 @@ export default {
     top: 50%;
     left: 50%;
     //box-shadow: $box-shadow;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: white;
     z-index: 5;
     padding: 25px;
@@ -181,7 +181,7 @@ export default {
 .group__card {
   position: relative;
   border: 1px solid #bfbfbf;
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 15px;
   width: 274px;
 }
@@ -220,7 +220,7 @@ export default {
     font-size: 14px;
     width: max-content;
     background: white;
-    border-radius: 4px;
+    border-radius: 2px;
     left: 70px;
     top: -8px;
     padding: 7px 7px 5px 7px;

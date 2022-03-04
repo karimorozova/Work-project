@@ -50,7 +50,7 @@ export default {
   align-items: flex-start;
   min-width: 420px;
   width: 420px;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-left: 50px;
   background: white;
   height: fit-content;

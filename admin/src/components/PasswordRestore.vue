@@ -74,7 +74,7 @@
       padding: 40px;
       box-sizing: border-box;
       background-color: $white;
-      border-radius: 4px;
+      border-radius: 2px;
       box-shadow: $box-shadow;
     }
 
@@ -98,7 +98,7 @@
       color: $main-color;
       padding: 0 10px;
       box-sizing: border-box;
-      border-radius: 4px;
+      border-radius: 2px;
       border: 2px solid #dedede;
       margin-top: 20px;
 
@@ -123,7 +123,7 @@
     &__send {
       width: 165px;
       height: 36px;
-      border-radius: 4px;
+      border-radius: 2px;
       font-size: 19px;
       background-color: #4BA5A5;
       color: #fff;

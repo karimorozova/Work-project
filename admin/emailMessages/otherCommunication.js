@@ -2,7 +2,7 @@ function getErrorTemplate(code, message) {
 	return `
 		<style> body {background: #fcfcfc} </style>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-		<div class="card" style="font-family:'Roboto'; color:#333; margin: 50px auto;  box-sizing: border-box; width: 390px; background-color: white; padding: 25px;border-radius: 4px;box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;">
+		<div class="card" style="font-family:'Roboto'; color:#333; margin: 50px auto;  box-sizing: border-box; width: 390px; background-color: white; padding: 25px;border-radius: 2px;box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;">
 		    <div style="display: flex;height: 50px;align-items: center;gap: 10px;justify-content: center;">
 		        <div class="image">
 		            <img style="height: 32px;" src="../static/error.svg" alt="">
@@ -29,7 +29,7 @@ function getSuccessTemplate(title, message, footer) {
 			a:hover{text-decoration: none;}
 		</style>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-		<div class="card" style="font-family:'Roboto'; color:#333; margin: 50px auto; box-sizing: border-box; width: 390px; background-color: white; border-radius: 4px;box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;">
+		<div class="card" style="font-family:'Roboto'; color:#333; margin: 50px auto; box-sizing: border-box; width: 390px; background-color: white; border-radius: 2px;box-shadow: rgba(99, 99, 99, 0.3) 0px 1px 2px 0px, rgba(99, 99, 99, 0.15) 0px 1px 3px 1px;">
 		    <div style="padding: 25px;">
 			    <div style="display: flex;height: 50px;align-items: center;gap: 10px;justify-content: center;">
 			        <div class="image">

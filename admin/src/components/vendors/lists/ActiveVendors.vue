@@ -137,7 +137,7 @@
     background: white;
 
     &__table {
-      border-radius: 4px;
+      border-radius: 2px;
       padding: 20px;
       box-sizing: border-box;
       box-shadow: $box-shadow;

@@ -737,7 +737,7 @@ export default {
     height: 32px;
     color: #fff;
     font-size: 15px;
-    border-radius: 4px;
+    border-radius: 2px;
     background-color: $red;
     justify-content: center;
     display: flex;
@@ -904,7 +904,7 @@ export default {
     justify-content: center;
     height: fit-content;
     padding-bottom: 150px;
-    border-radius: 4px;
+    border-radius: 2px;
   }
 }
 
@@ -917,7 +917,7 @@ export default {
   box-shadow: $box-shadow;
   position: relative;
   background: white;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-bottom: 70px;
 
   &__header {
@@ -1141,7 +1141,7 @@ export default {
     background-color: white;
     color: $text;
     text-align: center;
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 5px;
     position: absolute;
     z-index: 1;
@@ -1215,7 +1215,7 @@ export default {
   }
 
   &__item {
-    border-radius: 4px;
+    border-radius: 2px;
     border: 1px solid $border;
     box-sizing: border-box;
     background-color: #fff;

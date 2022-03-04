@@ -480,7 +480,7 @@ export default {
   background: white;
   padding: 25px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   box-shadow: $box-shadow;
 
   &__header {
