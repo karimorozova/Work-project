@@ -273,7 +273,7 @@ const getPayablesProjectsAndSteps = async (id) => {
 			}
 		} ]
 	)
-	return (await InvoicingPayables.populate(invoicingReports, [ 'vendor' ]))
+	return (await InvoicingPayables.populate(invoicingReports, [ { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] } ]))
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep, isSort = true) => {

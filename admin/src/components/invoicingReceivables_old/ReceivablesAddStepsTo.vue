@@ -7,7 +7,6 @@
         :tableData="steps",
         :isFilterShow="false"
         :isFilterAbsolute="false"
-        :isBodyShort="true"
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
