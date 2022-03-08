@@ -596,7 +596,10 @@ export default {
       }
     },
     setVendorToStep(vendor) {
-      this.$set(this.selectedVendors, this.currentStepId, vendor)
+      // TODO: Delete soon, Temporary for quantity with MT Translation
+      this.$set(this.selectedVendors, this.currentStepId, { ...vendor, fakeStepVendor: this.selectedStep }, )
+      //stable version
+      //this.$set(this.selectedVendors, this.currentStepId, vendor)
     },
     setVendorToReassignStep(vendor) {
       this.selectedReassignedVendor = {
