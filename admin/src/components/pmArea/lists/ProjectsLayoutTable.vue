@@ -1,122 +1,130 @@
 <template lang="pug">
   .table
+    LayoutsListWrapper(
+      :hasFilterButton="true"
+      :hasClearButton="true"
+      :isFilterActive="isFilterActive"
+      @toggleFilters="toggleFilters"
+      @clearFilters="clearFilters"
+    )
+      template(slot="filters")
+        .table__filters(ref="filter")
+          ProjectsLayoutFilter
 
-    .table__filters(ref="filter")
-      ProjectsLayoutFilter
+      template(slot="table")
+        .table__result
+          LayoutsTable(
+            :fields="filteredFields"
+            :tableData="list"
+            @bottomScrolled="bottomScrolled"
+          )
+            template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+              .table__header {{ field.label }}
 
-    .table__result
-      LayoutsTable(
-        :fields="filteredFields"
-        :tableData="list"
-        @bottomScrolled="bottomScrolled"
-      )
-        template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-          .table__header {{ field.label }}
+            template(slot="projectId" slot-scope="{ row, index }")
+              .table__data
+                router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+                  span {{row.projectId}}
 
-        template(slot="projectId" slot-scope="{ row, index }")
-          .table__data
-            router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              span {{row.projectId}}
+            template(slot="projectName" slot-scope="{ row, index }")
+              .table__data
+                router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+                  span {{ getProjectName( row.projectName ) }}
 
-        template(slot="projectName" slot-scope="{ row, index }")
-          .table__data
-            router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-              span {{ getProjectName( row.projectName ) }}
+            template(slot="clientName" slot-scope="{ row, index }")
+              .table__data {{row.customer.name}}
 
-        template(slot="clientName" slot-scope="{ row, index }")
-          .table__data {{row.customer.name}}
+            template(slot="languages" slot-scope="{ row, index }")
+              .table__data(v-html="projectLanguages(row.tasks)")
 
-        template(slot="languages" slot-scope="{ row, index }")
-          .table__data(v-html="projectLanguages(row.tasks)")
+            template(slot="startDate" slot-scope="{ row, index }")
+              .table__data {{ customFormatter(row.startDate) }}
 
-        template(slot="startDate" slot-scope="{ row, index }")
-          .table__data {{ customFormatter(row.startDate) }}
+            template(slot="deadline" slot-scope="{ row, index }")
+              .table__data {{ customFormatter(row.deadline) }}
 
-        template(slot="deadline" slot-scope="{ row, index }")
-          .table__data {{ customFormatter(row.deadline) }}
+            template(slot="projectManager" slot-scope="{ row, index }")
+              .table__data {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
 
-        template(slot="projectManager" slot-scope="{ row, index }")
-          .table__data {{ row.projectManager.firstName }} {{ row.projectManager.lastName }}
+            template(slot="accountManager" slot-scope="{ row, index }")
+              .table__data {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
 
-        template(slot="accountManager" slot-scope="{ row, index }")
-          .table__data {{ row.accountManager.firstName }} {{ row.accountManager.lastName }}
+            template(slot="industry" slot-scope="{ row, index }")
+              .table__data {{ row.industry.name }}
 
-        template(slot="industry" slot-scope="{ row, index }")
-          .table__data {{ row.industry.name }}
+            template(slot="services" slot-scope="{ row, index }")
+              .table__data {{ servicesToString(row.tasks) }}
 
-        template(slot="services" slot-scope="{ row, index }")
-          .table__data {{ servicesToString(row.tasks) }}
+            template(slot="isTest" slot-scope="{ row, index }")
+              .table__data(v-if="row.isTest")
+                i.fas.fa-check
+              .table__data(v-else) -
 
-        template(slot="isTest" slot-scope="{ row, index }")
-          .table__data(v-if="row.isTest")
-            i.fas.fa-check
-          .table__data(v-else) -
+            template(slot="urgent" slot-scope="{ row, index }")
+              .table__data(v-if="row.isUrgent")
+                i.fas.fa-check
+              .table__data(v-else) -
 
-        template(slot="urgent" slot-scope="{ row, index }")
-          .table__data(v-if="row.isUrgent")
-            i.fas.fa-check
-          .table__data(v-else) -
+            template(slot="payables" slot-scope="{ row, index }")
+              .table__data(v-if="row.finance.Price && row.finance.Price.payables")
+                span.currency(v-html="currency(row.projectCurrency)")
+                span {{ price(row.finance.Price.payables) }}
+              .table__data(v-else) -
 
-        template(slot="payables" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price && row.finance.Price.payables")
-            span.currency(v-html="currency(row.projectCurrency)")
-            span {{ price(row.finance.Price.payables) }}
-          .table__data(v-else) -
+            template(slot="receivables" slot-scope="{ row, index }")
+              .table__data(v-if="row.finance.Price && row.finance.Price.receivables")
+                span.currency(v-html="currency(row.projectCurrency)")
+                span {{ price(row.finance.Price.receivables) }}
+              .table__data(v-else) -
 
-        template(slot="receivables" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price && row.finance.Price.receivables")
-            span.currency(v-html="currency(row.projectCurrency)")
-            span {{ price(row.finance.Price.receivables) }}
-          .table__data(v-else) -
+            template(slot="margin" slot-scope="{ row, index }")
+              .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
+                span.currency(v-html="currency(row.projectCurrency)")
+                span {{ price(row.finance.Price.receivables - row.finance.Price.payables) }}
+              .table__data(v-else) -
 
-        template(slot="margin" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
-            span.currency(v-html="currency(row.projectCurrency)")
-            span {{ price(row.finance.Price.receivables - row.finance.Price.payables) }}
-          .table__data(v-else) -
+            template(slot="marginPercentage" slot-scope="{ row, index }")
+              .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
+                span {{ price( (1 - (row.finance.Price.payables / row.finance.Price.receivables)) * 100 ) }}
+                span.symbol %
+              .table__data(v-else) -
 
-        template(slot="marginPercentage" slot-scope="{ row, index }")
-          .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
-            span {{ price( (1 - (row.finance.Price.payables / row.finance.Price.receivables)) * 100 ) }}
-            span.symbol %
-          .table__data(v-else) -
+            template(slot="roi" slot-scope="{ row, index }")
+              .table__data {{ roi(row.roi) }}
 
-        template(slot="roi" slot-scope="{ row, index }")
-          .table__data {{ roi(row.roi) }}
+            template(slot="projectCurrency" slot-scope="{ row, index }")
+              .table__data(v-if="row.projectCurrency") {{ row.projectCurrency }}
+              .table__data(v-else) -
 
-        template(slot="projectCurrency" slot-scope="{ row, index }")
-          .table__data(v-if="row.projectCurrency") {{ row.projectCurrency }}
-          .table__data(v-else) -
+            template(slot="status" slot-scope="{ row, index }")
+              .table__data {{ row.status }}
 
-        template(slot="status" slot-scope="{ row, index }")
-          .table__data {{ row.status }}
+            template(slot="paymentProfile" slot-scope="{ row, index }")
+              .table__data(v-if="row.paymentProfile ") {{ row.paymentProfile }}
+              .table__data(v-else) -
 
-        template(slot="paymentProfile" slot-scope="{ row, index }")
-          .table__data(v-if="row.paymentProfile ") {{ row.paymentProfile }}
-          .table__data(v-else) -
+            template(slot="xtrf" slot-scope="{ row, index }")
+              .table__data(v-if="!!row.hasOwnProperty('isSendToXtrf')" v-html=" inXtrf(row)")
+              .table__data(v-else) Old project
 
-        template(slot="xtrf" slot-scope="{ row, index }")
-          .table__data(v-if="!!row.hasOwnProperty('isSendToXtrf')" v-html=" inXtrf(row)")
-          .table__data(v-else) Old project
+            template(slot="progress" slot-scope="{ row, index }")
+              .table__data(style="width: 100%" v-if="originallyServices.length && originallyUnits.length")
+                ProgressLine(:progress="progress(row)" :status="row.status")
 
-        template(slot="progress" slot-scope="{ row, index }")
-          .table__data(style="width: 100%" v-if="originallyServices.length && originallyUnits.length")
-            ProgressLine(:progress="progress(row)" :status="row.status")
+            template(slot="discounts" slot-scope="{ row, index }")
+              .table__data(v-html="discounts(row.discounts)")
 
-        template(slot="discounts" slot-scope="{ row, index }")
-          .table__data(v-html="discounts(row.discounts)")
+            template(slot="vendors" slot-scope="{ row, index }")
+              .table__data soon...
 
-        template(slot="vendors" slot-scope="{ row, index }")
-          .table__data soon...
+            template(slot="tasksStatuses" slot-scope="{ row, index }")
+              .table__data {{ tasksToString(row.tasks) }}
 
-        template(slot="tasksStatuses" slot-scope="{ row, index }")
-          .table__data {{ tasksToString(row.tasks) }}
-
-        template(slot="requestId" slot-scope="{ row, index }")
-          .table__data(v-if="!!row.requestId")
-            router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${row.requestId._id}`}")
-              span {{row.requestId.projectId}}
-          .table__data(v-else) -
+            template(slot="requestId" slot-scope="{ row, index }")
+              .table__data(v-if="!!row.requestId")
+                router-link(class="link-to" :to="{path: `/pangea-projects/requests/closed-requests/Closed/details/${row.requestId._id}`}")
+                  span {{row.requestId.projectId}}
+              .table__data(v-else) -
 
 
 </template>
@@ -125,9 +133,11 @@
 import LayoutsTable from "../../LayoutsTable"
 import ProjectsLayoutFilter from "./ProjectsLayoutFilter"
 import ProgressLine from "../../ProgressLine"
+import LayoutsListWrapper from "../../LayoutsListWrapper"
 import { mapGetters } from "vuex"
 import moment from "moment"
 import _ from "lodash"
+import LayoutsListWrapperLogic from "../../../mixins/LayoutsListWrapperLogic"
 
 export default {
   props: {
@@ -135,6 +145,8 @@ export default {
       type: Array
     }
   },
+  mixins: [ LayoutsListWrapperLogic ],
+  components: { ProgressLine, ProjectsLayoutFilter, LayoutsTable,LayoutsListWrapper },
   data() {
     return {
       fields: [
@@ -299,6 +311,9 @@ export default {
     }
   },
   methods: {
+    clearFilters( ) {
+      this.$emit('clearFilters')
+    },
     getProjectName(str) {
       if (!str.substr(0, 32).includes(' ') && str.length > 32) {
         return str.substr(0, 32) + '...'
@@ -469,7 +484,6 @@ export default {
       }
     }
   },
-  components: { ProgressLine, ProjectsLayoutFilter, LayoutsTable }
 }
 </script>
 
@@ -477,18 +491,14 @@ export default {
 @import "../../../assets/scss/colors";
 
 .table {
-  background: white;
-  padding: 25px;
-  box-sizing: border-box;
-  border-radius: 2px;
-  box-shadow: $box-shadow;
+  //background: white;
+  //padding: 25px;
+  //box-sizing: border-box;
+  //border-radius: 2px;
+  //box-shadow: $box-shadow;
 
   &__header {
     padding: 0 0 0 7px;
-  }
-
-  &__result {
-    margin-top: 15px;
   }
 
   &__data {

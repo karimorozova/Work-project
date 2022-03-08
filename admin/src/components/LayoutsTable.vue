@@ -188,6 +188,7 @@ table tr th {
 table {
   border-collapse: collapse;
   background: white;
+  width: 100%;
 }
 
 th {

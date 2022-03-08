@@ -8,11 +8,12 @@
 
       @updateFiltersAndFields="updateFiltersAndFields"
     )
-    .clear-filter(@click="clearFilters")
-      i(class="fas fa-broom")
+    //.clear-filter(@click="clearFilters")
+    //  i(class="fas fa-broom")
     ProjectsLayoutTable(
       :list="allProjects"
       @bottomScrolled="bottomScrolled"
+      @clearFilters="clearFilters"
     )
 </template>
 
@@ -459,8 +460,8 @@ export default {
 @import "../../../assets/scss/colors";
 
 .all-projects {
-  width: 1530px;
-  margin: 50px 50px 0 50px;
+  //width: 1530px;
+  //margin: 50px 50px 0 50px;
   position: relative;
 }
 

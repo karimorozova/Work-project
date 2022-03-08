@@ -539,16 +539,17 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
+@import "../../../assets/scss/LayoutFilters";
 
 
 .filter {
-  display: flex;
-  flex-wrap: wrap;
+  //display: flex;
+  //flex-wrap: wrap;
 
   &__item {
     position: relative;
     margin-bottom: 15px;
-    margin-right: 25px;
+    //margin-right: 25px;
     width: 220px;
   }
 

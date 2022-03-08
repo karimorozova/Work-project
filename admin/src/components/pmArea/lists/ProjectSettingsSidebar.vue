@@ -1,8 +1,10 @@
 <template lang="pug">
   .sidebarSettings
-    .sidebarSettings__mainIcon(@click="toggleSettings")
-      i.fas.fa-cogs
+    //.sidebarSettings__mainIcon(@click="toggleSettings")
+    //  i.fas.fa-cogs
 
+    IconButton.sidebarSettings__mainIcon(@clicked="toggleSettings")
+      i.fas.fa-cogs
     transition(name='slide')
       .sidebarSettings__body(v-if="isShowSettings")
 
@@ -39,10 +41,11 @@
 	import draggable from 'vuedraggable'
 	import CheckBox from "../../CheckBox"
 	import Button from "../../Button"
+	import IconButton from "../../IconButton"
 
 	export default {
 		name: "ProjectSettingsSidebar",
-		components: { Button, CheckBox, Tabs, draggable },
+		components: { Button, CheckBox, Tabs, draggable, IconButton },
 		props: {
 			filters: {
 				type: Array,
@@ -117,9 +120,6 @@
     overflow: auto;
   }
 
-  .fa-cogs {
-    color: $dark-border;
-  }
 
   i {
     height: 20px;
@@ -167,21 +167,21 @@
 
     &__mainIcon {
       position: absolute;
-      right: 10px;
-      top: 10px;
-      background: #fff;
-      border: 1px solid $border;
-      border-radius: 2px;
-      cursor: pointer;
-      padding: 5px;
-      transition: .2s ease-out;
-      z-index: 20;
+      left: 130px;
+      top: -40px;
+      //background: #fff;
+      //border: 1px solid $border;
+      //border-radius: 2px;
+      //cursor: pointer;
+      //padding: 5px;
+      //transition: .2s ease-out;
+      //z-index: 20;
 
-      &:hover {
-        .fa-cogs {
-          color: $text;
-        }
-      }
+      //&:hover {
+      //  .fa-cogs {
+      //    color: $text;
+      //  }
+      //}
     }
 
     .draggable__element {
