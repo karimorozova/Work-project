@@ -244,7 +244,10 @@
                   span {{ +(row.nativeFinance.Price.payables).toFixed(2) }}
 
               template(slot="icons", slot-scope="{ row, index }")
-                .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
+                .table__icons(
+                  v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')"
+                  :class="{'not-editable-icon': !!getRequestCounter}"
+                )
                   i(class="fas fa-trash" @click="requestToDelete(row._id)")
 
       .invoicing-details__add-steps
@@ -275,13 +278,14 @@ import SelectSingle from "../SelectSingle"
 import DatepickerWithTime from "../DatepickerWithTime"
 import CheckBox from "../CheckBox"
 import PayablesPaymentInformationCard from "./PayablesPaymentInformationCard"
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import getBgColor from "../../mixins/getBgColor"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
 import IconButton from "../IconButton"
 import UploadFileButton from "../UploadFileButton"
 import ValidationErrors from "../ValidationErrors"
+import { getRequestCounter } from "../../vuex/general/getters"
 
 export default {
   name: "InvoicingDetails",
@@ -591,6 +595,7 @@ export default {
       }
     },
     requestToDelete(stepId) {
+      if (!!this.getRequestCounter) return
       this.deleteInfo = { reportId: this.reportDetailsInfo._id, stepId }
       this.isDeletingStep = true
     },
@@ -612,7 +617,6 @@ export default {
         stepsId: [ stepId ]
       })
       await this.refreshReports()
-
     },
     closeModalStep() {
       this.deleteInfo = {}
@@ -650,6 +654,9 @@ export default {
     ...mapActions([ 'alertToggle' ])
   },
   computed: {
+    ...mapGetters({
+      getRequestCounter: 'getRequestCounter'
+    }),
     abilityToSubmitPayment() {
       return this.amount !== 0
           && this.amount !== '0'
@@ -1273,5 +1280,10 @@ textarea {
   &:hover {
     color: $text;
   }
+}
+
+.not-editable-icon {
+  opacity: 0.5;
+  cursor: default !important;
 }
 </style>

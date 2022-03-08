@@ -38,10 +38,10 @@
         template(slot="amount" slot-scope="{ row, index }")
           .table__data
             span.currency(v-html="'&euro;'")
-            span {{ getStepsPayables(row.steps).toFixed(2) }}
+            span {{ +(row.total).toFixed(2) }}
 
         template(slot="created" slot-scope="{ row, index }")
-          .table__data {{ formattedDate( row.createdAt) }}
+          .table__data {{ formattedDate( row.createAt) }}
 
         template(slot="icon" slot-scope="{ row, index }")
           .table__icons
@@ -84,10 +84,10 @@
         template(slot="amount" slot-scope="{ row, index }")
           .table__data
             span.currency(v-html="'&euro;'")
-            span {{ getStepsPayables(row.steps).toFixed(2) }}
+            span {{ +(row.total).toFixed(2) }}
 
         template(slot="created" slot-scope="{ row, index }")
-          .table__data {{ formattedDate( row.createdAt) }}
+          .table__data {{ formattedDate( row.createAt) }}
 
         template(slot="icon" slot-scope="{ row, index }")
           .table__icons
@@ -166,12 +166,12 @@ export default {
     }
   },
   methods: {
-    getStepsPayables(steps) {
-      return steps.reduce((sum, finance) => {
-        sum += finance.nativeFinance.Price.payables || 0
-        return sum
-      }, 0)
-    },
+    // getStepsPayables(steps) {
+    //   return steps.reduce((sum, finance) => {
+    //     sum += finance.nativeFinance.Price.payables || 0
+    //     return sum
+    //   }, 0)
+    // },
     formattedDate(date) {
       return moment(date).format('MMM D, HH:mm')
     },

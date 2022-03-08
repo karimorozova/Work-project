@@ -7,7 +7,6 @@
         :tableData="steps",
         :isFilterShow="false"
         :isFilterAbsolute="false"
-        :isBodyShort="true"
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -73,7 +72,6 @@ export default {
   props: {
     invoicingEditId: {
       type: String,
-      default: '0'
     },
     steps: {
       type: Array,

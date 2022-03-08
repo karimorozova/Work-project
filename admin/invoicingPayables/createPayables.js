@@ -8,7 +8,7 @@ const payablesAddSteps = async (reportId, stepsId) => {
 	try {
 		for (const stepId of stepsId) {
 			let { total } = await InvoicingPayables.findOne({ _id: reportId })
-			const { steps } = await Projects.findOne({ 'steps._id': stepId }, { steps: 1 })
+			const { steps } = await Projects.findOne({ 'steps._id': stepId })
 			const { nativeFinance: { Price: { payables } } } = steps.find(({ _id }) => `${ _id }` === `${ stepId }`)
 			await InvoicingPayables.updateOne({ _id: reportId }, { $set: { total: +(total + payables).toFixed(2) }, $push: { 'steps': stepId } })
 		}

@@ -141,10 +141,10 @@ const getPayable = async (id) => {
 				{
 					$addFields: {
 						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] },
-						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" },
+						totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
 						// paidAmount: { $sum: "$paymentInformation.paidAmount" }
 					}
-				},
+				}
 				// {
 				// 	$addFields: {
 				// 		unpaidAmount: { $subtract: [ "$totalPrice", "$paidAmount" ] }
@@ -237,7 +237,7 @@ const getPayableByVendorId = async (id, reportQuery = {}) => {
 				},
 				{
 					$addFields: {
-						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] },
+						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
 						// totalPrice: { $sum: "$steps.nativeFinance.Price.payables" }
 					}
 				},
@@ -273,7 +273,7 @@ const getPayablesProjectsAndSteps = async (id) => {
 			}
 		} ]
 	)
-	return (await InvoicingPayables.populate(invoicingReports, [ 'vendor' ]))
+	return (await InvoicingPayables.populate(invoicingReports, [ { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] } ]))
 }
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep, isSort = true) => {

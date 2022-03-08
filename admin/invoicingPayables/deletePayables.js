@@ -7,7 +7,7 @@ const payableDeleteSteps = async (reportId, stepsId) => {
 	try {
 		for (const stepId of stepsId) {
 			let { total, steps: reportSteps } = await InvoicingPayables.findOne({ _id: reportId })
-			const { steps } = await Projects.findOne({ 'steps._id': stepId }, { steps: 1 })
+			const { steps } = await Projects.findOne({ 'steps._id': stepId })
 			const { nativeFinance: { Price: { payables } } } = steps.find(({ _id }) => `${ _id }` === `${ stepId }`)
 
 			total = reportSteps.length === 1 ? 0 : +(total - payables).toFixed(2)
