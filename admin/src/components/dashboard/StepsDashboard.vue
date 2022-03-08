@@ -1,17 +1,5 @@
 <template lang="pug">
   .step-dashboard(v-if="user._id")
-    //.clear-filter(@click="clearFilters")
-      i(class="fas fa-broom")
-    .step-dashboard__stepsActions
-      .drop__title Step Actions:
-      .drop
-        SelectSingle(
-          :selectedOption="selectedAction"
-          :options="stepActions"
-          placeholder="Option"
-          @chooseOption="setAction"
-          :isDisabled="!checkedSteps.length"
-        )
     .step-dashboard__change-deadline(v-if="deadlineModal")
       .step-dashboard__change-deadline-close(@click="closeErrorsDeadline") &#215;
       DatePicker(
@@ -72,121 +60,138 @@
         @close="closeVendorDetailsModal"
       )
 
-    StepsDashboardFilters(
-      v-if="userGroup && user"
-      :userGroup="userGroup"
+    .step-dashboard__stepsActions(v-if="checkedSteps.length")
+      .drop
+        SelectSingle(
+          :selectedOption="selectedAction"
+          :options="stepActions"
+          placeholder="Step Actions"
+          @chooseOption="setAction"
+          :isDisabled="!checkedSteps.length"
+        )
+    LayoutsListWrapper(
+      :hasFilterButton="true"
+      :hasClearButton="true"
+      :isFilterActive="isFilterActive"
+      @toggleFilters="toggleFilters"
+      @clearFilters="clearFilters"
     )
-    LayoutsTable(
-      :fields="fields"
-      :tableData="steps"
-      @bottomScrolled="bottomScrolled"
-      style="margin-top: 15px;"
-    )
-      template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-        .table__header(v-if="field.headerKey === 'headerCheck'")
-          CheckBox(:isChecked="isAllSelected" :isWhite="true" :isDisabled="isAm" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-        .table__header(v-else) {{ field.label }}
+      template(slot="filters")
+        StepsDashboardFilters(
+          v-if="userGroup && user"
+          :userGroup="userGroup"
+        )
+      template(slot="table")
+        LayoutsTable(
+          :fields="fields"
+          :tableData="steps"
+          @bottomScrolled="bottomScrolled"
+        )
+          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+            .table__header(v-if="field.headerKey === 'headerCheck'")
+              CheckBox(:isChecked="isAllSelected" :isWhite="true" :isDisabled="isAm" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+            .table__header(v-else) {{ field.label }}
 
-      template(slot="check" slot-scope="{ row, index }")
-        .table__data
-          CheckBox(:isChecked="row.isCheck" :isDisabled="isAm" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+          template(slot="check" slot-scope="{ row, index }")
+            .table__data
+              CheckBox(:isChecked="row.isCheck" :isDisabled="isAm" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-      template(slot="projectId" slot-scope="{ row, index }")
-        .table__projectId
-          router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
-            span {{row.projectId}}
-          .short
-            span {{ row.projectName }}
+          template(slot="projectId" slot-scope="{ row, index }")
+            .table__projectId
+              router-link(class="link-to" :to="{path: `/pangea-projects/all-projects/All/details/${row._id}`}")
+                span {{row.projectId}}
+              .short
+                span {{ row.projectName }}
 
-      template(slot="status" slot-scope="{ row, index }")
-        .table__statusAndProgress
-          .status {{ row.steps.status }}
-          .progress
-            ProgressLineStep(:progress="progress(row.steps.progress)" :status="row.steps.status")
+          template(slot="status" slot-scope="{ row, index }")
+            .table__statusAndProgress
+              .status {{ row.steps.status }}
+              .progress
+                ProgressLineStep(:progress="progress(row.steps.progress)" :status="row.steps.status")
 
-      template(slot="langPair" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.sourceLanguage}} &ensp;
-          span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
-            i(class="fas fa-angle-double-right")
-          span {{row.steps.targetLanguage}} &ensp;
+          template(slot="langPair" slot-scope="{ row, index }")
+            .table__data
+              span {{row.steps.sourceLanguage}} &ensp;
+              span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+                i(class="fas fa-angle-double-right")
+              span {{row.steps.targetLanguage}} &ensp;
 
-      template(slot="langPair" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.sourceLanguage+' '}}
-          span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
-            i(class="fas fa-angle-double-right")
-          span {{' ' + row.steps.targetLanguage}}
+          template(slot="langPair" slot-scope="{ row, index }")
+            .table__data
+              span {{row.steps.sourceLanguage+' '}}
+              span( style="font-size: 12px;color: #9c9c9c;margin: 0 2px;")
+                i(class="fas fa-angle-double-right")
+              span {{' ' + row.steps.targetLanguage}}
 
-      template(slot="step" slot-scope="{ row, index }")
-        .table__data
-          span {{row.steps.step.title}}
+          template(slot="step" slot-scope="{ row, index }")
+            .table__data
+              span {{row.steps.step.title}}
 
-      template(slot="vendor" slot-scope="{ row, index }")
-        .table__data(v-if="row.steps.vendor")
-          .vendor-details(@click="openVendorDetailsModal(row.steps.vendor, row.steps, index)")
-            span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
-        .table__data(v-else)
-          .emptyVendor No vendor...
+          template(slot="vendor" slot-scope="{ row, index }")
+            .table__data(v-if="row.steps.vendor")
+              .vendor-details(@click="openVendorDetailsModal(row.steps.vendor, row.steps, index)")
+                span {{row.steps.vendor.firstName + ' ' + row.steps.vendor.surname  }}
+            .table__data(v-else)
+              .emptyVendor No vendor...
 
-      template(slot="startDate" slot-scope="{ row, index }")
-        .table__data {{ customFormatter(row.steps.start) }}
+          template(slot="startDate" slot-scope="{ row, index }")
+            .table__data {{ customFormatter(row.steps.start) }}
 
-      template(slot="deadline" slot-scope="{ row, index }")
-        .table__data
-          span.deadline-red(v-if="isDueToday(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
-          span.deadline-orange(v-else-if="isDueTomorrow(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
-          span(v-else) {{ customFormatter(row.steps.deadline) }}
+          template(slot="deadline" slot-scope="{ row, index }")
+            .table__data
+              span.deadline-red(v-if="isDueToday(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
+              span.deadline-orange(v-else-if="isDueTomorrow(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
+              span(v-else) {{ customFormatter(row.steps.deadline) }}
 
-      template(slot="receivables" slot-scope="{ row }")
-        .table__data
-          span.currency(v-if="!row.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span(v-if="row.steps.finance.Price.receivables !== ''") {{ !row.minimumCharge.isUsed ? +(row.steps.finance.Price.receivables).toFixed(2) : '-' }}
+          template(slot="receivables" slot-scope="{ row }")
+            .table__data
+              span.currency(v-if="!row.minimumCharge.isUsed" v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+              span(v-if="row.steps.finance.Price.receivables !== ''") {{ !row.minimumCharge.isUsed ? +(row.steps.finance.Price.receivables).toFixed(2) : '-' }}
 
-      template(slot="payables" slot-scope="{ row }")
-        .table__data
-          span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span(v-if="row.steps.finance.Price.payables !== ''") {{ +(row.steps.finance.Price.payables).toFixed(2) }}
+          template(slot="payables" slot-scope="{ row }")
+            .table__data
+              span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+              span(v-if="row.steps.finance.Price.payables !== ''") {{ +(row.steps.finance.Price.payables).toFixed(2) }}
 
-      template(slot="margin" slot-scope="{ row, index }")
-        .table__finance(:id="'margin'+index")
-          span(v-if="marginCalc(row.steps)")
-            span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-          span(v-if="marginCalc(row.steps)") {{ marginCalc(row.steps) }}
-          sup(:class="{'red-color': (+marginCalcPercent(row.steps) > 1 && +marginCalcPercent(row.steps) < 50) || +marginCalcPercent(row.steps) < 0  }" v-if="marginCalc(row.steps)") {{ marginCalcPercent(row.steps) }}%
+          template(slot="margin" slot-scope="{ row, index }")
+            .table__finance(:id="'margin'+index")
+              span(v-if="marginCalc(row.steps)")
+                span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
+              span(v-if="marginCalc(row.steps)") {{ marginCalc(row.steps) }}
+              sup(:class="{'red-color': (+marginCalcPercent(row.steps) > 1 && +marginCalcPercent(row.steps) < 50) || +marginCalcPercent(row.steps) < 0  }" v-if="marginCalc(row.steps)") {{ marginCalcPercent(row.steps) }}%
 
-      template(slot="icons" slot-scope="{ row, index }")
-        .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen && !isAm")
-          img(src="../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
-          img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: pointer;" @click="toggleVendorManage(index)")
-          img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: pointer;" @click="() => refreshProgress(index)")
-        .table__icons(v-else)
-          img(src="../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: default; filter: opacity(0.5);")
-          img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: default; filter: opacity(0.5);")
+          template(slot="icons" slot-scope="{ row, index }")
+            .table__icons(v-if="!isFinanceEdit && !isStepInfo && !isVendorDetailsModal && !isModalOpen && !isAm")
+              img(src="../../assets/images/latest-version/step-info.svg" style="cursor: pointer;" @click="showFinanceEditing(index)")
+              img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: pointer;" @click="toggleVendorManage(index)")
+              img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: pointer;" @click="() => refreshProgress(index)")
+            .table__icons(v-else)
+              img(src="../../assets/images/latest-version/step-info.svg" style="cursor: default; filter: opacity(0.5);")
+              img(src="../../assets/images/latest-version/vendor-manage.svg" style="cursor: default; filter: opacity(0.5);")
+              img(src="../../assets/images/latest-version/refresh-icon.svg" style="cursor: default; filter: opacity(0.5);")
 
-      template(slot="projectManager" slot-scope="{ row, index }")
-        .table__imageWithHover
-          .tooltip.user__image
-            .tooltip-data.user(v-html="row.projectManager.firstName + ' ' + row.projectManager.lastName")
-            img(v-if="getUserPhoto(row.projectManager)" :src="getUserPhoto(row.projectManager)")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(row.projectManager._id)[0], '--color':getBgColor(row.projectManager._id)[1]  }" v-else)
-              span {{ row.projectManager.firstName[0].toUpperCase() }}
+          template(slot="projectManager" slot-scope="{ row, index }")
+            .table__imageWithHover
+              .tooltip.user__image
+                .tooltip-data.user(v-html="row.projectManager.firstName + ' ' + row.projectManager.lastName")
+                img(v-if="getUserPhoto(row.projectManager)" :src="getUserPhoto(row.projectManager)")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(row.projectManager._id)[0], '--color':getBgColor(row.projectManager._id)[1]  }" v-else)
+                  span {{ row.projectManager.firstName[0].toUpperCase() }}
 
-      template(slot="accountManager" slot-scope="{ row, index }")
-        .table__imageWithHover
-          .tooltip.user__image
-            .tooltip-data.user(v-html="row.accountManager.firstName + ' ' + row.accountManager.lastName")
-            img(v-if="getUserPhoto(row.accountManager)" :src="getUserPhoto(row.accountManager)")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else)
-              span {{ row.accountManager.firstName[0].toUpperCase() }}
+          template(slot="accountManager" slot-scope="{ row, index }")
+            .table__imageWithHover
+              .tooltip.user__image
+                .tooltip-data.user(v-html="row.accountManager.firstName + ' ' + row.accountManager.lastName")
+                img(v-if="getUserPhoto(row.accountManager)" :src="getUserPhoto(row.accountManager)")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(row.accountManager._id)[0], '--color':getBgColor(row.accountManager._id)[1]  }" v-else)
+                  span {{ row.accountManager.firstName[0].toUpperCase() }}
 
-      template(slot="clientName" slot-scope="{ row, index }")
-        .table__imageWithHover
-          .tooltip.user__image
-            .tooltip-data.user(v-html="row.customer.name")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(row.customer._id)[0], '--color':getBgColor(row.customer._id)[1] }")
-              span {{ row.customer.name[0].toUpperCase() }}
+          template(slot="clientName" slot-scope="{ row, index }")
+            .table__imageWithHover
+              .tooltip.user__image
+                .tooltip-data.user(v-html="row.customer.name")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(row.customer._id)[0], '--color':getBgColor(row.customer._id)[1] }")
+                  span {{ row.customer.name[0].toUpperCase() }}
 </template>
 
 <script>
@@ -208,12 +213,29 @@ import ApproveModal from "../ApproveModal"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
 import _ from 'lodash'
-import Vue from "vue"
+import LayoutsListWrapper from '../LayoutsListWrapper'
+import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
 
 export default {
-  mixins: [ getBgColor, currencyIconDetected ],
+  mixins: [ getBgColor, currencyIconDetected, LayoutsListWrapperLogic],
+  components: {
+    ApproveModal,
+    SelectSingle,
+    StepVendorDetails,
+    StepInfo,
+    ProjectFinanceModal,
+    CheckBox,
+    ProgressLineStep,
+    LayoutsTable,
+    Tabs,
+    StepsDashboardFilters,
+    VendorManage,
+    DatePicker,
+    LayoutsListWrapper
+  },
   data() {
     return {
+      isFilterActive: false,
       deadlineModal: false,
       isApproveActionShow: false,
       selectedAction: '',
@@ -752,44 +774,32 @@ export default {
     this.querySetter(this, this.$route)
     this.getData()
   },
-  components: {
-    ApproveModal,
-    SelectSingle,
-    StepVendorDetails,
-    StepInfo,
-    ProjectFinanceModal,
-    CheckBox,
-    ProgressLineStep,
-    LayoutsTable,
-    Tabs,
-    StepsDashboardFilters,
-    VendorManage,
-    DatePicker
-  }
 }
 </script>
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
+@import "../../assets/scss/LayoutFilters";
 
 .red-color {
   color: $red;
 }
 
 .step-dashboard {
-  width: 1530px;
-  margin: 50px 50px 0;
   position: relative;
-  background: #fff;
-  padding: 25px;
-  box-sizing: border-box;
-  border-radius: 2px;
-  box-shadow: $box-shadow;
+  //width: 1530px;
+  //margin: 50px 50px 0;
+  //position: relative;
+  //background: #fff;
+  //padding: 25px;
+  //box-sizing: border-box;
+  //border-radius: 2px;
+  //box-shadow: $box-shadow;
 
   &__stepsActions {
+    left: 136px;
+    top: -41px;
     position: absolute;
-    top: 157px;
-    z-index: 22;
   }
 
   &__modal {

@@ -127,8 +127,6 @@
         )
 
     .filter__item
-    .filter__item
-    .filter__itemLong
       label Start Date Range:
       .filter__input
         DatePicker.range-with-one-panel(
@@ -145,7 +143,7 @@
       .clear-icon-picker(v-if="!!selectedStartRange[0]" @click="removeSelectedStartRange()")
         i.fas.fa-backspace.backspace-long
 
-    .filter__itemLong
+    .filter__item
       label Deadline Range:
       .filter__input
         DatePicker.range-with-one-panel(
@@ -446,24 +444,25 @@ export default {
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
+@import "../../assets/scss/LayoutFilters";
 
 .filter {
-  display: flex;
-  flex-wrap: wrap;
+  //display: flex;
+  //flex-wrap: wrap;
 
-  &__itemLong {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 342.5px;
-  }
-
-  &__item {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 220px;
-  }
+  //&__itemLong {
+  //  position: relative;
+  //  margin-bottom: 15px;
+  //  margin-right: 25px;
+  //  width: 342.5px;
+  //}
+  //
+  //&__item {
+  //  position: relative;
+  //  margin-bottom: 15px;
+  //  margin-right: 25px;
+  //  width: 220px;
+  //}
 
   &__input {
     position: relative;
