@@ -1,6 +1,15 @@
 <template lang="pug">
   .reports
     .reports__wrapper
+      .options
+        .options__item(v-if="ifSomeCheck")
+          .options__input
+            SelectSingle(
+              :options="availableActionOptions",
+              placeholder="Reports Actions",
+              :selectedOption="selectedReportAction",
+              @chooseOption="openApproveActionModal"
+            )
       .modal
         .modal__block
           ApproveModal(
@@ -12,142 +21,127 @@
             @close="closeApproveActionModal"
             @notApprove="closeApproveActionModal"
           )
-      .filter
-        .filter__item
-          label Report Id:
-          .filter__input
-            input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
-            .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
-              i.fas.fa-backspace
-        .filter__item
-          label Vendors:
-          .filter__input
-            SelectMulti(
-              :selectedOptions="selectedVendors"
-              :options="allVendors"
-              :hasSearch="true"
-              placeholder="Options"
-              @chooseOptions="setVendors"
-              :isSelectedWithIcon="true"
-              :isRemoveOption="true"
-              @removeOption="removeVendors"
-            )
-        .filter__item
-          label Status:
-          .filter__input
-            SelectSingle(
-              :selectedOption="selectedStatus"
-              :options="['Created', 'Sent', 'Approved', 'Invoice on-hold', 'Invoice Ready', 'Partially Paid']"
-              placeholder="Option"
-              @chooseOption="setStatus"
-              :isRemoveOption="true"
-              @removeOption="removeStatus"
-            )
-        .filter__itemLong
-          label Date Range:
-          .filter__input
-            DatePicker.range-with-one-panel(
-              :value="selectedBillingDateRange"
-              @input="(e) => setBillingDateRange(e)"
-              format="DD-MM-YYYY, HH:mm"
-              prefix-class="xmx"
-              range-separator=" - "
-              :clearable="false"
-              type="datetime"
-              range
-              placeholder="Select datetime range"
-            )
-          .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
-            i.fas.fa-backspace.backspace-long
+        .modal__block
+          ApproveModal(
+            v-if="deleteRequestId !== ''"
+            text="Are you sure?"
+            approveValue="Yes"
+            notApproveValue="Cancel"
+            @approve="deleteRequest"
+            @close="closeDeleteRequestModal"
+            @notApprove="closeDeleteRequestModal"
+          )
 
-      .options
-        .options__item(v-if="ifSomeCheck")
-          label Reports Actions:
-          .options__input
-            SelectSingle(
-              :options="availableActionOptions",
-              placeholder="Action",
-              :selectedOption="selectedReportAction",
-              @chooseOption="openApproveActionModal"
-            )
-          .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
+      LayoutsListWrapper(
+        :hasFilterButton="true"
+        :hasClearButton="true"
+        :isFilterActive="isFilterActive"
+        @toggleFilters="toggleFilters"
+        @clearFilters="clearFilters"
+      )
+        template(slot="table")
+          LayoutsTable(
+            :fields="fields"
+            :tableData="reports"
+            @bottomScrolled="bottomScrolled"
+          )
+            template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
+              .table__header(v-if="field.headerKey === 'headerCheck'")
+                CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+              .table__header(v-else) {{ field.label }}
 
-        .options__button(v-else)
-          //Button(value="Zoho sync." :outline="true" @clicked="updatePayablesStateFromZoho()" style="margin-right: 10px;")
-          router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-payables/create-reports`}")
-            Button(value="Add Reports")
+            template(slot="check" slot-scope="{ row, index }")
+              .table__data
+                CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
 
-      .reports__container
-        .modal
-          .modal__block
-            ApproveModal(
-              v-if="deleteRequestId !== ''"
-              text="Are you sure?"
-              approveValue="Yes"
-              notApproveValue="Cancel"
-              @approve="deleteRequest"
-              @close="closeDeleteRequestModal"
-              @notApprove="closeDeleteRequestModal"
-            )
-        LayoutsTable(
-          :fields="fields"
-          :tableData="reports"
-          :customNumberOfFilterRows="2"
-          @bottomScrolled="bottomScrolled"
-        )
-          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-            .table__header(v-if="field.headerKey === 'headerCheck'")
-              CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
-            .table__header(v-else) {{ field.label }}
+            template(slot="reportId" slot-scope="{ row, index }" )
+              .table__data
+                router-link(class="link-to" :to="{path: `/pangea-finance/payables-reports/reports/${row._id}`}")
+                  span {{ row.reportId }}
 
-          template(slot="check" slot-scope="{ row, index }")
-            .table__data
-              CheckBox(:isChecked="row.isCheck" @check="toggleCheck(index, true)" @uncheck="toggleCheck(index, false)")
+            template(slot="dateRange" slot-scope="{ row, index }")
+              .table__data(v-html="dateRange(row)")
 
-          template(slot="reportId" slot-scope="{ row, index }" )
-            .table__data
-              router-link(class="link-to" :to="{path: `/pangea-finance/payables-reports/reports/${row._id}`}")
-                span {{ row.reportId }}
+            template(slot="vendorName" slot-scope="{ row, index }")
+              .table__data
+                router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
+                  span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
 
-          template(slot="dateRange" slot-scope="{ row, index }")
-            .table__data(v-html="dateRange(row)")
+            template(slot="type" slot-scope="{ row, index }")
+              .table__data(v-if="row.paymentDetails.paymentMethod" )
+                div.type {{ row.paymentDetails.paymentMethod.paymentType  }}
+                div.name {{ row.paymentDetails.paymentMethod.name }}
+              .table__data(v-else) -
 
-          template(slot="vendorName" slot-scope="{ row, index }")
-            .table__data
-              router-link(class="link-to" :to="{path: '/pangea-vendors/all/details/' + row.vendor._id }" target= '_blank')
-                span {{ row.vendor.firstName + ' ' + row.vendor.surname }}
+            template(slot="status" slot-scope="{ row, index }")
+              .table__data {{ row.status }}
 
-          template(slot="type" slot-scope="{ row, index }")
-            .table__data(v-if="row.paymentDetails.paymentMethod" )
-              div.type {{ row.paymentDetails.paymentMethod.paymentType  }}
-              div.name {{ row.paymentDetails.paymentMethod.name }}
-            .table__data(v-else) -
+            template(slot="jobs" slot-scope="{ row, index }")
+              .table__data {{ row.steps.length }}
 
-          template(slot="status" slot-scope="{ row, index }")
-            .table__data {{ row.status }}
+            template(slot="amount" slot-scope="{ row, index }")
+              .table__data
+                span.currency(v-html="'&euro;'")
+                span {{ +(row.total).toFixed(2) }}
 
-          template(slot="jobs" slot-scope="{ row, index }")
-            .table__data {{ row.steps.length }}
-          //
-          //template(slot="project" slot-scope="{ row, index }")
-          //  .table__data {{ getProjectCount(row.stepFinance) }}
+            template(slot="created" slot-scope="{ row, index }")
+              .table__data {{ getTime( row.createAt) }}
 
-          template(slot="amount" slot-scope="{ row, index }")
-            .table__data
-              span.currency(v-html="'&euro;'")
-              span {{ +(row.total).toFixed(2) }}
+            template(slot="updated" slot-scope="{ row, index }")
+              .table__data {{ getTime( row.updatedAt) }}
 
-          template(slot="created" slot-scope="{ row, index }")
-            .table__data {{ getTime( row.createAt) }}
+            template(slot="icon" slot-scope="{ row, index }")
+              .table__icon(v-if="row.status === 'Created'|| row.status === 'Sent' || user.group.name === 'Developers'  || user.group.name === 'Administrators'")
+                i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
 
-          template(slot="updated" slot-scope="{ row, index }")
-            .table__data {{ getTime( row.updatedAt) }}
-
-          template(slot="icon" slot-scope="{ row, index }")
-            .table__icon(v-if="row.status === 'Created'|| row.status === 'Sent' || user.group.name === 'Developers'  || user.group.name === 'Administrators'")
-              i(class="fas fa-trash" @click="requestToDeleteRequest(row._id)")
-
-        .table__empty(v-if="!reports.length") Nothing found...
+        template(slot="filters")
+          .filter
+            .filter__item
+              label Report Id:
+              .filter__input
+                input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
+                .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
+                  i.fas.fa-backspace
+            .filter__item
+              label Vendors:
+              .filter__input
+                SelectMulti(
+                  :selectedOptions="selectedVendors"
+                  :options="allVendors"
+                  :hasSearch="true"
+                  placeholder="Options"
+                  @chooseOptions="setVendors"
+                  :isSelectedWithIcon="true"
+                  :isRemoveOption="true"
+                  @removeOption="removeVendors"
+                )
+            .filter__item
+              label Status:
+              .filter__input
+                SelectSingle(
+                  :selectedOption="selectedStatus"
+                  :options="['Created', 'Sent', 'Approved', 'Invoice on-hold', 'Invoice Ready', 'Partially Paid']"
+                  placeholder="Option"
+                  @chooseOption="setStatus"
+                  :isRemoveOption="true"
+                  @removeOption="removeStatus"
+                )
+            .filter__itemLong
+              label Date Range:
+              .filter__input
+                DatePicker.range-with-one-panel(
+                  :value="selectedBillingDateRange"
+                  @input="(e) => setBillingDateRange(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  prefix-class="xmx"
+                  range-separator=" - "
+                  :clearable="false"
+                  type="datetime"
+                  range
+                  placeholder="Select datetime range"
+                )
+              .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+                i.fas.fa-backspace.backspace-long
 
 </template>
 
@@ -164,17 +158,17 @@ import Button from "../Button"
 import ApproveModal from "../ApproveModal"
 import '../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
+import LayoutsListWrapper from "../LayoutsListWrapper"
+import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
 
 export default {
   name: "InvoicingPayablesList",
+  mixins: [ LayoutsListWrapperLogic ],
   data() {
     return {
       selectedReportAction: '',
       isActionModal: false,
       reports: [],
-      highlighted: {
-        days: [ 6, 0 ]
-      },
       vendorsList: [],
       fields: [
         {
@@ -199,7 +193,7 @@ export default {
           label: "Type / Name",
           headerKey: "headerType",
           key: "type",
-          style: { width: "150px" }
+          style: { width: "170px" }
         },
         {
           label: "Date Range",
@@ -213,12 +207,6 @@ export default {
           key: "status",
           style: { width: "140px" }
         },
-        // {
-        //   label: "Projects",
-        //   headerKey: "headerProject",
-        //   key: "project",
-        //   style: { width: "80px" }
-        // },
         {
           label: "Jobs",
           headerKey: "headerJobs",
@@ -539,6 +527,7 @@ export default {
     }
   },
   components: {
+    LayoutsListWrapper,
     Button,
     SelectSingle,
     DatepickerWithTime,
@@ -554,23 +543,15 @@ export default {
 
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
+@import "../../assets/scss/LayoutFilters";
 
 .fa-trash {
   cursor: pointer;
 }
 
 .reports {
-  position: relative;
-  width: 1530px;
-  margin: 50px;
-  background: #fff;
-
   &__wrapper {
     position: relative;
-    border-radius: 2px;
-    padding: 25px;
-    box-sizing: border-box;
-    box-shadow: $box-shadow;
   }
 
   &__container {
@@ -578,48 +559,10 @@ export default {
   }
 }
 
-.filter {
-  display: flex;
-  flex-wrap: wrap;
-
-  &__itemLong {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 342.5px;
-  }
-
-  &__item {
-    position: relative;
-    margin-bottom: 15px;
-    margin-right: 25px;
-    width: 220px;
-  }
-
-  &__input {
-    position: relative;
-    height: 32px;
-  }
-}
-
 .options {
-  display: flex;
-  flex-wrap: wrap;
   position: absolute;
-  top: 25px;
-  right: 25px;
-  align-items: center;
-
-  &__description {
-    opacity: .5;
-    margin-top: 5px;
-  }
-
-  &__button {
-    height: 66px;
-    display: flex;
-    align-items: center;
-  }
+  top: -41px;
+  left: 129px;
 
   &__item {
     position: relative;
@@ -640,71 +583,6 @@ export default {
     justify-content: center;
     font-size: 15px;
   }
-
-  &__header {
-    padding: 0 7px;
-  }
-
-  &__empty {
-    margin-top: 10px;
-  }
-}
-
-.fa-backspace {
-  font-size: 16px;
-  transition: .2s ease-out;
-  color: $dark-border;
-  cursor: pointer;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-
-  &:hover {
-    color: $text;
-  }
-}
-
-.clickable-element {
-  cursor: pointer;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: .2s ease-out;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-label {
-  display: block;
-  margin-bottom: 3px;
-  font-family: 'Myriad600';
-}
-
-input {
-  font-size: 14px;
-  color: $text;
-  border: 1px solid $border;
-  border-radius: 2px;
-  box-sizing: border-box;
-  padding: 0 7px;
-  outline: none;
-  height: 32px;
-  transition: .1s ease-out;
-  width: 220px;
-  font-family: 'Myriad400';
-
-  &:focus {
-    border: 1px solid $border-focus;
-  }
-}
-
-.currency {
-  margin-right: 4px;
-  color: $dark-border;
 }
 
 .modal {
@@ -719,10 +597,9 @@ input {
   }
 }
 
-.backspace-long {
-  position: absolute;
-  right: 54px !important;
-  top: 27px !important;
+.currency {
+  margin-right: 4px;
+  color: $dark-border;
 }
 
 .name {
@@ -732,4 +609,5 @@ input {
   overflow: hidden;
   max-width: 131px;
 }
+
 </style>

@@ -12,7 +12,7 @@
     .layout-wrapper
       transition(name='show')
         .layout-wrapper__filters(
-          :style="{ 'max-height': innerHeight - 171 + 'px' }"
+          :style="{ 'height': innerHeight - 171 + 'px' }"
           v-if="isFilterActive"
         )
           slot(name="filters")
