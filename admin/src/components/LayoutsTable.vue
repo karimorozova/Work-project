@@ -192,7 +192,7 @@ table {
 
 th {
   box-sizing: border-box;
-  padding: 0 0 0 7px;
+  padding: 0 0 0 8px;
   background: $table-header !important;
 }
 

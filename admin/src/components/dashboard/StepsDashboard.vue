@@ -217,7 +217,7 @@ import LayoutsListWrapper from '../LayoutsListWrapper'
 import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
 
 export default {
-  mixins: [ getBgColor, currencyIconDetected, LayoutsListWrapperLogic],
+  mixins: [ getBgColor, currencyIconDetected, LayoutsListWrapperLogic ],
   components: {
     ApproveModal,
     SelectSingle,
@@ -288,7 +288,7 @@ export default {
           label: "",
           headerKey: "headerCheck",
           key: "check",
-          style: { width: "36px" }
+          style: { width: "26px" }
         },
         {
           label: "Project ID",
@@ -318,19 +318,19 @@ export default {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
-          style: { "width": "120px" }
+          style: { "width": "110px" }
         },
         {
           label: "Start",
           headerKey: "headerStartDate",
           key: "startDate",
-          style: { "width": "105px" }
+          style: { "width": "100px" }
         },
         {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { "width": "105px" }
+          style: { "width": "100px" }
         },
         {
           label: "Rec.",
@@ -360,19 +360,19 @@ export default {
           label: "PM",
           headerKey: "headerProjectManager",
           key: "projectManager",
-          style: { "width": "56px" }
+          style: { "width": "52px" }
         },
         {
           label: "AM",
           headerKey: "headerAccountManager",
           key: "accountManager",
-          style: { "width": "56px" }
+          style: { "width": "52px" }
         },
         {
           label: "Client",
           headerKey: "headerClientName",
           key: "clientName",
-          style: { "width": "56px" }
+          style: { "width": "52px" }
         }
       ]
     }
@@ -773,7 +773,7 @@ export default {
     this.setCurrentAmOrPm()
     this.querySetter(this, this.$route)
     this.getData()
-  },
+  }
 }
 </script>
 
@@ -797,7 +797,7 @@ export default {
   //box-shadow: $box-shadow;
 
   &__stepsActions {
-    left: 136px;
+    left: 131px;
     top: -41px;
     position: absolute;
   }
@@ -831,10 +831,6 @@ export default {
       display: flex;
       justify-content: center;
       width: 100%;
-    }
-
-    &__header {
-      padding: 0 0 0 7px;
     }
   }
 
