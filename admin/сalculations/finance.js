@@ -107,7 +107,7 @@ const getClientDiscount = async (clientDiscountsIds) => {
 	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
 }
 
-const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate }) => {
+const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate, fakeStepVendor, prevStep }) => {
 	const currencyRatio = await CurrencyRatio.findOne()
 	const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
 	const { fullSourceLanguage, fullTargetLanguage, payablesUnit } = step
@@ -124,7 +124,6 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 	let vendorPrice = !!nativeRate
 			? nativeRate
-			// : getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) || getPriceFromPricelist(defaultVendorPricelist, dataForComparison, vendor.currency, currencyRatio) / 2 || 0
 			: getPriceFromPersonRates(vendor.rates.pricelistTable, dataForComparison) || 0
 
 	step.vendorRate = rateExchangeVendorOntoProject(projectCurrency, 'EUR', +vendorPrice, crossRate)
@@ -132,10 +131,19 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 	if (isMemoqCatUnit) {
 		task.metrics = setTaskMetrics({ metrics: task.metrics, matrix: vendor.matrix, prop: "vendor" })
-		step.finance.Wordcount.payables = step.nativeFinance.Wordcount.payables = step.step.title === 'Translation' ? +getRelativeQuantity(task.metrics, 'vendor') : task.metrics.totalWords
+		step.finance.Wordcount.payables = step.nativeFinance.Wordcount.payables = step.step.title === 'Translation'
+				? +getRelativeQuantity(task.metrics, 'vendor')
+				: task.metrics.totalWords
 	}
 
-	const quantity = isMemoqCatUnit ? step.finance.Wordcount.payables : step.finance.Quantity.payables
+	// TODO: Delete soon, Temporary for quantity with MT Translation
+	if (fakeStepVendor === 'Post-Editing' && isMemoqCatUnit) {
+		step.finance.Wordcount.payables = prevStep.finance.Wordcount.receivables
+	}
+
+	let quantity = isMemoqCatUnit
+			? step.finance.Wordcount.payables
+			: step.finance.Quantity.payables
 
 	step.finance.Price.payables = (quantity * step.vendorRate).toFixed(2)
 	step.nativeFinance.Price.payables = (quantity * step.nativeVendorRate).toFixed(2)
