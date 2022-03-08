@@ -5,10 +5,6 @@ const {
 } = require('./getReceivables')
 
 const {
-	createReports
-} = require('./createReceivables')
-
-const {
 	receivableDelete,
 	deleteStepFromReport
 } = require('./deleteReceivables')
@@ -59,7 +55,6 @@ module.exports = {
 	paidOrAddPaymentInfo,
 	deleteStepFromReport,
 	reportsFiltersQuery,
-	createReports,
 	getAllSteps,
 	receivableDelete,
 	createZohoInvoice,

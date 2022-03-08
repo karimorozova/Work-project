@@ -35,10 +35,8 @@
           template(slot="client" slot-scope="{ row, index }")
             .table__data
               router-link(class="link-to" target='_blank' :to="{path: `/pangea-clients/all/details/${row.customer._id}`}")
-                span {{ row.customer.name }}
-
-          template(slot="bn" slot-scope="{ row, index }")
-            .table__data {{ row.selectedBillingInfo.officialName }}
+                div {{ row.customer.name }}
+              .name {{ row.selectedBillingInfo.officialName }}
 
           template(slot="pt" slot-scope="{ row, index }")
             .table__data {{ row.selectedBillingInfo.paymentType }}
@@ -177,37 +175,37 @@ export default {
           label: "Project",
           headerKey: "headerProject",
           key: "project",
-          style: { width: "175px" }
+          style: { width: "190px" }
         },
         {
-          label: "Client",
+          label: "Client / Billing Name",
           headerKey: "headerClient",
           key: "client",
-          style: { width: "150px" }
+          style: { width: "220px" }
         },
-        {
-          label: "Billing Name",
-          headerKey: "headerBN",
-          key: "bn",
-          style: { width: "125px" }
-        },
+        // {
+        //   label: "Billing Name",
+        //   headerKey: "headerBN",
+        //   key: "bn",
+        //   style: { width: "125px" }
+        // },
         {
           label: "Payment Type",
           headerKey: "headerPT",
           key: "pt",
-          style: { width: "105px" }
+          style: { width: "115px" }
         },
         {
           label: "Step ID",
           headerKey: "headerStepId",
           key: "stepId",
-          style: { width: "180px" }
+          style: { width: "190px" }
         },
         {
           label: "Step",
           headerKey: "headerService",
           key: "step",
-          style: { width: "110px" }
+          style: { width: "120px" }
         },
         {
           label: "Language Pair",
@@ -237,13 +235,13 @@ export default {
           label: "Status",
           headerKey: "headerJobStatus",
           key: "jobStatus",
-          style: { width: "80px" }
+          style: { width: "90px" }
         },
         {
           label: "Fee",
           headerKey: "headerPrice",
           key: "price",
-          style: { width: "80px" }
+          style: { width: "90px" }
         }
       ],
       isDataRemain: true,
@@ -496,10 +494,18 @@ export default {
   color: $dark-border;
 }
 
+.name {
+  opacity: 0.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 204px;
+}
+
 .short {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  max-width: 161px;
+  max-width: 174px;
 }
 </style>

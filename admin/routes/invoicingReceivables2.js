@@ -99,16 +99,7 @@ router.post("/not-selected-steps-list-multi-project/", async (req, res) => {
 	}
 })
 
-router.post('/create-report', async (req, res) => {
-	const { checkedSteps, createdBy } = req.body
-	try {
-		await createReports({ checkedSteps, createdBy })
-		res.send('Done')
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Something wrong on /create-report!')
-	}
-})
+
 
 router.post("/report/:reportId/delete/:stepId", async (req, res) => {
 	const { reportId, stepId } = req.params
