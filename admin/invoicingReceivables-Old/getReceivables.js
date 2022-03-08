@@ -1,30 +1,6 @@
 const { Projects, InvoicingReceivables } = require("../models")
 const { ObjectID: ObjectId } = require('mongodb')
 
-
-const reportsFiltersQuery = ({ reportId, clients, billingDateTo, billingDateFrom, status }) => {
-	const q = {}
-	const reg = /[.*+?^${}()|[\]\\]/g
-
-	if (reportId) {
-		const f = reportId.replace(reg, '\\$&')
-		q['reportId'] = { "$regex": new RegExp(f, 'i') }
-	}
-	if (clients) {
-		q["client"] = { $in: clients.split(',').map(item => ObjectId(item)) }
-	}
-	if (status) {
-		q["status"] = status
-	}
-
-	if (!!billingDateTo && !!billingDateFrom) {
-		q['firstPaymentDate'] = { $gte: new Date(+billingDateFrom) }
-		q['lastPaymentDate'] = { $lt: new Date(+billingDateTo) }
-	}
-
-	return q
-}
-
 const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields,  unsetFields = []) => {
 	const queryResult = await InvoicingReceivables.aggregate([
 		{ $match: { ...query } },
@@ -192,6 +168,6 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 
 module.exports = {
 	getAllReportsFromDb,
-	reportsFiltersQuery,
+	// reportsFiltersQuery,
 	getAllSteps
 }

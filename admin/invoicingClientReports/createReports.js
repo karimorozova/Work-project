@@ -67,11 +67,13 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 					changePaymentRange(temp[_tmpIndex], element)
 					refreshUpdatedInfo(temp[_tmpIndex], createdBy)
 					temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
+					temp[_tmpIndex].total = temp[_tmpIndex].total + element.steps.finance.Price.receivables
 				}
 			} else {
 				changePaymentRange(updatedReports[_dbIndex], element)
 				refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
 				updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
+				updatedReports[_dbIndex].total = updatedReports[_dbIndex].total + element.steps.finance.Price.receivables
 			}
 		})
 		return {
@@ -103,11 +105,13 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 					changePaymentRange(temp[_tmpIndex], element)
 					refreshUpdatedInfo(temp[_tmpIndex], createdBy)
 					temp[_tmpIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
+					temp[_tmpIndex].total = temp[_tmpIndex].total + element.steps.finance.Price.receivables
 				}
 			} else {
 				changePaymentRange(updatedReports[_dbIndex], element)
 				refreshUpdatedInfo(updatedReports[_dbIndex], createdBy)
 				updatedReports[_dbIndex].stepsAndProjects.push({ step: nativeStepId, project: nativeProjectId, type })
+				updatedReports[_dbIndex].total = updatedReports[_dbIndex].total + element.steps.finance.Price.receivables
 			}
 		})
 
@@ -144,7 +148,8 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 			clientBillingInfo,
 			stepsAndProjects: [ { step: steps._id, project: _id, type } ],
 			firstPaymentDate: startDate,
-			lastPaymentDate: deadline
+			lastPaymentDate: deadline,
+			total: steps.finance.Price.receivables
 		}
 	}
 

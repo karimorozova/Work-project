@@ -1,6 +1,6 @@
 const {
 	getAllSteps,
-	reportsFiltersQuery,
+	// reportsFiltersQuery,
 	getAllReportsFromDb
 } = require('./getReceivables')
 
@@ -54,7 +54,7 @@ module.exports = {
 	updateInvoiceReceivablesStatus,
 	paidOrAddPaymentInfo,
 	deleteStepFromReport,
-	reportsFiltersQuery,
+	// reportsFiltersQuery,
 	getAllSteps,
 	receivableDelete,
 	createZohoInvoice,

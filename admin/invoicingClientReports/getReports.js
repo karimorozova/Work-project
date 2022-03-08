@@ -1,85 +1,60 @@
-const { Projects, InvoicingReceivables } = require("../models")
-const { ObjectID: ObjectId } = require('mongodb')
+const { Projects, InvoicingClientReports } = require("../models")
 
+const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields, unsetFields = []) => {
+	const reports = await InvoicingClientReports.aggregate([
+		{ $match: { ...query } },
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'steps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ $unwind: "$steps" },
+					{ $match: { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ $addFields: { "steps.type": 'Classic' } },
+					...generateExtraFieldForSteps('steps'),
+					{ $replaceRoot: { newRoot: '$steps' } }
+				],
+				as: "stepsClassic"
+			}
+		},
+		{
+			$lookup: {
+				from: "projects",
+				let: { 'additionsSteps': '$stepsAndProjects.step' },
+				pipeline: [
+					{ $unwind: "$additionsSteps" },
+					{ $match: { "$expr": { "$in": [ "$additionsSteps._id", "$$additionsSteps" ] } } },
+					{ $addFields: { "additionsSteps.type": 'Extra' } },
+					...generateExtraFieldForSteps('additionsSteps'),
+					{ $replaceRoot: { newRoot: '$additionsSteps' } }
+				],
+				as: "stepsExtra"
+			}
+		},
+		{ $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
+		// { $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
+		{ $unset: [ 'stepsClassic', 'stepsExtra', ...unsetFields ] },
+		...(!!projectFields ? [ { $project: projectFields } ] : []),
+		{ $sort: { reportId: -1 } },
+		{ $skip: countToSkip },
+		{ $limit: countToGet }
+	])
 
-// const reportsFiltersQuery = ({ reportId, clients, billingDateTo, billingDateFrom, status }) => {
-// 	const q = {}
-// 	const reg = /[.*+?^${}()|[\]\\]/g
-//
-// 	if (reportId) {
-// 		const f = reportId.replace(reg, '\\$&')
-// 		q['reportId'] = { "$regex": new RegExp(f, 'i') }
-// 	}
-// 	if (clients) {
-// 		q["client"] = { $in: clients.split(',').map(item => ObjectId(item)) }
-// 	}
-// 	if (status) {
-// 		q["status"] = status
-// 	}
-//
-// 	if (!!billingDateTo && !!billingDateFrom) {
-// 		q['firstPaymentDate'] = { $gte: new Date(+billingDateFrom) }
-// 		q['lastPaymentDate'] = { $lt: new Date(+billingDateTo) }
-// 	}
-//
-// 	return q
-// }
+	return await InvoicingClientReports.populate(reports, [
+				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] }
+			]
+	)
 
-// const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields,  unsetFields = []) => {
-// 	const queryResult = await InvoicingReceivables.aggregate([
-// 		{ $match: { ...query } },
-// 		{
-// 			$lookup: {
-// 				from: "projects",
-// 				let: { 'steps': '$stepsAndProjects.step' },
-// 				pipeline: [
-// 					{ $unwind: "$steps" },
-// 					{ $match: { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-// 					{ $addFields: { "steps.type": 'Classic' } },
-// 					...generateExtraFieldForSteps('steps'),
-// 					{ $replaceRoot: { newRoot: '$steps' } }
-// 				],
-// 				as: "stepsClassic"
-// 			}
-// 		},
-// 		{
-// 			$lookup: {
-// 				from: "projects",
-// 				let: { 'additionsSteps': '$stepsAndProjects.step' },
-// 				pipeline: [
-// 					{ $unwind: "$additionsSteps" },
-// 					{ $match: { "$expr": { "$in": [ "$additionsSteps._id", "$$additionsSteps" ] } } },
-// 					{ $addFields: { "additionsSteps.type": 'Extra' } },
-// 					...generateExtraFieldForSteps('additionsSteps'),
-// 					{ $replaceRoot: { newRoot: '$additionsSteps' } }
-// 				],
-// 				as: "stepsExtra"
-// 			}
-// 		},
-// 		{ $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
-// 		{ $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
-// 		{ $unset: [ 'stepsClassic', 'stepsExtra', ...unsetFields] },
-// 		...(!!projectFields ? [{$project:  projectFields}] : []),
-// 		{ $sort: { reportId: -1 } },
-// 		{ $skip: countToSkip },
-// 		{ $limit: countToGet }
-// 	])
-//
-// 	return await InvoicingReceivables.populate(queryResult, [
-// 				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] }
-// 			]
-// 	)
-//
-// 	function generateExtraFieldForSteps(key) {
-// 		return [
-// 			{ "$addFields": { [`${ key }` + ".projectNativeId"]: '$_id' } },
-// 			{ "$addFields": { [`${ key }` + ".projectName"]: '$projectName' } },
-// 			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
-// 			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
-// 			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } }
-// 		]
-// 	}
-// }
+	function generateExtraFieldForSteps(key) {
+		return [
+			{ "$addFields": { [`${ key }` + ".projectNativeId"]: '$_id' } },
+			{ "$addFields": { [`${ key }` + ".projectName"]: '$projectName' } },
+			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
+			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
+			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } }
+		]
+	}
+}
 
 const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 	const matchProject = {
@@ -195,7 +170,6 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 }
 
 module.exports = {
-// 	getAllReportsFromDb,
-// 	reportsFiltersQuery,
+	getAllReportsFromDb,
 	getAllSteps
 }

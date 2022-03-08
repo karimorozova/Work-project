@@ -183,12 +183,6 @@ export default {
           key: "client",
           style: { width: "220px" }
         },
-        // {
-        //   label: "Billing Name",
-        //   headerKey: "headerBN",
-        //   key: "bn",
-        //   style: { width: "125px" }
-        // },
         {
           label: "Payment Type",
           headerKey: "headerPT",
