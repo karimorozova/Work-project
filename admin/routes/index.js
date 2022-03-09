@@ -27,6 +27,7 @@ router.use("/pm-manage", requiresLogin, require("./pmArea/pm-manage"))
 router.use("/reportsapi", requiresLogin, require("./reportsapi"))
 router.use("/invoicing-payables", requiresLogin, require("./invoicingPayables"))
 router.use("/invoicing-receivables", requiresLogin, require("./invoicingReceivables"))
+router.use("/invoicing", requiresLogin, require("./invoicingLocal"))
 
 //Open API ==========================================================================
 router.use("/open-pangea", require("./OpenPangea"))

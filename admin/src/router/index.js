@@ -74,6 +74,10 @@ import cookie from "../../../vendor/plugins/vue-cookie"
 import AddReports from "../components/invoicingClientReports/AddReports"
 import ReportDetails from "../components/invoicingClientReports/ReportDetails"
 import ReportsList from "../components/invoicingClientReports/ReportsList"
+
+import AddInvoice from "../components/invoicingClientInvoices/AddInvoice"
+import InvoiceDetails from "../components/invoicingClientInvoices/InvoiceDetails"
+import InvoicesList from "../components/invoicingClientInvoices/InvoicesList"
 // =====================================================================================================
 
 
@@ -597,7 +601,23 @@ const router = new Router({
 							path: 'receivables-reports/create-reports',
 							name: 'receivables-reports',
 							component: AddReports
-						}
+						},
+						{
+							path: 'receivables-reports/invoice',
+							name: 'receivables-invoice',
+							component: InvoicesList
+						},
+						{
+							path: 'receivables-reports/invoice/:id',
+							name: 'receivables-invoice',
+							component: InvoiceDetails
+						},
+						{
+							path: 'receivables-reports/create-invoice',
+							name: 'receivables-invoice',
+							component: AddInvoice
+						},
+
 
 					]
 				},

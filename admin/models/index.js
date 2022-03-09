@@ -47,6 +47,7 @@ const PaymentTerms = require('./paymentTerms')
 const PaymentMethods = require('./PaymentMethods')
 const PaymentMethodsKeys = require('./PaymentMethodsKeys')
 const InvoicingClientReports = require('./invoicingClientReports')
+const Invoice = require('./invoice')
 
 const Models = {
   // InvoicingReceivables,
@@ -98,6 +99,7 @@ const Models = {
   PaymentTerms,
   PaymentMethods,
   PaymentMethodsKeys,
+  Invoice,
 };
 
 module.exports = Models;

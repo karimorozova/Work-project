@@ -209,6 +209,16 @@ router.post('/all-clients', async (req, res) => {
 	}
 })
 
+router.post('/all-clients-billing', async (req, res) => {
+	try {
+		const clients = await getSimpleClients({}, { 'name': 1, billingInfo: 1 })
+		res.send(clients)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Clients from DB ")
+	}
+})
+
 router.get('/payment-methods', async (req, res) => {
 	try {
 		const paymentsMethods = await getAllPaymentMethods()

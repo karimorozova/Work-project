@@ -310,8 +310,18 @@ export default {
                 },
                 {
                   type: 'link',
+                  path: '/pangea-finance/receivables-reports/invoice',
+                  name: 'Invoice'
+                },
+                {
+                  type: 'link',
                   path: '/pangea-finance/receivables-reports/create-reports',
                   name: 'Add Reports'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/receivables-reports/create-invoice',
+                  name: 'Add Invoice'
                 }
               ]
             }
