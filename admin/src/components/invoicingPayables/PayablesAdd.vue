@@ -132,7 +132,7 @@
                 placeholder="Datetime range"
               )
             .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
-              i.fas.fa-backspace.backspace-long
+              i.fas.fa-backspace.backspace
 
 </template>
 

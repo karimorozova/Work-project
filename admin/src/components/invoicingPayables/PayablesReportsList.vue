@@ -126,7 +126,7 @@
                   :isRemoveOption="true"
                   @removeOption="removeStatus"
                 )
-            .filter__itemLong
+            .filter__item
               label Date Range:
               .filter__input
                 DatePicker.range-with-one-panel(
@@ -141,7 +141,7 @@
                   placeholder="Select datetime range"
                 )
               .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
-                i.fas.fa-backspace.backspace-long
+                i.fas.fa-backspace.backspace
 
 </template>
 

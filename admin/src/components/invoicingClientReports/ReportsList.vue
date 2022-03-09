@@ -55,7 +55,7 @@
 
             template(slot="reportId" slot-scope="{ row, index }" )
               .table__data
-                router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/reports/${row._id}`}")
+                router-link(class="link-to" :to="{path: `/pangea-finance/receivables-reports/reports/${row._id}`}")
                   span {{ row.reportId }}
 
             template(slot="dateRange" slot-scope="{ row, index }")
@@ -95,58 +95,45 @@
                 i(class="fas fa-trash" @click="requestToDeleteReceivables(row._id)")
 
         template(slot="filters")
+          .filter
+            .filter__item
+              label Report ID:
+              .filter__input
+                input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
+                .clear-icon(v-if="reportIdValue.length" @click="requestToDeleteReceivables('reportId')")
+                  i.fas.fa-backspace
+            .filter__item
+              label Clients:
+              .filter__input
+                SelectMulti(
+                  :selectedOptions="selectedClients"
+                  :options="allClients"
+                  :hasSearch="true"
+                  placeholder="Options"
+                  @chooseOptions="setClient"
+                  :isSelectedWithIcon="true"
+                  :isRemoveOption="true"
+                  @removeOption="removeClients"
+                )
+            .filter__item
+              label Date Range:
+              .filter__input
+                DatePicker.range-with-one-panel(
+                  :value="selectedBillingDateRange"
+                  @input="(e) => setBillingDateRange(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  prefix-class="xmx"
+                  range-separator=" - "
+                  :clearable="false"
+                  type="datetime"
+                  range
+                  placeholder="Select datetime range"
+                )
+              .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+                i.fas.fa-backspace.backspace
 
-      //.filter
-      //  .filter__item
-      //    label Report Id:
-      //    .filter__input
-      //      input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
-      //      .clear-icon(v-if="reportIdValue.length" @click="requestToDeleteReceivables('reportId')")
-      //        i.fas.fa-backspace
-      //  .filter__item
-      //    label Clients:
-      //    .filter__input
-      //      SelectMulti(
-      //        :selectedOptions="selectedClients"
-      //        :options="allClients"
-      //        :hasSearch="true"
-      //        placeholder="Options"
-      //        @chooseOptions="setClient"
-      //        :isSelectedWithIcon="true"
-      //        :isRemoveOption="true"
-      //        @removeOption="removeClients"
-      //      )
-      //  .filter__item
-      //    label Status:
-      //    .filter__input
-      //      SelectSingle(
-      //        :selectedOption="selectedStatus"
-      //        :options="['Created', 'Sent']"
-      //        placeholder="Option"
-      //        @chooseOption="setStatus"
-      //        :isRemoveOption="true"
-      //        @removeOption="removeStatus"
-      //      )
-      //  .filter__itemLong
-      //    label Date Range:
-      //    .filter__input
-      //      DatePicker.range-with-one-panel(
-      //        :value="selectedBillingDateRange"
-      //        @input="(e) => setBillingDateRange(e)"
-      //        format="DD-MM-YYYY, HH:mm"
-      //        prefix-class="xmx"
-      //        range-separator=" - "
-      //        :clearable="false"
-      //        type="datetime"
-      //        range
-      //        placeholder="Select datetime range"
-      //      )
-      //    .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
-      //      i.fas.fa-backspace.backspace-long
-      //
 
       //      .options__description Reports Selected: {{ reports.filter(item => item.isCheck).length }}
-      //
       //    .options__button(v-else)
       //      Button(value="Zoho sync." :outline="true" @clicked="updateReportsStateFromZoho()" style="margin-right: 10px;")
       //      router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/create-reports`}")
@@ -454,9 +441,6 @@ export default {
     },
     ifSomeCheck() {
       return this.reports.length && this.reports.some(item => item.isCheck)
-    },
-    selectedStatus() {
-      return this.$route.query.status || ''
     },
     selectedBillingDateRange() {
       return this.$route.query.billingDateFrom
