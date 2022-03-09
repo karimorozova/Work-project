@@ -26,56 +26,7 @@
 // const {
 // 	stepsFiltersQuery
 // } = require('../invoicingPayables')
-//
-// router.post("/report/:id", async (req, res) => {
-// 	const { id } = req.params
-// 	try {
-// 		const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(id) })
-// 		res.send(report)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Something wrong on getting steps')
-// 	}
-// })
-//
 
-//
-//
-// router.post("/not-selected-steps-list-mono-project", async (req, res) => {
-// 	const { projectId, clientBillingInfo } = req.body
-// 	try {
-// 		const steps = await getAllSteps(0, 1e6, { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo) })
-// 		res.send(steps)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Something wrong on getting steps')
-// 	}
-// })
-//
-// router.post("/not-selected-steps-list-multi-project/", async (req, res) => {
-// 	const { clientBillingInfo } = req.body
-// 	try {
-// 		const steps = await getAllSteps(0, 1e6, { "clientBillingInfo": ObjectId(clientBillingInfo) })
-// 		res.send(steps)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Something wrong on getting steps')
-// 	}
-// })
-//
-//
-//
-// router.post("/report/:reportId/delete/:stepId", async (req, res) => {
-// 	const { reportId, stepId } = req.params
-// 	try {
-// 		await deleteStepFromReport(reportId, stepId)
-// 		res.send('Done!')
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Something wrong on deleting steps from report!')
-// 	}
-// })
-//
 // router.post("/zoho/createInvoice", async (req, res) => {
 // 	const { _id } = req.body
 // 	try {

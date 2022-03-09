@@ -1,4 +1,4 @@
-const { InvoicingClientReports } = require("../models")
+const { InvoicingClientReports, Projects } = require("../models")
 const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
 
@@ -22,15 +22,27 @@ const deleteReport = async (reportId) => {
 	}
 }
 
-const deleteStepFromReport = async (reportId, stepId) => {
+const deleteStepFromReport = async (reportId, stepsId) => {
 	try {
-		await InvoicingClientReports.updateOne(
-				{ _id: reportId },
-				{ $pull: { 'stepsAndProjects': { "step": stepId } } }
-		)
-		const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(reportId) })
-		let { stepsWithProject } = report
+		for (const stepId of stepsId) {
+			let { total, stepsAndProjects } = await InvoicingClientReports.findOne({ _id: reportId })
+			const classicProject = await Projects.findOne({ "steps._id": stepId })
+			const extraProject = await Projects.findOne({ "additionsSteps._id": stepId })
 
+			let step = {}
+			if (classicProject) step = classicProject.steps.find(({ _id }) => `${ _id }` === `${ stepId }`)
+			if (extraProject) step = extraProject.additionsSteps.find(({ _id }) => `${ _id }` === `${ stepId }`)
+
+			const { finance: { Price: { receivables } } } = step
+			total = stepsAndProjects.length === 1 ? 0 : +(total - receivables).toFixed(2)
+			await InvoicingClientReports.updateOne({ _id: reportId }, {
+				$set: { total },
+				$pull: { 'stepsAndProjects': { "step": stepId } }
+			})
+			await unbindStepsFromReportByProjectMutation(stepId)
+		}
+
+		const [ { stepsWithProject } ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(reportId) })
 		const { firstPaymentDate, lastPaymentDate } = stepsWithProject.reduce((acc, { deadline }) => {
 			acc.firstPaymentDate = moment.min(moment(deadline.toString()), moment(acc.firstPaymentDate)).toISOString()
 			acc.lastPaymentDate = moment.max(moment(deadline.toString()), moment(acc.lastPaymentDate)).toISOString()
@@ -39,19 +51,18 @@ const deleteStepFromReport = async (reportId, stepId) => {
 			firstPaymentDate: moment().add(20, 'years').toISOString(),
 			lastPaymentDate: moment().subtract(20, 'years')
 		})
-
-		await InvoicingClientReports.updateOne(
-				{ _id: reportId },
-				{ $set: { firstPaymentDate, lastPaymentDate } }
-		)
-		await unbindStepsFromReportByProjectMutation(stepId)
+		await InvoicingClientReports.updateOne({ _id: reportId }, { $set: { firstPaymentDate, lastPaymentDate } })
 	} catch (e) {
 		console.log(e)
 	}
 }
 
+const addStepToReport = async (reportId, checkedSteps) => {
+	console.log(reportId, checkedSteps)
+}
 
 module.exports = {
 	deleteReport,
-	deleteStepFromReport
+	deleteStepFromReport,
+	addStepToReport
 }

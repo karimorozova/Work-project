@@ -88,12 +88,13 @@ export default {
 .block {
 
   &__header {
-    height: 45px;
+    height: 46px;
     display: flex;
     justify-content: space-between;
     padding: 0 50px;
     background: white;
-    box-shadow: $box-shadow;
+    //box-shadow: $box-shadow;
+    border-bottom: 1px solid $light-border;
     position: relative;
     z-index: 40;
 

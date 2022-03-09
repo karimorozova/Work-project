@@ -265,7 +265,7 @@
 <script>
 import GeneralTable from '../GeneralTable'
 import moment from "moment"
-import ReceivablesAddStepsTo from "./ReceivablesAddStepsTo"
+import ReceivablesAddStepsTo from "../invoicingClientReports/ReceivablesAddStepsTo"
 import ApproveModal from '../ApproveModal'
 import Button from "../Button"
 import SelectSingle from "../SelectSingle"

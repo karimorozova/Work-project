@@ -1,11 +1,12 @@
 const router = require('express').Router()
 const { Languages } = require("../models")
+const { ObjectId } = require("mongodb")
 const { stepsFiltersQuery } = require("../invoicingPayables")
 const {
 	getAllSteps,
 	createReports,
 	reportsFiltersQuery,
-	getAllReportsFromDb, deleteReport
+	getAllReportsFromDb, deleteReport, deleteStepFromReport, addStepToReport
 } = require("../invoicingClientReports")
 
 
@@ -19,6 +20,41 @@ router.post("/not-selected-steps-list", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting Steps List!')
+	}
+})
+
+router.post("/report/:reportId/delete", async (req, res) => {
+	const { reportId } = req.params
+	const { stepsId } = req.body
+	try {
+		await deleteStepFromReport(reportId, stepsId)
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on deleting steps from report!')
+	}
+})
+
+router.post("/report/:reportId/add", async (req, res) => {
+	const { reportId } = req.params
+	const { checkedSteps } = req.body
+	try {
+		await addStepToReport(reportId, checkedSteps)
+		res.send('Done!')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
+	}
+})
+
+router.post("/report-details/:id", async (req, res) => {
+	const { id } = req.params
+	try {
+		const [ report ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(id) })
+		res.send(report)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
 })
 
@@ -63,6 +99,28 @@ router.post("/delete-reports", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on deleting reports')
+	}
+})
+
+router.post("/not-selected-steps-list-mono-project", async (req, res) => {
+	const { projectId, clientBillingInfo } = req.body
+	try {
+		const steps = await getAllSteps(0, 1e6, { "_id": ObjectId(projectId), "clientBillingInfo": ObjectId(clientBillingInfo) })
+		res.send(steps)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
+	}
+})
+
+router.post("/not-selected-steps-list-multi-project/", async (req, res) => {
+	const { clientBillingInfo } = req.body
+	try {
+		const steps = await getAllSteps(0, 1e6, { "clientBillingInfo": ObjectId(clientBillingInfo) })
+		res.send(steps)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
 	}
 })
 

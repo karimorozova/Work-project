@@ -214,17 +214,17 @@ export default {
           style: { width: "95px" }
         },
         {
-          label: "Deadline",
+          label: "Pr. Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
           style: { width: "95px" }
         },
-        {
-          label: "Billing Date",
-          headerKey: "headerBillingDate",
-          key: "billingDate",
-          style: { width: "95px" }
-        },
+        // {
+        //   label: "Billing Date",
+        //   headerKey: "headerBillingDate",
+        //   key: "billingDate",
+        //   style: { width: "95px" }
+        // },
         {
           label: "Status",
           headerKey: "headerJobStatus",

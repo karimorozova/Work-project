@@ -5,8 +5,6 @@
       GeneralTable(
         :fields="fields",
         :tableData="steps",
-        :isFilterShow="false"
-        :isFilterAbsolute="false"
       )
 
         template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
@@ -62,8 +60,20 @@
       .table__empty(v-if="!steps.length") Nothing found...
 
       .table__buttons
-        Button(v-if="steps.length" class="add-button" value="Add Jobs" :isDisabled="!isOptionToCreateReport" @clicked="sendSteps")
-        Button(class="add-button" :outline="true" value="Close" @clicked="closeTable")
+        Button(
+          v-if="steps.length"
+          class="add-button"
+          value="Add Jobs"
+          :isDisabled="!isOptionToCreateReport || !!isRequestNow"
+          @clicked="sendSteps"
+        )
+        Button(
+          class="add-button"
+          :outline="true"
+          value="Close"
+          :isDisabled="!!isRequestNow"
+          @clicked="closeTable"
+        )
 
 </template>
 
@@ -175,9 +185,12 @@ export default {
       this.isAllSelected = val
     },
     async sendSteps() {
-      const checkedSteps = this.steps.filter(i => i.isCheck)
       try {
-        await this.$http.post('/invoicing-receivables/create-report', { checkedSteps, createdBy: this.user._id })
+        const checkedSteps = this.steps.filter(i => i.isCheck)
+        await this.$http.post(`/invoicing-receivables/report/${ this.$route.params.id }/add`, {
+          checkedSteps: checkedSteps.map(({ steps }) => steps._id),
+          createdBy: this.user._id
+        })
         this.$emit('refreshReports')
       } catch (e) {
         console.log(e)
@@ -186,7 +199,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "getUser"
+      user: "getUser",
+      isRequestNow: 'getRequestCounter'
     }),
     isOptionToCreateReport() {
       if (this.steps.length) {
@@ -207,14 +221,9 @@ export default {
 @import "../../assets/scss/colors";
 
 .addContainer {
-  &__table {
-    //margin-top: 40px;
-  }
-
   &__title {
     font-size: 16px;
     font-family: 'Myriad600';
-    margin-top: 25px;
     margin-bottom: 10px;
   }
 }

@@ -5,7 +5,7 @@ const { removeDir } = require("./PayablesFilesAndDirecrory")
 
 const payableDeleteSteps = async (reportId, stepsId) => {
 	try {
-		for (const stepId of stepsId) {
+		for await (const stepId of stepsId) {
 			let { total, steps: reportSteps } = await InvoicingPayables.findOne({ _id: reportId })
 			const { steps } = await Projects.findOne({ 'steps._id': stepId })
 			const { nativeFinance: { Price: { payables } } } = steps.find(({ _id }) => `${ _id }` === `${ stepId }`)

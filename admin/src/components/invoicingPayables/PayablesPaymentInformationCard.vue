@@ -1,6 +1,6 @@
 <template lang="pug">
   .receipt
-    .receipt__title RECEIPT
+    .receipt__title Receipt
     .receipt__number
       span #
       span {{ cardInfo._id }}

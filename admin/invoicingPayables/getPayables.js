@@ -267,7 +267,8 @@ const getPayablesProjectsAndSteps = async (id) => {
 				let: { 'steps': '$steps' },
 				pipeline: [
 					{ "$unwind": "$steps" },
-					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } }
+					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+					{ "$addFields": { "steps.deadline": '$deadline' } },
 				],
 				as: "steps"
 			}

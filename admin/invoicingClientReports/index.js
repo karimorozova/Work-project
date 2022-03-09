@@ -13,11 +13,13 @@ const {
 
 const {
 	deleteReport,
-	deleteStepFromReport
+	deleteStepFromReport,
+	addStepToReport
 } = require('./updateReports')
 
 
 module.exports = {
+	addStepToReport,
 	deleteReport,
 	deleteStepFromReport,
 	getAllReportsFromDb,
