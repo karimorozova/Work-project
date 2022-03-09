@@ -138,7 +138,7 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 	// TODO: Delete soon, Temporary for quantity with MT Translation
 	if (fakeStepVendor === 'Post-Editing' && isMemoqCatUnit) {
-		step.finance.Wordcount.payables = prevStep.finance.Wordcount.receivables
+		step.finance.Wordcount.payables = prevStep.finance.Wordcount?.payables || prevStep.finance.Wordcount.receivables
 	}
 
 	let quantity = isMemoqCatUnit
