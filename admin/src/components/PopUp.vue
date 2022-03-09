@@ -1,6 +1,6 @@
 <template lang="pug">
   .test
-    .popcorn
+    .popcorn(:class="{seted: isDisabled}")
       slot
     .tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
       span {{text}}
