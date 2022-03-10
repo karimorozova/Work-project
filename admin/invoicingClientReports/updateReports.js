@@ -1,10 +1,7 @@
-const { InvoicingClientReports, Projects } = require("../models")
-const { ObjectID: ObjectId } = require("mongodb")
-const moment = require("moment")
+const { InvoicingClientReports } = require("../models")
 
 const { removeDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")
-const { unbindStepsFromReportByProjectMutation } = require("./helpers")
-const { getAllReportsFromDb } = require("./getReports")
+const { bindingStepsInReportsByOptions, getStepFromProject, recalculateReportDatesRange } = require("./helpers")
 
 const deleteReport = async (reportId) => {
 	try {
@@ -14,7 +11,7 @@ const deleteReport = async (reportId) => {
 				? receivables.stepsAndProjects.map(({ step }) => step)
 				: []
 
-		for await (const stepId of steps) await unbindStepsFromReportByProjectMutation(stepId)
+		for await (const stepId of steps) await bindingStepsInReportsByOptions(stepId, false)
 		await InvoicingClientReports.deleteOne({ _id: reportId })
 		await removeDir(DIR, reportId)
 	} catch (e) {
@@ -26,39 +23,38 @@ const deleteStepFromReport = async (reportId, stepsId) => {
 	try {
 		for (const stepId of stepsId) {
 			let { total, stepsAndProjects } = await InvoicingClientReports.findOne({ _id: reportId })
-			const classicProject = await Projects.findOne({ "steps._id": stepId })
-			const extraProject = await Projects.findOne({ "additionsSteps._id": stepId })
-
-			let step = {}
-			if (classicProject) step = classicProject.steps.find(({ _id }) => `${ _id }` === `${ stepId }`)
-			if (extraProject) step = extraProject.additionsSteps.find(({ _id }) => `${ _id }` === `${ stepId }`)
-
+			const { step } = await getStepFromProject(stepId)
 			const { finance: { Price: { receivables } } } = step
 			total = stepsAndProjects.length === 1 ? 0 : +(total - receivables).toFixed(2)
 			await InvoicingClientReports.updateOne({ _id: reportId }, {
 				$set: { total },
 				$pull: { 'stepsAndProjects': { "step": stepId } }
 			})
-			await unbindStepsFromReportByProjectMutation(stepId)
+			await bindingStepsInReportsByOptions(stepId, false)
 		}
-
-		const [ { stepsWithProject } ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(reportId) })
-		const { firstPaymentDate, lastPaymentDate } = stepsWithProject.reduce((acc, { deadline }) => {
-			acc.firstPaymentDate = moment.min(moment(deadline.toString()), moment(acc.firstPaymentDate)).toISOString()
-			acc.lastPaymentDate = moment.max(moment(deadline.toString()), moment(acc.lastPaymentDate)).toISOString()
-			return acc
-		}, {
-			firstPaymentDate: moment().add(20, 'years').toISOString(),
-			lastPaymentDate: moment().subtract(20, 'years')
-		})
-		await InvoicingClientReports.updateOne({ _id: reportId }, { $set: { firstPaymentDate, lastPaymentDate } })
+		await recalculateReportDatesRange(reportId)
 	} catch (e) {
 		console.log(e)
 	}
 }
 
-const addStepToReport = async (reportId, checkedSteps) => {
-	console.log(reportId, checkedSteps)
+const addStepToReport = async (reportId, stepsId) => {
+	try {
+		for (const stepId of stepsId) {
+			let { total } = await InvoicingClientReports.findOne({ _id: reportId })
+			const { step, project: { _id: _projectId } } = await getStepFromProject(stepId)
+			const { finance: { Price: { receivables } } } = step
+			total = +(total + receivables).toFixed(2)
+			await InvoicingClientReports.updateOne({ _id: reportId }, {
+				$set: { total },
+				$push: { 'stepsAndProjects': { step: stepId, project: _projectId, type: step.vendor ? 'Classic' : 'Extra' } }
+			})
+			await bindingStepsInReportsByOptions(stepId, true)
+		}
+		await recalculateReportDatesRange(reportId)
+	} catch (e) {
+		console.log(e)
+	}
 }
 
 module.exports = {

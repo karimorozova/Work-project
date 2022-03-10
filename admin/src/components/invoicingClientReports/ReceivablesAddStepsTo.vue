@@ -1,5 +1,11 @@
 <template lang="pug">
   .addContainer
+    ValidationErrors(
+      v-if="errors.length"
+      :errors="errors"
+      :isAbsolute="true"
+      @closeErrors="closeErrors"
+    )
     .addContainer__title Available Jobs
     .addContainer__table
       GeneralTable(
@@ -54,7 +60,7 @@
         template(slot="receivables" slot-scope="{ row, index }")
           .table__data
             span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-            span {{ row.steps.finance.Price.receivables | roundTwoDigit }}
+            span {{ +(row.steps.finance.Price.receivables).toFixed(2)}}
 
 
       .table__empty(v-if="!steps.length") Nothing found...
@@ -84,11 +90,14 @@ import Button from '../Button'
 import moment from "moment"
 import { mapGetters } from "vuex"
 import currencyIconDetected from "../../mixins/currencyIconDetected"
+import ValidationErrors from "../ValidationErrors"
 
 export default {
   mixins: [ currencyIconDetected ],
-
   props: {
+    paymentType: {
+      type: String
+    },
     steps: {
       type: Array,
       default: []
@@ -97,6 +106,7 @@ export default {
   data() {
     return {
       isAllSelected: false,
+      errors: [],
       fields: [
         {
           label: "",
@@ -168,6 +178,9 @@ export default {
     }
   },
   methods: {
+    closeErrors() {
+      this.errors = []
+    },
     closeTable() {
       this.$emit('closeTable')
     },
@@ -186,7 +199,12 @@ export default {
     },
     async sendSteps() {
       try {
+        this.errors = []
         const checkedSteps = this.steps.filter(i => i.isCheck)
+        const projectIds = [ ...new Set(checkedSteps.map(i => i.projectId)) ]
+        if (projectIds.length > 1 && this.paymentType === 'PPP') this.errors.push('Only one Project for "PPP" Payment type')
+        if (this.errors.length) return
+
         await this.$http.post(`/invoicing-receivables/report/${ this.$route.params.id }/add`, {
           checkedSteps: checkedSteps.map(({ steps }) => steps._id),
           createdBy: this.user._id
@@ -210,6 +228,7 @@ export default {
     }
   },
   components: {
+    ValidationErrors,
     GeneralTable,
     CheckBox,
     Button
@@ -221,6 +240,8 @@ export default {
 @import "../../assets/scss/colors";
 
 .addContainer {
+  position: relative;
+
   &__title {
     font-size: 16px;
     font-family: 'Myriad600';
@@ -236,6 +257,7 @@ export default {
   &__buttons {
     display: flex;
     gap: 20px;
+    justify-content: center;
   }
 
   &__header,

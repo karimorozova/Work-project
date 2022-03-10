@@ -1,23 +1,60 @@
-const { Projects } = require("../models")
+const { Projects, InvoicingClientReports } = require("../models")
+const { getAllReportsFromDb } = require("./getReports")
+const { ObjectID: ObjectId } = require("mongodb")
+const moment = require("moment")
 
-const unbindStepsFromReportByProjectMutation = async (stepId) => {
+const bindingStepsInReportsByOptions = async (stepId, option) => {
 	const isClassic = await Projects.findOne({ "steps._id": stepId })
 	const isExtra = await Projects.findOne({ "additionsSteps._id": stepId })
 
 	if (isClassic)
 		await Projects.updateOne(
 				{ "steps._id": stepId },
-				{ "steps.$[i].isInReportReceivables": false },
+				{ "steps.$[i].isInReportReceivables": option },
 				{ arrayFilters: [ { "i._id": stepId } ] }
 		)
 	if (isExtra)
 		await Projects.updateOne(
 				{ "additionsSteps._id": stepId },
-				{ "additionsSteps.$[i].isInReportReceivables": false },
+				{ "additionsSteps.$[i].isInReportReceivables": option },
 				{ arrayFilters: [ { "i._id": stepId } ] }
 		)
 }
 
+const getStepFromProject = async stepId => {
+	const classicProject = await Projects.findOne({ "steps._id": stepId })
+	const extraProject = await Projects.findOne({ "additionsSteps._id": stepId })
+	if (classicProject) return {
+		project: classicProject,
+		step: classicProject.steps.find(({ _id }) => `${ _id }` === `${ stepId }`)
+	}
+	if (extraProject) return {
+		project: extraProject,
+		step: extraProject.additionsSteps.find(({ _id }) => `${ _id }` === `${ stepId }`)
+	}
+}
+
+const recalculateReportDatesRange = async reportId => {
+	const [ { stepsWithProject } ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(reportId) })
+	const { firstPaymentDate, lastPaymentDate } = stepsWithProject.reduce((acc, { deadline }) => {
+		acc.firstPaymentDate = moment.min(
+				moment(deadline),
+				moment(acc.firstPaymentDate)
+		).toISOString()
+		acc.lastPaymentDate = moment.max(
+				moment(deadline),
+				moment(acc.lastPaymentDate)
+		).toISOString()
+		return acc
+	}, {
+		firstPaymentDate: moment().add(20, 'years').toISOString(),
+		lastPaymentDate: moment().subtract(20, 'years')
+	})
+	await InvoicingClientReports.updateOne({ _id: reportId }, { $set: { firstPaymentDate, lastPaymentDate } })
+}
+
 module.exports = {
-	unbindStepsFromReportByProjectMutation
+	recalculateReportDatesRange,
+	bindingStepsInReportsByOptions,
+	getStepFromProject
 }

@@ -64,6 +64,7 @@
           @deleteStep="deleteStep"
         )
         Add(
+          v-if="!toggleAddSteps"
           @add="changeToggleAddSteps"
         )
       //  .payment-card(v-if="isPaymentCard")
@@ -235,6 +236,7 @@
       //
     .available-jobs(v-if="toggleAddSteps")
       ReceivablesAddStepsTo(
+        :paymentType="getBillingDetails(reportDetailsInfo).getPaymentType()"
         :steps="steps"
         @refreshReports="refreshReports"
         @closeTable="changeToggleAddSteps"
@@ -431,6 +433,7 @@ export default {
     async getStepsMonoProject() {
       const { stepsAndProjects, clientBillingInfo } = this.reportDetailsInfo
       try {
+        if (!stepsAndProjects.length) return this.getStepsMultiProject()
         this.steps = (await this.$http.post('/invoicing-receivables/not-selected-steps-list-mono-project/', {
           projectId: stepsAndProjects[0].project,
           clientBillingInfo

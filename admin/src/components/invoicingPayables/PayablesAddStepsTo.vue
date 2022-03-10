@@ -224,6 +224,7 @@ export default {
   &__buttons {
     display: flex;
     gap: 20px;
+    justify-content: center;
   }
 
   &__header,
