@@ -77,6 +77,7 @@ import ReportsList from "../components/invoicingClientReports/ReportsList"
 
 import AddInvoice from "../components/invoicingClientInvoices/AddInvoice"
 import InvoiceDetails from "../components/invoicingClientInvoices/InvoiceDetails"
+import InvoiceEdit from "../components/invoicingClientInvoices/InvoiceEdit"
 import InvoicesList from "../components/invoicingClientInvoices/InvoicesList"
 // =====================================================================================================
 
@@ -611,6 +612,11 @@ const router = new Router({
 							path: 'receivables-reports/invoice/:id',
 							name: 'receivables-invoice',
 							component: InvoiceDetails
+						},
+						{
+							path: 'receivables-reports/invoice/:id/edit',
+							name: 'receivables-invoice',
+							component: InvoiceEdit
 						},
 						{
 							path: 'receivables-reports/create-invoice',

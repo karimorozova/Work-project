@@ -56,11 +56,7 @@ const InvoiceSchema = new mongoose.Schema({
 			}
 		},
 	}],
-
-
-
-
-	invoicingId: {
+	invoiceId: {
 		type: String
 	},
 	createdAt: {
@@ -71,9 +67,18 @@ const InvoiceSchema = new mongoose.Schema({
 		type: Date,
 		default: ''
 	},
-	// terms: {
-	// 	type: String,
-	// },
+	invoicingDate: {
+		type: Date,
+		default: ''
+	},
+	terms: {
+		type: String,
+	},
+	accountManager: {
+		type: Schema.Types.ObjectId,
+		ref: 'User',
+		default: null,
+	}
 
 
 

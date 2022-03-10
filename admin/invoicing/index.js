@@ -3,6 +3,18 @@ const {
 } = require('./createInvoicing')
 
 
+const {
+	getInvoices,
+	getInvoice,
+} = require('./getInvoicing')
+
+const {
+	updateInvoice
+} = require('./updateInvoice')
+
 module.exports = {
-	createInvoice
+	createInvoice,
+	getInvoices,
+	getInvoice,
+	updateInvoice,
 }

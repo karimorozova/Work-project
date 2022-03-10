@@ -57,8 +57,7 @@ export default {
     },
     async createInvoice() {
       const { id } = (await this.$http.post('/invoicing/create-invoice', { customerId: this.selectedClient._id, clientBillingInfoId: this.selectedBillingInfo._id })).data
-      console.log(id)
-      this.$router.push(`/pangea-finance/receivables-reports/invoice/${id}`)
+      this.$router.push(`/pangea-finance/receivables-reports/invoice/${id}/edit`)
     }
   },
 
