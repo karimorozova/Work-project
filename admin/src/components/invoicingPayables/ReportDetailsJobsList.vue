@@ -41,7 +41,8 @@
             .table__data(v-else) -
 
           template(slot="deadline" slot-scope="{ row, index }")
-            .table__data {{ formattedDate(row.deadline) }}
+            .table__data(v-if="enumOfReports === 'client'" ) {{ formattedDate(row.billingDate) }}
+            .table__data(v-else) {{ formattedDate(row.deadline) }}
 
           template(slot="status" slot-scope="{ row, index }")
             .table__data {{ row.status || 'Completed' }}
@@ -83,7 +84,7 @@
               .clear-icon(v-if="filterStep.length" @click="clearFilter('filterStep')")
                 i.fas.fa-backspace
           .filter__item
-            label Deadline Range:
+            label {{ enumOfReports === 'client' ? 'Billing Date Range:' : 'Deadline Range:' }}
             .filter__input
               DatePicker.range-with-one-panel(
                 :value="!!filterDateRange[0] ? [new Date(filterDateRange[0]), new Date(filterDateRange[1])] : filterDateRange"
@@ -184,7 +185,7 @@ export default {
           style: { width: "12%" }
         },
         {
-          label: "Pr. Deadline",
+          label: this.enumOfReports !== 'client' ? "Pr. Deadline" : "Billing Date",
           headerKey: "headerDeadline",
           key: "deadline",
           style: { width: "11%" }
@@ -276,15 +277,18 @@ export default {
       const targets = this.filterTargets.map(i => this.getLangId(i))
 
       return this.steps.filter(item => {
-            const deadline = new Date(item.deadline).getTime()
             return item.projectId.includes(this.filterProjectId)
                 && item.projectName.toLowerCase().includes(this.filterProjectName.toLowerCase())
                 && (!!item?.title
                     ? item.title.toLowerCase().includes(this.filterStep.toLowerCase())
                     : item.stepAndUnit.step.title.toLowerCase().includes(this.filterStep.toLowerCase()))
-                && (this.filterDateRange[0]
-                    ? (deadline > this.filterDateRange[0] && deadline < this.filterDateRange[1])
-                    : item)
+                && (
+                    this.filterDateRange[0]
+                        ? this.enumOfReports === 'client'
+                            ? (new Date(item.billingDate).getTime() > this.filterDateRange[0] && new Date(item.billingDate).getTime() < this.filterDateRange[1])
+                            : (new Date(item.deadline).getTime() > this.filterDateRange[0] && new Date(item.deadline).getTime() < this.filterDateRange[1])
+                        : item
+                )
                 && (sources.length ? sources.includes(item.fullSourceLanguage) : item)
                 && (targets.length ? targets.includes(item.fullTargetLanguage) : item)
                 && item
@@ -335,11 +339,11 @@ export default {
   }
 
   &__data {
-    min-width: 100px;
+    min-width: 85px;
   }
 
   &__data {
-    width: 100%;
+    //width: 100%;
 
     a {
       color: inherit;
@@ -354,7 +358,7 @@ export default {
 
   &__icons {
     width: 100%;
-    height: 40px;
+    height: 42px;
     align-items: center;
     display: flex;
     justify-content: center;

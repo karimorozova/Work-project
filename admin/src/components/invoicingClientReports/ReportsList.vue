@@ -82,7 +82,7 @@
             template(slot="amount" slot-scope="{ row, index }")
               .table__data
                 span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-                span {{ row.total | roundTwoDigit }}
+                span {{ +(row.total).toFixed(2) }}
 
             template(slot="created" slot-scope="{ row, index }")
               .table__data {{ getTime( row.createdAt) }}

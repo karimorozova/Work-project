@@ -36,13 +36,13 @@ const getStepFromProject = async stepId => {
 
 const recalculateReportDatesRange = async reportId => {
 	const [ { stepsWithProject } ] = await getAllReportsFromDb(0, 1, { _id: ObjectId(reportId) })
-	const { firstPaymentDate, lastPaymentDate } = stepsWithProject.reduce((acc, { deadline }) => {
+	const { firstPaymentDate, lastPaymentDate } = stepsWithProject.reduce((acc, { billingDate }) => {
 		acc.firstPaymentDate = moment.min(
-				moment(deadline),
+				moment(billingDate),
 				moment(acc.firstPaymentDate)
 		).toISOString()
 		acc.lastPaymentDate = moment.max(
-				moment(deadline),
+				moment(billingDate),
 				moment(acc.lastPaymentDate)
 		).toISOString()
 		return acc

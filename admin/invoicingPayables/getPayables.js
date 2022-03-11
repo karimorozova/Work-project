@@ -11,28 +11,31 @@ const getPayablesDateRange = (steps) => {
 	}, { firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20, 'years') })
 }
 
-const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, deadlineDateTo, deadlineDateFrom, step }, allLanguages) => {
-	const q = {}
+const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, deadlineDateTo, deadlineDateFrom, step, billingDateFrom, billingDateTo }, allLanguages) => {
+	const query = {}
 	if (vendors) {
-		q["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+		query["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
 	}
 	if (clients) {
-		q["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
+		query["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
 	if (sourceLanguages) {
-		q["steps.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+		query["steps.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
 	}
 	if (targetLanguages) {
-		q["steps.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+		query["steps.targetLanguage"] = { $in: targetLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
 	}
 	if (step) {
-		q["steps.stepAndUnit.step.title"] = step
+		query["steps.stepAndUnit.step.title"] = step
 	}
 	if (!!deadlineDateTo && !!deadlineDateFrom) {
-		q["deadline"] = { $gte: new Date(+deadlineDateFrom), $lt: new Date(+deadlineDateTo) }
+		query["deadline"] = { $gte: new Date(+deadlineDateFrom), $lt: new Date(+deadlineDateTo) }
+	}
+	if (!!billingDateTo && !!billingDateFrom) {
+		query["billingDate"] = { $gte: new Date(+billingDateFrom), $lt: new Date(+billingDateTo) }
 	}
 
-	return q
+	return query
 }
 
 const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateFrom, status }) => {

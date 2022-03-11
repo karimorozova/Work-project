@@ -52,7 +52,8 @@ const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields
 			{ "$addFields": { [`${ key }` + ".projectId"]: '$projectId' } },
 			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
 			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
-			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } }
+			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } },
+			{ "$addFields": { [`${ key }` + ".billingDate"]: '$billingDate' } },
 		]
 	}
 }

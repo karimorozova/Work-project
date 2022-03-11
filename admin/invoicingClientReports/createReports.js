@@ -154,8 +154,8 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 	}
 
 	function changePaymentRange(tempElement, element) {
-		tempElement.firstPaymentDate = moment.min(moment(element.deadline.toString()), moment(tempElement.firstPaymentDate)).toISOString()
-		tempElement.lastPaymentDate = moment.max(moment(element.deadline.toString()), moment(tempElement.lastPaymentDate)).toISOString()
+		tempElement.firstPaymentDate = moment.min(moment(element.billingDate), moment(tempElement.firstPaymentDate)).toISOString()
+		tempElement.lastPaymentDate = moment.max(moment(element.billingDate), moment(tempElement.lastPaymentDate)).toISOString()
 	}
 
 	function refreshUpdatedInfo(tempElement, createdBy) {

@@ -47,8 +47,8 @@
           template(slot="name" slot-scope="{row}" )
             .table__data {{ row.selectedBillingInfo.name }}
 
-          template(slot="deadline" slot-scope="{ row, index }")
-            .table__data {{ formattedDate(row.deadline) }}
+          template(slot="billingDate" slot-scope="{ row, index }")
+            .table__data {{ formattedDate(row.billingDate) }}
 
           template(slot="service" slot-scope="{ row, index }")
             .table__data {{ row.type === 'Classic' ? row.steps.stepAndUnit.step.title : row.steps.title }}
@@ -91,7 +91,7 @@
               .clear-icon(v-if="filterStep.length" @click="clearFilter('filterStep')")
                 i.fas.fa-backspace
           .filter__item
-            label Deadline Range:
+            label Billing Date Range:
             .filter__input
               DatePicker.range-with-one-panel(
                 :value="!!filterDateRange[0] ? [new Date(filterDateRange[0]), new Date(filterDateRange[1])] : filterDateRange"
@@ -231,9 +231,9 @@ export default {
           style: { width: "9%" }
         },
         {
-          label: "Deadline",
-          headerKey: "headerDeadline",
-          key: "deadline",
+          label: "Billing Date",
+          headerKey: "headerBillingDate",
+          key: "billingDate",
           style: { width: "8%" }
         },
         {
@@ -346,14 +346,14 @@ export default {
       const targets = this.filterTargets.map(i => this.getLangId(i))
 
       return this.steps.filter(item => {
-            const deadline = new Date(item.deadline).getTime()
+            const billingDate = new Date(item.billingDate).getTime()
             return item.projectId.includes(this.filterProjectId)
                 && item.projectName.toLowerCase().includes(this.filterProjectName.toLowerCase())
                 && (!!item?.steps.title
                     ? item.steps.title.toLowerCase().includes(this.filterStep.toLowerCase())
                     : item.steps.stepAndUnit.step.title.toLowerCase().includes(this.filterStep.toLowerCase()))
                 && (this.filterDateRange[0]
-                    ? (deadline > this.filterDateRange[0] && deadline < this.filterDateRange[1])
+                    ? (billingDate > this.filterDateRange[0] && billingDate < this.filterDateRange[1])
                     : item)
                 && (sources.length ? sources.includes(item.steps.fullSourceLanguage) : item)
                 && (targets.length ? targets.includes(item.steps.fullTargetLanguage) : item)
