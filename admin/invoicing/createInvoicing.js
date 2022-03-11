@@ -11,3 +11,13 @@ exports.createInvoice = async (customerId, clientBillingInfoId) => {
 
 	}
 }
+
+exports.createInvoiceItem = async (invoicingId, itemData) => {
+	try {
+
+		const invoice = await Invoice.findByIdAndUpdate(invoicingId, {$push: {'items':  itemData}})
+		return invoice._id
+	} catch (e) {
+
+	}
+}

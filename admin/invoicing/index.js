@@ -1,5 +1,6 @@
 const {
 	createInvoice,
+	createInvoiceItem,
 } = require('./createInvoicing')
 
 
@@ -14,6 +15,7 @@ const {
 
 module.exports = {
 	createInvoice,
+	createInvoiceItem,
 	getInvoices,
 	getInvoice,
 	updateInvoice,

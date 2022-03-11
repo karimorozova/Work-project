@@ -9,3 +9,12 @@ exports.updateInvoice = async (invoiceId, updateData) => {
 
 	}
 }
+
+exports.updateInvoiceItem = async (invoiceId, updateData) => {
+	try {
+		const invoice = await Invoice.findByIdAndUpdate(invoiceId, updateData)
+		return invoice._id
+	} catch (e) {
+
+	}
+}

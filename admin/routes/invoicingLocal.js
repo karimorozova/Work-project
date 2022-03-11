@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { createInvoice, getInvoices, getInvoice, updateInvoice } = require('../invoicing')
+const { createInvoice, getInvoices, getInvoice, updateInvoice,  createInvoiceItem } = require('../invoicing')
 
 router.post("/create-invoice", async (req, res) => {
 	const { customerId, clientBillingInfoId } = req.body
@@ -57,16 +57,16 @@ router.post("/invoice/:id", async (req, res) => {
 // 	}
 // })
 //
-// router.post("/invoice/:id/item", async (req, res) => {
-// 	try {
-// 		const { id } = req.params
-// 		// const invoice = await updateInvoiceItem(id, req.body)
-// 		res.json(invoice)
-// 	} catch (err) {
-// 		console.log(err)
-// 		res.status(500).send('Something wrong on invoicing')
-// 	}
-// })
+router.post("/invoice/:id/item", async (req, res) => {
+	try {
+		const { id } = req.params
+		const invoice = await createInvoiceItem(id, req.body)
+		res.json(invoice)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on invoicing')
+	}
+})
 
 
 module.exports = router
