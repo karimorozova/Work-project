@@ -67,173 +67,6 @@
           v-if="!toggleAddSteps"
           @add="changeToggleAddSteps"
         )
-      //  .payment-card(v-if="isPaymentCard")
-      //    .payment-card__close(@click="closePaymentCard") &#215;
-      //    .payment-card__title Payment
-      //    .payment-card__header
-      //      //.payment-card__header-block
-      //      //  .drop-title Payment Method:
-      //      //  .drop
-      //      //    SelectSingle(
-      //      //      :selectedOption="paymentMethod.name || ''"
-      //      //      :options="reportDetailsInfo.vendor.billingInfo.paymentMethod.length ? reportDetailsInfo.vendor.billingInfo.paymentMethod.map(i => i.name) : []"
-      //      //      placeholder="Option"
-      //      //      @chooseOption="setPaymentMethod"
-      //      //    )
-      //      .payment-card__header-block
-      //        .drop-title Payment Date:
-      //        .drop
-      //          DatePicker(
-      //            :value="paymentDate"
-      //            @confirm="(e) => setFromDate(e)"
-      //            format="MMM D, HH:mm"
-      //            type="datetime"
-      //            ref="deadline"
-      //            :clearable="false"
-      //            :confirm="true"
-      //            confirm-text="Set date"
-      //            prefix-class="xmx"
-      //          )
-      //      .payment-card__header-block(v-if="!isNotes" @click="isNotes = true")
-      //        .payment-card__link Add Note
-      //      .payment-card__header-block(v-else style="margin-top: 10px; width: 100%;")
-      //        .drop-title Notes:
-      //        textarea(type="text" rows="4" v-model="notes")
-      //    .payment-card__body
-      //      .payment-card__body-block
-      //        .drop-title Amount:
-      //        input(v-model="amount" ref="input" @click="selectInput" :class="'payment-card__input'" type="number" style="background-color: white;")
-      //      .payment-card__body-block
-      //        .drop-title Unpaid Amount:
-      //        input(:value="getUnpaidAmount" :class="'payment-card__input'" :disabled="true")
-      //      .payment-card__body-block
-      //        .payment-card__link(@click="approvePaidFull") Pay Full Amount
-      //    .payment-card__buttons
-      //      Button(
-      //        :isDisabled="!abilityToSubmitPayment"
-      //        :value="`${abilityToSubmitPayment ? 'Submit ' + amount + ' €' : 'Cannot be confirmed' }`"
-      //        @clicked="reportToPayment"
-      //      )
-      //      Button(:value="'Cancel'" :outline="true" @clicked="closePaymentCard")
-      //
-      //  .invoicing-details__details
-      //    .invoicing-details__body(v-if="Object.keys(reportDetailsInfo).length")
-      //      .invoicing-details__details
-      //
-      //        .invoicing-details__text
-
-      //
-      //
-      //          //TODO PAYMENT CARD ====>
-      //          //.payment-info(v-if="false")
-      //          //  .payment-info__doublePay
-      //          //    .payment-info__payBlock
-      //          //      .amount__title Paid Amount:
-      //          //      input(:value="amount" @change="updatePaidAmount" class="payment-info__input" :disabled="isFull")
-      //          //    .check-box
-      //          //      CheckBox(:isChecked="isFull" :isWhite="true" @check="togglePaidFull(true)" @uncheck="togglePaidFull(false)")
-      //          //      span(class="check-box__text") Paid full
-      //          //
-      //          //  .payment-info__amountAndFile
-      //          //    .payment-info__amount
-      //          //      .amount__title Unpaid Amount:
-      //          //      .amount__value(:class="{'green-value': +getUnpaidAmount === 0 }") {{ getUnpaidAmount }} €
-      //          //
-      //          //  .payment-info__double
-      //          //    .payment-info__block
-      //          //      .payment-info__title Payment Method:
-      //          //      .payment-info__select
-      //          //        SelectSingle(
-      //          //          :selectedOption="paymentMethod"
-      //          //          :options="['test1', 'test2', 'test3' ]"
-      //          //          placeholder="Option"
-      //          //          @chooseOption="setPaymentMethod"
-      //          //        )
-      //          //    .payment-info__block
-      //          //      .payment-info__title Payment Date:
-      //          //      DatepickerWithTime(
-      //          //        :value="paymentDate"
-      //          //        @selected="setFromDate"
-      //          //        placeholder="Date"
-      //          //        :isTime="true"
-      //          //        :highlighted="highlighted"
-      //          //        :monday-first="true"
-      //          //        inputClass="datepicker-custom-filter-185"
-      //          //        calendarClass="calendar-custom"
-      //          //        :format="customFormatter"
-      //          //        :disabled="disabled"
-      //          //      )
-      //          //
-      //          //
-      //          //  .payment-info__notes
-      //          //    .payment-info__title Notes:
-      //          //    textarea(type="text" rows="3" v-model="notes")
-      //          //
-      //          //  Button(style="display: flex; justify-content: center; margin-top: 20px;" v-if="amount" :value="'Submit ' + `${amount} €`" @clicked="reportToPayment")
-      //
-      //        .payment-buttons
-      //          Button(v-if="reportDetailsInfo.status === 'Invoice Ready'" value="Send" @clicked="sendInvoice")
-      //          Button(v-if="reportDetailsInfo.status === 'Created'" value="Generate And Send" @clicked="generateAndSendInvoice")
-      //          Button(v-if="reportDetailsInfo.status === 'Created'" value="Generate Invoice" @clicked="generateInvoice")
-      //          Button(v-if="reportDetailsInfo.status === 'Sent'" value="Add Payment" @clicked="openPaymentCard")
-      //          Button(v-if="reportDetailsInfo.status === 'Created'" value="Add jobs" @clicked="changeToggleAddSteps")
-      //
-      //
-      //      .invoicing-details__table
-      //        ApproveModal(
-      //          v-if="isDeletingStep"
-      //          class="absolute-middle"
-      //          text="Are you sure?"
-      //          approveValue="Yes"
-      //          notApproveValue="Cancel"
-      //          @approve="deleteStep"
-      //          @close="closeModalStep"
-      //          @notApprove="closeModalStep"
-      //        )
-      //        GeneralTable(
-      //          :fields="fields",
-      //          :tableData="reportDetailsInfo.stepsWithProject",
-      //          :isFilterShow="false"
-      //          :isFilterAbsolute="false"
-      //        )
-      //
-      //          template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
-      //            .table__header {{ field.label }}
-      //
-      //          template(slot="project" slot-scope="{ row, index }")
-      //            .table__data
-      //              router-link(class="link-to" target= '_blank' :to="{path: `/pangea-projects/all-projects/All/details/${row.projectNativeId}`}")
-      //                .short {{ row.projectName }}
-      //
-      //          template(slot="stepId" slot-scope="{ row, index }")
-      //            .table__data {{ row.stepId || '-' }}
-      //
-      //          template(slot="service" slot-scope="{ row, index }")
-      //            .table__data {{ row.type === 'Classic' ? row.stepAndUnit.step.title : row.title }}
-      //
-      //          template(slot="langPair" slot-scope="{ row, index }")
-      //            span(v-if="row.type === 'Classic'" )
-      //              .table__data {{ row.sourceLanguage}}
-      //                span(style="font-size: 12px;color: #999999; margin: 0 4px;")
-      //                  i(class="fas fa-angle-double-right")
-      //                | {{ row.targetLanguage }}
-      //            span(v-else) -
-      //
-      //          template(slot="billing" slot-scope="{ row, index }")
-      //            .table__data {{ formattedDate(row.billingDate) }}
-      //
-      //          template(slot="status" slot-scope="{ row, index }")
-      //            .table__data {{ row.status || 'Completed' }}
-      //
-      //          template(slot="receivables" slot-scope="{ row, index }")
-      //            .table__data
-      //              span.currency(v-html="returnIconCurrencyByStringCode(row.projectCurrency)")
-      //              span {{ row.finance.Price.receivables | roundTwoDigit }}
-      //
-      //          template(slot="icons", slot-scope="{ row, index }")
-      //            .table__icons(v-if="(reportDetailsInfo.status === 'Created' || reportDetailsInfo.status === 'Sent')")
-      //              i(class="fas fa-trash" @click="requestToDelete(row._id)")
-      //
     .available-jobs(v-if="toggleAddSteps")
       ReceivablesAddStepsTo(
         :paymentType="getBillingDetails(reportDetailsInfo).getPaymentType()"
@@ -241,14 +74,6 @@
         @refreshReports="refreshReports"
         @closeTable="changeToggleAddSteps"
       )
-    //
-    ////.invoicing-details__cards(v-if="reportDetailsInfo && reportDetailsInfo.hasOwnProperty('paymentInformation') && reportDetailsInfo.paymentInformation.length")
-    ////  .invoicing-details__card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
-    ////    ReceivablesPaymentInformationCard(
-    ////      :cardInfo="cardInfo"
-    ////      :paymentDetails="{paymentDetails: {expectedPaymentDate: 0}}"
-    ////    )
-
 </template>
 
 <script>
@@ -259,9 +84,7 @@ import ApproveModal from '../ApproveModal'
 import Button from "../Button"
 import SelectSingle from "../SelectSingle"
 import CheckBox from "../CheckBox"
-// import ReceivablesPaymentInformationCard from "./ReceivablesPaymentInformationCard"
 import { mapActions } from "vuex"
-import _ from "lodash"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
 import currencyIconDetected from "../../mixins/currencyIconDetected"
@@ -273,16 +96,6 @@ export default {
   mixins: [ currencyIconDetected ],
   data() {
     return {
-      // isNotes: false,
-      // isPaymentCard: false,
-
-      // deleteInfo: {},
-      // isDeletingStep: false,
-
-      // paymentMethod: '',
-      // paymentDate: new Date(),
-      // amount: 0,
-      // notes: ''
       reportDetailsInfo: {},
       toggleAddSteps: false,
       steps: []
@@ -292,23 +105,6 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    //   closePaymentCard() {
-    //     this.isPaymentCard = false
-    //     this.isNotes = false
-    //     this.notes = ''
-    //     // this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
-    //     this.amount = 0
-    //   },
-    //   openPaymentCard() {
-    //     this.isPaymentCard = true
-    //     this.paymentDate = new Date()
-    //   },
-    //   downloadFile(path) {
-    //     let link = document.createElement('a')
-    //     link.href = this.$domains.admin + '/' + path
-    //     link.target = "_blank"
-    //     link.click()
-    //   },
     getBillingDetails({ client, clientBillingInfo }) {
       const { billingInfo } = client
       const {
@@ -330,81 +126,6 @@ export default {
       const { length } = [ ...new Set(stepsAndProjects.map(i => i.project)) ]
       return length
     },
-    //   // setPaymentMethod({ option }) {
-    //   //   this.paymentMethod = option
-    //   // },
-    //   approvePaidFull() {
-    //     this.amount = this.getUnpaidAmount
-    //   },
-    //   selectInput() {
-    //     this.$refs.input.select()
-    //   },
-    //   setFromDate(e) {
-    //     this.paymentDate = e
-    //   },
-    //   async reportToPayment() {
-    //     const amount = +(parseFloat(this.amount)).toFixed(2)
-    //     const data = {
-    //       paidAmount: amount,
-    //       unpaidAmount: +(this.getUnpaidAmount - amount).toFixed(2),
-    //       paymentMethod: this.paymentMethod,
-    //       paymentDate: this.paymentDate,
-    //       // zohoBillingId: this.reportDetailsInfo.zohoBillingId,
-    //       // vendorName: this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname,
-    //       notes: this.notes
-    //     }
-    //     this.closePaymentCard()
-    //     // const reuslt = (await (this.$http.post(`/invoicing-receivables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
-    //     // if (reuslt === "Moved") {
-    //     //   await this.$router.push('/pangea-finance/invoicing-payables/paid-invoices/' + this.reportDetailsInfo._id)
-    //     // } else {
-    //     //   await this.refreshReports()
-    //     // }
-    //     this.amount = 0
-    //   },
-    //   // updatePaidAmount(event) {
-    //   //   const value = event.target.value
-    //   //   if ((+value).toFixed(2) <= this.getUnpaidAmount && value >= 0) {
-    //   //     this.amount = (parseFloat(value)).toFixed(2)
-    //   //   }
-    //   //   this.$forceUpdate()
-    //   // },
-    //   // togglePaidFull(val) {
-    //   //   this.isFull = val
-    //   //   if (val) {
-    //   //     this.amount = this.getUnpaidAmount
-    //   //   }
-    //   // },
-    //   async sendInvoice() {
-    //     try {
-    //       const result = await this.$http.post('/invoicing-receivables/sendInvoice', { _id: this.$route.params.id })
-    //       await this.getReportDetails(this.$route.params.id)
-    //       const { type, message } = result.data
-    //       this.alertToggle({ message, isShow: true, type })
-    //     } catch (e) {
-    //       console.log(e, 'generateInvoice()')
-    //     }
-    //   },
-    //   async generateAndSendInvoice() {
-    //     try {
-    //       const result = await this.$http.post('/invoicing-receivables/zoho/createAndSendInvoice', { _id: this.$route.params.id })
-    //       await this.getReportDetails(this.$route.params.id)
-    //       const { type, message } = result.data
-    //       this.alertToggle({ message, isShow: true, type })
-    //     } catch (e) {
-    //       console.log(e, 'generateInvoice()')
-    //     }
-    //   },
-    //   async generateInvoice() {
-    //     try {
-    //       const result = await this.$http.post('/invoicing-receivables/zoho/createInvoice', { _id: this.$route.params.id })
-    //       await this.getReportDetails(this.$route.params.id)
-    //       const { type, message } = result.data
-    //       this.alertToggle({ message, isShow: true, type })
-    //     } catch (e) {
-    //       console.log(e, 'generateInvoice()')
-    //     }
-    //   },
     formattedDate(date) {
       return moment(date).format('MMM D, HH:mm')
     },
@@ -460,36 +181,9 @@ export default {
         this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
       }
     }
-    // },
-    // computed: {
-    //   getPaymentRemainder() {
-    //     const { paymentInformation = [] } = this.reportDetailsInfo
-    //     return paymentInformation.reduce((sum, item) => {
-    //       sum += +item.paidAmount
-    //       return sum
-    //     }, 0)
-    //   },
-    //   getUnpaidAmount() {
-    //     const rawUnpaidAmount = +this.reportDetailsInfo.total - +this.getPaymentRemainder
-    //     return +(parseFloat(rawUnpaidAmount)).toFixed(2)
-    //   },
-    //   abilityToSubmitPayment() {
-    //     return this.amount !== 0
-    //         && this.amount !== '0'
-    //         && this.amount > 0
-    //         && this.amount <= this.getUnpaidAmount
-    //   }
-    // groupByProject() {
-    //   const groupedByProject = _.groupBy(this.reportDetailsInfo.stepsWithProject, (item) => {
-    //     return item.projectId
-    //   })
-    //   return groupedByProject
-    // }
   },
   async created() {
     await this.getReportDetails()
-    // await this.updateReportsStateFromZoho(this.$route.params.id)
-    // this.paymentMethod = this.reportDetailsInfo.paymentDetails.paymentMethod
   },
   components: {
     Add,
@@ -501,7 +195,6 @@ export default {
     ApproveModal,
     SelectSingle,
     CheckBox
-    // ReceivablesPaymentInformationCard
   }
 }
 </script>
