@@ -209,24 +209,6 @@
           @add="changeToggleAddSteps"
         )
 
-
-      //.invoicing-details__details
-      //  .invoicing-details__body(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
-      //    .invoicing-details__details
-
-    //
-    //        .invoicing-details__text
-
-    //
-
-    //
-    //        .payment-buttons
-    //
-    //          Button(v-if='' value="Add Jobs" @clicked="changeToggleAddSteps")
-    //
-
-     //
-
     .available-jobs(v-if="toggleAddSteps")
       PayablesAddStepsTo(
         :steps="steps"

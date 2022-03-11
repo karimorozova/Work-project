@@ -163,7 +163,6 @@ export default {
       filterSources: [],
       filterTargets: [],
 
-
       isFilter: false,
       fields: [
         {
@@ -191,7 +190,7 @@ export default {
           style: { width: "11%" }
         },
         {
-          label: "Language Pair",
+          label: "Language",
           headerKey: "headerLangPair",
           key: "langPair",
           style: { width: "12%" }
