@@ -203,15 +203,54 @@ export default {
     editItem() {
 
     },
+    findItemById(id) {
+      console.log(this.invoice)
+      return this.invoice.items.find(({_id}) => _id.toString() === id)
+    },
+    setEditedData({title = '', rate = 0, quantity = 0, tax = 0, amount = 0}) {
+      this.title = title
+      this.rate = rate
+      this.quantity = quantity
+      this.tax = tax
+      this.amount = amount
+    },
     async makeAction(key, id, index) {
-      console.log(key, id)
-      if (id == null && key === 'create'){
+      console.log({test: this.editedId, index, id })
+      if (this.editedId != null && !(this.editedId === id || this.editedId === index)) return
+      if (id == null && key === 'save'){
         await this.createItem()
       } else {
         switch (key) {
           case 'edit':
+            if (this.editedId != null ) return
             this.editedId = id
-
+            const item = this.findItemById(id)
+            this.setEditedData(item)
+            break;
+          case 'save':
+            if (this.editedId == null ) return
+            await this.$http.put(`/invoicing/invoice/${this.$route.params.id}/item/${id}`, {
+              title:this.title,
+              quantity:this.quantity,
+              rate:this.rate,
+              tax:this.tax,
+              amount:this.amount,
+            })
+            this.editedId = null
+            this.clearEditCreateFields()
+            await this.getInvoice()
+            break;
+          case 'cancel':
+            if (this.editedId == null ) return
+            this.editedId = null
+            this.setEditedData({})
+            break
+          case 'delete':
+            // if (this.editedId != null ) return
+            await this.$http.delete(`/invoicing/invoice/${this.$route.params.id}/item/${id}`)
+            this.editedId = null
+            this.clearEditCreateFields()
+            await this.getInvoice()
             break;
         }
       }

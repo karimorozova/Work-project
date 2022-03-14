@@ -10,7 +10,9 @@ const {
 } = require('./getInvoicing')
 
 const {
-	updateInvoice
+	updateInvoice,
+	updateInvoiceItem,
+	deleteInvoiceItem,
 } = require('./updateInvoice')
 
 module.exports = {
@@ -19,4 +21,6 @@ module.exports = {
 	getInvoices,
 	getInvoice,
 	updateInvoice,
+	updateInvoiceItem,
+	deleteInvoiceItem,
 }
