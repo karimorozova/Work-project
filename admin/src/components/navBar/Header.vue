@@ -175,7 +175,8 @@ export default {
   &__item {
     display: flex;
     padding: 10px 14px;
-    transition: 0.1s cubic-bezier(0.12, 0, 0.39, 0);
+    transition: .1s ease-out;
+
     align-items: center;
 
     &-icon {

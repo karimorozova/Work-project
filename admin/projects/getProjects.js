@@ -3,6 +3,25 @@ const { getFilterdProjectsQuery, getFilteredPortalProjectsQuery, getFilteredVend
 const { filterNotQuoteStepsInStartedProjectForClientPortal, filterQuoteStepsInStartedProjectForClientPortal } = require('./helpers')
 const { ObjectID: ObjectId } = require("mongodb")
 
+const getShortProjectList = async () => {
+	return (await Projects.aggregate([
+		{
+			$project: {
+				_id: 1,
+				projectId: 1,
+				projectName: 1,
+				status: 1
+
+			}
+		},
+		{
+			$sort: { _id: -1 }
+		}
+		// {
+		// 	$limit: 200
+		// }
+	]))
+}
 
 async function getProjectsForVendorPortal(obj) {
 	return (await Projects.find(obj)
@@ -429,6 +448,7 @@ async function getFilteredProjects(filters) {
 }
 
 module.exports = {
+	getShortProjectList,
 	getProject,
 	getProjects,
 	getProjectsForPortalAll,

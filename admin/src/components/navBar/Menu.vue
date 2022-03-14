@@ -181,7 +181,7 @@ a {
 }
 
 .element {
-  transition: 0.1s cubic-bezier(0.12, 0, 0.39, 0);
+  transition: .1s ease-out;
 }
 
 .element:hover {

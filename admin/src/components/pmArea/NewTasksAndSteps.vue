@@ -164,7 +164,7 @@ export default {
   width: 1040px;
   box-sizing: border-box;
   border-radius: 2px;
-  margin-top: 50px;
+  margin-top: 25px;
 
   &__buttons {
     display: flex;

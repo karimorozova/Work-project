@@ -9,6 +9,7 @@ const {
 	getProjectsForPortalList,
 	getProjectForClientPortal,
 	getProjectsForVendorPortalAll,
+	getShortProjectList,
 } = require('./getProjects')
 
 const {
@@ -105,6 +106,7 @@ const {
 
 //EXPORT  =============================>
 module.exports = {
+	getShortProjectList,
 	getProjectsForVendorPortalAll,
 	generateTargetFileFromMemoq,
 	reImportFilesFromMemoq,

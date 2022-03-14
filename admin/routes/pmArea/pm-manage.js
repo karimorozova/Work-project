@@ -51,7 +51,8 @@ const {
 	autoCreatingTranslationTaskInProjectByXTMFile,
 	createProjectIndividual,
 	reImportFilesFromMemoq,
-	generateTargetFileFromMemoq
+	generateTargetFileFromMemoq,
+	getShortProjectList
 } = require('../../projects')
 
 const {
@@ -188,6 +189,16 @@ router.post('/allprojects', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong with DB while getting projects!')
+	}
+})
+
+router.get('/short-project-list', async (req, res) => {
+	try {
+		const projects = await getShortProjectList()
+		res.send(projects)
+	} catch (err) {
+		console.log(err)
+		console.log('Error on getting Project')
 	}
 })
 

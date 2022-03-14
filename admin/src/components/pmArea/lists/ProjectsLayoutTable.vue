@@ -490,21 +490,6 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
 
-.table {
-  //background: white;
-  //padding: 25px;
-  //box-sizing: border-box;
-  //border-radius: 2px;
-  //box-shadow: $box-shadow;
-
-  &__header {
-    padding: 0 0 0 7px;
-  }
-
-  &__data {
-    width: 100%;
-  }
-}
 
 a .fa-link {
   transition: .2s ease-out;

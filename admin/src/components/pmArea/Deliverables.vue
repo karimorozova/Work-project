@@ -913,7 +913,7 @@ export default {
   padding: 25px;
   min-width: 1040px;
   width: 1040px;
-  margin-top: 50px;
+  margin-top: 25px;
   box-shadow: $box-shadow;
   position: relative;
   background: white;
