@@ -164,12 +164,12 @@ export default {
     background-color: white;
     z-index: 5;
     padding: 25px;
-    transform: translate(-50%, -50%);
+    transform: translate(-51%, -50%);
   }
 }
 
 .service-group {
-  border: 1px solid #bfbfbf;
+  border: 1px solid $border;
   padding: 20px;
 }
 
@@ -180,7 +180,7 @@ export default {
 }
 .group__card {
   position: relative;
-  border: 1px solid #bfbfbf;
+  border: 1px solid $light-border;
   border-radius: 2px;
   padding: 15px;
   width: 274px;

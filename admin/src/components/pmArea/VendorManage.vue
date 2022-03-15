@@ -464,11 +464,13 @@ export default {
       this.isReassignment = !this.isReassignment
     },
     getMaxHeight() {
-      let max = 560
-      if (this.isEditable) max = max - 94
-      if (this.currentStepId && (this.steps.find(i => i._id.toString() === this.currentStepId).vendor || this.selectedVendors[this.currentStepId])) max = max - 110
-      if (this.isReassignment) max = max - 119
-      return 'max-height:' + max + 'px'
+      let max = 68
+      let blocks = 0
+      if (this.isEditable && !this.isAllVendors) blocks += 94
+      if (this.currentStepId && (this.steps.find(i => i._id.toString() === this.currentStepId).vendor || this.selectedVendors[this.currentStepId])) blocks += 110
+      if (this.isReassignment) blocks += 120
+
+      return 'max-height:' + `calc(  ${ max }vh - ${ blocks }px )`
     },
     getReAssignedVendorInfo() {
       const { _id, name, email, photo } = this.selectedReassignedVendor[this.currentStepId]
@@ -597,7 +599,7 @@ export default {
     },
     setVendorToStep(vendor) {
       // TODO: Delete soon, Temporary for quantity with MT Translation
-      this.$set(this.selectedVendors, this.currentStepId, { ...vendor, fakeStepVendor: this.selectedStep }, )
+      this.$set(this.selectedVendors, this.currentStepId, { ...vendor, fakeStepVendor: this.selectedStep })
       //stable version
       //this.$set(this.selectedVendors, this.currentStepId, vendor)
     },
@@ -849,7 +851,7 @@ export default {
 .assignmentsOptions {
   display: flex;
   justify-content: space-between;
-  background: $table-list;
+  background: $light-background;
   padding: 15px;
   align-items: center;
   margin-top: 20px;
@@ -1271,7 +1273,7 @@ export default {
     margin: 20px 0;
 
     &-title {
-      font-size: 16px;
+      font-size: 14px;
       font-family: 'Myriad600';
     }
 
@@ -1284,7 +1286,7 @@ export default {
 .blocks {
   background: white;
   margin-top: 20px;
-  height: 560px;
+  height: 68vh;
   overflow-y: auto;
 }
 
@@ -1390,7 +1392,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }

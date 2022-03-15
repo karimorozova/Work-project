@@ -49,7 +49,6 @@
         :clearable="false"
         :confirm="true"
         confirm-text="Set date"
-        :disabled-date="notBeforeStartDate"
         :inline="true"
         prefix-class="xmx"
       )
@@ -112,7 +111,6 @@
             icon-calendar=''
             :confirm="true"
             confirm-text="Set date"
-            :disabled-date="notBeforeStartDate"
             prefix-class="xmx"
           )
 
@@ -129,7 +127,6 @@
             icon-calendar=''
             :confirm="true"
             confirm-text="Set date"
-            :disabled-date="notBeforeStartDate"
             prefix-class="xmx"
           )
 

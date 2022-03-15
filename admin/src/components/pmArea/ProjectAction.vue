@@ -550,7 +550,7 @@ export default {
   padding: 25px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 420px;
+  width: 400px;
   margin-top: 25px;
   display: flex;
   flex-direction: column;
@@ -600,7 +600,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     border-bottom: 1px solid $light-border;
     margin-bottom: 20px;

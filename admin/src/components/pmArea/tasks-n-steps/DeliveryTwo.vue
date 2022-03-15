@@ -492,7 +492,7 @@ export default {
   width: 592px;
   height: 32px;
   transition: .1s ease-out;
-  font-size: 18px;
+  font-size: 16px;
   color: $text;
 
   &:focus {
@@ -626,7 +626,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 20px;
     font-family: 'Myriad600';
     display: flex;

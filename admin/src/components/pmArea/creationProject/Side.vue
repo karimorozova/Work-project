@@ -48,10 +48,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 420px;
-  width: 420px;
+  min-width: 360px;
+  width: 360px;
   border-radius: 2px;
-  margin-left: 50px;
+  margin-left: 25px;
   background: white;
   height: fit-content;
 }
@@ -73,7 +73,6 @@ export default {
   }
 
   &__value {
-    width: 220px;
     position: relative;
   }
 }

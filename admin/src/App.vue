@@ -92,6 +92,10 @@ sup {
   color: $dark-border;
 }
 
+.hiddenScroll {
+  overflow: hidden;
+}
+
 .b-log-in,
 .b-log-out {
   padding: 6px;

@@ -18,7 +18,10 @@
           :list="tasksData.targets ? mappedTargetLanguages.filter(item => !tasksData.targets.map(i => i.lang).includes(item)) : mappedTargetLanguages"
           @moveItem="moveFromAll"
         )
-        ListManagementButtons(@moveAll="moveAll" @removeAll="removeAll")
+        ListManagementButtons(
+          @moveAll="moveAll"
+          @removeAll="removeAll"
+        )
         ListManagement(
           :list="tasksData.targets ? tasksData.targets.map(i => i.lang) : []"
           @moveItem="moveFromChosen"

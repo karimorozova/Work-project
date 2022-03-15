@@ -44,6 +44,7 @@
         .taskData__button
           Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksMemoq")
 
+
     .option(v-if="selectedTab === 'Classic' && allServices.length" )
       .taskData
         .taskData__row-servicesLanguages
@@ -73,9 +74,9 @@
             TasksLangsDuo
 
         .taskData__row
-          NewServicesCreationStepsWorkflow(
-            :templates="templates"
-          )
+          //NewServicesCreationStepsWorkflow(
+          //  :templates="templates"
+          //)
 
         .taskData__files
           TasksFiles

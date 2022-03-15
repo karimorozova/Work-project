@@ -56,7 +56,7 @@ export default {
 }
 
 .item {
-  padding: 12px 10px 10px 16px;
+  padding: 14px 12px 12px 18px;
   border-bottom: 1px solid $light-border;
   transition: .1s ease-out;
 

@@ -30,12 +30,11 @@
           @refreshProject="refreshProject"
         )
         ProjectSubInformation(:project="currentProject" @refreshProject="refreshProject")
-        .project-info__action
-          ProjectAction(
-            :project="currentProject"
-            @editAndSend="editAndSend"
-            @setStatus="setStatus"
-          )
+        ProjectAction(
+          :project="currentProject"
+          @editAndSend="editAndSend"
+          @setStatus="setStatus"
+        )
         ProjectFinance
       .project-info__preview(v-if="isEditAndSend")
         Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
@@ -198,8 +197,10 @@ export default {
   watch: {
     async $route(to, from) {
       if (to.name === from.name) {
-        this.setCurrentProject({})
-        await this.getProject()
+        if (to.params.id !== from.params.id) {
+          this.setCurrentProject({})
+          await this.getProject()
+        }
       }
     }
   },

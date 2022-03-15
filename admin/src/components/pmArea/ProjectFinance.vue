@@ -203,7 +203,7 @@ export default {
 
 .project-finance {
   box-sizing: border-box;
-  width: 420px;
+  width: 400px;
   margin-top: 25px;
   padding: 25px;
   box-shadow: $box-shadow;
@@ -211,7 +211,7 @@ export default {
   border-radius: 2px;
 
   &__titleFinance {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
   }
 

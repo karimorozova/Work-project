@@ -495,8 +495,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 420px;
-  width: 420px;
+  min-width: 400px;
+  width: 400px;
   background: white;
   border-radius: 2px;
   background: white;
@@ -538,7 +538,7 @@ export default {
     align-items: center;
 
     &-title {
-      font-size: 18px;
+      font-size: 16px;
       font-family: 'Myriad600';
     }
 

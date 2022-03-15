@@ -422,7 +422,7 @@ export default {
 
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 20px;
     font-family: 'Myriad600';
   }

@@ -96,14 +96,14 @@ export default {
   box-sizing: border-box;
   padding: 25px;
   box-shadow: $box-shadow;
-  min-width: 420px;
-  width: 420px;
+  min-width: 400px;
+  width: 400px;
   background: white;
   border-radius: 2px;
   margin-bottom: 25px;
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     border-bottom: 1px solid $light-border;
     margin-bottom: 20px;

@@ -155,7 +155,7 @@ export default {
   padding: 25px;
   box-shadow: $box-shadow;
   min-width: 420px;
-  width: 420px;
+  width: 400px;
   background: white;
   border-radius: 2px;
   margin-bottom: 25px;

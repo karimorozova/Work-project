@@ -3,20 +3,35 @@
     .TS__titleAndButtons
       .TS__title Tasks and Steps
       .TS__buttons
-        .TS__button
-          .TS__addTask(style="font-size: 14px;" v-if="!isProjectFinished && !isTaskData && currentProject.steps.length" @click="toggleVendorManage")
-            i.fas.fa-user(style="margin-right: 6px;")
-            span(style="margin-top: 2px;") Manage Vendors
+        IconButton(
+          v-if="!isProjectFinished && !isTaskData && currentProject.steps.length"
+          @clicked="toggleVendorManage"
+          :hasPopup="true"
+          popupText="Manage Vendors"
+        )
+          i.fas.fa-user
+        IconButton(
+          v-if="!isProjectFinished && !isTaskData"
+          @clicked="toggleTaskData"
+          :hasPopup="true"
+          popupText="Add T&S"
+        )
+          i.fas.fa-plus-circle
+        IconButton(
+          v-if="!isProjectFinished && isTaskData"
+          @clicked="toggleTaskData"
+          :hasPopup="true"
+          popupText="Close T&S Creation"
+        )
+          i.fas.fa-times-circle
 
-        .TS__button
-          .TS__addTask(v-if="!isProjectFinished && !isTaskData" @click="toggleTaskData")
-            i.fas.fa-plus-circle
-          .TS__closeAddTask(v-if="!isProjectFinished && isTaskData" @click="toggleTaskData")
-            i.fas.fa-times-circle
-
-        .TS__button
-          .TS__refresh(v-if="!isProjectFinished" @click="refreshProject")
-            i.fas.fa-sync
+        IconButton(
+          v-if="!isProjectFinished"
+          @clicked="refreshProject"
+          :hasPopup="true"
+          popupText="Update project progress"
+        )
+          i.fas.fa-sync
 
 
     .modal(v-if="isModalOpen")
@@ -76,17 +91,19 @@ import VendorManage from "./VendorManage"
 // import Invoicing from "./tasks-n-steps/Invoicing"
 import { mapActions, mapGetters } from "vuex"
 import { clearTasksData, foo, updateProgress } from "../../vuex/pmarea/actions"
+import IconButton from "../IconButton"
 
 export default {
   name: "NewTaskAndSteps",
   components: {
+    IconButton,
     NewTasksData,
     NewTasks,
     NewSteps,
     Tabs,
     AdditionsSteps,
     VendorManage,
-    Button,
+    Button
     // Invoicing,
   },
   data() {
@@ -129,6 +146,12 @@ export default {
     },
     toggleVendorManage() {
       this.isModalOpen = !this.isModalOpen
+      let elem = document.getElementsByTagName('body')[0]
+      if (this.isModalOpen) {
+        elem.classList.add("hiddenScroll")
+      } else {
+        elem.classList.remove("hiddenScroll")
+      }
     },
     setDefaultIsTaskData() {
       if (!this.currentProject.tasks.length) this.isTaskData = true
@@ -150,7 +173,7 @@ export default {
   },
   mounted() {
     this.setDefaultIsTaskData()
-  },
+  }
 }
 </script>
 
@@ -215,23 +238,23 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: 'Myriad600';
   }
 
   .modal {
-    position: absolute;
-    left: 0px;
+    position: fixed;
+    left: 255px;
     top: 0px;
     z-index: 45;
     box-sizing: border-box;
-    min-width: 1510px;
-    width: 1510px;
-    padding: 25px;
+    width: calc(100% - 255px);
+    padding: 50px;
     box-shadow: $box-shadow;
     background: white;
     border-radius: 2px;
     z-index: 30000;
+    height: 100%;
   }
 }
 

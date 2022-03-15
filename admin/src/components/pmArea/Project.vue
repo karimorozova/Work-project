@@ -511,7 +511,7 @@ export default {
     &-client {
 
       &-title {
-        font-size: 18px;
+        font-size: 14px;
         font-family: 'Myriad900';
         margin-bottom: 7px;
         margin-top: 7px;
@@ -608,7 +608,7 @@ export default {
   }
 
   &__name {
-    font-size: 18px;
+    font-size: 16px;
     padding: 0 10px;
     height: 44px;
     width: 100%;

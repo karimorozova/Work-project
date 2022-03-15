@@ -1,6 +1,7 @@
 <template lang="pug">
   .wrapper
     .steps(v-if="tasksData.service && tasksData.stepsAndUnits")
+
       .steps__modal-without-border(v-if="isDeleteStep")
         ApproveModal(
           text="Are you sure?"
@@ -10,16 +11,19 @@
           @close="closeAcceptModal"
           @notApprove="closeAcceptModal"
         )
+
       .steps__modal(v-if="isAddModal")
         .modal-title Add steps to workflow
-        .step__setting-title Steps:
-        .drop(style="width: 220px;")
-          SelectSingle(
-            :selectedOption="newStep"
-            :options="possibleStepsForAdding"
-            placeholder="Option"
-            @chooseOption="setNewStep"
-          )
+        .steps__modal-body
+          .step__setting-title Steps:
+          .drop(style="width: 220px;")
+            SelectSingle(
+              :hasSearch="true"
+              :selectedOption="newStep"
+              :options="possibleStepsForAdding"
+              placeholder="Option"
+              @chooseOption="setNewStep"
+            )
         .buttons
           .buttons__btn
             Button(@clicked="addStep" value="Add" )
@@ -27,8 +31,8 @@
             Button(@clicked="closeAddStepModal" value="Cancel" :outline="true")
 
       draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
-        .step(v-for="(item, index) in tasksData.stepsAndUnits" )
 
+        .step(v-for="(item, index) in tasksData.stepsAndUnits" )
           .step__titleRow
             .step__titleRow-title {{ item.step.title }}
             .step__titleRow-desctiptions(v-if="isCatUnit || isDisabledPayablesEdit" )
@@ -275,7 +279,8 @@ export default {
     ...mapGetters({
       tasksData: "getTasksData",
       allUnits: "getAllUnits",
-      project: "getCurrentProject"
+      project: "getCurrentProject",
+      allSteps: "getAllSteps"
     }),
     isCatUnit() {
       if (this.tasksData && this.tasksData.service && this.tasksData.stepsAndUnits.length) {
@@ -283,8 +288,9 @@ export default {
       }
     },
     possibleStepsForAdding() {
-      if (this.tasksData.service) {
-        return this.tasksData.service.steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
+      if (this.tasksData.service && this.allSteps.length) {
+        return this.allSteps.map(i => i.title)
+        // return this.tasksData.service.steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
       }
       return []
     }
@@ -309,7 +315,13 @@ export default {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-49%);
+
+    &-body {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
   }
 
   &__modal-without-border {
@@ -331,7 +343,6 @@ export default {
 
 .modal-title {
   margin-bottom: 15px;
-  font-size: 18px;
   font-family: Myriad600;
 }
 

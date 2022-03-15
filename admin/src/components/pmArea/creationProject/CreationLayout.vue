@@ -112,7 +112,7 @@ export default {
 
 .creation {
   padding: 25px;
-  width: 1040px;
+  width: 900px;
   box-shadow: $box-shadow;
   position: relative;
   background: white;
@@ -125,7 +125,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     margin-bottom: 15px;
   }

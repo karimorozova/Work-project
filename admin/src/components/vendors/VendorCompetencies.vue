@@ -562,10 +562,10 @@
 
     &__editing {
       position: absolute;
-      height: 40px;
-      background-color: $light-green;
+      height: 42px;
+      background-color: $border;
       z-index: 3;
-      top: 80px;
+      top: 42px;
       left: 0;
       right: 0;
       display: flex;
@@ -573,7 +573,7 @@
       margin-left: 1px;
 
       &.move-bottom{
-        top:120px;
+        top:84px;
       }
 
       &-item {

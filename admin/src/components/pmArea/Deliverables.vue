@@ -44,16 +44,17 @@
 
 
       .modal__tasks(v-if="assignTaskModal")
-        .modal__title Select a tasks
-        span.modal__close-modal(@click="closeTasksModal()") &#215;
-        .deliverables__select
-          SelectMulti(
-            :allOptionsButtons="true"
-            placeholder="Select"
-            :options="selectTaskInfo"
-            :selectedOptions="selectedTasks"
-            @chooseOptions="selectedTasksMethod"
-          )
+        .modal__tasks-body
+          .modal__title Select a tasks:
+          span.modal__close-modal(@click="closeTasksModal()") &#215;
+          .deliverables__select
+            SelectMulti(
+              :allOptionsButtons="true"
+              placeholder="Select"
+              :options="selectTaskInfo"
+              :selectedOptions="selectedTasks"
+              @chooseOptions="selectedTasksMethod"
+            )
         .modal__button
           Button(value="Upload files" :isDisabled="!selectedTasks.length" @clicked="openDeliverablesModal")
 
@@ -711,7 +712,7 @@ export default {
   &__upload {
     &-buttons {
       display: flex;
-      width: 300px;
+      width: 330px;
       justify-content: space-between;
     }
 
@@ -723,7 +724,7 @@ export default {
 
 .uploadButtons {
   &__title {
-    width: 80px;
+    width: 90px;
   }
 
   &__uploadItem {
@@ -769,14 +770,7 @@ export default {
     justify-content: center;
   }
 
-  &__title {
-    font-size: 18px;
-    font-family: "Myriad600";
-    margin-bottom: 10px;
-  }
-
   &__title2 {
-    font-size: 18px;
     font-family: "Myriad600";
     margin-bottom: 15px;
   }
@@ -784,7 +778,7 @@ export default {
 
   &__tasks,
   &__vault {
-    padding: 20px;
+    padding: 25px;
     background: white;
     position: absolute;
     box-shadow: $box-shadow;
@@ -794,6 +788,14 @@ export default {
     z-index: 500;
   }
 
+  &__tasks {
+    &-body {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+  }
+
   &__vault {
     padding: 20px 35px 20px 20px;
   }
@@ -801,7 +803,7 @@ export default {
   &__close-modal {
     position: absolute;
     top: 5px;
-    right: 7px;
+    right: 5px;
     font-size: 22px;
     cursor: pointer;
     height: 22px;
@@ -809,7 +811,6 @@ export default {
     justify-content: center;
     display: flex;
     align-items: center;
-    font-family: Myriad900;
     opacity: 0.8;
     transition: ease 0.2s;
 
@@ -958,14 +959,14 @@ export default {
   }
 
   &__titleModal {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 20px;
     text-align: center;
     font-family: Myriad600;
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     justify-content: space-between;
     font-family: Myriad600;
@@ -988,7 +989,7 @@ export default {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -49%);
     }
 
     &__actions {

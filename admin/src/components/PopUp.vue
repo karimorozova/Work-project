@@ -98,14 +98,17 @@ export default {
   position: absolute;
   inset: auto auto 0px 0px;
   word-break: break-word;
-  min-width: 100px;
-  max-width: 220px;
+  white-space: nowrap;
   text-align: center;
   border-radius: 2px;
-  padding: 6px;
+  padding: 6px 10px;
   z-index: 100000;
   margin-left: -4px !important;
   text-align: center;
+
+  //text-overflow: ellipsis;
+  //overflow: hidden;
+  //max-width: 300px;
 }
 
 .arrow,
