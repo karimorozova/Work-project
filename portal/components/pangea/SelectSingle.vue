@@ -10,10 +10,11 @@
         span.selected(v-if="selectedOption") {{ selectedOption }}
         span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
 
-        .remove__icon(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
+        .remove__icon(v-if="isRemoveOption && ( Object.keys(selectedOption).length ) && !isDisabled" @click="removeOption")
           i(class="fas fa-backspace" aria-hidden='true')
       .arrow-button(@click="toggleOptions")
-        i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
+        .icon(:class="{'reverse-icon': isDropped}")
+          i.fas.fa-caret-down
 
     .drop(v-if="isDropped")
       //.remove-option(v-if="isRemoveOption && ( Object.keys(selectedOption).length )" @click="removeOption")
@@ -152,9 +153,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/scss/colors.scss';
+@import 'assets/scss/colors.scss';
 
-i {
+.icon {
   font-size: 19px;
   color: $border;
 }
@@ -193,7 +194,7 @@ i {
   position: absolute;
   width: 100%;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   overflow: hidden;
   flex-direction: column;
   box-sizing: border-box;

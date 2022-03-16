@@ -40,7 +40,8 @@ const {
 	cancelProjectInMemoq,
 	setApprovedStepStatus,
 	reImportFilesFromMemoq,
-	generateTargetFileFromMemoq
+	generateTargetFileFromMemoq,
+	manageReceivableVisible
 } = require('./updates')
 
 const {
@@ -106,6 +107,7 @@ const {
 
 //EXPORT  =============================>
 module.exports = {
+	manageReceivableVisible,
 	getShortProjectList,
 	getProjectsForVendorPortalAll,
 	generateTargetFileFromMemoq,

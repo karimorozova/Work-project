@@ -9,7 +9,7 @@
         @setTab="setTab"
       )
 
-    .option(v-if="selectedTab === 'XTM'")
+    .option(v-if="selectedTab === 'XTM Import'")
       .taskData
         .taskData__xtm
           .taskData__xtm-title XTM File:
@@ -24,7 +24,7 @@
         .taskData__button
           Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksXTM")
 
-    .option(v-if="selectedTab === 'Memoq'" )
+    .option(v-if="selectedTab === 'Memoq Import'" )
       .taskData
         .taskData__memoqLink
           .taskData__memoqLink-select
@@ -73,10 +73,17 @@
           .language
             TasksLangsDuo
 
-        .taskData__row
-          //NewServicesCreationStepsWorkflow(
-          //  :templates="templates"
-          //)
+        .taskData__row(v-if="tasksData.service")
+          .tabs-workflow
+            .tabs-workflow__title Workflow process:
+            .tabs-workflow__tabs
+              Tabs(
+                :tabs="tabsWorkflow"
+                :selectedTab="selectedTabWorkflow"
+                @setTab="setTabWorkflow"
+              )
+          NewServicesCreationStepsWorkflowClassic(v-if="selectedTabWorkflow === 'System'")
+          NewServicesCreationStepsWorkflowCAT(v-if="selectedTabWorkflow === 'Memoq'")
 
         .taskData__files
           TasksFiles
@@ -90,7 +97,7 @@
 import { mapActions, mapGetters } from "vuex"
 import SelectSingle from "../../SelectSingle"
 import TasksLangsDuo from "./TasksLangsDuo"
-import NewServicesCreationStepsWorkflow from "./NewServicesCreationStepsWorkflow"
+import NewServicesCreationStepsWorkflowCAT from "./NewServicesCreationStepsWorkflowCAT"
 import TasksFiles from "./TasksFiles"
 import Toggler from "../../Toggler"
 import StepsAdditions from "./stepsAdditions"
@@ -99,6 +106,7 @@ import ValidationErrors from "../../ValidationErrors"
 import { clearTasksData } from "../../../vuex/pmarea/actions"
 import Tabs from "../../Tabs"
 import UploadFileButton from "../../UploadFileButton"
+import NewServicesCreationStepsWorkflowClassic from "./NewServicesCreationStepsWorkflowClassic"
 
 export default {
   name: "NewTasksData",
@@ -112,8 +120,9 @@ export default {
   },
   data() {
     return {
-      tabs: [ 'Classic', 'Memoq', 'XTM' ],
+      tabs: [ 'Classic', 'Memoq Import', 'XTM Import' ],
       selectedTab: 'Classic',
+      selectedTabWorkflow: 'System',
 
       memoqLink: '',
       selectedMemoqWorkflow: '',
@@ -122,7 +131,7 @@ export default {
       xtmFileData: null,
 
       allServices: [],
-      templates: [],
+      // templates: [],
       isAdditions: false,
       IsErrorModal: false,
       errors: [],
@@ -147,6 +156,10 @@ export default {
     },
     setTab({ index }) {
       this.selectedTab = this.tabs[index]
+    },
+    setTabWorkflow({ index }) {
+      this.selectedTabWorkflow = this.tabsWorkflow[index]
+      this.setStepsAndUnitByService(this.tasksData.service)
     },
     setMemoqWorkflow({ option }) {
       this.selectedMemoqWorkflow = option
@@ -212,15 +225,9 @@ export default {
     },
     saveTasksChecks() {
       this.errors = []
-
-      const { service } = this.tasksData
-      if (service.title === 'Translation') {
-        if (!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation') {
-          this.errors.push("Translation job should be the first step.")
-        }
-      }
       if (!this.tasksData.targets || !this.tasksData.targets.length) this.errors.push("Please, select Target language(s).")
-      if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation")) {
+
+      if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation") && this.selectedTabWorkflow === 'Memoq') {
         if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
           this.errors.push("Please, upload Source file(s).")
         }
@@ -271,7 +278,11 @@ export default {
       this.isDisabledSaveButton = true
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount') {
+        if (
+            this.selectedTabWorkflow === 'Memoq'
+            // this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
+        ) {
+
           const creatorUserId = await this.getCreatorUserId()
           data.append('creatorUserId', creatorUserId)
           try {
@@ -335,29 +346,33 @@ export default {
     async buildAutoData() {
       const service = this.activeClientServices()[0]
       this.setDataValue({ prop: "service", value: service })
-
-      if (service.title === 'Translation') await this.getMemoqTemplates()
-
       const source = this.getServiceSourceLanguages(service)[0]
       this.setDataValue({ prop: "source", value: source })
       this.setDataValue({ prop: "targets", value: [] })
 
+      this.selectedTabWorkflow = 'System'
       this.setStepsAndUnitByService(service)
     },
     setStepsAndUnitByService(service) {
       const stepsAndUnits = []
       for (let { step } of service.steps) {
-        if (service.title !== 'Translation') step.calculationUnit = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
+        let units = []
+        if (this.selectedTabWorkflow === 'System' || service.title !== 'Translation') {
+          units = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
+        }
+        if (this.selectedTabWorkflow === 'Memoq') {
+          units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
+        }
         stepsAndUnits.push({
           step,
           start: '',
           deadline: '',
           receivables: {
-            unit: step.calculationUnit[0],
+            unit: units[0],
             quantity: 0
           },
           payables: {
-            unit: step.calculationUnit[0],
+            unit: units[0],
             quantity: 0
           }
         })
@@ -381,9 +396,6 @@ export default {
     async setService({ option }) {
       const service = this.allServices.find(item => item.title === option)
       this.setDataValue({ prop: "service", value: service })
-
-      if (service.title === 'Translation') await this.getMemoqTemplates()
-
       const source = this.getServiceSourceLanguages(service)[0]
       this.setDataValue({ prop: "source", value: source })
       this.setDataValue({ prop: "targets", value: [] })
@@ -407,14 +419,6 @@ export default {
         }
       })
       return finalServicesArr
-    },
-    async getMemoqTemplates() {
-      try {
-        const result = await this.$http.get("/memoqapi/templates")
-        this.templates = result.data
-      } catch (err) {
-        this.templates = [ { name: 'No Templates' } ]
-      }
     },
     async getAllServices() {
       try {
@@ -447,6 +451,9 @@ export default {
     ...mapGetters({
       tasksData: "getTasksData"
     }),
+    tabsWorkflow() {
+      return [ 'System', 'Memoq' ].filter(i => this.tasksData.service.title === 'Translation' ? i : i !== 'Memoq')
+    },
     isStepsWithCATWordcount() {
       return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount")
     },
@@ -468,7 +475,19 @@ export default {
   destroyed() {
     this.clearTasksData()
   },
-  components: { UploadFileButton, Tabs, ValidationErrors, Button, StepsAdditions, Toggler, TasksFiles, NewServicesCreationStepsWorkflow, TasksLangsDuo, SelectSingle }
+  components: {
+    NewServicesCreationStepsWorkflowClassic,
+    UploadFileButton,
+    Tabs,
+    ValidationErrors,
+    Button,
+    StepsAdditions,
+    Toggler,
+    TasksFiles,
+    NewServicesCreationStepsWorkflowCAT,
+    TasksLangsDuo,
+    SelectSingle
+  }
 }
 
 </script>
@@ -557,8 +576,8 @@ export default {
 
 .extraServices {
   display: flex;
-  gap: 10px;
-  margin: 17px 0;
+  gap: 12px;
+  margin: 20px 0;
 }
 
 .drop {
@@ -589,6 +608,17 @@ export default {
   &__title {
     margin-bottom: 3px;
     position: relative;
+  }
+}
+
+.tabs-workflow {
+  margin-top: 20px;
+  display: flex;
+  gap: 25px;
+  align-items: baseline;
+  border-bottom: 1px solid $light-border;
+
+  &__title {
   }
 }
 </style>

@@ -169,7 +169,6 @@ export default {
   right: 0;
   top: -37px;
 }
-
 .data {
   &.active {
     opacity: 0.5;
@@ -191,7 +190,7 @@ export default {
 
 .filter {
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 30px;
   width: 30px;
   margin-bottom: 6px;
@@ -253,7 +252,7 @@ input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
@@ -288,9 +287,8 @@ input {
 
     &-close {
       position: absolute;
-      font-size: 16px;
-      right: 10px;
-      top: 1px;
+      right: 14px;
+      top: 8px;
     }
   }
 }
@@ -380,21 +378,11 @@ tbody tr:hover {
   overflow-y: scroll;
 }
 
-.red-row {
+.red-row{
   background-color: $light-red;
 }
 
 .shortBody {
   max-height: 252px;
-}
-.icon-wrapper {
-    transition: .2s ease-out;
-    color: $dark-border;
-    cursor: pointer;
-
-    &:hover {
-      color: $text;
-    }
-
 }
 </style>

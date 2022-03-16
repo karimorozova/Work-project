@@ -297,7 +297,8 @@ router.get('/vendor-data-to-display', getProjectManageToken, async (req, res) =>
 router.get('/client-data-to-display', getProjectManageToken, async (req, res) => {
 	const { projectId: _id } = req.query
 	try {
-		const { projectName, projectId, industry: { name: industry }, steps, finance, projectCurrency, deadline } = await getProject({ _id })
+		let { projectName, projectId, industry: { name: industry }, steps, finance, projectCurrency, deadline } = await getProject({ _id })
+		steps = steps.filter(({ status, isReceivableVisible }) => status !== 'Cancelled' && isReceivableVisible)
 		const services = [ ...new Set(steps.map(i => i.step.title)) ].join(', ')
 		const languages = [ ...new Set(steps.map(i => i.targetLanguage)) ].join(', ')
 
@@ -323,7 +324,7 @@ router.get('/client-data-tasks-to-display', getProjectManageToken, async (req, r
 	try {
 		tasksIds = tasksIds.replace(/['_']/g, ' ').split('*')
 		const { projectName, projectId, industry: { name: industry }, steps: allSteps, projectCurrency, deadline } = await getProject({ _id })
-		const steps = allSteps.filter(i => tasksIds.includes(i.taskId))
+		const steps = allSteps.filter(i => tasksIds.includes(i.taskId)).filter(({ status, isReceivableVisible }) => status !== 'Cancelled' && isReceivableVisible)
 		const services = [ ...new Set(steps.map(i => i.step.title)) ].join(', ')
 		const languages = [ ...new Set(steps.map(i => i.targetLanguage)) ].join(', ')
 		const amount = steps.reduce((a, c) => a + c.finance.Price.receivables, 0).toFixed(2)

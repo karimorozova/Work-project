@@ -154,7 +154,7 @@ export default {
   box-sizing: border-box;
   padding: 25px;
   box-shadow: $box-shadow;
-  min-width: 420px;
+  min-width: 400px;
   width: 400px;
   background: white;
   border-radius: 2px;

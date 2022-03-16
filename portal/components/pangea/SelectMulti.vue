@@ -19,7 +19,8 @@
       span.selected.no-choice(v-if="!selectedOptions.length") {{ placeholder }}
 
       .arrow-button(@click="toggleOptions")
-        i.fas.fa-caret-down(:class="{'reverse-icon': isDropped}")
+        .icon(:class="{'reverse-icon': isDropped}")
+          i.fas.fa-caret-down
 
     .drop(v-if="isDropped")
       //.remove-option(v-if="isRemoveOption && selectedOptions.length" @click="removeOption")
@@ -205,7 +206,7 @@
     }
   }
 
-  i {
+  .icon {
     font-size: 19px;
     color: $border;
   }

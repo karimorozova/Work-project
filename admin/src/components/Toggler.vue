@@ -14,7 +14,7 @@ export default {
     },
     isDisabled: {
       type: Boolean,
-      default: true
+      default: false
     },
     customClass: {
       type: [ String, Object ]
@@ -35,7 +35,7 @@ export default {
   position: relative;
   display: inline-block;
   width: 30px;
-  height: 16px;
+  height: 15px;
 }
 
 .switch .toggler__input {
@@ -59,9 +59,9 @@ export default {
 .slider:before {
   position: absolute;
   content: "";
-  height: 10px;
-  width: 10px;
-  left: 2px;
+  height: 9px;
+  width: 9px;
+  left: 18px;
   bottom: 3px;
   background-color: white;
   border-radius: 50%;
@@ -69,11 +69,11 @@ export default {
 }
 
 input.toggler__input:checked + .slider {
-  background-color: $text;
+  background-color: $green;
 }
 
 input.toggler__input:checked + .slider:before {
-  transform: translateX(16px);
+  transform: translateX(-15px);
 }
 
 </style>

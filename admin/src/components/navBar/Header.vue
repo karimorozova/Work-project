@@ -93,7 +93,6 @@ export default {
     justify-content: space-between;
     padding: 0 50px;
     background: white;
-    //box-shadow: $box-shadow;
     border-bottom: 1px solid $light-border;
     position: relative;
     z-index: 40;

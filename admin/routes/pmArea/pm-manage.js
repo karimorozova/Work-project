@@ -52,7 +52,8 @@ const {
 	createProjectIndividual,
 	reImportFilesFromMemoq,
 	generateTargetFileFromMemoq,
-	getShortProjectList
+	getShortProjectList,
+	manageReceivableVisible
 } = require('../../projects')
 
 const {
@@ -120,6 +121,17 @@ const { getEmailBackbone } = require("../../emailMessages/otherCommunication")
 // XTRF ==>
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
+
+router.post('/manage-receivable-visible', async (req, res) => {
+	const { bool, _stepId } = req.body
+	try {
+		const updatedProject = await manageReceivableVisible(bool, _stepId)
+		res.send(updatedProject)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding project\'s words tasks')
+	}
+})
 
 router.post('/build-TnS-from-memoq-link', async (req, res) => {
 	const {

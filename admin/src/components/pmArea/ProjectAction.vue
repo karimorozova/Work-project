@@ -2,15 +2,27 @@
   .project-actions
 
     .project-action
-
       .project-action__preview(v-if="isEditAndSendQuote")
-        PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageQuotes")
+        PreviewQuote(
+          @closePreview="closePreview"
+          :allMails="projectClientContacts"
+          :message="previewMessage" @send="sendMessageQuotes"
+        )
 
       .project-action__preview(v-if="isEditAndSendCostQuote")
-        PreviewQuote(@closePreview="closePreview" :allMails="projectClientContacts" :message="previewMessage" @send="sendMessageCostQuotes")
+        PreviewQuote(
+          @closePreview="closePreview"
+          :allMails="projectClientContacts"
+          :message="previewMessage"
+          @send="sendMessageCostQuotes"
+        )
 
       .project-action__preview(v-if="isEditAndSendCancel")
-        Preview(@closePreview="closePreview" :message="previewMessage" @send="sendMessageCancel")
+        Preview(
+          @closePreview="closePreview"
+          :message="previewMessage"
+          @send="sendMessageCancel"
+        )
 
       .project-action__title(:style="{'padding-bottom': '8px'}")
         .project-action__title-text Project Actions
@@ -453,7 +465,7 @@ export default {
           && (this.project.projectManager._id === this.user._id || this.user.group.name === 'Administrators' || this.user.group.name === 'Developers')
     },
     projectClientContacts() {
-      return this.project.clientContacts.map(({ email }) => email)
+      return this.project.clientContacts.map(({ _id, email, photo, firstName }) => ({ _id, email, photo, firstName }))
     },
     type() {
       return this.project.projectId ? 'project' : 'request'

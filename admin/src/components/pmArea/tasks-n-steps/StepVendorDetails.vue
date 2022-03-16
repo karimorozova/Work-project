@@ -295,7 +295,7 @@ export default {
 
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 10px;
     font-family: 'Myriad600';
   }
@@ -326,7 +326,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }

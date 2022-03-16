@@ -17,8 +17,6 @@ const GBP = {
 const financeExtract = {
 	receivables: { type: Number },
 	payables: { type: Number }
-	// halfReceivables: { type: Number },
-	// halfPayables: { type: Number }
 }
 
 const stepFinance = {
@@ -64,11 +62,6 @@ const ProjectsSchema = new mongoose.Schema({
 		default: false
 	},
 	clientContacts: [],
-	// paymentProfile: {
-	// 	type: String,
-	// 	default: '',
-	// 	trim: true
-	// },
 	clientBillingInfo: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients.billingInfo',
@@ -353,7 +346,8 @@ const ProjectsSchema = new mongoose.Schema({
 		isInReportPayables: { type: Boolean, default: false },
 		isInReportReceivables: { type: Boolean, default: false },
 		stepAndUnit: {},
-		memoqAssignmentRole: { type: Number }
+		memoqAssignmentRole: { type: Number },
+		isReceivableVisible: { type: Boolean, default: true }
 	} ],
 	additionsSteps: [ {
 		projectId: { type: String, trim: true },

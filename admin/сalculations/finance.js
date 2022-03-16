@@ -58,7 +58,7 @@ const calculateProjectTotal = async (projectId) => {
 
 //FINANCE FN #1 USED FOR STEPS  ==>
 const recalculateStepFinance = async (projectId) => {
-	const { steps, discounts, minimumCharge, customer } = await getProject({ _id: projectId })
+	const { steps, discounts, minimumCharge } = await getProject({ _id: projectId })
 	let newDiscounts = discounts
 	const newSteps = updateStepsFinanceWithDiscounts(steps, newDiscounts)
 	let queryToUpdateSteps = { steps: newSteps }
@@ -92,9 +92,10 @@ const updateStepsFinanceWithDiscounts = (steps, discounts = []) => {
 }
 
 const updateStepsWithMinimal = async (steps, minimumCharge) => {
-	const minimumCost = minimumCharge.value / steps.filter(({ status }) => status !== 'Cancelled').length
+	const stepLength = steps.filter(({ status, isReceivableVisible }) => status !== 'Cancelled' && isReceivableVisible).length
+	const minimumCost = minimumCharge.value / stepLength
 	const newSteps = steps.map((step) => {
-		if (step.status !== "Cancelled") {
+		if (step.status !== "Cancelled" && step.isReceivableVisible) {
 			step.finance.Price.receivables = minimumCost
 		}
 		return step
@@ -102,14 +103,14 @@ const updateStepsWithMinimal = async (steps, minimumCharge) => {
 	return { 'steps': newSteps }
 }
 
-const getClientDiscount = async (clientDiscountsIds) => {
-	const allDiscounts = await Discounts.find().lean()
-	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
-}
+// const getClientDiscount = async (clientDiscountsIds) => {
+// 	const allDiscounts = await Discounts.find().lean()
+// 	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
+// }
 
 const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate, fakeStepVendor, prevStep }) => {
-	const currencyRatio = await CurrencyRatio.findOne()
-	const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
+	// const currencyRatio = await CurrencyRatio.findOne()
+	// const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
 	const { fullSourceLanguage, fullTargetLanguage, payablesUnit } = step
 	const { type } = payablesUnit
 	const isMemoqCatUnit = type === 'CAT Wordcount'
@@ -153,7 +154,7 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTargetLanguage, metrics, step, receivablesUnit, receivablesQuantity, payablesQuantity }, isMemoq) => {
 	const currencyRatio = await CurrencyRatio.findOne()
-	const { customer, industry, discounts } = await getProject({ "projectId": projectId })
+	const { customer, industry } = await getProject({ "projectId": projectId })
 	const { rates: { pricelistTable }, defaultPricelist, currency } = customer
 	const pricelist = await Pricelist.findOne({ "_id": defaultPricelist })
 

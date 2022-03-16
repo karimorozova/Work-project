@@ -53,14 +53,23 @@
           template(slot="receivables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.receivables }}
             .table__data(v-else)
-              input(v-if="!isMinimumChargeUsed && step.status !== 'Cancelled'" @keyup="setReceivables($event, row.title)" :value="row.receivables" :disabled="isInReceivablesInvoicing")
-              span(v-else) -
+              input(
+                v-if="!isMinimumChargeUsed && step.status !== 'Cancelled' && step.isReceivableVisible"
+                @keyup="setReceivables($event, row.title)"
+                :value="row.receivables"
+              )
+              .disabled(v-else) Disabled
 
           template(slot="payables" slot-scope="{ row, index }")
             .table__data(v-if="row.title === 'Unit'") {{ row.payables }}
             .table__data(v-else)
-              input(v-if="step.status !== 'Cancelled'" @keyup="setPayables($event, row.title)" v-model="row.payables" :disabled="!step.vendor || isInPayablesInvoicing")
-              span(v-else) -
+              input(
+                v-if="step.status !== 'Cancelled'"
+                @keyup="setPayables($event, row.title)"
+                :value="row.payables"
+                :disabled="!step.vendor"
+              )
+              .disabled(v-else) Disabled
 
     .finance__buttons
       Button(value="Save" @clicked="saveFinance" :isDisabled="isEdited")
@@ -214,12 +223,12 @@ export default {
     //   const { status } = this.currentProject
     //   return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
     // },
-    isInReceivablesInvoicing() {
-      return false
-    },
-    isInPayablesInvoicing() {
-      return false
-    },
+    // isInReceivablesInvoicing() {
+    //   return false
+    // },
+    // isInPayablesInvoicing() {
+    //   return false
+    // },
     isMinimumChargeUsed() {
       return this.currentProject.minimumCharge.isUsed
     },
@@ -413,7 +422,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 10px;
     font-family: 'Myriad600';
   }
@@ -434,7 +443,7 @@ export default {
   padding: 25px;
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }
@@ -467,34 +476,9 @@ export default {
   }
 }
 
-//.finance {
-//  width: 800px;
-//  padding: 25px;
-//  background: white;
-//  position: absolute;
-//  box-shadow: $box-shadow;
-//  top: 50%;
-//  left: 50%;
-//  transform: translate(-50%, -50%);
-//  z-index: 501;
-//
-//  &__title {
-//    font-size: 18px;
-//    font-family: Myriad600;
-//    margin-bottom: 10px;
-//  }
-//
-//  &__status-bar {
-//    display: flex;
-//    margin: 10px 0;
-//    padding: 10px;
-//    border: 2px solid $light-border;
-//    border-radius: 2px;
-//
-//    gap: 30px;
-//  }
-//
-//}
+.disabled {
+  opacity: 0.4;
+}
 
 
 .table {

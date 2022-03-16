@@ -498,7 +498,7 @@ export default {
 }
 
 .table {
-  width: 1170px;
+  width: 1220px;
   box-sizing: border-box;
   border-radius: 4px;
   background-color: #fff;

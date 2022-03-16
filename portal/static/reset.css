@@ -1,16 +1,15 @@
 html, body {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-family: Myriad400;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: Myriad400;
 }
 
 html {
-	line-height: 1.15
+    line-height: 1.15
 }
 
 input, textarea {
-    color: #67573E;
     font-family: Myriad400;
 }
 
@@ -19,7 +18,7 @@ button {
 }
 
 blockquote, q {
-	quotes: none;
+    quotes: none;
 }
 
 input[type="checkbox"] {

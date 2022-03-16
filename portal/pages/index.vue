@@ -295,7 +295,8 @@ export default {
   z-index: 99999;
   box-sizing: border-box;
   background: white;
-  box-shadow: $box-shadow;
+  border-right: 1px solid $light-border;
+
 
   &__name {
     text-align: center;

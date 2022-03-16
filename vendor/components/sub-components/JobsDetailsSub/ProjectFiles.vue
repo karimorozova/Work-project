@@ -151,11 +151,12 @@ export default {
               : this.generateSourceFilesFakeCat(memoqDocs)
         }
       } else {
-        if (!sourceFiles.length) return
         if (stepNumber === 1) {
+          if (!sourceFiles.length) return
           this.generateSourceFilesNonCat(sourceFiles)
         } else {
           if (prevStep.hasOwnProperty("status") && prevStep.status === "Completed") {
+            if (!targetFiles.length) return
             this.generateSourceFilesNonCat(targetFiles.map(i => './dist' + i.path))
           }
         }

@@ -24,7 +24,7 @@ export const addProjectTasks = async ({ dispatch }, payload) => {
 		await dispatch('setCurrentProject', updatedProject.data)
 		dispatch('alertToggle', { message: "Tasks were added", isShow: true, type: "success" })
 	} catch (err) {
-		dispatch('alertToggle', { message: err.data, isShow: true, type: "error" })
+		dispatch(   'alertToggle', { message: err.data, isShow: true, type: "error" })
 	} finally {
 		dispatch('decrementRequestCounter')
 	}

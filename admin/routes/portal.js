@@ -168,19 +168,6 @@ router.post('/all-projects', checkClientContact, async (req, res) => {
 	}
 })
 
-router.get('/open-projects', checkClientContact, async (req, res) => {
-	const { token } = req.query
-	const openStatuses = [ 'Approved', 'In progress' ]
-	try {
-		const verificationResult = jwt.verify(token, secretKey)
-		const projects = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
-		res.send(projects)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send("Error on getting Projects.")
-	}
-})
-
 router.get('/project/:id', checkClientContact, async (req, res) => {
 	const { customer } = req.query
 	const { id } = req.params
@@ -220,12 +207,19 @@ router.get('/client-requests/:id', checkClientContact, async (req, res) => {
 	}
 })
 
+// dashboard ==>>
 router.get('/open-quotes', checkClientContact, async (req, res) => {
 	const { token } = req.query
 	const openStatuses = [ 'Quote sent', 'Cost Quote' ]
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: openStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
+		const quotes = await getProjectsForPortalList({
+			$and: [ {
+				status: { $in: openStatuses },
+				isTest: false
+			}, { 'customer': verificationResult.clientId } ]
+		})
+		quotes.forEach((item) => item.steps = item.steps.filter(i => i.isReceivableVisible))
 		res.send(quotes)
 	} catch (err) {
 		console.log(err)
@@ -238,7 +232,6 @@ router.get('/extra-quotes', checkClientContact, async (req, res) => {
 	const activeStatuses = [ 'Approved', 'In progress' ]
 	try {
 		const verificationResult = jwt.verify(token, secretKey)
-		// const quotes = await getProjectsForPortalList({ $and: [ { status: { $in: activeStatuses }, isTest: false }, { 'customer': verificationResult.clientId } ] })
 		const quotes = await getProjectsForPortalList({
 			$and: [ {
 				"tasks.status": 'Quote sent',
@@ -246,6 +239,7 @@ router.get('/extra-quotes', checkClientContact, async (req, res) => {
 				isTest: false
 			}, { 'customer': verificationResult.clientId } ]
 		})
+		quotes.forEach((item) => item.steps = item.steps.filter(i => i.isReceivableVisible))
 		res.send(quotes)
 	} catch (err) {
 		console.log(err)
@@ -253,6 +247,25 @@ router.get('/extra-quotes', checkClientContact, async (req, res) => {
 	}
 })
 
+router.get('/open-projects', checkClientContact, async (req, res) => {
+	const { token } = req.query
+	const openStatuses = [ 'Approved', 'In progress' ]
+	try {
+		const verificationResult = jwt.verify(token, secretKey)
+		const projects = await getProjectsForPortalList({
+			$and: [ {
+				status: { $in: openStatuses },
+				isTest: false
+			}, { 'customer': verificationResult.clientId } ]
+		})
+		projects.forEach((item) => item.steps = item.steps.filter(i => i.isReceivableVisible))
+		res.send(projects)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Projects.")
+	}
+})
+// <<== dashboard
 
 router.get('/client', checkClientContact, async (req, res) => {
 	const { token } = req.query
@@ -308,17 +321,17 @@ router.get('/user', checkClientContact, async (req, res) => {
 })
 
 
-router.get('/language-combinations', checkClientContact, async (req, res) => {
-	let id = +req.query.customerId
-	try {
-		let result = await customer.languageComb(id)
-		let languages = result.data
-		res.send(languages)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on getting language combinations')
-	}
-})
+// router.get('/language-combinations', checkClientContact, async (req, res) => {
+// 	let id = +req.query.customerId
+// 	try {
+// 		let result = await customer.languageComb(id)
+// 		let languages = result.data
+// 		res.send(languages)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on getting language combinations')
+// 	}
+// })
 
 router.get('/request-service', checkClientContact, async (req, res) => {
 	const { symbol } = req.query
@@ -389,16 +402,16 @@ router.get('/clientinfo', checkClientContact, async (req, res) => {
 //     }
 // });
 
-router.get('/reject', checkClientContact, async (req, res) => {
-	const id = req.query.quoteId
-	try {
-		await customer.quoteReject(id)
-		res.send("rejected")
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on rejecting')
-	}
-})
+// router.get('/reject', checkClientContact, async (req, res) => {
+// 	const id = req.query.quoteId
+// 	try {
+// 		await customer.quoteReject(id)
+// 		res.send("rejected")
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on rejecting')
+// 	}
+// })
 
 
 router.get('/deliverables', checkClientContact, async (req, res) => {
@@ -496,12 +509,12 @@ router.post('/service-template/:clientId/:id', checkClientContact, async (req, r
 	}
 })
 
-router.get('/invoices', checkClientContact,async (req, res) => {
+router.get('/invoices', checkClientContact, async (req, res) => {
 	// const { clientId } = req.params
 	//
 	// let client = await getClient({ "_id": verificationResult.clientId })
 	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
-	const  token  = req.headers['token-header']
+	const token = req.headers['token-header']
 	const verificationResult = jwt.verify(token, secretKey)
 	try {
 		const projectFields = {
@@ -509,10 +522,10 @@ router.get('/invoices', checkClientContact,async (req, res) => {
 			"clientBillingInfo": 1,
 			"client": 1,
 			"status": 1,
-			"total": 1,
+			"total": 1
 		}
 
-		const reportsList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
+		const reportsList = await getAllReportsFromDb(0, 10000, { "client": ObjectId(verificationResult.clientId.toString()), status: { $ne: "Created" } }, projectFields)
 		res.json(reportsList)
 	} catch (err) {
 		console.log(err)
@@ -520,12 +533,12 @@ router.get('/invoices', checkClientContact,async (req, res) => {
 	}
 })
 
-router.get('/invoices-paid', checkClientContact,async (req, res) => {
+router.get('/invoices-paid', checkClientContact, async (req, res) => {
 	// const { clientId } = req.params
 	//
 	// let client = await getClient({ "_id": verificationResult.clientId })
 	// const verificationResult = jwt.verify(req.headers['token-header'], secretKey)
-	const  token  = req.headers['token-header']
+	const token = req.headers['token-header']
 	const verificationResult = jwt.verify(token, secretKey)
 	try {
 		const projectFields = {
@@ -533,10 +546,13 @@ router.get('/invoices-paid', checkClientContact,async (req, res) => {
 			"clientBillingInfo": 1,
 			"client": 1,
 			"status": 1,
-			"total": 1,
+			"total": 1
 		}
 
-		const reportsList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), status: {$ne: "Created"}}, projectFields)
+		const reportsList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {
+			"client": ObjectId(verificationResult.clientId.toString()),
+			status: { $ne: "Created" }
+		}, projectFields)
 		res.json(reportsList)
 	} catch (err) {
 		console.log(err)
@@ -544,10 +560,10 @@ router.get('/invoices-paid', checkClientContact,async (req, res) => {
 	}
 })
 
-router.get('/invoice/:invoiceId', checkClientContact,async (req, res) => {
+router.get('/invoice/:invoiceId', checkClientContact, async (req, res) => {
 	const { invoiceId } = req.params
 
-	const  token  = req.headers['token-header']
+	const token = req.headers['token-header']
 	const verificationResult = jwt.verify(token, secretKey)
 	try {
 		const projectFields = {
@@ -570,20 +586,20 @@ router.get('/invoice/:invoiceId', checkClientContact,async (req, res) => {
 			"stepsWithProject.finance.Price": 1,
 			"stepsWithProject.projectNativeId": 1,
 			"invoice": 1,
-			"paymentInformation": 1,
+			"paymentInformation": 1
 		}
 
-		const reportList = await getAllReportsFromDb(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)}, projectFields)
+		const reportList = await getAllReportsFromDb(0, 10000, { "client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId) }, projectFields)
 		res.json(reportList)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on rollback-review')
 	}
 })
-router.get('/invoice-paid/:invoiceId', checkClientContact,async (req, res) => {
+router.get('/invoice-paid/:invoiceId', checkClientContact, async (req, res) => {
 	const { invoiceId } = req.params
 
-	const  token  = req.headers['token-header']
+	const token = req.headers['token-header']
 	const verificationResult = jwt.verify(token, secretKey)
 	try {
 		const projectFields = {
@@ -606,10 +622,13 @@ router.get('/invoice-paid/:invoiceId', checkClientContact,async (req, res) => {
 			"stepsWithProject.finance.Price": 1,
 			"stepsWithProject.projectNativeId": 1,
 			"invoice": 1,
-			"paymentInformation": 1,
+			"paymentInformation": 1
 		}
 
-		const reportList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {"client": ObjectId(verificationResult.clientId.toString()), _id: ObjectId(invoiceId)}, projectFields)
+		const reportList = await getAllPaidReceivablesFromDbWithProject(0, 10000, {
+			"client": ObjectId(verificationResult.clientId.toString()),
+			_id: ObjectId(invoiceId)
+		}, projectFields)
 		res.json(reportList)
 	} catch (err) {
 		console.log(err)

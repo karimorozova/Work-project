@@ -36,8 +36,12 @@
           @setStatus="setStatus"
         )
         ProjectFinance
-      .project-info__preview(v-if="isEditAndSend")
-        Preview(@closePreview="closePreview" :message="message" @send="sendQuote")
+      //.project-info__preview(v-if="isEditAndSend")
+      //  Preview(
+      //    @closePreview="closePreview"
+      //    :message="message"
+      //    @send="sendMessage"
+      //  )
 
 </template>
 
@@ -52,7 +56,6 @@ import { mapGetters, mapActions } from 'vuex'
 import ProjectSubInformation from './ProjectSubInformation'
 import Deliverables from './Deliverables'
 import ImportTasksToXtrf from "./ImportTasksToXtrf"
-import Preview from "./Preview"
 import ValidationErrors from "../ValidationErrors"
 import NavbarList from "../NavbarLists"
 
@@ -61,7 +64,7 @@ export default {
     return {
       errors: [],
       isEditAndSend: false,
-      message: '',
+      // message: '',
       mailSubject: '',
       customer: null,
       shortProjectList: []
@@ -97,23 +100,23 @@ export default {
       this.message = message.data.message
       this.mailSubject = subject
     },
-    async sendQuote({ message }) {
-      try {
-        if (this.mailSubject === 'quote') {
-          await this.sendClientQuote({ message })
-        }
-        if (this.mailSubject === 'details') {
-          await this.sendProjectDetails({ message })
-        }
-        this.alertToggle({ message: "Details sent", isShow: true, type: "success" })
-      } catch (err) {
-        this.alertToggle({ message: err.message, isShow: true, type: "error" })
-      }
-      this.closePreview()
-    },
-    closePreview() {
-      this.isEditAndSend = false
-    },
+    // async sendMessage({ message }) {
+    //   try {
+    //     if (this.mailSubject === 'quote') {
+    //       await this.sendClientQuote({ message })
+    //     }
+    //     if (this.mailSubject === 'details') {
+    //       await this.sendProjectDetails({ message })
+    //     }
+    //     this.alertToggle({ message: "Details sent", isShow: true, type: "success" })
+    //   } catch (err) {
+    //     this.alertToggle({ message: err.message, isShow: true, type: "error" })
+    //   }
+    //   this.closePreview()
+    // },
+    // closePreview() {
+    //   this.isEditAndSend = false
+    // },
     async getProject() {
       const { id } = this.$route.params
       try {
@@ -179,7 +182,6 @@ export default {
   components: {
     NavbarList,
     ValidationErrors,
-    Preview,
     ImportTasksToXtrf,
     ImportProjectToXtrf,
     Project,

@@ -495,7 +495,7 @@ export default {
       return this.$route.query.selectedTab || 'Tasks'
     },
     projectClientContacts() {
-      return this.currentProject.clientContacts.map(({ email }) => email)
+      return this.currentProject.clientContacts.map(({ _id, email, photo, firstName }) => ({ _id, email, photo, firstName }))
     },
     availableActionsOptions() {
       //   const { status, tasks } = this.currentProject
@@ -655,8 +655,8 @@ export default {
 
   &__action {
     position: absolute;
-    top: -52px;
-    right: 232px;
+    top: -51px;
+    right: 126px;
   }
 
   &__title {

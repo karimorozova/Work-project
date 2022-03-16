@@ -18,7 +18,7 @@ async function messageForClientSendQuote(project, tasksIds, allUnits, allSetting
 	const date = Date.now()
 	const token = jwt.sign({ id: project._id }, secretKey, { expiresIn: '21d' })
 	let { accountManager, tasks, steps, finance, discounts, projectCurrency, additionsSteps } = project
-	steps = steps.filter(item => item.status !== "Cancelled")
+	steps = steps.filter(item => item.status !== "Cancelled" && item.isReceivableVisible)
 	const subTotal = getStepsSubTotal(tasksIds, steps, allUnits)
 	const TMDiscount = +(getStepsSubTotal(tasksIds, steps, allUnits) - getStepsTotal(tasksIds, steps, allUnits)).toFixed(2)
 	const isHideWhenMinimumCharge = project.minimumCharge.isUsed
@@ -95,7 +95,7 @@ async function messageForClientSendQuote(project, tasksIds, allUnits, allSetting
 function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 	let { steps, finance, discounts, projectCurrency, projectId, clientBillingInfo, additionsSteps } = project
 
-	steps = steps.filter(item => item.status !== "Cancelled")
+	steps = steps.filter(item => item.status !== "Cancelled" && item.isReceivableVisible)
 	const subTotal = getStepsSubTotal(tasksIds, steps, allUnits)
 	const TMDiscount = +(getStepsSubTotal(tasksIds, steps, allUnits) - getStepsTotal(tasksIds, steps, allUnits)).toFixed(2)
 	const isHideWhenMinimumCharge = project.minimumCharge.isUsed
@@ -170,7 +170,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 async function messageForClientSendCostQuote(project, allUnits, allSettingsSteps) {
 	const tasksIds = []
 	let { accountManager, tasks, steps, finance, discounts, projectCurrency, additionsSteps } = project
-	steps = steps.filter(item => item.status !== "Cancelled")
+	steps = steps.filter(item => item.status !== "Cancelled" && item.isReceivableVisible)
 	const subTotal = getStepsSubTotal(tasksIds, steps, allUnits)
 	const TMDiscount = +(getStepsSubTotal(tasksIds, steps, allUnits) - getStepsTotal(tasksIds, steps, allUnits)).toFixed(2)
 	let totalForAdditions = 0

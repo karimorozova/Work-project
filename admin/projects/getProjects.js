@@ -118,6 +118,7 @@ async function getProjectsForVendorPortalAll({ filters }) {
 	])
 }
 
+// CLIENT PORTAL PROJECTS LIST
 async function getProjectsForPortalAll({ filters }) {
 	const allLanguages = await Languages.find()
 	const allServices = await Services.find()
@@ -125,7 +126,7 @@ async function getProjectsForPortalAll({ filters }) {
 
 	const projects = await Projects.find(
 			{
-				'isTest': 'false',
+				'isTest': false,
 				'customer': filters.customer,
 				...query
 			},
@@ -144,7 +145,8 @@ async function getProjectsForPortalAll({ filters }) {
 				"steps.finance.Price.receivables": 1,
 				"finance.Price.receivables": 1,
 				"tasks.taskId": 1,
-				"tasks.status": 1
+				"tasks.status": 1,
+				"steps.isReceivableVisible": 1
 			}
 	)
 			.sort({ startDate: -1 })
@@ -153,12 +155,13 @@ async function getProjectsForPortalAll({ filters }) {
 
 	for (let i = 0; i < projects.length; i++) {
 		projects[i].steps = filterNotQuoteStepsInStartedProjectForClientPortal(projects[i])
-		projects[i].steps = projects[i].steps.filter(({ status }) => status !== 'Cancelled')
+		projects[i].steps = projects[i].steps.filter(({ status, isReceivableVisible }) => status !== 'Cancelled' && isReceivableVisible)
 	}
 
 	return projects
 }
 
+// CLIENT PORTAL PROJECTS DASHBOARD
 async function getProjectsForPortalList(obj) {
 	return (await Projects.find(obj, {
 						projectId: 1,
@@ -178,13 +181,15 @@ async function getProjectsForPortalList(obj) {
 						"tasks.taskId": 1,
 						"tasks.status": 1,
 						"steps.taskId": 1,
-						"steps.finance.Price.receivables": 1
+						"steps.finance.Price.receivables": 1,
+						"steps.isReceivableVisible": 1
 					}
 			)
 					.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
 	)
 }
 
+// CLIENT PORTAL PROJECT DETAILS
 async function getProjectForClientPortal(obj) {
 	const project = await Projects.findOne(obj,
 			{
@@ -221,8 +226,8 @@ async function getProjectForClientPortal(obj) {
 				"tasks.sourceLanguage": 1,
 				"tasks.targetLanguage": 1,
 				"tasks.taskId": 1,
-				"tasks.status": 1
-
+				"tasks.status": 1,
+				"steps.isReceivableVisible": 1
 			}
 	)
 			.populate('accountManager', [ 'firstName', 'lastName', 'photo', 'email' ])
@@ -243,7 +248,7 @@ async function getProjectForClientPortal(obj) {
 									: +item._doc.finance.Quantity.receivables || 0
 						}
 					}
-			).filter(({ status }) => status !== 'Cancelled')
+			).filter(({ status, isReceivableVisible }) => status !== 'Cancelled' && isReceivableVisible)
 			: []
 
 	project._doc.incomingSteps = filterQuoteStepsInStartedProjectForClientPortal(project, false)

@@ -18,6 +18,7 @@
         :task="getTask(infoIndex)"
         @closeStepInfo="closeStepInfo"
         :projectCurrency="currentProject.projectCurrency"
+        @updateProject="approveFinanceModal"
       )
 
     .steps__stepFinance(v-if="isFinanceEdit")
@@ -87,7 +88,12 @@
           CheckBox(:isChecked="row.isCheck" @check="()=>toggleCheck(row._id, true)" @uncheck="()=>toggleCheck(row._id, false)" customClass="tasks-n-steps")
 
       template(slot="step" slot-scope="{ row }")
-        .table__data {{ row.step.title }}
+        .table__data(style="display: flex; flex-wrap: wrap; gap: 6px;")
+          span(v-if="!row.isReceivableVisible")
+            PopUp(text="Disabled")
+              span(style="opacity: 0.4; cursor: help;")
+                i(class="fa-solid fa-eye-slash")
+          span {{ row.step.title }}
 
       template(slot="language" slot-scope="{ row }")
         .table__data(v-html="getStepPair(row)")
@@ -182,6 +188,7 @@ import StepVendorDetails from './StepVendorDetails'
 
 import DatePicker from 'vue2-datepicker'
 import '../../../assets/scss/datepicker.scss'
+import PopUp from "../../PopUp"
 
 export default {
   mixins: [ scrollDrop, currencyIconDetected, tableSortAndFilter ],
@@ -535,6 +542,7 @@ export default {
     }
   },
   components: {
+    PopUp,
     StepVendorDetails,
     ProjectFinanceModal,
     StepInfo,
@@ -559,8 +567,8 @@ export default {
 
   &__action {
     position: absolute;
-    top: -52px;
-    right: 232px;
+    top: -51px;
+    right: 127px;
   }
 
   &__title {

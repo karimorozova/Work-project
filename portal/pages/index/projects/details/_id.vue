@@ -527,8 +527,9 @@ export default {
 
 .quote {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-top: 20px;
+  gap: 20px;
 }
 
 .priceExplanation {
@@ -564,8 +565,6 @@ export default {
 
 .total {
   margin-top: 20px;
-  //padding-top: 20px;
-  //border-top: 1px solid $light-border;
 
   &__row {
     width: 100%;
@@ -574,12 +573,11 @@ export default {
   }
 
   &__key {
-    font-family: Myriad900;
+    font-family: Myriad600;
   }
 
   &__value {
-    margin-left: 15px;
-    font-family: Myriad900;
+    margin-left: 10px;
   }
 }
 
@@ -655,7 +653,7 @@ export default {
   border-radius: 4px;
   box-shadow: $box-shadow;
   box-sizing: border-box;
-  width: 840px;
+  width: 900px;
   height: fit-content;
 }
 
@@ -675,7 +673,7 @@ export default {
   &__email {
     display: flex;
     gap: 5px;
-    margin-top: 5px;
+    margin-top: 10px;
   }
 
   &__fakeImage {

@@ -216,8 +216,8 @@ export default {
 .component {
   &__title {
     position: absolute;
-    top: 20px;
-    font-size: 16px;
+    top: 25px;
+    font-size: 14px;
     font-family: 'Myriad600';
   }
 

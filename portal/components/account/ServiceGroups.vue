@@ -184,7 +184,7 @@ export default {
 
 .group__card {
   position: relative;
-  border: 1px solid #bfbfbf;
+  border: 1px solid $light-border;
   border-radius: 4px;
   padding: 15px;
   width: 250px;
@@ -204,8 +204,8 @@ export default {
     font-family: Myriad600;
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #999;
-    font-size: 16px;
+    border-bottom: 1px solid $border;
+    font-size: 14px;
 
     .title {
       margin-right: 55px;

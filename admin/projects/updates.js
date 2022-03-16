@@ -38,6 +38,24 @@ const { notifyManagerProjectStarts, managerNotifyMail, sendQuoteToVendorsAfterPr
 const { calculateProjectTotal, recalculateStepFinance } = require("../сalculations/finance")
 
 
+const manageReceivableVisible = async (bool, _stepId) => {
+	const project = await Projects.findOneAndUpdate(
+			{ "steps._id": _stepId },
+			{
+				$set: {
+					"steps.$[i].isReceivableVisible": bool,
+					"steps.$[i].finance.Quantity.receivables": 0,
+					"steps.$[i].nativeFinance.Quantity.receivables": 0,
+					"steps.$[i].finance.Wordcount.receivables": 0,
+					"steps.$[i].nativeFinance.Wordcount.receivables": 0
+				}
+			},
+			{ arrayFilters: [ { 'i._id': _stepId } ] }
+	)
+	await recalculateStepFinance(project.id)
+	return await calculateProjectTotal(project.id)
+}
+
 const cancelProjectInMemoq = async (project) => {
 	if (project.status !== 'Cancelled') return
 
@@ -740,6 +758,7 @@ const setStepDeadlineProjectAndMemoq = async ({ projectId, stepId }) => {
 }
 
 module.exports = {
+	manageReceivableVisible,
 	generateTargetFileFromMemoq,
 	reImportFilesFromMemoq,
 	cancelProjectInMemoq,

@@ -98,6 +98,12 @@
 				}
 				if (key === "cancel") {
 					if (this.currentActive === -1) return
+          if (!this.discounts[index]._id) {
+            this.discounts.splice(index, 1)
+            this.cancel()
+            await this.getdiscounts()
+            return
+          }
 					this.cancel()
           await this.getdiscounts()
 				}
@@ -131,7 +137,7 @@
 			},
 			cancel() {
 				this.currentActive = -1
-				this.currentDiscount = {},
+				this.currentDiscount = {}
         this.deleteIndex = -1
 				this.isDeleting = false
 			},
@@ -154,7 +160,7 @@
 
         if(!this.currentDiscount._id) updatedArray.push(this.currentDiscount)
         else updatedArray.splice(index, 1, this.currentDiscount)
-			
+
 				try {
 					const result = await this.$http.post(this.setCurrentRoutes.update, { _id: this.$route.params.id, updatedArray })
 					this.updateEnumData(result)

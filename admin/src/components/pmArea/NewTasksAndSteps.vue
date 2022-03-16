@@ -246,7 +246,6 @@ export default {
     position: fixed;
     left: 255px;
     top: 0px;
-    z-index: 45;
     box-sizing: border-box;
     width: calc(100% - 255px);
     padding: 50px;

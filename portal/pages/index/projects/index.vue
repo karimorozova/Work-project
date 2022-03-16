@@ -572,7 +572,7 @@ export default {
 }
 
 .table {
-  width: 980px;
+  width: 1170px;
   box-sizing: border-box;
   border-radius: 4px;
   background-color: #fff;
@@ -580,6 +580,10 @@ export default {
   padding: 25px;
   position: relative;
   height: fit-content;
+
+  @media all and (max-width: 1400px) {
+    width: 700px;
+  }
 
   &__projectName {
     width: 100%;
@@ -590,10 +594,6 @@ export default {
   &__empty {
     margin-top: 10px;
     color: $dark-border;
-  }
-
-  &__header {
-    padding: 0 0 0 7px;
   }
 
   &__dataImage {

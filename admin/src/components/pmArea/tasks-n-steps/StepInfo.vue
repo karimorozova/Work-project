@@ -14,6 +14,15 @@
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
       .info__value(v-if="step.step.title === 'Translation' && step.totalWords" ) Total Words:  {{ step.totalWords }}
 
+    .details__options
+      .details__options-row
+        .details__options-key Visible for Client:
+        .details__options-value
+          Toggler(
+            :isActive="step.isReceivableVisible"
+            @toggle="toggleVisible"
+          )
+
     .step-info__block
       StepDetails(
         :vendor="step.vendor"
@@ -37,6 +46,7 @@ import { mapGetters, mapActions } from "vuex"
 import StepDetails from "../stepinfo/StepDetails"
 import Tabs from "../../Tabs"
 import TableMatrix from "../stepinfo/finance/TableMatrix"
+import Toggler from "../../Toggler"
 
 export default {
   props: {
@@ -62,6 +72,21 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: "alertToggle"
+    }),
+    async toggleVisible() {
+      try {
+        const updatedProject = await this.$http.post(`/pm-manage/manage-receivable-visible`, {
+          bool: !this.step.isReceivableVisible,
+          _stepId: this.step._id
+        })
+        this.$emit('updateProject', updatedProject.data)
+        this.alertToggle({ message: "Option installed", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: 'Error on hiding step', isShow: true, type: "error" })
+      }
+    },
     showMainTab({ index }) {
       switch (this.mainTabs[index]) {
         case 'Vendor Details':
@@ -104,6 +129,7 @@ export default {
     }
   },
   components: {
+    Toggler,
     TableMatrix,
     Tabs,
     StepDetails,
@@ -114,6 +140,27 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
+
+.details {
+  &__options {
+    margin-top: 20px;
+    margin-bottom: 10px;
+
+    &-row {
+      height: 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    &-key {
+      margin-right: 20px;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
 
 .info {
   padding: 15px;
@@ -149,7 +196,7 @@ export default {
 
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 10px;
     font-family: 'Myriad600';
   }
@@ -175,7 +222,7 @@ export default {
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     margin-bottom: 20px;
   }

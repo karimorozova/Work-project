@@ -1,10 +1,10 @@
 <template lang="pug">
-  .test
+  .wrapper
     .popcorn(:class="{seted: isDisabled}")
       slot
     .tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
       span {{text}}
-      .arrow( data-popper-arrow)
+      //.arrow( data-popper-arrow)
 </template>
 
 <script>
@@ -93,6 +93,10 @@ export default {
 
 <style scoped lang="scss">
 
+.wrapper {
+  width: fit-content;
+}
+
 .tooltip {
   display: none;
   position: absolute;
@@ -111,24 +115,24 @@ export default {
   //max-width: 300px;
 }
 
-.arrow,
-.arrow::before {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: inherit;
-  margin-top: 1px;
-}
+//.arrow,
+//.arrow::before {
+//  position: absolute;
+//  width: 8px;
+//  height: 8px;
+//  background: inherit;
+//  margin-top: 1px;
+//}
+//
+//.arrow {
+//  visibility: hidden;
+//}
 
-.arrow {
-  visibility: hidden;
-}
-
-.arrow::before {
-  visibility: visible;
-  content: '';
-  transform: rotate(45deg);
-}
+//.arrow::before {
+//  visibility: visible;
+//  content: '';
+//  transform: rotate(45deg);
+//}
 
 
 .tooltip[data-show] {

@@ -111,10 +111,10 @@ export default {
 @import "./assets/scss/colors";
 
 .swapper {
-  width: 750px;
+  width: 500px;
   text-align: center;
   padding: 10px 25px;
-  border: 1px solid #ccc;
+  border: 1px solid $border;
   display: flex;
   font-size: 14px;
   align-items: center;
@@ -123,17 +123,17 @@ export default {
 }
 
 .dashboard {
-  width: 1530px;
+  //width: 1530px;
 
   .row {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 50px;
+    margin-bottom: 25px;
     flex-wrap: wrap;
+    gap: 25px;
   }
 
   .col {
-    width: 755px;
+    width: 775px;
     padding: 15px 25px 25px;
     box-shadow: $box-shadow;
     box-sizing: border-box;

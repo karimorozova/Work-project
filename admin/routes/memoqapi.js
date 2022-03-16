@@ -418,15 +418,15 @@ router.post('/update-project-discounts', async (req, res) => {
 	}
 })
 
-router.post('/update-minimum-charge', async (req, res) => {
-	const { _id, value, toIgnore } = req.body
-	try {
-		const updatedProject = await getProjectAfterUpdate({ _id }, { minimumCharge: { value, toIgnore } })
-		res.send(updatedProject)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send('Error on updating project\'s minimum charge!')
-	}
-})
+// router.post('/update-minimum-charge', async (req, res) => {
+// 	const { _id, value, toIgnore } = req.body
+// 	try {
+// 		const updatedProject = await getProjectAfterUpdate({ _id }, { minimumCharge: { value, toIgnore } })
+// 		res.send(updatedProject)
+// 	} catch (err) {
+// 		console.log(err)
+// 		res.status(500).send('Error on updating project\'s minimum charge!')
+// 	}
+// })
 
 module.exports = router

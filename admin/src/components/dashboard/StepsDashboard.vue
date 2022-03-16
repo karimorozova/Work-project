@@ -39,6 +39,7 @@
         :projectCurrency="steps[infoIndex].projectCurrency"
         :task="getTask(infoIndex)"
         @closeStepInfo="closeStepInfo"
+        @updateProject="approveFinanceModal"
       )
 
     .modal(v-if="isModalOpen")
@@ -125,6 +126,8 @@
 
           template(slot="step" slot-scope="{ row, index }")
             .table__data
+              span(v-if="!row.steps.isReceivableVisible" style="margin-right: 6px; opacity: 0.4")
+                i(class="fa-solid fa-eye-slash")
               span {{row.steps.step.title}}
 
           template(slot="vendor" slot-scope="{ row, index }")
@@ -215,10 +218,12 @@ import '../../assets/scss/datepicker.scss'
 import _ from 'lodash'
 import LayoutsListWrapper from '../LayoutsListWrapper'
 import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
+import PopUp from "../PopUp"
 
 export default {
   mixins: [ getBgColor, currencyIconDetected, LayoutsListWrapperLogic ],
   components: {
+    PopUp,
     ApproveModal,
     SelectSingle,
     StepVendorDetails,
@@ -593,6 +598,12 @@ export default {
         this.infoIndex = -1
       }
       this.isModalOpen = !this.isModalOpen
+      let elem = document.getElementsByTagName('body')[0]
+      if (this.isModalOpen) {
+        elem.classList.add("hiddenScroll")
+      } else {
+        elem.classList.remove("hiddenScroll")
+      }
     },
     updateSteps(data) {
       const { steps } = data
@@ -1007,18 +1018,17 @@ a {
 }
 
 .modal {
-  position: absolute;
-  left: 0px;
+  position: fixed;
+  left: 255px;
   top: 0px;
-  z-index: 45;
   box-sizing: border-box;
-  min-width: 1510px;
-  width: 1530px;
-  padding: 25px;
+  width: calc(100% - 255px);
+  padding: 50px;
   box-shadow: $box-shadow;
   background: white;
   border-radius: 2px;
   z-index: 30000;
+  height: 100%;
 }
 
 .drop {
