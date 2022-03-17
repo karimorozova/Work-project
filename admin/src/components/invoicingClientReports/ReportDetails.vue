@@ -1,98 +1,104 @@
 <template lang="pug">
-  .invoicing-details
-    .invoicing-details__buttons
-      .buttons__group(v-if="reportDetailsInfo.invoice === null")
-        IconButton(@clicked="createNewInvoice")
-          i(class="fa-solid fa-plus")
-        IconButton(@clicked="addToInvoice")
-          i(class="fa-solid fa-file-import")
-      .buttons__group(v-else)
-        IconButton(@clicked="")
-          i(class="fa-solid fa-minus")
-    .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
-      .invoicing-details__info
-        .info__user
-          .user
-            .user__description
-              .user__name
-                router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
-                  span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
-              .user__address {{ getBillingDetails(reportDetailsInfo).getAddressFull() }}
+  .layout
+    NavbarList(
+      v-if="shortProjectList.length"
+      :items="shortProjectList"
+      :basicLink="'/pangea-finance/receivables-reports/reports/'"
+    )
+    .invoicing-details
+      .invoicing-details__buttons
+        .buttons__group(v-if="reportDetailsInfo.invoice === null")
+          IconButton(@clicked="createNewInvoice")
+            i(class="fa-solid fa-plus")
+          IconButton(@clicked="addToInvoice")
+            i(class="fa-solid fa-file-import")
+        .buttons__group(v-else)
+          IconButton(@clicked="")
+            i(class="fa-solid fa-minus")
+      .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
+        .invoicing-details__info
+          .info__user
+            .user
+              .user__description
+                .user__name
+                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
+                    span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
+                .user__address {{ getBillingDetails(reportDetailsInfo).getAddressFull() }}
 
-        .info__descriptions
-          .text__block
-            .text__title Report ID:
-            .text__value {{reportDetailsInfo.reportId}}
+          .info__descriptions
+            .text__block
+              .text__title Report ID:
+              .text__value {{reportDetailsInfo.reportId}}
 
-          .text__block
-            .text__title Customer:
-            .text__value {{reportDetailsInfo.client.name}}
+            .text__block
+              .text__title Customer:
+              .text__value {{reportDetailsInfo.client.name}}
 
-          .text__block(v-if="reportDetailsInfo.invoice")
-            .text__title Invoice Id:
-            .text__value
-              router-link(class="link-to" target= '_blank' :to="{path: `/receivables-reports/invoice/${reportDetailsInfo.invoice._id}`}")
-                span {{ reportDetailsInfo.invoice.invoiceId }}
+            .text__block(v-if="reportDetailsInfo.invoice")
+              .text__title Invoice Id:
+              .text__value
+                router-link(class="link-to" target= '_blank' :to="{path: `/receivables-reports/invoice/${reportDetailsInfo.invoice._id}`}")
+                  span {{ reportDetailsInfo.invoice.invoiceId }}
 
-          .text__block(v-if="reportDetailsInfo.invoice")
-            .text__title Invoice Status:
-            .text__value {{reportDetailsInfo.invoice.status}}
+            .text__block(v-if="reportDetailsInfo.invoice")
+              .text__title Invoice Status:
+              .text__value {{reportDetailsInfo.invoice.status}}
 
-          .text__block
-            .text__title Billing Name:
-            .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
+            .text__block
+              .text__title Billing Name:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
 
-          .text__block
-            .text__title Payment Type:
-            .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
+            .text__block
+              .text__title Payment Type:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
 
-          .text__block
-            .text__title Created On:
-            .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
+            .text__block
+              .text__title Created On:
+              .text__value {{ formattedDate(reportDetailsInfo.createdAt) }}
 
-          .text__block
-            .text__title Date Range:
-            .text__value
-              span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate) }}
-              span /
-              span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
+            .text__block
+              .text__title Date Range:
+              .text__value
+                span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate) }}
+                span /
+                span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
 
-          .text__block
-            .text__title Payment Terms:
-            .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
+            .text__block
+              .text__title Payment Terms:
+              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
 
-          .text__block
-            .text__title Projects / Jobs:
-            .text__value
-              span {{ getReportProjectsCount(reportDetailsInfo) }}
-              span /
-              span {{ reportDetailsInfo.stepsWithProject.length }}
+            .text__block
+              .text__title Projects / Jobs:
+              .text__value
+                span {{ getReportProjectsCount(reportDetailsInfo) }}
+                span /
+                span {{ reportDetailsInfo.stepsWithProject.length }}
 
-          .text__block(v-if="reportDetailsInfo.stepsWithProject.length" )
-            .text__title Total Amount:
-            .text__value
-              span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
-              span.currency(v-html="returnIconCurrencyByStringCode(reportDetailsInfo.stepsWithProject.at(0).projectCurrency)")
+            .text__block(v-if="reportDetailsInfo.stepsWithProject.length" )
+              .text__title Total Amount:
+              .text__value
+                span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
+                span.currency(v-html="returnIconCurrencyByStringCode(reportDetailsInfo.stepsWithProject.at(0).projectCurrency)")
 
 
-      .invoicing-details__listOfJobs
-        ReportDetailsJobsList(
-          :isAvailableDeleting="true"
-          :enumOfReports="'client'"
-          :steps="reportDetailsInfo.stepsWithProject"
-          @deleteStep="deleteStep"
+        .invoicing-details__listOfJobs
+          ReportDetailsJobsList(
+            :isAvailableDeleting="true"
+            :enumOfReports="'client'"
+            :steps="reportDetailsInfo.stepsWithProject"
+            @deleteStep="deleteStep"
+          )
+          Add(
+            v-if="!toggleAddSteps"
+            @add="changeToggleAddSteps"
+          )
+      .available-jobs(v-if="toggleAddSteps")
+        ReceivablesAddStepsTo(
+          :paymentType="getBillingDetails(reportDetailsInfo).getPaymentType()"
+          :steps="steps"
+          @refreshReports="refreshReports"
+          @closeTable="changeToggleAddSteps"
         )
-        Add(
-          v-if="!toggleAddSteps"
-          @add="changeToggleAddSteps"
-        )
-    .available-jobs(v-if="toggleAddSteps")
-      ReceivablesAddStepsTo(
-        :paymentType="getBillingDetails(reportDetailsInfo).getPaymentType()"
-        :steps="steps"
-        @refreshReports="refreshReports"
-        @closeTable="changeToggleAddSteps"
-      )
 </template>
 
 <script>
@@ -110,6 +116,7 @@ import '../../assets/scss/datepicker.scss'
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 import ReportDetailsJobsList from "../invoicingPayables/ReportDetailsJobsList"
 import Add from "../Add"
+import NavbarList from "../NavbarLists"
 
 export default {
   name: "ReportDetails",
@@ -118,7 +125,8 @@ export default {
     return {
       reportDetailsInfo: {},
       toggleAddSteps: false,
-      steps: []
+      steps: [],
+      shortProjectList: []
     }
   },
   methods: {
@@ -220,12 +228,49 @@ export default {
     },
     addToInvoice() {
       console.log('test insta')
+    },
+    async getShortReports() {
+      try {
+        const shortProjectList = await this.$http.get(`/invoicing-receivables/short-report-list`)
+        this.shortProjectList = shortProjectList.data.map(i => {
+          return {
+            _id: i._id,
+            item1: i.reportId,
+            item2: i.client.name,
+            item3: i.invoice?.status || 'No invoice',
+            item4: i.total + ' ' + getCurrencySymbol(i.client.currency)
+          }
+        })
+      } catch (err) {
+      }
+
+      function getCurrencySymbol(str) {
+        let symbol = ''
+        if (str === 'USD') symbol = '$'
+        else if (str === 'EUR') symbol = '€'
+        else if (str === 'GBP') symbol = '£'
+        return symbol
+      }
     }
   },
   async created() {
+    await this.getShortReports()
     await this.getReportDetails()
   },
+  watch: {
+    async $route(to, from) {
+      if (to.name === from.name) {
+        if (to.params.id !== from.params.id) {
+          this.reportDetailsInfo = {}
+          this.toggleAddSteps = false
+          this.steps = []
+          await this.getReportDetails()
+        }
+      }
+    }
+  },
   components: {
+    NavbarList,
     Add,
     ReportDetailsJobsList,
     DatePicker,
@@ -250,13 +295,13 @@ export default {
   box-shadow: $box-shadow;
   height: fit-content;
   box-sizing: border-box;
-  width: 1545px;
+  width: 1455px;
   margin-top: 25px;
 }
 
 .invoicing-details {
   position: relative;
-  margin: 50px;
+  margin: 50px 0 50px 180px;
 
 
   &__wrapper {
@@ -271,7 +316,7 @@ export default {
     box-shadow: $box-shadow;
     height: fit-content;
     box-sizing: border-box;
-    width: 450px;
+    width: 410px;
   }
 
   &__listOfJobs {
@@ -281,7 +326,7 @@ export default {
     box-shadow: $box-shadow;
     height: fit-content;
     box-sizing: border-box;
-    width: 1070px;
+    width: 1020px;
   }
 }
 
@@ -552,13 +597,13 @@ export default {
   }
 
   &__title {
-    width: 130px;
+    width: 120px;
     position: relative;
     margin-right: 10px;
   }
 
   &__value {
-    width: 260px;
+    width: 230px;
     position: relative;
     display: flex;
     gap: 10px;

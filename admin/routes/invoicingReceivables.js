@@ -6,9 +6,22 @@ const {
 	getAllSteps,
 	createReports,
 	reportsFiltersQuery,
-	getAllReportsFromDb, deleteReport, deleteStepFromReport, addStepToReport
+	getAllReportsFromDb,
+	deleteReport,
+	deleteStepFromReport,
+	addStepToReport,
+	getShortReportList
 } = require("../invoicingClientReports")
 
+router.get('/short-report-list', async (req, res) => {
+	try {
+		const reports = await getShortReportList()
+		res.send(reports)
+	} catch (err) {
+		console.log(err)
+		console.log('Error on getting Reports')
+	}
+})
 
 router.post("/not-selected-steps-list", async (req, res) => {
 	const { countToSkip, countToGet, filters } = req.body

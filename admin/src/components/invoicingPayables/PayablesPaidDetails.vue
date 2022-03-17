@@ -1,114 +1,120 @@
 <template lang="pug">
-  .invoicing-details
-    ApproveModal(
-      v-if="isDoubleApproveForceStatus"
-      class="absolute-middle"
-      text="Are you sure?"
-      approveValue="Yes"
-      notApproveValue="Cancel"
-      @approve="approveForceStatus"
-      @close="toggleForceStatusEdition"
-      @notApprove="toggleForceStatusEdition"
+  .layout
+    NavbarList(
+      v-if="shortProjectList.length"
+      :items="shortProjectList"
+      :basicLink="'/pangea-finance/payables-reports/paid-reports/'"
     )
-    .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
-      .invoicing-details__info
-        .info__user
-          .user
-            .user__image(v-if="reportDetailsInfo.vendor.photo")
-              img(:src="domain + reportDetailsInfo.vendor.photo")
-            .user__fakeImage(:style="{'--bgColor': getBgColor(reportDetailsInfo.vendor._id)[0], '--color': getBgColor(reportDetailsInfo.vendor._id)[1]}" v-else) {{ reportDetailsInfo.vendor.firstName[0] }}
-            .user__description
-              .user__name
-                router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
-                  span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
-              .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
+    .invoicing-details
+      ApproveModal(
+        v-if="isDoubleApproveForceStatus"
+        class="absolute-middle"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="approveForceStatus"
+        @close="toggleForceStatusEdition"
+        @notApprove="toggleForceStatusEdition"
+      )
+      .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
+        .invoicing-details__info
+          .info__user
+            .user
+              .user__image(v-if="reportDetailsInfo.vendor.photo")
+                img(:src="domain + reportDetailsInfo.vendor.photo")
+              .user__fakeImage(:style="{'--bgColor': getBgColor(reportDetailsInfo.vendor._id)[0], '--color': getBgColor(reportDetailsInfo.vendor._id)[1]}" v-else) {{ reportDetailsInfo.vendor.firstName[0] }}
+              .user__description
+                .user__name
+                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
+                    span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+                .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
 
-        .info__descriptions
-          .text__block
-            .text__title Report ID:
-            .text__value {{reportDetailsInfo.reportId}}
-          .text__block
-            .text__title Status:
-            .text__value
-              .text__edit
-                IconButton(
-                  :hasPopup="true"
-                  popupText="Rollback"
-                  @clicked="toggleForceStatusEdition"
-                )
-                  i(class="fas fa-pen" v-if="!isStatusEdit" )
-                  i(class="fa-solid fa-xmark" v-else )
+          .info__descriptions
+            .text__block
+              .text__title Report ID:
+              .text__value {{reportDetailsInfo.reportId}}
+            .text__block
+              .text__title Status:
+              .text__value
+                .text__edit
+                  IconButton(
+                    :hasPopup="true"
+                    popupText="Rollback"
+                    @clicked="toggleForceStatusEdition"
+                  )
+                    i(class="fas fa-pen" v-if="!isStatusEdit" )
+                    i(class="fa-solid fa-xmark" v-else )
 
-              .text__select(v-if="isStatusEdit")
-                SelectSingle(
-                  :selectedOption="forceStatus"
-                  :options="['Created']"
-                  placeholder="Option"
-                  @chooseOption="jumpOrRollbackStatus"
-                )
-              span(v-else) {{reportDetailsInfo.status}}
-          .text__block
-            .text__title Created On:
-            .text__value {{ formattedDate(reportDetailsInfo.createAt) }}
-          .text__block
-            .text__title Date Range:
-            .text__value
-              span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
-              span /
-              span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
-          .text__block
-            .text__title Jobs:
-            .text__value {{ reportDetailsInfo.steps.length }}
-          .text__block
-            .text__title Invoice:
-            .text__value
-              IconButton(
-                @clicked="downloadFile(reportDetailsInfo.paymentDetails.file.path)"
-              )
-                i(class="fa-solid fa-download")
-              span.file-name {{ reportDetailsInfo.paymentDetails.file ? reportDetailsInfo.paymentDetails.file.fileName : '' }}
-          .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
-            .text__title Payment method:
-            .text__value
-              IconButton(
-                :hasPopup="true"
-                popupText="Payment Details"
-                @clicked="togglePaymentDetails"
-              )
-                i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
-                i( v-else class="fa-solid fa-xmark")
-              span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
-          div(v-if="isShowPaymentDetails" )
-            .text__block(v-for="[key, val] in Object.entries(allFieldsOutput(reportDetailsInfo.paymentDetails.paymentMethod))" v-if="key !== 'name'" )
-              .text__title {{ replaceKey(key) }}:
+                .text__select(v-if="isStatusEdit")
+                  SelectSingle(
+                    :selectedOption="forceStatus"
+                    :options="['Created']"
+                    placeholder="Option"
+                    @chooseOption="jumpOrRollbackStatus"
+                  )
+                span(v-else) {{reportDetailsInfo.status}}
+            .text__block
+              .text__title Created On:
+              .text__value {{ formattedDate(reportDetailsInfo.createAt) }}
+            .text__block
+              .text__title Date Range:
+              .text__value
+                span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
+                span /
+                span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
+            .text__block
+              .text__title Jobs:
+              .text__value {{ reportDetailsInfo.steps.length }}
+            .text__block
+              .text__title Invoice:
               .text__value
                 IconButton(
-                  @clicked="copyDetailsInfo(val)"
+                  @clicked="downloadFile(reportDetailsInfo.paymentDetails.file.path)"
                 )
-                  i(class="fa-regular fa-copy")
-                span {{ val }}
-          .text__block
-            .text__title Expected payment date:
-            .text__value {{ formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate) }}
-          .text__block(v-if="reportDetailsInfo.total" )
-            .text__title Total Amount:
-            .text__value
-              span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
-              span(v-html="'&euro;'")
+                  i(class="fa-solid fa-download")
+                span.file-name {{ reportDetailsInfo.paymentDetails.file ? reportDetailsInfo.paymentDetails.file.fileName : '' }}
+            .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
+              .text__title Payment method:
+              .text__value
+                IconButton(
+                  :hasPopup="true"
+                  popupText="Payment Details"
+                  @clicked="togglePaymentDetails"
+                )
+                  i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
+                  i( v-else class="fa-solid fa-xmark")
+                span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+            div(v-if="isShowPaymentDetails" )
+              .text__block(v-for="[key, val] in Object.entries(allFieldsOutput(reportDetailsInfo.paymentDetails.paymentMethod))" v-if="key !== 'name'" )
+                .text__title {{ replaceKey(key) }}:
+                .text__value
+                  IconButton(
+                    @clicked="copyDetailsInfo(val)"
+                  )
+                    i(class="fa-regular fa-copy")
+                  span {{ val }}
+            .text__block
+              .text__title Expected payment date:
+              .text__value {{ formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate) }}
+            .text__block(v-if="reportDetailsInfo.total" )
+              .text__title Total Amount:
+              .text__value
+                span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
+                span(v-html="'&euro;'")
 
-      .invoicing-details__listOfJobs
-        ReportDetailsJobsList(
-          :isAvailableDeleting="false"
-          :enumOfReports="'vendor'"
-          :steps="reportDetailsInfo.steps"
-        )
+        .invoicing-details__listOfJobs
+          ReportDetailsJobsList(
+            :isAvailableDeleting="false"
+            :enumOfReports="'vendor'"
+            :steps="reportDetailsInfo.steps"
+          )
 
-    .cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
-      .card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
-        PayablesPaymentInformationCard(
-          :cardInfo="cardInfo"
-          :paymentDetails="reportDetailsInfo.paymentDetails"
-        )
+      .cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
+        .card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
+          PayablesPaymentInformationCard(
+            :cardInfo="cardInfo"
+            :paymentDetails="reportDetailsInfo.paymentDetails"
+          )
 </template>
 
 <script>
@@ -123,6 +129,7 @@ import PayablesPaymentInformationCard from "./PayablesPaymentInformationCard"
 import getBgColor from "../../mixins/getBgColor"
 import IconButton from "../IconButton"
 import ReportDetailsJobsList from "./ReportDetailsJobsList"
+import NavbarList from "../NavbarLists"
 
 export default {
   mixins: [ getBgColor ],
@@ -131,6 +138,7 @@ export default {
       isStatusEdit: false,
       forceStatus: '',
       isDoubleApproveForceStatus: false,
+      shortProjectList: [],
 
       reportDetailsInfo: {},
       domain: '',
@@ -243,6 +251,21 @@ export default {
     },
     async openDetails(id) {
       this.reportDetailsInfo = (await this.$http.post('/invoicing-payables/paid-report/' + id)).data[0]
+    },
+    async getShortReports() {
+      try {
+        const shortProjectList = await this.$http.get(`/invoicing-payables/short-paid-report-list`)
+        this.shortProjectList = shortProjectList.data.map(i => {
+          return {
+            _id: i._id,
+            item1: i.reportId,
+            item2: `${ i.vendor.firstName } ${ i.vendor.surname || '' }`,
+            item3: i.status,
+            item4: i.total + ' ' + '€'
+          }
+        })
+      } catch (err) {
+      }
     }
   },
   computed: {
@@ -259,11 +282,27 @@ export default {
     //   return +(parseFloat(rawUnpaidAmount)).toFixed(2)
     // }
   },
-  created() {
-    this.openDetails(this.$route.params.id)
+  async created() {
+    await this.getShortReports()
+    await this.openDetails(this.$route.params.id)
     this.domain = this.$domains.admin
   },
+  watch: {
+    async $route(to, from) {
+      if (to.name === from.name) {
+        if (to.params.id !== from.params.id) {
+          this.isStatusEdit = false
+          this.forceStatus = ''
+          this.isDoubleApproveForceStatus = false
+          this.reportDetailsInfo = {}
+          this.isShowPaymentDetails = false
+          await this.openDetails(this.$route.params.id)
+        }
+      }
+    }
+  },
   components: {
+    NavbarList,
     ReportDetailsJobsList,
     IconButton,
     Button,
@@ -294,13 +333,14 @@ export default {
   box-shadow: $box-shadow;
   height: fit-content;
   box-sizing: border-box;
-  width: 1545px;
+  width: 1455px;
   margin-top: 25px;
 }
 
 .invoicing-details {
   position: relative;
-  margin: 50px;
+  margin: 50px 0 50px 180px;
+
 
   &__wrapper {
     display: flex;
@@ -314,7 +354,7 @@ export default {
     box-shadow: $box-shadow;
     height: fit-content;
     box-sizing: border-box;
-    width: 450px;
+    width: 410px;
   }
 
   &__listOfJobs {
@@ -324,7 +364,7 @@ export default {
     box-shadow: $box-shadow;
     height: fit-content;
     box-sizing: border-box;
-    width: 1070px;
+    width: 1020px;
   }
 }
 
@@ -589,13 +629,13 @@ textarea {
   }
 
   &__title {
-    width: 130px;
+    width: 120px;
     position: relative;
     margin-right: 10px;
   }
 
   &__value {
-    width: 260px;
+    width: 230px;
     position: relative;
     display: flex;
     gap: 10px;
@@ -623,7 +663,7 @@ textarea {
 
 .file-name {
   position: absolute;
-  width: 220px;
+  width: 200px;
   top: 7px;
   left: 40px;
   text-overflow: ellipsis;

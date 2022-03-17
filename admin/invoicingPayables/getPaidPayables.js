@@ -1,6 +1,25 @@
 const { ObjectID: ObjectId } = require("mongodb")
 const { InvoicingPayables, InvoicingPayablesArchive } = require("../models")
 
+const getPaidShortReportList = async () => {
+	const reports = await InvoicingPayablesArchive.aggregate([
+		{
+			$project: {
+				_id: 1,
+				reportId: 1,
+				vendor: 1,
+				status: 1,
+				total: 1
+			}
+		},
+		{
+			$sort: { _id: -1 }
+		}
+	])
+	return InvoicingPayablesArchive.populate(reports, [
+		{ path: 'vendor', select: [ 'firstName', 'surname' ] }
+	])
+}
 
 const getAllPaidPayables = async (countToSkip, countToGet, query) => {
 	const invoicingReports = await InvoicingPayablesArchive.aggregate([
@@ -153,6 +172,7 @@ const getReportPaidByVendorId = async (id, reportQuery = {}) => {
 }
 
 module.exports = {
+	getPaidShortReportList,
 	getAllPaidPayables,
 	getPaidReport,
 	getReportPaidByVendorId

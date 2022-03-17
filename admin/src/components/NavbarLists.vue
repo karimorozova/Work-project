@@ -6,9 +6,13 @@
         v-for="item in items"
         @click="openCurrentLink(item._id)"
       )
-        .item__1(:class="{'selected': item._id === $route.params.id}") {{ item.item1 }}
-        .item__2 {{ item.item2 }}
-        .item__3 {{ item.item3 }}
+        .item__1(
+          :class="{'selected': item._id === $route.params.id}"
+          v-if="item.item1"
+        ) {{ item.item1 }}
+
+        .item__2(v-if="item.item2" ) {{ item.item2 }}
+        .item__3(v-if="item.item3" ) {{ item.item3 }}
         .item__4(v-if="item.item4" ) {{ item.item4 }}
 </template>
 

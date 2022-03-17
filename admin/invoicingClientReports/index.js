@@ -1,6 +1,7 @@
 const {
 	getAllSteps,
-	getAllReportsFromDb
+	getAllReportsFromDb,
+	getShortReportList
 } = require('./getReports')
 
 const {
@@ -19,6 +20,7 @@ const {
 
 
 module.exports = {
+	getShortReportList,
 	addStepToReport,
 	deleteReport,
 	deleteStepFromReport,

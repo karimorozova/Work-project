@@ -1,5 +1,26 @@
 const { Projects, InvoicingClientReports } = require("../models")
 
+const getShortReportList = async () => {
+	const reports = await InvoicingClientReports.aggregate([
+		{
+			$project: {
+				_id: 1,
+				reportId: 1,
+				client: 1,
+				invoice: 1,
+				total: 1
+			}
+		},
+		{
+			$sort: { _id: -1 }
+		}
+	])
+	return InvoicingClientReports.populate(reports, [
+		{ path: 'client', select: [ 'name', 'currency' ] },
+		{ path: 'invoice', select: [ 'status' ] }
+	])
+}
+
 const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields, unsetFields = []) => {
 	const reports = await InvoicingClientReports.aggregate([
 		{ $match: { ...query } },
@@ -54,7 +75,7 @@ const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields
 			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
 			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
 			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } },
-			{ "$addFields": { [`${ key }` + ".billingDate"]: '$billingDate' } },
+			{ "$addFields": { [`${ key }` + ".billingDate"]: '$billingDate' } }
 		]
 	}
 }
@@ -114,6 +135,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
 				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway' ] },
 				"steps.finance.Price.receivables": { $gt: 0 },
+				"steps.isReceivableVisible": true,
 				...queryForStep
 			}
 		},
@@ -173,6 +195,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 }
 
 module.exports = {
+	getShortReportList,
 	getAllReportsFromDb,
 	getAllSteps
 }

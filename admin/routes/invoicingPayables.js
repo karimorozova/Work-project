@@ -22,11 +22,33 @@ const {
 	notifyVendorReportsIsSent,
 	notifyVendorReportsIsPaid,
 	invoiceSubmission,
-	rollBackFromPaidToDraft
+	rollBackFromPaidToDraft,
+	getShortReportList,
+	getPaidShortReportList
 } = require('../invoicingPayables')
 
 const { ObjectID: ObjectId } = require("mongodb")
 const upload = require("../utils/uploads")
+
+router.get('/short-report-list', async (req, res) => {
+	try {
+		const reports = await getShortReportList()
+		res.send(reports)
+	} catch (err) {
+		console.log(err)
+		console.log('Error on getting Reports')
+	}
+})
+
+router.get('/short-paid-report-list', async (req, res) => {
+	try {
+		const reports = await getPaidShortReportList()
+		res.send(reports)
+	} catch (err) {
+		console.log(err)
+		console.log('Error on getting Reports')
+	}
+})
 
 router.post("/manage-report-status", async (req, res) => {
 	const { nextStatus } = req.body

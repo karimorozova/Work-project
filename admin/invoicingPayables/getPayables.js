@@ -2,6 +2,25 @@ const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
 const { InvoicingPayables, Projects, Vendors } = require("../models")
 
+const getShortReportList = async () => {
+	const reports = await InvoicingPayables.aggregate([
+		{
+			$project: {
+				_id: 1,
+				reportId: 1,
+				vendor: 1,
+				status: 1,
+				total: 1
+			}
+		},
+		{
+			$sort: { _id: -1 }
+		}
+	])
+	return InvoicingPayables.populate(reports, [
+		{ path: 'vendor', select: [ 'firstName', 'surname' ] }
+	])
+}
 
 const getPayablesDateRange = (steps) => {
 	return steps.reduce((acc, { deadline }) => {
@@ -198,7 +217,6 @@ const getAllPayableByDefaultQuery = async (query = {}) => {
 	// return (await InvoicingPayables.populate(invoicingReports, { path: 'vendor', select: [ 'firstName', 'surname', 'billingInfo', 'photo', 'email' ] }))
 }
 
-
 const getPayableByVendorId = async (id, reportQuery = {}) => {
 	if ('steps' in reportQuery) reportQuery.steps = ObjectId(reportQuery.steps)
 
@@ -271,7 +289,7 @@ const getPayablesProjectsAndSteps = async (id) => {
 				pipeline: [
 					{ "$unwind": "$steps" },
 					{ "$match": { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ "$addFields": { "steps.deadline": '$deadline' } },
+					{ "$addFields": { "steps.deadline": '$deadline' } }
 				],
 				as: "steps"
 			}
@@ -323,6 +341,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep, isSort = true)
 }
 
 module.exports = {
+	getShortReportList,
 	getPayableByVendorId,
 	stepsFiltersQuery,
 	getAllPayables,
