@@ -142,8 +142,14 @@
 
           template(slot="deadline" slot-scope="{ row, index }")
             .table__data
-              span.deadline-red(v-if="isDueToday(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
-              span.deadline-orange(v-else-if="isDueTomorrow(row.steps.deadline)" ) {{ customFormatter(row.steps.deadline) }}
+              span(v-if="isDueToday(row.steps.deadline)" )
+                span.alert.alert-red
+                  i(class="fa-solid fa-triangle-exclamation")
+                span {{ customFormatter(row.steps.deadline) }}
+              span(v-else-if="isDueTomorrow(row.steps.deadline)" )
+                span.alert.alert-orange
+                  i(class="fa-solid fa-triangle-exclamation")
+                span {{ customFormatter(row.steps.deadline) }}
               span(v-else) {{ customFormatter(row.steps.deadline) }}
 
           template(slot="receivables" slot-scope="{ row }")
@@ -335,7 +341,7 @@ export default {
           label: "Deadline",
           headerKey: "headerDeadline",
           key: "deadline",
-          style: { "width": "100px" }
+          style: { "width": "116px" }
         },
         {
           label: "Rec.",
@@ -359,25 +365,25 @@ export default {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: { "width": "115px" }
+          style: { "width": "105px" }
         },
         {
           label: "PM",
           headerKey: "headerProjectManager",
           key: "projectManager",
-          style: { "width": "52px" }
+          style: { "width": "50px" }
         },
         {
           label: "AM",
           headerKey: "headerAccountManager",
           key: "accountManager",
-          style: { "width": "52px" }
+          style: { "width": "50px" }
         },
         {
           label: "Client",
           headerKey: "headerClientName",
           key: "clientName",
-          style: { "width": "52px" }
+          style: { "width": "50px" }
         }
       ]
     }
@@ -1043,13 +1049,17 @@ a {
   }
 }
 
-.deadline {
-  &-red {
-    color: #f44336;
-  }
 
+.alert {
+  font-size: 14px;
+  margin-right: 7px;
+  margin-left: -2px;
+
+  &-red {
+    color: $red;
+  }
   &-orange {
-    color: #ffa726;
+    color: $yellow;
   }
 }
 

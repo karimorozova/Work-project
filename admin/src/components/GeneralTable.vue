@@ -375,9 +375,9 @@
     overflow-y: scroll;
   }
 
-  .red-row{
-    background-color: $light-red;
-  }
+  //.red-row{
+  //  background-color: $light-red;
+  //}
 
   .shortBody {
     max-height: 252px;

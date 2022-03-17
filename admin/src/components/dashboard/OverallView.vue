@@ -1,6 +1,5 @@
 <template lang="pug">
   .overallView
-
     div(v-if="isAdmin")
       .row
         .col
@@ -31,9 +30,9 @@
           AcceptedRequest( :projects="acceptedRequest")
       .row
         .col
-          Dr1( :projects="dr1")
+          Dr1(:projects="dr1")
         .col
-          Dr2( :projects ="dr2")
+          Dr2(:projects="dr2")
       .row
         .col
           DueToday( :projects="dueToday")
@@ -45,31 +44,22 @@
         .col
           AcceptedRequest( :projects="acceptedRequest")
         .col
-          Dr1( :projects="dr1")
+          Dr1(:projects="dr1")
       .row(v-if="isAm")
         .col
           IncomingRequests( :projects="incomingRequests")
         .col
-          Dr2( :projects ="dr2")
+          Dr2(:projects ="dr2")
       .row
         .col
-          DueToday( :projects="dueToday")
+          DueToday(:projects="dueToday")
         .col
-          StartedToday( :projects="startedToday")
+          StartedToday(:projects="startedToday")
       .row
         .col
-          Quotes( :projects ="quotes")
+          Quotes(:projects ="quotes")
         .col
-          MyQuotes( :projects ="myQuotes")
-
-    //.overallView__col
-      .col__title Today
-      ProjectFinanceStats
-    //.overallView__spaceLine
-      .overallView__spaceLine-line
-    //.overallView__col
-      .col__title Month
-      ProjectFinanceStats(:startDateSet="startDateMonth")
+          MyQuotes(:projects ="myQuotes")
 
 </template>
 <script>
@@ -116,7 +106,7 @@ export default {
       const clientRequest = this.clientRequest.filter(({ status }) => status === "Client Request")
       if (this.isAdmin) return clientRequest
       if (this.isAm || this.isComplianceCoordinator) return clientRequest.filter(({ accountManager, projectManager }) => accountManager === this.user._id || accountManager === null
-          || ( this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager === "60b4dee7f2611f5115701566" )
+          || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager === "60b4dee7f2611f5115701566")
       )
     },
     acceptedRequest() {
@@ -125,7 +115,7 @@ export default {
       if (this.isAdmin) return clientRequest
       if (this.isComplianceCoordinator) {
         return clientRequest.filter(({ accountManager, projectManager }) => {
-          return accountManager === this.user._id || ( this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager === "60b4dee7f2611f5115701566" )
+          return accountManager === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager === "60b4dee7f2611f5115701566")
         })
       }
       if (this.isPm) {
@@ -139,10 +129,10 @@ export default {
       if (this.isAdmin) return this.projects.filter(item => {
         return item.tasks.some(({ status }) => status === 'Pending Approval [DR1]')
       })
-      if(this.isComplianceCoordinator){
+      if (this.isComplianceCoordinator) {
         return this.projects.filter(item => {
           const DR1Tasks = item.tasks.filter(({ status }) => status === 'Pending Approval [DR1]').length
-          return DR1Tasks && (item.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" &&  item.projectManager._id === "60b4dee7f2611f5115701566"))
+          return DR1Tasks && (item.accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && item.projectManager._id === "60b4dee7f2611f5115701566"))
         })
       }
       if (this.isPm) {
@@ -173,7 +163,7 @@ export default {
       if (this.isAdmin) return this.projects
       if (this.isAm || this.isComplianceCoordinator)
         return this.projects.filter(({ accountManager, projectManager }) => {
-          return accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" &&  projectManager._id === "60b4dee7f2611f5115701566")
+          return accountManager._id === this.user._id || (this.user._id.toString() === "61b359f25c9ee507f4aa7a14" && projectManager._id === "60b4dee7f2611f5115701566")
         })
 
       if (this.isPm)
@@ -183,11 +173,11 @@ export default {
     },
     dueToday() {
       if (this.filteredForPmAmOrAdmin.length) {
-        const today = [ ...this.filteredForPmAmOrAdmin.filter((project) => moment(0, "HH").isSame(project.deadline, 'days')) ]
-        return today.map(item => {
-          item.class = moment(item.deadline).diff(moment()) <= 0 ? 'red-row' : ''
-          return item
-        })
+        return [ ...this.filteredForPmAmOrAdmin.filter((project) => moment(0, "HH").isSame(project.deadline, 'days')) ]
+        // return today.map(item => {
+        //   item.class = moment(item.deadline).diff(moment()) <= 0 ? 'red-row' : ''
+        //   return item
+        // })
       }
     },
     startedToday() {
@@ -242,25 +232,24 @@ export default {
   async created() {
     this.projects = (await this.$http.get('/dashboard-api/all-projects')).data
     this.clientRequest = (await this.$http.get('/dashboard-api/all-client-requests')).data
-  },
+  }
 }
 </script>
 <style lang="scss" scoped>
 @import "../../assets/scss/colors";
 
 .overallView {
-  width: 1530px;
-  margin: 50px;
+  margin: 50px 0 50px 50px;
 
   .row {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 35px;
+    margin-bottom: 25px;
+    gap: 25px;
   }
 
   .col {
-    width: 755px;
-    padding: 10px 20px 20px;
+    width: 770px;
+    padding: 15px 25px 25px;
     box-shadow: $box-shadow;
     box-sizing: border-box;
     background-color: white;
