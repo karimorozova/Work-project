@@ -1,5 +1,5 @@
 <template lang="pug">
-  .invoice-edit
+  .invoice-edit(v-if="invoice.customer")
     .invoice-details__field
       .title Invoice ID
       .value {{invoice.invoiceId}}
@@ -298,7 +298,7 @@ export default {
           .map(({ firstName, lastName, _id }) => ({_id, firstName, lastName, name: firstName + ' ' + lastName}))
     },
     currentAM() {
-      if (!this.invoice.hasOwnProperty('accountManager')) return ''
+      if (this.invoice.accountManager === null) return ''
       const {firstName, lastName} = this.invoice.accountManager
       return firstName + ' ' + lastName
     }

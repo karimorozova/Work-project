@@ -1,5 +1,14 @@
 <template lang="pug">
   .invoicing-details
+    .invoicing-details__buttons
+      .buttons__group(v-if="reportDetailsInfo.invoice === null")
+        IconButton(@clicked="createNewInvoice")
+          i(class="fa-solid fa-plus")
+        IconButton(@clicked="addToInvoice")
+          i(class="fa-solid fa-file-import")
+      .buttons__group(v-else)
+        IconButton(@clicked="")
+          i(class="fa-solid fa-minus")
     .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
       .invoicing-details__info
         .info__user
@@ -18,6 +27,16 @@
           .text__block
             .text__title Customer:
             .text__value {{reportDetailsInfo.client.name}}
+
+          .text__block(v-if="reportDetailsInfo.invoice")
+            .text__title Invoice Id:
+            .text__value
+              router-link(class="link-to" target= '_blank' :to="{path: `/receivables-reports/invoice/${reportDetailsInfo.invoice._id}`}")
+                span {{ reportDetailsInfo.invoice.invoiceId }}
+
+          .text__block(v-if="reportDetailsInfo.invoice")
+            .text__title Invoice Status:
+            .text__value {{reportDetailsInfo.invoice.status}}
 
           .text__block
             .text__title Billing Name:
@@ -82,6 +101,7 @@ import moment from "moment"
 import ReceivablesAddStepsTo from "./ReceivablesAddStepsTo"
 import ApproveModal from '../ApproveModal'
 import Button from "../Button"
+import IconButton from "../IconButton"
 import SelectSingle from "../SelectSingle"
 import CheckBox from "../CheckBox"
 import { mapActions } from "vuex"
@@ -180,6 +200,26 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting details", isShow: true, type: "error" })
       }
+    },
+    async createNewInvoice() {
+      console.log(this.reportDetailsInfo)
+      await this.$http.post(
+          `/invoicing/invoice-from-report/`,
+          {
+            reportId: this.reportDetailsInfo._id,
+            customerId: this.reportDetailsInfo.client._id,
+            clientBillingInfoId: this.reportDetailsInfo.clientBillingInfo,
+            "title": this.reportDetailsInfo.reportId,
+            "quantity": 1,
+            "rate": this.reportDetailsInfo.total,
+            "tax": 0,
+            "amount": this.reportDetailsInfo.total
+
+          }
+      )
+    },
+    addToInvoice() {
+      console.log('test insta')
     }
   },
   async created() {
@@ -194,7 +234,8 @@ export default {
     ReceivablesAddStepsTo,
     ApproveModal,
     SelectSingle,
-    CheckBox
+    CheckBox,
+    IconButton
   }
 }
 </script>
@@ -216,6 +257,7 @@ export default {
 .invoicing-details {
   position: relative;
   margin: 50px;
+
 
   &__wrapper {
     display: flex;
@@ -482,6 +524,12 @@ export default {
 //  }
 //}
 //
+.buttons__group {
+  position: absolute;
+  top: -40px;
+  gap: 12px;
+  display: flex;
+}
 
 .text {
   &__block {

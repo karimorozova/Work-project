@@ -41,7 +41,8 @@ const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields
 	])
 
 	return await InvoicingClientReports.populate(reports, [
-				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] }
+				{ path: 'client', select: [ 'name', 'billingInfo', 'currency' ] },
+				{ path: 'invoice', select: [ 'invoiceId', 'status' ] }
 			]
 	)
 

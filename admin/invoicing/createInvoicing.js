@@ -1,6 +1,6 @@
-const { Invoice } = require("../models")
+const { Invoice, InvoicingClientReports } = require("../models")
 
-exports.createInvoice = async (customerId, clientBillingInfoId) => {
+createInvoice = async (customerId, clientBillingInfoId) => {
 	try {
 		const lastIndex = await Invoice.findOne().sort({ 'invoiceId': -1 }).lean()
 		let lastIntIndex = lastIndex != null ? parseInt(lastIndex.invoiceId.split('_').pop()) : 100
@@ -12,7 +12,7 @@ exports.createInvoice = async (customerId, clientBillingInfoId) => {
 	}
 }
 
-exports.createInvoiceItem = async (invoicingId, itemData) => {
+createInvoiceItem = async (invoicingId, itemData) => {
 	try {
 
 		const invoice = await Invoice.findByIdAndUpdate(invoicingId, {$push: {'items':  itemData}})
@@ -20,4 +20,20 @@ exports.createInvoiceItem = async (invoicingId, itemData) => {
 	} catch (e) {
 
 	}
+}
+
+createInvoiceFromReport = async ({ reportId, customerId, clientBillingInfoId, title, quantity, rate, tax, amount}) => {
+	try {
+		const invoice = await createInvoice(customerId, clientBillingInfoId)
+		await createInvoiceItem(invoice._id, { title, quantity, rate, tax, amount })
+		await InvoicingClientReports.findByIdAndUpdate(reportId, {invoice: invoice._id})
+	} catch (e) {
+
+	}
+}
+
+module.exports = {
+	createInvoice,
+	createInvoiceItem,
+	createInvoiceFromReport,
 }
