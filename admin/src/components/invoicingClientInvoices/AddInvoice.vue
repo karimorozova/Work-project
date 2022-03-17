@@ -1,34 +1,40 @@
 <template lang="pug">
-  .invoicing-payables-add
-    .title Client Invoices
+  .layout
+    .invoicing-payables-add
+      .title Add Invoice
       .row
-        SelectSingle(
-          placeholder="Select"
-          :hasSearch="true"
-          :options="allClients"
-          :selectedOption="selectedClient.name"
-          @chooseOption="setClient"
-          :allOptionsButtons="true"
-        )
+        .row__key Client Name:
+        .row__value
+          .drop
+            SelectSingle(
+              placeholder="Select"
+              :hasSearch="true"
+              :options="allClients"
+              :selectedOption="selectedClient.name"
+              @chooseOption="setClient"
+              :allOptionsButtons="true"
+            )
       .row
-        SelectSingle(
-          v-if="selectedClient.hasOwnProperty('name')"
-          placeholder="Select"
-          :hasSearch="true"
-          :options="selectedClient.billingInfo"
-          :selectedOption="selectedBillingInfo.name"
-          @chooseOption="setBilling"
-          :allOptionsButtons="true"
-        )
-
-      Button(value="Next >" @clicked="createInvoice" :isDisabled="!selectedBillingInfo.hasOwnProperty('name')")
+        .row__key Payment Profile:
+        .row__value
+          .drop
+            SelectSingle(
+              :isDisabled="!selectedClient.hasOwnProperty('name')"
+              placeholder="Select"
+              :hasSearch="true"
+              :options="selectedClient.billingInfo"
+              :selectedOption="selectedBillingInfo.name"
+              @chooseOption="setBilling"
+              :allOptionsButtons="true"
+            )
+      .add
+        Button(value="Next >>" @clicked="createInvoice" :isDisabled="!selectedBillingInfo.hasOwnProperty('name')")
 </template>
 
 <script>
 import SelectSingle from "../SelectSingle"
 import IconButton from "../IconButton"
 import Button from "../Button"
-import { mapGetters } from "vuex"
 
 export default {
   components: {
@@ -48,36 +54,68 @@ export default {
       let result = await this.$http.post('/api-settings/all-clients-billing')
       this.allClients = result.data
     },
-    setClient({option}) {
+    setClient({ option }) {
       this.selectedClient = option
 
     },
-    setBilling({option}) {
+    setBilling({ option }) {
       this.selectedBillingInfo = option
     },
     async createInvoice() {
       const { id } = (await this.$http.post('/invoicing/create-invoice', { customerId: this.selectedClient._id, clientBillingInfoId: this.selectedBillingInfo._id })).data
-      this.$router.push(`/pangea-finance/receivables-reports/invoice/${id}/edit`)
+      await this.$router.push(`/pangea-finance/receivables-reports/invoice/${ id }/edit`)
     }
   },
-
-  computed: {
-
-  },
+  computed: {},
   mounted() {
 
     this.getAllClients()
   },
-  watch: {
-
-  },
+  watch: {}
 
 }
 </script>
 
 <style lang="scss" scoped>
-.row {
+@import "../../assets/scss/colors";
+
+.invoicing-payables-add {
+  margin: 50px;
+  padding: 25px;
+  background: white;
+  border-radius: 2px;
+  box-shadow: $box-shadow;
+  height: fit-content;
+  box-sizing: border-box;
+  width: fit-content;
+}
+
+.drop {
+  height: 32px;
   position: relative;
-  height: 30px;
+  width: 220px;
+  border-radius: 2px;
+}
+
+.title {
+  font-size: 16px;
+  font-family: Myriad600;
+  margin-bottom: 25px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 12px;
+
+  &__key {
+    width: 120px;
+  }
+}
+
+.add {
+  margin-top: 25px;
+  text-align: center;
 }
 </style>
