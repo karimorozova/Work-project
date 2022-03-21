@@ -1,10 +1,10 @@
 <template lang="pug">
   .layout
-    NavbarList(
-      v-if="shortProjectList.length"
-      :items="shortProjectList"
-      :basicLink="'/pangea-projects/all-projects/All/details/'"
-    )
+    //NavbarList(
+    //  v-if="shortProjectList.length"
+    //  :items="shortProjectList"
+    //  :basicLink="'/pangea-projects/all-projects/All/details/'"
+    //)
     .project-info(v-if="currentProject._id")
       .project-info__leftSide
         Project(:project="currentProject")
@@ -193,19 +193,19 @@ export default {
     ImportedProjectToXtrf
   },
   async created() {
-    await this.getShortProjects()
+    // await this.getShortProjects()
     await this.getProject()
   },
-  watch: {
-    async $route(to, from) {
-      if (to.name === from.name) {
-        if (to.params.id !== from.params.id) {
-          this.setCurrentProject({})
-          await this.getProject()
-        }
-      }
-    }
-  },
+  // watch: {
+  //   async $route(to, from) {
+  //     if (to.name === from.name) {
+  //       if (to.params.id !== from.params.id) {
+  //         this.setCurrentProject({})
+  //         await this.getProject()
+  //       }
+  //     }
+  //   }
+  // },
   beforeDestroy() {
     this.setCurrentProject({})
   },
@@ -226,7 +226,8 @@ export default {
 .project-info {
   position: relative;
   display: flex;
-  margin: 50px 0 50px 180px;
+  //margin: 50px 0 50px 180px;
+  margin: 50px 0 50px 50px;
 
   &__rigthSide {
     margin-left: 25px;

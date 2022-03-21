@@ -39,19 +39,24 @@ const { calculateProjectTotal, recalculateStepFinance } = require("../сalculati
 
 
 const manageReceivableVisible = async (bool, _stepId) => {
+	let quantity = 0
+	if (bool) {
+		const { steps } = await Projects.findOne({ "steps._id": _stepId })
+		const _idx = steps.findIndex(({ _id }) => _id.toString() === _stepId.toString())
+		quantity = steps[_idx].nativeFinance.Wordcount.receivables || steps[_idx].nativeFinance.Quantity.receivables
+	}
 	const project = await Projects.findOneAndUpdate(
 			{ "steps._id": _stepId },
 			{
 				$set: {
 					"steps.$[i].isReceivableVisible": bool,
-					"steps.$[i].finance.Quantity.receivables": 0,
-					"steps.$[i].nativeFinance.Quantity.receivables": 0,
-					"steps.$[i].finance.Wordcount.receivables": 0,
-					"steps.$[i].nativeFinance.Wordcount.receivables": 0
+					"steps.$[i].finance.Quantity.receivables": quantity,
+					"steps.$[i].finance.Wordcount.receivables": quantity
 				}
 			},
 			{ arrayFilters: [ { 'i._id': _stepId } ] }
 	)
+
 	await recalculateStepFinance(project.id)
 	return await calculateProjectTotal(project.id)
 }

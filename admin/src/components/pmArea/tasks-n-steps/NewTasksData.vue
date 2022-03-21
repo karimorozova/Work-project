@@ -82,7 +82,7 @@
                 :selectedTab="selectedTabWorkflow"
                 @setTab="setTabWorkflow"
               )
-          NewServicesCreationStepsWorkflowClassic(v-if="selectedTabWorkflow === 'System'")
+          NewServicesCreationStepsWorkflowClassic(v-if="selectedTabWorkflow === 'Alpha'")
           NewServicesCreationStepsWorkflowCAT(v-if="selectedTabWorkflow === 'Memoq'")
 
         .taskData__files
@@ -122,7 +122,7 @@ export default {
     return {
       tabs: [ 'Classic', 'Memoq Import', 'XTM Import' ],
       selectedTab: 'Classic',
-      selectedTabWorkflow: 'System',
+      selectedTabWorkflow: 'Alpha',
 
       memoqLink: '',
       selectedMemoqWorkflow: '',
@@ -350,19 +350,31 @@ export default {
       this.setDataValue({ prop: "source", value: source })
       this.setDataValue({ prop: "targets", value: [] })
 
-      this.selectedTabWorkflow = 'System'
+      this.selectedTabWorkflow = 'Alpha'
       this.setStepsAndUnitByService(service)
     },
     setStepsAndUnitByService(service) {
       const stepsAndUnits = []
-      for (let { step } of service.steps) {
-        let units = []
-        if (this.selectedTabWorkflow === 'System' || service.title !== 'Translation') {
+
+      if (this.selectedTabWorkflow === 'Alpha' || service.title !== 'Translation') {
+        for (let { step } of service.steps) {
+          if (step.title !== 'Translation' && step.title !== 'Revising') continue
+          let units = []
           units = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
+          collectWorkFlow(step, units)
         }
-        if (this.selectedTabWorkflow === 'Memoq') {
+      }
+
+      if (this.selectedTabWorkflow === 'Memoq') {
+        for (let { step } of service.steps) {
+          if (step.title !== 'Translation' && step.title !== 'Revising') continue
+          let units = []
           units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
+          collectWorkFlow(step, units)
         }
+      }
+
+      function collectWorkFlow(step, units) {
         stepsAndUnits.push({
           step,
           start: '',
@@ -377,6 +389,7 @@ export default {
           }
         })
       }
+
       this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
     },
     getServiceSourceLanguages(service) {
@@ -452,7 +465,7 @@ export default {
       tasksData: "getTasksData"
     }),
     tabsWorkflow() {
-      return [ 'System', 'Memoq' ].filter(i => this.tasksData.service.title === 'Translation' ? i : i !== 'Memoq')
+      return [ 'Alpha', 'Memoq' ].filter(i => this.tasksData.service.title === 'Translation' ? i : i !== 'Memoq')
     },
     isStepsWithCATWordcount() {
       return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount")
