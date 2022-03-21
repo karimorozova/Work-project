@@ -297,34 +297,34 @@ export default {
               ]
 
             },
-            // {
-            //   type: 'group',
-            //   path: 'receivables-reports',
-            //   name: 'Receivables',
-            //   isOpen: false,
-            //   children: [
-            //     {
-            //       type: 'link',
-            //       path: '/pangea-finance/receivables-reports/reports',
-            //       name: 'Reports'
-            //     },
-            //     {
-            //       type: 'link',
-            //       path: '/pangea-finance/receivables-reports/invoice',
-            //       name: 'Invoice'
-            //     },
-            //     {
-            //       type: 'link',
-            //       path: '/pangea-finance/receivables-reports/create-reports',
-            //       name: 'Add Reports'
-            //     },
-            //     {
-            //       type: 'link',
-            //       path: '/pangea-finance/receivables-reports/create-invoice',
-            //       name: 'Add Invoice'
-            //     }
-            //   ]
-            // }
+            {
+              type: 'group',
+              path: 'receivables-reports',
+              name: 'Receivables',
+              isOpen: false,
+              children: [
+                {
+                  type: 'link',
+                  path: '/pangea-finance/receivables-reports/reports',
+                  name: 'Reports'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/receivables-reports/invoice',
+                  name: 'Invoice'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/receivables-reports/create-reports',
+                  name: 'Add Reports'
+                },
+                {
+                  type: 'link',
+                  path: '/pangea-finance/receivables-reports/create-invoice',
+                  name: 'Add Invoice'
+                }
+              ]
+            }
           ]
         },
         {
