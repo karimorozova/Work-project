@@ -18,14 +18,7 @@ exports.updateInvoiceItem = async (invoiceId, itemId, updateData) => {
 
 	}
 }
-exports.deleteInvoiceItem = async (invoiceId, itemId) => {
-	try {
-		 await Invoice.findByIdAndUpdate(invoiceId, {"$pull":{ 'items': {'_id': itemId}}})
-		return "success"
-	} catch (e) {
 
-	}
-}
 
 
 

@@ -5,17 +5,29 @@
       :items="shortProjectList"
       :basicLink="'/pangea-finance/receivables-reports/reports/'"
     )
-    .invoicing-details
+    .invoicing-details(v-if="Object.keys(reportDetailsInfo).length")
+      .modals
+        .modal(v-if="isModalOpen")
+          .select-options
+            SelectSingle(
+              placeholder="Option",
+              :options="invoicesList",
+              :selectedOption="selectedInvoice.name",
+              @chooseOption="selectInvoice"
+            )
+          .buttons__modal
+            Button(value="Add to Invoice" @clicked="addToInvoice")
+            Button(value="Close" @clicked="closeRequestAddToInvoice")
       .invoicing-details__buttons
         .buttons__group(v-if="reportDetailsInfo.invoice === null")
           IconButton(@clicked="createNewInvoice")
             i(class="fa-solid fa-plus")
-          IconButton(@clicked="addToInvoice")
+          IconButton(@clicked="openRequestAddToInvoice")
             i(class="fa-solid fa-file-import")
         .buttons__group(v-else)
-          IconButton(@clicked="")
+          IconButton(@clicked="deleteReportFromInvoice")
             i(class="fa-solid fa-minus")
-      .invoicing-details__wrapper(v-if="Object.keys(reportDetailsInfo).length")
+      .invoicing-details__wrapper
         .invoicing-details__info
           .info__user
             .user
@@ -37,7 +49,7 @@
             .text__block(v-if="reportDetailsInfo.invoice")
               .text__title Invoice Id:
               .text__value
-                router-link(class="link-to" target= '_blank' :to="{path: `/receivables-reports/invoice/${reportDetailsInfo.invoice._id}`}")
+                router-link(class="link-to" target= '_blank' :to="{path: `/pangea-finance/receivables-reports/invoice/${reportDetailsInfo.invoice._id}`}")
                   span {{ reportDetailsInfo.invoice.invoiceId }}
 
             .text__block(v-if="reportDetailsInfo.invoice")
@@ -126,7 +138,10 @@ export default {
       reportDetailsInfo: {},
       toggleAddSteps: false,
       steps: [],
-      shortProjectList: []
+      shortProjectList: [],
+      isModalOpen: false,
+      invoicesList: [],
+      selectedInvoice: '',
     }
   },
   methods: {
@@ -210,7 +225,6 @@ export default {
       }
     },
     async createNewInvoice() {
-      console.log(this.reportDetailsInfo)
       await this.$http.post(
           `/invoicing/invoice-from-report/`,
           {
@@ -225,9 +239,41 @@ export default {
 
           }
       )
+      await this.getReportDetails()
     },
-    addToInvoice() {
-      console.log('test insta')
+    async openRequestAddToInvoice() {
+      this.isModalOpen = !this.isModalOpen
+      const invoicesList = (await this.$http.get('/invoicing/invoices-list-for-options')).data
+      this.invoicesList = invoicesList.map(data => ({name: data.invoiceId, id: data._id}))
+    },
+    closeRequestAddToInvoice() {
+      this.isModalOpen = !this.isModalOpen
+      this.invoicesList = []
+      this.selectedInvoice = {}
+    },
+    selectInvoice({ option }) {
+      this.selectedInvoice = option
+
+    },
+    async addToInvoice() {
+      await this.$http.post(
+          `/invoicing/invoice/${this.selectedInvoice.id}/item/`,
+          {
+            reportId: this.reportDetailsInfo._id,
+            "title": this.reportDetailsInfo.reportId,
+            "quantity": 1,
+            "rate": this.reportDetailsInfo.total,
+            "tax": 0,
+            "amount": this.reportDetailsInfo.total
+
+          }
+      )
+      this.closeRequestAddToInvoice()
+      await this.getReportDetails()
+    },
+    async deleteReportFromInvoice() {
+      await this.$http.delete(`/invoicing/invoice-from-report/${this.$route.params.id}/invoice/${this.reportDetailsInfo.invoice._id}`)
+      await this.getReportDetails()
     },
     async getShortReports() {
       try {
@@ -251,7 +297,7 @@ export default {
         else if (str === 'GBP') symbol = '£'
         return symbol
       }
-    }
+    },
   },
   async created() {
     await this.getShortReports()
@@ -680,7 +726,30 @@ export default {
     }
   }
 }
+.modal {
+  position: absolute;
+  box-shadow: $box-shadow;
+  box-sizing: border-box;
+  padding: 25px;
+  width: 600px;
+  transform: translate(-50%, 0%);
+  left: 50%;
+  top: 0%;
+  background-color: $white;
+  z-index: 20;
 
+}
+.modals {
+  position: relative;
+}
+.buttons__modal {
+  display: flex;
+  gap: 20px;
+}
+.select-options {
+  position: relative;
+  height: 31px;
+}
 //
 //.payment-button {
 //  display: flex;

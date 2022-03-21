@@ -14,8 +14,11 @@ createInvoice = async (customerId, clientBillingInfoId) => {
 
 createInvoiceItem = async (invoicingId, itemData) => {
 	try {
-
 		const invoice = await Invoice.findByIdAndUpdate(invoicingId, {$push: {'items':  itemData}})
+		console.log(itemData, invoice._id)
+		if(itemData.hasOwnProperty("reportId")) {
+			await InvoicingClientReports.findByIdAndUpdate(itemData.reportId, {invoice: invoice._id})
+		}
 		return invoice._id
 	} catch (e) {
 
@@ -25,7 +28,7 @@ createInvoiceItem = async (invoicingId, itemData) => {
 createInvoiceFromReport = async ({ reportId, customerId, clientBillingInfoId, title, quantity, rate, tax, amount}) => {
 	try {
 		const invoice = await createInvoice(customerId, clientBillingInfoId)
-		await createInvoiceItem(invoice._id, { title, quantity, rate, tax, amount })
+		await createInvoiceItem(invoice._id, { title, quantity, rate, tax, amount, reportId } )
 		await InvoicingClientReports.findByIdAndUpdate(reportId, {invoice: invoice._id})
 	} catch (e) {
 

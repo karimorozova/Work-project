@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { createInvoice, createInvoiceItem, createInvoiceFromReport, getInvoices, getInvoice, updateInvoice, updateInvoiceItem, deleteInvoiceItem } = require('../invoicing')
+const { createInvoice, createInvoiceItem, createInvoiceFromReport, getInvoices, getInvoice, updateInvoice, updateInvoiceItem, deleteInvoiceItem, deleteInvoiceItemFromReport, getInvoicesForOptions } = require('../invoicing')
 
 router.post("/create-invoice", async (req, res) => {
 	const { customerId, clientBillingInfoId } = req.body
@@ -17,6 +17,16 @@ router.post("/invoices-list", async (req, res) => {
 		const { page, limit } = req.query
 		const { filters } = req.body
 		const invoices = await getInvoices({}, page, limit, filters)
+		res.json(invoices)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on invoicing')
+	}
+})
+
+router.get("/invoices-list-for-options", async (req, res) => {
+	try {
+		const invoices = await getInvoicesForOptions({})
 		res.json(invoices)
 	} catch (err) {
 		console.log(err)
@@ -91,12 +101,19 @@ router.delete("/invoice/:id/item/:itemId", async (req, res) => {
 //========================================================================
 
 router.post("/invoice-from-report", async (req, res) => {
-	// const { reportId, customerId, clientBillingInfoId, title, quantity, rate, tax, amount} = req.body
 	try {
-
 		await createInvoiceFromReport(req.body)
-		// console.log(invoice)
-		// res.json({ id: invoice._id })
+		res.send("")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on invoicing')
+	}
+})
+
+router.delete("/invoice-from-report/:reportId/invoice/:invoiceId", async (req, res) => {
+	const { invoiceId, reportId } = req.params
+	try {
+	 	await deleteInvoiceItemFromReport(invoiceId, reportId)
 		res.send("")
 	} catch (err) {
 		console.log(err)
