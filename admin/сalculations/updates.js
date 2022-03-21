@@ -27,10 +27,10 @@ async function assignVendorToStep({ projectId, stepsVendors }) {
 					crossRate,
 					task: tasks[_idxT],
 					nativeRate: stepsVendors[stepId].nativeRate,
+					prevStep: steps[_idxS - 1],
 
 					// TODO: Delete soon, Temporary for quantity with MT Translation
-					fakeStepVendor: stepsVendors[stepId].fakeStepVendor,
-					prevStep: steps[_idxS - 1]
+					// fakeStepVendor: stepsVendors[stepId].fakeStepVendor,
 				})
 
 				steps[_idxS] = step

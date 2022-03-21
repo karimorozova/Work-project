@@ -598,10 +598,11 @@ export default {
       }
     },
     setVendorToStep(vendor) {
-      // TODO: Delete soon, Temporary for quantity with MT Translation
-      this.$set(this.selectedVendors, this.currentStepId, { ...vendor, fakeStepVendor: this.selectedStep })
+      // // TODO: Delete soon, Temporary for quantity with MT Translation
+      // this.$set(this.selectedVendors, this.currentStepId, { ...vendor, fakeStepVendor: this.selectedStep })
+
       //stable version
-      //this.$set(this.selectedVendors, this.currentStepId, vendor)
+      this.$set(this.selectedVendors, this.currentStepId, vendor)
     },
     setVendorToReassignStep(vendor) {
       this.selectedReassignedVendor = {
@@ -649,8 +650,8 @@ export default {
       this.selectedTarget = step.fullTargetLanguage.lang
       this.selectedUnit = step.payablesUnit.type
       this.selectedStep = step.step.title
-      this.selectedIndustry = this.currentProject.industry.name,
-          this.vendorsSearch = ''
+      this.selectedIndustry = this.currentProject.industry.name
+      // this.vendorsSearch = ''
     },
     closeVendorManage() {
       this.$emit('closeVendorManage')

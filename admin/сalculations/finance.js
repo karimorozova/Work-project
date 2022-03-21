@@ -108,7 +108,7 @@ const updateStepsWithMinimal = async (steps, minimumCharge) => {
 // 	return allDiscounts.filter(({ _id }) => clientDiscountsIds.includes(_id))
 // }
 
-const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate, fakeStepVendor, prevStep }) => {
+const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCurrency, crossRate, task, nativeRate, prevStep }) => {
 	// const currencyRatio = await CurrencyRatio.findOne()
 	// const defaultVendorPricelist = await Pricelist.findOne({ isVendorDefault: true })
 	const { fullSourceLanguage, fullTargetLanguage, payablesUnit } = step
@@ -132,15 +132,17 @@ const getNewStepPayablesFinanceData = async ({ step, vendor, industry, projectCu
 
 	if (isMemoqCatUnit) {
 		task.metrics = setTaskMetrics({ metrics: task.metrics, matrix: vendor.matrix, prop: "vendor" })
-		step.finance.Wordcount.payables = step.nativeFinance.Wordcount.payables = step.step.title === 'Translation'
+		step.finance.Wordcount.payables = step.nativeFinance.Wordcount.payables = (step.step.title === 'Translation' || step.step.title === 'Post-Editing')
 				? +getRelativeQuantity(task.metrics, 'vendor')
 				: task.metrics.totalWords
 	}
 
+	// console.log(prevStep && isMemoqCatUnit && step.step.title === 'Post-Editing')
 	// TODO: Delete soon, Temporary for quantity with MT Translation
-	if (fakeStepVendor === 'Post-Editing' && isMemoqCatUnit) {
-		step.finance.Wordcount.payables = prevStep.finance.Wordcount?.payables || prevStep.finance.Wordcount.receivables
-	}
+	// if (prevStep && isMemoqCatUnit && step.step.title === 'Post-Editing') {
+	//
+	// 	step.finance.Wordcount.payables = prevStep.finance.Wordcount?.payables || prevStep.finance.Wordcount.receivables
+	// }
 
 	let quantity = isMemoqCatUnit
 			? step.finance.Wordcount.payables
@@ -241,7 +243,7 @@ const getRelativeQuantity = (metrics, key) => {
 			counter += (rest[item].value * rest[item][key]) / 100
 		}
 	}
-	return counter
+	return +(counter).toFixed(2)
 }
 
 const getCorrectBasicPrice = (basicPriceRow, currency) => {
