@@ -1,94 +1,95 @@
 <template lang="pug">
-  .invoice-edit(v-if="invoice.customer")
-    .invoice-details__field
-      .title Invoice ID
-      .value {{invoice.invoiceId}}
-    .invoice-details__field
-      .title Customer Name
-      .value {{invoice.customer.name}}
-    .invoice-details__field
-      .title Invoice Date
-      DatePicker.range-with-one-panel-short(
-        :value="new Date(invoice.invoicingDate)"
-        @input="(e) => setInvoiceDate(e)"
-        format="DD-MM-YYYY, HH:mm"
-        prefix-class="xmx"
-        :clearable="false"
-        type="datetime"
-        placeholder="Select datetime range"
-      )
-    .invoice-details__field
-      .title Terms
-      .drop-down
-        SelectSingle(
-          :options="terms",
-          placeholder="Reports Actions",
-          :selectedOption="invoice.terms",
-          @chooseOption="setTerms"
-        )
-
-    .invoice-details__field
-      .title Account Manager
-      .drop-down
-        SelectSingle(
-          :options="allAMs",
-          placeholder="Reports Actions",
-          :selectedOption="currentAM",
-          @chooseOption="setAm"
-        )
-    .invoice-details__field
-      .title Due date
-      DatePicker.range-with-one-panel-short(
-        :value="new Date(invoice.dueDate)"
-        @input="(e) => setDueDate(e)"
-        format="DD-MM-YYYY, HH:mm"
-        prefix-class="xmx"
-        :clearable="false"
-        type="datetime"
-        placeholder="Select datetime range"
-      )
-    Button(value="Save" @clicked="saveChanges")
-
-    GeneralTable.test(
-      :fields="fieldsItems"
-      :tableData="invoice.items"
-      :isBodyShort="true"
-    )
-      template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
-        .table__header {{ field.label }}
-
-      template(slot="title" slot-scope="{ row, index }")
-        .table__data(v-if="editedId === row._id || editedId === index")
-          input(type="text" placeholder="Value" v-model="title")
-        .table__data(v-else) {{ row.title }}
-      template(slot="quantity" slot-scope="{ row, index }")
-        .table__data(v-if="editedId === row._id || editedId === index")
-          input(type="text" placeholder="Value" v-model="quantity")
-        .table__data(v-else) {{ row.quantity }}
-      template(slot="rate" slot-scope="{ row, index }")
-        .table__data(v-if="editedId === row._id || editedId === index")
-          input(type="text" placeholder="Value" v-model="rate")
-        .table__data(v-else) {{ row.rate }}
-      template(slot="tax" slot-scope="{ row, index }")
-        .table__data(v-if="editedId === row._id || editedId === index")
-          input(type="text" placeholder="Value" v-model="tax")
-        .table__data(v-else) {{ row.tax }}
-      template(slot="amount" slot-scope="{ row, index }")
-        .table__data(v-if="editedId === row._id || editedId === index")
-          input(type="text" placeholder="Value" v-model="amount")
-        .table__data(v-else) {{ row.amount }}
-
-      template(slot="icons" slot-scope="{ row, index }")
-        .table__icons
-          img.table__icon(
-            v-for="(icon, key) in icons"
-            :class="{'table__opacity': isActive(key, index, row._id)}"
-            :src="icon.icon"
-            @click="makeAction(key, row._id, index)"
-          )
-
-    IconButton(@clicked="addNewItem")
-      i(class="fa-solid fa-plus")
+  .invoicing-layout
+    | asdkjaskd
+  //.invoice-edit(v-if="invoice.customer")
+  //  .invoice-details__field
+  //    .title Invoice ID
+  //    .value {{invoice.invoiceId}}
+  //  .invoice-details__field
+  //    .title Customer Name
+  //    .value {{invoice.customer.name}}
+  //  .invoice-details__field
+  //    .title Invoice Date
+  //    DatePicker.range-with-one-panel-short(
+  //      :value="new Date(invoice.invoicingDate)"
+  //      @input="(e) => setInvoiceDate(e)"
+  //      format="DD-MM-YYYY, HH:mm"
+  //      prefix-class="xmx"
+  //      :clearable="false"
+  //      type="datetime"
+  //      placeholder="Select datetime range"
+  //    )
+  //  .invoice-details__field
+  //    .title Terms
+  //    .drop-down
+  //      SelectSingle(
+  //        :options="terms",
+  //        placeholder="Reports Actions",
+  //        :selectedOption="invoice.terms",
+  //        @chooseOption="setTerms"
+  //      )
+  //
+  //  .invoice-details__field
+  //    .title Account Manager
+  //    .drop-down
+  //      SelectSingle(
+  //        :options="allAMs",
+  //        placeholder="Reports Actions",
+  //        :selectedOption="currentAM",
+  //        @chooseOption="setAm"
+  //      )
+  //  .invoice-details__field
+  //    .title Due date
+  //    DatePicker.range-with-one-panel-short(
+  //      :value="new Date(invoice.dueDate)"
+  //      @input="(e) => setDueDate(e)"
+  //      format="DD-MM-YYYY, HH:mm"
+  //      prefix-class="xmx"
+  //      :clearable="false"
+  //      type="datetime"
+  //      placeholder="Select datetime range"
+  //    )
+  //  Button(value="Save" @clicked="saveChanges")
+  //
+  //  GeneralTable.test(
+  //    :fields="fieldsItems"
+  //    :tableData="invoice.items"
+  //  )
+  //    template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
+  //      .table__header {{ field.label }}
+  //
+  //    template(slot="title" slot-scope="{ row, index }")
+  //      .table__data(v-if="editedId === row._id || editedId === index")
+  //        input(type="text" placeholder="Value" v-model="title")
+  //      .table__data(v-else) {{ row.title }}
+  //    template(slot="quantity" slot-scope="{ row, index }")
+  //      .table__data(v-if="editedId === row._id || editedId === index")
+  //        input(type="text" placeholder="Value" v-model="quantity")
+  //      .table__data(v-else) {{ row.quantity }}
+  //    template(slot="rate" slot-scope="{ row, index }")
+  //      .table__data(v-if="editedId === row._id || editedId === index")
+  //        input(type="text" placeholder="Value" v-model="rate")
+  //      .table__data(v-else) {{ row.rate }}
+  //    template(slot="tax" slot-scope="{ row, index }")
+  //      .table__data(v-if="editedId === row._id || editedId === index")
+  //        input(type="text" placeholder="Value" v-model="tax")
+  //      .table__data(v-else) {{ row.tax }}
+  //    template(slot="amount" slot-scope="{ row, index }")
+  //      .table__data(v-if="editedId === row._id || editedId === index")
+  //        input(type="text" placeholder="Value" v-model="amount")
+  //      .table__data(v-else) {{ row.amount }}
+  //
+  //    template(slot="icons" slot-scope="{ row, index }")
+  //      .table__icons
+  //        img.table__icon(
+  //          v-for="(icon, key) in icons"
+  //          :class="{'table__opacity': isActive(key, index, row._id)}"
+  //          :src="icon.icon"
+  //          @click="makeAction(key, row._id, index)"
+  //        )
+  //
+  //  IconButton(@clicked="addNewItem")
+  //    i(class="fa-solid fa-plus")
 </template>
 
 <script>
@@ -102,7 +103,7 @@ import { mapGetters } from "vuex"
 import crudIcons from "../../mixins/crudIcons"
 
 export default {
-  mixins: [crudIcons],
+  mixins: [ crudIcons ],
   components: {
     SelectSingle,
     DatePicker,
@@ -113,12 +114,12 @@ export default {
   data() {
     return {
       invoice: {},
-      terms: ['test', 'test2', 'test3'],
+      terms: [ 'test', 'test2', 'test3' ],
       editedId: null,
       title: '',
       quantity: 0,
       rate: 0,
-      tax:0,
+      tax: 0,
       amount: 0,
       fieldsItems: [
         {
@@ -129,33 +130,33 @@ export default {
         },
         {
           label: "Quantity",
-            headerKey: "headerQuantity",
-            key: "quantity",
-            style: { "width": "160px" }
+          headerKey: "headerQuantity",
+          key: "quantity",
+          style: { "width": "160px" }
         },
         {
           label: "Rate",
-            headerKey: "headerRate",
-            key: "rate",
-            style: { "width": "160px" }
+          headerKey: "headerRate",
+          key: "rate",
+          style: { "width": "160px" }
         },
         {
           label: "Tax",
-            headerKey: "headerTax",
-            key: "tax",
-            style: { "width": "160px" }
+          headerKey: "headerTax",
+          key: "tax",
+          style: { "width": "160px" }
         },
         {
           label: "Amount",
-            headerKey: "headerAmount",
-            key: "amount",
-            style: { "width": "160px" }
+          headerKey: "headerAmount",
+          key: "amount",
+          style: { "width": "160px" }
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: {width: "16%"},
+          style: { width: "16%" },
           padding: "0"
         }
       ]
@@ -164,12 +165,12 @@ export default {
   methods: {
     async getInvoice() {
       console.log('test')
-      this.invoice = (await this.$http.get(`/invoicing/invoice/${this.$route.params.id}`)).data
+      this.invoice = (await this.$http.get(`/invoicing/invoice/${ this.$route.params.id }`)).data
     },
     setDueDate(date) {
       this.$set(this.invoice, 'dueDate', date)
     },
-    setAm({option}) {
+    setAm({ option }) {
       this.$set(this.invoice, 'accountManager', option)
     },
     setTerms({ option }) {
@@ -185,8 +186,8 @@ export default {
         title: '',
         quantity: 0,
         rate: 0,
-        tax:0,
-        amount: 0,
+        tax: 0,
+        amount: 0
       })
 
       this.editedId = this.invoice.items.length - 1
@@ -195,7 +196,7 @@ export default {
     isActive(key, index, id) {
       if (this.editedId === id || this.editedId === index) {
         return key !== "edit"
-      }else  {
+      } else {
         return key !== "save" && key !== "cancel"
       }
 
@@ -205,9 +206,9 @@ export default {
     },
     findItemById(id) {
       console.log(this.invoice)
-      return this.invoice.items.find(({_id}) => _id.toString() === id)
+      return this.invoice.items.find(({ _id }) => _id.toString() === id)
     },
-    setEditedData({title = '', rate = 0, quantity = 0, tax = 0, amount = 0}) {
+    setEditedData({ title = '', rate = 0, quantity = 0, tax = 0, amount = 0 }) {
       this.title = title
       this.rate = rate
       this.quantity = quantity
@@ -215,43 +216,43 @@ export default {
       this.amount = amount
     },
     async makeAction(key, id, index) {
-      console.log({test: this.editedId, index, id })
+      console.log({ test: this.editedId, index, id })
       if (this.editedId != null && !(this.editedId === id || this.editedId === index)) return
-      if (id == null && key === 'save'){
+      if (id == null && key === 'save') {
         await this.createItem()
       } else {
         switch (key) {
           case 'edit':
-            if (this.editedId != null ) return
+            if (this.editedId != null) return
             this.editedId = id
             const item = this.findItemById(id)
             this.setEditedData(item)
-            break;
+            break
           case 'save':
-            if (this.editedId == null ) return
-            await this.$http.put(`/invoicing/invoice/${this.$route.params.id}/item/${id}`, {
-              title:this.title,
-              quantity:this.quantity,
-              rate:this.rate,
-              tax:this.tax,
-              amount:this.amount,
+            if (this.editedId == null) return
+            await this.$http.put(`/invoicing/invoice/${ this.$route.params.id }/item/${ id }`, {
+              title: this.title,
+              quantity: this.quantity,
+              rate: this.rate,
+              tax: this.tax,
+              amount: this.amount
             })
             this.editedId = null
             this.clearEditCreateFields()
             await this.getInvoice()
-            break;
+            break
           case 'cancel':
-            if (this.editedId == null ) return
+            if (this.editedId == null) return
             this.editedId = null
             this.setEditedData({})
             break
           case 'delete':
             // if (this.editedId != null ) return
-            await this.$http.delete(`/invoicing/invoice/${this.$route.params.id}/item/${id}`)
+            await this.$http.delete(`/invoicing/invoice/${ this.$route.params.id }/item/${ id }`)
             this.editedId = null
             this.clearEditCreateFields()
             await this.getInvoice()
-            break;
+            break
         }
       }
 
@@ -273,19 +274,19 @@ export default {
     //   })
     // },
     async createItem() {
-      await this.$http.post(`/invoicing/invoice/${this.$route.params.id}/item`, {
-        title:this.title,
-        quantity:this.quantity,
-        rate:this.rate,
-        tax:this.tax,
-        amount:this.amount,
+      await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/item`, {
+        title: this.title,
+        quantity: this.quantity,
+        rate: this.rate,
+        tax: this.tax,
+        amount: this.amount
       })
       this.editedId = null
       this.clearEditCreateFields()
       await this.getInvoice()
     },
     async saveChanges() {
-      this.invoice = (await this.$http.post(`/invoicing/invoice/${this.$route.params.id}`,  this.invoice )).data
+      this.invoice = (await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }`, this.invoice)).data
     }
   },
   computed: {
@@ -295,11 +296,11 @@ export default {
     allAMs() {
       return this.users
           .filter(({ group }) => group.name === 'Account Managers')
-          .map(({ firstName, lastName, _id }) => ({_id, firstName, lastName, name: firstName + ' ' + lastName}))
+          .map(({ firstName, lastName, _id }) => ({ _id, firstName, lastName, name: firstName + ' ' + lastName }))
     },
     currentAM() {
       if (this.invoice.accountManager === null) return ''
-      const {firstName, lastName} = this.invoice.accountManager
+      const { firstName, lastName } = this.invoice.accountManager
       return firstName + ' ' + lastName
     }
   },
@@ -312,12 +313,12 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
-.invoice-details {
-  &__field {
-    margin-bottom: 10px;
-  }
+//.invoice-details {
+//  &__field {
+//    margin-bottom: 10px;
+//  }
+//}
 
-}
 .table {
   &__data {
     padding: 0 7px;
@@ -359,9 +360,10 @@ export default {
     padding: 0 7px;
   }
 }
-.drop-down {
-  position: relative;
-  height: 31px;
-  width: 220px;
-}
+
+//.drop-down {
+//  position: relative;
+//  height: 32px;
+//  width: 220px;
+//}
 </style>

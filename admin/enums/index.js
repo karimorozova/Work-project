@@ -5,8 +5,10 @@ const { langTierIndustries } = require('./langTierIndustries')
 const { dr1Instructions, dr2Instructions, drInstructionsCompliance } = require('./deliveryInstructions')
 const instructions = require('./serviceInstructions')
 const XTMLanguageReplacer = require('./XTMLanguageReplacer')
+const company = require('./InvoiceCompanyDetails')
 
 module.exports = {
+	company,
 	differenceOperationType,
 	tableKeys,
 	defaultFinanceObj,
