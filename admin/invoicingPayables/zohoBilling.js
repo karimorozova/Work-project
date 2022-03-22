@@ -46,7 +46,7 @@ const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorE
 		"line_items": lineItems
 	}
 	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')
-	return billing.data
+	return billing?.data
 }
 
 const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, amount) => {

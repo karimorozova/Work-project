@@ -195,8 +195,8 @@ router.post("/reports-final-status", async (req, res) => {
 					"rate": paidAmount + unpaidAmount,
 					"quantity": 1
 				} ]
-				const { bill } = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
-				zohoBillingId = bill?.bill_id || ''
+				const bill = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+				zohoBillingId = bill?.data?.bill_id || ''
 
 				await InvoicingPayables.updateOne({ _id: reportId }, { zohoBillingId })
 				if (zohoBillingId) zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
@@ -229,8 +229,8 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 				"rate": paidAmount + unpaidAmount,
 				"quantity": 1
 			} ]
-			const { bill = '' } = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
-			zohoBillingId = bill?.bill_id || ''
+			const bill = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+			zohoBillingId = bill?.data?.bill_id || ''
 
 			await InvoicingPayables.updateOne({ _id: reportId }, { zohoBillingId })
 
