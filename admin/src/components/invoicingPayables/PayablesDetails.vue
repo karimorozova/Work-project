@@ -386,6 +386,10 @@ export default {
             unpaidAmount: 0,
             paymentMethod: this.reportDetailsInfo.paymentDetails.paymentMethod,
             paymentDate: new Date(),
+            zohoBillingId: this.reportDetailsInfo.zohoBillingId,
+            vendorEmail: this.reportDetailsInfo.vendor.email,
+            reportTextId: this.reportDetailsInfo.reportId,
+            dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
             notes: this.notes
           }
           const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data
@@ -511,10 +515,11 @@ export default {
         unpaidAmount: +(this.getUnpaidAmount - amount).toFixed(2),
         paymentMethod: this.paymentMethod,
         paymentDate: this.paymentDate,
-        notes: this.notes
-        // zohoBillingId: this.reportDetailsInfo.zohoBillingId,
-        // vendorName: this.reportDetailsInfo.vendor.firstName + ' ' + this.reportDetailsInfo.vendor.surname,
-        // vendorEmail: this.reportDetailsInfo.vendor.email,
+        notes: this.notes,
+        zohoBillingId: this.reportDetailsInfo.zohoBillingId,
+        vendorEmail: this.reportDetailsInfo.vendor.email,
+        reportTextId: this.reportDetailsInfo.reportId,
+        dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
       }
       this.closePaymentCard()
       const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data

@@ -329,16 +329,18 @@ export default {
       this.closeApproveActionModal()
     },
     async paidChecked() {
-      const data = this.reports.filter(i => i.isCheck).reduce((acc, { _id, zohoBillingId, stepFinance, paymentDetails, vendor }) => {
-        const amount = stepFinance.reduce((acc, { payables }) => acc += payables)
+      const data = this.reports.filter(i => i.isCheck).reduce((acc, { _id, reportId, zohoBillingId, total, paymentDetails, vendor }) => {
+
         acc[_id] = {
-          paidAmount: amount,
+          paidAmount: total,
           unpaidAmount: 0,
           paymentMethod: paymentDetails.paymentMethod,
           paymentDate: new Date(),
           vendorEmail: vendor.email,
           vendorName: vendor.firstName + ' ' + vendor.surname,
           zohoBillingId: zohoBillingId,
+          reportTextId: reportId,
+          dueDate: paymentDetails.expectedPaymentDate,
           notes: ''
         }
         return acc

@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { Languages, Vendors } = require('../models')
+const { Languages, Vendors, InvoicingPayables } = require('../models')
 const {
 	getAllPayables,
 	getPayable,
@@ -170,11 +170,25 @@ router.post("/paid-reports", async (req, res) => {
 router.post("/reports-final-status", async (req, res) => {
 	const data = req.body
 	try {
-		for await (let [ reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId } ] of Object.entries(data)) {
+		for await (let [ reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId, reportTextId, dueDate } ] of Object.entries(data)) {
 			paidAmount = paidAmount.toFixed(2)
-			// TODO Zoho (soon)
-			// const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
-			await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+			if (!zohoBillingId) {
+				const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
+				const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
+				const lineItems = [ {
+					"name": `TS ${ paymentDateMonthAndYear }`,
+					"account_id": "335260000002330131",
+					"rate": paidAmount + unpaidAmount,
+					"quantity": 1
+				} ]
+				const { bill } = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+				zohoBillingId = bill.bill_id
+
+				await InvoicingPayables.updateOne({ _id: reportId }, { zohoBillingId })
+			}
+
+			const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
+			await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes }, zohoPaymentId)
 			await notifyVendorReportsIsPaid(true, { reportId })
 		}
 		res.send('success')
@@ -186,20 +200,28 @@ router.post("/reports-final-status", async (req, res) => {
 
 router.post("/report-final-status/:reportId", async (req, res) => {
 	const { reportId } = req.params
-	const { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, zohoBillingId, vendorName, vendorEmail } = req.body
+	const { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, reportTextId, dueDate } = req.body
+	let { zohoBillingId } = req.body
 
 	try {
 		// TODO Zoho (soon)
-		// const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
-		const monthAndYear = moment(paymentDate).format('YYYY-MM-DD')
-		const lineItems = [ {
-			"name": `TS ${ monthAndYear }`,
-			"account_id": "335260000002330131",
-			"rate": paidAmount,
-			"quantity": 1
-		} ]
-		const test = await createBillZohoRequest(monthAndYear, '', vendorEmail, "Api_Test_001", lineItems)
-		const result = await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
+		if (!zohoBillingId) {
+			const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
+			const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
+			const lineItems = [ {
+				"name": `TS ${ paymentDateMonthAndYear }`,
+				"account_id": "335260000002330131",
+				"rate": paidAmount + unpaidAmount,
+				"quantity": 1
+			} ]
+			const { bill } = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+			zohoBillingId = bill.bill_id
+
+			await InvoicingPayables.updateOne({ _id: reportId }, { zohoBillingId })
+		}
+
+		const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
+		const result = await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes }, zohoPaymentId)
 
 		result === 'Success'
 				? await notifyVendorReportsIsPaid(false, { reportId })
