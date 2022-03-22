@@ -490,7 +490,6 @@ export default {
 <style lang="scss" scoped>
 @import "../../../assets/scss/colors";
 
-
 a .fa-link {
   transition: .2s ease-out;
   color: $dark-border;

@@ -3,7 +3,7 @@
     .popcorn(:class="{seted: isDisabled}")
       slot
     .tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
-      span {{text}}
+      .text {{text}}
       //.arrow( data-popper-arrow)
 </template>
 
@@ -105,7 +105,7 @@ export default {
   white-space: nowrap;
   text-align: center;
   border-radius: 2px;
-  padding: 6px 10px;
+  padding: 7px 12px;
   z-index: 100000;
   margin-left: -4px !important;
   text-align: center;
@@ -133,7 +133,11 @@ export default {
 //  content: '';
 //  transform: rotate(45deg);
 //}
-
+.text {
+  font-family: Myriad400;
+  font-size: 14px !important;
+  font-weight: normal !important;
+}
 
 .tooltip[data-show] {
   display: block;

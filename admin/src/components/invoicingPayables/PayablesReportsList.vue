@@ -48,6 +48,15 @@
             template(v-for="field in fields" :slot="field.headerKey" slot-scope="{ field }")
               .table__header(v-if="field.headerKey === 'headerCheck'")
                 CheckBox(:isChecked="!!isAllSelected" :isWhite="true" @check="toggleAll(true)" @uncheck="toggleAll(false)")
+              .table__header(v-else-if="field.headerKey === 'headerAmount'" )
+                .amount-header
+                  .amount-header__title {{ field.label }}
+                  .amount-header__icon
+                    PopUp(
+                      :text="getTotalAmount + ' €'"
+                    )
+                      span &Sigma;
+
               .table__header(v-else) {{ field.label }}
 
             template(slot="check" slot-scope="{ row, index }")
@@ -84,6 +93,10 @@
                 span.currency(v-html="'&euro;'")
                 span {{ +(row.total).toFixed(2) }}
 
+            template(slot="paymentDay" slot-scope="{ row, index }")
+              .table__data(v-if="row.paymentDetails.expectedPaymentDate && row.status !== 'Invoice on-hold'" ) {{ getTime( row.paymentDetails.expectedPaymentDate) }}
+              .table__data(v-else) -
+
             template(slot="created" slot-scope="{ row, index }")
               .table__data {{ getTime( row.createAt) }}
 
@@ -97,13 +110,13 @@
         template(slot="filters")
           .filter
             .filter__item
-              label Report Id:
+              label Report Id
               .filter__input
                 input(type="text" placeholder="Value" :value="reportIdValue" @change="reportIdSetFilter" @keyup.13="reportIdSetFilter")
                 .clear-icon(v-if="reportIdValue.length" @click="removeSelectedInputs('reportId')")
                   i.fas.fa-backspace
             .filter__item
-              label Vendors:
+              label Vendors
               .filter__input
                 SelectMulti(
                   :selectedOptions="selectedVendors"
@@ -116,7 +129,7 @@
                   @removeOption="removeVendors"
                 )
             .filter__item
-              label Status:
+              label Status
               .filter__input
                 SelectSingle(
                   :selectedOption="selectedStatus"
@@ -127,20 +140,47 @@
                   @removeOption="removeStatus"
                 )
             .filter__item
-              label Date Range:
+              label Payment Method
+              .filter__input
+                SelectSingle(
+                  :selectedOption="selectedPaymentMethod"
+                  :options="allPaymentMethods.map(i => i.name)"
+                  placeholder="Option"
+                  @chooseOption="setPaymentMethod"
+                  :isRemoveOption="true"
+                  @removeOption="removePaymentMethod"
+                )
+            .filter__item
+              label Payment Date Range
               .filter__input
                 DatePicker.range-with-one-panel(
-                  :value="selectedBillingDateRange"
-                  @input="(e) => setBillingDateRange(e)"
+                  :value="selectedPaymentDateRange"
+                  @input="(e) => setPaymentDateRange(e)"
                   format="DD-MM-YYYY, HH:mm"
                   prefix-class="xmx"
                   range-separator=" - "
                   :clearable="false"
                   type="datetime"
                   range
-                  placeholder="Select datetime range"
+                  placeholder="Datetime range"
                 )
-              .clear-icon-picker(v-if="!!selectedBillingDateRange[0]" @click="removeSelectedBillingDateRange()")
+              .clear-icon-picker(v-if="!!selectedPaymentDateRange[0]" @click="removeSelectedPaymentDateRange()")
+                i.fas.fa-backspace.backspace
+            .filter__item
+              label Deadline Date Range
+              .filter__input
+                DatePicker.range-with-one-panel(
+                  :value="selectedDeadlineDateRange"
+                  @input="(e) => setDeadlineDateRange(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  prefix-class="xmx"
+                  range-separator=" - "
+                  :clearable="false"
+                  type="datetime"
+                  range
+                  placeholder="Datetime range"
+                )
+              .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
                 i.fas.fa-backspace.backspace
 
 </template>
@@ -160,6 +200,7 @@ import '../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
 import LayoutsListWrapper from "../LayoutsListWrapper"
 import LayoutsListWrapperLogic from "../../mixins/LayoutsListWrapperLogic"
+import PopUp from "../PopUp"
 
 export default {
   name: "InvoicingPayablesList",
@@ -170,36 +211,31 @@ export default {
       isActionModal: false,
       reports: [],
       vendorsList: [],
+      allPaymentMethods: [],
       fields: [
         {
           label: "",
           headerKey: "headerCheck",
           key: "check",
-          style: { width: "35px" }
+          style: { width: "28px" }
         },
         {
           label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "140px" }
+          style: { width: "130px" }
         },
         {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "199px" }
+          style: { width: "180px" }
         },
         {
           label: "Type / Name",
           headerKey: "headerType",
           key: "type",
           style: { width: "170px" }
-        },
-        {
-          label: "Date Range",
-          headerKey: "headerDateRange",
-          key: "dateRange",
-          style: { width: "175px" }
         },
         {
           label: "Status",
@@ -211,25 +247,37 @@ export default {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "80px" }
+          style: { width: "70px" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { width: "100px" }
+          style: { width: "110px" }
+        },
+        {
+          label: "Payment Date",
+          headerKey: "headerPaymentDate",
+          key: "paymentDay",
+          style: { width: "120px" }
+        },
+        {
+          label: "Date Range",
+          headerKey: "headerDateRange",
+          key: "dateRange",
+          style: { width: "175px" }
         },
         {
           label: "Created On",
           headerKey: "headerCreated",
           key: "created",
-          style: { width: "160px" }
+          style: { width: "120px" }
         },
         {
           label: "Updated On",
           headerKey: "headerUpdated",
           key: "updated",
-          style: { width: "160px" }
+          style: { width: "120px" }
         },
         {
           label: "",
@@ -242,16 +290,22 @@ export default {
 
       reportId: '',
       vendors: '',
-      billingDateFrom: '',
-      billingDateTo: '',
+      deadlineDateFrom: '',
+      deadlineDateTo: '',
+      paymentDateFrom: '',
+      paymentDateTo: '',
       status: '',
+      paymentMethod: '',
 
       dataVariables: [
         'reportId',
         'vendors',
-        'billingDateFrom',
-        'billingDateTo',
-        'status'
+        'deadlineDateFrom',
+        'deadlineDateTo',
+        'paymentDateFrom',
+        'paymentDateTo',
+        'status',
+        'paymentMethod'
       ],
 
       deleteRequestId: ''
@@ -324,6 +378,12 @@ export default {
     setStatus({ option }) {
       this.replaceRoute('status', option)
     },
+    setPaymentMethod({ option }) {
+      this.replaceRoute('paymentMethod', option)
+    },
+    removePaymentMethod() {
+      this.replaceRoute('paymentMethod', '')
+    },
     removeStatus() {
       this.replaceRoute('status', '')
     },
@@ -340,22 +400,41 @@ export default {
       const { value } = e.target
       this.replaceRoute('reportId', value)
     },
-    removeSelectedBillingDateRange() {
+    removeSelectedDeadlineDateRange() {
       let query = this.$route.query
       this.$router.replace({
         path: this.$route.path,
-        query: { ...query, billingDateFrom: '', billingDateTo: '' }
+        query: { ...query, deadlineDateFrom: '', deadlineDateTo: '' }
       })
     },
-    setBillingDateRange(e) {
+    removeSelectedPaymentDateRange() {
       let query = this.$route.query
-      delete query.billingDateFrom
-      delete query.billingDateTo
+      this.$router.replace({
+        path: this.$route.path,
+        query: { ...query, paymentDateFrom: '', paymentDateTo: '' }
+      })
+    },
+    setDeadlineDateRange(e) {
+      let query = this.$route.query
+      delete query.deadlineDateFrom
+      delete query.deadlineDateTo
       this.$router.replace({
         path: this.$route.path,
         query: {
-          ...query, billingDateFrom: new Date(e[0]).getTime(),
-          billingDateTo: new Date(e[1]).getTime()
+          ...query, deadlineDateFrom: new Date(e[0]).getTime(),
+          deadlineDateTo: new Date(e[1]).getTime()
+        }
+      })
+    },
+    setPaymentDateRange(e) {
+      let query = this.$route.query
+      delete query.paymentDateFrom
+      delete query.paymentDateTo
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...query, paymentDateFrom: new Date(e[0]).getTime(),
+          paymentDateTo: new Date(e[1]).getTime()
         }
       })
     },
@@ -444,6 +523,14 @@ export default {
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
         this.isDataRemain = result.data.length === 100
       }
+    },
+    async getPaymentsMethods() {
+      try {
+        const result = await this.$http.get("/api-settings/payment-methods")
+        this.allPaymentMethods = result.data
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
+      }
     }
     // TODO Zoho (soon)
     // async updatePayablesStateFromZoho() {
@@ -459,9 +546,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      // vendorsList: "getAllVendorsForOptions",
       user: "getUser"
     }),
+    getTotalAmount() {
+      return (+(this.reports.reduce((acc, curr) => acc += +curr.total || 0, 0)).toFixed(2)).toString()
+    },
     availableActionOptions() {
       if (this.reports && this.reports.length) {
         const availableOptions = []
@@ -488,6 +577,9 @@ export default {
     selectedStatus() {
       return this.$route.query.status || ''
     },
+    selectedPaymentMethod() {
+      return this.$route.query.paymentMethod || ''
+    },
     selectedVendors() {
       return this.$route.query.vendors && this.vendorsList.length
           ? this.$route.query.vendors.split(',').map(_id => {
@@ -499,9 +591,14 @@ export default {
     allVendors() {
       return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
     },
-    selectedBillingDateRange() {
-      return this.$route.query.billingDateFrom
-          ? [ new Date(+this.$route.query.billingDateFrom), new Date(+this.$route.query.billingDateTo) ]
+    selectedDeadlineDateRange() {
+      return this.$route.query.deadlineDateFrom
+          ? [ new Date(+this.$route.query.deadlineDateFrom), new Date(+this.$route.query.deadlineDateTo) ]
+          : [ null, null ]
+    },
+    selectedPaymentDateRange() {
+      return this.$route.query.paymentDateFrom
+          ? [ new Date(+this.$route.query.paymentDateFrom), new Date(+this.$route.query.paymentDateTo) ]
           : [ null, null ]
     },
     reportIdValue() {
@@ -516,6 +613,7 @@ export default {
       vm.defaultSetter()
       vm.querySetter(vm, to)
       vm.getReports()
+      vm.getPaymentsMethods()
     })
   },
   watch: {
@@ -523,10 +621,12 @@ export default {
       if (to.path === from.path) {
         this.querySetter(this, to)
         this.getReports()
+        this.getPaymentsMethods()
       }
     }
   },
   components: {
+    PopUp,
     LayoutsListWrapper,
     Button,
     SelectSingle,
@@ -610,4 +710,22 @@ export default {
   max-width: 131px;
 }
 
+.amount-header {
+  display: flex;
+  align-items: center;
+
+  &__icon {
+    margin-left: 10px;
+    cursor: help;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: -1px;
+    color: $dark-border;
+    transition: 0.2s ease-out;
+
+    &:hover {
+      color: $text;
+    }
+  }
+}
 </style>

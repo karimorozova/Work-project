@@ -2,28 +2,28 @@
   .filter(v-if="Object.keys(user).length")
     template(v-for="filter in user.layoutsSettings.project.filters")
       .filter__item(v-if="filter === 'projectId'")
-        label Project Id:
+        label Project Id
         .filter__input
           input(type="text" placeholder="Value" :value="projectIdValue" @change="projectIdSetFilter" @keyup.13="projectIdSetFilter")
           .clear-icon(v-if="projectIdValue.length" @click="removeSelectedInputs('projectId')")
             i.fas.fa-backspace
 
       .filter__item(v-if="filter === 'projectName'")
-        label Project Name:
+        label Project Name
         .filter__input
           input(type="text" placeholder="Value" :value="projectNameValue" @change="projectNameSetFilter" @keyup.13="projectNameSetFilter")
           .clear-icon(v-if="projectNameValue.length" @click="removeSelectedInputs('projectName')")
             i.fas.fa-backspace
 
       .filter__item(v-if="filter === 'clientName'")
-        label Client Name:
+        label Client Name
         .filter__input
           input(type="text" placeholder="Value" :value="clientNameValue" @change="clientNameSetFilter" @keyup.13="clientNameSetFilter")
           .clear-icon(v-if="clientNameValue.length" @click="removeSelectedInputs('clientName')")
             i.fas.fa-backspace
 
       .filter__item(v-if="filter === 'projectManager'")
-        label Project Manager:
+        label Project Manager
         .filter__input
           SelectSingle(
             :hasSearch="true"
@@ -36,7 +36,7 @@
           )
 
       .filter__item(v-if="filter === 'accountManger'")
-        label Account Manager:
+        label Account Manager
         .filter__input
           SelectSingle(
             :hasSearch="true"
@@ -49,9 +49,9 @@
           )
 
       .filter__item(v-if="filter === 'startDate'")
-        label Start Date:
+        label Start Date
         .filter__input
-          DatePicker.range-with-one-panel-short(
+          DatePicker.range-with-one-panel(
             :value="selectedStartDateRange"
             @input="(e) => setStartDateRange(e)"
             format="DD-MM-YYYY, HH:mm"
@@ -63,12 +63,12 @@
             placeholder="Select datetime range"
           )
         .clear-icon-picker(v-if="!!selectedStartDateRange[0]" @click="removeSelectedStartDateRange()")
-          i.fas.fa-backspace.backspace-long
+          i.fas.fa-backspace.backspace
 
       .filter__item(v-if="filter === 'deadline'")
-        label Deadline:
+        label Deadline
         .filter__input
-          DatePicker.range-with-one-panel-short(
+          DatePicker.range-with-one-panel(
             :value="selectedDeadlineRange"
             @input="(e) => setDeadlineRange(e)"
             format="DD-MM-YYYY, HH:mm"
@@ -80,10 +80,10 @@
             placeholder="Select datetime range"
           )
         .clear-icon-picker(v-if="!!selectedDeadlineRange[0]" @click="removeSelectedDeadlineRange()")
-          i.fas.fa-backspace.backspace-long
+          i.fas.fa-backspace.backspace
 
       .filter__item(v-if="filter === 'sourceLanguages'")
-        label Source Languages:
+        label Source Languages
         .filter__input
           SelectMulti(
             :selectedOptions="selectedSourceLanguages"
@@ -97,7 +97,7 @@
           )
 
       .filter__item(v-if="filter === 'targetLanguages'")
-        label Target Languages:
+        label Target Languages
         .filter__input
           SelectMulti(
             :selectedOptions="selectedTargetLanguages"
@@ -111,7 +111,7 @@
           )
 
       .filter__item(v-if="filter === 'industry'")
-        label Industry:
+        label Industry
         .filter__input
           SelectSingle(
             :hasSearch="true"
@@ -124,7 +124,7 @@
           )
 
       .filter__item(v-if="filter === 'services'")
-        label Services:
+        label Services
         .filter__input
           SelectMulti(
             :selectedOptions="selectedServices"
@@ -138,7 +138,7 @@
           )
 
       .filter__item(v-if="filter === 'tasksStatuses'")
-        label Tasks Statuses:
+        label Tasks Statuses
         .filter__input
           SelectMulti(
             :selectedOptions="selectedTasksStatuses"
@@ -152,7 +152,7 @@
           )
 
       .filter__item(v-if="filter === 'vendors'")
-        label Vendors:
+        label Vendors
         .filter__input
           SelectMulti(
             :selectedOptions="selectedVendors"
@@ -166,7 +166,7 @@
           )
 
       .filter__item(v-if="filter === 'isTest'")
-        label Test:
+        label Test
         .filter__input
           SelectSingle(
             :selectedOption="selectedIsTest"
@@ -178,7 +178,7 @@
           )
 
       .filter__item(v-if="filter === 'projectCurrency'")
-        label Currency:
+        label Currency
         .filter__input
           SelectSingle(
             :selectedOption="selectedProjectCurrency"
@@ -190,7 +190,7 @@
           )
 
       .filter__item(v-if="filter === 'paymentProfile'")
-        label Payment Profile:
+        label Payment Profile
         .filter__input
           SelectSingle(
             :selectedOption="selectedPaymentProfile"
@@ -202,7 +202,7 @@
           )
 
       .filter__item(v-if="filter === 'requestId'")
-        label Request Id:
+        label Request Id
         .filter__input
           input(type="text" placeholder="Value" :value="requestIdValue" @change="requestIdSetFilter" @keyup.13="requestIdSetFilter")
           .clear-icon(v-if="requestIdValue.length" @click="removeSelectedInputs('requestId')")
@@ -541,71 +541,47 @@ export default {
 @import "../../../assets/scss/colors";
 @import "../../../assets/scss/LayoutFilters";
 
-
-.filter {
-  //display: flex;
-  //flex-wrap: wrap;
-
-  &__item {
-    position: relative;
-    margin-bottom: 15px;
-    //margin-right: 25px;
-    width: 220px;
-  }
-
-  &__input {
-    position: relative;
-    height: 32px;
-  }
-}
-
-label {
-  display: block;
-  margin-bottom: 3px;
-  font-family: 'Myriad600';
-}
-
-input {
-  font-size: 14px;
-  color: $text;
-  border: 1px solid $border;
-  border-radius: 2px;
-  box-sizing: border-box;
-  padding: 0 7px;
-  outline: none;
-  height: 32px;
-  transition: .1s ease-out;
-  width: 220px;
-  font-family: 'Myriad400';
-
-  &:focus {
-    border: 1px solid $border-focus;
-  }
-}
-
-.fa-backspace {
-  font-size: 16px;
-  transition: .2s ease-out;
-  color: $dark-border;
-  cursor: pointer;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-
-  &:hover {
-    color: $text;
-  }
-}
-
-.range-with-one-panel-short {
-  width: 220px !important;
-}
-
-.backspace-long {
-  position: absolute;
-  right: 8px !important;
-  top: 27px !important;
-  background: white;
-}
+//input {
+//  font-size: 14px;
+//  color: $text;
+//  border: 1px solid $border;
+//  border-radius: 2px;
+//  box-sizing: border-box;
+//  padding: 0 7px;
+//  outline: none;
+//  height: 32px;
+//  transition: .1s ease-out;
+//  width: 220px;
+//  font-family: 'Myriad400';
+//
+//  &:focus {
+//    border: 1px solid $border-focus;
+//  }
+//}
+//
+//.fa-backspace {
+//  font-size: 16px;
+//  transition: .2s ease-out;
+//  color: $dark-border;
+//  cursor: pointer;
+//  position: absolute;
+//  right: 8px;
+//  top: 8px;
+//
+//  &:hover {
+//    color: $text;
+//  }
+//}
+//
+//.range-with-one-panel {
+//  width: 220px !important;
+//}
+//
+//.backspace-long {
+//  position: absolute;
+//  right: 8px !important;
+//  top: 27px !important;
+//  background: white;
+//}
 
 </style>

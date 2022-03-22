@@ -112,15 +112,21 @@ export default {
 
   &__filters {
     position: relative;
-    width: 285px;
+    width: 275px;
     display: flex;
     justify-content: center;
-    padding: 13px 0px;
+    padding: 20px 0px;
     background: white;
     overflow: auto;
     border-top: 1px solid $light-border;
     border-bottom: 1px solid $light-border;
     border-left: 1px solid $light-border;
+
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0px;
+    }
   }
 }
 
