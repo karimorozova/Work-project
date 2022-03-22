@@ -195,7 +195,7 @@ router.post("/reports-final-status", async (req, res) => {
 					"quantity": 1
 				} ]
 				const { bill } = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
-				zohoBillingId = bill.bill_id
+				zohoBillingId = bill?.bill_id || ''
 
 				await InvoicingPayables.updateOne({ _id: reportId }, { zohoBillingId })
 			}
@@ -227,8 +227,8 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 				"rate": paidAmount + unpaidAmount,
 				"quantity": 1
 			} ]
-			const { bill } = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
-			zohoBillingId = bill.bill_id
+			const { bill = ''} = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+			zohoBillingId = bill?.bill_id || ''
 
 			await InvoicingPayables.updateOne({ _id: reportId }, { zohoBillingId })
 		}

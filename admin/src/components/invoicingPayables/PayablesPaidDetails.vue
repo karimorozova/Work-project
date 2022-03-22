@@ -33,6 +33,13 @@
             .text__block
               .text__title Report ID:
               .text__value {{reportDetailsInfo.reportId}}
+
+            .text__block(v-if="reportDetailsInfo.zohoBillingId")
+              .text__title Zoho Bill:
+              .text__value
+                a( target="_blank" :href="`https://books.zoho.com/app#/bills/${reportDetailsInfo.zohoBillingId}`")
+                  span Link
+
             .text__block
               .text__title Status:
               .text__value
