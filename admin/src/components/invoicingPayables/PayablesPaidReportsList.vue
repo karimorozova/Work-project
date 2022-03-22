@@ -82,11 +82,11 @@
             .filter__item
               label Payment Method
               .filter__input
-                SelectSingle(
-                  :selectedOption="selectedPaymentMethod"
+                SelectMulti(
+                  :selectedOptions="selectedPaymentMethod"
                   :options="allPaymentMethods.map(i => i.name)"
-                  placeholder="Option"
-                  @chooseOption="setPaymentMethod"
+                  placeholder="Options"
+                  @chooseOptions="setPaymentMethod"
                   :isRemoveOption="true"
                   @removeOption="removePaymentMethod"
                 )
@@ -267,7 +267,14 @@ export default {
       })
     },
     setPaymentMethod({ option }) {
-      this.replaceRoute('paymentMethod', option)
+      if (!this.$route.query.paymentMethod) {
+        this.replaceRoute('paymentMethod', option)
+        return
+      }
+      let list = this.$route.query.paymentMethod.split(',')
+      if (list.includes(option)) list = list.filter(item => item !== option)
+      else list.push(option)
+      this.replaceRoute('paymentMethod', list.join(','))
     },
     removePaymentMethod() {
       this.replaceRoute('paymentMethod', '')
@@ -386,7 +393,7 @@ export default {
           : []
     },
     selectedPaymentMethod() {
-      return this.$route.query.paymentMethod || ''
+      return this.$route.query.paymentMethod ? this.$route.query.paymentMethod.split(',') : []
     },
     allVendors() {
       return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)

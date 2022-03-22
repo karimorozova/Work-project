@@ -66,7 +66,7 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 			$in: allVendors
 					.map(({ billingInfo }) => billingInfo.paymentMethods)
 					.flat()
-					.filter(({ paymentType }) => paymentType === paymentMethod)
+					.filter(({ paymentType }) => paymentMethod.includes(paymentType))
 					.map(({ _id }) => ObjectId(_id))
 		}
 	}
