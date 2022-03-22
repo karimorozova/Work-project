@@ -257,12 +257,20 @@ export default {
           name: "Payables",
           fixed: false,
           isCheck: false
-        }, {
+        },
+        {
           id: "receivables",
           name: "Receivables",
           fixed: false,
           isCheck: false
-        }, {
+        },
+        {
+          id: "total",
+          name: "Total",
+          fixed: false,
+          isCheck: false
+        },
+        {
           id: "margin",
           name: "Margin",
           fixed: false,

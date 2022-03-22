@@ -77,6 +77,12 @@
                 span {{ price(row.finance.Price.receivables) }}
               .table__data(v-else) -
 
+            template(slot="total" slot-scope="{ row, index }")
+              .table__data(v-if="row.finance.Price && row.finance.Price.receivables")
+                span.currency(v-html="currency(row.projectCurrency)")
+                span {{ priceTotal(row) }}
+              .table__data(v-else) -
+
             template(slot="margin" slot-scope="{ row, index }")
               .table__data(v-if="row.finance.Price && row.finance.Price.receivables && row.finance.Price.payables")
                 span.currency(v-html="currency(row.projectCurrency)")
@@ -146,7 +152,7 @@ export default {
     }
   },
   mixins: [ LayoutsListWrapperLogic ],
-  components: { ProgressLine, ProjectsLayoutFilter, LayoutsTable,LayoutsListWrapper },
+  components: { ProgressLine, ProjectsLayoutFilter, LayoutsTable, LayoutsListWrapper },
   data() {
     return {
       fields: [
@@ -227,6 +233,12 @@ export default {
           label: "Receivables",
           headerKey: "receivablesHeader",
           key: "receivables",
+          style: { "width": "90px" }
+        },
+        {
+          label: "Total",
+          headerKey: "totalHeader",
+          key: "total",
           style: { "width": "90px" }
         },
         {
@@ -311,7 +323,7 @@ export default {
     }
   },
   methods: {
-    clearFilters( ) {
+    clearFilters() {
       this.$emit('clearFilters')
     },
     getProjectName(str) {
@@ -437,6 +449,11 @@ export default {
       if (amount % 1 === 0) return amount
       return +amount.toFixed(2)
     },
+    priceTotal(project) {
+      const { receivables } = project.finance.Price
+      const additionsStepsSum = project.additionsSteps.reduce((acc, { finance }) => acc += finance.Price.receivables, 0)
+      return +(+receivables + +additionsStepsSum).toFixed(2)
+    },
     projectLanguages(tasks) {
       if (!tasks.length) return '-'
       const taskLanguages = tasks.map(({ sourceLanguage, targetLanguage }) => ({ sourceLanguage, targetLanguage }))
@@ -483,7 +500,7 @@ export default {
         return filteredFields
       }
     }
-  },
+  }
 }
 </script>
 

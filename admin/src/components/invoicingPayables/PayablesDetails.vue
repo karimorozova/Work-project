@@ -1,4 +1,4 @@
-<template lang="pug">
+ <template lang="pug">
   .layout
     NavbarList(
       v-if="shortProjectList.length"
@@ -124,12 +124,6 @@
             .text__block
               .text__title Report ID:
               .text__value {{reportDetailsInfo.reportId}}
-
-            .text__block(v-if="reportDetailsInfo.zohoBillingId")
-              .text__title Zoho Bill:
-              .text__value
-                a( target="_blank" :href="`https://books.zoho.com/app#/bills/${reportDetailsInfo.zohoBillingId}`")
-                  span Link
 
             .text__block.fixed-height
               .text__title Status:

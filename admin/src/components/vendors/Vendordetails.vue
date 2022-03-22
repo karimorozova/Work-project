@@ -560,9 +560,8 @@ export default {
     },
     async updateVendor() {
       let sendData = new FormData()
-
       const data = { ...this.getVendorUpdatedData }
-      data.billingInfo.paymentMethod = this.currentVendor.billingInfo.paymentMethod
+      data.billingInfo.paymentMethods = this.currentVendor.billingInfo.paymentMethods
 
       sendData.append("vendor", JSON.stringify({ ...data, _id: this.$route.params.id }))
       sendData.append("photo", this.photoFile[0])
