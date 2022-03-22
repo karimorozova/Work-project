@@ -37,7 +37,8 @@ const createVendor = async (vendorName, vendorEmail) => {
 
 const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems) => {
 	let zohoVendorId = await getVendor(vendorEmail)
-	zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
+	if (!zohoVendorId || !vendorEmail) return ''
+	// zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
@@ -50,7 +51,8 @@ const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorE
 
 const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, amount) => {
 	let vendorId = await getVendor(vendorEmail)
-	vendorId = vendorId ? vendorId : await createVendor(vendorName, vendorEmail)
+	if (!vendorId || !vendorEmail) return ''
+	// vendorId = vendorId ? vendorId : await createVendor(vendorName, vendorEmail)
 
 	const data = {
 		"vendor_id": vendorId,
@@ -125,6 +127,10 @@ const addFile = async (billId, filePath) => {
 }
 
 const deleteBill = async (billId) => {
+	await sendRequestToZoho(`bills/${ billId }?organization_id=${ organizationId }`)
+}
+
+const deleteBillWithPayments = async (billId) => {
 	await sendRequestToZoho(`bills/${ billId }?organization_id=${ organizationId }`)
 }
 

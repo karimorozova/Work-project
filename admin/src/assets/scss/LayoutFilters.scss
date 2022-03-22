@@ -2,8 +2,7 @@
 
 .filter {
   label {
-    font-family: Myriad600;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     display: block;
   }
 
@@ -11,6 +10,10 @@
     position: relative;
     margin-bottom: 15px;
     width: 220px;
+
+    &:last-child {
+      padding-bottom: 20px;
+    }
   }
 
   &__input {
@@ -55,7 +58,7 @@ input {
 .backspace {
   position: absolute;
   right: 30px !important;
-  top: 29px !important;
+  top: 28px !important;
   background: white;
 }
 

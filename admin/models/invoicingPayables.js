@@ -7,11 +7,11 @@ const InvoicingPayablesSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	// zohoBillingId: {
-	// 	type: String,
-	// 	default: '',
-	// 	trim: true
-	// },
+	zohoBillingId: {
+		type: String,
+		default: '',
+		trim: true
+	},
 	vendor: {
 		type: Schema.Types.ObjectId,
 		ref: 'Vendors'

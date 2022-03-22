@@ -57,27 +57,38 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 	return query
 }
 
-const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateFrom, status }) => {
-	const q = {}
+const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateFrom, status, paymentMethod, paymentDateFrom, paymentDateTo }, allVendors) => {
+	const query = {}
 	const reg = /[.*+?^${}()|[\]\\]/g
 
+	if (paymentMethod) {
+		query['paymentDetails.paymentMethod'] = {
+			$in: allVendors
+					.map(({ billingInfo }) => billingInfo.paymentMethods)
+					.flat()
+					.filter(({ paymentType }) => paymentType === paymentMethod)
+					.map(({ _id }) => ObjectId(_id))
+		}
+	}
 	if (reportId) {
 		const f = reportId.replace(reg, '\\$&')
-		q['reportId'] = { "$regex": new RegExp(f, 'i') }
+		query['reportId'] = { "$regex": new RegExp(f, 'i') }
 	}
 	if (vendors) {
-		q["vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
+		query["vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
 	}
 	if (status) {
-		q["status"] = status
+		query["status"] = status
 	}
-
+	if (!!paymentDateFrom && !!paymentDateTo) {
+		query['paymentDetails.expectedPaymentDate'] = { $gte: new Date(+paymentDateFrom), $lte: new Date(+paymentDateTo) }
+	}
 	if (!!deadlineDateTo && !!deadlineDateFrom) {
-		q['firstPaymentDate'] = { $gte: new Date(+deadlineDateFrom) }
-		q['lastPaymentDate'] = { $lt: new Date(+deadlineDateTo) }
+		query['firstPaymentDate'] = { $gte: new Date(+deadlineDateFrom) }
+		query['lastPaymentDate'] = { $lt: new Date(+deadlineDateTo) }
 	}
 
-	return q
+	return query
 }
 
 const getAllPayables = async (countToSkip, countToGet, query) => {

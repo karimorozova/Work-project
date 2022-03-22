@@ -22,6 +22,10 @@
                 router-link(class="link-to" :to="{path: `/pangea-finance/payables-reports/paid-reports/${row._id}`}")
                   span {{ row.reportId }}
 
+            template(slot="paymentDay" slot-scope="{ row, index }")
+              .table__data(v-if="row.paymentDetails.expectedPaymentDate" ) {{ getTime( row.paymentDetails.expectedPaymentDate) }}
+              .table__data(v-else) -
+
             template(slot="dateRange" slot-scope="{ row, index }")
               .table__data(v-html="dateRange(row)")
 
@@ -75,7 +79,34 @@
                   :isRemoveOption="true"
                   @removeOption="removeVendors"
                 )
-            .filter__itemLong
+            .filter__item
+              label Payment Method
+              .filter__input
+                SelectSingle(
+                  :selectedOption="selectedPaymentMethod"
+                  :options="allPaymentMethods.map(i => i.name)"
+                  placeholder="Option"
+                  @chooseOption="setPaymentMethod"
+                  :isRemoveOption="true"
+                  @removeOption="removePaymentMethod"
+                )
+            .filter__item
+              label Payment Date Range
+              .filter__input
+                DatePicker.range-with-one-panel(
+                  :value="selectedPaymentDateRange"
+                  @input="(e) => setPaymentDateRange(e)"
+                  format="DD-MM-YYYY, HH:mm"
+                  prefix-class="xmx"
+                  range-separator=" - "
+                  :clearable="false"
+                  type="datetime"
+                  range
+                  placeholder="Datetime range"
+                )
+              .clear-icon-picker(v-if="!!selectedPaymentDateRange[0]" @click="removeSelectedPaymentDateRange()")
+                i.fas.fa-backspace.backspace
+            .filter__item
               label Date Range:
               .filter__input
                 DatePicker.range-with-one-panel(
@@ -119,33 +150,25 @@ export default {
       isActionModal: false,
       vendorsList: [],
       reports: [],
-      highlighted: {
-        days: [ 6, 0 ]
-      },
+      allPaymentMethods: [],
       fields: [
         {
           label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
-          style: { width: "150px" }
+          style: { width: "130px" }
         },
         {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
-          style: { width: "200px" }
+          style: { width: "180px" }
         },
         {
           label: "Type / Name",
           headerKey: "headerType",
           key: "type",
-          style: { width: "150px" }
-        },
-        {
-          label: "Date Range",
-          headerKey: "headerDateRange",
-          key: "dateRange",
-          style: { width: "185px" }
+          style: { width: "170px" }
         },
         {
           label: "Status",
@@ -157,25 +180,37 @@ export default {
           label: "Jobs",
           headerKey: "headerJobs",
           key: "jobs",
-          style: { width: "100px" }
+          style: { width: "70px" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
+          style: { width: "110px" }
+        },
+        {
+          label: "Payment Date",
+          headerKey: "headerPaymentDate",
+          key: "paymentDay",
           style: { width: "120px" }
+        },
+        {
+          label: "Date Range",
+          headerKey: "headerDateRange",
+          key: "dateRange",
+          style: { width: "175px" }
         },
         {
           label: "Created On",
           headerKey: "headerCreated",
           key: "created",
-          style: { width: "160px" }
+          style: { width: "120px" }
         },
         {
           label: "Updated On",
           headerKey: "headerUpdated",
           key: "updated",
-          style: { width: "160px" }
+          style: { width: "120px" }
         }
       ],
       isDataRemain: true,
@@ -184,6 +219,9 @@ export default {
       vendors: '',
       deadlineDateFrom: '',
       deadlineDateTo: '',
+      paymentDateFrom: '',
+      paymentDateTo: '',
+      paymentMethod: '',
       status: '',
 
       dataVariables: [
@@ -191,6 +229,9 @@ export default {
         'vendors',
         'deadlineDateFrom',
         'deadlineDateTo',
+        'paymentDateFrom',
+        'paymentDateTo',
+        'paymentMethod',
         'status'
       ],
 
@@ -205,6 +246,31 @@ export default {
         path: this.$route.path,
         query: { ...query, deadlineDateFrom: '', deadlineDateTo: '' }
       })
+    },
+    setPaymentDateRange(e) {
+      let query = this.$route.query
+      delete query.paymentDateFrom
+      delete query.paymentDateTo
+      this.$router.replace({
+        path: this.$route.path,
+        query: {
+          ...query, paymentDateFrom: new Date(e[0]).getTime(),
+          paymentDateTo: new Date(e[1]).getTime()
+        }
+      })
+    },
+    removeSelectedPaymentDateRange() {
+      let query = this.$route.query
+      this.$router.replace({
+        path: this.$route.path,
+        query: { ...query, paymentDateFrom: '', paymentDateTo: '' }
+      })
+    },
+    setPaymentMethod({ option }) {
+      this.replaceRoute('paymentMethod', option)
+    },
+    removePaymentMethod() {
+      this.replaceRoute('paymentMethod', '')
     },
     getTime(date) {
       return moment(date).format('MMM D, HH:mm')
@@ -292,6 +358,14 @@ export default {
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
         this.isDataRemain = result.data.length === 100
       }
+    },
+    async getPaymentsMethods() {
+      try {
+        const result = await this.$http.get("/api-settings/payment-methods")
+        this.allPaymentMethods = result.data
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
+      }
     }
   },
   computed: {
@@ -311,12 +385,20 @@ export default {
           })
           : []
     },
+    selectedPaymentMethod() {
+      return this.$route.query.paymentMethod || ''
+    },
     allVendors() {
       return this.vendorsList.map(({ firstName, surname }) => `${ firstName } ${ surname }`)
     },
     selectedDeadlineDateRange() {
       return this.$route.query.deadlineDateFrom
           ? [ new Date(+this.$route.query.deadlineDateFrom), new Date(+this.$route.query.deadlineDateTo) ]
+          : [ null, null ]
+    },
+    selectedPaymentDateRange() {
+      return this.$route.query.paymentDateFrom
+          ? [ new Date(+this.$route.query.paymentDateFrom), new Date(+this.$route.query.paymentDateTo) ]
           : [ null, null ]
     },
     reportIdValue() {
@@ -331,6 +413,7 @@ export default {
       vm.defaultSetter()
       vm.querySetter(vm, to)
       vm.getReports()
+      vm.getPaymentsMethods()
     })
   },
   watch: {
@@ -338,6 +421,7 @@ export default {
       if (to.path === from.path) {
         this.querySetter(this, to)
         this.getReports()
+        this.getPaymentsMethods()
       }
     }
   },
