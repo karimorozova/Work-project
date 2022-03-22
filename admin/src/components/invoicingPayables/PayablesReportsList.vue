@@ -51,9 +51,9 @@
               .table__header(v-else-if="field.headerKey === 'headerAmount'" )
                 .amount-header
                   .amount-header__title {{ field.label }}
-                  .amount-header__icon
+                  .amount-header__icon(@mouseover="calculateTotal" @mouseout="totalAmount = 0")
                     PopUp(
-                      :text="getTotalAmount + ' €'"
+                      :text="totalAmount + ' €'"
                     )
                       span &Sigma;
 
@@ -308,11 +308,15 @@ export default {
         'paymentMethod'
       ],
 
-      deleteRequestId: ''
+      deleteRequestId: '',
+      totalAmount: 0
     }
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
+    calculateTotal() {
+      this.getTotalAmount()
+    },
     async manageReportActions() {
 
       switch (this.selectedReportAction) {
@@ -533,6 +537,15 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
+    },
+    async getTotalAmount() {
+      const result = await this.$http.post("/invoicing-payables/reports", {
+        filters: this.allFilters,
+        countToSkip: 0,
+        countToGet: 1e6
+      })
+
+      this.totalAmount = result.data.length ? (+(result.data.reduce((acc, curr) => acc += +curr.total || 0, 0)).toFixed(2)).toString() : 0
     }
     // TODO Zoho (soon)
     // async updatePayablesStateFromZoho() {
@@ -550,9 +563,9 @@ export default {
     ...mapGetters({
       user: "getUser"
     }),
-    getTotalAmount() {
-      return (+(this.reports.reduce((acc, curr) => acc += +curr.total || 0, 0)).toFixed(2)).toString()
-    },
+    // getTotalAmount() {
+    //   return
+    // },
     availableActionOptions() {
       if (this.reports && this.reports.length) {
         const availableOptions = []
