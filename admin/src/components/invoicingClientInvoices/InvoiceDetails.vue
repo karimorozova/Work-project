@@ -18,11 +18,15 @@
             .header__data-line
             .header__data-title Invoice
             .header__data-number INV-002047
-            .header__data-total
-              .header__data-total-name Balance Due:
-              .header__data-total-amount
-                span EUR
-                span 123.123
+            .row
+              .row__key Balance Due:
+              .row__value-bold EUR 123.123
+
+            //.header__data-total
+            //  .header__data-total-name Balance Due:
+            //  .header__data-total-amount
+            //    span EUR
+            //    span 123.123
 
 
         .subheader
@@ -69,17 +73,17 @@
             .table-details
               .row
                 .row__key Sub Total:
-                .row__value 222
+                .row__value EUR 222
               .row
                 .row__key VAT:
-                .row__value 222
+                .row__value EUR 222
               .row
                 .row__key Total:
-                .row__value 222
+                .row__value EUR 222
               .splitter
               .row
                 .row__key Balance Due:
-                .row__value 222
+                .row__value-bold EUR 222
 
   //.invoice-details
   //  Button(value="Edit" @clicked="goToEdit" )
@@ -184,8 +188,9 @@ export default {
   margin: 50px;
   border-radius: 2px;
   box-shadow: $box-shadow;
-  padding: 50px 25px;
+  padding: 40px;
   background: white;
+  font-size: 15px;
 }
 
 .subheader {
@@ -198,56 +203,53 @@ export default {
 
 .row {
   display: flex;
-  height: 28px;
+  height: 30px;
   align-items: center;
 
   &__key {
-    width: 110px;
+    width: 120px;
     margin-right: 10px;
   }
 
   &__value {
     width: 150px;
+
+    &-bold {
+      font-family: Myriad600;
+    }
   }
 }
 
 .header {
   display: flex;
   justify-content: space-between;
+  gap: 25px;
 
   &__data {
-    width: 270px;
-
-    &-total {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-
-      &-amount {
-        //font-family: Myriad900;
-      }
-    }
+    width: 280px;
 
     &-title {
-      margin: 8px 0;
-      font-size: 24px;
+      margin: 10px 0;
+      font-size: 30px;
+      font-family: Myriad300;
     }
 
     &-number {
-      margin: 8px 0;
-      //font-size: 16px;
+      margin: 5px 0;
+      font-family: Myriad600;
+      font-size: 16px;
     }
 
     &-line {
       height: 20px;
       background: $green;
-      margin-right: -25px;
+      margin-right: -40px;
     }
   }
 
   &__logo {
     &-company {
-      margin-top: 30px;
+      margin-top: 25px;
     }
 
     &-image {
@@ -283,6 +285,7 @@ export default {
   &__header,
   &__data {
     padding: 0 7px;
+    font-size: 15px;
   }
 }
 
