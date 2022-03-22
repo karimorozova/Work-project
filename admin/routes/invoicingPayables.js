@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { Languages } = require('../models')
+const { Languages, Vendors } = require('../models')
 const {
 	getAllPayables,
 	getPayable,
@@ -145,7 +145,8 @@ router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 router.post("/reports", async (req, res) => {
 	try {
 		const { countToSkip, countToGet, filters } = req.body
-		const query = payablesFiltersQuery(filters)
+		const allVendors = await Vendors.find({}, { billingInfo: 1 })
+		const query = payablesFiltersQuery(filters, allVendors)
 		const reports = await getAllPayables(countToSkip, countToGet, query)
 		res.send(reports)
 	} catch (err) {
