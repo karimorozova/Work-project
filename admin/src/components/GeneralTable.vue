@@ -16,7 +16,7 @@
 
           th(v-for="{ headerKey, style, sortInfo, dataKey, key, filterInfo, ...rest } in fields" :style="style")
 
-            .th__titleAndSort(:class="{'darkMode': isDarkMode}")
+            .th__titleAndSort
               slot(:name="headerKey" :field="{ headerKey, sortInfo, style, dataKey, key, filterInfo, ...rest }")
 
               .th__sortIcons(v-if="sortInfo && sortInfo.isSort")
@@ -98,10 +98,10 @@ export default {
       type: Number,
       default: -1
     },
-    isDarkMode: {
-      type: Boolean,
-      default: false
-    }
+    // isDarkMode: {
+    //   type: Boolean,
+    //   default: false
+    // }
   },
   data() {
     return {
@@ -386,10 +386,5 @@ tbody tr:hover {
 
 .shortBody {
   max-height: 252px;
-}
-
-.darkMode {
-  background: #666;
-  color: #fff;
 }
 </style>

@@ -1,6 +1,5 @@
 <template lang="pug">
   .invoicing-layout(v-if="invoice._id" )
-
     .template
       .template__header
         .header
@@ -11,8 +10,7 @@
             .header__logo-company
               .profile__name {{ companyProfile().name }}
               .profile__text {{ companyProfile().address }}
-              .profile__text {{ companyProfile().city }}, {{ companyProfile().postCode }}
-              .profile__text {{ companyProfile().country }}
+              .profile__text {{ companyProfile().country }}, {{ companyProfile().city }}, {{ companyProfile().postCode }}
               .profile__text {{ companyProfile().taxId }}
 
 
@@ -33,7 +31,6 @@
             .profile__text {{ paymentProfile().getAddress() }}
             .profile__text(v-if="paymentProfile().getState()" ) {{ paymentProfile().getState() }}
             .profile__text {{ paymentProfile().getCityWithCode() }}
-            .profile__text {{ paymentProfile().getCountry() }}
             .profile__text {{ paymentProfile().getVat() }}
 
           .subheader__right
@@ -67,6 +64,22 @@
                 .table__data {{ row.tax }}
               template(slot="amount" slot-scope="{ row, index }")
                 .table__data {{ row.amount }}
+
+          .body__subtable
+            .table-details
+              .row
+                .row__key Sub Total:
+                .row__value 222
+              .row
+                .row__key VAT:
+                .row__value 222
+              .row
+                .row__key Total:
+                .row__value 222
+              .splitter
+              .row
+                .row__key Balance Due:
+                .row__value 222
 
   //.invoice-details
   //  Button(value="Edit" @clicked="goToEdit" )
@@ -142,10 +155,10 @@ export default {
         getState: () => state || '',
         getCity: () => city || '',
         getZipCode: () => zipCode || '',
-        getCityWithCode() {
-          return `${ this.getCity() }${ this.getZipCode() && ', ' }${ this.getZipCode() }`
-        },
         getCountry: () => country || '',
+        getCityWithCode() {
+          return `${ this.getCountry() }${ this.getCity() && ', ' }${ this.getCity() }${ this.getZipCode() && ', ' }${ this.getZipCode() }`
+        },
         getVat: () => vat || ''
       }
     },
@@ -166,28 +179,31 @@ export default {
 @import "../../assets/scss/colors";
 
 .template {
-  width: 900px;
+  width: 860px;
   box-sizing: border-box;
   margin: 50px;
   border-radius: 2px;
   box-shadow: $box-shadow;
-  padding: 25px;
+  padding: 50px 25px;
   background: white;
 }
 
 .subheader {
   display: flex;
   justify-content: space-between;
-  margin: 25px 0;
+  margin: 15px 0 32px 0px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid $green;
 }
 
 .row {
   display: flex;
-  height: 24px;
+  height: 28px;
   align-items: center;
 
   &__key {
     width: 110px;
+    margin-right: 10px;
   }
 
   &__value {
@@ -200,7 +216,7 @@ export default {
   justify-content: space-between;
 
   &__data {
-    width: 260px;
+    width: 270px;
 
     &-total {
       display: flex;
@@ -208,22 +224,22 @@ export default {
       align-items: center;
 
       &-amount {
-        font-family: Myriad900;
+        //font-family: Myriad900;
       }
     }
 
     &-title {
-      margin: 6px 0;
-      font-size: 28px;
+      margin: 8px 0;
+      font-size: 24px;
     }
 
     &-number {
-      margin: 6px 0;
-      font-size: 16px;
+      margin: 8px 0;
+      //font-size: 16px;
     }
 
     &-line {
-      height: 16px;
+      height: 20px;
       background: $green;
       margin-right: -25px;
     }
@@ -231,11 +247,22 @@ export default {
 
   &__logo {
     &-company {
-      margin-top: 25px;
+      margin-top: 30px;
     }
 
     &-image {
-      width: 220px;
+      width: 230px;
+    }
+  }
+}
+
+.body {
+  &__subtable {
+    display: flex;
+    justify-content: end;
+
+    .table-details {
+      margin-top: 25px;
     }
   }
 }
@@ -247,7 +274,7 @@ export default {
 
   &__text,
   &__name {
-    margin: 5px 0;
+    margin: 7px 0;
   }
 }
 
@@ -257,5 +284,13 @@ export default {
   &__data {
     padding: 0 7px;
   }
+}
+
+.splitter {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  height: 1px;
+  background-color: $light-border;
+  width: 100%;
 }
 </style>
