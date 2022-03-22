@@ -158,7 +158,8 @@ router.post("/reports", async (req, res) => {
 router.post("/paid-reports", async (req, res) => {
 	try {
 		const { countToSkip, countToGet, filters } = req.body
-		const query = payablesFiltersQuery(filters)
+		const allVendors = await Vendors.find({}, { billingInfo: 1 })
+		const query = payablesFiltersQuery(filters, allVendors)
 		const reports = await getAllPaidPayables(countToSkip, countToGet, query)
 		res.send(reports)
 	} catch (err) {
@@ -170,7 +171,19 @@ router.post("/paid-reports", async (req, res) => {
 router.post("/reports-final-status", async (req, res) => {
 	const data = req.body
 	try {
-		for await (let [ reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes, vendorName, vendorEmail, zohoBillingId, reportTextId, dueDate } ] of Object.entries(data)) {
+		for await (let [ reportId, {
+			paidAmount,
+			unpaidAmount,
+			paymentMethod,
+			paymentDate,
+			notes,
+			vendorName,
+			vendorEmail,
+			zohoBillingId,
+			reportTextId,
+			dueDate
+		} ] of Object.entries(data)) {
+
 			paidAmount = paidAmount.toFixed(2)
 			if (!zohoBillingId) {
 				const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
