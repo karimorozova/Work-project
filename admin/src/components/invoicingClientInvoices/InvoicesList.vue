@@ -2,8 +2,8 @@
   .invoice-list
     LayoutsListWrapper(
       v-if="invoices.length"
-      :hasFilterButton="false"
-      :hasClearButton="false"
+      :hasFilterButton="true"
+      :hasClearButton="true"
       :isFilterActive="isFilterActive"
       @toggleFilters="toggleFilters"
       @clearFilters="clearFilters"
@@ -32,6 +32,9 @@
           template(slot="customer" slot-scope="{ row, index }")
             .table__statusAndProgress
               .status {{ row.customer.name }}
+          template(slot="items" slot-scope="{ row, index }")
+            .table__statusAndProgress
+              .status {{ row.items.length }}
 
           template(slot="status" slot-scope="{ row, index }")
             .table__statusAndProgress
@@ -78,6 +81,7 @@ export default {
           key: "invoiceId",
           style: { "width": "160px" }
         },
+
         {
           label: "Client Name",
           headerKey: "headerCustomer",
@@ -86,9 +90,39 @@ export default {
           style: { "width": "160px" }
         },
         {
+          label: "Date Range",
+          headerKey: "headerDateRange",
+          key: "dateRange",
+          style: { "width": "160px" }
+        },
+        {
+          label: "Projects",
+          headerKey: "headerProjects",
+          key: "items",
+          style: { "width": "160px" }
+        },
+        {
+          label: "Amount",
+          headerKey: "headerAmount",
+          key: "amount",
+          style: { "width": "160px" }
+        },
+        {
           label: "Status",
           headerKey: "headerStatus",
           key: "status",
+          style: { "width": "160px" }
+        },
+        {
+          label: "Created By",
+          headerKey: "headerCreatedBy",
+          key: "createdBy",
+          style: { "width": "160px" }
+        },
+        {
+          label: "Updated By",
+          headerKey: "headerUpdatedBy",
+          key: "updateBy",
           style: { "width": "160px" }
         },
       ]

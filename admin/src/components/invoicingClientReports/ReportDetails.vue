@@ -7,7 +7,8 @@
     )
     .invoicing-details(v-if="Object.keys(reportDetailsInfo).length")
       .modals
-        .modal(v-if="isModalOpen")
+        .modal.wrapper(v-if="isModalOpen")
+          .text Add to Invoice
           .select-options
             SelectSingle(
               placeholder="Option",
@@ -16,8 +17,17 @@
               @chooseOption="selectInvoice"
             )
           .buttons__modal
-            Button(value="Add to Invoice" @clicked="addToInvoice")
-            Button(value="Close" @clicked="closeRequestAddToInvoice")
+            Button(value="Add" @clicked="addToInvoice")
+            Button(value="Close" :outline="true" @clicked="closeRequestAddToInvoice")
+        .modal(v-if="isDeleteModalOpen")
+          ApproveModal(
+            text="Are you sure?"
+            approveValue="Yes"
+            notApproveValue="Cancel"
+            @approve="deleteReportFromInvoice"
+            @notApprove="closeDeleteModal"
+            @close="closeDeleteModal"
+          )
       .invoicing-details__buttons
         .buttons__group(v-if="reportDetailsInfo.invoice === null")
           IconButton(@clicked="createNewInvoice")
@@ -25,7 +35,7 @@
           IconButton(@clicked="openRequestAddToInvoice")
             i(class="fa-solid fa-file-import")
         .buttons__group(v-else)
-          IconButton(@clicked="deleteReportFromInvoice")
+          IconButton(@clicked="openDeleteModal")
             i(class="fa-solid fa-minus")
       .invoicing-details__wrapper
         .invoicing-details__info
@@ -142,6 +152,7 @@ export default {
       isModalOpen: false,
       invoicesList: [],
       selectedInvoice: '',
+      isDeleteModalOpen: false,
     }
   },
   methods: {
@@ -271,9 +282,16 @@ export default {
       this.closeRequestAddToInvoice()
       await this.getReportDetails()
     },
+    openDeleteModal() {
+      this.isDeleteModalOpen = !this.isDeleteModalOpen
+    },
+    closeDeleteModal() {
+      this.isDeleteModalOpen = false
+    },
     async deleteReportFromInvoice() {
       await this.$http.delete(`/invoicing/invoice-from-report/${this.$route.params.id}/invoice/${this.reportDetailsInfo.invoice._id}`)
       await this.getReportDetails()
+      this.closeDeleteModal()
     },
     async getShortReports() {
       try {
@@ -726,21 +744,30 @@ export default {
     }
   }
 }
-.modal {
-  position: absolute;
+.wrapper {
   box-shadow: $box-shadow;
   box-sizing: border-box;
   padding: 25px;
-  width: 600px;
-  transform: translate(-50%, 0%);
-  left: 50%;
-  top: 0%;
+  //width: 600px;
   background-color: $white;
-  z-index: 20;
+}
 
+.modal {
+  text-align: center;
+  position: absolute;
+  left: 40%;
+  top: 0;
+  z-index: 20;
+  transform: translate(-50%, 0%);
 }
 .modals {
   position: relative;
+}
+.text {
+  //text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 .buttons__modal {
   display: flex;
@@ -749,6 +776,8 @@ export default {
 .select-options {
   position: relative;
   height: 31px;
+  width: 220px;
+  margin-bottom: 20px;
 }
 //
 //.payment-button {
