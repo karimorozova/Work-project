@@ -24,11 +24,12 @@ const {
 	invoiceSubmission,
 	rollBackFromPaidToDraft,
 	getShortReportList,
-	getPaidShortReportList
+	getPaidShortReportList, createBillZohoRequest
 } = require('../invoicingPayables')
 
 const { ObjectID: ObjectId } = require("mongodb")
 const upload = require("../utils/uploads")
+const moment = require("moment")
 
 router.get('/short-report-list', async (req, res) => {
 	try {
@@ -189,6 +190,14 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 	try {
 		// TODO Zoho (soon)
 		// const zohoPaymentId = await createNewPayable(vendorName, vendorEmail, zohoBillingId, paidAmount)
+		const monthAndYear = moment(paymentDate).format('YYYY-MM-DD')
+		const lineItems = [ {
+			"name": `TS ${ monthAndYear }`,
+			"account_id": "335260000002330131",
+			"rate": paidAmount,
+			"quantity": 1
+		} ]
+		const test = await createBillZohoRequest(monthAndYear, '', vendorEmail, "Api_Test_001", lineItems)
 		const result = await paidOrAddPaymentInfo(reportId, { paidAmount, unpaidAmount, paymentMethod, paymentDate, notes })
 
 		result === 'Success'
