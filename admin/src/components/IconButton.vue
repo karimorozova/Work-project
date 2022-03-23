@@ -5,7 +5,7 @@
       :color="color"
       :text="popupText"
       :side="popupSide"
-      :isDisabled="!hasPopup"
+      :isDisabled="!popupText"
     )
       .button(:class="{disabled: isDisabled}" @click.stop="click")
         .button__icon
@@ -25,10 +25,10 @@ export default {
       type: Boolean,
       default: false
     },
-    hasPopup: {
-      type: Boolean,
-      default: false
-    },
+    // hasPopup: {
+    //   type: Boolean,
+    //   default: false
+    // },
     backgroundColor: {
       type: String
     },

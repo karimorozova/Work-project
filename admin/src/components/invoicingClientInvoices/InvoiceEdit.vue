@@ -1,95 +1,19 @@
 <template lang="pug">
-  .invoicing-layout
-    | asdkjaskd
-  //.invoice-edit(v-if="invoice.customer")
-  //  .invoice-details__field
-  //    .title Invoice ID
-  //    .value {{invoice.invoiceId}}
-  //  .invoice-details__field
-  //    .title Customer Name
-  //    .value {{invoice.customer.name}}
-  //  .invoice-details__field
-  //    .title Invoice Date
-  //    DatePicker.range-with-one-panel-short(
-  //      :value="new Date(invoice.invoicingDate)"
-  //      @input="(e) => setInvoiceDate(e)"
-  //      format="DD-MM-YYYY, HH:mm"
-  //      prefix-class="xmx"
-  //      :clearable="false"
-  //      type="datetime"
-  //      placeholder="Select datetime range"
-  //    )
-  //  .invoice-details__field
-  //    .title Terms
-  //    .drop-down
-  //      SelectSingle(
-  //        :options="terms",
-  //        placeholder="Reports Actions",
-  //        :selectedOption="invoice.terms",
-  //        @chooseOption="setTerms"
-  //      )
-  //
-  //  .invoice-details__field
-  //    .title Account Manager
-  //    .drop-down
-  //      SelectSingle(
-  //        :options="allAMs",
-  //        placeholder="Reports Actions",
-  //        :selectedOption="currentAM",
-  //        @chooseOption="setAm"
-  //      )
-  //  .invoice-details__field
-  //    .title Due date
-  //    DatePicker.range-with-one-panel-short(
-  //      :value="new Date(invoice.dueDate)"
-  //      @input="(e) => setDueDate(e)"
-  //      format="DD-MM-YYYY, HH:mm"
-  //      prefix-class="xmx"
-  //      :clearable="false"
-  //      type="datetime"
-  //      placeholder="Select datetime range"
-  //    )
-  //  Button(value="Save" @clicked="saveChanges")
-  //
-  //  GeneralTable.test(
-  //    :fields="fieldsItems"
-  //    :tableData="invoice.items"
-  //  )
-  //    template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
-  //      .table__header {{ field.label }}
-  //
-  //    template(slot="title" slot-scope="{ row, index }")
-  //      .table__data(v-if="editedId === row._id || editedId === index")
-  //        input(type="text" placeholder="Value" v-model="title")
-  //      .table__data(v-else) {{ row.title }}
-  //    template(slot="quantity" slot-scope="{ row, index }")
-  //      .table__data(v-if="editedId === row._id || editedId === index")
-  //        input(type="text" placeholder="Value" v-model="quantity")
-  //      .table__data(v-else) {{ row.quantity }}
-  //    template(slot="rate" slot-scope="{ row, index }")
-  //      .table__data(v-if="editedId === row._id || editedId === index")
-  //        input(type="text" placeholder="Value" v-model="rate")
-  //      .table__data(v-else) {{ row.rate }}
-  //    template(slot="tax" slot-scope="{ row, index }")
-  //      .table__data(v-if="editedId === row._id || editedId === index")
-  //        input(type="text" placeholder="Value" v-model="tax")
-  //      .table__data(v-else) {{ row.tax }}
-  //    template(slot="amount" slot-scope="{ row, index }")
-  //      .table__data(v-if="editedId === row._id || editedId === index")
-  //        input(type="text" placeholder="Value" v-model="amount")
-  //      .table__data(v-else) {{ row.amount }}
-  //
-  //    template(slot="icons" slot-scope="{ row, index }")
-  //      .table__icons
-  //        img.table__icon(
-  //          v-for="(icon, key) in icons"
-  //          :class="{'table__opacity': isActive(key, index, row._id)}"
-  //          :src="icon.icon"
-  //          @click="makeAction(key, row._id, index)"
-  //        )
-  //
-  //  IconButton(@clicked="addNewItem")
-  //    i(class="fa-solid fa-plus")
+
+  .invoicing-layout(v-if="invoice._id" )
+    .invoicing-layout__rightSide
+      InvoiceDetailsPDFEdit(
+        :invoice="invoice"
+        @modifyInvoice="modifyInvoiceByPropValue"
+      )
+    .invoicing-layout__leftSide
+      InvoiceDetailsSubInfoEdit(
+        :invoice="invoice"
+        @modifyInvoice="modifyInvoiceByPropValue"
+      )
+      InvoiceDetailsActionsEdit(
+        @save="saveInvoiceChanges"
+      )
 </template>
 
 <script>
@@ -99,12 +23,19 @@ import IconButton from "../IconButton"
 import GeneralTable from "../GeneralTable"
 import '../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import crudIcons from "../../mixins/crudIcons"
+
+import InvoiceDetailsPDFEdit from "./sub-components/InvoiceDetailsPDFEdit"
+import InvoiceDetailsActionsEdit from "./sub-components/InvoiceDetailsActionsEdit"
+import InvoiceDetailsSubInfoEdit from "./sub-components/InvoiceDetailsSubInfoEdit"
 
 export default {
   mixins: [ crudIcons ],
   components: {
+    InvoiceDetailsSubInfoEdit,
+    InvoiceDetailsActionsEdit,
+    InvoiceDetailsPDFEdit,
     SelectSingle,
     DatePicker,
     Button,
@@ -114,7 +45,6 @@ export default {
   data() {
     return {
       invoice: {},
-      terms: [ 'test', 'test2', 'test3' ],
       editedId: null,
       title: '',
       quantity: 0,
@@ -163,22 +93,9 @@ export default {
     }
   },
   methods: {
-    async getInvoice() {
-      console.log('test')
-      this.invoice = (await this.$http.get(`/invoicing/invoice/${ this.$route.params.id }`)).data
-    },
-    setDueDate(date) {
-      this.$set(this.invoice, 'dueDate', date)
-    },
-    setAm({ option }) {
-      this.$set(this.invoice, 'accountManager', option)
-    },
-    setTerms({ option }) {
-      this.$set(this.invoice, 'terms', option)
-    },
-    setInvoiceDate(date) {
-      this.$set(this.invoice, 'invoicingDate', date)
-    },
+    // setTerms({ option }) {
+    //   this.$set(this.invoice, 'terms', option)
+    // },
     addNewItem() {
       if (typeof this.editedId === 'number') return
 
@@ -201,9 +118,7 @@ export default {
       }
 
     },
-    editItem() {
 
-    },
     findItemById(id) {
       console.log(this.invoice)
       return this.invoice.items.find(({ _id }) => _id.toString() === id)
@@ -264,15 +179,15 @@ export default {
       this.tax = 0
       this.amount = 0
     },
-    // async editItem( ) {
-    //   await this.$http.post(`/invoicing/invoice/${this.$route.params.id}/item`, {
-    //     title:this.title,
-    //     quantity:this.quantity,
-    //     rate:this.rate,
-    //     tax:this.tax,
-    //     amount:this.amount,
-    //   })
-    // },
+    async editItem() {
+      await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/item`, {
+        title: this.title,
+        quantity: this.quantity,
+        rate: this.rate,
+        tax: this.tax,
+        amount: this.amount
+      })
+    },
     async createItem() {
       await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/item`, {
         title: this.title,
@@ -285,23 +200,32 @@ export default {
       this.clearEditCreateFields()
       await this.getInvoice()
     },
-    async saveChanges() {
-      this.invoice = (await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }`, this.invoice)).data
-    }
-  },
-  computed: {
-    ...mapGetters({
-      users: 'getUsers'
-    }),
-    allAMs() {
-      return this.users
-          .filter(({ group }) => group.name === 'Account Managers')
-          .map(({ firstName, lastName, _id }) => ({ _id, firstName, lastName, name: firstName + ' ' + lastName }))
+
+
+    ...mapActions([ 'alertToggle' ]),
+    modifyInvoiceByPropValue({ prop, value }) {
+      this.$set(this.invoice, prop, value)
     },
-    currentAM() {
-      if (this.invoice.accountManager === null) return ''
-      const { firstName, lastName } = this.invoice.accountManager
-      return firstName + ' ' + lastName
+    checkSaves() {
+      {
+        if (!this.invoice.invoiceId.includes('_')) this.invoice.invoiceId = 'INV_' + this.invoice.invoiceId
+        let num = this.invoice.invoiceId.split('_')[1]
+        if (!num) num = '000000'
+        this.invoice.invoiceId = 'INV_' + num.split('').map(i => +i).filter(Number.isInteger).join('')
+      }
+    },
+    async saveInvoiceChanges() {
+      this.checkSaves()
+      try {
+        this.invoice = (await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }`, this.invoice)).data
+        await this.$router.push(`/pangea-finance/receivables-reports/invoice/${ this.$route.params.id }`)
+        this.alertToggle({ message: "Invoice updated", isShow: true, type: "success" })
+      } catch (err) {
+        this.alertToggle({ message: err.message, isShow: true, type: "error" })
+      }
+    },
+    async getInvoice() {
+      this.invoice = (await this.$http.get(`/invoicing/invoice/${ this.$route.params.id }`)).data
     }
   },
   created() {
@@ -313,54 +237,60 @@ export default {
 <style scoped lang="scss">
 @import "../../assets/scss/colors";
 
+.invoicing-layout {
+  margin: 50px;
+  display: flex;
+  gap: 25px;
+}
+
 //.invoice-details {
 //  &__field {
 //    margin-bottom: 10px;
 //  }
 //}
-
-.table {
-  &__data {
-    padding: 0 7px;
-  }
-
-  &__header {
-    padding: 0 7px;
-  }
-
-  &__drop {
-    position: relative;
-    height: 32px;
-    max-width: 220px;
-    margin: 0 7px;
-    width: 100%;
-    background: white;
-    border-radius: 2px;
-  }
-
-  &__icons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    gap: 8px;
-  }
-
-  &__icon {
-    cursor: pointer;
-    opacity: 0.5;
-  }
-
-  &__opacity {
-    opacity: 1;
-  }
-
-  &__input {
-    width: 100%;
-    padding: 0 7px;
-  }
-}
-
+//
+//.table {
+//  &__data {
+//    padding: 0 7px;
+//  }
+//
+//  &__header {
+//    padding: 0 7px;
+//  }
+//
+//  &__drop {
+//    position: relative;
+//    height: 32px;
+//    max-width: 220px;
+//    margin: 0 7px;
+//    width: 100%;
+//    background: white;
+//    border-radius: 2px;
+//  }
+//
+//  &__icons {
+//    display: flex;
+//    align-items: center;
+//    justify-content: center;
+//    width: 100%;
+//    gap: 8px;
+//  }
+//
+//  &__icon {
+//    cursor: pointer;
+//    opacity: 0.5;
+//  }
+//
+//  &__opacity {
+//    opacity: 1;
+//  }
+//
+//  &__input {
+//    width: 100%;
+//    padding: 0 7px;
+//  }
+//}
+//
 //.drop-down {
 //  position: relative;
 //  height: 32px;

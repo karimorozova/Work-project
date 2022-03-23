@@ -92,6 +92,14 @@ sup {
   color: $dark-border;
 }
 
+.dropbox {
+  height: 32px;
+  position: relative;
+  width: 220px;
+  border-radius: 2px;
+  background-color: white;
+}
+
 .hiddenScroll {
   overflow: hidden;
 }

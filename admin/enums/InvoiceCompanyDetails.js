@@ -5,7 +5,6 @@ const company = {
 	postCode: '3020',
 	country: 'Cyprus',
 	taxId: 'CY10362046H'
-
 }
 
 module.exports = company
