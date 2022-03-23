@@ -358,7 +358,6 @@ export default {
 
       if (this.selectedTabWorkflow === 'Alpha' || service.title !== 'Translation') {
         for (let { step } of service.steps) {
-          if (step.title !== 'Translation' && step.title !== 'Revising') continue
           let units = []
           units = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
           collectWorkFlow(step, units)

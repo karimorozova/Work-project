@@ -51,9 +51,9 @@
               .table__header(v-else-if="field.headerKey === 'headerAmount'" )
                 .amount-header
                   .amount-header__title {{ field.label }}
-                  .amount-header__icon
+                  .amount-header__icon(@mouseover="calculateTotal" @mouseout="totalAmount = 0")
                     PopUp(
-                      :text="getTotalAmount + ' €'"
+                      :text="totalAmount + ' €'"
                     )
                       span &Sigma;
 
@@ -131,8 +131,8 @@
             .filter__item
               label Status
               .filter__input
-                SelectSingle(
-                  :selectedOption="selectedStatus"
+                SelectMulti(
+                  :selectedOptions="selectedStatus"
                   :options="['Created', 'Sent', 'Approved', 'Invoice on-hold', 'Invoice Ready', 'Partially Paid']"
                   placeholder="Option"
                   @chooseOption="setStatus"
@@ -142,11 +142,11 @@
             .filter__item
               label Payment Method
               .filter__input
-                SelectSingle(
-                  :selectedOption="selectedPaymentMethod"
+                SelectMulti(
+                  :selectedOptions="selectedPaymentMethod"
                   :options="allPaymentMethods.map(i => i.name)"
-                  placeholder="Option"
-                  @chooseOption="setPaymentMethod"
+                  placeholder="Options"
+                  @chooseOptions="setPaymentMethod"
                   :isRemoveOption="true"
                   @removeOption="removePaymentMethod"
                 )
@@ -308,11 +308,15 @@ export default {
         'paymentMethod'
       ],
 
-      deleteRequestId: ''
+      deleteRequestId: '',
+      totalAmount: 0
     }
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
+    calculateTotal() {
+      this.getTotalAmount()
+    },
     async manageReportActions() {
 
       switch (this.selectedReportAction) {
@@ -381,7 +385,14 @@ export default {
       this.replaceRoute('status', option)
     },
     setPaymentMethod({ option }) {
-      this.replaceRoute('paymentMethod', option)
+      if (!this.$route.query.paymentMethod) {
+        this.replaceRoute('paymentMethod', option)
+        return
+      }
+      let list = this.$route.query.paymentMethod.split(',')
+      if (list.includes(option)) list = list.filter(item => item !== option)
+      else list.push(option)
+      this.replaceRoute('paymentMethod', list.join(','))
     },
     removePaymentMethod() {
       this.replaceRoute('paymentMethod', '')
@@ -533,6 +544,15 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
+    },
+    async getTotalAmount() {
+      const result = await this.$http.post("/invoicing-payables/reports", {
+        filters: this.allFilters,
+        countToSkip: 0,
+        countToGet: 1e6
+      })
+
+      this.totalAmount = result.data.length ? (+(result.data.reduce((acc, curr) => acc += +curr.total || 0, 0)).toFixed(2)).toString() : 0
     }
     // TODO Zoho (soon)
     // async updatePayablesStateFromZoho() {
@@ -550,9 +570,9 @@ export default {
     ...mapGetters({
       user: "getUser"
     }),
-    getTotalAmount() {
-      return (+(this.reports.reduce((acc, curr) => acc += +curr.total || 0, 0)).toFixed(2)).toString()
-    },
+    // getTotalAmount() {
+    //   return
+    // },
     availableActionOptions() {
       if (this.reports && this.reports.length) {
         const availableOptions = []
@@ -580,7 +600,7 @@ export default {
       return this.$route.query.status || ''
     },
     selectedPaymentMethod() {
-      return this.$route.query.paymentMethod || ''
+      return this.$route.query.paymentMethod ? this.$route.query.paymentMethod.split(',') : []
     },
     selectedVendors() {
       return this.$route.query.vendors && this.vendorsList.length
