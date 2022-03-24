@@ -19,7 +19,10 @@
           .header__data-number {{invoice.invoiceId}}
           .row
             .row__key Balance Due:
-            .row__value.row__value-bold EUR 123.123
+            .row__value.row__value-bold
+              span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+              span {{ takeInvoiceFinance().total }}
+
 
 
       .subheader
@@ -72,20 +75,28 @@
               .row__value EUR 222
             .row
               .row__key Total:
-              .row__value EUR 222
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().total }}
             .splitter
             .row
               .row__key Balance Due:
-              .row__value.row__value-bold EUR 222
+              .row__value.row__value-bold
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().total }}
+
 </template>
 
 <script>
 import { company } from "../../../../enums"
 import GeneralTable from "../../GeneralTable"
 import moment from "moment"
+import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import { getInvoiceFinance } from '../../../../invoicing/helpers'
 
 export default {
   name: "InvoiceDetailsPDF",
+  mixins: [ currencyIconDetected ],
   components: { GeneralTable },
   props: {
     invoice: {
@@ -131,6 +142,9 @@ export default {
   methods: {
     getTime(date) {
       return moment(date).format('DD/MM/YYYY')
+    },
+    takeInvoiceFinance() {
+      return getInvoiceFinance(this.invoice)
     },
     companyProfile() {
       return company

@@ -59,8 +59,11 @@
               .user__description
                 .user__name
                   router-link(class="link-to" target= '_blank' :to="{path: `/pangea-clients/all/details/${reportDetailsInfo.client._id}`}")
-                    span {{ getBillingDetails(reportDetailsInfo).getOfficialName() }}
-                .user__address {{ getBillingDetails(reportDetailsInfo).getAddressFull() }}
+                    span {{ paymentProfile(reportDetailsInfo).getOfficialName() }}
+                .user__text {{ paymentProfile(reportDetailsInfo).getAddress() }}
+                //.user__text(v-if="paymentProfile(reportDetailsInfo).getState()" ) {{ paymentProfile(reportDetailsInfo).getState() }}
+                .user__text {{ paymentProfile(reportDetailsInfo).getCityWithCode() }}
+                //.user__text {{ paymentProfile(reportDetailsInfo).getVat() }}
 
           .info__descriptions
             .text__block
@@ -82,12 +85,12 @@
               .text__value {{reportDetailsInfo.client.name}}
 
             .text__block
-              .text__title Billing Name:
-              .text__value {{ getBillingDetails(reportDetailsInfo).getName() }}
+              .text__title Payment Profile Name:
+              .text__value {{ paymentProfile(reportDetailsInfo).getName() }}
 
             .text__block
               .text__title Payment Type:
-              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentType() }}
+              .text__value {{ paymentProfile(reportDetailsInfo).getPaymentType() }}
 
             .text__block
               .text__title Created On:
@@ -102,7 +105,7 @@
 
             .text__block
               .text__title Payment Terms:
-              .text__value {{ getBillingDetails(reportDetailsInfo).getPaymentTerms() }}
+              .text__value {{ paymentProfile(reportDetailsInfo).getPaymentTerms() }}
 
             .text__block
               .text__title Projects / Jobs:
@@ -131,7 +134,7 @@
           )
       .available-jobs(v-if="toggleAddSteps")
         ReceivablesAddStepsTo(
-          :paymentType="getBillingDetails(reportDetailsInfo).getPaymentType()"
+          :paymentType="paymentProfile(reportDetailsInfo).getPaymentType()"
           :steps="steps"
           @refreshReports="refreshReports"
           @closeTable="changeToggleAddSteps"
@@ -179,21 +182,25 @@ export default {
     toggleAllSteps(bool) {
       this.steps = this.steps.map(i => ({ ...i, isCheck: bool }))
     },
-    getBillingDetails({ client, clientBillingInfo }) {
+    paymentProfile({ client, clientBillingInfo }) {
       const { billingInfo } = client
-      const {
-        name,
-        officialName,
-        paymentType,
-        paymentTerms: { name: paymentTerms },
-        address: { street1, street2, country, city }
-      } = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+      const data = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+      const { officialName, name, address, paymentType, paymentTerms: { name: paymentTerms } } = data
+      const { city, country, state, street1, street2, vat, zipCode } = address
       return {
-        getOfficialName: () => officialName,
+        getOfficialName: () => officialName || '',
+        getAddress: () => `${ street1 || '' }${ street2 && '. ' }${ street2 || '' }`,
+        getState: () => state || '',
+        getCity: () => city || '',
+        getZipCode: () => zipCode || '',
+        getCountry: () => country || '',
+        getCityWithCode() {
+          return `${ this.getCountry() }${ this.getCity() && ', ' }${ this.getCity() }${ this.getZipCode() && ', ' }${ this.getZipCode() }`
+        },
+        getVat: () => vat || '',
         getName: () => name,
         getPaymentTerms: () => paymentTerms,
-        getPaymentType: () => paymentType,
-        getAddressFull: () => `${ street1 || 'No street' }, ${ city || 'No city' }, ${ country || 'No country' }`
+        getPaymentType: () => paymentType
       }
     },
     getReportProjectsCount({ stepsAndProjects }) {
@@ -222,7 +229,7 @@ export default {
       await this.refreshReports()
     },
     callDesiredStepsMethod() {
-      const PT = this.getBillingDetails(this.reportDetailsInfo).getPaymentType()
+      const PT = this.paymentProfile(this.reportDetailsInfo).getPaymentType()
       PT === 'PPP' || PT === 'Pre-Payment' ? this.getStepsMonoProject() : this.getStepsMultiProject()
     },
     async getStepsMonoProject() {
@@ -435,242 +442,11 @@ export default {
 .info {
   &__user {
     margin-bottom: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 15px;
     border-bottom: 1px solid $light-border;
   }
 }
 
-//textarea {
-//  width: 100%;
-//  border-radius: 2px;
-//  border: 1px solid $border;
-//  padding: 5px;
-//  color: $text;
-//  outline: none;
-//  box-sizing: border-box;
-//  transition: .1s ease-out;
-//
-//  &:focus {
-//    border: 1px solid $border-focus;
-//  }
-//}
-//
-//.green-value {
-//  border: 1px solid $border !important;
-//  color: $text !important;
-//}
-//
-//.amount {
-//  &__title {
-//    font-family: Myriad600;
-//    width: 120px;
-//    align-items: center;
-//    display: flex;
-//  }
-//
-//  &__value {
-//    border-radius: 2px;
-//    border: 1px solid #d66f5847;
-//    padding: 0 7px;
-//    height: 32px;
-//    display: flex;
-//    align-items: center;
-//    width: 100px;
-//    box-sizing: border-box;
-//    color: $red;
-//  }
-//}
-//
-//.payment-card {
-//  background-color: white;
-//  padding: 25px;
-//  box-shadow: $box-shadow;
-//  border-radius: 2px;
-//  height: fit-content;
-//  z-index: 500;
-//  width: 510px;
-//  box-sizing: border-box;
-//  position: absolute;
-//  top: 50%;
-//  left: 485px;
-//  transform: translate(0%, -50%);
-//
-//  &__buttons {
-//    display: flex;
-//    justify-content: center;
-//    gap: 20px;
-//    margin-top: 25px;
-//  }
-//
-//  &__input {
-//    font-size: 14px;
-//    border: 1px solid $border;
-//    border-radius: 2px;
-//    box-sizing: border-box;
-//    padding: 0 7px;
-//    outline: none;
-//    width: 220px;
-//    height: 32px;
-//    transition: .1s ease-out;
-//
-//    &:focus {
-//      border: 1px solid $border-focus;
-//    }
-//  }
-//
-//  &__link {
-//    transition: .2s ease-out;
-//    margin-top: 10px;
-//    cursor: pointer;
-//
-//    &:hover {
-//      text-decoration: underline;
-//    }
-//  }
-//
-//  &__body {
-//    display: flex;
-//    justify-content: space-between;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__header {
-//    display: flex;
-//    justify-content: space-between;
-//    margin: 15px 0;
-//    padding: 15px 0;
-//    border-top: 1px solid $light-border;
-//    border-bottom: 1px solid $light-border;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__title {
-//    text-align: center;
-//    font-family: 'Myriad900';
-//    text-transform: uppercase;
-//  }
-//
-//  &__close {
-//    position: absolute;
-//    top: 10px;
-//    right: 10px;
-//    font-size: 22px;
-//    cursor: pointer;
-//    height: 22px;
-//    width: 22px;
-//    justify-content: center;
-//    display: flex;
-//    align-items: center;
-//    font-family: Myriad900;
-//    opacity: 0.8;
-//    transition: ease 0.2s;
-//
-//    &:hover {
-//      opacity: 1
-//    }
-//  }
-//}
-//
-//.drop {
-//  height: 32px;
-//  position: relative;
-//  width: 220px;
-//  background-color: white;
-//  border-radius: 2px;
-//
-//  &-title {
-//    margin-bottom: 3px;
-//  }
-//}
-//
-//.title {
-//  display: flex;
-//  justify-content: space-between;
-//  align-items: center;
-//  margin-bottom: 15px;
-//  height: 32px;
-//
-//  &__button {
-//    display: flex;
-//    gap: 20px;
-//  }
-//
-//  &__text {
-//    font-size: 18px;
-//    font-family: 'Myriad600';
-//
-//    a {
-//      color: inherit;
-//      text-decoration: none;
-//      transition: .2s ease-out;
-//
-//      &:hover {
-//        text-decoration: underline;
-//      }
-//    }
-//  }
-//}
-//
-//.invoicing-details {
-//  position: relative;
-//  width: 1530px;
-//  margin: 50px;
-//
-//
-//  &__cards {
-//    display: flex;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__body {
-//    display: flex;
-//    justify-content: space-between;
-//  }
-//
-//  &__wrapper {
-//    border-radius: 2px;
-//    padding: 25px;
-//    box-sizing: border-box;
-//    box-shadow: $box-shadow;
-//    background: white;
-//    position: relative;
-//  }
-//
-//  &__table {
-//    width: 1050px;
-//    position: relative;
-//  }
-//
-//  &__text {
-//    width: 380px;
-//    background: $light-background;
-//    box-sizing: border-box;
-//    padding: 25px;
-//    height: fit-content;
-//    border-radius: 2px;
-//    border-bottom: 1px solid $light-border;
-//  }
-//
-//  &__user {
-//    padding: 25px;
-//    background: $light-background;
-//    margin-bottom: 15px;
-//    border-radius: 2px;
-//    width: 380px;
-//    box-sizing: border-box;
-//    border-bottom: 1px solid $light-border;
-//  }
-//
-//  &__title {
-//    font-size: 18px;
-//    margin-bottom: 20px;
-//    display: flex;
-//    justify-content: space-between;
-//    align-items: center;
-//    font-family: Myriad600;
-//  }
-//}
-//
 .buttons__group {
   position: absolute;
   top: -40px;
@@ -723,47 +499,13 @@ export default {
   }
 }
 
-//
-//.file-name {
-//  position: absolute;
-//  width: 145px;
-//  top: 7px;
-//  left: 40px;
-//  opacity: 0.6;
-//  text-overflow: ellipsis;
-//  white-space: nowrap;
-//  overflow: hidden;
-//}
-//
-//.check-box {
-//  display: flex;
-//  margin-top: 6px;
-//
-//  &__text {
-//    font-family: Myriad400;
-//    margin-left: 7px;
-//    margin-top: 2px;
-//  }
-//}
-//
-//.absolute-middle {
-//  position: absolute;
-//  top: 50%;
-//  left: 50%;
-//  transform: translate(-50%, -50%);
-//  z-index: 5;
-//}
-//
-//
-//
+
 .user {
   display: flex;
   gap: 20px;
 
-  &__address {
-    color: $dark-border;
-    font-family: 'Myriad300';
-    letter-spacing: 0.2px;
+  &__text {
+    margin: 5px 0;
   }
 
   &__name {

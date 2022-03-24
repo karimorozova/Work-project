@@ -9,13 +9,13 @@ const getInvoices = async (query, queryPage, queryLimit, filters) => {
 	//
 	// } = filters
 	return Invoice.find({})
-			.populate('customer', [ 'name' ]).lean()
+			.populate('customer', [ 'name', 'currency' ]).lean()
 			.populate('terms')
 }
 
 const getInvoice = async (invoiceId) => {
 	return Invoice.findById(invoiceId)
-			.populate('customer', [ 'name', 'billingInfo' ])
+			.populate('customer', [ 'name', 'billingInfo', 'currency' ])
 			.populate('accountManager', [ 'firstName', 'lastName' ])
 			.populate('terms')
 			.lean()

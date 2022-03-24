@@ -25,7 +25,9 @@
 
           .row
             .row__key Balance Due:
-            .row__value.row__value-bold EUR 123.123
+            .row__value.row__value-bold
+              span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+              span {{ takeInvoiceFinance().total }}
 
 
       .subheader
@@ -136,11 +138,15 @@
               .row__value EUR 222
             .row
               .row__key Total:
-              .row__value EUR 222
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().total }}
             .splitter
             .row
               .row__key Balance Due:
-              .row__value.row__value-bold EUR 222
+              .row__value.row__value-bold
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().total }}
 </template>
 
 <script>
@@ -150,8 +156,11 @@ import GeneralTable from "../../GeneralTable"
 import Add from "../../Add"
 import SelectSingle from "../../SelectSingle"
 import moment from "moment"
+import currencyIconDetected from "../../../mixins/currencyIconDetected"
+import { getInvoiceFinance } from "../../../../invoicing/helpers"
 
 export default {
+  mixins: [ currencyIconDetected ],
   name: "InvoiceDetailsPDFEdit",
   components: { SelectSingle, Add, GeneralTable, DatePicker },
   props: {
@@ -199,10 +208,20 @@ export default {
           style: { width: "12%" }
         }
       ],
-      paymentTerms: []
+      paymentTerms: [],
+
+
+      editedId: null,
+      title: '',
+      quantity: 0,
+      rate: 0,
+      amount: 0
     }
   },
   methods: {
+    takeInvoiceFinance() {
+      return getInvoiceFinance(this.invoice)
+    },
     setPaymentTerms({ option }) {
       const terms = this.paymentTerms.find(i => i.name === option)
       this.modifyInvoice('terms', terms)

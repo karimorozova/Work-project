@@ -44,12 +44,6 @@ export default {
   data() {
     return {
       invoice: {},
-      editedId: null,
-      title: '',
-      quantity: 0,
-      rate: 0,
-      tax: 0,
-      amount: 0
     }
   },
   methods: {
@@ -159,6 +153,7 @@ export default {
       this.clearEditCreateFields()
       await this.getInvoice()
     },
+
 
     //DONE!! ==========>>>
     ...mapActions([ 'alertToggle' ]),
