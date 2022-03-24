@@ -61,6 +61,13 @@
             template(slot="dateRange" slot-scope="{ row, index }")
               .table__data(v-html="dateRange(row)")
 
+            template(slot="invoiceId" slot-scope="{ row, index }")
+              .table__data(v-if="row.invoice")
+                router-link(class="link-to" :to="{path: '/pangea-finance/receivables-reports/invoice/' + row.invoice._id }" target= '_blank')
+                  span {{ row.invoice.invoiceId }}
+                .name {{ row.invoice.status }}
+              .table__data(v-else) -
+
             template(slot="client" slot-scope="{ row, index }")
               .table__data
                 router-link(class="link-to" :to="{path: '/pangea-clients/all/details/' + row.client._id }" target= '_blank')
@@ -91,7 +98,7 @@
               .table__data {{ getTime( row.updatedAt) }}
 
             template(slot="icon" slot-scope="{ row, index }")
-              .table__icon
+              .table__icon(v-if="!row.invoice")
                 i(class="fas fa-trash" @click="requestToDeleteReceivables(row._id)")
 
         template(slot="filters")
@@ -138,8 +145,6 @@
       //      Button(value="Zoho sync." :outline="true" @clicked="updateReportsStateFromZoho()" style="margin-right: 10px;")
       //      router-link(class="link-to" :to="{path: `/pangea-finance/invoicing-receivables/create-reports`}")
       //        Button(value="Add Reports")
-      //
-
 
 </template>
 
@@ -180,6 +185,12 @@ export default {
           headerKey: "headerReportId",
           key: "reportId",
           style: { width: "120px" }
+        },
+        {
+          label: "Invoice ID / Status",
+          headerKey: "headerInvoiceId",
+          key: "invoiceId",
+          style: { width: "150px" }
         },
         {
           label: "Client / Billing Name",
@@ -429,7 +440,7 @@ export default {
     },
     availableActionOptions() {
       if (this.reports && this.reports.length) {
-        if (this.reports.filter(i => i.isCheck).every(i => i.status === 'Created')) {
+        if (this.reports.filter(i => i.isCheck).every(i => i.invoice === null)) {
           return [ "Delete" ]
         }
       }

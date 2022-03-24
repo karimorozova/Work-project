@@ -57,6 +57,8 @@
                 v-if="!isMinimumChargeUsed && step.status !== 'Cancelled' && step.isReceivableVisible"
                 @keyup="setReceivables($event, row.title)"
                 :value="row.receivables"
+                :readonly="step.isInReportReceivables"
+                :disabled="step.isInReportReceivables"
               )
               .disabled(v-else) Disabled
 
@@ -67,7 +69,8 @@
                 v-if="step.status !== 'Cancelled'"
                 @keyup="setPayables($event, row.title)"
                 :value="row.payables"
-                :disabled="!step.vendor"
+                :disabled="!step.vendor || step.isInReportPayables"
+                :readonly="!step.vendor || step.isInReportPayables"
               )
               .disabled(v-else) Disabled
 

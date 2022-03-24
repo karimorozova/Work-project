@@ -33,13 +33,13 @@
         .subheader__right
           .row
             .row__key Invoice Date:
-            .row__value 222
+            .row__value {{ getTime(invoice.invoicingDate)  }}
           .row
             .row__key Terms:
-            .row__value 222
+            .row__value {{ invoice.terms.name }}
           .row
             .row__key Due Date:
-            .row__value 222
+            .row__value {{ getTime(invoice.dueDate) }}
 
       .body
         .body__table
@@ -82,6 +82,7 @@
 <script>
 import { company } from "../../../../enums"
 import GeneralTable from "../../GeneralTable"
+import moment from "moment"
 
 export default {
   name: "InvoiceDetailsPDF",
@@ -128,6 +129,9 @@ export default {
     }
   },
   methods: {
+    getTime(date) {
+      return moment(date).format('DD/MM/YYYY')
+    },
     companyProfile() {
       return company
     },

@@ -1,28 +1,31 @@
 const { Invoice, InvoicingClientReports } = require("../models")
 
 
-deleteInvoiceItem = async (invoiceId, itemId) => {
+const deleteInvoiceItem = async (invoiceId, itemId) => {
 	try {
-		await Invoice.findByIdAndUpdate(invoiceId, {"$pull":{ 'items': {'_id': itemId}}})
-		return "success"
+		await Invoice.findByIdAndUpdate(invoiceId, { "$pull": { 'items': { '_id': itemId } } })
 	} catch (e) {
 
 	}
 }
 
-deleteInvoiceItemByReportId = async (invoiceId, reportId) => {
+const deleteInvoiceItemByReportId = async (_invoiceId, _reportId) => {
 	try {
-		await Invoice.findByIdAndUpdate(invoiceId, {"$pull":{ 'items': {'reportId': reportId}}})
-		return "success"
+		const find = { _id: _invoiceId }
+		await Invoice.updateOne(find, { "$pull": { 'items': { 'reportId': _reportId } } })
+		const { items } = await Invoice.findOne(find)
+		if (!items.length) {
+			await Invoice.deleteOne(find)
+		}
 	} catch (e) {
 
 	}
 }
 
-deleteInvoiceItemFromReport = async ( invoiceId, reportId) => {
+const deleteInvoiceItemFromReport = async (_invoiceId, _reportId) => {
 	try {
-		await deleteInvoiceItemByReportId(invoiceId, reportId)
-		await InvoicingClientReports.findByIdAndUpdate(reportId, {invoice: null})
+		await deleteInvoiceItemByReportId(_invoiceId, _reportId)
+		await InvoicingClientReports.findByIdAndUpdate(_reportId, { invoice: null })
 	} catch (e) {
 
 	}
@@ -31,5 +34,5 @@ deleteInvoiceItemFromReport = async ( invoiceId, reportId) => {
 
 module.exports = {
 	deleteInvoiceItem,
-	deleteInvoiceItemFromReport,
+	deleteInvoiceItemFromReport
 }

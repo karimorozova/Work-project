@@ -5,57 +5,67 @@ const InvoiceSchema = new mongoose.Schema({
 	customer: {
 		type: Schema.Types.ObjectId,
 		ref: 'Clients',
-		default: null,
+		default: null
 	},
 	clientBillingInfo: {
 		type: Schema.Types.ObjectId,
-		default: null,
+		default: null
 	},
 	status: {
 		type: String,
 		enum: [ 'Draft', 'Ready', 'Sent', 'Paid', 'Partially Paid', 'Overdue', 'Void' ],
 		default: 'Draft'
 	},
-	items: [{
+	items: [ {
 		title: {
-			type: String,
+			type: String
 		},
-		amount: {
-			type: Number,
-		},
-
-		type:{
+		type: {
 			type: String,
-			enum: [ 'Report', 'Custom' ],
+			enum: [ 'Report', 'Custom' ]
 		},
 		reportId: {
 			type: Schema.Types.ObjectId,
-			default: null,
+			ref: 'InvoicingClientReports',
+			default: null
 		},
 		quantity: {
 			type: Number,
+			default: 0
 		},
 		rate: {
 			type: Number,
+			default: 0
 		},
-		tax: {
+		vatAmount: {
 			type: Number,
+			default: 0
 		},
-
-
-		vat: {
-			type: String,
+		vatPercents: {
+			type: Number,
+			default: 0
 		},
-		discount: {
-			amount: {
-				type: Number,
-			},
-			type: {
-				type: String,
-				enum: [ 'Percent', 'Valet' ],
-			}
+		discountsAmount: {
+			type: Number,
+			default: 0
 		},
-	}],
+		discountsPercents: {
+			type: Number,
+			default: 0
+		},
+		surchargesAmount: {
+			type: Number,
+			default: 0
+		},
+		surchargesPercents: {
+			type: Number,
+			default: 0
+		},
+		amount: {
+			type: Number,
+			default: 0
+		}
+	} ],
 	invoiceId: {
 		type: String
 	},
@@ -72,14 +82,15 @@ const InvoiceSchema = new mongoose.Schema({
 		default: ''
 	},
 	terms: {
-		type: String,
+		type: Schema.Types.ObjectId,
+		ref: 'PaymentTerms',
+		default: null
 	},
 	accountManager: {
 		type: Schema.Types.ObjectId,
 		ref: 'User',
-		default: null,
+		default: null
 	}
-
 
 
 })

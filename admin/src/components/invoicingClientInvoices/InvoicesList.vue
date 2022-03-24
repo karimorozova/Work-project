@@ -1,7 +1,6 @@
 <template lang="pug">
   .invoice-list
     LayoutsListWrapper(
-      v-if="invoices.length"
       :hasFilterButton="true"
       :hasClearButton="true"
       :isFilterActive="isFilterActive"

@@ -8,9 +8,10 @@
     .invoicing-details(v-if="Object.keys(reportDetailsInfo).length")
       .modals
         .modal.wrapper(v-if="isModalOpen")
-          .text Add to Invoice
+          .modal__title Choose Invoice
           .select-options
             SelectSingle(
+              :hasSearch="true"
               placeholder="Option",
               :options="invoicesList",
               :selectedOption="selectedInvoice.name",
@@ -30,13 +31,27 @@
           )
       .invoicing-details__buttons
         .buttons__group(v-if="reportDetailsInfo.invoice === null")
-          IconButton(@clicked="createNewInvoice")
-            i(class="fa-solid fa-plus")
-          IconButton(@clicked="openRequestAddToInvoice")
+          IconButton(
+            :isDisabled="!!requestCounter"
+            :popupText="'Create invoice and attach report'"
+            @clicked="createNewInvoice"
+          )
+            i(class="fa-solid fa-file-circle-plus")
+          IconButton(
+            :popupText="'Attach report to invoice'"
+            :isDisabled="!!requestCounter"
+            @clicked="openRequestAddToInvoice"
+          )
             i(class="fa-solid fa-file-import")
         .buttons__group(v-else)
-          IconButton(@clicked="openDeleteModal")
-            i(class="fa-solid fa-minus")
+          IconButton(
+            v-if="reportDetailsInfo.invoice.status === 'Draft'"
+            :isDisabled="!!requestCounter"
+            :popupText="'Delete report from invoice'"
+            @clicked="openDeleteModal"
+          )
+            i(class="fa-solid fa-file-circle-minus")
+
       .invoicing-details__wrapper
         .invoicing-details__info
           .info__user
@@ -52,12 +67,8 @@
               .text__title Report ID:
               .text__value {{reportDetailsInfo.reportId}}
 
-            .text__block
-              .text__title Customer:
-              .text__value {{reportDetailsInfo.client.name}}
-
             .text__block(v-if="reportDetailsInfo.invoice")
-              .text__title Invoice Id:
+              .text__title Invoice ID:
               .text__value
                 router-link(class="link-to" target= '_blank' :to="{path: `/pangea-finance/receivables-reports/invoice/${reportDetailsInfo.invoice._id}`}")
                   span {{ reportDetailsInfo.invoice.invoiceId }}
@@ -65,6 +76,10 @@
             .text__block(v-if="reportDetailsInfo.invoice")
               .text__title Invoice Status:
               .text__value {{reportDetailsInfo.invoice.status}}
+
+            .text__block
+              .text__title Customer:
+              .text__value {{reportDetailsInfo.client.name}}
 
             .text__block
               .text__title Billing Name:
@@ -105,13 +120,13 @@
 
         .invoicing-details__listOfJobs
           ReportDetailsJobsList(
-            :isAvailableDeleting="true"
+            :isAvailableDeleting="!reportDetailsInfo.invoice"
             :enumOfReports="'client'"
             :steps="reportDetailsInfo.stepsWithProject"
             @deleteStep="deleteStep"
           )
           Add(
-            v-if="!toggleAddSteps"
+            v-if="!toggleAddSteps && !reportDetailsInfo.invoice"
             @add="changeToggleAddSteps"
           )
       .available-jobs(v-if="toggleAddSteps")
@@ -120,6 +135,7 @@
           :steps="steps"
           @refreshReports="refreshReports"
           @closeTable="changeToggleAddSteps"
+          @toggleAll="toggleAllSteps"
         )
 </template>
 
@@ -132,13 +148,14 @@ import Button from "../Button"
 import IconButton from "../IconButton"
 import SelectSingle from "../SelectSingle"
 import CheckBox from "../CheckBox"
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
 import currencyIconDetected from "../../mixins/currencyIconDetected"
 import ReportDetailsJobsList from "../invoicingPayables/ReportDetailsJobsList"
 import Add from "../Add"
 import NavbarList from "../NavbarLists"
+import { getAmountByPercent } from "/invoicing/helpers"
 
 export default {
   name: "ReportDetails",
@@ -152,13 +169,16 @@ export default {
       isModalOpen: false,
       invoicesList: [],
       selectedInvoice: '',
-      isDeleteModalOpen: false,
+      isDeleteModalOpen: false
     }
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    toggleAllSteps(bool) {
+      this.steps = this.steps.map(i => ({ ...i, isCheck: bool }))
+    },
     getBillingDetails({ client, clientBillingInfo }) {
       const { billingInfo } = client
       const {
@@ -237,25 +257,29 @@ export default {
     },
     async createNewInvoice() {
       await this.$http.post(
-          `/invoicing/invoice-from-report/`,
+          `/invoicing/create-invoice-from-report/`,
           {
-            reportId: this.reportDetailsInfo._id,
-            customerId: this.reportDetailsInfo.client._id,
-            clientBillingInfoId: this.reportDetailsInfo.clientBillingInfo,
-            "title": this.reportDetailsInfo.reportId,
-            "quantity": 1,
-            "rate": this.reportDetailsInfo.total,
-            "tax": 0,
-            "amount": this.reportDetailsInfo.total
-
+            _reportId: this.reportDetailsInfo._id,
+            _customerId: this.reportDetailsInfo.client._id,
+            _clientBillingInfoId: this.reportDetailsInfo.clientBillingInfo,
+            item: {
+              title: 'Language Service: report ' + this.reportDetailsInfo.reportId,
+              quantity: 1,
+              rate: this.reportDetailsInfo.total
+            }
           }
       )
       await this.getReportDetails()
     },
     async openRequestAddToInvoice() {
       this.isModalOpen = !this.isModalOpen
-      const invoicesList = (await this.$http.get('/invoicing/invoices-list-for-options')).data
-      this.invoicesList = invoicesList.map(data => ({name: data.invoiceId, id: data._id}))
+      const invoicesList = (await this.$http.post('/invoicing/invoices-list-for-options', {
+        query: {
+          customer: this.reportDetailsInfo.client._id,
+          status: 'Draft'
+        }
+      })).data
+      this.invoicesList = invoicesList.map(data => ({ name: data.invoiceId, id: data._id }))
     },
     closeRequestAddToInvoice() {
       this.isModalOpen = !this.isModalOpen
@@ -264,23 +288,32 @@ export default {
     },
     selectInvoice({ option }) {
       this.selectedInvoice = option
-
     },
     async addToInvoice() {
-      await this.$http.post(
-          `/invoicing/invoice/${this.selectedInvoice.id}/item/`,
-          {
-            reportId: this.reportDetailsInfo._id,
-            "title": this.reportDetailsInfo.reportId,
-            "quantity": 1,
-            "rate": this.reportDetailsInfo.total,
-            "tax": 0,
-            "amount": this.reportDetailsInfo.total
+      let amount = 0, vatPercents = 0, vatAmount = 0, invoiceId = this.selectedInvoice.id
+      const { client: { billingInfo }, clientBillingInfo } = this.reportDetailsInfo
+      const currBI = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+      const rate = this.reportDetailsInfo.total
 
-          }
-      )
-      this.closeRequestAddToInvoice()
-      await this.getReportDetails()
+      if (currBI.address && currBI.address.country === 'Cyprus') {
+        vatPercents = 19
+        vatAmount = getAmountByPercent(rate, 19)
+      }
+      !!vatAmount ? amount = +(rate + vatAmount).toFixed(2) : amount = rate
+
+      try {
+        this.closeRequestAddToInvoice()
+        await this.$http.post(`/invoicing/invoice/${ invoiceId }/create-item/`, {
+          reportId: this.reportDetailsInfo._id,
+          title: 'Language Service: report ' + this.reportDetailsInfo.reportId,
+          quantity: 1,
+          rate,
+          amount,
+          type: "Report"
+        })
+        await this.getReportDetails()
+      } catch (err) {
+      }
     },
     openDeleteModal() {
       this.isDeleteModalOpen = !this.isDeleteModalOpen
@@ -289,9 +322,9 @@ export default {
       this.isDeleteModalOpen = false
     },
     async deleteReportFromInvoice() {
-      await this.$http.delete(`/invoicing/invoice-from-report/${this.$route.params.id}/invoice/${this.reportDetailsInfo.invoice._id}`)
-      await this.getReportDetails()
       this.closeDeleteModal()
+      await this.$http.delete(`/invoicing/invoice-from-report/${ this.$route.params.id }/invoice/${ this.reportDetailsInfo.invoice._id }`)
+      await this.getReportDetails()
     },
     async getShortReports() {
       try {
@@ -315,7 +348,12 @@ export default {
         else if (str === 'GBP') symbol = '£'
         return symbol
       }
-    },
+    }
+  },
+  computed: {
+    ...mapGetters({
+      requestCounter: 'getRequestCounter'
+    })
   },
   async created() {
     await this.getShortReports()
@@ -744,41 +782,42 @@ export default {
     }
   }
 }
+
 .wrapper {
   box-shadow: $box-shadow;
   box-sizing: border-box;
   padding: 25px;
-  //width: 600px;
   background-color: $white;
 }
 
 .modal {
-  text-align: center;
   position: absolute;
   left: 40%;
   top: 0;
   z-index: 20;
   transform: translate(-50%, 0%);
+
+  &__title {
+    margin-bottom: 10px;
+  }
 }
+
 .modals {
   position: relative;
 }
-.text {
-  //text-align: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-size: 15px;
-}
+
 .buttons__modal {
   display: flex;
   gap: 20px;
 }
+
 .select-options {
   position: relative;
-  height: 31px;
+  height: 32px;
   width: 220px;
   margin-bottom: 20px;
 }
+
 //
 //.payment-button {
 //  display: flex;

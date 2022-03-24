@@ -8,19 +8,25 @@ const getInvoices = async (query, queryPage, queryLimit, filters) => {
 	// const {
 	//
 	// } = filters
-	return Invoice.find({}).populate('customer', [ 'name' ]).lean()
+	return Invoice.find({})
+			.populate('customer', [ 'name' ]).lean()
+			.populate('terms')
 }
 
 const getInvoice = async (invoiceId) => {
-	return Invoice.findById(invoiceId).populate('customer', [ 'name', 'billingInfo' ]).populate('accountManager', ['firstName', 'lastName']).lean()
+	return Invoice.findById(invoiceId)
+			.populate('customer', [ 'name', 'billingInfo' ])
+			.populate('accountManager', [ 'firstName', 'lastName' ])
+			.populate('terms')
+			.lean()
 }
 
-const getInvoicesForOptions = async () => {
-	return Invoice.find({}, {invoiceId: 1})
+const getInvoicesForOptions = async (query) => {
+	return Invoice.find({ ...query }, { invoiceId: 1 }).sort({ _id: -1 })
 
 }
 module.exports = {
 	getInvoice,
 	getInvoices,
-	getInvoicesForOptions,
+	getInvoicesForOptions
 }

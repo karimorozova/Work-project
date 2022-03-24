@@ -50,18 +50,25 @@
                 DatePicker(
                   :value="new Date(invoice.invoicingDate)"
                   @input="(e) => modifyInvoice('invoicingDate',e)"
-                  format="DD-MM-YYYY, HH:mm"
+                  format="DD/MM/YYYY"
                   prefix-class="xmx"
                   :clearable="false"
-                  type="datetime"
-                  placeholder="Datetime"
+                  type="date"
+                  placeholder="Date"
                   :confirm="true"
                   confirm-text="Set date"
                 )
 
           .row-edit
             .row-edit__key Terms:
-            .row-edit__value SOON...
+            .row-edit__value
+              .dropbox
+                SelectSingle(
+                  placeholder="Option"
+                  :options="paymentTerms.map(i => i.name)"
+                  :selectedOption="invoice.terms.name"
+                  @chooseOption="setPaymentTerms"
+                )
           .row-edit
             .row-edit__key Due Date:
             .row-edit__value
@@ -69,11 +76,11 @@
                 DatePicker(
                   :value="new Date(invoice.dueDate)"
                   @input="(e) => modifyInvoice('dueDate',e)"
-                  format="DD-MM-YYYY, HH:mm"
+                  format="DD/MM/YYYY"
                   prefix-class="xmx"
                   :clearable="false"
-                  type="datetime"
-                  placeholder="Datetime"
+                  type="date"
+                  placeholder="Date"
                   :confirm="true"
                   confirm-text="Set date"
                 )
@@ -88,56 +95,36 @@
             template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
               .table__header {{ field.label }}
 
-            template(slot="title" slot-scope="{ row, index }")
-              .table__data(v-if="editedId === row._id || editedId === index")
-                input(type="text" placeholder="Value" v-model="title")
-              .table__data(v-else) {{ row.title }}
-            template(slot="quantity" slot-scope="{ row, index }")
-              .table__data(v-if="editedId === row._id || editedId === index")
-                input(type="text" placeholder="Value" v-model="quantity")
-              .table__data(v-else) {{ row.quantity }}
-            template(slot="rate" slot-scope="{ row, index }")
-              .table__data(v-if="editedId === row._id || editedId === index")
-                input(type="text" placeholder="Value" v-model="rate")
-              .table__data(v-else) {{ row.rate }}
-            template(slot="tax" slot-scope="{ row, index }")
-              .table__data(v-if="editedId === row._id || editedId === index")
-                input(type="text" placeholder="Value" v-model="tax")
-              .table__data(v-else) {{ row.tax }}
-            template(slot="amount" slot-scope="{ row, index }")
-              .table__data(v-if="editedId === row._id || editedId === index")
-                input(type="text" placeholder="Value" v-model="amount")
-              .table__data(v-else) {{ row.amount }}
+            //template(slot="title" slot-scope="{ row, index }")
+            //  .table__data(v-if="editedId === row._id || editedId === index")
+            //    input(type="text" placeholder="Value" v-model="title")
+            //  .table__data(v-else) {{ row.title }}
+            //template(slot="quantity" slot-scope="{ row, index }")
+            //  .table__data(v-if="editedId === row._id || editedId === index")
+            //    input(type="text" placeholder="Value" v-model="quantity")
+            //  .table__data(v-else) {{ row.quantity }}
+            //template(slot="rate" slot-scope="{ row, index }")
+            //  .table__data(v-if="editedId === row._id || editedId === index")
+            //    input(type="text" placeholder="Value" v-model="rate")
+            //  .table__data(v-else) {{ row.rate }}
+            //template(slot="tax" slot-scope="{ row, index }")
+            //  .table__data(v-if="editedId === row._id || editedId === index")
+            //    input(type="text" placeholder="Value" v-model="tax")
+            //  .table__data(v-else) {{ row.tax }}
+            //template(slot="amount" slot-scope="{ row, index }")
+            //  .table__data(v-if="editedId === row._id || editedId === index")
+            //    input(type="text" placeholder="Value" v-model="amount")
+            //  .table__data(v-else) {{ row.amount }}
 
-            template(slot="icons" slot-scope="{ row, index }")
-              .table__icons
-                img.table__icon(
-                  v-for="(icon, key) in icons"
-                  :class="{'table__opacity': isActive(key, index, row._id)}"
-                  :src="icon.icon"
-                  @click="makeAction(key, row._id, index)"
-                )
-          Add(@add="addNewItem")
-
-
-          //GeneralTable(
-          //  :fields="fieldsItems"
-          //  :tableData="invoice.items"
-          //
-          //)
-          //  template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
-          //    .table__header {{ field.label }}
-          //
-          //  template(slot="title" slot-scope="{ row, index }")
-          //    .table__data  {{ row.title }}
-          //  template(slot="quantity" slot-scope="{ row, index }")
-          //    .table__data {{ row.quantity }}
-          //  template(slot="rate" slot-scope="{ row, index }")
-          //    .table__data {{ row.rate }}
-          //  template(slot="tax" slot-scope="{ row, index }")
-          //    .table__data {{ row.tax }}
-          //  template(slot="amount" slot-scope="{ row, index }")
-          //    .table__data {{ row.amount }}
+          //  template(slot="icons" slot-scope="{ row, index }")
+          //    .table__icons
+          //      img.table__icon(
+          //        v-for="(icon, key) in icons"
+          //        :class="{'table__opacity': isActive(key, index, row._id)}"
+          //        :src="icon.icon"
+          //        @click="makeAction(key, row._id, index)"
+          //      )
+          //Add(@add="addNewItem")
 
         .body__subtable
           .table-details
@@ -161,10 +148,12 @@ import '../../../assets/scss/datepicker.scss'
 import DatePicker from 'vue2-datepicker'
 import GeneralTable from "../../GeneralTable"
 import Add from "../../Add"
+import SelectSingle from "../../SelectSingle"
+import moment from "moment"
 
 export default {
   name: "InvoiceDetailsPDFEdit",
-  components: { Add, GeneralTable, DatePicker },
+  components: { SelectSingle, Add, GeneralTable, DatePicker },
   props: {
     invoice: {
       type: Object
@@ -183,33 +172,57 @@ export default {
           label: "Quantity",
           headerKey: "headerQuantity",
           key: "quantity",
-          style: { "width": "15%" }
+          style: { "width": "12%" }
         },
         {
           label: "Rate",
           headerKey: "headerRate",
           key: "rate",
-          style: { "width": "15%" }
+          style: { "width": "12%" }
         },
         {
           label: "Tax",
           headerKey: "headerTax",
           key: "tax",
-          style: { "width": "15%" }
+          style: { "width": "12%" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { "width": "15%" }
+          style: { "width": "12%" }
+        },
+        {
+          label: "",
+          headerKey: "headerIcons",
+          key: "icons",
+          style: { width: "12%" }
         }
-      ]
+      ],
+      paymentTerms: []
     }
   },
   methods: {
+    setPaymentTerms({ option }) {
+      const terms = this.paymentTerms.find(i => i.name === option)
+      this.modifyInvoice('terms', terms)
+      this.modifyInvoice('dueDate', new Date(moment().add((terms.value || 21), 'days').format('YYYY-MM-DD')))
+    },
     modifyInvoice(prop, value) {
       this.$emit('modifyInvoice', { prop, value })
+    },
+    async getPaymentTerms() {
+      try {
+        const result = await this.$http.get("/api-settings/payment-terms")
+        const { paymentTerms } = result.data
+        this.paymentTerms = paymentTerms
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Payment Terms", isShow: true, type: "error" })
+      }
     }
+  },
+  created() {
+    this.getPaymentTerms()
   }
 }
 </script>

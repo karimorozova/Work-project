@@ -286,10 +286,7 @@ export default {
       this.steps[index].isCheck = val
     },
     toggleAll(val) {
-      this.steps = this.steps.reduce((acc, cur) => {
-        acc.push({ ...cur, isCheck: val })
-        return acc
-      }, [])
+      this.$emit('toggleAll', val)
       this.isAllSelected = val
     },
     async sendTasks() {

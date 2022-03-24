@@ -1,4 +1,4 @@
- <template lang="pug">
+<template lang="pug">
   .layout
     NavbarList(
       v-if="shortProjectList.length"
@@ -220,6 +220,7 @@
           :invoicingEditId="reportDetailsInfo._id"
           @refreshReports="refreshReports"
           @closeTable="changeToggleAddSteps"
+          @toggleAll="toggleAllSteps"
         )
 
       .cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
@@ -350,6 +351,9 @@ export default {
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
+    toggleAllSteps(bool) {
+      this.steps = this.steps.map(i => ({ ...i, isCheck: bool }))
+    },
     allFieldsOutput(item, result = {}) {
       for (const key in item) {
         if (typeof item[key] === 'object') {
@@ -519,7 +523,7 @@ export default {
         zohoBillingId: this.reportDetailsInfo.zohoBillingId,
         vendorEmail: this.reportDetailsInfo.vendor.email,
         reportTextId: this.reportDetailsInfo.reportId,
-        dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
+        dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate
       }
       this.closePaymentCard()
       const res = (await (this.$http.post(`/invoicing-payables/report-final-status/${ this.reportDetailsInfo._id }`, data))).data

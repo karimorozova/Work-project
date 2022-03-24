@@ -153,7 +153,7 @@ export default {
     isAvailableDeleting: {
       type: Boolean,
       default: false
-    }
+    },
   },
   data() {
     return {

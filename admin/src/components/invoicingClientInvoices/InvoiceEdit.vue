@@ -1,5 +1,4 @@
 <template lang="pug">
-
   .invoicing-layout(v-if="invoice._id" )
     .invoicing-layout__rightSide
       InvoiceDetailsPDFEdit(
@@ -50,46 +49,7 @@ export default {
       quantity: 0,
       rate: 0,
       tax: 0,
-      amount: 0,
-      fieldsItems: [
-        {
-          label: "Title",
-          headerKey: "headerTitle",
-          key: "title",
-          style: { "width": "160px" }
-        },
-        {
-          label: "Quantity",
-          headerKey: "headerQuantity",
-          key: "quantity",
-          style: { "width": "160px" }
-        },
-        {
-          label: "Rate",
-          headerKey: "headerRate",
-          key: "rate",
-          style: { "width": "160px" }
-        },
-        {
-          label: "Tax",
-          headerKey: "headerTax",
-          key: "tax",
-          style: { "width": "160px" }
-        },
-        {
-          label: "Amount",
-          headerKey: "headerAmount",
-          key: "amount",
-          style: { "width": "160px" }
-        },
-        {
-          label: "",
-          headerKey: "headerIcons",
-          key: "icons",
-          style: { width: "16%" },
-          padding: "0"
-        }
-      ]
+      amount: 0
     }
   },
   methods: {
@@ -118,7 +78,6 @@ export default {
       }
 
     },
-
     findItemById(id) {
       console.log(this.invoice)
       return this.invoice.items.find(({ _id }) => _id.toString() === id)
@@ -201,7 +160,7 @@ export default {
       await this.getInvoice()
     },
 
-
+    //DONE!! ==========>>>
     ...mapActions([ 'alertToggle' ]),
     modifyInvoiceByPropValue({ prop, value }) {
       this.$set(this.invoice, prop, value)
@@ -242,58 +201,4 @@ export default {
   display: flex;
   gap: 25px;
 }
-
-//.invoice-details {
-//  &__field {
-//    margin-bottom: 10px;
-//  }
-//}
-//
-//.table {
-//  &__data {
-//    padding: 0 7px;
-//  }
-//
-//  &__header {
-//    padding: 0 7px;
-//  }
-//
-//  &__drop {
-//    position: relative;
-//    height: 32px;
-//    max-width: 220px;
-//    margin: 0 7px;
-//    width: 100%;
-//    background: white;
-//    border-radius: 2px;
-//  }
-//
-//  &__icons {
-//    display: flex;
-//    align-items: center;
-//    justify-content: center;
-//    width: 100%;
-//    gap: 8px;
-//  }
-//
-//  &__icon {
-//    cursor: pointer;
-//    opacity: 0.5;
-//  }
-//
-//  &__opacity {
-//    opacity: 1;
-//  }
-//
-//  &__input {
-//    width: 100%;
-//    padding: 0 7px;
-//  }
-//}
-//
-//.drop-down {
-//  position: relative;
-//  height: 32px;
-//  width: 220px;
-//}
 </style>
