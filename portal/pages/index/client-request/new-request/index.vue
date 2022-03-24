@@ -508,6 +508,7 @@ export default {
       if (!this.selectedService) return []
       if ((this.clientInfo.name === 'eToro (Europe) Limited') && this.selectedService === 'Compliance') return this.instructions['ComplianceEtoro']
       if (this.clientInfo.name === '888' && this.selectedService === 'Compliance') return this.instructions['Compliance888']
+      if (this.clientInfo.name === '4T Markets' && this.selectedService === 'Compliance') return this.instructions['Compliance4T']
       if (this.clientInfo.name === 'Pepperstone' && this.selectedService === 'Compliance') return this.instructions['CompliancePepperstone']
 
 
