@@ -41,6 +41,7 @@ import RequestInfo from "../components/pmArea/clientRequests/clientRequestInfo"
 import QuoteDecision from '../components/pmArea/QuoteDecision'
 import CreationLayout from "../components/pmArea/creationProject/CreationLayout"
 import PaymentMethodsLayout from "../components/Table/PaymentMethods/Layout"
+import Company from "../components/Table/company/Layout"
 
 
 // LIST ================================================================================================
@@ -247,6 +248,11 @@ const router = new Router({
 							path: 'payment-terms',
 							name: 'payment-terms',
 							component: TablePaymentTerms
+						},
+						{
+							path: 'company',
+							name: 'company',
+							component: Company
 						}
 					]
 				},

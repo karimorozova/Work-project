@@ -443,6 +443,11 @@ export default {
               type: 'link',
               name: 'Groups',
               path: '/pangea-settings/groups'
+            },
+            {
+              type: 'link',
+              name: 'Company',
+              path: '/pangea-settings/company'
             }
           ]
         }
