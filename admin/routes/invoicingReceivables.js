@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { Languages } = require("../models")
+const { Languages, InvoicingClientReports } = require("../models")
 const { ObjectId } = require("mongodb")
 const { stepsFiltersQuery } = require("../invoicingPayables")
 const {
@@ -69,6 +69,17 @@ router.post("/report-details/:id", async (req, res) => {
 		console.log(err)
 		res.status(500).send('Something wrong on getting steps')
 	}
+})
+
+router.post('/update-report', async (req, res) => {
+  const { _reportId, updates } = req.body
+  try {
+    await InvoicingClientReports.updateOne({ "_id": _reportId }, updates)
+    res.send('Done')
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Something wrong on /create-report!')
+  }
 })
 
 router.post('/create-report', async (req, res) => {

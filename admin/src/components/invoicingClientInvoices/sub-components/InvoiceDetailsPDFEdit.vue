@@ -89,6 +89,21 @@
 
       .body
         .body__table
+          .body__modal(v-if="isOpenNewModalEdit")
+            .body__modal-title Add Item
+            .body__modal-item
+              span Title:
+              input(type="text" v-model="itemTitle")
+            .body__modal-item
+              span Quantity:
+              input(type="number" v-model="itemQuantity")
+            .body__modal-item
+              span Rate:
+              input(type="number" v-model="itemRate")
+            .body__modal-buttons
+              Button(value="Add" @clicked="saveItem('Custom', null)")
+              Button(value="Cancel" @clicked="closeNewItemModal" :outline="true")
+
           GeneralTable(
             :fields="fieldsItems"
             :tableData="invoice.items"
@@ -96,6 +111,22 @@
           )
             template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
               .table__header {{ field.label }}
+
+          .add
+            Add(@add="openItemModal" v-if="!isOpenModalEdit && !isOpenNewModalEdit")
+            .add__modal(v-if="isOpenModalEdit")
+              .selectList
+                .selectList__close(@click="closeItemModal")
+                  span &#215;
+                .selectList__item(v-for="item in listOfClientReports" @click="closeItemModal(), saveItem('Report', item._id)")
+                  span {{ item.reportId }} -
+                  span(style="margin-left: 3px;") {{ item.total }}
+                  span(style="margin-left: 3px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                .selectList__item.selectList__item-flex(@click="openNewItemModal")
+                  span
+                    i.fas.fa-plus
+                  span Add Custom Item
+
 
             //template(slot="title" slot-scope="{ row, index }")
             //  .table__data(v-if="editedId === row._id || editedId === index")
@@ -157,12 +188,15 @@ import Add from "../../Add"
 import SelectSingle from "../../SelectSingle"
 import moment from "moment"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
-import { getInvoiceFinance } from "../../../../invoicing/helpers"
+import {getAmountByPercent, getInvoiceFinance} from "../../../../invoicing/helpers"
+import Button from "../../Button";
+import {mapActions} from "vuex";
+// import {ObjectId} from "mongoose";
 
 export default {
   mixins: [ currencyIconDetected ],
   name: "InvoiceDetailsPDFEdit",
-  components: { SelectSingle, Add, GeneralTable, DatePicker },
+  components: {Button, SelectSingle, Add, GeneralTable, DatePicker },
   props: {
     invoice: {
       type: Object
@@ -211,14 +245,99 @@ export default {
       paymentTerms: [],
 
 
-      editedId: null,
-      title: '',
-      quantity: 0,
-      rate: 0,
-      amount: 0
+      // editedId: null,
+
+      itemTitle: '',
+      itemQuantity: 1,
+      itemRate: 0,
+
+      isOpenModalEdit: false,
+      isOpenNewModalEdit: false,
+
+      listOfClientReports: [],
+
+      defaultItem: {
+        reportId : null,
+        quantity : 0,
+        rate : 0,
+        vatAmount : 0,
+        vatPercents : 0,
+        discountsAmount : 0,
+        discountsPercents : 0,
+        surchargesAmount : 0,
+        surchargesPercents : 0,
+        amount : 0,
+        title : '',
+        // type : "Custom"
+      }
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: 'alertToggle'
+    }),
+    openNewItemModal(){
+      this.isOpenNewModalEdit = true
+      this.closeItemModal()
+    },
+    closeNewItemModal(){
+      this.isOpenNewModalEdit = false
+      this.itemTitle= ''
+      this.itemQuantity= 1
+      this.itemRate= 0
+    },
+    openItemModal(){
+      this.isOpenModalEdit = true
+      this.getItemsReports()
+    },
+    closeItemModal(){
+      this.isOpenModalEdit = false
+    },
+    async saveItem(type, _reportId){
+      let item = { ...this.defaultItem }
+      item.type = type
+
+      if(type === 'Custom'){
+        item.rate = this.itemRate
+        item.quantity = this.itemQuantity
+        item.amount = item.rate * item.quantity
+      }else{
+        const report = this.listOfClientReports.find(i => i._id === _reportId)
+        item.reportId = _reportId
+        item.title = 'Language Service: report ' + report.reportId
+        item.rate = report.total
+        item.amount = report.total
+        item.type = "Report"
+      }
+
+      const { customer: { billingInfo }, clientBillingInfo } = this.invoice
+      const currBI = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+
+      if (currBI.address && currBI.address.country === 'Cyprus') {
+        item.vatPercents = 19
+        item.vatAmount = getAmountByPercent(item.amount, 19)
+      }
+      if(!!item.vatAmount) item.amount = +(item.amount + item.vatAmount).toFixed(2)
+
+      this.modifyInvoice('items', [...this.invoice.items, item])
+
+      this.closeNewItemModal()
+
+      // try {
+      //   await this.$http.post(`/invoicing/invoice/${ this.invoice._id }/create-item/`, {
+      //     reportId: null,
+      //     title: this.itemTitle,
+      //     quantity: this.itemQuantity,
+      //     rate: this.itemRate,
+      //     amount,
+      //     type: "Custom"
+      //   })
+      //   this.alertToggle({ message: "Item created", isShow: true, type: "success" })
+      // } catch (err) {
+      // }finally {
+      //   this.closeNewItemModal()
+      // }
+    },
     takeInvoiceFinance() {
       return getInvoiceFinance(this.invoice)
     },
@@ -237,6 +356,20 @@ export default {
         this.paymentTerms = paymentTerms
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Terms", isShow: true, type: "error" })
+      }
+    },
+    async getItemsReports(){
+      const existingReports = (item) => !this.invoice.items.map(i => `${i.reportId}`).includes(`${item._id}`)
+      try{
+      this.listOfClientReports = (await this.$http.post('/invoicing/reports-list/', {
+        query: {
+          invoice: null,
+          client: this.invoice.customer._id,
+          clientBillingInfo: this.invoice.clientBillingInfo
+        }
+      })).data.filter(existingReports)
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Reports", isShow: true, type: "error" })
       }
     }
   },
@@ -361,6 +494,44 @@ export default {
       margin-top: 25px;
     }
   }
+
+  &__table{
+    position: relative;
+  }
+
+  &__modal{
+    position: absolute;
+    box-shadow: $box-shadow;
+    padding: 25px;
+    overflow: auto;
+    left: 50%;
+    top: 49%;
+    transform: translateX(-50%) translateY(-49%);
+    background: white;
+    z-index: 3;
+    box-sizing: border-box;
+
+    &-item{
+      display: flex;
+      align-items: center;
+      width: 300px;
+      justify-content: space-between;
+      height: 44px;
+    }
+
+    &-title{
+      font-size: 16px;
+      font-family: Myriad600;
+      margin-bottom: 15px;
+    }
+
+    &-buttons{
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+  }
 }
 
 .profile {
@@ -371,6 +542,65 @@ export default {
   &__text,
   &__name {
     margin: 7px 0;
+  }
+}
+
+.add{
+  position: relative;
+  height: 27px;
+  margin-top: 10px;
+
+  &__modal{
+    position: absolute;
+    box-shadow: $box-shadow;
+    width: 220px;
+    max-height: 350px;
+    overflow: auto;
+    //left: 50%;
+    //top: 49%;
+    //transform: translateX(-50%) translateY(-49%);
+    background: white;
+    z-index: 2;
+    box-sizing: border-box;
+  }
+  .selectList{
+
+    &__close {
+      padding: 5px;
+      font-size: 22px;
+      cursor: pointer;
+      text-align: right;
+      margin-right: 6px;
+      color: $dark-border;
+
+      &:hover {
+        color: $text;
+      }
+    }
+
+    &__item{
+      padding: 10px;
+      border-bottom: 1px solid $light-border;
+      cursor: pointer;
+      font-size: 14px;
+      transition: .1s ease-out;
+      display: flex;
+      align-items: center;
+      color: $text;
+
+      &-flex{
+        display: flex;
+        gap: 10px;
+      }
+
+      &:last-child {
+        border: none;
+      }
+
+      &:hover {
+        background-color: $list-hover;
+      }
+    }
   }
 }
 

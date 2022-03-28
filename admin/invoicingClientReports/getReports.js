@@ -135,7 +135,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
 				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway' ] },
 				"steps.finance.Price.receivables": { $gt: 0 },
-				"steps.isReceivableVisible": true,
+				"steps.isReceivablesVisible": true,
 				...queryForStep
 			}
 		},

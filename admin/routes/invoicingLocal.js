@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { InvoicingClientReports } = require('../models')
 const {
 	createInvoice,
 	createInvoiceItem,
@@ -11,6 +12,7 @@ const {
 	deleteInvoiceItemFromReport,
 	getInvoicesForOptions
 } = require('../invoicing')
+const {ObjectId} = require("mongodb");
 
 router.post("/create-invoice", async (req, res) => {
 	const { customerId, clientBillingInfoId } = req.body
@@ -33,6 +35,17 @@ router.post("/invoices-list", async (req, res) => {
 		console.log(err)
 		res.status(500).send('Something wrong on invoicing')
 	}
+})
+
+router.post("/reports-list", async (req, res) => {
+  try {
+    const { query } = req.body
+    const reports = await InvoicingClientReports.find(query)
+    res.send(reports)
+  } catch (err) {
+    console.log(err)
+    res.status(500).send('Something wrong on getting steps')
+  }
 })
 
 router.post("/invoices-list-for-options", async (req, res) => {
