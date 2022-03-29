@@ -9,6 +9,14 @@ const {
 } = require("./languages")
 
 const {
+	createCompany,
+	getCompanies,
+	deleteCompany,
+	editCompanyDetails,
+	addPaymentMethodToCompany,
+} = require("./companies")
+
+const {
 	getClientsApi
 } = require("./getClientsApi")
 
@@ -68,4 +76,9 @@ module.exports = {
 	createPaymentMethodKeys,
 	updatePaymentMethodKeys,
 	removePaymentMethodKeys,
+	getCompanies,
+	createCompany,
+	deleteCompany,
+	editCompanyDetails,
+	addPaymentMethodToCompany,
 }

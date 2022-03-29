@@ -1,7 +1,9 @@
 <template lang="pug">
   .edit-company
-    .isLoading(v-if="isLoading")
-      .isLoading__text Searching for Vendors...
+    .title
+      
+    //.isLoading(v-if="isLoading")
+    //  .isLoading__text Loading...
 </template>
 
 <script>

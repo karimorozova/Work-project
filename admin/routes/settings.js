@@ -26,7 +26,11 @@ const {
 	removePaymentMethodKeys,
 	updatePaymentMethodKeys,
 	removePaymentMethod,
-	updatePaymentMethod
+	updatePaymentMethod,
+	createCompany,
+	deleteCompany,
+	editCompanyDetails,
+	addPaymentMethodToCompany, getCompanies,
 } = require('../settings')
 
 const {
@@ -306,6 +310,41 @@ router.delete('/payment-methods-keys/:id', async (req, res) => {
 		res.status(500).send('Error on vendor-payment-benchmark')
 	}
 })
+
+router.get('/companies', async (req, res) => {
+	try {
+		const companies = await getCompanies()
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.post('/company', async (req, res)  => {
+	const { companyName, officialCompanyName, isActive, isDefault } = req.body
+	console.log({test: req.body})
+	try {
+		const companies = await createCompany(companyName, officialCompanyName, isActive, isDefault )
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+
+router.delete('/company/:id', async (req, res) => {
+	const { id } = req.params
+	try {
+		const companies = await deleteCompany(id)
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
 
 
 module.exports = router

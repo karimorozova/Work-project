@@ -5,7 +5,6 @@ const CompanySchema = new Schema({
 	logo: {
 		type: String,
 		trim: true,
-		required: true
 	},
 	companyName: {
 		type: String,
@@ -19,7 +18,6 @@ const CompanySchema = new Schema({
 	},
 	financeEmail: {
 		type: String,
-		required: true
 	},
 	website: {
 		type: String,
@@ -46,34 +44,29 @@ const CompanySchema = new Schema({
 	},
 	isDefault: {
 		type: Boolean,
-		default: true
+		default: false
 	},
 
 	country: {
 		type: String,
 		trim: true,
-		required: true
 	},
 
 	city: {
 		type: String,
 		trim: true,
-		required: true
 	},
 	state: {
 		type: String,
 		trim: true,
-		required: true
 	},
 	address: {
 		type: String,
 		trim: true,
-		required: true
 	},
 	postCode: {
 		type: String,
 		trim: true,
-		required: true
 	},
 	vat: {
 		type: String,
@@ -82,7 +75,6 @@ const CompanySchema = new Schema({
 		name: {
 			type: String,
 			trim: true,
-			required: true
 		},
 		paymentType: {
 			type: Schema.Types.ObjectId,

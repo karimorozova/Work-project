@@ -49,7 +49,7 @@
           .table__icons
             img.table__icon(v-for="(icon, key) in iconsWithEditingModal" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': !isActive(key, index)}")
 
-      .table__empty(v-show="!paymentMethods.length") No data...
+      .table__empty(v-show="!companies.length") No data...
 
     Add(@add="addData")
 
@@ -90,13 +90,13 @@ export default {
   },
   methods: {
     // chooseKeys({ option }) {
-    //   if (!this.currentKeys.length) return this.currentKeys.push(this.paymentMethodsKeys.find(({ key }) => key === option))
+    //   if (!this.currentKeys.length) return this.currentKeys.push(this.companies.find(({ key }) => key === option))
     //
     //   const position = this.currentKeys.findIndex(({ key }) => key === option)
     //   if (position !== -1) {
     //     this.currentKeys.splice(position, 1)
     //   } else {
-    //     this.currentKeys.push(this.paymentMethodsKeys.find(({ key }) => key === option))
+    //     this.currentKeys.push(this.companies.find(({ key }) => key === option))
     //   }
     // },
     toggleActive(index, field) {
@@ -153,11 +153,11 @@ export default {
       this.companies[index].officialCompanyName = this.currentOfficialCompanyName
       this.companies[index].isActive = this.currentIsActive
       this.companies[index].isDefault = this.currentIsDefault
-
+      console.log(this.companies[index])
       try {
         this.companies = this.companies[index]._id
             ? (await this.$http.put(`/api-settings/payment-methods/${ this.companies[index]._id }`, { ...this.companies[index] })).data
-            : (await this.$http.post(`/api-settings/payment-methods/`, { ...this.companies[index] })).data
+            : (await this.$http.post(`/api-settings/company/`, { ...this.companies[index] })).data
 
         this.alertToggle({ message: "Saved", isShow: true, type: "success" })
       } catch (err) {
@@ -169,7 +169,7 @@ export default {
     async deleteMethod() {
       try {
         const { _id } = this.companies[this.deleteIndex]
-        const result = await this.$http.delete(`/api-settings/payment-methods/${ _id }`)
+        const result = await this.$http.delete(`/api-settings/company/${ _id }`)
         this.companies = result.data
         this.alertToggle({ message: "Removed", isShow: true, type: "success" })
       } catch (err) {
@@ -189,10 +189,10 @@ export default {
     addData() {
       if (this.currentActive !== -1) return this.isEditing()
       this.companies.push({
-        name: "",
-        minimumAmount: "",
+        companyName: "",
+        officialCompanyName: "",
         isActive: true,
-        keys: []
+        isDefault: true,
       })
       this.setEditionData(this.companies.length - 1)
       this.$nextTick(() => this.scrollToEnd())
@@ -206,8 +206,9 @@ export default {
     // },
     async getCompanies() {
       try {
-        const result = await this.$http.get("/api-settings/payment-methods")
+        const result = await this.$http.get("/api-settings/companies")
         this.companies = result.data
+
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
