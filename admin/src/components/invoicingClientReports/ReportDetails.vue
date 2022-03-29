@@ -283,6 +283,7 @@ export default {
       const invoicesList = (await this.$http.post('/invoicing/invoices-list-for-options', {
         query: {
           customer: this.reportDetailsInfo.client._id,
+          clientBillingInfo: this.reportDetailsInfo.clientBillingInfo,
           status: 'Draft'
         }
       })).data

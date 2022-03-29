@@ -89,20 +89,20 @@
 
       .body
         .body__table
-          .body__modal(v-if="isOpenNewModalEdit")
-            .body__modal-title Add Item
+          .body__modal(v-if="isOpenModalAddItem || isOpenModalEditItem")
+            .body__modal-title Custom Item
             .body__modal-item
               span Title:
-              input(type="text" v-model="itemTitle")
+              input(type="text" v-model="itemTitle" placeholder="Value")
             .body__modal-item
               span Quantity:
-              input(type="number" v-model="itemQuantity")
+              input(type="number" v-model="itemQuantity" placeholder="Value")
             .body__modal-item
               span Rate:
-              input(type="number" v-model="itemRate")
+              input(type="number" v-model="itemRate" placeholder="Value")
             .body__modal-buttons
-              Button(value="Add" @clicked="saveItem('Custom', null)")
-              Button(value="Cancel" @clicked="closeNewItemModal" :outline="true")
+              Button(value="Save" @clicked="isOpenModalAddItem ? saveItem('Custom', null) : saveEditItem()")
+              Button(value="Cancel" @clicked="closeItemsModal" :outline="true")
 
           GeneralTable(
             :fields="fieldsItems"
@@ -112,17 +112,24 @@
             template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
               .table__header {{ field.label }}
 
+            template(slot="icons" slot-scope="{ row, index }")
+              .table__icons
+                .table__icon(@click="openItemModalEdit")
+                  i(class="fas fa-pen")
+                .table__icon(@click="deleteItem(index)")
+                  i(class="fas fa-trash")
+
           .add
-            Add(@add="openItemModal" v-if="!isOpenModalEdit && !isOpenNewModalEdit")
-            .add__modal(v-if="isOpenModalEdit")
+            Add(@add="openOptionsModal" v-if="!isOpenModalOptions && !isOpenModalAddItem && !isOpenModalEditItem")
+            .add__modal(v-if="isOpenModalOptions")
               .selectList
-                .selectList__close(@click="closeItemModal")
+                .selectList__close(@click="closeOptionsModal")
                   span &#215;
-                .selectList__item(v-for="item in listOfClientReports" @click="closeItemModal(), saveItem('Report', item._id)")
+                .selectList__item(v-for="item in listOfClientReports" @click="closeOptionsModal(), saveItem('Report', item._id)")
                   span {{ item.reportId }} -
                   span(style="margin-left: 3px;") {{ item.total }}
                   span(style="margin-left: 3px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
-                .selectList__item.selectList__item-flex(@click="openNewItemModal")
+                .selectList__item.selectList__item-flex(@click="openItemModalAdd")
                   span
                     i.fas.fa-plus
                   span Add Custom Item
@@ -148,16 +155,6 @@
             //  .table__data(v-if="editedId === row._id || editedId === index")
             //    input(type="text" placeholder="Value" v-model="amount")
             //  .table__data(v-else) {{ row.amount }}
-
-          //  template(slot="icons" slot-scope="{ row, index }")
-          //    .table__icons
-          //      img.table__icon(
-          //        v-for="(icon, key) in icons"
-          //        :class="{'table__opacity': isActive(key, index, row._id)}"
-          //        :src="icon.icon"
-          //        @click="makeAction(key, row._id, index)"
-          //      )
-          //Add(@add="addNewItem")
 
         .body__subtable
           .table-details
@@ -209,50 +206,63 @@ export default {
           label: "Title",
           headerKey: "headerTitle",
           key: "title",
-          style: { "width": "40%" }
+          style: { "width": "100%" }
         },
         {
           label: "Quantity",
           headerKey: "headerQuantity",
           key: "quantity",
-          style: { "width": "12%" }
+          style: { "width": "50%" }
         },
         {
           label: "Rate",
           headerKey: "headerRate",
           key: "rate",
-          style: { "width": "12%" }
+          style: { "width": "50%" }
         },
         {
           label: "Tax",
           headerKey: "headerTax",
           key: "tax",
-          style: { "width": "12%" }
+          style: { "width": "50%" }
+        },
+        {
+          label: "Discounts",
+          headerKey: "headerDiscounts",
+          key: "discounts",
+          style: { "width": "50%" }
+        },
+        {
+          label: "Surcharges",
+          headerKey: "headerSurcharges",
+          key: "surcharges",
+          style: { "width": "50%" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { "width": "12%" }
+          style: { "width": "50%" }
         },
         {
           label: "",
           headerKey: "headerIcons",
           key: "icons",
-          style: { width: "12%" }
+          style: { width: "40%" }
         }
       ],
       paymentTerms: [],
-
 
       // editedId: null,
 
       itemTitle: '',
       itemQuantity: 1,
       itemRate: 0,
+      itemsForDelete: [],
 
-      isOpenModalEdit: false,
-      isOpenNewModalEdit: false,
+      isOpenModalOptions: false,
+      isOpenModalAddItem: false,
+      isOpenModalEditItem: false,
 
       listOfClientReports: [],
 
@@ -276,22 +286,26 @@ export default {
     ...mapActions({
       alertToggle: 'alertToggle'
     }),
-    openNewItemModal(){
-      this.isOpenNewModalEdit = true
-      this.closeItemModal()
+    openItemModalAdd(){
+      this.isOpenModalAddItem = true
+      this.closeOptionsModal()
     },
-    closeNewItemModal(){
-      this.isOpenNewModalEdit = false
+    openItemModalEdit(){
+      this.isOpenModalEditItem = true
+    },
+    closeItemsModal(){
+      this.isOpenModalAddItem = false
+      this.isOpenModalEditItem = false
       this.itemTitle= ''
       this.itemQuantity= 1
       this.itemRate= 0
     },
-    openItemModal(){
-      this.isOpenModalEdit = true
+    openOptionsModal(){
+      this.isOpenModalOptions = true
       this.getItemsReports()
     },
-    closeItemModal(){
-      this.isOpenModalEdit = false
+    closeOptionsModal(){
+      this.isOpenModalOptions = false
     },
     async saveItem(type, _reportId){
       let item = { ...this.defaultItem }
@@ -321,22 +335,12 @@ export default {
 
       this.modifyInvoice('items', [...this.invoice.items, item])
 
-      this.closeNewItemModal()
-
-      // try {
-      //   await this.$http.post(`/invoicing/invoice/${ this.invoice._id }/create-item/`, {
-      //     reportId: null,
-      //     title: this.itemTitle,
-      //     quantity: this.itemQuantity,
-      //     rate: this.itemRate,
-      //     amount,
-      //     type: "Custom"
-      //   })
-      //   this.alertToggle({ message: "Item created", isShow: true, type: "success" })
-      // } catch (err) {
-      // }finally {
-      //   this.closeNewItemModal()
-      // }
+      this.closeItemsModal()
+    },
+    deleteItem(index){
+      const deletedItem = this.invoice.items.splice(index, 1)
+      this.itemsForDelete.push(...deletedItem)
+      this.modifyInvoice('items', [...this.invoice.items])
     },
     takeInvoiceFinance() {
       return getInvoiceFinance(this.invoice)
@@ -394,7 +398,7 @@ export default {
 .subheader {
   display: flex;
   justify-content: space-between;
-  margin: 15px 0 32px 0px;
+  margin: 15px 0 32px 0;
   padding-bottom: 25px;
   border-bottom: 1px solid $green;
 
@@ -609,6 +613,15 @@ export default {
   &__header,
   &__data {
     padding: 0 7px;
+  }
+  &__icons{
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+  }
+  &__icon{
+    cursor: pointer;
   }
 }
 

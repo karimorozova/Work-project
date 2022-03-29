@@ -168,13 +168,14 @@ export default {
     },
     async saveInvoiceChanges() {
       this.checkSaves()
+      const pdfEditComponent = this.$children.find(item => item.$options.name === "InvoiceDetailsPDFEdit")
       try {
         const reportsItems = this.invoice.items.filter(i => i.type === 'Report')
-        if(reportsItems.length){
-          for await (const report of reportsItems) {
-            await this.$http.post(`/invoicing-receivables/update-report`, {_reportId: report.reportId, updates: { invoice: this.invoice._id } })
-          }
-        }
+        const deleteReportsItems = pdfEditComponent.itemsForDelete.filter(i => i.type === 'Report')
+
+        if(reportsItems.length) await this.bindingInvoicingToReport(reportsItems, this.invoice._id)
+        if(deleteReportsItems.length) await this.bindingInvoicingToReport(deleteReportsItems, null)
+
         this.invoice = (await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }`, this.invoice)).data
         await this.$router.push(`/pangea-finance/receivables-reports/invoice/${ this.$route.params.id }`)
         this.alertToggle({ message: "Invoice updated", isShow: true, type: "success" })
@@ -184,6 +185,11 @@ export default {
     },
     async getInvoice() {
       this.invoice = (await this.$http.get(`/invoicing/invoice/${ this.$route.params.id }`)).data
+    },
+    async bindingInvoicingToReport(reportsList, _invoiceId){
+      for await (const report of reportsList) {
+        await this.$http.post(`/invoicing-receivables/update-report`, {_reportId: report.reportId, updates: { invoice: _invoiceId } })
+      }
     }
   },
   created() {
