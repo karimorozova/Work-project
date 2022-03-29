@@ -42,7 +42,6 @@ export default {
     margin-top: 20px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
   }
 
   &__vendorLinks {
