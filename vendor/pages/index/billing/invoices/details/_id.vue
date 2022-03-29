@@ -25,10 +25,10 @@
               .row__title Status:
               .row__value
                 div {{ reportDetailsInfo.status }}
-                .row__info(v-if="reportDetailsInfo.status === 'Invoice on-hold'" )
-                  i(class="fa-solid fa-circle-info" style="margin-right: 5px;")
-                  span Threshold amount {{ reportDetailsInfo.paymentDetails.paymentMethod.minimumAmount }}
-                  span(v-html="'&euro;'" style="margin-left: 4px;")
+                .row__info(v-if="reportDetailsInfo.status === 'Invoice on-hold' && reportDetailsInfo.paymentDetails.paymentMethod" )
+                    i(class="fa-solid fa-circle-info" style="margin-right: 5px;")
+                    span Threshold amount {{ reportDetailsInfo.paymentDetails.paymentMethod.minimumAmount }}
+                    span(v-html="'&euro;'" style="margin-left: 4px;")
 
 
             .row
@@ -78,9 +78,9 @@
 
             .row
               .submission-alert.center(v-if="isSubmissionAlert" ) {{submissionAlertMessage}}
-                Button.center(style="margin-top: 20px; display: flex; justify-content: center;" value="Submit Payment Method" @clicked="reSubmitPaymentMethod")
+                Button.center(style="margin-top: 20px; display: flex; justify-content: center;" :isDisabled="!!currentRequests" value="Submit Payment Method" @clicked="reSubmitPaymentMethod")
 
-            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" value="Send New Invoice File" @clicked="submitFile")
+            Button(v-if="invoiceFile" style="margin-top: 20px; display: flex; justify-content: center;" :isDisabled="!!currentRequests" value="Send New Invoice File" @clicked="submitFile")
           // <<== Invoice
 
 
@@ -280,7 +280,7 @@ export default {
     },
     async resetPaymentMethod({ option }) {
       await this.getReport()
-      if (this.reportDetailsInfo.paymentDetails.paymentMethod.name === option.name) {
+      if (this.reportDetailsInfo.paymentDetails.paymentMethod && this.reportDetailsInfo.paymentDetails.paymentMethod.name === option.name) {
         this.clearResetsPaymentMethod()
         return
       }
@@ -395,7 +395,6 @@ export default {
         const result = await this.$axios.get(`/vendor/get-report?reportId=${ this.$route.params.id }`)
         const decode = window.atob(result.data)
         this.reportDetailsInfo = JSON.parse(decode)[0]
-        console.log(this.reportDetailsInfo)
       } catch (e) {
       }
     },
@@ -426,7 +425,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      vendor: "getVendor"
+      vendor: "getVendor",
+      currentRequests: "getRequestsCount"
     }),
     isVendorDontHaveBI() {
       return !this.vendorExtra.hasOwnProperty('billingInfo') || !this.vendorExtra.billingInfo.paymentMethods.length
