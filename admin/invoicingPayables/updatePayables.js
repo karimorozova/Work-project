@@ -45,7 +45,7 @@ const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMet
 			(status === 'Invoice on-hold' || status === 'Invoice Ready')
 			&& `${ reportId }` !== `${ _id }`
 			&& paymentDetails.paymentMethod
-			&& currentPaymentDetails.paymentMethod.name === paymentDetails.paymentMethod.name
+			&& currentPaymentDetails.paymentMethod?.name === paymentDetails.paymentMethod.name
 	)
 	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
 
