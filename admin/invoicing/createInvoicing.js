@@ -44,7 +44,8 @@ const createInvoiceItem = async (_invoiceId, item) => {
 
 const createInvoiceFromReport = async ({ _reportId, _customerId, _clientBillingInfoId, item }) => {
 	try {
-		let { title, quantity, rate, type = 'Report', vatPercents = 0, vatAmount = 0, amount = 0 } = item
+		let { title, quantity, rate, type = 'Report', tax = 0, taxType = 'Percents' } = item
+    let amount = rate
 		const invoice = await createInvoice(_customerId, _clientBillingInfoId)
 
 		const { billingInfo: billingInfos, accountManager } = await Clients.findById(_customerId, { billingInfo: 1, accountManager: 1 })
@@ -63,12 +64,12 @@ const createInvoiceFromReport = async ({ _reportId, _customerId, _clientBillingI
 		})
 
 		if (billingInfo.address && billingInfo.address.country === 'Cyprus') {
-			vatPercents = 19
-			vatAmount = getAmountByPercent(rate, 19)
+      tax = 19
+			const taxTotal = getAmountByPercent(amount, 19)
+      amount = +(amount + taxTotal).toFixed(2)
 		}
-		!!vatAmount ? amount = +(rate + vatAmount).toFixed(2) : amount = rate
 
-		await createInvoiceItem(invoice._id, { title, quantity, type, rate, vatPercents, vatAmount, amount, reportId: _reportId })
+		await createInvoiceItem(invoice._id, { title, quantity, type, rate, tax, taxType, amount, reportId: _reportId })
 	} catch (e) {
 
 	}

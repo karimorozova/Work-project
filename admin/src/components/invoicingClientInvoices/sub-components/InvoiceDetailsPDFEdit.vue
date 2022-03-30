@@ -90,31 +90,73 @@
       .body
         .body__table
           .body__modal(v-if="isOpenModalAddItem || isOpenModalEditItem")
-            .body__modal-title Custom Item
-            .body__modal-item
-              span Title:
-              input(type="text" v-model="itemTitle" placeholder="Value")
-            .body__modal-item
-              span Quantity:
-              input(type="number" v-model="itemQuantity" placeholder="Value")
-            .body__modal-item
-              span Rate:
-              input(type="number" v-model="itemRate" placeholder="Value")
+            .body__modal-title {{ isOpenModalAddItem ? 'Add Item' : 'Edit Item' }}
+            .body__modal-cols
+              .body__modal-col1
+                .body__modal-item
+                  span Title:
+                  input(type="text" v-model="title" placeholder="Value")
+                .body__modal-item
+                  span Quantity:
+                  input(type="number" v-model="quantity" placeholder="Value")
+                .body__modal-item
+                  span Rate:
+                  input(type="number" v-model="rate" placeholder="Value")
+              .body__modal-col2
+                .body__modal-item
+                  span(style="width: 75px;") Tax:
+                  input.w-90(type="number" v-model="tax"  placeholder="Value")
+                  .input-option
+                    SelectSingle(
+                      :selectedOption="taxType"
+                      :options="['Percent', 'Currency']"
+                      @chooseOption="({option}) => setItemOption(option, 'taxType')"
+                    )
+                .body__modal-item
+                  span(style="width: 75px;") Discounts:
+                  input.w-90(type="number" v-model="discount" placeholder="Value")
+                  .input-option
+                    SelectSingle(
+                      :selectedOption="discountType"
+                      :options="['Percent', 'Currency']"
+                      @chooseOption="({option}) => setItemOption(option, 'discountType')"
+                    )
+
             .body__modal-buttons
-              Button(value="Save" @clicked="isOpenModalAddItem ? saveItem('Custom', null) : saveEditItem()")
+              Button(value="Save" @clicked="isOpenModalAddItem ? saveNewItem('Custom', null) : saveEditItem()")
               Button(value="Cancel" @clicked="closeItemsModal" :outline="true")
 
           GeneralTable(
-            :fields="fieldsItems"
+            :fields="fieldsItemsFiltered"
             :tableData="invoice.items"
             :isDarkMode="true"
           )
             template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
               .table__header {{ field.label }}
-
+            template(slot="title" slot-scope="{ row, index }")
+              .table__data  {{ row.title }}
+            template(slot="quantity" slot-scope="{ row, index }")
+              .table__data {{ row.quantity }}
+            template(slot="rate" slot-scope="{ row, index }")
+              .table__data
+                span {{ row.rate }}
+            template(slot="discount" slot-scope="{ row, index }")
+              .table__data
+                span {{ row.discount }}
+                span.table-symbol(v-if="row.discountType === 'Currency'" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)")
+                span.table-symbol(v-else) %
+            template(slot="tax" slot-scope="{ row, index }")
+              .table__data
+                span {{ row.tax }}
+                span.table-symbol(v-if="row.taxType === 'Currency'" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)")
+                span.table-symbol(v-else) %
+            template(slot="amount" slot-scope="{ row, index }")
+              .table__data
+                span {{ row.amount }}
+                span.table-symbol(v-html="returnIconCurrencyByStringCode(invoice.customer.currency)")
             template(slot="icons" slot-scope="{ row, index }")
               .table__icons
-                .table__icon(@click="openItemModalEdit")
+                .table__icon(@click="openItemModalEdit(index)")
                   i(class="fas fa-pen")
                 .table__icon(@click="deleteItem(index)")
                   i(class="fas fa-trash")
@@ -125,7 +167,7 @@
               .selectList
                 .selectList__close(@click="closeOptionsModal")
                   span &#215;
-                .selectList__item(v-for="item in listOfClientReports" @click="closeOptionsModal(), saveItem('Report', item._id)")
+                .selectList__item(v-for="item in listOfClientReports" @click="closeOptionsModal(), saveNewItem('Report', item._id)")
                   span {{ item.reportId }} -
                   span(style="margin-left: 3px;") {{ item.total }}
                   span(style="margin-left: 3px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
@@ -133,28 +175,6 @@
                   span
                     i.fas.fa-plus
                   span Add Custom Item
-
-
-            //template(slot="title" slot-scope="{ row, index }")
-            //  .table__data(v-if="editedId === row._id || editedId === index")
-            //    input(type="text" placeholder="Value" v-model="title")
-            //  .table__data(v-else) {{ row.title }}
-            //template(slot="quantity" slot-scope="{ row, index }")
-            //  .table__data(v-if="editedId === row._id || editedId === index")
-            //    input(type="text" placeholder="Value" v-model="quantity")
-            //  .table__data(v-else) {{ row.quantity }}
-            //template(slot="rate" slot-scope="{ row, index }")
-            //  .table__data(v-if="editedId === row._id || editedId === index")
-            //    input(type="text" placeholder="Value" v-model="rate")
-            //  .table__data(v-else) {{ row.rate }}
-            //template(slot="tax" slot-scope="{ row, index }")
-            //  .table__data(v-if="editedId === row._id || editedId === index")
-            //    input(type="text" placeholder="Value" v-model="tax")
-            //  .table__data(v-else) {{ row.tax }}
-            //template(slot="amount" slot-scope="{ row, index }")
-            //  .table__data(v-if="editedId === row._id || editedId === index")
-            //    input(type="text" placeholder="Value" v-model="amount")
-            //  .table__data(v-else) {{ row.amount }}
 
         .body__subtable
           .table-details
@@ -212,37 +232,31 @@ export default {
           label: "Quantity",
           headerKey: "headerQuantity",
           key: "quantity",
-          style: { "width": "50%" }
+          style: { "width": "40%" }
         },
         {
           label: "Rate",
           headerKey: "headerRate",
           key: "rate",
-          style: { "width": "50%" }
+          style: { "width": "40%" }
+        },
+        {
+          label: "Discount",
+          headerKey: "headerDiscount",
+          key: "discount",
+          style: { "width": "40%" }
         },
         {
           label: "Tax",
           headerKey: "headerTax",
           key: "tax",
-          style: { "width": "50%" }
-        },
-        {
-          label: "Discounts",
-          headerKey: "headerDiscounts",
-          key: "discounts",
-          style: { "width": "50%" }
-        },
-        {
-          label: "Surcharges",
-          headerKey: "headerSurcharges",
-          key: "surcharges",
-          style: { "width": "50%" }
+          style: { "width": "40%" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { "width": "50%" }
+          style: { "width": "40%" }
         },
         {
           label: "",
@@ -253,32 +267,33 @@ export default {
       ],
       paymentTerms: [],
 
-      // editedId: null,
+      title: '',
+      quantity: 1,
+      rate: 0,
+      tax : 0,
+      taxType: 'Percents',
+      discount: 0,
+      discountType: 'Percents',
 
-      itemTitle: '',
-      itemQuantity: 1,
-      itemRate: 0,
+      itemEditingIndex: null,
+
       itemsForDelete: [],
+      listOfClientReports: [],
 
       isOpenModalOptions: false,
       isOpenModalAddItem: false,
       isOpenModalEditItem: false,
 
-      listOfClientReports: [],
-
       defaultItem: {
+        title : '',
         reportId : null,
         quantity : 0,
         rate : 0,
-        vatAmount : 0,
-        vatPercents : 0,
-        discountsAmount : 0,
-        discountsPercents : 0,
-        surchargesAmount : 0,
-        surchargesPercents : 0,
+        taxType: 'Percents',
+        discount: 0,
+        discountType: 'Percents',
         amount : 0,
-        title : '',
-        // type : "Custom"
+        type: ''
       }
     }
   },
@@ -290,15 +305,19 @@ export default {
       this.isOpenModalAddItem = true
       this.closeOptionsModal()
     },
-    openItemModalEdit(){
-      this.isOpenModalEditItem = true
+    openItemModalEdit(index){
+      // this.itemEditingIndex = index
+      // const item = this.invoice.items[index]
+      // this.title = item.title
+      // this.quantity = item.quantity
+      // this.rate = item.rate
+      // this.isOpenModalEditItem = true
     },
     closeItemsModal(){
       this.isOpenModalAddItem = false
       this.isOpenModalEditItem = false
-      this.itemTitle= ''
-      this.itemQuantity= 1
-      this.itemRate= 0
+      this.setDefaultData()
+      this.itemEditingIndex = null
     },
     openOptionsModal(){
       this.isOpenModalOptions = true
@@ -307,40 +326,68 @@ export default {
     closeOptionsModal(){
       this.isOpenModalOptions = false
     },
-    async saveItem(type, _reportId){
+    saveEditItem(){
+      const item = this.invoice.items[this.itemEditingIndex]
+
+    },
+    async saveNewItem(type, _reportId){
       let item = { ...this.defaultItem }
       item.type = type
 
       if(type === 'Custom'){
-        item.rate = this.itemRate
-        item.quantity = this.itemQuantity
-        item.amount = item.rate * item.quantity
-      }else{
+        item.title = this.title
+        item.rate = this.rate
+        item.quantity = this.quantity
+        item.amount = +(item.rate * item.quantity).toFixed(2)
+      }
+
+      if(type === 'Report'){
         const report = this.listOfClientReports.find(i => i._id === _reportId)
         item.reportId = _reportId
         item.title = 'Language Service: report ' + report.reportId
         item.rate = report.total
         item.amount = report.total
-        item.type = "Report"
+        item.quantity = 1
+        //Cyprus
+        const { customer: { billingInfo }, clientBillingInfo } = this.invoice
+        const currBI = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
+        if (currBI.address && currBI.address.country === 'Cyprus') this.tax = 19
       }
 
-      const { customer: { billingInfo }, clientBillingInfo } = this.invoice
-      const currBI = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
-
-      if (currBI.address && currBI.address.country === 'Cyprus') {
-        item.vatPercents = 19
-        item.vatAmount = getAmountByPercent(item.amount, 19)
+      if (this.discount) {
+        item.discount = +this.discount
+        if (this.discountType === 'Currency') {
+          item.discountType = 'Currency'
+          item.amount = +(item.amount - item.discount).toFixed(2)
+        } else {
+          item.discountType = 'Percents'
+          const discountTotal = getAmountByPercent(item.amount, item.discount)
+          item.amount = +(item.amount - discountTotal).toFixed(2)
+        }
       }
-      if(!!item.vatAmount) item.amount = +(item.amount + item.vatAmount).toFixed(2)
+
+      if(this.tax){
+        item.tax = +this.tax
+        if (this.taxType === 'Currency') {
+          item.taxType = 'Currency'
+          item.amount = +(item.amount + item.tax).toFixed(2)
+        } else {
+          item.taxType = 'Percents'
+          const taxTotal = getAmountByPercent(item.amount, item.tax)
+          item.amount = +(item.amount + taxTotal).toFixed(2)
+        }
+      }
 
       this.modifyInvoice('items', [...this.invoice.items, item])
-
       this.closeItemsModal()
     },
     deleteItem(index){
       const deletedItem = this.invoice.items.splice(index, 1)
       this.itemsForDelete.push(...deletedItem)
       this.modifyInvoice('items', [...this.invoice.items])
+    },
+    setItemOption(option, prop){
+      this[prop] = option
     },
     takeInvoiceFinance() {
       return getInvoiceFinance(this.invoice)
@@ -375,6 +422,26 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting Reports", isShow: true, type: "error" })
       }
+    },
+    setDefaultData(){
+        this.title = ''
+        this.quantity = 1
+        this.rate = 0
+        this.tax = 0
+        this.taxType = 'Percents'
+        this.discount = 0
+        this.discountType = 'Percents'
+        this.itemEditingIndex = null
+    }
+  },
+  computed: {
+    fieldsItemsFiltered() {
+      const items = this.invoice.items
+      const hasTax = this.invoice.items.some(j => !!j.tax)
+      const hasDiscount = this.invoice.items.some(k => !!k.discount)
+      return this.fieldsItems
+        .filter(item => (!items.length || !hasTax) ? item.key !== 'tax' : item)
+        .filter(item => (!items.length || !hasDiscount) ? item.key !== 'discount' : item)
     }
   },
   created() {
@@ -515,6 +582,16 @@ export default {
     z-index: 3;
     box-sizing: border-box;
 
+    &-cols{
+      display: flex;
+    }
+
+    &-col2{
+      margin-left: 26px;
+      padding-left: 25px;
+      border-left: 1px solid $light-border;
+    }
+
     &-item{
       display: flex;
       align-items: center;
@@ -533,7 +610,7 @@ export default {
       display: flex;
       gap: 20px;
       justify-content: center;
-      margin-top: 20px;
+      margin-top: 24px;
     }
   }
 }
@@ -573,9 +650,9 @@ export default {
       padding: 5px;
       font-size: 22px;
       cursor: pointer;
-      text-align: right;
-      margin-right: 6px;
+      text-align: center;
       color: $dark-border;
+      border-bottom: 1px solid $light-border;
 
       &:hover {
         color: $text;
@@ -648,5 +725,19 @@ input {
   &:focus {
     border: 1px solid $border-focus;
   }
+}
+.w-90{
+  width: 90px;
+  margin-right: -10px;
+}
+.input-option{
+  height: 32px;
+  width: 110px;
+  position: relative;
+}
+
+.table-symbol{
+  color: $dark-border;
+  margin-left: 4px;
 }
 </style>

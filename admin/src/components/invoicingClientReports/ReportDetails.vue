@@ -158,7 +158,7 @@ import currencyIconDetected from "../../mixins/currencyIconDetected"
 import ReportDetailsJobsList from "../invoicingPayables/ReportDetailsJobsList"
 import Add from "../Add"
 import NavbarList from "../NavbarLists"
-import { getAmountByPercent } from "/invoicing/helpers"
+import { getAmountByPercent } from "../../../invoicing/helpers"
 
 export default {
   name: "ReportDetails",
@@ -298,16 +298,18 @@ export default {
       this.selectedInvoice = option
     },
     async addToInvoice() {
-      let amount = 0, vatPercents = 0, vatAmount = 0, invoiceId = this.selectedInvoice.id
+      let amount = 0, tax = 0, taxType = "Percents", invoiceId = this.selectedInvoice.id
+
       const { client: { billingInfo }, clientBillingInfo } = this.reportDetailsInfo
       const currBI = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
       const rate = this.reportDetailsInfo.total
+      amount = rate
 
       if (currBI.address && currBI.address.country === 'Cyprus') {
-        vatPercents = 19
-        vatAmount = getAmountByPercent(rate, 19)
+        tax = 19
+        const taxTotal = getAmountByPercent(amount, 19)
+        amount = +(amount + taxTotal).toFixed(2)
       }
-      !!vatAmount ? amount = +(rate + vatAmount).toFixed(2) : amount = rate
 
       try {
         this.closeRequestAddToInvoice()
@@ -316,6 +318,8 @@ export default {
           title: 'Language Service: report ' + this.reportDetailsInfo.reportId,
           quantity: 1,
           rate,
+          tax,
+          taxType,
           amount,
           type: "Report"
         })

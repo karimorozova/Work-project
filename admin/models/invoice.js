@@ -37,30 +37,24 @@ const InvoiceSchema = new mongoose.Schema({
 			type: Number,
 			default: 0
 		},
-		vatAmount: {
+		tax: {
 			type: Number,
 			default: 0
 		},
-		vatPercents: {
+    taxType: {
+      type: String,
+      enum: ['Percent', 'Currency'],
+      default: 'Percent'
+    },
+		discount: {
 			type: Number,
 			default: 0
 		},
-		discountsAmount: {
-			type: Number,
-			default: 0
-		},
-		discountsPercents: {
-			type: Number,
-			default: 0
-		},
-		surchargesAmount: {
-			type: Number,
-			default: 0
-		},
-		surchargesPercents: {
-			type: Number,
-			default: 0
-		},
+    discountType: {
+      type: String,
+      enum: ['Percent', 'Currency'],
+      default: 'Percent'
+    },
 		amount: {
 			type: Number,
 			default: 0
@@ -91,8 +85,6 @@ const InvoiceSchema = new mongoose.Schema({
 		ref: 'User',
 		default: null
 	}
-
-
 })
 
 const Invoice = mongoose.model('Invoice', InvoiceSchema)

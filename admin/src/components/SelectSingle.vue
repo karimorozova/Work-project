@@ -305,6 +305,7 @@ i {
     border-left: 1px solid $light-border;
     cursor: pointer;
     transition: .1s ease-out;
+    min-width: 36px;
 
     .reverse-icon {
       transform: rotate(180deg);

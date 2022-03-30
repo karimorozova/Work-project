@@ -24,7 +24,6 @@
               span {{ takeInvoiceFinance().total }}
 
 
-
       .subheader
         .subheader__left
           .profile__name {{ paymentProfile().getOfficialName() }}
@@ -47,23 +46,33 @@
       .body
         .body__table
           GeneralTable(
-            :fields="fieldsItems"
+            :fields="fieldsItemsFiltered"
             :tableData="invoice.items"
             :isDarkMode="true"
           )
             template(v-for="field in fieldsItems" :slot="field.headerKey" slot-scope="{ field }")
               .table__header {{ field.label }}
-
             template(slot="title" slot-scope="{ row, index }")
               .table__data  {{ row.title }}
             template(slot="quantity" slot-scope="{ row, index }")
               .table__data {{ row.quantity }}
             template(slot="rate" slot-scope="{ row, index }")
-              .table__data {{ row.rate }}
+              .table__data
+                span {{ row.rate }}
+            template(slot="discount" slot-scope="{ row, index }")
+              .table__data
+                span {{ row.discount }}
+                span.table-symbol(v-if="row.discountType === 'Currency'" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)")
+                span.table-symbol(v-else) %
             template(slot="tax" slot-scope="{ row, index }")
-              .table__data {{ row.tax }}
+              .table__data
+                span {{ row.tax }}
+                span.table-symbol(v-if="row.taxType === 'Currency'" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)")
+                span.table-symbol(v-else) %
             template(slot="amount" slot-scope="{ row, index }")
-              .table__data {{ row.amount }}
+              .table__data
+                span {{ row.amount }}
+                span.table-symbol(v-html="returnIconCurrencyByStringCode(invoice.customer.currency)")
 
         .body__subtable
           .table-details
@@ -110,31 +119,37 @@ export default {
           label: "Title",
           headerKey: "headerTitle",
           key: "title",
-          style: { "width": "40%" }
+          style: { "width": "100%" }
         },
         {
           label: "Quantity",
           headerKey: "headerQuantity",
           key: "quantity",
-          style: { "width": "15%" }
+          style: { "width": "50%" }
         },
         {
           label: "Rate",
           headerKey: "headerRate",
           key: "rate",
-          style: { "width": "15%" }
+          style: { "width": "50%" }
+        },
+        {
+          label: "Discount",
+          headerKey: "headerDiscount",
+          key: "discount",
+          style: { "width": "50%" }
         },
         {
           label: "Tax",
           headerKey: "headerTax",
           key: "tax",
-          style: { "width": "15%" }
+          style: { "width": "50%" }
         },
         {
           label: "Amount",
           headerKey: "headerAmount",
           key: "amount",
-          style: { "width": "15%" }
+          style: { "width": "50%" }
         }
       ]
     }
@@ -166,7 +181,17 @@ export default {
         getVat: () => vat || ''
       }
     }
-  }
+  },
+  computed: {
+    fieldsItemsFiltered() {
+      const items = this.invoice.items
+      const hasTax = this.invoice.items.some(j => !!j.tax)
+      const hasDiscount = this.invoice.items.some(k => !!k.discount)
+      return this.fieldsItems
+        .filter(item => (!items.length || !hasTax) ? item.key !== 'tax' : item)
+        .filter(item => (!items.length || !hasDiscount) ? item.key !== 'discount' : item)
+    }
+  },
 }
 </script>
 
@@ -283,5 +308,9 @@ export default {
   height: 1px;
   background-color: $light-border;
   width: 100%;
+}
+.table-symbol{
+  color: $dark-border;
+  margin-left: 4px;
 }
 </style>
