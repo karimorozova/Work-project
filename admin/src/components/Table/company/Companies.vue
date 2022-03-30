@@ -122,7 +122,7 @@ export default {
         this.isDeleting = true
       }
       if (key === "editModal") {
-        this.$emit('openModal')
+        this.$emit('openModal', this.companies[index]._id)
       }
     },
     setEditionData(index) {

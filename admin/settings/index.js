@@ -11,6 +11,7 @@ const {
 const {
 	createCompany,
 	getCompanies,
+	getCompany,
 	deleteCompany,
 	editCompanyDetails,
 	addPaymentMethodToCompany,
@@ -77,6 +78,7 @@ module.exports = {
 	updatePaymentMethodKeys,
 	removePaymentMethodKeys,
 	getCompanies,
+	getCompany,
 	createCompany,
 	deleteCompany,
 	editCompanyDetails,

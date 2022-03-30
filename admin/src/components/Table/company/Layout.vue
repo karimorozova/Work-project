@@ -1,7 +1,7 @@
 <template lang="pug">
   .services-wrapper
     .modal(v-if="isModalOpen")
-      EditCompany
+      EditCompany(:editedId="editedId")
     Companies(
       @openModal="toggleModal"
     )
@@ -21,15 +21,17 @@ export default {
   data() {
     return {
       selectedTab: "Companies",
-      isModalOpen: false
+      isModalOpen: false,
+      editedId: '',
     }
   },
   methods: {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
-    toggleModal() {
+    toggleModal(id) {
       this.isModalOpen = !this.isModalOpen
+      this.editedId = id
       let elem = document.getElementsByTagName('body')[0]
       if (this.isModalOpen) {
         elem.classList.add("hiddenScroll")

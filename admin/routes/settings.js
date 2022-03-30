@@ -30,7 +30,7 @@ const {
 	createCompany,
 	deleteCompany,
 	editCompanyDetails,
-	addPaymentMethodToCompany, getCompanies,
+	addPaymentMethodToCompany, getCompanies, getCompany,
 } = require('../settings')
 
 const {
@@ -321,7 +321,32 @@ router.get('/companies', async (req, res) => {
 	}
 })
 
+router.get('/company/:id', async (req, res) => {
+	const {id} = req.params
+	try {
+		console.log('gere', id)
+		const companies = await getCompany(id)
+		console.log(companies)
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
 router.post('/company', async (req, res)  => {
+	const { companyName, officialCompanyName, isActive, isDefault } = req.body
+	console.log({test: req.body})
+	try {
+		const companies = await createCompany(companyName, officialCompanyName, isActive, isDefault )
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.put('/company', async (req, res)  => {
 	const { companyName, officialCompanyName, isActive, isDefault } = req.body
 	console.log({test: req.body})
 	try {
