@@ -207,18 +207,6 @@ export default {
           key: "langPair",
           style: { width: "120px" }
         },
-        // {
-        //   label: "Start Date",
-        //   headerKey: "headerStartDate",
-        //   key: "startDate",
-        //   style: { width: "95px" }
-        // },
-        // {
-        //   label: "Pr. Deadline",
-        //   headerKey: "headerDeadline",
-        //   key: "deadline",
-        //   style: { width: "95px" }
-        // },
         {
           label: 'Billing Date',
           headerKey: 'headerBillingDate',
@@ -246,15 +234,18 @@ export default {
       billingDateFrom: '',
       billingDateTo: '',
       step: '',
-      clientsList: [],
+      clientBillingInfo: '',
+
       dataVariables: [
         'clients',
         'sourceLanguages',
         'targetLanguages',
         'billingDateFrom',
         'billingDateTo',
-        'step'
-      ]
+        'step',
+        'clientBillingInfo'
+      ],
+      clientsList: [],
     }
   },
   methods: {
@@ -314,7 +305,7 @@ export default {
       this.clientsList = (await this.$http.get('/pm-manage/clients-for-options')).data
     },
     async bottomScrolled() {
-      if (this.isDataRemain) {
+      if (this.isDataRemain && this.steps.length) {
         const result = await this.$http.post("/invoicing-receivables/not-selected-steps-list", {
           filters: this.allFilters,
           countToSkip: this.steps.length,
@@ -441,12 +432,17 @@ export default {
       if (this.steps && this.steps.length) return this.steps.every(i => i.isCheck)
     }
   },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.defaultSetter()
-      vm.querySetter(vm, to)
-      vm.getSteps()
-    })
+  // beforeRouteEnter(to, from, next) {
+  //   next((vm) => {
+  //     vm.defaultSetter()
+  //     vm.querySetter(vm, to)
+  //     vm.getSteps()
+  //   })
+  // },
+  created() {
+    this.defaultSetter()
+    this.querySetter(this, this.$route)
+    this.getSteps()
   },
   watch: {
     $route(to, from) {

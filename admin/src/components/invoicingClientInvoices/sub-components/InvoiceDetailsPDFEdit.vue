@@ -1,5 +1,14 @@
 <template lang="pug">
   .template
+    .full-modal(v-if="isOpenJobsModal")
+      .full-modal__close
+        IconButton(
+          popupText="Close reports modal"
+          @clicked="closeAllJobsModal()"
+        )
+          i(class="fa-solid fa-circle-xmark")
+      AddReports
+
     .template__header
       .header
         .header__logo
@@ -98,13 +107,13 @@
                   input(type="text" v-model="title" placeholder="Value")
                 .body__modal-item
                   span Quantity:
-                  input(type="number" v-model="quantity" placeholder="Value")
+                  input(type="number" :disabled="editedInvoiceItemType === 'Report'" v-model="quantity" placeholder="Value")
                 .body__modal-item
                   span Rate:
-                  input(type="number" v-model="rate" placeholder="Value")
+                  input(type="number" :disabled="editedInvoiceItemType === 'Report'" v-model="rate" placeholder="Value")
               .body__modal-col2
                 .body__modal-item
-                  span(style="width: 75px;") Tax:
+                  span(style="width: 70px;") Tax:
                   input.w-90(type="number" v-model="tax"  placeholder="Value")
                   .input-option
                     SelectSingle(
@@ -113,7 +122,7 @@
                       @chooseOption="({option}) => setItemOption(option, 'taxType')"
                     )
                 .body__modal-item
-                  span(style="width: 75px;") Discounts:
+                  span(style="width: 70px;") Discounts:
                   input.w-90(type="number" v-model="discount" placeholder="Value")
                   .input-option
                     SelectSingle(
@@ -169,8 +178,13 @@
                   span &#215;
                 .selectList__item(v-for="item in listOfClientReports" @click="closeOptionsModal(), saveNewItem('Report', item._id)")
                   span {{ item.reportId }} -
-                  span(style="margin-left: 3px;") {{ item.total }}
+                  span(style="margin-left: 3px;") {{ +(item.total).toFixed(2) }}
                   span(style="margin-left: 3px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+
+                .selectList__item.selectList__item-flex(@click="openAllJobsModal")
+                  span
+                    i.fas.fa-plus
+                  span Generate Report
                 .selectList__item.selectList__item-flex(@click="openItemModalAdd")
                   span
                     i.fas.fa-plus
@@ -208,12 +222,13 @@ import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import {getAmountByPercent, getInvoiceFinance} from "../../../../invoicing/helpers"
 import Button from "../../Button";
 import {mapActions} from "vuex";
-// import {ObjectId} from "mongoose";
+import AddReports from "../../invoicingClientReports/AddReports";
+import IconButton from "../../IconButton";
 
 export default {
   mixins: [ currencyIconDetected ],
   name: "InvoiceDetailsPDFEdit",
-  components: {Button, SelectSingle, Add, GeneralTable, DatePicker },
+  components: {IconButton, AddReports, Button, SelectSingle, Add, GeneralTable, DatePicker },
   props: {
     invoice: {
       type: Object
@@ -283,6 +298,7 @@ export default {
       isOpenModalOptions: false,
       isOpenModalAddItem: false,
       isOpenModalEditItem: false,
+      isOpenJobsModal: false,
 
       defaultItem: {
         title : '',
@@ -306,12 +322,16 @@ export default {
       this.closeOptionsModal()
     },
     openItemModalEdit(index){
-      // this.itemEditingIndex = index
-      // const item = this.invoice.items[index]
-      // this.title = item.title
-      // this.quantity = item.quantity
-      // this.rate = item.rate
-      // this.isOpenModalEditItem = true
+      this.itemEditingIndex = index
+      const item = this.invoice.items[index]
+      this.title = item.title
+      this.quantity = item.quantity
+      this.rate = item.rate
+      this.tax = item.tax
+      this.taxType = item.taxType
+      this.discount = item.discount
+      this.discountType = item.discountType
+      this.isOpenModalEditItem = true
     },
     closeItemsModal(){
       this.isOpenModalAddItem = false
@@ -327,8 +347,17 @@ export default {
       this.isOpenModalOptions = false
     },
     saveEditItem(){
-      const item = this.invoice.items[this.itemEditingIndex]
+      let item = this.invoice.items[this.itemEditingIndex]
+      item.title = this.title
+      item.rate = this.rate
+      item.quantity = this.quantity
+      item.amount = +(item.rate * item.quantity).toFixed(2)
 
+      item = this.calcItemTaxAndDiscount(item)
+
+      this.invoice.items.splice(this.itemEditingIndex, 1, item)
+      this.modifyInvoice('items', this.invoice.items)
+      this.closeItemsModal()
     },
     async saveNewItem(type, _reportId){
       let item = { ...this.defaultItem }
@@ -354,6 +383,12 @@ export default {
         if (currBI.address && currBI.address.country === 'Cyprus') this.tax = 19
       }
 
+      item = this.calcItemTaxAndDiscount(item)
+
+      this.modifyInvoice('items', [...this.invoice.items, item])
+      this.closeItemsModal()
+    },
+    calcItemTaxAndDiscount(item){
       if (this.discount) {
         item.discount = +this.discount
         if (this.discountType === 'Currency') {
@@ -365,7 +400,6 @@ export default {
           item.amount = +(item.amount - discountTotal).toFixed(2)
         }
       }
-
       if(this.tax){
         item.tax = +this.tax
         if (this.taxType === 'Currency') {
@@ -377,9 +411,7 @@ export default {
           item.amount = +(item.amount + taxTotal).toFixed(2)
         }
       }
-
-      this.modifyInvoice('items', [...this.invoice.items, item])
-      this.closeItemsModal()
+      return item
     },
     deleteItem(index){
       const deletedItem = this.invoice.items.splice(index, 1)
@@ -432,7 +464,23 @@ export default {
         this.discount = 0
         this.discountType = 'Percents'
         this.itemEditingIndex = null
-    }
+    },
+    openAllJobsModal(){
+      this.closeOptionsModal()
+      let elem = document.getElementsByTagName('body')[0]
+      elem.classList.add("hiddenScroll")
+      this.$router.replace({ path: this.$route.path, query: { clientBillingInfo: this.invoice.clientBillingInfo } } ).then(() => {
+        this.isOpenJobsModal = true
+      })
+    },
+    closeAllJobsModal(){
+      this.closeOptionsModal()
+      let elem = document.getElementsByTagName('body')[0]
+      elem.classList.remove("hiddenScroll")
+      this.$router.replace({ path: this.$route.path, query: { } } ).then(() =>{
+        this.isOpenJobsModal = false
+      } )
+    },
   },
   computed: {
     fieldsItemsFiltered() {
@@ -442,6 +490,9 @@ export default {
       return this.fieldsItems
         .filter(item => (!items.length || !hasTax) ? item.key !== 'tax' : item)
         .filter(item => (!items.length || !hasDiscount) ? item.key !== 'discount' : item)
+    },
+    editedInvoiceItemType(){
+      return this.invoice.items[this.itemEditingIndex]?.type
     }
   },
   created() {
@@ -727,13 +778,32 @@ input {
   }
 }
 .w-90{
-  width: 90px;
+  width: 95px;
   margin-right: -10px;
 }
 .input-option{
   height: 32px;
   width: 110px;
   position: relative;
+}
+
+.full-modal{
+  position: fixed;
+  left: 255px;
+  top: 0;
+  box-sizing: border-box;
+  width: calc(100% - 255px);
+  box-shadow: $box-shadow;
+  background: white;
+  border-radius: 2px;
+  z-index: 30000;
+  height: 100%;
+
+  &__close{
+    position: absolute;
+    left: 290px;
+    top: 10px;
+  }
 }
 
 .table-symbol{

@@ -90,7 +90,12 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 		matchProject.$match.customer = queryForStep.customer
 		delete queryForStep.customer
 	}
-	const lookup = {
+  if('clientBillingInfo' in queryForStep){
+    matchProject.$match.clientBillingInfo = queryForStep.clientBillingInfo
+    delete queryForStep.clientBillingInfo
+  }
+
+  const lookup = {
 		$lookup:
 				{
 					from: "clients",
@@ -132,10 +137,12 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 		{ $unwind: "$steps" },
 		{
 			$match: {
-				$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ],
+        $and: [
+          {$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ]},
+          {$or: [ {"steps.isReceivableVisible": true,}, {"steps.isReceivablesVisible": true,} ]}
+        ],
 				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway' ] },
 				"steps.finance.Price.receivables": { $gt: 0 },
-				"steps.isReceivablesVisible": true,
 				...queryForStep
 			}
 		},

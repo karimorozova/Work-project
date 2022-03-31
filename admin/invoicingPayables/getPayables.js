@@ -30,7 +30,18 @@ const getPayablesDateRange = (steps) => {
 	}, { firstPaymentDate: moment().add(20, 'years').toISOString(), lastPaymentDate: moment().subtract(20, 'years') })
 }
 
-const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages, deadlineDateTo, deadlineDateFrom, step, billingDateFrom, billingDateTo }, allLanguages) => {
+const stepsFiltersQuery = (
+  { vendors,
+    clients,
+    sourceLanguages,
+    targetLanguages,
+    deadlineDateTo,
+    deadlineDateFrom,
+    step,
+    billingDateFrom,
+    billingDateTo,
+    clientBillingInfo
+  }, allLanguages) => {
 	const query = {}
 	if (vendors) {
 		query["steps.vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
@@ -38,6 +49,9 @@ const stepsFiltersQuery = ({ vendors, clients, sourceLanguages, targetLanguages,
 	if (clients) {
 		query["customer"] = { $in: clients.split(',').map(item => ObjectId(item)) }
 	}
+  if(clientBillingInfo){
+    query["clientBillingInfo"] = ObjectId(clientBillingInfo)
+  }
 	if (sourceLanguages) {
 		query["steps.sourceLanguage"] = { $in: sourceLanguages.split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
 	}
