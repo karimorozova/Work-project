@@ -243,7 +243,7 @@ export default {
     width: 280px;
 
     &-title {
-      margin: 10px 0;
+      margin: 15px 0 10px;
       font-size: 30px;
       font-family: Myriad300;
     }
@@ -255,7 +255,7 @@ export default {
     }
 
     &-line {
-      height: 20px;
+      height: 18px;
       background: $green;
       margin-right: -40px;
     }

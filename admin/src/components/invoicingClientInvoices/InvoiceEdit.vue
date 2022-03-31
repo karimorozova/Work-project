@@ -205,5 +205,6 @@ export default {
   margin: 50px;
   display: flex;
   gap: 25px;
+  position: relative;
 }
 </style>

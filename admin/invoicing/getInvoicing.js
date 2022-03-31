@@ -16,7 +16,7 @@ const getInvoices = async (query, queryPage, queryLimit, filters) => {
 const getInvoice = async (invoiceId) => {
 	return Invoice.findById(invoiceId)
 			.populate('customer', [ 'name', 'billingInfo', 'currency' ])
-			.populate('accountManager', [ 'firstName', 'lastName' ])
+			.populate('accountManager', [ 'firstName', 'lastName', 'email', 'photo' ])
 			.populate('terms')
 			.lean()
 }

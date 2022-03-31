@@ -40,7 +40,7 @@ export default {
   props: {
     emails: {
       type: Array,
-      default: []
+      default: () => []
     }
   },
   data() {
@@ -219,7 +219,7 @@ export default {
     margin-left: 12px;
 
     input {
-      width: 300px;
+      width: 270px;
       height: 50px;
       outline: none;
       border: none;
