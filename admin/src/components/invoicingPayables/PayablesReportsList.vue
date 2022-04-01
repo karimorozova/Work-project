@@ -135,7 +135,7 @@
                   :selectedOptions="selectedStatus"
                   :options="['Created', 'Sent', 'Approved', 'Invoice on-hold', 'Invoice Ready', 'Partially Paid']"
                   placeholder="Option"
-                  @chooseOption="setStatus"
+                  @chooseOptions="setStatus"
                   :isRemoveOption="true"
                   @removeOption="removeStatus"
                 )
@@ -382,7 +382,14 @@ export default {
       this.isActionModal = false
     },
     setStatus({ option }) {
-      this.replaceRoute('status', option)
+      if (!this.$route.query.status) {
+        this.replaceRoute('status', option)
+        return
+      }
+      let list = this.$route.query.status.split(',')
+      if (list.includes(option)) list = list.filter(item => item !== option)
+      else list.push(option)
+      this.replaceRoute('status', list.join(','))
     },
     setPaymentMethod({ option }) {
       if (!this.$route.query.paymentMethod) {
@@ -597,7 +604,7 @@ export default {
       return this.reports.length && this.reports.some(item => item.isCheck)
     },
     selectedStatus() {
-      return this.$route.query.status || ''
+      return this.$route.query.status ? this.$route.query.status.split(',') : []
     },
     selectedPaymentMethod() {
       return this.$route.query.paymentMethod ? this.$route.query.paymentMethod.split(',') : []
