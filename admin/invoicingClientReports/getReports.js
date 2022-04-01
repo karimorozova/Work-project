@@ -75,7 +75,8 @@ const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields
 			{ "$addFields": { [`${ key }` + ".projectCurrency"]: '$projectCurrency' } },
 			{ "$addFields": { [`${ key }` + ".start"]: '$startDate' } },
 			{ "$addFields": { [`${ key }` + ".deadline"]: '$deadline' } },
-			{ "$addFields": { [`${ key }` + ".billingDate"]: '$billingDate' } }
+			{ "$addFields": { [`${ key }` + ".billingDate"]: '$billingDate' } },
+			{ "$addFields": { [`${ key }` + ".PO"]: '$PO' } }
 		]
 	}
 }
@@ -94,6 +95,10 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
     matchProject.$match.clientBillingInfo = queryForStep.clientBillingInfo
     delete queryForStep.clientBillingInfo
   }
+	if('billingDate' in queryForStep ){
+		matchProject.$match.billingDate = queryForStep.billingDate
+		delete queryForStep.billingDate
+	}
 
   const lookup = {
 		$lookup:
