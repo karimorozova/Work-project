@@ -92,7 +92,7 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 		query["vendor"] = { $in: vendors.split(',').map(item => ObjectId(item)) }
 	}
 	if (status) {
-		query["status"] = status
+		query["status"] = { $in: status.split(',') }
 	}
 	if (!!paymentDateFrom && !!paymentDateTo) {
 		query['paymentDetails.expectedPaymentDate'] = { $gte: new Date(+paymentDateFrom), $lte: new Date(+paymentDateTo) }
