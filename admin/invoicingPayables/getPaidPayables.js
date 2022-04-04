@@ -21,7 +21,7 @@ const getPaidShortReportList = async () => {
 	])
 }
 
-const getAllPaidPayables = async (countToSkip, countToGet, query) => {
+const getAllPaidPayables = async (countToSkip, countToGet, query, sort = {reportId: -1}) => {
 	const invoicingReports = await InvoicingPayablesArchive.aggregate([
 				{ $match: { ...query } },
 				// {
@@ -57,7 +57,7 @@ const getAllPaidPayables = async (countToSkip, countToGet, query) => {
 						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
 					}
 				},
-				{ $sort: { reportId: -1 } },
+				{ $sort: sort },
 				{ $skip: countToSkip },
 				{ $limit: countToGet }
 			]

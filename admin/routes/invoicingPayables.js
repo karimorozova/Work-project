@@ -144,10 +144,16 @@ router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 
 router.post("/reports", async (req, res) => {
 	try {
-		const { countToSkip, countToGet, filters } = req.body
+		const sortNormalizer = {
+			'Report Id (asc)': {reportId: 1},
+			'Report Id (desc)': {reportId: -1},
+			'Date Range (asc)': {firstPaymentDate: 1},
+			'Date Range (desc)': {firstPaymentDate: -1},
+		}
+		const { countToSkip, countToGet, filters, sortBy = 'Report Id (desc)' } = req.body
 		const allVendors = await Vendors.find({}, { billingInfo: 1 })
 		const query = payablesFiltersQuery(filters, allVendors)
-		const reports = await getAllPayables(countToSkip, countToGet, query)
+		const reports = await getAllPayables(countToSkip, countToGet, query, sortNormalizer[sortBy])
 		res.send(reports)
 	} catch (err) {
 		console.log(err)
@@ -157,10 +163,16 @@ router.post("/reports", async (req, res) => {
 
 router.post("/paid-reports", async (req, res) => {
 	try {
-		const { countToSkip, countToGet, filters } = req.body
+		const sortNormalizer = {
+			'Report Id (asc)': {reportId: 1},
+			'Report Id (desc)': {reportId: -1},
+			'Date Range (asc)': {firstPaymentDate: 1},
+			'Date Range (desc)': {firstPaymentDate: -1},
+		}
+		const { countToSkip, countToGet, filters, sortBy = 'Report Id (desc)' } = req.body
 		const allVendors = await Vendors.find({}, { billingInfo: 1 })
 		const query = payablesFiltersQuery(filters, allVendors)
-		const reports = await getAllPaidPayables(countToSkip, countToGet, query)
+		const reports = await getAllPaidPayables(countToSkip, countToGet, query, sortNormalizer[sortBy])
 		res.send(reports)
 	} catch (err) {
 		console.log(err)

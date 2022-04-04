@@ -120,8 +120,20 @@
                   range
                   placeholder="Select datetime range"
                 )
-              .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
-                i.fas.fa-backspace.backspace-long
+                .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
+                  i.fas.fa-backspace.backspace-long
+
+            .filter__item
+              label Sort By
+              .filter__input
+                SelectSingle(
+                  :options="sortByKeys",
+                  placeholder="Sort By",
+                  :selectedOption="selectedSortBy"
+                  @chooseOption="selectSortBy"
+                  :isRemoveOption="true"
+                  @removeOption="removeSortBy"
+                )
 
 </template>
 
@@ -147,6 +159,12 @@ export default {
   data() {
     return {
       selectedReportAction: '',
+      sortByKeys: [
+        'Report Id (desc)',
+        'Report Id (asc)',
+        'Date Range (desc)',
+        'Date Range (asc)',
+      ],
       isActionModal: false,
       vendorsList: [],
       reports: [],
@@ -240,6 +258,12 @@ export default {
   },
   methods: {
     ...mapActions([ 'alertToggle' ]),
+    selectSortBy({ option }) {
+      this.replaceRoute('sortBy', option)
+    },
+    removeSortBy() {
+      this.replaceRoute('sortBy', '')
+    },
     removeSelectedDeadlineDateRange() {
       let query = this.$route.query
       this.$router.replace({
@@ -351,7 +375,8 @@ export default {
       this.reports = (await this.$http.post('/invoicing-payables/paid-reports', {
         countToSkip: 0,
         countToGet: 100,
-        filters: this.allFilters
+        filters: this.allFilters,
+        sortBy: this.selectedSortBy,
       })).data.map(i => ({ ...i, isCheck: false }))
       this.vendorsList = (await this.$http.get('/pm-manage/vendors-for-options')).data
     },
@@ -360,6 +385,7 @@ export default {
         const result = await this.$http.post("/invoicing-payables/paid-reports", {
           filters: this.allFilters,
           countToSkip: this.reports.length,
+          sortBy: this.selectedSortBy,
           countToGet: 100
         })
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
@@ -379,6 +405,12 @@ export default {
     ...mapGetters({
       // vendorsList: "getAllVendorsForOptions"
     }),
+    selectedSortBy() {
+      if (this.$route.query.sortBy) {
+        return `${ this.$route.query.sortBy }`
+      }
+      return ''
+    },
     allFilters() {
       const filters = {}
       for (let variable of this.dataVariables) filters[variable] = this[variable]

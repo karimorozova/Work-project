@@ -91,7 +91,7 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 	return query
 }
 
-const getAllPayables = async (countToSkip, countToGet, query) => {
+const getAllPayables = async (countToSkip, countToGet, query, sort = {reportId: -1}) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
 				{ $match: { ...query } },
 				// {
@@ -129,7 +129,7 @@ const getAllPayables = async (countToSkip, countToGet, query) => {
 						"paymentDetails.paymentMethod": { $arrayElemAt: [ '$paymentDetails.paymentMethod', 0 ] }
 					}
 				},
-				{ $sort: { reportId: -1 } },
+				{ $sort: sort },
 				{ $skip: countToSkip },
 				{ $limit: countToGet }
 			]

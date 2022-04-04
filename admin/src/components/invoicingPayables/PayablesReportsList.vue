@@ -182,6 +182,17 @@
                 )
               .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
                 i.fas.fa-backspace.backspace
+            .filter__item
+              label Sort By
+              .filter__input
+                SelectSingle(
+                  :options="sortByKeys",
+                  placeholder="Sort By",
+                  :selectedOption="selectedSortBy"
+                  @chooseOption="selectSortBy"
+                  :isRemoveOption="true"
+                  @removeOption="removeSortBy"
+                )
 
 </template>
 
@@ -208,6 +219,12 @@ export default {
   data() {
     return {
       selectedReportAction: '',
+      sortByKeys: [
+        'Report Id (desc)',
+        'Report Id (asc)',
+        'Date Range (desc)',
+        'Date Range (asc)',
+      ],
       isActionModal: false,
       reports: [],
       vendorsList: [],
@@ -316,6 +333,12 @@ export default {
     ...mapActions([ 'alertToggle' ]),
     calculateTotal() {
       this.getTotalAmount()
+    },
+    selectSortBy({ option }) {
+      this.replaceRoute('sortBy', option)
+    },
+    removeSortBy() {
+      this.replaceRoute('sortBy', '')
     },
     async manageReportActions() {
 
@@ -529,7 +552,8 @@ export default {
       this.reports = (await this.$http.post('/invoicing-payables/reports', {
         countToSkip: 0,
         countToGet,
-        filters: this.allFilters
+        filters: this.allFilters,
+        sortBy: this.selectedSortBy,
       })).data.map(i => ({ ...i, isCheck: false }))
       this.vendorsList = (await this.$http.get('/pm-manage/vendors-for-options')).data
     },
@@ -538,6 +562,7 @@ export default {
         const result = await this.$http.post("/invoicing-payables/reports", {
           filters: this.allFilters,
           countToSkip: this.reports.length,
+          sortBy: this.selectedSortBy,
           countToGet: 100
         })
         this.reports.push(...result.data.map(i => ({ ...i, isCheck: false })))
@@ -580,6 +605,13 @@ export default {
     // getTotalAmount() {
     //   return
     // },
+
+    selectedSortBy() {
+      if (this.$route.query.sortBy) {
+        return `${ this.$route.query.sortBy }`
+      }
+      return ''
+    },
     availableActionOptions() {
       if (this.reports && this.reports.length) {
         const availableOptions = []
