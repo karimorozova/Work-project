@@ -1,5 +1,6 @@
 const { Company } = require("../models")
 const { createDir, removeDir } = require("../helpers/files")
+const { company } = require("../enums")
 const PATH = './dist/companies/'
 
 const createCompany = async (companyName, officialCompanyName, isActive, isDefault) => {
@@ -16,12 +17,35 @@ const getCompany = async (id) => {
 	return Company.findById(id)
 }
 
-const editCompanyBase = () => {
-
+const editCompanyBase = async (id, data) => {
+	await Company.findOneAndUpdate({isDefault: true}, {isDefault: false})
+	await Company.findByIdAndUpdate(id, data)
+	return getCompanies()
 }
 
-const editCompanyDetails = () => {
-
+const editCompanyDetails = async (id, data) => {
+	// const {
+	// 	isActive,
+	// 	isDefault,
+	// 	_id,
+	// 	companyName,
+	// 	officialCompanyName,
+	// 	financeEmail,
+	// 	website,
+	// 	phone,
+	// 	timeZone,
+	// 	mainCurrency,
+	// 	companyId,
+	// 	taxId,
+	// 	country,
+	// 	city,
+	// 	address,
+	// 	vat,
+	// 	zipCode,
+	// 	state
+	// } = data
+	await Company.findByIdAndUpdate(id, data)
+	return getCompany(id)
 }
 
 const addPaymentMethodToCompany = () => {

@@ -36,6 +36,7 @@ const {
 const {
 	getSimpleClients
 } = require('../clients')
+const { editCompanyBase } = require("../settings/companies")
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]
@@ -346,11 +347,22 @@ router.post('/company', async (req, res)  => {
 	}
 })
 
-router.put('/company', async (req, res)  => {
-	const { companyName, officialCompanyName, isActive, isDefault } = req.body
-	console.log({test: req.body})
+router.post('/company/:id', async (req, res)  => {
+	const {id} = req.params
 	try {
-		const companies = await createCompany(companyName, officialCompanyName, isActive, isDefault )
+		const company = await editCompanyDetails(id, req.body )
+		res.json(company)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.put('/company/:id', async (req, res)  => {
+	const { id } = req.params
+	const { companyName, officialCompanyName, isActive, isDefault } = req.body
+	try {
+		const companies = await editCompanyBase(id, {companyName, officialCompanyName, isActive, isDefault} )
 		res.json(companies)
 	} catch (err) {
 		console.log(err)

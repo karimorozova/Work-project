@@ -1,7 +1,7 @@
 <template lang="pug">
   .services-wrapper
     .modal(v-if="isModalOpen")
-      EditCompany(:editedId="editedId")
+      EditCompany(:editedId="editedId" @closeModal="toggleModal")
     Companies(
       @openModal="toggleModal"
     )

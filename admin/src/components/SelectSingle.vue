@@ -7,7 +7,7 @@
 
     .select
       .content
-        span.selected(v-if="selectedOption") {{ selectedOption }}
+        span.selected(v-if="selectedOption") {{ selectedOption[this.objectKey] || selectedOption }}
         span.selected.no-choice(v-if="!selectedOption") {{ placeholder }}
 
         .remove__icon(v-if="isRemoveOption && ( Object.keys(selectedOption).length ) && !isDisabled" @click="removeOption")
@@ -40,6 +40,10 @@ export default {
     },
     options: {
       type: Array
+    },
+    objectKey: {
+      type: String,
+      default: 'name'
     },
     placeholder: {
       type: String
@@ -95,7 +99,7 @@ export default {
       this.$emit('scrollDrop', { drop: this.isDropped, offsetTop: top, offsetHeight: height })
     },
     showOption(opt) {
-      return (typeof opt === "string") ? opt : opt.name
+      return (typeof opt === "string") ? opt : opt[this.objectKey]
     },
     outOptions() {
       this.isDropped = false
@@ -136,8 +140,8 @@ export default {
       let result = this.options
       if (this.searchValue) {
         return result.filter(item => {
-          if (item.name) {
-            return item.name.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1
+          if (item[this.objectKey]) {
+            return item[this.objectKey].toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1
           }
           return item.toLowerCase().indexOf(this.searchValue.toLowerCase()) !== -1
         })

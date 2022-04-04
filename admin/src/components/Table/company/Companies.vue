@@ -153,10 +153,9 @@ export default {
       this.companies[index].officialCompanyName = this.currentOfficialCompanyName
       this.companies[index].isActive = this.currentIsActive
       this.companies[index].isDefault = this.currentIsDefault
-      console.log(this.companies[index])
       try {
         this.companies = this.companies[index]._id
-            ? (await this.$http.put(`/api-settings/payment-methods/${ this.companies[index]._id }`, { ...this.companies[index] })).data
+            ? (await this.$http.put(`/api-settings/company/${ this.companies[index]._id }`, { ...this.companies[index] })).data
             : (await this.$http.post(`/api-settings/company/`, { ...this.companies[index] })).data
 
         this.alertToggle({ message: "Saved", isShow: true, type: "success" })
