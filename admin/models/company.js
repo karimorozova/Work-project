@@ -26,7 +26,8 @@ const CompanySchema = new Schema({
 		type: String,
 	},
 	timeZone: {
-		type: String,
+		type: Schema.Types.ObjectId,
+		ref: 'Timezones'
 	},
 	mainCurrency: {
 		type: String,

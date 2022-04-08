@@ -382,6 +382,17 @@ router.delete('/company/:id', async (req, res) => {
 	}
 })
 
+router.post('/company/:id/payment-method', async (req, res)  => {
+	const { id } = req.params
+	const { name, paymentType, otherStatement } = req.body
+	try {
+		const companies = await addPaymentMethodToCompany(id, {name, paymentType, otherStatement} )
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
 
 
 module.exports = router

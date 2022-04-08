@@ -4,6 +4,8 @@ const { company } = require("../enums")
 const PATH = './dist/companies/'
 
 const createCompany = async (companyName, officialCompanyName, isActive, isDefault) => {
+	if (isDefault) await Company.findOneAndUpdate({isDefault: true}, {isDefault: false})
+
   const company = await Company.create({companyName, officialCompanyName, isActive, isDefault})
 	await createDir(PATH, company._id.toString())
 	return getCompanies()
@@ -14,7 +16,7 @@ const getCompanies = async () => {
 }
 
 const getCompany = async (id) => {
-	return Company.findById(id)
+	return Company.findById(id).populate('paymentMethods.paymentType').populate('timeZone').populate('paymentMethods.paymentType.keys')
 }
 
 const editCompanyBase = async (id, data) => {
@@ -48,8 +50,12 @@ const editCompanyDetails = async (id, data) => {
 	return getCompany(id)
 }
 
-const addPaymentMethodToCompany = () => {
+const addPaymentMethodToCompany = async (companyId, data) => {
+	await Company.findByIdAndUpdate(companyId, {$push: {paymentMethods: data}})
+}
 
+const editPaymentMethodToCompany = async (companyId, paymentId,data) => {
+	await Company.updateOne(companyId, data)
 }
 
 const deleteCompany = async (id) => {

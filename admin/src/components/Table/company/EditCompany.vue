@@ -1,14 +1,16 @@
 <template lang="pug">
   .edit-company
+    .modal(v-if="isModalOpened")
+      CompanyPaymentMethodModal(:editablePaymentMethod="editingId" @savePaymentMethod="savePaymentMethod")
     .edit-company__close(@click.stop="closeCompanyDetails") &#215;
     .title
-    .body
-      .logo-edit
+    .logo-edit
+    .input
+      .input__title Active:
+      .input__field
+        CheckBox(:isChecked="company.isActive" @check="toggleActive" @uncheck="toggleActive" )
+    .flex-wrapper
       .main-info
-        .input
-          .input__title Active:
-          .input__field
-            CheckBox(:isChecked="company.isActive" @check="toggleActive" @uncheck="toggleActive" )
         .input
           .input__title Company Name:
           .input__field
@@ -56,6 +58,8 @@
           .input__title Tax ID:
           .input__field
             input(type="text" placeholder="Value" v-model="company.taxId")
+
+        Button(value="Edit" @clicked="checkErrors")
       .billing-address
         .title Billing Address
         .input
@@ -87,14 +91,37 @@
           .input__title Address 1:
           .input__field
             input(type="text" placeholder="Value" v-model="company.address")
-      Button(value="Edit" @clicked="checkErrors")
-      .payment-methods
+    .payment-methods
+      .payment-methods__body
+        .item(v-for="(item, index) in company.paymentMethods")
+          .item__header
+
+            .item__header--icons(v-if="deletingIndex === null && editingId === null")
+              .item__header--icon(@click="openModalForEdition(item)")
+                i(class="fas fa-pen")
+              .item__header--icon(@click="openApproveModal(item)")
+                i(class="fas fa-trash")
+            .item__header--icons(v-else)
+              .item__header--icon
+                i(class="fas fa-pen")
+              .item__header--icon
+                i(class="fas fa-trash")
+          .item__body
+            .item__body--key Name:
+            .item__body--value {{item.name}}
+          .item__body
+            .item__body--key Payment Type:
+            .item__body--value {{ item.paymentType.name }}
+          .item__body(v-for="[key, value] in Object.entries(allFieldsOutput(item.otherStatement))" )
+            .item__body--key {{ replaceKeyName(key) }}:
+            .item__body--value {{ value }}
 </template>
 
 <script>
 import CheckBox from "../../CheckBox"
 import Button from "../../Button"
 import SelectSingle from "../../SelectSingle"
+import CompanyPaymentMethodModal from "./CompanyPaymentMethodModal"
 
 export default {
   name: "EditCompany",
@@ -102,6 +129,7 @@ export default {
     CheckBox,
     Button,
     SelectSingle,
+    CompanyPaymentMethodModal,
   },
   props: {
     editedId: {
@@ -113,6 +141,9 @@ export default {
     return {
       isLoading: true,
       company: {},
+      deletingIndex: null,
+      editingId: null,
+      isModalOpened: false,
       timeZones: [],
 
     }
@@ -121,10 +152,18 @@ export default {
     async getCompany() {
       try {
         const result = await this.$http.get(`/api-settings/company/${this.editedId}`)
-        this.company= result.data
+        this.company = result.data
 
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
+      }
+    },
+    async savePaymentMethod(test) {
+      // console.log({ test })
+      try {
+        const result = await this.$http.post(`/api-settings/company/${this.editedId}/payment-method`, test)
+      }catch (err) {
+        this.alertToggle({message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
     },
     toggleActive() {
@@ -163,8 +202,35 @@ export default {
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
+    },
+    allFieldsOutput(item, result = {}) {
+      for (const key in item) {
+        if ((typeof item[key] === 'object') && key !== 'paymentType') {
+          return this.allFieldsOutput(item[key], result)
+        } else {
+          result = {
+            ...result,
+            [key]: item[key.name || key]
+          }
+        }
+      }
+      delete result._id
+      return result
+    },
+    replaceKeyName(key) {
+      if (key === 'paymentType ') return 'Payment Type '
+      // if (key === 'minimumAmount') return 'Threshold amount'
+      if (key === 'name') return 'Name'
+      return key
+    },
+    openModalForEdition(item) {
+      console.log({ item })
+      this.isModalOpened = true
+      this.editingId = item
+    },
+    openApproveModal(item) {
+      console.log(item)
     }
-
   },
   created() {
     this.getCompany()
@@ -197,6 +263,99 @@ export default {
       }
     }
   }
+.modal {
+  position: absolute;
+  background-color: $white;
+
+}
+.payment-methods {
+  margin-top: 15px;
+  padding-top: 25px;
+  border-top: 1px solid $light-border;
+
+  &__body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+
+    &--title {
+      font-size: 14px;
+      font-family: Myriad600;
+    }
+
+    &--add {
+      margin-top: -17px;
+    }
+  }
+}
+
+.item {
+  width: 307px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  margin-top: 20px;
+  border: 1px solid $light-border;
+  height: fit-content;
+
+  &__body {
+    padding: 6px 15px;
+    display: flex;
+    gap: 8px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: end;
+    border-bottom: 1px solid $light-border;
+    background-color: $light-background;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    min-height: 18px;
+
+    &--name {
+      font-size: 14px;
+      font-family: 'Myriad600';
+      width: 200px;
+    }
+
+    &--icons {
+      display: flex;
+      gap: 10px;
+    }
+
+    &--icon {
+      font-size: 14px;
+      border-radius: 2px;
+      height: 30px;
+      width: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: .2s ease-out;
+      justify-content: center;
+      border: 1px solid $border;
+      color: $dark-border;
+      box-sizing: border-box;
+      background-color: white;
+
+      &:hover {
+        color: $text;
+      }
+    }
+  }
+}
+.flex-wrapper {
+  display: flex;
+  gap: 200px;
+}
+.input {
+  padding-bottom: 15px;
+}
   .isLoading {
     background: white;
     width: 100%;
