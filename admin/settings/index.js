@@ -15,6 +15,8 @@ const {
 	deleteCompany,
 	editCompanyDetails,
 	addPaymentMethodToCompany,
+	editPaymentMethodInCompany,
+	deletePaymentMethodInCompany,
 } = require("./companies")
 
 const {
@@ -83,4 +85,6 @@ module.exports = {
 	deleteCompany,
 	editCompanyDetails,
 	addPaymentMethodToCompany,
+	editPaymentMethodInCompany,
+	deletePaymentMethodInCompany,
 }

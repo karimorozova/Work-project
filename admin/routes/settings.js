@@ -30,7 +30,11 @@ const {
 	createCompany,
 	deleteCompany,
 	editCompanyDetails,
-	addPaymentMethodToCompany, getCompanies, getCompany,
+	addPaymentMethodToCompany,
+	getCompanies,
+	getCompany,
+	editPaymentMethodInCompany,
+	deletePaymentMethodInCompany,
 } = require('../settings')
 
 const {
@@ -384,9 +388,25 @@ router.delete('/company/:id', async (req, res) => {
 
 router.post('/company/:id/payment-method', async (req, res)  => {
 	const { id } = req.params
-	const { name, paymentType, otherStatement } = req.body
+	const { name, paymentType, otherStatement, paymentMethodId } = req.body
 	try {
-		const companies = await addPaymentMethodToCompany(id, {name, paymentType, otherStatement} )
+		let companies;
+		if (!paymentMethodId) {
+			companies = await addPaymentMethodToCompany(id, {name, paymentType, otherStatement} )
+		} else {
+			companies = await editPaymentMethodInCompany(id, paymentMethodId, {name, paymentType, otherStatement})
+		}
+		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.delete('/company/:companyId/payment-method/:paymentId', async (req, res)  => {
+	const { companyId, paymentId } = req.params
+	try {
+		const companies = await deletePaymentMethodInCompany(companyId, paymentId )
 		res.json(companies)
 	} catch (err) {
 		console.log(err)

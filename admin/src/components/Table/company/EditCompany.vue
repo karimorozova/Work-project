@@ -1,7 +1,7 @@
 <template lang="pug">
   .edit-company
     .modal(v-if="isModalOpened")
-      CompanyPaymentMethodModal(:editablePaymentMethod="editingId" @savePaymentMethod="savePaymentMethod")
+      CompanyPaymentMethodModal(:editablePaymentMethod="editingId" @savePaymentMethod="savePaymentMethod" @closePaymentMethod="closeModal")
     .edit-company__close(@click.stop="closeCompanyDetails") &#215;
     .title
     .logo-edit
@@ -115,12 +115,15 @@
           .item__body(v-for="[key, value] in Object.entries(allFieldsOutput(item.otherStatement))" )
             .item__body--key {{ replaceKeyName(key) }}:
             .item__body--value {{ value }}
+
+      Add(@add="isModalOpened = true")
 </template>
 
 <script>
 import CheckBox from "../../CheckBox"
 import Button from "../../Button"
 import SelectSingle from "../../SelectSingle"
+import Add from "../../Add"
 import CompanyPaymentMethodModal from "./CompanyPaymentMethodModal"
 
 export default {
@@ -130,6 +133,7 @@ export default {
     Button,
     SelectSingle,
     CompanyPaymentMethodModal,
+    Add,
   },
   props: {
     editedId: {
@@ -159,9 +163,10 @@ export default {
       }
     },
     async savePaymentMethod(test) {
-      // console.log({ test })
       try {
         const result = await this.$http.post(`/api-settings/company/${this.editedId}/payment-method`, test)
+        this.company = result.data
+        this.closeModal()
       }catch (err) {
         this.alertToggle({message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
@@ -187,9 +192,7 @@ export default {
     async saveDetails() {
       try {
         const result = await this.$http.post(`/api-settings/company/${this.editedId}`, this.company)
-        console.log({t: result.data})
         this.company = result.data
-
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
@@ -219,17 +222,20 @@ export default {
     },
     replaceKeyName(key) {
       if (key === 'paymentType ') return 'Payment Type '
-      // if (key === 'minimumAmount') return 'Threshold amount'
       if (key === 'name') return 'Name'
       return key
     },
     openModalForEdition(item) {
-      console.log({ item })
       this.isModalOpened = true
       this.editingId = item
     },
-    openApproveModal(item) {
-      console.log(item)
+    async openApproveModal(item) {
+      const result = await this.$http.delete(`/api-settings/company/${this.editedId}/payment-method/${item._id}`)
+      this.company = result.data
+    },
+    closeModal() {
+      this.editingId = null
+      this.isModalOpened = false
     }
   },
   created() {

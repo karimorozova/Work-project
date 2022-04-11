@@ -24,7 +24,7 @@
             :selectedOption="currentType"
             @chooseOption="setPaymentType"
           )
-    p {{getKeys}}
+
     .modalRow(v-if="isAvailableExtraFields" v-for="item in getKeys" )
       .modalRow__key {{item}}:
       .modalRow__value
@@ -88,9 +88,9 @@ export default {
       if (this.errors.length) return
 
       this.$emit('savePaymentMethod', {
+        paymentMethodId: this.editablePaymentMethod ? this.editablePaymentMethod._id : null,
         paymentType: this.currentType,
         name: this.currentName,
-        // minimumAmount: this.currentMinimumAmount < 0 ? 0 : this.currentMinimumAmount,
         otherStatement: this.rest
       })
     },
@@ -101,10 +101,8 @@ export default {
       this.$set(this.rest, prop, value)
     },
     setPaymentType({ option }) {
-      console.log(option)
-      this.currentType = this.paymentMethods.find(({_id})=> _id === option)
-      const { minimumAmount, keys } = this.currentType
-      this.currentMinimumAmount = minimumAmount
+      this.currentType = option
+      const { keys } = this.currentType
       this.rest = {}
       keys.forEach(elem => this.rest[elem.key] = '')
     },
@@ -117,12 +115,10 @@ export default {
       }
     },
     setEditableDefaultData() {
-      if (this.editablePaymentMethod.name) {
-        const { paymentType, name, minimumAmount, otherStatement } = this.editablePaymentMethod
-        console.log({ paymentType, name, minimumAmount, otherStatement })
-        this.currentType = paymentType
+      if (this.editablePaymentMethod && this.editablePaymentMethod.name) {
+        const { paymentType, name,  otherStatement } = this.editablePaymentMethod
+        this.currentType =  paymentType
         this.currentName = name
-        // this.currentMinimumAmount = minimumAmount
         this.rest = otherStatement
       }
     }
@@ -133,7 +129,7 @@ export default {
     },
     getKeys() {
       if (!this.isAvailableExtraFields) return []
-      const method = this.currentType
+      const method = this.paymentMethods.find(j => j.name === this.currentType.name)
       if (!method) return []
       return method.keys.map(i => i.key)
     }

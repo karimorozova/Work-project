@@ -72,7 +72,7 @@ const CompanySchema = new Schema({
 	vat: {
 		type: String,
 	},
-	paymentMethods: {
+	paymentMethods: [{
 		name: {
 			type: String,
 			trim: true,
@@ -85,7 +85,7 @@ const CompanySchema = new Schema({
 			type: Object,
 			default: {}
 		}
-	}
+	}]
 });
 
 const Company = mongoose.model('Company', CompanySchema);

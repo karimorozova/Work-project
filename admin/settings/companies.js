@@ -16,7 +16,7 @@ const getCompanies = async () => {
 }
 
 const getCompany = async (id) => {
-	return Company.findById(id).populate('paymentMethods.paymentType').populate('timeZone').populate('paymentMethods.paymentType.keys')
+	return Company.findById(id).populate('timeZone').populate('paymentMethods.paymentType')
 }
 
 const editCompanyBase = async (id, data) => {
@@ -52,10 +52,17 @@ const editCompanyDetails = async (id, data) => {
 
 const addPaymentMethodToCompany = async (companyId, data) => {
 	await Company.findByIdAndUpdate(companyId, {$push: {paymentMethods: data}})
+	return getCompany(companyId)
 }
 
-const editPaymentMethodToCompany = async (companyId, paymentId,data) => {
-	await Company.updateOne(companyId, data)
+const editPaymentMethodInCompany = async (companyId, paymentMethodId, data) => {
+	await Company.findByIdAndUpdate(companyId, { $set: { 'paymentMethods.$[i]': data } }, { arrayFilters: [ { 'i._id': paymentMethodId } ] })
+	return getCompany(companyId)
+}
+
+const deletePaymentMethodInCompany = async (companyId, paymentMethodId) => {
+	await Company.findByIdAndUpdate(companyId, { $pull: { 'paymentMethods':{_id: paymentMethodId }} })
+	return getCompany(companyId)
 }
 
 const deleteCompany = async (id) => {
@@ -71,5 +78,7 @@ module.exports = {
 	editCompanyBase,
 	editCompanyDetails,
 	addPaymentMethodToCompany,
+	editPaymentMethodInCompany,
+	deletePaymentMethodInCompany,
 	deleteCompany,
 }
