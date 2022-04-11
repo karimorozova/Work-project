@@ -78,10 +78,21 @@
           .table-details
             .row
               .row__key Sub Total:
-              .row__value EUR 222
-            .row
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().subTotal }}
+
+            .row(v-if="takeInvoiceFinance().vat")
               .row__key VAT:
-              .row__value EUR 222
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().vat }}
+
+            .row(v-if="takeInvoiceFinance().discount" )
+              .row__key Discount:
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().discount }}
             .row
               .row__key Total:
               .row__value

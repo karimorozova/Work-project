@@ -272,7 +272,7 @@ export default {
             item: {
               title: 'Language Service: report ' + this.reportDetailsInfo.reportId,
               quantity: 1,
-              rate: this.reportDetailsInfo.total
+              rate: +(this.reportDetailsInfo.total).toFixed(2)
             }
           }
       )
@@ -303,7 +303,7 @@ export default {
       const { client: { billingInfo }, clientBillingInfo } = this.reportDetailsInfo
       const currBI = billingInfo.find(item => item._id.toString() === clientBillingInfo.toString())
       const rate = this.reportDetailsInfo.total
-      amount = rate
+      amount = +(rate).toFixed(2)
 
       if (currBI.address && currBI.address.country === 'Cyprus') {
         tax = 19

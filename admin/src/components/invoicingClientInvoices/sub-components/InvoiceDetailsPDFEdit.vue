@@ -194,10 +194,22 @@
           .table-details
             .row
               .row__key Sub Total:
-              .row__value EUR 222
-            .row
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().subTotal }}
+
+            .row(v-if="takeInvoiceFinance().vat")
               .row__key VAT:
-              .row__value EUR 222
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().vat }}
+
+            .row(v-if="takeInvoiceFinance().discount" )
+              .row__key Discount:
+              .row__value
+                span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
+                span {{ takeInvoiceFinance().discount }}
+
             .row
               .row__key Total:
               .row__value
@@ -365,7 +377,7 @@ export default {
 
       if(type === 'Custom'){
         item.title = this.title
-        item.rate = this.rate
+        item.rate = +(this.rate).toFixed(2)
         item.quantity = this.quantity
         item.amount = +(item.rate * item.quantity).toFixed(2)
       }
@@ -374,8 +386,8 @@ export default {
         const report = this.listOfClientReports.find(i => i._id === _reportId)
         item.reportId = _reportId
         item.title = 'Language Service: report ' + report.reportId
-        item.rate = report.total
-        item.amount = report.total
+        item.rate = +(report.total).toFixed(2)
+        item.amount = +(report.total).toFixed(2)
         item.quantity = 1
         //Cyprus
         const { customer: { billingInfo }, clientBillingInfo } = this.invoice
