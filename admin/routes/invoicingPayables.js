@@ -24,12 +24,25 @@ const {
 	invoiceSubmission,
 	rollBackFromPaidToDraft,
 	getShortReportList,
-	getPaidShortReportList, createBillZohoRequest
+	getPaidShortReportList,
+	getAllVendorReports,
+	createBillZohoRequest
 } = require('../invoicingPayables')
 
 const { ObjectID: ObjectId } = require("mongodb")
 const upload = require("../utils/uploads")
 const moment = require("moment")
+
+router.get('/all-vendor-reports/:_vendorId', async (req, res) => {
+	const { _vendorId } = req.params
+	try {
+		const reports = await getAllVendorReports(_vendorId)
+		res.send([])
+	} catch (err) {
+		console.log(err)
+		console.log('Error on getting Reports')
+	}
+})
 
 router.get('/short-report-list', async (req, res) => {
 	try {

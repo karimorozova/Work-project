@@ -2,6 +2,10 @@ const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
 const { InvoicingPayables, Projects, Vendors } = require("../models")
 
+const getAllVendorReports = async () => {
+	console.log('ress')
+}
+
 const getShortReportList = async () => {
 	const reports = await InvoicingPayables.aggregate([
 		{
@@ -91,7 +95,7 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 	return query
 }
 
-const getAllPayables = async (countToSkip, countToGet, query, sort = {reportId: -1}) => {
+const getAllPayables = async (countToSkip, countToGet, query, sort = { reportId: -1 }) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
 				{ $match: { ...query } },
 				// {
@@ -285,6 +289,11 @@ const getPayableByVendorId = async (id, reportQuery = {}) => {
 						"steps.service",
 						"steps.memoqDocIds"
 					]
+				},
+				{
+					$sort: {
+						_id: -1
+					}
 				}
 			]
 	))
@@ -352,6 +361,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep, isSort = true)
 }
 
 module.exports = {
+	getAllVendorReports,
 	getShortReportList,
 	getPayableByVendorId,
 	stepsFiltersQuery,

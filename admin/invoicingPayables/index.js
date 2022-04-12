@@ -33,7 +33,8 @@ const {
 	stepsFiltersQuery,
 	payablesFiltersQuery,
 	getPayableByVendorId,
-	getShortReportList
+	getShortReportList,
+	getAllVendorReports,
 } = require('./getPayables')
 
 const {
@@ -58,6 +59,7 @@ const {
 } = require("./notification")
 
 module.exports = {
+	getAllVendorReports,
 	getPaidShortReportList,
 	getShortReportList,
 	rollBackFromPaidToDraft,
