@@ -351,10 +351,13 @@ router.post('/company', async (req, res)  => {
 	}
 })
 
-router.post('/company/:id', async (req, res)  => {
+router.post('/company/:id', upload.fields([ { name: 'photo' } ]), async (req, res)  => {
 	const {id} = req.params
+	const editedCompany  = JSON.parse(req.body.company)
+	const photoFile = req.files["photo"]
+
 	try {
-		const company = await editCompanyDetails(id, req.body )
+		const company = await editCompanyDetails(id, editedCompany, photoFile )
 		res.json(company)
 	} catch (err) {
 		console.log(err)

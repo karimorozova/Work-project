@@ -1,6 +1,8 @@
 const { Company } = require("../models")
 const { createDir, removeDir } = require("../helpers/files")
 const { company } = require("../enums")
+const { moveFile } = require("../utils/movingFile")
+const fs = require("fs")
 const PATH = './dist/companies/'
 
 const createCompany = async (companyName, officialCompanyName, isActive, isDefault) => {
@@ -25,7 +27,32 @@ const editCompanyBase = async (id, data) => {
 	return getCompanies()
 }
 
-const editCompanyDetails = async (id, data) => {
+
+async function getPhotoLink(id, file) {
+	try {
+		const newPath = await moveFile(file[0], PATH + `${ id }/${ file[0].filename }`)
+		return newPath.split('./dist')[1]
+	} catch (err) {
+		console.log(err)
+		console.log("Error in getPhotoLink")
+	}
+}
+
+function removeOldVendorFile(oldPath, newPath) {
+	if (oldPath === newPath || !oldPath) return
+	return new Promise((resolve, reject) => {
+		fs.unlink(`./dist${ oldPath }`, (err) => {
+			if (err) {
+				console.log(err)
+				console.log("Error in removing Company photo")
+				reject(err)
+			}
+		})
+		resolve("removed")
+	})
+}
+
+const editCompanyDetails = async (id, data, photoFile) => {
 	// const {
 	// 	isActive,
 	// 	isDefault,
@@ -46,6 +73,15 @@ const editCompanyDetails = async (id, data) => {
 	// 	zipCode,
 	// 	state
 	// } = data
+
+	if (photoFile) {
+		if (data.photo) {
+			let oldPath = data.photo
+			await removeOldVendorFile(oldPath, data.photo)
+		}
+		data.photo = await getPhotoLink(id, photoFile)
+	}
+
 	await Company.findByIdAndUpdate(id, data)
 	return getCompany(id)
 }

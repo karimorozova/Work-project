@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const CompanySchema = new Schema({
-	logo: {
+	photo: {
 		type: String,
 		trim: true,
 	},

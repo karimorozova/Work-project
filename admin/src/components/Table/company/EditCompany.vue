@@ -1,15 +1,37 @@
 <template lang="pug">
   .edit-company
-    .modal(v-if="isModalOpened")
+    .modal.modal-border(v-if="isModalOpened")
       CompanyPaymentMethodModal(:editablePaymentMethod="editingId" @savePaymentMethod="savePaymentMethod" @closePaymentMethod="closeModal")
+    .modal(v-if="deletingId")
+      ApproveModal(
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="No"
+        @approve="deletingId"
+        @close="closeApproveModal"
+        @notApprove="closeApproveModal"
+      )
     .edit-company__close(@click.stop="closeCompanyDetails") &#215;
     .title
-    .logo-edit
-    .input
-      .input__title Active:
-      .input__field
-        CheckBox(:isChecked="company.isActive" @check="toggleActive" @uncheck="toggleActive" )
     .flex-wrapper
+      .logo
+        .logo-edit
+          .photo-wrap(v-if="!company.photo")
+            input.photo-file(type="file" @change="previewPhoto")
+            .photo-text(v-if="!isImageExist")
+              p.photo-text__message(v-if="!isFileError") Upload File
+                br
+                span.photo-extensions *.jpg/jpeg/png
+                span.photo-size <= 3MB
+            img.photo-image(v-if="isImageExist")
+            p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
+          .photo-wrap(v-if="company.photo")
+            input.photo-file(type="file" @change="previewPhoto")
+            img.photo-image(:src="company.photo")
+        .input
+          .input__title Active:
+          .input__field
+            CheckBox(:isChecked="company.isActive" @check="toggleActive" @uncheck="toggleActive" )
       .main-info
         .input
           .input__title Company Name:
@@ -59,9 +81,8 @@
           .input__field
             input(type="text" placeholder="Value" v-model="company.taxId")
 
-        Button(value="Edit" @clicked="checkErrors")
       .billing-address
-        .title Billing Address
+        //.title Billing Address
         .input
           .input__title Country/Region:
           .input__select
@@ -91,12 +112,14 @@
           .input__title Address 1:
           .input__field
             input(type="text" placeholder="Value" v-model="company.address")
+    Button(value="Edit" @clicked="checkErrors")
+
     .payment-methods
       .payment-methods__body
         .item(v-for="(item, index) in company.paymentMethods")
           .item__header
 
-            .item__header--icons(v-if="deletingIndex === null && editingId === null")
+            .item__header--icons(v-if="deletingId === null && editingId === null")
               .item__header--icon(@click="openModalForEdition(item)")
                 i(class="fas fa-pen")
               .item__header--icon(@click="openApproveModal(item)")
@@ -125,15 +148,19 @@ import Button from "../../Button"
 import SelectSingle from "../../SelectSingle"
 import Add from "../../Add"
 import CompanyPaymentMethodModal from "./CompanyPaymentMethodModal"
+import photoPreview from "../../../mixins/photoPreview"
+import ApproveModal from "../../ApproveModal"
 
 export default {
   name: "EditCompany",
+  mixins: [ photoPreview ],
   components: {
     CheckBox,
     Button,
     SelectSingle,
     CompanyPaymentMethodModal,
     Add,
+    ApproveModal,
   },
   props: {
     editedId: {
@@ -145,11 +172,13 @@ export default {
     return {
       isLoading: true,
       company: {},
-      deletingIndex: null,
+      deletingId: null,
       editingId: null,
       isModalOpened: false,
       timeZones: [],
-
+      photoFile: [],
+      isImageExist: false,
+      isFileError: false,
     }
   },
   methods: {
@@ -162,6 +191,24 @@ export default {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
     },
+    // async previewPhoto() {
+    //   let sendData = new FormData()
+    //   let input = document.getElementsByClassName('photo-file')[0]
+    //   if (this.checkFile(input.files)) {
+    //     // const vendor = JSON.stringify(this.currentVendorFull)
+    //     // sendData.append("vendor", vendor)
+    //     sendData.append("photo", input.files[0])
+    //     try {
+    //       // const res = await this.$http.post("/vendorsapi/update-vendor", sendData)
+    //       // console.log(res)
+    //       this.alertToggle({ message: "Vendor info updated", isShow: true, type: "success" })
+    //     } catch (err) {
+    //       this.alertToggle({ message: "Server error / Cannot update Vendor info", isShow: true, type: "error" })
+    //     }
+    //   } else {
+    //     this.showFileError(input)
+    //   }
+    // },
     async savePaymentMethod(test) {
       try {
         const result = await this.$http.post(`/api-settings/company/${this.editedId}/payment-method`, test)
@@ -191,7 +238,10 @@ export default {
     },
     async saveDetails() {
       try {
-        const result = await this.$http.post(`/api-settings/company/${this.editedId}`, this.company)
+        let sendData = new FormData()
+        sendData.append("photo", this.photoFile[0])
+        sendData.append("company", JSON.stringify(this.company))
+        const result = await this.$http.post(`/api-settings/company/${this.editedId}`, sendData)
         this.company = result.data
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
@@ -230,7 +280,13 @@ export default {
       this.editingId = item
     },
     async openApproveModal(item) {
-      const result = await this.$http.delete(`/api-settings/company/${this.editedId}/payment-method/${item._id}`)
+      this.deletingId = item._id
+    },
+    async closeApproveModal(item) {
+      this.deletingId = null
+    },
+    async deletePaymentMethod() {
+      const result = await this.$http.delete(`/api-settings/company/${this.editedId}/payment-method/${this.deletingId}`)
       this.company = result.data
     },
     closeModal() {
@@ -247,33 +303,44 @@ export default {
 
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
-  .edit-company {
-    position: relative;
-    &__close {
-      position: absolute;
-      top: -6px;
-      right: -5px;
-      font-size: 22px;
-      cursor: pointer;
-      height: 22px;
-      width: 22px;
-      justify-content: center;
-      display: flex;
-      align-items: center;
-      font-family: Myriad900;
-      opacity: 0.8;
-      transition: ease 0.2s;
 
-      &:hover {
-        opacity: 1
-      }
+.edit-company {
+  position: relative;
+  &__close {
+    position: absolute;
+    top: -6px;
+    right: -5px;
+    font-size: 22px;
+    cursor: pointer;
+    height: 22px;
+    width: 22px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-family: Myriad900;
+    opacity: 0.8;
+    transition: ease 0.2s;
+
+    &:hover {
+      opacity: 1
     }
   }
+}
+
 .modal {
   position: absolute;
-  background-color: $white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -49%);
+  z-index: 20;
 
+  &__border {
+    padding: 25px;
+    background: white;
+    box-shadow: rgba(99, 99, 99, 0.12) 0px 0px 1px, rgba(99, 99, 99, 0.2) 0px 1px 2px, rgba(99, 99, 99, 0.05) 0px 2px 1.3px;
+  }
 }
+
 .payment-methods {
   margin-top: 15px;
   padding-top: 25px;
@@ -357,44 +424,107 @@ export default {
 }
 .flex-wrapper {
   display: flex;
-  gap: 200px;
+  gap: 100px;
 }
 .input {
   padding-bottom: 15px;
 }
-  .isLoading {
-    background: white;
-    width: 100%;
-    position: absolute;
-    z-index: 2;
-    height: 100%;
-    text-align: center;
-    line-height: 50;
-  }
-  .input {
-    &__select {
-      position: relative;
-      height: 31px;
-      width: 220px;
-    }
-  }
-
-
-  input {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 2px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    height: 32px;
-    transition: .1s ease-out;
+.isLoading {
+  background: white;
+  width: 100%;
+  position: absolute;
+  z-index: 2;
+  height: 100%;
+  text-align: center;
+  line-height: 50;
+}
+.input {
+  &__select {
+    position: relative;
+    height: 31px;
     width: 220px;
-    font-family: 'Myriad400';
-
-    &:focus {
-      border: 1px solid $border-focus;
-    }
   }
+}
+
+//Photo
+.photo-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  &__message {
+    opacity: .4;
+    text-align: center;
+  }
+
+  &__error-message {
+    position: absolute;
+    z-index: 12;
+    background-color: white;
+    color: $red;
+    height: 150px;
+    width: 150px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+.photo-wrap {
+  width: 150px;
+  height: 150px;
+  border: 2px solid $light-border;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8%;
+  background-color: white;
+
+  .photo-image {
+    object-fit: cover;
+    height: 150px;
+    width: 150px;
+  }
+}
+
+.photo-file {
+  position: absolute;
+  top: -24px;
+  height: 172px;
+  width: 150px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  z-index: 5;
+  cursor: pointer;
+  border-radius: 8%;
+}
+
+
+input {
+  font-size: 14px;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 2px;
+  box-sizing: border-box;
+  padding: 0 7px;
+  outline: none;
+  height: 32px;
+  transition: .1s ease-out;
+  width: 220px;
+  font-family: 'Myriad400';
+
+  &:focus {
+    border: 1px solid $border-focus;
+  }
+}
 </style>
