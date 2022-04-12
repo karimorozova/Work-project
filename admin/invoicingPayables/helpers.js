@@ -77,7 +77,8 @@ const getVendorAndCheckPaymentTerms = async (vendorId) => {
 const paidOrAddPaymentInfo = async (reportId, data, zohoPaymentId = '') => {
 	const status = data.unpaidAmount <= 0 ? "Paid" : "Partially Paid"
 
-	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data, zohoPaymentId } } })
+	// await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data, zohoPaymentId } } })
+	await InvoicingPayables.updateOne({ _id: reportId }, { $set: { status: status }, $push: { paymentInformation: { ...data } } })
 
 	if ("Paid" === status) {
 		await InvoicingPayables.aggregate([
