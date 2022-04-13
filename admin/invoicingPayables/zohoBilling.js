@@ -42,6 +42,7 @@ const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorE
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
+		"date": moment(due_date).subtract(1,'days').format('YYYY-MM-DD'),
 		"due_date": due_date,
 		"line_items": lineItems
 	}
