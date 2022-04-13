@@ -23,7 +23,12 @@
                   span {{ row.reportId }}
 
             template(slot="paymentDay" slot-scope="{ row, index }")
-              .table__data(v-if="row.paymentDetails.expectedPaymentDate" ) {{ getTime( row.paymentDetails.expectedPaymentDate) }}
+              .table__data(v-if="row.paymentDetails.expectedPaymentDate" ) {{ getDate( row.paymentDetails.expectedPaymentDate) }}
+              .table__data(v-else) -
+            template(slot="inZoho" slot-scope="{ row, index }")
+              .table__data(v-if="row.zohoBillingId" )
+                a( target="_blank" :href="`https://books.zoho.com/app#/bills/${row.zohoBillingId}`")
+                  span Link
               .table__data(v-else) -
 
             template(slot="dateRange" slot-scope="{ row, index }")
@@ -54,8 +59,8 @@
             template(slot="created" slot-scope="{ row, index }")
               .table__data {{ getTime( row.createdAt) }}
 
-            template(slot="updated" slot-scope="{ row, index }")
-              .table__data {{ getTime( row.updatedAt) }}
+            //template(slot="updated" slot-scope="{ row, index }")
+            //  .table__data {{ getTime( row.updatedAt) }}
 
         template(slot="filters")
           .filter
@@ -96,11 +101,11 @@
                 DatePicker.range-with-one-panel(
                   :value="selectedPaymentDateRange"
                   @input="(e) => setPaymentDateRange(e)"
-                  format="DD-MM-YYYY, HH:mm"
+                  format="DD-MM-YYYY"
                   prefix-class="xmx"
                   range-separator=" - "
                   :clearable="false"
-                  type="datetime"
+                  type="date"
                   range
                   placeholder="Datetime range"
                 )
@@ -112,16 +117,16 @@
                 DatePicker.range-with-one-panel(
                   :value="selectedDeadlineDateRange"
                   @input="(e) => setDeadlineDateRange(e)"
-                  format="DD-MM-YYYY, HH:mm"
+                  format="DD-MM-YYYY"
                   prefix-class="xmx"
                   range-separator=" - "
                   :clearable="false"
-                  type="datetime"
+                  type="date"
                   range
                   placeholder="Select datetime range"
                 )
                 .clear-icon-picker(v-if="!!selectedDeadlineDateRange[0]" @click="removeSelectedDeadlineDateRange()")
-                  i.fas.fa-backspace.backspace-long
+                  i.fas.fa-backspace.backspace
 
             .filter__item
               label Sort By
@@ -177,6 +182,12 @@ export default {
           style: { width: "130px" }
         },
         {
+          label: "Zoho",
+          headerKey: "headerInZoho",
+          key: "inZoho",
+          style: { width: "130px" }
+        },
+        {
           label: "Vendor Name",
           headerKey: "headerVendorName",
           key: "vendorName",
@@ -224,12 +235,12 @@ export default {
           key: "created",
           style: { width: "120px" }
         },
-        {
-          label: "Updated On",
-          headerKey: "headerUpdated",
-          key: "updated",
-          style: { width: "120px" }
-        }
+        // {
+        //   label: "Updated On",
+        //   headerKey: "headerUpdated",
+        //   key: "updated",
+        //   style: { width: "120px" }
+        // }
       ],
       isDataRemain: true,
 
@@ -263,6 +274,9 @@ export default {
     },
     removeSortBy() {
       this.replaceRoute('sortBy', '')
+    },
+    getDate(date){
+      return moment(date).format('MMM D')
     },
     removeSelectedDeadlineDateRange() {
       let query = this.$route.query

@@ -94,14 +94,11 @@
                 span {{ +(row.total).toFixed(2) }}
 
             template(slot="paymentDay" slot-scope="{ row, index }")
-              .table__data(v-if="row.paymentDetails.expectedPaymentDate && row.status !== 'Invoice on-hold'" ) {{ getTime( row.paymentDetails.expectedPaymentDate) }}
+              .table__data(v-if="row.paymentDetails.expectedPaymentDate && row.status !== 'Invoice on-hold'" ) {{ getDate( row.paymentDetails.expectedPaymentDate) }}
               .table__data(v-else) -
 
             template(slot="created" slot-scope="{ row, index }")
               .table__data {{ getTime( row.createAt) }}
-
-            template(slot="updated" slot-scope="{ row, index }")
-              .table__data {{ getTime( row.updatedAt) }}
 
             template(slot="icon" slot-scope="{ row, index }")
               .table__icon(v-if="row.status === 'Created'|| row.status === 'Sent' || user.group.name === 'Developers'  || user.group.name === 'Administrators'")
@@ -156,11 +153,11 @@
                 DatePicker.range-with-one-panel(
                   :value="selectedPaymentDateRange"
                   @input="(e) => setPaymentDateRange(e)"
-                  format="DD-MM-YYYY, HH:mm"
+                  format="DD-MM-YYYY"
                   prefix-class="xmx"
                   range-separator=" - "
                   :clearable="false"
-                  type="datetime"
+                  type="date"
                   range
                   placeholder="Datetime range"
                 )
@@ -172,11 +169,11 @@
                 DatePicker.range-with-one-panel(
                   :value="selectedDeadlineDateRange"
                   @input="(e) => setDeadlineDateRange(e)"
-                  format="DD-MM-YYYY, HH:mm"
+                  format="DD-MM-YYYY"
                   prefix-class="xmx"
                   range-separator=" - "
                   :clearable="false"
-                  type="datetime"
+                  type="date"
                   range
                   placeholder="Datetime range"
                 )
@@ -288,12 +285,6 @@ export default {
           label: "Created On",
           headerKey: "headerCreated",
           key: "created",
-          style: { width: "120px" }
-        },
-        {
-          label: "Updated On",
-          headerKey: "headerUpdated",
-          key: "updated",
           style: { width: "120px" }
         },
         {
@@ -433,6 +424,9 @@ export default {
     getTime(date) {
       return moment(date).format('MMM D, HH:mm')
     },
+    getDate(date){
+      return moment(date).format('MMM D')
+    },
     dateRange(row) {
       return `${ this.formattedDate(row.firstPaymentDate) } <span style="color: #999999; margin: 0 4px;">/</span> ${ this.formattedDate(row.lastPaymentDate) || "-" }`
     },
@@ -531,6 +525,7 @@ export default {
       this.replaceRoute('vendors', _ids.join(','))
     },
     querySetter(vm, to) {
+      if(!Object.keys(to.query).length) return this.defaultSetter()
       for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
     },
     defaultSetter() {

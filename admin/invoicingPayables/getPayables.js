@@ -1,6 +1,13 @@
 const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
 const { InvoicingPayables, Projects, Vendors } = require("../models")
+const { getAllPaidPayables } = require("./getPaidPayables")
+
+const getAllVendorReports = async (_vendorId) => {
+	const reports = await getAllPayables(0, 1e6, { vendor: ObjectId(_vendorId) })
+	const paidReports = await getAllPaidPayables(0, 1e6, { vendor: ObjectId(_vendorId) })
+	return reports.concat(paidReports)
+}
 
 const getShortReportList = async () => {
 	const reports = await InvoicingPayables.aggregate([
@@ -105,25 +112,9 @@ const payablesFiltersQuery = ({ reportId, vendors, deadlineDateTo, deadlineDateF
 	return query
 }
 
-const getAllPayables = async (countToSkip, countToGet, query, sort = {reportId: -1}) => {
+const getAllPayables = async (countToSkip, countToGet, query, sort = { reportId: -1 }) => {
 	const invoicingReports = await InvoicingPayables.aggregate([
 				{ $match: { ...query } },
-				// {
-				// 	$lookup: {
-				// 		from: "projects.as",
-				// 		let: { 'steps': '$steps' },
-				// 		pipeline: [
-				// 			// { $match: { isTest: false, "steps.nativeFinance.Price": { $gt: 0 } } },
-				// 			// { "$project": { 'steps.nativeFinance': 1 } },
-				// 			{ "$unwind": "$steps" },
-				// 			{ "$match": { "$expr": { "$eq": [ "$steps._id", "$$steps" ] } } },
-				// 			{ "$addFields": { "steps.nativeFinance.Price.projectName": '$projectName' } },
-				// 			{ "$addFields": { "steps.deadline": '$deadline' } },
-				// 			{ '$replaceRoot': { newRoot: '$steps.nativeFinance.Price' } }
-				// 		],
-				// 		as: "stepFinance"
-				// 	}
-				// },
 				{
 					$lookup: {
 						from: "vendors",
@@ -299,6 +290,11 @@ const getPayableByVendorId = async (id, reportQuery = {}) => {
 						"steps.service",
 						"steps.memoqDocIds"
 					]
+				},
+				{
+					$sort: {
+						_id: -1
+					}
 				}
 			]
 	))
@@ -366,6 +362,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep, isSort = true)
 }
 
 module.exports = {
+	getAllVendorReports,
 	getShortReportList,
 	getPayableByVendorId,
 	stepsFiltersQuery,

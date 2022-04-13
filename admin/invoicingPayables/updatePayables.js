@@ -49,10 +49,7 @@ const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMet
 	)
 	const vendor = await getVendorAndCheckPaymentTerms(vendorId)
 
-	await InvoicingPayables.updateMany(
-			{ _id: { $in: [ reportId, ...sameVendorReports.map(i => `${ i._id }`) ] } },
-			{ "paymentDetails.paymentMethod": paymentMethod }
-	)
+	await InvoicingPayables.updateMany({ _id: { $in: [ reportId, ...sameVendorReports.map(i => `${ i._id }`) ] } }, { "paymentDetails.paymentMethod": paymentMethod })
 
 	vendorReportsAll = (await getPayableByVendorId(vendorId)).filter(({ status }) => status === 'Invoice on-hold' || status === 'Invoice Ready')
 
@@ -67,10 +64,7 @@ const invoicePaymentMethodResubmission = async ({ reportId, vendorId, paymentMet
 				? new Date(moment().add(vendor.billingInfo.paymentTerm.value, 'days').format('YYYY-MM-DD'))
 				: ''
 
-		await InvoicingPayables.updateMany(
-				{ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } },
-				{ status, "paymentDetails.expectedPaymentDate": expectedPaymentDate }
-		)
+		await InvoicingPayables.updateMany({ _id: { $in: [ ...paymentGroup.map(i => `${ i._id }`) ] } }, { status, "paymentDetails.expectedPaymentDate": expectedPaymentDate })
 	}
 }
 
@@ -107,9 +101,8 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 			break
 		}
 		case (vendorReports.length && (getReportsTotal(vendorReports) + +total) > paymentDetails.paymentMethod.minimumAmount): {
-			await updatePayableReport(reportId, { paymentDetails })
 			for await (let id of [ reportId, ...vendorReports.map(({ _id }) => _id.toString()) ]) {
-				await updatePayableReport(id, { status: 'Invoice Ready' })
+				await updatePayableReport(id, { status: 'Invoice Ready', paymentDetails })
 			}
 			break
 		}

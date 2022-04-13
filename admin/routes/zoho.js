@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { Zoho } = require('../models')
 const { getTokens } = require('../services')
+const { sendRequestToZoho } = require("../services/zoho")
 
 router.get("/getTokens", async (req, res) => {
 	const { code } = req.query
@@ -18,6 +19,17 @@ router.get("/getTokens", async (req, res) => {
 		console.log(err)
 		res.status(500).send("Error on getting ZOHO tokens")
 	}
+})
+
+router.get("/getBankAccounts", async (req, res) => {
+	try{
+		const response = await sendRequestToZoho('bankaccounts')
+		const bankAccounts = response.data.bankaccounts.map(({account_id, account_name, account_type}) => ({id: account_id, name: account_name, type: account_type}))
+		res.send(bankAccounts)
+	} catch (e) {
+		res.status(500).send("Error on getting ZOHO tokens")
+	}
+
 })
 // router.get("/refreshToken", async (req, res) => {
 //     try {
