@@ -1,6 +1,6 @@
 const router = require('express').Router()
 
-const { Languages, Vendors, InvoicingPayables } = require('../models')
+const { Languages, Vendors, InvoicingPayablesArchive } = require('../models')
 const {
 	getAllPayables,
 	getPayable,
@@ -272,6 +272,37 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 		result === 'Success'
 				? await notifyVendorReportsIsPaid(false, { reportId })
 				: await notifyVendorReportsIsPaid(true, { reportId })
+
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on getting steps')
+	}
+})
+
+
+router.post("/report/:reportId/sendToZoho", async (req, res) => {
+	const { reportId } = req.params
+	const { paidAmount,  paymentMode, paidThrough, date,  paymentDate,  vendorName, vendorEmail, reportTextId, dueDate } = req.body
+	let zohoBillingId;
+	try {
+			const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
+			const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
+			const lineItems = [ {
+				"name": `TS ${ paymentDateMonthAndYear }`,
+				"account_id": "335260000002330131",
+				"rate": paidAmount,
+				"quantity": 1
+			} ]
+			let result = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+			if (result) {
+				zohoBillingId = result.bill.bill_id
+			}
+
+			await InvoicingPayablesArchive.updateOne({ _id: reportId }, { zohoBillingId })
+
+			await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date)
+
 
 		res.send(result)
 	} catch (err) {

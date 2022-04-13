@@ -17,6 +17,55 @@
         @notApprove="toggleForceStatusEdition"
       )
       .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
+        .modal(v-if="isOpenSendToZoho")
+          .modal__item
+            .item__title Payment mode
+            .item__select
+              SelectSingle(
+                :options="paymentMode",
+                placeholder="Select",
+                :selectedOption="selectedPaymentMode",
+                @chooseOption="chosePaymentMode"
+              )
+          .modal__item
+            .item__title Paid through
+            .item__select
+              SelectSingle(
+                :options="paidThrough",
+                placeholder="Select",
+                :selectedOption="selectedPaidThrough ? selectedPaidThrough.name : ''",
+                @chooseOption="chosePaidThrough"
+              )
+
+          .modal__item
+            .item__title Date
+            .item__input.datepicker__normalize
+              DatePicker(
+                :value="new Date(selectedDate)"
+                @input="(e) => setDueDate(e)"
+                format="DD-MM-YYYY"
+                prefix-class="xmx"
+                :clearable="false"
+                type="date"
+                placeholder="Select datetime range"
+              )
+          .modal__buttons
+            Button(
+              value="Send"
+              @clicked="sendToZoho"
+            )
+            Button(
+              value="Cancel"
+              :outline="true"
+              @clicked="closeZohoModal"
+            )
+        .options-buttons
+          Button(
+            v-if="!reportDetailsInfo.zohoBillingId"
+            value="Send to Zoho"
+            :outline="true"
+            @clicked="openZohoModal"
+          )
         .invoicing-details__info
           .info__user
             .user
@@ -138,10 +187,47 @@ import IconButton from "../IconButton"
 import ReportDetailsJobsList from "./ReportDetailsJobsList"
 import NavbarList from "../NavbarLists"
 
+import DatePicker from 'vue2-datepicker'
+import '../../assets/scss/datepicker.scss'
+import { mapActions } from "vuex"
+
 export default {
   mixins: [ getBgColor ],
+  components: {
+    NavbarList,
+    ReportDetailsJobsList,
+    IconButton,
+    Button,
+    GeneralTable,
+    ApproveModal,
+    SelectSingle,
+    DatepickerWithTime,
+    CheckBox,
+    PayablesPaymentInformationCard,
+    DatePicker,
+  },
   data() {
     return {
+      isOpenSendToZoho: false,
+      selectedPaymentMode: '',
+      selectedPaidThrough: null,
+      selectedDate: '',
+      paidThrough: [],
+      paymentMode: [
+          'Bank Remittance',
+          'Bank Transfer',
+          'Cash',
+          'Cheque',
+          'Compensation ',
+          'Credit Card',
+          'GoCardless',
+          'Net Cents',
+          'PayPal',
+          'Skrill',
+          'SmartCAT',
+          'Stripe',
+          'TransferWise',
+      ],
       isStatusEdit: false,
       forceStatus: '',
       isDoubleApproveForceStatus: false,
@@ -197,6 +283,58 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: "alertToggle"
+    }),
+    openZohoModal() {
+      this.isOpenSendToZoho = true
+    },
+    closeZohoModal() {
+      this.isOpenSendToZoho = false
+      this.selectedPaymentMode= ''
+      this.selectedPaidThrough = null
+      this.selectedDate = ''
+    },
+    async getPaidThrough() {
+      try {
+        const rest = await this.$http.get('/zoho/getBankAccounts')
+        this.paidThrough =  rest.data
+      } catch (e) {
+        console.log(e)
+        this.alertToggle({ message: e.body, isShow: true, type: "error" })
+      }
+    },
+    chosePaymentMode({ option }) {
+      this.selectedPaymentMode = option
+    },
+    chosePaidThrough({ option }) {
+      this.selectedPaidThrough = option
+    },
+    setDueDate(test) {
+      this.selectedDate = moment(test).format("YYYY-MM-DD")
+    },
+    async sendToZoho() {
+      try {
+        await this.$http.post(`/invoicing-payables/report/${this.$route.params.id}/sendToZoho`, {
+          paidAmount: +(this.reportDetailsInfo.total).toFixed(2),
+          paymentMode: this.selectedPaymentMode,
+          paidThrough: this.selectedPaidThrough.id,
+          date: this.selectedDate,
+          paymentDate: new Date(),
+          vendorEmail: this.reportDetailsInfo.vendor.email,
+          reportTextId: this.reportDetailsInfo.reportId,
+          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
+        })
+        this.closeZohoModal()
+      } catch (e) {
+        if(e.body) {
+          this.alertToggle({ message: e.body, isShow: true, type: "error" })
+        } else {
+          console.log(e)
+          this.alertToggle({ message: "Something went wrong", isShow: true, type: "error" })
+        }
+      }
+    },
     async approveForceStatus() {
       try {
         await this.$http.post('/invoicing-payables/rollback-invoiceReport-from-paid', { reportsIds: [ this.$route.params.id ] })
@@ -292,6 +430,7 @@ export default {
   async created() {
     await this.getShortReports()
     await this.openDetails(this.$route.params.id)
+    await this.getPaidThrough()
     this.domain = this.$domains.admin
   },
   watch: {
@@ -308,18 +447,6 @@ export default {
       }
     }
   },
-  components: {
-    NavbarList,
-    ReportDetailsJobsList,
-    IconButton,
-    Button,
-    GeneralTable,
-    ApproveModal,
-    SelectSingle,
-    DatepickerWithTime,
-    CheckBox,
-    PayablesPaymentInformationCard
-  }
 }
 </script>
 
@@ -1364,4 +1491,33 @@ textarea {
 //    color: $text;
 //  }
 //}
+.modal {
+  padding: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -49%);
+  background: white;
+  box-shadow: $box-shadow;
+  z-index: 20;
+  &__item {
+    margin-bottom: 15px;
+  }
+  &__buttons {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.item {
+  &__title {
+    margin-bottom: 3px;
+  }
+  &__select{
+    position: relative;
+    height: 31px;
+    width: 220px;
+  }
+}
+
 </style>

@@ -49,7 +49,7 @@ const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorE
 	return billing?.data
 }
 
-const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, amount) => {
+const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, paymentMode, paidThrough, billId, amount, date) => {
 	let vendorId = await getVendor(vendorEmail)
 	if (!vendorId || !vendorEmail) return ''
 	// vendorId = vendorId ? vendorId : await createVendor(vendorName, vendorEmail)
@@ -62,11 +62,14 @@ const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, billId, a
 				"amount_applied": amount
 			}
 		],
-		"date": moment().format('YYYY-MM-DD'),
+		"paid_through_account_id": paidThrough,
+		"payment_mode": paymentMode,
+		"date": date,
 		"amount": amount
 	}
-	const { vendorpayment } = (await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')).data
-	return vendorpayment.payment_id
+	const response = (await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST'))
+	console.log(response)
+	return response.data.vendorpayment.payment_id
 }
 
 const updatePayablesFromZoho = async () => {
