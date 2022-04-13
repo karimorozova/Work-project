@@ -283,7 +283,7 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 
 router.post("/report/:reportId/sendToZoho", async (req, res) => {
 	const { reportId } = req.params
-	const { paidAmount,  paymentMode, paidThrough, date,  paymentDate,  vendorName, vendorEmail, reportTextId, dueDate } = req.body
+	const { paidAmount,  paymentMode, paidThrough, date, bankCharges,  paymentDate,  vendorName, vendorEmail, reportTextId, dueDate } = req.body
 	let zohoBillingId;
 	try {
 			const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
@@ -301,7 +301,7 @@ router.post("/report/:reportId/sendToZoho", async (req, res) => {
 
 			await InvoicingPayablesArchive.updateOne({ _id: reportId }, { zohoBillingId })
 
-			await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date)
+			await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date, bankCharges)
 
 		res.send(result)
 	} catch (err) {

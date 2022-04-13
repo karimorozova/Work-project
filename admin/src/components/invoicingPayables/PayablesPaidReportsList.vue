@@ -25,6 +25,11 @@
             template(slot="paymentDay" slot-scope="{ row, index }")
               .table__data(v-if="row.paymentDetails.expectedPaymentDate" ) {{ getDate( row.paymentDetails.expectedPaymentDate) }}
               .table__data(v-else) -
+            template(slot="inZoho" slot-scope="{ row, index }")
+              .table__data(v-if="row.zohoBillingId" )
+                a( target="_blank" :href="`https://books.zoho.com/app#/bills/${row.zohoBillingId}`")
+                  span Link
+              .table__data(v-else) -
 
             template(slot="dateRange" slot-scope="{ row, index }")
               .table__data(v-html="dateRange(row)")
@@ -174,6 +179,12 @@ export default {
           label: "Report ID",
           headerKey: "headerReportId",
           key: "reportId",
+          style: { width: "130px" }
+        },
+        {
+          label: "Zoho",
+          headerKey: "headerInZoho",
+          key: "inZoho",
           style: { width: "130px" }
         },
         {

@@ -49,15 +49,21 @@
                 type="date"
                 placeholder="Select datetime range"
               )
+          .modal__item
+            .item__title Bank Charges
+            .item__input
+              input(v-model="selectedBankCharges")
           .modal__buttons
             Button(
               value="Send"
               @clicked="sendToZoho"
+              :isDisabled="!!getRequestCounter"
             )
             Button(
               value="Cancel"
               :outline="true"
               @clicked="closeZohoModal"
+              :isDisabled="!!getRequestCounter"
             )
         .options-buttons
           Button(
@@ -204,7 +210,7 @@ import NavbarList from "../NavbarLists"
 
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import ReportDetailsVendorReports from "./ReportDetailsVendorReports"
 
 export default {
@@ -229,6 +235,7 @@ export default {
       selectedPaymentMode: '',
       selectedPaidThrough: null,
       selectedDate: '',
+      selectedBankCharges: 0,
       paidThrough: [],
       paymentMode: [
         'Bank Remittance',
@@ -332,7 +339,7 @@ export default {
       this.selectedDate = moment(test).format("YYYY-MM-DD")
     },
     async sendToZoho() {
-      if ( !(this.selectedPaymentMode && this.selectedPaidThrough.hasOwnProperty('id') && this.selectedDate)) {
+      if ( !(this.selectedPaymentMode && this.selectedPaidThrough.hasOwnProperty('id') && this.selectedDate && this.selectedBankCharges >= 0)) {
         this.alertToggle({ message: "Fill all field for sending to Zoho", isShow: true, type: "error" })
         return
       }
@@ -341,6 +348,7 @@ export default {
           paidAmount: +(this.reportDetailsInfo.total).toFixed(2),
           paymentMode: this.selectedPaymentMode,
           paidThrough: this.selectedPaidThrough.id,
+          bankCharges: this.selectedBankCharges,
           date: this.selectedDate,
           paymentDate: new Date(),
           vendorEmail: this.reportDetailsInfo.vendor.email,
@@ -447,6 +455,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      getRequestCounter: 'getRequestCounter'
+    }),
     getOutstandingAmount() {
       if (!this.vendorOtherReports.length) return 0
       return +(this.vendorOtherReports
@@ -1095,6 +1106,26 @@ textarea {
     height: 31px;
     width: 220px;
   }
+  &__input {
+    input {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 2px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      height: 32px;
+      transition: .1s ease-out;
+      width: 220px;
+      font-family: 'Myriad400';
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
+    }
+  }
+
 }
 
 </style>
