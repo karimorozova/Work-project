@@ -238,19 +238,20 @@ export default {
       selectedBankCharges: 0,
       paidThrough: [],
       paymentMode: [
-        'Bank Remittance',
-        'Bank Transfer',
-        'Cash',
-        'Cheque',
-        'Compensation ',
-        'Credit Card',
-        'GoCardless',
-        'Net Cents',
         'PayPal',
+        'Bank Transfer',
+        'TransferWise',
         'Skrill',
         'SmartCAT',
-        'Stripe',
-        'TransferWise'
+        'Credit Card'
+
+        // 'Bank Remittance',
+        // 'Cash',
+        // 'Cheque',
+        // 'Compensation ',
+        // 'GoCardless',
+        // 'Net Cents',
+        // 'Stripe',
       ],
       isStatusEdit: false,
       forceStatus: '',
@@ -324,6 +325,12 @@ export default {
       try {
         const rest = await this.$http.get('/zoho/getBankAccounts')
         this.paidThrough = rest.data
+            //temp for Julia
+            .filter(i =>
+                i.name === 'Pangea Translation Services [01]'
+                || i.name === 'Paypal'
+                || i.name === 'Transfer Wise'
+            )
       } catch (e) {
         console.log(e)
         this.alertToggle({ message: e.body, isShow: true, type: "error" })
@@ -339,7 +346,7 @@ export default {
       this.selectedDate = moment(test).format("YYYY-MM-DD")
     },
     async sendToZoho() {
-      if ( !(this.selectedPaymentMode && this.selectedPaidThrough.hasOwnProperty('id') && this.selectedDate && this.selectedBankCharges >= 0)) {
+      if (!(this.selectedPaymentMode && this.selectedPaidThrough.hasOwnProperty('id') && this.selectedDate && this.selectedBankCharges >= 0)) {
         this.alertToggle({ message: "Fill all field for sending to Zoho", isShow: true, type: "error" })
         return
       }
@@ -359,7 +366,7 @@ export default {
         this.closeZohoModal()
         await this.openDetails(this.$route.params.id)
 
-        this.alertToggle({  message: 'Sent to Zoho', isShow: true, type: "success" })
+        this.alertToggle({ message: 'Sent to Zoho', isShow: true, type: "success" })
       } catch (e) {
         if (e.body) {
           this.alertToggle({ message: e.body, isShow: true, type: "error" })
@@ -463,7 +470,7 @@ export default {
       return +(this.vendorOtherReports
           .filter(i => i.status === 'Invoice Ready' || i.status === 'Partially Paid')
           .reduce((acc, curr) => {
-            if(curr.status === 'Partially Paid'){
+            if (curr.status === 'Partially Paid') {
               return acc += curr.paymentInformation.at(-1).unpaidAmount
             }
             return acc += curr.total
@@ -1106,6 +1113,7 @@ textarea {
     height: 31px;
     width: 220px;
   }
+
   &__input {
     input {
       font-size: 14px;
