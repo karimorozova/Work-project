@@ -468,7 +468,10 @@ export default {
     getOutstandingAmount() {
       if (!this.vendorOtherReports.length) return 0
       return +(this.vendorOtherReports
-          .filter(i => i.status === 'Invoice Ready' || i.status === 'Partially Paid')
+          .filter(i => (i.status === 'Invoice Ready' || i.status === 'Partially Paid')
+              && this.reportDetailsInfo.paymentDetails.paymentMethod
+              && `${ i.paymentDetails.paymentMethod._id }` === `${ this.reportDetailsInfo.paymentDetails.paymentMethod._id }`
+          )
           .reduce((acc, curr) => {
             if (curr.status === 'Partially Paid') {
               return acc += curr.paymentInformation.at(-1).unpaidAmount

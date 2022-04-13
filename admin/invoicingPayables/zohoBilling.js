@@ -45,6 +45,7 @@ const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorE
 		"due_date": due_date,
 		"line_items": lineItems
 	}
+	console.log(data)
 	const billing = await sendRequestToZoho(`bills?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST')
 	return billing?.data
 }
@@ -52,6 +53,7 @@ const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorE
 const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, paymentMode, paidThrough, billId, amount, date, bankCharges) => {
 	let vendorId = await getVendor(vendorEmail)
 	if (!vendorId || !vendorEmail) return ''
+	console.log(vendorId)
 	// vendorId = vendorId ? vendorId : await createVendor(vendorName, vendorEmail)
 
 	const data = {
@@ -68,6 +70,7 @@ const createNewPayable = async (vendorName = 'RENAME!!!', vendorEmail, paymentMo
 		"amount": amount,
 		"bank_charges": bankCharges,
 	}
+	console.log(data)
 	const response = (await sendRequestToZoho(`vendorpayments?organization_id=${ organizationId }`, `JSONString=` + JSON.stringify(data), 'POST'))
 	console.log(response)
 	return response.data.vendorpayment.payment_id
