@@ -89,10 +89,11 @@ const sendRequestToZoho = async (link, data = {}, method = "GET", header = {}, a
 				return await zohoRequest(link, data, token, method, header, additional)
 			}
 		} catch (err) {
-			returnMessageAndType(err.message, 'error')
+			// console.log(err.response.data.message)
+			// return returnMessageAndType(err.response.data.message || err.message , 'error')
+			return returnMessageAndType(err.message , 'error')
 		}
-
-		returnMessageAndType(err.message, 'error')
+		return returnMessageAndType( err.message , 'error')
 	}
 }
 

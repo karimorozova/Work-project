@@ -332,8 +332,12 @@ export default {
       this.selectedDate = moment(test).format("YYYY-MM-DD")
     },
     async sendToZoho() {
+      if ( !(this.selectedPaymentMode && this.selectedPaidThrough.hasOwnProperty('id') && this.selectedDate)) {
+        this.alertToggle({ message: "Fill all field for sending to Zoho", isShow: true, type: "error" })
+        return
+      }
       try {
-        await this.$http.post(`/invoicing-payables/report/${ this.$route.params.id }/sendToZoho`, {
+        const result = await this.$http.post(`/invoicing-payables/report/${ this.$route.params.id }/sendToZoho`, {
           paidAmount: +(this.reportDetailsInfo.total).toFixed(2),
           paymentMode: this.selectedPaymentMode,
           paidThrough: this.selectedPaidThrough.id,
@@ -343,7 +347,11 @@ export default {
           reportTextId: this.reportDetailsInfo.reportId,
           dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate
         })
+        // console.log(result)
         this.closeZohoModal()
+        await this.openDetails(this.$route.params.id)
+
+        this.alertToggle({  message: 'Sent to Zoho', isShow: true, type: "success" })
       } catch (e) {
         if (e.body) {
           this.alertToggle({ message: e.body, isShow: true, type: "error" })

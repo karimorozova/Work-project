@@ -303,7 +303,6 @@ router.post("/report/:reportId/sendToZoho", async (req, res) => {
 
 			await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date)
 
-
 		res.send(result)
 	} catch (err) {
 		console.log(err)
