@@ -37,7 +37,7 @@ router.get('/all-vendor-reports/:_vendorId', async (req, res) => {
 	const { _vendorId } = req.params
 	try {
 		const reports = await getAllVendorReports(_vendorId)
-		res.send([])
+		res.send(reports)
 	} catch (err) {
 		console.log(err)
 		console.log('Error on getting Reports')

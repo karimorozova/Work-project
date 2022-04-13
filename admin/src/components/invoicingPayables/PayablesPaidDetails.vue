@@ -66,104 +66,119 @@
             :outline="true"
             @clicked="openZohoModal"
           )
-        .invoicing-details__info
-          .info__user
-            .user
-              .user__image(v-if="reportDetailsInfo.vendor.photo")
-                img(:src="domain + reportDetailsInfo.vendor.photo")
-              .user__fakeImage(:style="{'--bgColor': getBgColor(reportDetailsInfo.vendor._id)[0], '--color': getBgColor(reportDetailsInfo.vendor._id)[1]}" v-else) {{ reportDetailsInfo.vendor.firstName[0] }}
-              .user__description
-                .user__name
-                  router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
-                    span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
-                .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
+        .left-side
+          .invoicing-details__info
+            .info__user
+              .user
+                .user__image(v-if="reportDetailsInfo.vendor.photo")
+                  img(:src="domain + reportDetailsInfo.vendor.photo")
+                .user__fakeImage(:style="{'--bgColor': getBgColor(reportDetailsInfo.vendor._id)[0], '--color': getBgColor(reportDetailsInfo.vendor._id)[1]}" v-else) {{ reportDetailsInfo.vendor.firstName[0] }}
+                .user__description
+                  .user__name
+                    router-link(class="link-to" target= '_blank' :to="{path: `/pangea-vendors/all/details/${reportDetailsInfo.vendor._id}`}")
+                      span {{reportDetailsInfo.vendor.firstName + ' ' + reportDetailsInfo.vendor.surname}}
+                  .user__address {{ reportDetailsInfo.vendor.billingInfo.address || 'No address...' }}
 
-          .info__descriptions
-            .text__block
-              .text__title Report ID:
-              .text__value {{reportDetailsInfo.reportId}}
+            .info__descriptions
+              .text__block
+                .text__title Report ID:
+                .text__value {{reportDetailsInfo.reportId}}
 
-            .text__block(v-if="reportDetailsInfo.zohoBillingId")
-              .text__title Zoho Bill:
-              .text__value
-                a( target="_blank" :href="`https://books.zoho.com/app#/bills/${reportDetailsInfo.zohoBillingId}`")
-                  span Link
+              .text__block(v-if="reportDetailsInfo.zohoBillingId")
+                .text__title Zoho Bill:
+                .text__value
+                  a( target="_blank" :href="`https://books.zoho.com/app#/bills/${reportDetailsInfo.zohoBillingId}`")
+                    span Link
 
-            .text__block
-              .text__title Status:
-              .text__value
-                .text__edit
-                  IconButton(
-                    :hasPopup="true"
-                    popupText="Rollback"
-                    @clicked="toggleForceStatusEdition"
-                  )
-                    i(class="fas fa-pen" v-if="!isStatusEdit" )
-                    i(class="fa-solid fa-xmark" v-else )
+              .text__block
+                .text__title Status:
+                .text__value
+                  .text__edit
+                    IconButton(
+                      :hasPopup="true"
+                      popupText="Rollback"
+                      @clicked="toggleForceStatusEdition"
+                    )
+                      i(class="fas fa-pen" v-if="!isStatusEdit" )
+                      i(class="fa-solid fa-xmark" v-else )
 
-                .text__select(v-if="isStatusEdit")
-                  SelectSingle(
-                    :selectedOption="forceStatus"
-                    :options="['Created']"
-                    placeholder="Option"
-                    @chooseOption="jumpOrRollbackStatus"
-                  )
-                span(v-else) {{reportDetailsInfo.status}}
-            .text__block
-              .text__title Created On:
-              .text__value {{ formattedDate(reportDetailsInfo.createAt) }}
-            .text__block
-              .text__title Date Range:
-              .text__value
-                span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
-                span /
-                span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
-            .text__block
-              .text__title Jobs:
-              .text__value {{ reportDetailsInfo.steps.length }}
-            .text__block
-              .text__title Invoice:
-              .text__value
-                IconButton(
-                  @clicked="downloadFile(reportDetailsInfo.paymentDetails.file.path)"
-                )
-                  i(class="fa-solid fa-download")
-                span.file-name {{ reportDetailsInfo.paymentDetails.file ? reportDetailsInfo.paymentDetails.file.fileName : '' }}
-            .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
-              .text__title Payment method:
-              .text__value
-                IconButton(
-                  :hasPopup="true"
-                  popupText="Payment Details"
-                  @clicked="togglePaymentDetails"
-                )
-                  i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
-                  i( v-else class="fa-solid fa-xmark")
-                span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
-            div(v-if="isShowPaymentDetails" )
-              .text__block(v-for="[key, val] in Object.entries(allFieldsOutput(reportDetailsInfo.paymentDetails.paymentMethod))" v-if="key !== 'name'" )
-                .text__title {{ replaceKey(key) }}:
+                  .text__select(v-if="isStatusEdit")
+                    SelectSingle(
+                      :selectedOption="forceStatus"
+                      :options="['Created']"
+                      placeholder="Option"
+                      @chooseOption="jumpOrRollbackStatus"
+                    )
+                  span(v-else) {{reportDetailsInfo.status}}
+              .text__block
+                .text__title Created On:
+                .text__value {{ formattedDate(reportDetailsInfo.createAt) }}
+              .text__block
+                .text__title Date Range:
+                .text__value
+                  span {{ formattedDateRange(reportDetailsInfo.firstPaymentDate)}}
+                  span /
+                  span {{ formattedDateRange(reportDetailsInfo.lastPaymentDate) }}
+              .text__block
+                .text__title Jobs:
+                .text__value {{ reportDetailsInfo.steps.length }}
+              .text__block
+                .text__title Invoice:
                 .text__value
                   IconButton(
-                    @clicked="copyDetailsInfo(val)"
+                    @clicked="downloadFile(reportDetailsInfo.paymentDetails.file.path)"
                   )
-                    i(class="fa-regular fa-copy")
-                  span {{ val }}
-            .text__block
-              .text__title Expected payment date:
-              .text__value {{ formattedDate(reportDetailsInfo.paymentDetails.expectedPaymentDate) }}
-            .text__block(v-if="reportDetailsInfo.total" )
-              .text__title Total Amount:
-              .text__value
-                span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
-                span(v-html="'&euro;'")
+                    i(class="fa-solid fa-download")
+                  span.file-name {{ reportDetailsInfo.paymentDetails.file ? reportDetailsInfo.paymentDetails.file.fileName : '' }}
+              .text__block(v-if="reportDetailsInfo.paymentDetails && reportDetailsInfo.paymentDetails.paymentMethod")
+                .text__title Payment method:
+                .text__value
+                  IconButton(
+                    :hasPopup="true"
+                    popupText="Payment Details"
+                    @clicked="togglePaymentDetails"
+                  )
+                    i( v-if="!isShowPaymentDetails" class="fa-solid fa-info")
+                    i( v-else class="fa-solid fa-xmark")
+                  span {{ reportDetailsInfo.paymentDetails.paymentMethod.name }}
+              div(v-if="isShowPaymentDetails" )
+                .text__block(v-for="[key, val] in Object.entries(allFieldsOutput(reportDetailsInfo.paymentDetails.paymentMethod))" v-if="key !== 'name'" )
+                  .text__title {{ replaceKey(key) }}:
+                  .text__value
+                    IconButton(
+                      @clicked="copyDetailsInfo(val)"
+                    )
+                      i(class="fa-regular fa-copy")
+                    span {{ val }}
+              .text__block
+                .text__title Expected payment date:
+                .text__value {{ formattedDateRange(reportDetailsInfo.paymentDetails.expectedPaymentDate) }}
+              .text__block(v-if="reportDetailsInfo.total" )
+                .text__title Total Amount:
+                .text__value
+                  span(style="margin-right: 4px;") {{ +(reportDetailsInfo.total).toFixed(2) }}
+                  span(v-html="'&euro;'")
 
-        .invoicing-details__listOfJobs
-          ReportDetailsJobsList(
-            :isAvailableDeleting="false"
-            :enumOfReports="'vendor'"
-            :steps="reportDetailsInfo.steps"
-          )
+              .outstandingAmount
+                .text__block
+                  .text__title Outstanding Payables:
+                  .text__value
+                    span {{ getOutstandingAmount }}
+                    span(v-html="'&euro;'")
+
+        .right-side
+          .invoicing-details__listOfJobs
+            ReportDetailsJobsList(
+              :isAvailableDeleting="false"
+              :enumOfReports="'vendor'"
+              :steps="reportDetailsInfo.steps"
+            )
+          .invoicing-details__allReports
+            .invoicing-details__allReports-table
+              .invoicing-details__allReports-table-title Reports
+              ReportDetailsVendorReports(
+                :reports="vendorOtherReports"
+              )
 
       .cards(v-if="reportDetailsInfo._id && reportDetailsInfo.paymentInformation.length")
         .card(v-for="cardInfo in reportDetailsInfo.paymentInformation")
@@ -190,10 +205,12 @@ import NavbarList from "../NavbarLists"
 import DatePicker from 'vue2-datepicker'
 import '../../assets/scss/datepicker.scss'
 import { mapActions } from "vuex"
+import ReportDetailsVendorReports from "./ReportDetailsVendorReports"
 
 export default {
   mixins: [ getBgColor ],
   components: {
+    ReportDetailsVendorReports,
     NavbarList,
     ReportDetailsJobsList,
     IconButton,
@@ -204,7 +221,7 @@ export default {
     DatepickerWithTime,
     CheckBox,
     PayablesPaymentInformationCard,
-    DatePicker,
+    DatePicker
   },
   data() {
     return {
@@ -214,19 +231,19 @@ export default {
       selectedDate: '',
       paidThrough: [],
       paymentMode: [
-          'Bank Remittance',
-          'Bank Transfer',
-          'Cash',
-          'Cheque',
-          'Compensation ',
-          'Credit Card',
-          'GoCardless',
-          'Net Cents',
-          'PayPal',
-          'Skrill',
-          'SmartCAT',
-          'Stripe',
-          'TransferWise',
+        'Bank Remittance',
+        'Bank Transfer',
+        'Cash',
+        'Cheque',
+        'Compensation ',
+        'Credit Card',
+        'GoCardless',
+        'Net Cents',
+        'PayPal',
+        'Skrill',
+        'SmartCAT',
+        'Stripe',
+        'TransferWise'
       ],
       isStatusEdit: false,
       forceStatus: '',
@@ -279,7 +296,8 @@ export default {
           key: "payables",
           style: { width: "10%" }
         }
-      ]
+      ],
+      vendorOtherReports: []
     }
   },
   methods: {
@@ -291,14 +309,14 @@ export default {
     },
     closeZohoModal() {
       this.isOpenSendToZoho = false
-      this.selectedPaymentMode= ''
+      this.selectedPaymentMode = ''
       this.selectedPaidThrough = null
       this.selectedDate = ''
     },
     async getPaidThrough() {
       try {
         const rest = await this.$http.get('/zoho/getBankAccounts')
-        this.paidThrough =  rest.data
+        this.paidThrough = rest.data
       } catch (e) {
         console.log(e)
         this.alertToggle({ message: e.body, isShow: true, type: "error" })
@@ -315,7 +333,7 @@ export default {
     },
     async sendToZoho() {
       try {
-        await this.$http.post(`/invoicing-payables/report/${this.$route.params.id}/sendToZoho`, {
+        await this.$http.post(`/invoicing-payables/report/${ this.$route.params.id }/sendToZoho`, {
           paidAmount: +(this.reportDetailsInfo.total).toFixed(2),
           paymentMode: this.selectedPaymentMode,
           paidThrough: this.selectedPaidThrough.id,
@@ -323,11 +341,11 @@ export default {
           paymentDate: new Date(),
           vendorEmail: this.reportDetailsInfo.vendor.email,
           reportTextId: this.reportDetailsInfo.reportId,
-          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
+          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate
         })
         this.closeZohoModal()
       } catch (e) {
-        if(e.body) {
+        if (e.body) {
           this.alertToggle({ message: e.body, isShow: true, type: "error" })
         } else {
           console.log(e)
@@ -411,9 +429,27 @@ export default {
         })
       } catch (err) {
       }
+    },
+    async getVendorOtherReports() {
+      try {
+        this.vendorOtherReports = (await this.$http.get('/invoicing-payables/all-vendor-reports/' + this.reportDetailsInfo.vendor._id)).data
+      } catch (e) {
+        this.alertToggle({ message: "Error on getting vendor reports", isShow: true, type: "error" })
+      }
     }
   },
   computed: {
+    getOutstandingAmount() {
+      if (!this.vendorOtherReports.length) return 0
+      return +(this.vendorOtherReports
+          .filter(i => i.status === 'Invoice Ready' || i.status === 'Partially Paid')
+          .reduce((acc, curr) => {
+            if(curr.status === 'Partially Paid'){
+              return acc += curr.paymentInformation.at(-1).unpaidAmount
+            }
+            return acc += curr.total
+          }, 0)).toFixed(2)
+    }
     //Todo: show status "Invoice Received" and "Partially Paid"1
     // getPaymentRemainder() {
     //   const { paymentInformation = [] } = this.reportDetailsInfo
@@ -430,6 +466,7 @@ export default {
   async created() {
     await this.getShortReports()
     await this.openDetails(this.$route.params.id)
+    await this.getVendorOtherReports()
     await this.getPaidThrough()
     this.domain = this.$domains.admin
   },
@@ -442,11 +479,12 @@ export default {
           this.isDoubleApproveForceStatus = false
           this.reportDetailsInfo = {}
           this.isShowPaymentDetails = false
+          this.vendorOtherReports = []
           await this.openDetails(this.$route.params.id)
         }
       }
     }
-  },
+  }
 }
 </script>
 
@@ -474,6 +512,33 @@ export default {
 .invoicing-details {
   position: relative;
   margin: 50px 0 50px 180px;
+
+  .outstandingAmount {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid $light-border;
+    font-family: 'Myriad600';
+  }
+
+  &__allReports {
+    &-table {
+      padding: 25px;
+      background: white;
+      border-radius: 2px;
+      box-shadow: $box-shadow;
+      height: fit-content;
+      box-sizing: border-box;
+      width: 1020px;
+      margin-top: 25px;
+      margin-right: 25px;
+
+      &-title {
+        font-family: Myriad600;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+    }
+  }
 
 
   &__wrapper {
@@ -746,7 +811,7 @@ textarea {
   &__block {
     min-height: 32px;
     display: flex;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     align-items: center;
 
     &:last-child {
@@ -992,505 +1057,6 @@ textarea {
   display: flex;
 }
 
-//textarea {
-//  width: 100%;
-//  border-radius: 2px;
-//  border: 1px solid $border;
-//  padding: 5px;
-//  color: $text;
-//  outline: none;
-//  box-sizing: border-box;
-//  transition: .1s ease-out;
-//
-//  &:focus {
-//    border: 1px solid $border-focus;
-//  }
-//}
-//
-//.green-value {
-//  border: 1px solid $border !important;
-//  color: $text !important;
-//}
-//
-//.amount {
-//  &__title {
-//    font-family: Myriad600;
-//    width: 120px;
-//    align-items: center;
-//    display: flex;
-//  }
-//
-//  &__value {
-//    border-radius: 2px;
-//    border: 1px solid #d66f5847;
-//    padding: 0 7px;
-//    height: 32px;
-//    display: flex;
-//    align-items: center;
-//    width: 100px;
-//    box-sizing: border-box;
-//    color: $red;
-//  }
-//}
-//
-//.payment-card {
-//  background-color: white;
-//  padding: 25px;
-//  box-shadow: $box-shadow;
-//  border-radius: 2px;
-//  height: fit-content;
-//  z-index: 500;
-//  width: 510px;
-//  box-sizing: border-box;
-//  position: absolute;
-//  top: 50%;
-//  left: 485px;
-//  transform: translate(0%, -50%);
-//
-//  &__buttons {
-//    display: flex;
-//    justify-content: center;
-//    gap: 20px;
-//    margin-top: 25px;
-//  }
-//
-//  &__input {
-//    font-size: 14px;
-//    border: 1px solid $border;
-//    border-radius: 2px;
-//    box-sizing: border-box;
-//    padding: 0 7px;
-//    outline: none;
-//    width: 220px;
-//    height: 32px;
-//    transition: .1s ease-out;
-//
-//    &:focus {
-//      border: 1px solid $border-focus;
-//    }
-//  }
-//
-//  &__link {
-//    transition: .2s ease-out;
-//    margin-top: 10px;
-//    cursor: pointer;
-//
-//    &:hover {
-//      text-decoration: underline;
-//    }
-//  }
-//
-//  &__body {
-//    display: flex;
-//    justify-content: space-between;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__header {
-//    display: flex;
-//    justify-content: space-between;
-//    margin: 15px 0;
-//    padding: 15px 0;
-//    border-top: 1px solid $light-border;
-//    border-bottom: 1px solid $light-border;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__title {
-//    text-align: center;
-//    font-family: 'Myriad900';
-//    text-transform: uppercase;
-//  }
-//
-//  &__close {
-//    position: absolute;
-//    top: 10px;
-//    right: 10px;
-//    font-size: 22px;
-//    cursor: pointer;
-//    height: 22px;
-//    width: 22px;
-//    justify-content: center;
-//    display: flex;
-//    align-items: center;
-//    font-family: Myriad900;
-//    opacity: 0.8;
-//    transition: ease 0.2s;
-//
-//    &:hover {
-//      opacity: 1
-//    }
-//  }
-//}
-//
-//.drop {
-//  height: 32px;
-//  position: relative;
-//  width: 220px;
-//  background-color: white;
-//  border-radius: 2px;
-//
-//  &-title {
-//    margin-bottom: 3px;
-//  }
-//}
-//
-//.title {
-//  display: flex;
-//  justify-content: space-between;
-//  align-items: center;
-//  margin-bottom: 15px;
-//  height: 32px;
-//
-//  &__button {
-//    display: flex;
-//    gap: 20px;
-//  }
-//
-//  &__text {
-//    font-size: 18px;
-//    font-family: 'Myriad600';
-//
-//    a {
-//      color: inherit;
-//      text-decoration: none;
-//      transition: .2s ease-out;
-//
-//      &:hover {
-//        text-decoration: underline;
-//      }
-//    }
-//  }
-//}
-//
-//.invoicing-details {
-//  position: relative;
-//  width: 1530px;
-//  margin: 50px;
-//
-//
-//  &__cards {
-//    display: flex;
-//    flex-wrap: wrap;
-//  }
-//
-//  &__body {
-//    display: flex;
-//    justify-content: space-between;
-//  }
-//
-//  &__wrapper {
-//    border-radius: 2px;
-//    padding: 25px;
-//    box-sizing: border-box;
-//    box-shadow: $box-shadow;
-//    background: white;
-//    position: relative;
-//  }
-//
-//  &__table {
-//    width: 1050px;
-//    position: relative;
-//  }
-//
-//  &__text {
-//    width: 380px;
-//    background: $light-background;
-//    box-sizing: border-box;
-//    padding: 25px 15px 25px 25px;
-//    height: fit-content;
-//    border-radius: 2px;
-//    border-bottom: 1px solid $light-border;
-//  }
-//
-//  &__user {
-//    padding: 25px;
-//    background: $light-background;
-//    margin-bottom: 15px;
-//    border-radius: 2px;
-//    width: 380px;
-//    box-sizing: border-box;
-//    border-bottom: 1px solid $light-border;
-//  }
-//
-//  &__title {
-//    font-size: 18px;
-//    margin-bottom: 20px;
-//    display: flex;
-//    justify-content: space-between;
-//    align-items: center;
-//    font-family: Myriad600;
-//  }
-//}
-//
-//.text {
-//  &__block {
-//    display: flex;
-//    margin-bottom: 12px;
-//    align-items: center;
-//
-//    &:last-child {
-//      margin-bottom: 0px;
-//    }
-//  }
-//
-//  &__select {
-//    width: 160px;
-//    height: 32px;
-//    background: white;
-//    border-radius: 2px;
-//    position: relative;
-//  }
-//
-//  &__title {
-//    width: 140px;
-//    color: $dark-border;
-//    position: relative;
-//  }
-//
-//  &__value {
-//    width: 200px;
-//    position: relative;
-//    display: flex;
-//    gap: 10px;
-//    align-items: center;
-//
-//    a {
-//      color: inherit;
-//      text-decoration: none;
-//      transition: .2s ease-out;
-//
-//      &:hover {
-//        text-decoration: underline;
-//      }
-//    }
-//  }
-//}
-//
-//.file-name {
-//  position: absolute;
-//  width: 145px;
-//  top: 7px;
-//  left: 40px;
-//  opacity: 0.6;
-//  text-overflow: ellipsis;
-//  white-space: nowrap;
-//  overflow: hidden;
-//}
-//
-//.fa-trash {
-//  cursor: pointer;
-//  font-size: 15px;
-//}
-//
-//.table {
-//  &__header,
-//  &__data {
-//    padding: 0 7px;
-//  }
-//
-//  &__data {
-//    width: 100%;
-//
-//    a {
-//      color: inherit;
-//      text-decoration: none;
-//      transition: .2s ease-out;
-//
-//      &:hover {
-//        text-decoration: underline;
-//      }
-//    }
-//  }
-//
-//  &__icons {
-//    width: 100%;
-//    height: 40px;
-//    align-items: center;
-//    display: flex;
-//    justify-content: center;
-//  }
-//}
-//
-//.check-box {
-//  display: flex;
-//  margin-top: 6px;
-//
-//  &__text {
-//    font-family: Myriad400;
-//    margin-left: 7px;
-//    margin-top: 2px;
-//  }
-//}
-//
-//.absolute-middle {
-//  position: absolute;
-//  top: 50%;
-//  left: 50%;
-//  transform: translate(-50%, -50%);
-//  z-index: 5;
-//}
-//
-//.currency {
-//  margin-right: 4px;
-//  color: $dark-border;
-//}
-//
-//.short {
-//  text-overflow: ellipsis;
-//  white-space: nowrap;
-//  overflow: hidden;
-//  max-width: 180px;
-//}
-//
-//
-//.user {
-//  display: flex;
-//  gap: 20px;
-//  width: 330px;
-//
-//  &__address {
-//    color: $dark-border;
-//    font-family: 'Myriad300';
-//    letter-spacing: 0.2px;
-//  }
-//
-//  &__name {
-//    font-family: Myriad600;
-//    margin-bottom: 10px;
-//    font-size: 16px;
-//
-//    a {
-//      color: inherit;
-//      text-decoration: none;
-//      transition: .2s ease-out;
-//
-//      &:hover {
-//        text-decoration: underline;
-//      }
-//    }
-//  }
-//
-//  &__fakeImage {
-//    height: 55px;
-//    width: 55px;
-//    min-width: 55px;
-//    border-radius: 8px;
-//    font-size: 28px;
-//    background: var(--bgColor);
-//    color: white;
-//    display: flex;
-//    justify-content: center;
-//    align-items: center;
-//    position: relative;
-//  }
-//
-//  &__image {
-//    height: 55px;
-//    width: 55px;
-//    min-width: 55px;
-//    position: relative;
-//
-//    img {
-//      width: 100%;
-//      height: 100%;
-//      border-radius: 8px;
-//      object-fit: cover;
-//    }
-//  }
-//}
-//
-//.payment-button {
-//  display: flex;
-//  justify-content: center;
-//}
-//
-//.payment-buttons {
-//  margin-top: 25px;
-//  display: flex;
-//  justify-content: center;
-//  gap: 20px;
-//}
-//
-//.payment-details {
-//  width: 380px;
-//  background: white;
-//  box-sizing: border-box;
-//  padding: 25px;
-//  border-radius: 2px;
-//  border: 1px solid $light-border;
-//  margin-top: 15px;
-//
-//  &__row {
-//    display: flex;
-//    margin-bottom: 12px;
-//
-//    &:last-child {
-//      margin-bottom: 0px;
-//    }
-//  }
-//
-//  &__key {
-//    width: 110px;
-//    color: $dark-border;
-//    margin-right: 10px;
-//  }
-//
-//  &__value {
-//    width: 210px;
-//    display: flex;
-//    gap: 12px;
-//  }
-//}
-//
-//.details-icon {
-//  transition: .2s ease-out;
-//  color: $dark-border;
-//  font-size: 15px;
-//
-//  &:hover {
-//    cursor: pointer;
-//    color: $text;
-//  }
-//}
-//
-//.toggle-details {
-//  font-size: 15px;
-//  border-radius: 2px;
-//  height: 30px;
-//  width: 30px;
-//  display: flex;
-//  align-items: center;
-//  cursor: pointer;
-//  transition: .2s ease-out;
-//  justify-content: center;
-//  border: 1px solid $border;
-//  color: $dark-border;
-//  box-sizing: border-box;
-//
-//  &:hover {
-//    color: $text;
-//  }
-//}
-//
-//.file-fake-button {
-//  height: 30px;
-//  width: 30px;
-//  border-radius: 2px;
-//  display: flex;
-//  align-items: center;
-//  justify-content: center;
-//  font-size: 14px;
-//  border: 1px solid $border;
-//  box-sizing: border-box;
-//  background-color: white;
-//  color: $dark-border;
-//  transition: .2s ease-out;
-//
-//  &:hover {
-//    color: $text;
-//  }
-//}
 .modal {
   padding: 25px;
   position: absolute;
@@ -1500,9 +1066,11 @@ textarea {
   background: white;
   box-shadow: $box-shadow;
   z-index: 20;
+
   &__item {
     margin-bottom: 15px;
   }
+
   &__buttons {
     display: flex;
     gap: 10px;
@@ -1513,7 +1081,8 @@ textarea {
   &__title {
     margin-bottom: 3px;
   }
-  &__select{
+
+  &__select {
     position: relative;
     height: 31px;
     width: 220px;
