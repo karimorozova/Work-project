@@ -26,7 +26,7 @@ const {
 	getShortReportList,
 	getPaidShortReportList,
 	getAllVendorReports,
-	createBillZohoRequest, addFile
+	createBillZohoRequest, addFile, clearZohoLink
 } = require('../invoicingPayables')
 
 const { ObjectID: ObjectId } = require("mongodb")
@@ -329,6 +329,17 @@ router.post("/report/:id", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting steps')
+	}
+})
+
+router.delete("/report/:id/clear-zoho-link", async (req, res) => {
+	const { id } = req.params
+	try {
+		await clearZohoLink(id)
+		res.send("success")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on cleaning zoho link')
 	}
 })
 

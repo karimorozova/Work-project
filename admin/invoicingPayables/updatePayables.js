@@ -109,6 +109,10 @@ const invoiceSubmission = async ({ reportId, vendorId, invoiceFile, paymentMetho
 	}
 }
 
+const clearZohoLink = async (id) => {
+	await InvoicingPayablesArchive.findByIdAndUpdate(id, {zohoBillingId: ''})
+}
+
 // TODO ZOHO API (soon)
 // const zohoBillCreation = async (_id) => {
 // 	const [ { vendor, reportId: billNumber, total, lastPaymentDate, paymentDetails: { expectedPaymentDate, file: { path } } } ] = await getPayable(_id)
@@ -132,5 +136,6 @@ module.exports = {
 	setPayablesNextStatus,
 	invoiceSubmission,
 	invoiceReloadFile,
-	invoicePaymentMethodResubmission
+	invoicePaymentMethodResubmission,
+	clearZohoLink
 }
