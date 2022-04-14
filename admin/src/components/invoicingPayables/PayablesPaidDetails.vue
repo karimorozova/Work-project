@@ -28,6 +28,7 @@
       )
       .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
         .modal(v-if="isOpenSendToZoho")
+          .modal__title Zoho Options
           .modal__item
             .item__title Payment mode
             .item__select
@@ -1115,14 +1116,22 @@ textarea {
 }
 
 .modal {
-  padding: 25px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -49%);
-  background: white;
   box-shadow: $box-shadow;
+  position: absolute;
+  top: 0px;
+  left: 430px;
+  background: white;
   z-index: 20;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__title{
+    font-size: 16px;
+    font-family: Myriad600;
+    margin-bottom: 20px;
+  }
 
   &__item {
     margin-bottom: 15px;
@@ -1130,7 +1139,8 @@ textarea {
 
   &__buttons {
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    margin-top: 20px;
   }
 }
 
@@ -1141,7 +1151,7 @@ textarea {
 
   &__select {
     position: relative;
-    height: 31px;
+    height: 32px;
     width: 220px;
   }
 
