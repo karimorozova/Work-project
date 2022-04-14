@@ -385,7 +385,7 @@ export default {
           paidThrough: this.selectedPaidThrough.id,
           bankCharges: this.selectedBankCharges,
           date: this.selectedDate,
-          paymentDate: new Date(),
+          lastPaymentDate: this.reportDetailsInfo.lastPaymentDate,
           vendorEmail: this.reportDetailsInfo.vendor.email,
           reportTextId: this.reportDetailsInfo.reportId,
           dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
