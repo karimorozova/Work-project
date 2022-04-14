@@ -289,7 +289,7 @@ router.post("/report/:reportId/sendToZoho", async (req, res) => {
 		const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
 		const lineItems = [ {
 			"name": `TS ${  moment(lastPaymentDate).format('MMMM YYYY') }`,
-			"account_id": "335260000002330131",
+			"account_id": "335260000002675077",
 			"rate": paidAmount,
 			"quantity": 1
 		} ]
