@@ -12,7 +12,8 @@ const {
 	setPayablesNextStatus,
 	invoiceSubmission,
 	invoiceReloadFile,
-	invoicePaymentMethodResubmission
+	invoicePaymentMethodResubmission,
+	clearZohoLink,
 } = require('./updatePayables')
 
 const {
@@ -94,5 +95,6 @@ module.exports = {
 	createNewPayable,
 	updatePayableFromZoho,
 	updatePayablesFromZoho,
-	getAllPayableByDefaultQuery
+	getAllPayableByDefaultQuery,
+	clearZohoLink,
 }

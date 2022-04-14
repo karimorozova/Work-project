@@ -11,7 +11,7 @@ const { parseAndWriteLQAReport } = require('./reports/newLQAStatusFromFiles')
 const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmarkCost } = require('./reports')
 
 
-const { getAllSteps, addStepsToPayables, getPayable } = require('./invoicingPayables')
+const { getAllSteps, addStepsToPayables, getPayable, getAllPaidPayables, addFile } = require('./invoicingPayables')
 const autoCreationPayablesReports = async () => {
 	const allSteps = await getAllSteps(0, 999999, {
 		"deadline": {
@@ -37,6 +37,16 @@ const generateTotal = async () => {
 	console.log('DONE')
 }
 // generateTotal()
+
+const uploadZohoInvoiceFileAll = async () => {
+	const reports = await getAllPaidPayables(0, 1e6)
+	for await (let report of reports) {
+		if(report.zohoBillingId) await addFile(report.zohoBillingId, report.paymentDetails.file.path)
+		console.log('Done', report.reportId)
+	}
+}
+
+// uploadZohoInvoiceFileAll()
 
 
 // downloadMemoqFile({memoqProjectId:'1443ab32-fa74-eb11-90ed-82bb18d08256', docId:'4c077bd7-e5e7-46a5-9e4e-2953ab86e913', path:'./dist/max.xlsx'} )

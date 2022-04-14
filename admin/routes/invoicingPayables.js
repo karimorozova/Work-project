@@ -26,7 +26,7 @@ const {
 	getShortReportList,
 	getPaidShortReportList,
 	getAllVendorReports,
-	createBillZohoRequest
+	createBillZohoRequest, addFile, clearZohoLink
 } = require('../invoicingPayables')
 
 const { ObjectID: ObjectId } = require("mongodb")
@@ -283,27 +283,38 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 
 router.post("/report/:reportId/sendToZoho", async (req, res) => {
 	const { reportId } = req.params
-	const { paidAmount,  paymentMode, paidThrough, date, bankCharges,  paymentDate,  vendorName, vendorEmail, reportTextId, dueDate } = req.body
+	const { paidAmount,  paymentMode, paidThrough, date, bankCharges,  paymentDate,  vendorName, vendorEmail, reportTextId, dueDate, reportPath } = req.body
 	let zohoBillingId;
 	try {
-			const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
-			const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
-			const lineItems = [ {
-				"name": `TS ${ paymentDateMonthAndYear }`,
-				"account_id": "335260000002330131",
-				"rate": paidAmount,
-				"quantity": 1
-			} ]
-			let result = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
-			if (result) {
-				zohoBillingId = result.bill.bill_id
-			}
+		const paymentDateMonthAndYear = moment(paymentDate).format('MMMM YYYY')
+		const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
+		const lineItems = [ {
+			"name": `TS ${ paymentDateMonthAndYear }`,
+			"account_id": "335260000002330131",
+			"rate": paidAmount,
+			"quantity": 1
+		} ]
+		let result = await createBillZohoRequest(dueDateFormatted, '', vendorEmail, reportTextId, lineItems)
+		if (result?.type === "error") {
+			res.json(result)
+			return
+		}
 
-			await InvoicingPayablesArchive.updateOne({ _id: reportId }, { zohoBillingId })
+		if (result) {
+			zohoBillingId = result.bill.bill_id
+		}
 
-			await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date, bankCharges)
+		await InvoicingPayablesArchive.updateOne({ _id: reportId }, { zohoBillingId })
 
-		res.send(result)
+		const resp = await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date, bankCharges)
+		if (resp?.type === "error") {
+			res.json(resp)
+			return
+		}
+		if(reportPath) {
+			await addFile(zohoBillingId, reportPath )
+		}
+		res.send({type: "success", message: 'Report sent to Zoho'})
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting steps')
@@ -318,6 +329,17 @@ router.post("/report/:id", async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting steps')
+	}
+})
+
+router.delete("/report/:id/clear-zoho-link", async (req, res) => {
+	const { id } = req.params
+	try {
+		await clearZohoLink(id)
+		res.send("success")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on cleaning zoho link')
 	}
 })
 

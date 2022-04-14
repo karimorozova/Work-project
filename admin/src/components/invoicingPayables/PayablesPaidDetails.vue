@@ -16,6 +16,16 @@
         @close="toggleForceStatusEdition"
         @notApprove="toggleForceStatusEdition"
       )
+      ApproveModal(
+        v-if="isClearZohoLink"
+        class="absolute-middle"
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="cleanZohoLink"
+        @close="closeModalClearZohoLink"
+        @notApprove="closeModalClearZohoLink"
+      )
       .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
         .modal(v-if="isOpenSendToZoho")
           .modal__item
@@ -71,6 +81,12 @@
             value="Send to Zoho"
             :outline="true"
             @clicked="openZohoModal"
+          )
+          Button(
+            v-else
+            value="Clear Zoho link"
+            :outline="true"
+            @clicked="openModalClearZohoLink"
           )
         .left-side
           .invoicing-details__info
@@ -231,6 +247,7 @@ export default {
   },
   data() {
     return {
+      isClearZohoLink: false,
       isOpenSendToZoho: false,
       selectedPaymentMode: '',
       selectedPaidThrough: null,
@@ -312,6 +329,17 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    openModalClearZohoLink() {
+      this.isClearZohoLink = true
+    },
+    closeModalClearZohoLink() {
+      this.isClearZohoLink = false
+    },
+    async cleanZohoLink() {
+      await this.$http.delete(`/invoicing-payables/report/${this.$route.params.id}/clear-zoho-link`)
+      await this.openDetails(this.$route.params.id)
+      this.closeModalClearZohoLink()
+    },
     openZohoModal() {
       this.isOpenSendToZoho = true
     },
@@ -360,13 +388,13 @@ export default {
           paymentDate: new Date(),
           vendorEmail: this.reportDetailsInfo.vendor.email,
           reportTextId: this.reportDetailsInfo.reportId,
-          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate
+          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
+          reportPath: this.reportDetailsInfo.paymentDetails.file.path,
         })
-        // console.log(result)
         this.closeZohoModal()
         await this.openDetails(this.$route.params.id)
 
-        this.alertToggle({ message: 'Sent to Zoho', isShow: true, type: "success" })
+        this.alertToggle({ message: result.data.message, isShow: true, type: result.data.type })
       } catch (e) {
         if (e.body) {
           this.alertToggle({ message: e.body, isShow: true, type: "error" })
