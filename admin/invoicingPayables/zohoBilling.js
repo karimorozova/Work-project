@@ -35,14 +35,14 @@ const createVendor = async (vendorName, vendorEmail) => {
 	return customer.data.contact.contact_id
 }
 
-const createBillZohoRequest = async (due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems) => {
+const createBillZohoRequest = async (lastPaymentDate, due_date, vendorName = 'RENAME!!!', vendorEmail, billNumber, lineItems) => {
 	let zohoVendorId = await getVendor(vendorEmail)
 	if (!zohoVendorId || !vendorEmail) return ''
 	// zohoVendorId = zohoVendorId ? zohoVendorId : await createVendor(vendorName, vendorEmail)
 	const data = {
 		"vendor_id": zohoVendorId,
 		"bill_number": billNumber,
-		"date": moment(due_date).subtract(1,'days').format('YYYY-MM-DD'),
+		"date": moment(lastPaymentDate).format('YYYY-MM-DD'),
 		"due_date": due_date,
 		"line_items": lineItems
 	}
