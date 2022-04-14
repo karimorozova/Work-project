@@ -64,6 +64,7 @@ export default {
   },
   data() {
     return {
+      currentId: '',
       currentType: '',
       currentName: '',
       currentMinimumAmount: 0,
@@ -87,6 +88,7 @@ export default {
       if (this.errors.length) return
 
       this.$emit('savePaymentMethod', {
+        _id: this.currentId,
         paymentType: this.currentType,
         name: this.currentName,
         minimumAmount: this.currentMinimumAmount < 0 ? 0 : this.currentMinimumAmount,
@@ -116,7 +118,8 @@ export default {
     },
     setEditableDefaultData() {
       if (this.editablePaymentMethod.name) {
-        const { paymentType, name, minimumAmount, otherStatement } = this.editablePaymentMethod
+        const { _id, paymentType, name, minimumAmount, otherStatement } = this.editablePaymentMethod
+        this.currentId = _id
         this.currentType = paymentType
         this.currentName = name
         this.currentMinimumAmount = minimumAmount
