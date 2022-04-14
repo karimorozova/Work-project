@@ -12,6 +12,7 @@ const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmar
 
 
 const { getAllSteps, addStepsToPayables, getPayable, getAllPaidPayables, addFile } = require('./invoicingPayables')
+const { sendRequestToZoho } = require("./services/zoho")
 const autoCreationPayablesReports = async () => {
 	const allSteps = await getAllSteps(0, 999999, {
 		"deadline": {
@@ -41,8 +42,12 @@ const generateTotal = async () => {
 const uploadZohoInvoiceFileAll = async () => {
 	const reports = await getAllPaidPayables(0, 1e6)
 	for await (let report of reports) {
-		if(report.zohoBillingId) await addFile(report.zohoBillingId, report.paymentDetails.file.path)
+		console.log('--1')
+		if(report.zohoBillingId){
+		console.log('start', report.reportId)
+			await sendRequestToZoho(`bills/335260000006169620?organization_id=630935724`, `JSONString=` + JSON.stringify({ "data": moment(report.lastPaymentDate).format('YYYY-MM-DD'), }), 'PUT')
 		console.log('Done', report.reportId)
+		}
 	}
 }
 
