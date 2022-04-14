@@ -393,7 +393,7 @@ export default {
         })
         this.closeZohoModal()
         await this.openDetails(this.$route.params.id)
-
+        await this.getVendorOtherReports()
         this.alertToggle({ message: result.data.message, isShow: true, type: result.data.type })
       } catch (e) {
         if (e.body) {
