@@ -360,13 +360,14 @@ export default {
           paymentDate: new Date(),
           vendorEmail: this.reportDetailsInfo.vendor.email,
           reportTextId: this.reportDetailsInfo.reportId,
-          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate
+          dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
+          reportPath: this.reportDetailsInfo.paymentDetails.file.path,
         })
-        // console.log(result)
+        console.log(result)
         this.closeZohoModal()
         await this.openDetails(this.$route.params.id)
 
-        this.alertToggle({ message: 'Sent to Zoho', isShow: true, type: "success" })
+        this.alertToggle({ message: result.data.message, isShow: true, type: result.data.type })
       } catch (e) {
         if (e.body) {
           this.alertToggle({ message: e.body, isShow: true, type: "error" })

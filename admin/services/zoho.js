@@ -83,19 +83,20 @@ const sendRequestToZoho = async (link, data = {}, method = "GET", header = {}, a
 		return await zohoRequest(link, data, token, method, header, additional)
 	} catch (err) {
 		try {
-			if (err.response || err.response.data.code === 57) {
+			if (err.response || err.response?.data?.code === 57) {
 				token = await setNewTokenFromRefresh()
 				if (!token) return returnMessageAndType('Can`t get access_token', 'error')
 				return await zohoRequest(link, data, token, method, header, additional)
 			}
 		} catch (err) {
-			console.log(err.response.data.message)
-			// return returnMessageAndType(err.response.data.message || err.message , 'error')
-			return returnMessageAndType(err.message , 'error')
+			console.log(err.response?.data?.message)
+			return returnMessageAndType(err.response?.data?.message || err.message , 'error')
+			// return returnMessageAndType(err.message , 'error')
 		}
-
-		console.log(err.response.data.message)
-		return returnMessageAndType( err.message , 'error')
+		// console.log({ firstError })
+		console.log(err.response?.data?.message)
+		// return returnMessageAndType( err.message , 'error')
+		return returnMessageAndType(err.response?.data?.message || err.message , 'error')
 	}
 }
 
