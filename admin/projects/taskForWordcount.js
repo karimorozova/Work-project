@@ -18,13 +18,6 @@ async function createTasksForWordcount(tasksInfo) {
 		memoqProjectId,
 		memoqFiles,
 		docs
-		// industry,
-		// template,
-		// nativeProjectName,
-		// projectManager,
-		// customerName,
-		// creatorUserId,
-		// projectName,
 	} = tasksInfo
 
 	const { tasks: projectsTasks, isSkipProgress, customer: { matrix } } = await getProject({ _id })
@@ -137,6 +130,11 @@ async function generateStepsForCATMemoqUnit({ tasks, stepsAdditions }) {
 						payablesQuantity: 0
 					}, true)
 
+			if(!stepsAndUnits[i].isReceivableVisible){
+				finance.Quantity.receivables = 0
+				finance.Wordcount.receivables = 0
+			}
+
 			steps.push({
 				stepNumber: i + 1,
 				projectId,
@@ -157,6 +155,7 @@ async function generateStepsForCATMemoqUnit({ tasks, stepsAdditions }) {
 				start: stepsAndUnits[i].start,
 				deadline: stepsAndUnits[i].deadline,
 				stepAndUnit: stepsAndUnits[i],
+				isReceivableVisible: stepsAndUnits[i].isReceivableVisible,
 				memoqAssignmentRole: i,
 				finance,
 				nativeFinance,
@@ -233,7 +232,7 @@ function getFilledMemoqMetrics(metrics) {
 
 function setStepsProgress(service, memoqDocs) {
 	const { title } = service
-	const prop = title === 'Translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
+	const prop = title === 'Translation' || title === 'Post-Editing' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
 
 	const totalProgress = memoqDocs.reduce((acc, cur) => {
 		acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop]

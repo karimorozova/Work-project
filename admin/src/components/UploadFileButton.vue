@@ -39,11 +39,11 @@ export default {
 
   &__button {
     position: relative;
-    width: 60px;
-    height: 30px;
+    width: 72px;
+    height: 36px;
     color: $text;
     font-size: 14px;
-    border-radius: 3px;
+    border-radius: 2px;
     text-align: center;
     display: flex;
     border: 1px solid $border;
@@ -98,8 +98,8 @@ export default {
     filter: alpha(opacity=0);
     font-size: 30px;
     font-family: Myriad400;
-    width: 60px;
-    height: 30px;
+    width: 72px;
+    height: 36px;
   }
 }
 </style>

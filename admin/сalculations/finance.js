@@ -183,13 +183,13 @@ const getNewStepFinanceData = async ({ projectId, fullSourceLanguage, fullTarget
 			},
 			Wordcount: {
 				receivables: isMemoq
-						? step.title === 'Translation' ? +getRelativeQuantity(metrics, 'client') : metrics.totalWords
+						? (step.title === 'Translation' || step.title === 'Post-Editing') ? +getRelativeQuantity(metrics, 'client') : metrics.totalWords
 						: 0,
 				payables: 0
 			},
 			Price: {
 				receivables: isMemoq
-						? step.title === 'Translation' ? +(clientRate * +getRelativeQuantity(metrics, 'client')).toFixed(2) : +(clientRate * +metrics.totalWords).toFixed(2)
+						? (step.title === 'Translation' || step.title === 'Post-Editing') ? +(clientRate * +getRelativeQuantity(metrics, 'client')).toFixed(2) : +(clientRate * +metrics.totalWords).toFixed(2)
 						: +(clientRate * receivablesQuantity).toFixed(2),
 				payables: 0
 			}

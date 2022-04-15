@@ -194,7 +194,10 @@ export default {
     }),
     possibleStepsForAdding() {
       if (this.tasksData.service && this.allSteps.length) {
-        return this.tasksData.service.steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
+        return this.tasksData.service.steps
+            .map(i => i.step.title)
+            .filter(i => i !== 'Post-Editing')
+            .filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
       }
       return []
     }

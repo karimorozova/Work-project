@@ -133,7 +133,6 @@ export default {
       xtmFileData: null,
 
       allServices: [],
-      // templates: [],
       isAdditions: false,
       IsErrorModal: false,
       errors: [],
@@ -161,6 +160,7 @@ export default {
     },
     setTabWorkflow({ index }) {
       this.selectedTabWorkflow = this.tabsWorkflow[index]
+      this.setDataValue({ prop: "template", value: {} })
       this.setStepsAndUnitByService(this.tasksData.service)
     },
     setMemoqWorkflow({ option }) {
@@ -229,7 +229,7 @@ export default {
       this.errors = []
       if (!this.tasksData.targets || !this.tasksData.targets.length) this.errors.push("Please, select Target language(s).")
 
-      if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation") && this.selectedTabWorkflow === 'Memoq') {
+      if (this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation") && (this.selectedTabWorkflow === 'Memoq' || this.selectedTabWorkflow === 'Memoq MT')) {
         if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
           this.errors.push("Please, upload Source file(s).")
         }
@@ -280,10 +280,8 @@ export default {
       this.isDisabledSaveButton = true
       const data = this.getDataForTasks(this.tasksData)
       try {
-        if (
-            this.selectedTabWorkflow === 'Memoq'
-            // this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
-        ) {
+        if (this.selectedTabWorkflow === 'Memoq' || this.selectedTabWorkflow === 'Memoq MT') {
+          // this.tasksData.template && this.tasksData.service.title === 'Translation' && this.tasksData.stepsAndUnits[0].receivables.unit.type === 'CAT Wordcount'
 
           const creatorUserId = await this.getCreatorUserId()
           data.append('creatorUserId', creatorUserId)
@@ -365,18 +363,30 @@ export default {
           collectWorkFlow(step, units)
         }
       }
+
       if (this.selectedTabWorkflow === 'Memoq') {
         for (let { step } of service.steps) {
-          // console.log(step)
-          // if (step.title !== 'Translation' && step.title !== 'Revising') continue
+          if (step.title !== 'Translation' && step.title !== 'Revising') continue
           let units = []
           units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
           collectWorkFlow(step, units)
         }
       }
+
       if (this.selectedTabWorkflow === 'Memoq MT') {
-        const postEditing = this.allSettingSteps.find(({ name }) => name === 'Post-Editing')
-        console.log('asd', this.allSettingSteps)
+        service.steps = service.steps.reduce((acc, curr) => {
+          curr.step.title === 'Translation'
+              ? acc[1] = curr
+              : curr.step.title === 'Revising'
+                  ? acc[2] = curr
+                  : acc[0] = curr
+          return acc
+        }, [])
+        for (let { step } of service.steps) {
+          let units = []
+          units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
+          collectWorkFlow(step, units)
+        }
       }
 
       function collectWorkFlow(step, units) {
@@ -384,6 +394,7 @@ export default {
           step,
           start: '',
           deadline: '',
+          isReceivableVisible: true,
           receivables: {
             unit: units[0],
             quantity: 0
@@ -467,8 +478,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      tasksData: "getTasksData",
-      allSettingSteps: 'getAllSteps'
+      tasksData: "getTasksData"
     }),
     tabsWorkflow() {
       return [ 'Alpha', 'Memoq', 'Memoq MT' ].filter(i => this.tasksData.service.title === 'Translation' ? i : i !== 'Memoq' && i !== 'Memoq MT')

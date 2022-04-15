@@ -12,7 +12,7 @@
       .info__title {{ step.step.title }}
       .info__value {{ step.stepId }}
       .info__value {{ step.sourceLanguage === step.targetLanguage ? step.fullTargetLanguage.lang : step.fullSourceLanguage.lang + ' to ' + step.fullTargetLanguage.lang }}
-      .info__value(v-if="step.step.title === 'Translation' && step.totalWords" ) Total Words:  {{ step.totalWords }}
+      .info__value(v-if="(step.step.title === 'Translation' || step.step.title === 'Post-Editing') && step.totalWords" ) Total Words:  {{ step.totalWords }}
 
     .details__options
       .details__options-row
@@ -30,7 +30,7 @@
         :task="task"
       )
 
-    .step-info__matrix(v-if="step.receivablesUnit.type === 'CAT Wordcount' && step.step.title === 'Translation'")
+    .step-info__matrix(v-if="step.receivablesUnit.type === 'CAT Wordcount' && (step.step.title === 'Translation' || step.step.title === 'Post-Editing')")
       Tabs(:tabs="tabs.filter(i => !step.vendor ? i !== 'Payables' : true)" :selectedTab="selectedTab" @setTab="setTab")
       TableMatrix(
         :step="step"

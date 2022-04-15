@@ -179,6 +179,7 @@ async function manageStatuses({ project, steps, jobId, status }) {
 async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }) {
 	const step = steps.find(item => item.id === jobId)
 	const task = tasks[taskIndex]
+
 	try {
 		await stepCompletedNotifyPM(project, step)
 
@@ -187,11 +188,23 @@ async function manageCompletedStatus({ project, jobId, steps, tasks, taskIndex }
 			await Projects.updateOne({ "steps._id": jobId }, { tasks, steps })
 			await pushTasksToDR1(project, task, step)
 			await taskCompleteNotifyPM(project, task)
+
+		} else if (step.step.title === 'Post-Editing' && !step.isReceivableVisible) {
+			//TODO: !!! temp checks !!! Only MT POST-EDITING first ==>>
+
+			tasks[taskIndex].status = 'Pending Approval [DR1]'
+			const actualStepsIds = steps.filter(({ status, taskId }) => (status !== 'Cancelled' && status !== 'Cancelled Halfway') && taskId === task.taskId).map(i => i.stepId)
+			steps = steps.map(item => {
+				if(actualStepsIds.includes(item.stepId)) item.status = 'Completed'
+				return item
+			})
+			await Projects.updateOne({ "steps._id": jobId }, { tasks, steps })
+			await pushTasksToDR1(project, task, step)
+			await taskCompleteNotifyPM(project, task)
 		} else {
 			//TODO: Need to refactor error translation second step canceled and stepNumber need to be +2
 
-			const actualSteps = steps
-					.filter(({ status, taskId }) => (status !== 'Cancelled' || status !== 'Cancelled Halfway') && taskId === task.taskId)
+			const actualSteps = steps.filter(({ status, taskId }) => (status !== 'Cancelled' && status !== 'Cancelled Halfway') && taskId === task.taskId)
 			let nextStep = actualSteps.find(item => item.stepNumber === step.stepNumber + 1)
 			// nextStep = !!nextStep ?  actualSteps.find(item => item.stepNumber === step.stepNumber + 2) : undefined
 
@@ -254,16 +267,6 @@ function getTaskTargetFilesWithCopy(project, task) {
 	}, [])
 }
 
-function getWithReadyToStartSteps({ task, steps }) {
-	// const stage2step = task.service.steps.find(item => item.stage === 'stage2')
-	// return steps.map(item => {
-	// 	if (stage2step && item.status === 'Waiting to Start' && item.taskId === task.taskId) {
-	// 		item.status = 'Ready to Start'
-	// 	}
-	// 	return item
-	// })
-}
-
 function setRejectedStatus({ steps, jobId }) {
 	return steps.map(item => {
 		if (item.id === jobId) {
@@ -272,52 +275,6 @@ function setRejectedStatus({ steps, jobId }) {
 		return item
 	})
 }
-
-
-async function setTaskStatusDR1({ project, jobId, steps, status }) {
-	// let { tasks } = project
-	// const { taskId } = steps.find(item => item._id.toString() === jobId)
-	//
-	// const currSteps = steps
-	// 		.filter(item => item.taskId === taskId)
-	// 		.filter(({ status }) => status !== 'Cancelled' && status !== 'Cancelled Halfway')
-	//
-	// const stepNumbers = currSteps.map(item => item.stepNumber)
-	// const maxStepNumber = Math.max.apply(null, stepNumbers)
-	//
-	//
-	// const updatedTasks = tasks.map(item => {
-	// 	if (item.taskId === taskId) {
-	//
-	// 		if (currSteps.stepNumber === maxStepNumber) {
-	//
-	// 		} else {
-	// 			item.status = 'In progress'
-	// 		}
-	// 		return item
-	//
-	// 		// if (currSteps.length === 2 && currSteps[0].status === "Completed" && currSteps[1].status === "Completed" ||
-	// 		// 		currSteps.length === 1 && currSteps[0].status === "Completed"
-	// 		// ) {
-	// 		// 	item.status = "Pending Approval [DR1]"
-	// 		// } else {
-	// 		//
-	// 		// }
-	// 		// return item
-	//
-	// 	}
-	// 	return item
-	// })
-	//
-	// projectStatus = projectStatus === 'Approved' ? 'In progress' : projectStatus
-	// try {
-	// 	await Projects.updateOne({ 'steps._id': jobId }, { status: projectStatus, tasks: updatedTasks, steps })
-	// } catch (err) {
-	// 	console.log(err)
-	// 	console.log("Error in setTaskStatusDR1")
-	// }
-}
-
 
 function isAllStepsCompleted({ steps, task }) {
 	const taskSteps = steps

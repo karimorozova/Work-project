@@ -45,13 +45,15 @@
 
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
           .step__titleRow
-            .step__titleRow-title {{ item.step.title }}
+            .step__titleRow-title
+                span {{ item.step.title }}
+                b(v-if="!item.isReceivableVisible" style="margin-left: 4px") [Hidden]
             .step__titleRow-desctiptions
               .step__titleRow-desctiptions-title-date Dates
               .step__titleRow-desctiptions-title Receivables & Payables
 
           .step__detailsRow
-            .step__icons(v-if="item.step.title !== 'Translation'")
+            .step__icons(v-if="item.step.title !== 'Translation' && item.step.title !== 'Post-Editing'")
               .step__icon(@click="openDeleteAcceptModal(index)" style="cursor: pointer;")
                 i.fas.fa-trash
 
@@ -183,6 +185,12 @@ export default {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
       this.closeAcceptModal()
     },
+    hideReceivableDefaultSteps() {
+      let { stepsAndUnits } = this.tasksData
+      stepsAndUnits.forEach((item, index) => {
+        if (item.step.title === 'Post-Editing') stepsAndUnits[index].isReceivableVisible = false
+      })
+    },
     ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" })
   },
   computed: {
@@ -200,6 +208,7 @@ export default {
     }
   },
   async created() {
+    this.hideReceivableDefaultSteps()
     await this.getMemoqTemplates()
   }
 }
