@@ -76,8 +76,14 @@ module.exports = {
 			title: '[1] POI',
 			description:
 					'<ul>' +
+					'<li>Full name</li>' +
 					'<li>Confirm name as</li>' +
+					'<li>Date of Birth</li>' +
+					'<li>Issue date</li>' +
+					'<li>Expiry date if there is any</li>' +
 					'<li>Place of birth</li>' +
+					'<li>Issuing Authority</li>' +
+					'<li>Type of document: e.g. Driving License, National ID etc</li>' +
 					'<li>Address of the customer (if any)</li>' +
 					'</ul>'
 		},
@@ -86,7 +92,12 @@ module.exports = {
 			title: '[2] POA',
 			description:
 					'<ul>' +
+					'<li>Full name</li>' +
 					'<li>Confirm name as</li>' +
+					'<li>Date of Birth</li>' +
+					'<li>Issue Date</li>' +
+					'<li>Issuing Authority/Company</li>' +
+					'<li>Type of the document: e.g. utility bill, bank statement etc</li>' +
 					'<li>Address of the customer on the document</li>' +
 					'</ul>'
 		}
