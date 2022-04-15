@@ -27,6 +27,16 @@
         @notApprove="closeModalClearZohoLink"
       )
       .invoicing-details__wrapper(v-if="reportDetailsInfo.hasOwnProperty('vendor')")
+        .modal(v-if="isOpenSendToZohoId")
+          .modal__title Zoho Bill ID
+          .modal__item
+            .item__input
+              input(placeholder="Value" ref="billId")
+            .item__input-label ex. 335260000006212001
+          .modal__buttons
+            Button(value="Send" @clicked="importZohoBill" :isDisabled="!!getRequestCounter")
+            Button(value="Cancel" :outline="true" @clicked="closeZohoModal" :isDisabled="!!getRequestCounter")
+
         .modal(v-if="isOpenSendToZoho")
           .modal__title Zoho Options
           .modal__item
@@ -65,30 +75,14 @@
             .item__input
               input(v-model="selectedBankCharges")
           .modal__buttons
-            Button(
-              value="Send"
-              @clicked="sendToZoho"
-              :isDisabled="!!getRequestCounter"
-            )
-            Button(
-              value="Cancel"
-              :outline="true"
-              @clicked="closeZohoModal"
-              :isDisabled="!!getRequestCounter"
-            )
+            Button( value="Send" @clicked="sendToZoho" :isDisabled="!!getRequestCounter")
+            Button( value="Cancel" :outline="true" @clicked="closeZohoModal" :isDisabled="!!getRequestCounter")
+
         .options-buttons
-          Button(
-            v-if="!reportDetailsInfo.zohoBillingId"
-            value="Send to Zoho"
-            :outline="true"
-            @clicked="openZohoModal"
-          )
-          Button(
-            v-else
-            value="Clear Zoho link"
-            :outline="true"
-            @clicked="openModalClearZohoLink"
-          )
+          Button( v-if="!reportDetailsInfo.zohoBillingId" value="Send to Zoho" :outline="true" @clicked="openZohoModal")
+          Button( v-if="!reportDetailsInfo.zohoBillingId" value="Import Zoho Bill" :outline="true" @clicked="openZohoModalId")
+          Button( v-else value="Clear Zoho link" :outline="true" @clicked="openModalClearZohoLink")
+
         .left-side
           .invoicing-details__info
             .info__user
@@ -248,6 +242,7 @@ export default {
   },
   data() {
     return {
+      isOpenSendToZohoId: false,
       isClearZohoLink: false,
       isOpenSendToZoho: false,
       selectedPaymentMode: '',
@@ -262,7 +257,6 @@ export default {
         'Skrill',
         'SmartCAT',
         'Credit Card'
-
         // 'Bank Remittance',
         // 'Cash',
         // 'Cheque',
@@ -330,6 +324,11 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    async importZohoBill(){
+      await this.$http.put(`/invoicing-payables/report/${ this.$route.params.id }/import-zoho-link`, { link: this.$refs.billId.value})
+      await this.openDetails(this.$route.params.id)
+      this.closeZohoModal()
+    },
     openModalClearZohoLink() {
       this.isClearZohoLink = true
     },
@@ -337,15 +336,21 @@ export default {
       this.isClearZohoLink = false
     },
     async cleanZohoLink() {
-      await this.$http.delete(`/invoicing-payables/report/${this.$route.params.id}/clear-zoho-link`)
+      await this.$http.delete(`/invoicing-payables/report/${ this.$route.params.id }/clear-zoho-link`)
       await this.openDetails(this.$route.params.id)
       this.closeModalClearZohoLink()
     },
     openZohoModal() {
+      this.closeZohoModal()
       this.isOpenSendToZoho = true
+    },
+    openZohoModalId() {
+      this.closeZohoModal()
+      this.isOpenSendToZohoId = true
     },
     closeZohoModal() {
       this.isOpenSendToZoho = false
+      this.isOpenSendToZohoId = false
       this.selectedPaymentMode = ''
       this.selectedPaidThrough = null
       this.selectedDate = ''
@@ -390,7 +395,7 @@ export default {
           vendorEmail: this.reportDetailsInfo.vendor.email,
           reportTextId: this.reportDetailsInfo.reportId,
           dueDate: this.reportDetailsInfo.paymentDetails.expectedPaymentDate,
-          reportPath: this.reportDetailsInfo.paymentDetails.file.path,
+          reportPath: this.reportDetailsInfo.paymentDetails.file.path
         })
         this.closeZohoModal()
         await this.openDetails(this.$route.params.id)
@@ -1127,7 +1132,7 @@ textarea {
   flex-direction: column;
   align-items: center;
 
-  &__title{
+  &__title {
     font-size: 16px;
     font-family: Myriad600;
     margin-bottom: 20px;
@@ -1172,6 +1177,12 @@ textarea {
       &:focus {
         border: 1px solid $border-focus;
       }
+    }
+
+    &-label {
+      margin-bottom: -20px;
+      margin-top: 5px;
+      opacity: 0.4;
     }
   }
 

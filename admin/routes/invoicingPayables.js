@@ -158,10 +158,10 @@ router.post("/not-selected-steps-list/:vendor", async (req, res) => {
 router.post("/reports", async (req, res) => {
 	try {
 		const sortNormalizer = {
-			'Report Id (asc)': {reportId: 1},
-			'Report Id (desc)': {reportId: -1},
-			'Date Range (asc)': {firstPaymentDate: 1},
-			'Date Range (desc)': {firstPaymentDate: -1},
+			'Report Id (asc)': { reportId: 1 },
+			'Report Id (desc)': { reportId: -1 },
+			'Date Range (asc)': { firstPaymentDate: 1 },
+			'Date Range (desc)': { firstPaymentDate: -1 }
 		}
 		const { countToSkip, countToGet, filters, sortBy = 'Report Id (desc)' } = req.body
 		const allVendors = await Vendors.find({}, { billingInfo: 1 })
@@ -177,10 +177,10 @@ router.post("/reports", async (req, res) => {
 router.post("/paid-reports", async (req, res) => {
 	try {
 		const sortNormalizer = {
-			'Report Id (asc)': {reportId: 1},
-			'Report Id (desc)': {reportId: -1},
-			'Date Range (asc)': {firstPaymentDate: 1},
-			'Date Range (desc)': {firstPaymentDate: -1},
+			'Report Id (asc)': { reportId: 1 },
+			'Report Id (desc)': { reportId: -1 },
+			'Date Range (asc)': { firstPaymentDate: 1 },
+			'Date Range (desc)': { firstPaymentDate: -1 }
 		}
 		const { countToSkip, countToGet, filters, sortBy = 'Report Id (desc)' } = req.body
 		const allVendors = await Vendors.find({}, { billingInfo: 1 })
@@ -283,12 +283,12 @@ router.post("/report-final-status/:reportId", async (req, res) => {
 
 router.post("/report/:reportId/sendToZoho", async (req, res) => {
 	const { reportId } = req.params
-	const { paidAmount,  paymentMode, paidThrough, date, bankCharges,  lastPaymentDate,  vendorName, vendorEmail, reportTextId, dueDate, reportPath } = req.body
-	let zohoBillingId;
+	const { paidAmount, paymentMode, paidThrough, date, bankCharges, lastPaymentDate, vendorName, vendorEmail, reportTextId, dueDate, reportPath } = req.body
+	let zohoBillingId
 	try {
 		const dueDateFormatted = moment(dueDate).format('YYYY-MM-DD')
 		const lineItems = [ {
-			"name": `TS ${  moment(lastPaymentDate).format('MMMM YYYY') }`,
+			"name": `TS ${ moment(lastPaymentDate).format('MMMM YYYY') }`,
 			"account_id": "335260000002675077",
 			"rate": paidAmount,
 			"quantity": 1
@@ -305,15 +305,15 @@ router.post("/report/:reportId/sendToZoho", async (req, res) => {
 
 		await InvoicingPayablesArchive.updateOne({ _id: reportId }, { zohoBillingId })
 
-		const resp = await createNewPayable(vendorName, vendorEmail,  paymentMode, paidThrough, zohoBillingId, paidAmount, date, bankCharges)
+		const resp = await createNewPayable(vendorName, vendorEmail, paymentMode, paidThrough, zohoBillingId, paidAmount, date, bankCharges)
 		if (resp?.type === "error") {
 			res.json(resp)
 			return
 		}
-		if(reportPath) {
-			await addFile(zohoBillingId, reportPath )
+		if (reportPath) {
+			await addFile(zohoBillingId, reportPath)
 		}
-		res.send({type: "success", message: 'Report sent to Zoho'})
+		res.send({ type: "success", message: 'Report sent to Zoho' })
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Something wrong on getting steps')
@@ -335,6 +335,18 @@ router.delete("/report/:id/clear-zoho-link", async (req, res) => {
 	const { id } = req.params
 	try {
 		await clearZohoLink(id)
+		res.send("success")
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on cleaning zoho link')
+	}
+})
+
+router.put("/report/:id/import-zoho-link", async (req, res) => {
+	const { id } = req.params
+	const { link } = req.body
+	try {
+		await InvoicingPayablesArchive.updateOne({ _id: id }, { zohoBillingId: link })
 		res.send("success")
 	} catch (err) {
 		console.log(err)
