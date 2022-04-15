@@ -8,7 +8,8 @@ function getJobsDetails(project, tasksIds, steps, allUnits) {
 
 	const data = allSteps.reduce((acc, curr) => {
 		const { type } = curr.receivablesUnit
-		const name = type === 'CAT Wordcount' ? curr.memoqAssignmentRole === 0 ? 'Translation' : 'Revising' : curr.step.title
+		// const name = type === 'CAT Wordcount' ? curr.memoqAssignmentRole === 0 ? 'Translation' : 'Revising' : curr.step.title
+		const name = curr.step.title
 		let quantity
 		let cost = 0
 
