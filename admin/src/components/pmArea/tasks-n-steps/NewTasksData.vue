@@ -83,7 +83,8 @@
                 @setTab="setTabWorkflow"
               )
           NewServicesCreationStepsWorkflowClassic(v-if="selectedTabWorkflow === 'Alpha'")
-          NewServicesCreationStepsWorkflowCAT(v-if="selectedTabWorkflow === 'Memoq'")
+          NewServicesCreationStepsWorkflowMemoq(v-if="selectedTabWorkflow === 'Memoq'")
+          NewServicesCreationStepsWorkflowMemoqMT(v-if="selectedTabWorkflow === 'Memoq MT'")
 
         .taskData__files
           TasksFiles
@@ -97,7 +98,7 @@
 import { mapActions, mapGetters } from "vuex"
 import SelectSingle from "../../SelectSingle"
 import TasksLangsDuo from "./TasksLangsDuo"
-import NewServicesCreationStepsWorkflowCAT from "./NewServicesCreationStepsWorkflowCAT"
+import NewServicesCreationStepsWorkflowMemoq from "./NewServicesCreationStepsWorkflowMemoq"
 import TasksFiles from "./TasksFiles"
 import Toggler from "../../Toggler"
 import StepsAdditions from "./stepsAdditions"
@@ -107,6 +108,7 @@ import { clearTasksData } from "../../../vuex/pmarea/actions"
 import Tabs from "../../Tabs"
 import UploadFileButton from "../../UploadFileButton"
 import NewServicesCreationStepsWorkflowClassic from "./NewServicesCreationStepsWorkflowClassic"
+import NewServicesCreationStepsWorkflowMemoqMT from "./NewServicesCreationStepsWorkflowMemoqMP"
 
 export default {
   name: "NewTasksData",
@@ -363,14 +365,18 @@ export default {
           collectWorkFlow(step, units)
         }
       }
-
       if (this.selectedTabWorkflow === 'Memoq') {
         for (let { step } of service.steps) {
-          if (step.title !== 'Translation' && step.title !== 'Revising') continue
+          // console.log(step)
+          // if (step.title !== 'Translation' && step.title !== 'Revising') continue
           let units = []
           units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
           collectWorkFlow(step, units)
         }
+      }
+      if (this.selectedTabWorkflow === 'Memoq MT') {
+        const postEditing = this.allSettingSteps.find(({ name }) => name === 'Post-Editing')
+        console.log('asd', this.allSettingSteps)
       }
 
       function collectWorkFlow(step, units) {
@@ -461,10 +467,11 @@ export default {
   },
   computed: {
     ...mapGetters({
-      tasksData: "getTasksData"
+      tasksData: "getTasksData",
+      allSettingSteps: 'getAllSteps'
     }),
     tabsWorkflow() {
-      return [ 'Alpha', 'Memoq' ].filter(i => this.tasksData.service.title === 'Translation' ? i : i !== 'Memoq')
+      return [ 'Alpha', 'Memoq', 'Memoq MT' ].filter(i => this.tasksData.service.title === 'Translation' ? i : i !== 'Memoq' && i !== 'Memoq MT')
     },
     isStepsWithCATWordcount() {
       return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount")
@@ -488,6 +495,7 @@ export default {
     this.clearTasksData()
   },
   components: {
+    NewServicesCreationStepsWorkflowMemoqMT,
     NewServicesCreationStepsWorkflowClassic,
     UploadFileButton,
     Tabs,
@@ -496,7 +504,7 @@ export default {
     StepsAdditions,
     Toggler,
     TasksFiles,
-    NewServicesCreationStepsWorkflowCAT,
+    NewServicesCreationStepsWorkflowMemoq,
     TasksLangsDuo,
     SelectSingle
   }

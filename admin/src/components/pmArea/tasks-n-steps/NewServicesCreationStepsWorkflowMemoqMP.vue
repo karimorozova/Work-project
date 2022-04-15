@@ -105,7 +105,7 @@ import Button from "../../Button"
 import ApproveModal from "../../ApproveModal"
 
 export default {
-  name: "NewServicesCreationStepsWorkflowCAT",
+  name: "NewServicesCreationStepsWorkflowMemoqMT",
   components: { Button, CheckBox, Add, SelectSingle, draggable, DatePicker, ApproveModal },
   data() {
     return {
