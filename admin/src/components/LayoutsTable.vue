@@ -38,6 +38,7 @@
 <script>
 import ApproveModal from './ApproveModal'
 import { mapGetters } from "vuex"
+import { getRequestCounter } from "../vuex/general/getters"
 
 export default {
   props: {
@@ -84,7 +85,8 @@ export default {
     },
     bottomScrolled(e) {
       const element = e.target
-      if (Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
+      if (element.scrollTop && Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
+        if(!!this.requestCounter) return
         this.$emit("bottomScrolled")
       }
     }
@@ -94,7 +96,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: "getUser"
+      user: "getUser",
+      requestCounter: 'getRequestCounter'
     })
   },
   components: {

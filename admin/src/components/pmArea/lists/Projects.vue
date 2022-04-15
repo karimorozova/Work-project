@@ -389,6 +389,7 @@ export default {
       return (data && data.length) ? data[data.length - 1].startDate : ""
     },
     querySetter(vm, to) {
+      if(!Object.keys(to.query).length) return this.defaultSetter()
       for (let variable of this.dataVariables) if (to.query[variable] != null) vm[variable] = to.query[variable]
     },
     defaultSetter() {
