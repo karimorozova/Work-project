@@ -34,7 +34,7 @@ const {
 	getCompanies,
 	getCompany,
 	editPaymentMethodInCompany,
-	deletePaymentMethodInCompany,
+	deletePaymentMethodInCompany, toggleDefaultPaymentMethod,
 } = require('../settings')
 
 const {
@@ -397,9 +397,21 @@ router.post('/company/:id/payment-method', async (req, res)  => {
 		if (!paymentMethodId) {
 			companies = await addPaymentMethodToCompany(id, {name, paymentType, otherStatement} )
 		} else {
-			companies = await editPaymentMethodInCompany(id, paymentMethodId, {name, paymentType, otherStatement})
+			companies = await editPaymentMethodInCompany(id, paymentMethodId, {_id: paymentMethodId, name, paymentType, otherStatement})
 		}
 		res.json(companies)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on vendor-payment-benchmark')
+	}
+})
+
+router.put('/company/:id/payment-method/:paymentMethodId/is-default', async (req, res)  => {
+	const { id, paymentMethodId } = req.params
+	const { status} = req.body
+	try {
+		const company = await toggleDefaultPaymentMethod(id, paymentMethodId, status)
+		res.json(company)
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Error on vendor-payment-benchmark')

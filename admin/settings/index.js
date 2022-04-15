@@ -17,6 +17,7 @@ const {
 	addPaymentMethodToCompany,
 	editPaymentMethodInCompany,
 	deletePaymentMethodInCompany,
+	toggleDefaultPaymentMethod,
 } = require("./companies")
 
 const {
@@ -87,4 +88,5 @@ module.exports = {
 	addPaymentMethodToCompany,
 	editPaymentMethodInCompany,
 	deletePaymentMethodInCompany,
+	toggleDefaultPaymentMethod,
 }

@@ -86,7 +86,6 @@ export default {
       if (values.some(i => !i)) this.errors.push('All fields are required')
       if (!this.currentName) this.errors.push("Please, enter a payment method name")
       if (this.errors.length) return
-
       this.$emit('savePaymentMethod', {
         paymentMethodId: this.editablePaymentMethod ? this.editablePaymentMethod._id : null,
         paymentType: this.currentType,

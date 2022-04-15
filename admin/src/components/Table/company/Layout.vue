@@ -1,10 +1,6 @@
 <template lang="pug">
   .services-wrapper
-    .modal(v-if="isModalOpen")
-      EditCompany(:editedId="editedId" @closeModal="toggleModal")
-    Companies(
-      @openModal="toggleModal"
-    )
+    Companies
 
 </template>
 
@@ -16,29 +12,6 @@ import EditCompany from "./EditCompany"
 export default {
   components: {
     Companies,
-    EditCompany,
-  },
-  data() {
-    return {
-      selectedTab: "Companies",
-      isModalOpen: false,
-      editedId: '',
-    }
-  },
-  methods: {
-    ...mapActions({
-      alertToggle: "alertToggle"
-    }),
-    toggleModal(id) {
-      this.isModalOpen = !this.isModalOpen
-      this.editedId = id
-      let elem = document.getElementsByTagName('body')[0]
-      if (this.isModalOpen) {
-        elem.classList.add("hiddenScroll")
-      } else {
-        elem.classList.remove("hiddenScroll")
-      }
-    },
   },
 
 }

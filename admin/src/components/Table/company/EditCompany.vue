@@ -7,7 +7,7 @@
         text="Are you sure?"
         approveValue="Yes"
         notApproveValue="No"
-        @approve="deletingId"
+        @approve="deletePaymentMethod"
         @close="closeApproveModal"
         @notApprove="closeApproveModal"
       )
@@ -28,7 +28,7 @@
           .photo-wrap(v-if="company.photo")
             input.photo-file(type="file" @change="previewPhoto")
             img.photo-image(:src="company.photo")
-        .input
+        .input.input__ia-active
           .input__title Active:
           .input__field
             CheckBox(:isChecked="company.isActive" @check="toggleActive" @uncheck="toggleActive" )
@@ -88,7 +88,8 @@
           .input__select
             SelectSingle(
               placeholder="Option"
-              :options="['Country 1', 'Country 2', 'Country 3']"
+              :hasSearch="true"
+              :options="countries"
               :selectedOption="company.country"
               @chooseOption="setCountry"
             )
@@ -135,6 +136,10 @@
           .item__body
             .item__body--key Payment Type:
             .item__body--value {{ item.paymentType.name }}
+          .item__body
+            .item__body--key Default:
+            .item__body--value
+              CheckBox(:isChecked="item.isDefault" @check="toggleDefault(item._id, true)" @uncheck="toggleDefault(item._id, false)")
           .item__body(v-for="[key, value] in Object.entries(allFieldsOutput(item.otherStatement))" )
             .item__body--key {{ replaceKeyName(key) }}:
             .item__body--value {{ value }}
@@ -176,12 +181,17 @@ export default {
       editingId: null,
       isModalOpened: false,
       timeZones: [],
+      countries: [],
       photoFile: [],
       isImageExist: false,
       isFileError: false,
     }
   },
   methods: {
+    async toggleDefault(id, status) {
+      const result = await this.$http.put(`/api-settings/company/${this.editedId}/payment-method/${id}/is-default`, { status })
+      this.company = result.data
+    },
     async getCompany() {
       try {
         const result = await this.$http.get(`/api-settings/company/${this.editedId}`)
@@ -209,9 +219,9 @@ export default {
     //     this.showFileError(input)
     //   }
     // },
-    async savePaymentMethod(test) {
+    async savePaymentMethod(data) {
       try {
-        const result = await this.$http.post(`/api-settings/company/${this.editedId}/payment-method`, test)
+        const result = await this.$http.post(`/api-settings/company/${this.editedId}/payment-method`, data)
         this.company = result.data
         this.closeModal()
       }catch (err) {
@@ -248,10 +258,17 @@ export default {
       }
     },
     async getTimezones() {
-
       try {
         const result = await this.$http.get('/api/timezones')
         this.timeZones = result.data
+      } catch (err) {
+        this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
+      }
+    },
+    async getCompanies() {
+      try {
+        const result = await this.$http.get('/api/countries')
+        this.countries = result.data
       } catch (err) {
         this.alertToggle({ message: "Error on getting Payment Methods", isShow: true, type: "error" })
       }
@@ -282,12 +299,13 @@ export default {
     async openApproveModal(item) {
       this.deletingId = item._id
     },
-    async closeApproveModal(item) {
+    closeApproveModal() {
       this.deletingId = null
     },
     async deletePaymentMethod() {
       const result = await this.$http.delete(`/api-settings/company/${this.editedId}/payment-method/${this.deletingId}`)
       this.company = result.data
+      this.closeApproveModal()
     },
     closeModal() {
       this.editingId = null
@@ -297,6 +315,7 @@ export default {
   created() {
     this.getCompany()
     this.getTimezones()
+    this.getCompanies()
   }
 }
 </script>
@@ -334,7 +353,7 @@ export default {
   transform: translate(-50%, -49%);
   z-index: 20;
 
-  &__border {
+  &-border {
     padding: 25px;
     background: white;
     box-shadow: rgba(99, 99, 99, 0.12) 0px 0px 1px, rgba(99, 99, 99, 0.2) 0px 1px 2px, rgba(99, 99, 99, 0.05) 0px 2px 1.3px;
@@ -510,7 +529,7 @@ export default {
 }
 
 
-input {
+.input__field > input {
   font-size: 14px;
   color: $text;
   border: 1px solid $border;
@@ -526,5 +545,11 @@ input {
   &:focus {
     border: 1px solid $border-focus;
   }
+}
+.input__ia-active {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 </style>

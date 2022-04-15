@@ -1,57 +1,60 @@
 <template lang="pug">
-  .terms
-    .terms__table
-      GeneralTable(
-        :fields="fields"
-        :tableData="companies"
-        :errors="errors"
-        :areErrors="areErrors"
-        :isApproveModal="isDeleting"
-        @closeErrors="closeErrors"
-        @approve="deleteMethod"
-        @notApprove="cancel"
-        @closeModal="cancel"
-      )
-        template(slot="headerCompanyName" slot-scope="{ field }")
-          .table__header {{ field.label }}
-        template(slot="headerOfficialCompanyName" slot-scope="{ field }")
-          .table__header {{ field.label }}
-        template(slot="headerDefault" slot-scope="{ field }")
-          .table__header {{ field.label }}
-        template(slot="headerActive" slot-scope="{ field }")
-          .table__header {{ field.label }}
-        template(slot="headerIcons" slot-scope="{ field }")
-          .table__header {{ field.label }}
+  .companies
+    .modal(v-if="isModalOpen")
+      EditCompany(:editedId="editedId" @closeModal="toggleModal")
+    .terms
+      .terms__table
+        GeneralTable(
+          :fields="fields"
+          :tableData="companies"
+          :errors="errors"
+          :areErrors="areErrors"
+          :isApproveModal="isDeleting"
+          @closeErrors="closeErrors"
+          @approve="deleteMethod"
+          @notApprove="cancel"
+          @closeModal="cancel"
+        )
+          template(slot="headerCompanyName" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerOfficialCompanyName" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerDefault" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerActive" slot-scope="{ field }")
+            .table__header {{ field.label }}
+          template(slot="headerIcons" slot-scope="{ field }")
+            .table__header {{ field.label }}
 
-        template(slot="companyName" slot-scope="{ row, index }")
-          .table__data(v-if="currentActive !== index") {{ row.companyName }}
-          .table__data(v-else)
-            input(type="text" placeholder="Value" v-model="currentCompanyName")
+          template(slot="companyName" slot-scope="{ row, index }")
+            .table__data(v-if="currentActive !== index") {{ row.companyName }}
+            .table__data(v-else)
+              input(type="text" placeholder="Value" v-model="currentCompanyName")
 
-        template(slot="officialCompanyName" slot-scope="{ row, index }")
-          .table__data(v-if="currentActive !== index") {{ row.officialCompanyName }}
-          .table__data(v-else)
-            input(type="text" placeholder="Value" v-model="currentOfficialCompanyName")
+          template(slot="officialCompanyName" slot-scope="{ row, index }")
+            .table__data(v-if="currentActive !== index") {{ row.officialCompanyName }}
+            .table__data(v-else)
+              input(type="text" placeholder="Value" v-model="currentOfficialCompanyName")
 
-        template(slot="default" slot-scope="{ row, index }")
-          .table__active(v-if="currentActive !== index")
-            CheckBox(:isChecked="row.isDefault" :isDisabled="true")
-          .table__active(v-else)
-            CheckBox(:isChecked="currentIsDefault" @check="toggleActive(index, 'currentIsDefault')" @uncheck="toggleActive(index, 'currentIsDefault')")
+          template(slot="default" slot-scope="{ row, index }")
+            .table__active(v-if="currentActive !== index")
+              CheckBox(:isChecked="row.isDefault" :isDisabled="true")
+            .table__active(v-else)
+              CheckBox(:isChecked="currentIsDefault" @check="toggleActive(index, 'currentIsDefault')" @uncheck="toggleActive(index, 'currentIsDefault')")
 
-        template(slot="active" slot-scope="{ row, index }")
-          .table__active(v-if="currentActive !== index")
-            CheckBox(:isChecked="row.isActive" :isDisabled="true")
-          .table__active(v-else)
-            CheckBox(:isChecked="currentIsActive" @check="toggleActive(index, 'currentIsActive')" @uncheck="toggleActive(index, 'currentIsActive')")
+          template(slot="active" slot-scope="{ row, index }")
+            .table__active(v-if="currentActive !== index")
+              CheckBox(:isChecked="row.isActive" :isDisabled="true")
+            .table__active(v-else)
+              CheckBox(:isChecked="currentIsActive" @check="toggleActive(index, 'currentIsActive')" @uncheck="toggleActive(index, 'currentIsActive')")
 
-        template(slot="icons" slot-scope="{ row, index }")
-          .table__icons
-            img.table__icon(v-for="(icon, key) in iconsWithEditingModal" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': !isActive(key, index)}")
+          template(slot="icons" slot-scope="{ row, index }")
+            .table__icons
+              img.table__icon(v-for="(icon, key) in iconsWithEditingModal" :src="icon.icon" @click="makeAction(index, key)" :class="{'table__opacity': !isActive(key, index)}")
 
-      .table__empty(v-show="!companies.length") No data...
+        .table__empty(v-show="!companies.length") No data...
 
-    Add(@add="addData")
+      Add(@add="addData")
 
 </template>
 
@@ -62,6 +65,7 @@ import crudIcons from "@/mixins/crudIcons"
 import GeneralTable from "../../GeneralTable"
 import CheckBox from "../../CheckBox"
 import SelectMulti from "../../SelectMulti"
+import EditCompany from "./EditCompany"
 
 export default {
   mixins: [ crudIcons ],
@@ -85,7 +89,9 @@ export default {
       areErrors: false,
       errors: [],
       isDeleting: false,
-      deleteIndex: -1
+      deleteIndex: -1,
+      isModalOpen: false,
+      editedId: '',
     }
   },
   methods: {
@@ -102,6 +108,17 @@ export default {
     toggleActive(index, field) {
       if (this.currentActive !== index) return
       this[field] = !this[field]
+    },
+    toggleModal(id) {
+      this.isModalOpen = !this.isModalOpen
+      this.editedId = id
+      let elem = document.getElementsByTagName('body')[0]
+      if (this.isModalOpen) {
+        elem.classList.add("hiddenScroll")
+      } else {
+        elem.classList.remove("hiddenScroll")
+      }
+      this.getCompanies()
     },
     async makeAction(index, key) {
       if (this.currentActive !== -1 && this.currentActive !== index) return this.isEditing()
@@ -122,7 +139,7 @@ export default {
         this.isDeleting = true
       }
       if (key === "editModal") {
-        this.$emit('openModal', this.companies[index]._id)
+        this.toggleModal(this.companies[index]._id)
       }
     },
     setEditionData(index) {
@@ -133,16 +150,16 @@ export default {
       this.currentIsActive = this.companies[index].isActive
     },
     async checkErrors(index) {
-    //   // this.errors = []
-    //   // if (this.currentActive === -1) return
-    //   // if (!this.currentName) this.errors.push("Name should not be empty!")
-    //   // if (!this.currentMinimumAmount) this.errors.push("Minimum Amount should not be empty!")
-    //   // if (!this.currentKeys.length) this.errors.push("Fields should not be empty!")
-    //   //
-    //   // if (this.errors.length) {
-    //   //   this.areErrors = true
-    //   //   return
-    //   // }
+      this.errors = []
+      if (this.currentActive === -1) return
+      if (!this.currentCompanyName) this.errors.push("Name should not be empty!")
+      if (!this.currentOfficialCompanyName) this.errors.push("Full name should not be empty!")
+      if(!(this.companies.filter(({_id})=> _id !== this.companies[index]._id).some(({isDefault}) => isDefault ) || this.currentIsDefault)) this.errors.push("At least one company must be default!")
+
+      if (this.errors.length) {
+        this.areErrors = true
+        return
+      }
       await this.saveChanges(index)
     },
     closeErrors() {
@@ -215,14 +232,15 @@ export default {
   },
   computed: {
     iconsWithEditingModal() {
-      return {  ...this.icons, editModal :  { icon: require("../../../assets/images/latest-version/i-edit.png") }}
+      return {  ...this.icons, editModal :  { icon: require("../../../assets/images/latest-version/files.png") }}
     }
   },
   components: {
     SelectMulti,
     CheckBox,
     GeneralTable,
-    Add
+    Add,
+    EditCompany,
   },
   created() {
     this.getCompanies()
@@ -279,5 +297,30 @@ export default {
     width: 100%;
     height: 40px;
   }
+}
+
+.services-wrapper {
+  background-color: $white;
+  padding: 25px;
+  box-shadow: $box-shadow;
+  position: relative;
+
+  width: 900px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  margin: 50px;
+}
+.modal {
+  position: fixed;
+  left: 255px;
+  top: 0px;
+  box-sizing: border-box;
+  width: calc(100% - 255px);
+  padding: 50px;
+  box-shadow: $box-shadow;
+  background: white;
+  border-radius: 2px;
+  z-index: 30000;
+  height: 100%;
 }
 </style>

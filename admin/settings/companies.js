@@ -22,7 +22,7 @@ const getCompany = async (id) => {
 }
 
 const editCompanyBase = async (id, data) => {
-	await Company.findOneAndUpdate({isDefault: true}, {isDefault: false})
+	if (data?.isDefault) await Company.findOneAndUpdate({isDefault: true}, {isDefault: false})
 	await Company.findByIdAndUpdate(id, data)
 	return getCompanies()
 }
@@ -101,6 +101,11 @@ const deletePaymentMethodInCompany = async (companyId, paymentMethodId) => {
 	return getCompany(companyId)
 }
 
+const toggleDefaultPaymentMethod = async (companyId, paymentMethodId, status) => {
+	await Company.findByIdAndUpdate(companyId, { 'paymentMethods.$[i].isDefault': status  }, { arrayFilters: [ { 'i._id': paymentMethodId } ] })
+	return getCompany(companyId)
+}
+
 const deleteCompany = async (id) => {
 	await Company.findByIdAndDelete(id)
 	await removeDir(PATH, id.toString())
@@ -117,4 +122,5 @@ module.exports = {
 	editPaymentMethodInCompany,
 	deletePaymentMethodInCompany,
 	deleteCompany,
+	toggleDefaultPaymentMethod,
 }

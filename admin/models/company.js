@@ -81,6 +81,10 @@ const CompanySchema = new Schema({
 			type: Schema.Types.ObjectId,
 			ref: 'PaymentMethods'
 		},
+		isDefault: {
+			type: Boolean,
+			default: true
+		},
 		otherStatement: {
 			type: Object,
 			default: {}
