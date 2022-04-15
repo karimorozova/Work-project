@@ -27,7 +27,7 @@
             img(src="../../../assets/images/from-blank.svg")
           .block__check
             CustomRadio(:isChecked="!isFromTemplate" @toggleRadio="() => toggle('blank')")
-          .block__description(@click="toggle('blank')") Black Form
+          .block__description(@click="toggle('blank')") Blank Form
 
     Button(value="Start" style="margin-top: 20px;" :customClass="'middle'" :isDisabled="!someOptionChose" @clicked="setTemplate")
 </template>
