@@ -18,9 +18,3 @@ exports.updateInvoiceItem = async (invoiceId, itemId, updateData) => {
 
 	}
 }
-
-
-
-
-// { 'requestForm.sourceFiles.$[i].isCheck': check },
-// { arrayFilters: [ { 'i.path': path } ] })

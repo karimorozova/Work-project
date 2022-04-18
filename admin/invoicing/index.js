@@ -21,7 +21,14 @@ const {
 	deleteInvoiceItemFromReport,
 } = require('./deleteInvoice')
 
+const {
+	sendInvoice,
+	generateInvoiceFileAndSave,
+} = require('./actions')
+
 module.exports = {
+	generateInvoiceFileAndSave,
+	sendInvoice,
 	createInvoice,
 	createInvoiceItem,
 	createInvoiceFromReport,

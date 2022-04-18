@@ -555,6 +555,10 @@ async function pdfPPPReportTemplate(report, BI) {
 			</div>`
 }
 
+const getPdfInvoice = () => {
+	return `asd`
+}
+
 module.exports = {
 	pdfPPPReportTemplate,
 	invoicingMessage,
@@ -566,5 +570,6 @@ module.exports = {
 	projectMiddleCancelledMessage,
 	getPdfOfQuote,
 	messageForClientSendCostQuote,
-	getNotifyDeliveryMessage
+	getNotifyDeliveryMessage,
+	getPdfInvoice
 }

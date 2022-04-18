@@ -10,8 +10,20 @@ const {
 	updateInvoiceItem,
 	deleteInvoiceItem,
 	deleteInvoiceItemFromReport,
-	getInvoicesForOptions
+	getInvoicesForOptions,
+	sendInvoice
 } = require('../invoicing')
+
+router.post("/send-invoice", async (req, res) => {
+	const { _invoiceId, clientContactsEmails } = req.body
+	try {
+		await sendInvoice(_invoiceId, clientContactsEmails)
+		res.send('Done')
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on invoicing sending')
+	}
+})
 
 router.post("/create-invoice", async (req, res) => {
 	const { customerId, clientBillingInfoId } = req.body

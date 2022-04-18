@@ -1,5 +1,5 @@
 const { Company } = require("../models")
-const { createDir, removeDir } = require("../helpers/files")
+const { createDir, removeDir } = require("../utils/folder")
 const { company } = require("../enums")
 const { moveFile } = require("../utils/movingFile")
 const fs = require("fs")

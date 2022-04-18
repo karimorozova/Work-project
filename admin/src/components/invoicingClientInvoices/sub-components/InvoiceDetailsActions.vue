@@ -6,7 +6,7 @@
         @emailAction="fillSelectedEmail"
       )
       .modal-sender__buttons
-        Button(value="Send" :isDisabled="!!requestCounter || !selectedMails.length" @clicked="sendInvoice")
+        Button(value="Send" :isDisabled="!!requestCounter && !selectedMails.length" @clicked="sendInvoice")
         Button(value="Cancel" :isDisabled="!!requestCounter" @clicked="closeEmailSender" :outline="true")
 
     .details
@@ -32,7 +32,7 @@
 import IconButton from "../../IconButton"
 import MailChips from "../../MailChips"
 import Button from "../../Button"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 
 
 export default {
@@ -51,6 +51,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions({
+      alertToggle: "alertToggle"
+    }),
     fillSelectedEmail(emailArr) {
       this.selectedMails = emailArr
     },
@@ -73,7 +76,12 @@ export default {
       this.isEmailSender = false
     },
     sendInvoice() {
-      console.log('asdas')
+      try {
+        this.$http.post('/invoicing/send-invoice', { _invoiceId: this.invoice._id, clientContactsEmails: this.selectedMails })
+        this.alertToggle({ message: "Invoice sent", isShow: true, type: "success" })
+      } catch (err) {
+        console.log(err)
+      }
     }
   },
   computed: {

@@ -2,6 +2,8 @@ const { Invoice, InvoicingClientReports, Clients, PaymentTerms } = require("../m
 const { getAmountByPercent } = require("./helpers")
 const { updateInvoice } = require("./updateInvoice")
 const moment = require("moment")
+const { createDir } = require("../utils/folder")
+const DIR = './dist/invoice/'
 
 const createInvoice = async (_customerId, _clientBillingInfoId) => {
 	try {
@@ -24,6 +26,7 @@ const createInvoice = async (_customerId, _clientBillingInfoId) => {
 			dueDate: new Date(moment().add((billingInfo?.paymentTerms?.value || 21), 'days').format('YYYY-MM-DD'))
 		})
 
+		await createDir(DIR, invoice._id.toString())
 		return invoice._id
 	} catch (e) {
 
@@ -69,6 +72,7 @@ const createInvoiceFromReport = async ({ _reportId, _customerId, _clientBillingI
       amount = +(amount + taxTotal).toFixed(2)
 		}
 
+		await createDir(DIR, invoice._id.toString())
 		await createInvoiceItem(invoice._id, { title, quantity, type, rate, tax, taxType, amount, reportId: _reportId })
 	} catch (e) {
 
