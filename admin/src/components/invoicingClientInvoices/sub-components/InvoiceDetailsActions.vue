@@ -2,12 +2,12 @@
   .template
     .modal-sender(v-if="isEmailSender")
       MailChips(
-
+        :emails="emails"
+        @emailAction="fillSelectedEmail"
       )
       .modal-sender__buttons
-        Button(value="Send" :isDisabled="!!requestCounter || !selectedMails.length" v-if="" @clicked="sendInvoice")
+        Button(value="Send" :isDisabled="!!requestCounter || !selectedMails.length" @clicked="sendInvoice")
         Button(value="Cancel" :isDisabled="!!requestCounter" @clicked="closeEmailSender" :outline="true")
-
 
     .details
       .details__invoice
@@ -26,20 +26,18 @@
         )
           i.fa-solid.fa-envelope
 
-
-
 </template>
 
 <script>
 import IconButton from "../../IconButton"
-import MailChips from "../../MailChips";
-import Button from "../../Button";
-import { mapGetters } from "vuex";
+import MailChips from "../../MailChips"
+import Button from "../../Button"
+import { mapGetters } from "vuex"
 
 
 export default {
   name: "InvoiceDetailsActions",
-  components: {Button, MailChips, IconButton },
+  components: { Button, MailChips, IconButton },
   props: {
     invoice: {
       type: Object
@@ -49,35 +47,40 @@ export default {
     return {
       selectedMails: [],
       isEmailSender: false,
+      emails: []
     }
   },
   methods: {
+    fillSelectedEmail(emailArr) {
+      this.selectedMails = emailArr
+    },
     editInvoice() {
       this.$router.push(`/pangea-finance/receivables-reports/invoice/${ this.$route.params.id }/edit`)
     },
-    openEmailSender(){
-      // const { accountManager } = this.invoice
-      // this.selectedMails.push({
-      //   _id: accountManager._id,
-      //   email: accountManager.email,
-      //   photo: accountManager.photo,
-      //   firstName: accountManager.firstName
-      // })
-      // console.log(this.invoice)
+    openEmailSender() {
+      const { clientBillingInfo, customer: { billingInfo, contacts: allCustomerContacts } } = this.invoice
+      const { contacts } = billingInfo.find(({ _id }) => `${ _id }` === `${ clientBillingInfo }`)
+
+      this.emails = contacts.map(id => {
+        const { _id, email, photo, firstName, surname } = allCustomerContacts.find(({ _id }) => `${ _id }` === id)
+        return {
+          _id, email, photo, firstName: `${ firstName } ${ surname } || ''`
+        }
+      })
       this.isEmailSender = true
     },
-    closeEmailSender(){
+    closeEmailSender() {
       this.isEmailSender = false
     },
-    sendInvoice(){
+    sendInvoice() {
       console.log('asdas')
-    },
+    }
   },
   computed: {
     ...mapGetters({
       requestCounter: 'getRequestCounter'
     })
-  },
+  }
 }
 </script>
 
@@ -120,19 +123,19 @@ export default {
   }
 }
 
-.modal-sender{
+.modal-sender {
   position: absolute;
   width: 600px;
   left: 400px;
-  top: 50%;
+  top: 320px;
   padding: 25px;
   background: white;
   border-radius: 2px;
   box-shadow: $box-shadow;
 
-  &__buttons{
+  &__buttons {
     display: flex;
-    justify-content:center;
+    justify-content: center;
     gap: 20px;
     margin-top: 25px;
   }

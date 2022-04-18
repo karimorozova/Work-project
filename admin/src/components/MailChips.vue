@@ -41,6 +41,7 @@ export default {
     emails: {
       type: Array,
       default: () => []
+      // ex. { _id, email, photo, firstName }
     }
   },
   data() {
