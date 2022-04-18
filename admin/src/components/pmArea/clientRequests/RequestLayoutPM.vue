@@ -146,8 +146,7 @@ export default {
     box-shadow: $box-shadow;
     width: 420px;
     box-sizing: border-box;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin-top: 25px;
     border-radius: 2px;
     background: white;
   }
@@ -161,9 +160,8 @@ export default {
 }
 
 .sub-wrapper {
-  margin-left: 50px;
+  margin-left: 25px;
 }
-
 
 .form {
   position: relative;
@@ -185,7 +183,7 @@ export default {
     align-items: center;
 
     &-title {
-      font-size: 18px;
+      font-size: 16px;
       font-family: 'Myriad600';
     }
   }

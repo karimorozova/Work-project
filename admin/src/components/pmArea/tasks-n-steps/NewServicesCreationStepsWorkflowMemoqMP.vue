@@ -130,6 +130,7 @@ export default {
       stepsAndUnits.push({
         step,
         start: '',
+        isReceivableVisible: true,
         deadline: '',
         receivables: { unit: step.calculationUnit[0], quantity: 0 },
         payables: { unit: step.calculationUnit[0], quantity: 0 }

@@ -264,7 +264,7 @@
       position: relative;
       max-width: 100%;
       text-align: center;
-      font-size: 18px;
+      font-size: 16px;
       margin-bottom: 15px;
     }
 

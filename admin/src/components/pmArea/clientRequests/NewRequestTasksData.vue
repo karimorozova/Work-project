@@ -15,24 +15,21 @@
             :isDisabled="true"
           )
 
-        //.extraServices
-        //  .extraServices__title Extra Services:
-        //  Toggler(:isDisabled="false" :isActive="isAdditions" @toggle="toggleAdditions()")
-
-        //.extraServicesTable(v-if="isAdditions")
-        //  StepsAdditions(
-        //    :stepsAdditions="tasksData.stepsAdditions ? tasksData.stepsAdditions : []"
-        //    @save="setAdditions"
-        //    @delete="setAdditions"
-        //  )
-
       .language
         NewTasksLangsDuoRequest
 
-    .taskData__row(v-if="tasksData && tasksData.stepsAndUnits" )
-      NewRequestServicesCreationStepsWorkflow(
-        :templates="templates"
-      )
+    .taskData__row(v-if="currentProject.requestForm.service")
+      .tabs-workflow
+        .tabs-workflow__title Workflow process:
+        .tabs-workflow__tabs
+          Tabs(
+            :tabs="tabsWorkflow"
+            :selectedTab="selectedTabWorkflow"
+            @setTab="setTabWorkflow"
+          )
+      NewRequestCreationStepsWorkflowClassic(v-if="selectedTabWorkflow === 'Alpha'")
+      NewRequestServicesCreationStepsWorkflowMemoq(v-if="selectedTabWorkflow === 'Memoq'")
+      NewRequestServicesCreationStepsWorkflowMemoqMT(v-if="selectedTabWorkflow === 'Memoq MT'")
 
     .taskData__filesOptions
       .taskData__files
@@ -43,28 +40,23 @@
         )
 
     .taskData__button
-      Button(:value="'Add Tasks & Steps'" @clicked="saveTasksChecks")
+      Button(:value="currentTaskIdForUpdate ? `Update Tasks & Steps` : `Add Tasks & Steps`" @clicked="saveTasksChecks")
 
 </template>
 
 <script>
-// import { mapActions, mapGetters } from "vuex"
-// import SelectSingle from "../../SelectSingle"
-// import TasksLangsDuo from "./TasksLangsDuo"
-// import NewServicesCreationStepsWorkflow from "./NewServicesCreationStepsWorkflow"
-// import TasksFiles from "./TasksFiles"
-// import Toggler from "../../Toggler"
-// import StepsAdditions from "./stepsAdditions"
-// import Button from "../../Button"
 import ValidationErrors from "../../ValidationErrors"
 import { mapActions, mapGetters } from "vuex"
 import SelectSingle from "../../SelectSingle"
 import TasksLangsDuo from "../tasks-n-steps/TasksLangsDuo"
 import NewTasksLangsDuoRequest from "./NewTasksLangsDuoRequest"
-import NewRequestServicesCreationStepsWorkflow from "./NewRequestServicesCreationStepsWorkflow"
 import RequestTasksFiles from "./tasks-n-steps/RequestTasksFiles"
 import Button from "../../Button"
 import { clearTasksDataRequest } from "../../../vuex/clientsRequests/actions"
+import Tabs from "../../Tabs"
+import NewRequestCreationStepsWorkflowClassic from './NewRequestCreationStepsWorkflowClassic'
+import NewRequestServicesCreationStepsWorkflowMemoq from "./NewRequestServicesCreationStepsWorkflowMemoq"
+import NewRequestServicesCreationStepsWorkflowMemoqMT from "./NewRequestServicesCreationStepsWorkflowMemoqMP"
 
 export default {
   props: {
@@ -87,22 +79,19 @@ export default {
       templates: [],
       isAdditions: false,
       IsErrorModal: false,
+      selectedTabWorkflow: 'Alpha',
       errors: []
     }
   },
   methods: {
+    setTabWorkflow({ index }) {
+      this.selectedTabWorkflow = this.tabsWorkflow[index]
+      this.setDataValue({ prop: "template", value: {} })
+      this.setStepsAndUnitByService()
+    },
     saveTasksChecks() {
       this.errors = []
-      const { service } = this.currentProject.requestForm
-
-      if(service.title === 'Translation'){
-        if(!this.tasksData.stepsAndUnits.length || this.tasksData.stepsAndUnits[0].step.title !== 'Translation'){
-          this.errors.push("Translation job should be the first step.")
-        }
-      }
-
       if (!this.tasksData.targets || !this.tasksData.targets.length) this.errors.push("Please, select Target language(s).")
-
       if (!this.currentTaskIdForUpdate && this.tasksData.stepsAndUnits.some(item => item.step.title === "Translation")) {
         if ((!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) && (!this.tasksData.sourceFilesVault || !this.tasksData.sourceFilesVault.length)) {
           this.errors.push("Please, upload Source file(s).")
@@ -111,7 +100,6 @@ export default {
           this.errors.push('Target and Source Languages cannot be a same if a step "Translation" is selected')
         }
       }
-
       if (!this.tasksData.stepsAndUnits.length) {
         this.errors.push("Please, select minimum one Step")
       } else {
@@ -127,11 +115,6 @@ export default {
           this.errors.push(`Please, check dates for ${ stepAndUnit.step.title }`)
         }
       }
-      // if (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length) {
-      //   if ((!this.tasksData.sourceFilesVault || !this.tasksData.sourceFilesVault.length) && (!this.tasksData.sourceFiles || !this.tasksData.sourceFiles.length)) {
-      //     this.errors.push("Please, upload Source file(s).")
-      //   }
-      // }
       if ((this.tasksData.refFiles && this.tasksData.refFiles.length) && (this.tasksData.sourceFiles && this.tasksData.sourceFiles.length)) {
         if (
             new Set([ ...this.tasksData.sourceFiles, ...this.tasksData.refFiles ]
@@ -180,29 +163,26 @@ export default {
         !!this.currentTaskIdForUpdate && this.alertToggle({ message: 'Task updated!', isShow: true, type: "success" })
       } catch (err) {
         this.alertToggle({ message: 'Error on creating/updating task', isShow: true, type: "error" })
-      } finally {
-
       }
     },
     closeErrors() {
       this.errors = []
       this.IsErrorModal = false
     },
-    // setAdditions(data) {
-    //   this.setDataValue({ prop: "stepsAdditions", value: data })
-    // },
-    // toggleAdditions() {
-    //   this.isAdditions = !this.isAdditions
-    // },
     async buildAutoData() {
-      if (this.currentProject.requestForm.service.title === 'Translation') await this.getMemoqTemplates()
+      this.selectedTabWorkflow = 'Alpha'
 
       if (this.currentTaskIdForUpdate) {
         const { tasksAndSteps } = this.currentProject
         const { taskData } = tasksAndSteps.find(item => item.taskId === this.currentTaskIdForUpdate)
+
         if (taskData.stepsAndUnits[0].payables.unit.type === 'CAT Wordcount') {
+          const step = taskData.stepsAndUnits[0].step.title
+          if (step === 'Translation') this.selectedTabWorkflow = 'Memoq'
+          if (step === 'Post-Editing') this.selectedTabWorkflow = 'Memoq MT'
           this.setDataValue({ prop: "template", value: taskData.template })
         }
+
         this.setDataValue({ prop: "targets", value: taskData.targets })
         this.setDataValue({ prop: "stepsAndUnits", value: taskData.stepsAndUnits })
         return
@@ -211,61 +191,59 @@ export default {
       this.setStepsAndUnitByService()
     },
     setStepsAndUnitByService() {
-      const { service } = this.currentProject.requestForm
-      const steps = service.steps.map(item => ({ step: this.allSteps.find(({ _id }) => _id.toString() === item.step.toString()) }))
       const stepsAndUnits = []
-      for (const { step } of steps) {
+      const { service } = this.currentProject.requestForm
+      let steps = service.steps.map(item => ({ step: this.allSteps.find(({ _id }) => _id.toString() === item.step.toString()) }))
+
+      if (this.selectedTabWorkflow === 'Alpha' || service.title !== 'Translation') {
+        for (let { step } of steps) {
+          let units = []
+          units = step.calculationUnit.filter(({ type }) => type !== 'CAT Wordcount')
+          collectWorkFlow(step, units)
+        }
+      }
+      if (this.selectedTabWorkflow === 'Memoq') {
+        for (let { step } of steps) {
+          if (step.title !== 'Translation' && step.title !== 'Revising') continue
+          let units = []
+          units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
+          collectWorkFlow(step, units)
+        }
+      }
+      if (this.selectedTabWorkflow === 'Memoq MT') {
+        steps = steps.reduce((acc, curr) => {
+          curr.step.title === 'Translation'
+              ? acc[1] = curr
+              : curr.step.title === 'Revising'
+                  ? acc[2] = curr
+                  : acc[0] = curr
+          return acc
+        }, [])
+        for (let { step } of steps) {
+          let units = []
+          units = step.calculationUnit.filter(({ type }) => type === 'CAT Wordcount')
+          collectWorkFlow(step, units)
+        }
+      }
+
+      function collectWorkFlow(step, units) {
         stepsAndUnits.push({
           step,
           start: '',
           deadline: '',
-          receivables: { unit: step.calculationUnit[0], quantity: 0 },
-          payables: { unit: step.calculationUnit[0], quantity: 0 }
+          isReceivableVisible: true,
+          receivables: {
+            unit: units[0],
+            quantity: 0
+          },
+          payables: {
+            unit: units[0],
+            quantity: 0
+          }
         })
       }
+
       this.setDataValue({ prop: "stepsAndUnits", value: stepsAndUnits })
-    },
-    // getServiceSourceLanguages(service) {
-    //   const { customer: { services }, industry } = this.currentProject
-    //   const neededServices = services
-    //       .filter(item => item.services[0] === service._id.toString() && item.industries[0] === industry._id)
-    //       .map(item => item.sourceLanguage)
-    //   return this.allLanguages.filter(a => [ ...new Set(neededServices) ].some(b => a._id.toString() === b))
-    // },
-    // async setService({ option }) {
-    // const service = this.allServices.find(item => item.title === option)
-    // this.setDataValue({ prop: "service", value: service })
-    //
-    // if (service.title === 'Translation') await this.getMemoqTemplates()
-    //
-    // const source = this.getServiceSourceLanguages(service)[0]
-    // this.setDataValue({ prop: "source", value: source })
-    // this.setDataValue({ prop: "targets", value: [] })
-    //
-    // this.setStepsAndUnitByService(service)
-    // },
-    // activeClientServices() {
-    //   let finalServicesArr = []
-    //   const { industry, customer: { services, rates: { stepMultipliersTable } } } = this.currentProject
-    //   const arrayOfClientServices = [ ...new Set(services.filter(({ industries }) => industries[0] === industry._id).map(({ services }) => services).flat()) ]
-    //   const clientServices = this.allServices.filter((a) => arrayOfClientServices.some((b) => a._id.toString() === b))
-    //
-    //   clientServices.forEach(elem => {
-    //     if (elem.steps.length) {
-    //       const stepsIds = [ ...elem.steps ].map(i => `${ i.step._id }`)
-    //       const stepRates = stepMultipliersTable.filter(({ step }) => stepsIds.includes(`${ step }`))
-    //       if (stepRates.length) if (!stepRates.every(({ isActive }) => !isActive)) finalServicesArr.push(elem)
-    //     }
-    //   })
-    //   return finalServicesArr
-    // },
-    async getMemoqTemplates() {
-      try {
-        const result = await this.$http.get("/memoqapi/templates")
-        this.templates = result.data
-      } catch (err) {
-        this.templates = [ { name: 'No Templates' } ]
-      }
     },
     ...mapActions({
       clearTasksDataRequest: "clearTasksDataRequest",
@@ -278,6 +256,9 @@ export default {
     ...mapGetters({
       tasksData: "getTasksDataRequest"
     }),
+    tabsWorkflow() {
+      return [ 'Alpha', 'Memoq', 'Memoq MT' ].filter(i => this.currentProject.requestForm.service.title === 'Translation' ? i : i !== 'Memoq' && i !== 'Memoq MT')
+    },
     isStepsWithCATWordcount() {
       return this.tasksData.stepsAndUnits && this.tasksData.stepsAndUnits.every(({ receivables }) => receivables.unit.type === "CAT Wordcount")
     },
@@ -295,9 +276,12 @@ export default {
     this.clearTasksDataRequest()
   },
   components: {
+    NewRequestServicesCreationStepsWorkflowMemoqMT,
+    NewRequestServicesCreationStepsWorkflowMemoq,
+    NewRequestCreationStepsWorkflowClassic,
+    Tabs,
     Button,
     RequestTasksFiles,
-    NewRequestServicesCreationStepsWorkflow,
     NewTasksLangsDuoRequest,
     TasksLangsDuo,
     ValidationErrors,
@@ -310,14 +294,65 @@ export default {
 <style scoped lang="scss">
 @import "../../../assets/scss/colors";
 
+.container {
+  position: relative;
+}
+
 .taskData {
   position: relative;
   border: 1px solid $light-border;
   padding: 25px;
   margin-bottom: 30px;
 
+  &__xtm {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+
+    &-fileWrapper {
+      height: 30px;
+      padding: 0 7px;
+      display: flex;
+      border: 1px solid $border;
+      align-items: center;
+      gap: 5px;
+      border-radius: 2px;
+    }
+
+    &-fileName {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 260px;
+      opacity: 0.5;
+    }
+
+    &-removeFile {
+      font-size: 22px;
+      cursor: pointer;
+      height: 22px;
+      width: 22px;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      font-family: Myriad900;
+      opacity: 0.8;
+      transition: ease 0.2s;
+
+      &:hover {
+        opacity: 1
+      }
+    }
+  }
+
+  &__memoqLink {
+    display: flex;
+    gap: 25px;
+  }
+
   &__button {
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     justify-content: center;
   }
@@ -340,8 +375,8 @@ export default {
 
 .extraServices {
   display: flex;
-  gap: 10px;
-  margin: 17px 0;
+  gap: 12px;
+  margin: 20px 0;
 }
 
 .drop {
@@ -349,9 +384,40 @@ export default {
   position: relative;
   height: 32px;
 
+  &__input {
+    input {
+      font-size: 14px;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: 2px;
+      box-sizing: border-box;
+      padding: 0 7px;
+      outline: none;
+      height: 32px;
+      width: 690px;
+      font-family: 'Myriad400';
+      transition: .1s ease-out;
+
+      &:focus {
+        border: 1px solid $border-focus;
+      }
+    }
+  }
+
   &__title {
     margin-bottom: 3px;
     position: relative;
+  }
+}
+
+.tabs-workflow {
+  margin-top: 20px;
+  display: flex;
+  gap: 25px;
+  align-items: baseline;
+  border-bottom: 1px solid $light-border;
+
+  &__title {
   }
 }
 </style>

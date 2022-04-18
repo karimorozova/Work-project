@@ -1,6 +1,6 @@
 <template lang="pug">
   .wrapper
-    .steps(v-if="tasksData.service && tasksData.stepsAndUnits")
+    .steps
 
       .steps__modal-without-border(v-if="isDeleteStep")
         ApproveModal(
@@ -30,37 +30,32 @@
           .buttons__btn
             Button(@clicked="closeAddStepModal" value="Cancel" :outline="true")
 
-      .workflow
-
-        .steps__modal-body(style="margin-top: 20px;")
-          .step__setting-title Template:
-          .drop(v-if="templates.length")
-            SelectSingle(
-              :hasSearch="true"
-              :selectedOption="tasksData.template ? tasksData.template.name : ''"
-              :options="templates.map(i => i.name)"
-              placeholder="Option"
-              @chooseOption="setTemplate"
-            )
+      draggable( :value="tasksData.stepsAndUnits" @input="dragAndDropSteps" handle=".handle")
 
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
           .step__titleRow
             .step__titleRow-title {{ item.step.title }}
-            .step__titleRow-desctiptions
+            .step__titleRow-desctiptions(v-if="isDisabledPayablesEdit" )
               .step__titleRow-desctiptions-title-date Dates
               .step__titleRow-desctiptions-title Receivables & Payables
+            .step__titleRow-desctiptions(v-else)
+              .step__titleRow-desctiptions-title-date Dates
+              .step__titleRow-desctiptions-title Receivables
+              .step__titleRow-desctiptions-title Payables
 
           .step__detailsRow
-            .step__icons(v-if="item.step.title !== 'Translation'")
+            .step__icons
               .step__icon(@click="openDeleteAcceptModal(index)" style="cursor: pointer;")
                 i.fas.fa-trash
+              .step__icon.handle(style="cursor: grab")
+                i.fas.fa-arrows-alt-v
 
             .step__date
               .step__datepicker
                 .step__datepicker-title Start And Deadline:
                 .step__datepicker-input
                   DatePicker.range-with-one-panel(
-                    :value="[item.start, item.deadline]"
+                    :value="[new Date(item.start), new Date(item.deadline)]"
                     @input="(e) => setDates(e, index)"
                     format="DD-MM-YYYY, HH:mm"
                     prefix-class="xmx"
@@ -77,18 +72,53 @@
                 .step__setting-title Unit:
                 .drop
                   SelectSingle(
-                    :isDisabled="true"
                     :selectedOption="item.receivables.unit.type || ''"
-                    :options="item.step.calculationUnit.map(i => i.type)"
+                    :options="item.step.calculationUnit.map(i => i.type).filter(i => i !== 'CAT Wordcount')"
                     placeholder="Option"
                     @chooseOption="(e) => setUnit(e, 'receivables', index)"
                   )
+              .step__setting
+                .step__setting-title Quantity:
+                input(
+                  type="number"
+                  placeholder="Value"
+                  min="0"
+                  max="100000"
+                  :value="item.receivables.quantity || ''"
+                  @change="(e) => setQuantity(e, 'receivables', index)"
+                )
+
+            .step__settings(v-if="!isDisabledPayablesEdit")
+              .step__setting
+                .step__setting-title Unit:
+                .drop
+                  SelectSingle(
+                    :selectedOption="item.payables.unit.type || ''"
+                    :options="item.step.calculationUnit.map(i => i.type).filter(i => i !== 'CAT Wordcount')"
+                    placeholder="Option"
+                    @chooseOption="(e) => setUnit(e, 'payables', index)"
+                    :isDisabled="isDisabledPayablesEdit"
+                  )
+              .step__setting
+                .step__setting-title Quantity:
+                input(
+                  type="number"
+                  :disabled="isDisabledPayablesEdit"
+                  placeholder="Value"
+                  min="0"
+                  max="100000"
+                  :value="item.payables.quantity || ''"
+                  @change="(e) => setQuantity(e, 'payables', index)"
+                )
 
     .add
       .add__row
-        .add__add(v-if="tasksData.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
+        .add__add
           Add(@add="openAddStepModal")
-        .add__add(v-else)
+        .add__add
+        .add__options
+          CheckBox(:isChecked="isDisabledPayablesEdit" @check="toggleBox" @uncheck="toggleBox")
+          span Same payable options
 
 </template>
 
@@ -105,11 +135,11 @@ import Button from "../../Button"
 import ApproveModal from "../../ApproveModal"
 
 export default {
-  name: "NewServicesCreationStepsWorkflowMemoq",
   components: { Button, CheckBox, Add, SelectSingle, draggable, DatePicker, ApproveModal },
   data() {
     return {
-      templates: [],
+      time: {},
+      isDisabledPayablesEdit: true,
       isAddModal: false,
       isDeleteStep: false,
       deleteStepIndex: '',
@@ -123,15 +153,17 @@ export default {
       return date < start || new Date(this.project.deadline) <= date
     },
     addStep() {
-      const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
+      const step = this.allSteps.find(item => item.title === this.newStep)
+      const units = step.calculationUnit.filter(i => i.type !== 'CAT Wordcount')
+
       let stepsAndUnits = this.tasksData.stepsAndUnits
       stepsAndUnits.push({
         step,
         isReceivableVisible: true,
         start: '',
         deadline: '',
-        receivables: { unit: step.calculationUnit[0], quantity: 0 },
-        payables: { unit: step.calculationUnit[0], quantity: 0 }
+        receivables: { unit: units[0], quantity: 0 },
+        payables: { unit: units[0], quantity: 0 }
       })
       this.closeAddStepModal()
     },
@@ -145,14 +177,18 @@ export default {
       this.isAddModal = false
       this.newStep = ''
     },
-    setTemplate({ option }) {
-      const template = this.templates.find(i => i.name === option)
-      this.setDataValue({ prop: 'template', value: template })
+    toggleBox() {
+      if (!this.isDisabledPayablesEdit) {
+        for (let i = 0; i < this.tasksData.stepsAndUnits.length; i++) {
+          this.tasksData.stepsAndUnits[i].payables = { ...this.tasksData.stepsAndUnits[i].receivables }
+        }
+        this.setDataValue({ prop: 'stepsAndUnits', value: this.tasksData.stepsAndUnits })
+      }
+      this.isDisabledPayablesEdit = !this.isDisabledPayablesEdit
     },
     customFormatter(date) {
       return moment(date).format('DD-MM-YYYY, HH:mm')
     },
-
     setDates(e, index) {
       this.setDate(e[0], 'start', index)
       this.setDate(e[1], 'deadline', index)
@@ -162,13 +198,29 @@ export default {
       stepsAndUnits[index][prop] = new Date(e)
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
-    async getMemoqTemplates() {
-      try {
-        const result = await this.$http.get("/memoqapi/templates")
-        this.templates = result.data
-      } catch (err) {
-        this.templates = [ { name: 'No Templates' } ]
+    setQuantity(e, prop, index) {
+      let stepsAndUnits = this.tasksData.stepsAndUnits
+      if (this.isDisabledPayablesEdit) {
+        stepsAndUnits[index]['receivables'].quantity = e.target.value
+        stepsAndUnits[index]['payables'].quantity = e.target.value
+      } else {
+        stepsAndUnits[index][prop].quantity = e.target.value
       }
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+    },
+    setUnit({ option }, prop, index) {
+      let stepsAndUnits = this.tasksData.stepsAndUnits
+      const unit = this.allUnits.find(({ type }) => type === option)
+
+      if (this.isDisabledPayablesEdit) {
+        stepsAndUnits[index]['receivables'].unit = unit
+        stepsAndUnits[index]['payables'].unit = unit
+      }
+      stepsAndUnits[index][prop].unit = unit
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
+    },
+    dragAndDropSteps(stepsAndUnits) {
+      this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
     },
     openDeleteAcceptModal(id) {
       this.isDeleteStep = true
@@ -184,28 +236,26 @@ export default {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
       this.closeAcceptModal()
     },
-    ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" })
+    ...mapActions({
+      alertToggle: 'alertToggle',
+      setDataValue: "setTasksDataValueRequest"
+    })
   },
   computed: {
     ...mapGetters({
-      tasksData: "getTasksData",
+      tasksData: "getTasksDataRequest",
       allUnits: "getAllUnits",
-      project: "getCurrentProject",
+      project: 'getCurrentClientRequest',
       allSteps: "getAllSteps"
     }),
     possibleStepsForAdding() {
-      if (this.tasksData.service && this.allSteps.length) {
-        return this.tasksData.service.steps
-            .map(i => i.step.title)
-            .filter(i => i !== 'Post-Editing')
-            .filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
+      if (this.allSteps.length) {
+        return this.allSteps.map(i => i.title)
       }
       return []
     }
   },
-  async created() {
-    await this.getMemoqTemplates()
-  }
+  name: "NewRequestServicesCreationStepsWorkflowClassic"
 }
 </script>
 
@@ -379,7 +429,7 @@ input {
   box-sizing: border-box;
   padding: 0 7px;
   outline: none;
-  width: 210px;
+  width: 220px;
   height: 32px;
   transition: .1s ease-out;
 

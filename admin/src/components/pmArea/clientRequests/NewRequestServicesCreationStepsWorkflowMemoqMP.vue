@@ -1,7 +1,6 @@
 <template lang="pug">
   .wrapper
-    .steps(v-if="tasksData.service && tasksData.stepsAndUnits")
-
+    .steps
       .steps__modal-without-border(v-if="isDeleteStep")
         ApproveModal(
           text="Are you sure?"
@@ -45,13 +44,15 @@
 
         .step(v-for="(item, index) in tasksData.stepsAndUnits" )
           .step__titleRow
-            .step__titleRow-title {{ item.step.title }}
+            .step__titleRow-title
+              span {{ item.step.title }}
+              b(v-if="!item.isReceivableVisible" style="margin-left: 4px") [Hidden]
             .step__titleRow-desctiptions
               .step__titleRow-desctiptions-title-date Dates
               .step__titleRow-desctiptions-title Receivables & Payables
 
           .step__detailsRow
-            .step__icons(v-if="item.step.title !== 'Translation'")
+            .step__icons(v-if="item.step.title !== 'Translation' && item.step.title !== 'Post-Editing'")
               .step__icon(@click="openDeleteAcceptModal(index)" style="cursor: pointer;")
                 i.fas.fa-trash
 
@@ -60,7 +61,7 @@
                 .step__datepicker-title Start And Deadline:
                 .step__datepicker-input
                   DatePicker.range-with-one-panel(
-                    :value="[item.start, item.deadline]"
+                    :value="[new Date(item.start), new Date(item.deadline)]"
                     @input="(e) => setDates(e, index)"
                     format="DD-MM-YYYY, HH:mm"
                     prefix-class="xmx"
@@ -86,7 +87,7 @@
 
     .add
       .add__row
-        .add__add(v-if="tasksData.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
+        .add__add(v-if="project.requestForm.service.steps.map(i => i.step).length !== tasksData.stepsAndUnits.length")
           Add(@add="openAddStepModal")
         .add__add(v-else)
 
@@ -105,7 +106,7 @@ import Button from "../../Button"
 import ApproveModal from "../../ApproveModal"
 
 export default {
-  name: "NewServicesCreationStepsWorkflowMemoq",
+  name: "NewRequestServicesCreationStepsWorkflowMemoqMT",
   components: { Button, CheckBox, Add, SelectSingle, draggable, DatePicker, ApproveModal },
   data() {
     return {
@@ -123,11 +124,10 @@ export default {
       return date < start || new Date(this.project.deadline) <= date
     },
     addStep() {
-      const step = this.tasksData.service.steps.find(item => item.step.title === this.newStep).step
+      const step = this.allSteps.find(item => item.title === this.newStep)
       let stepsAndUnits = this.tasksData.stepsAndUnits
       stepsAndUnits.push({
         step,
-        isReceivableVisible: true,
         start: '',
         deadline: '',
         receivables: { unit: step.calculationUnit[0], quantity: 0 },
@@ -184,26 +184,35 @@ export default {
       this.setDataValue({ prop: 'stepsAndUnits', value: stepsAndUnits })
       this.closeAcceptModal()
     },
-    ...mapActions({ alertToggle: 'alertToggle', setDataValue: "setTasksDataValue" })
+    hideReceivableDefaultSteps() {
+      let { stepsAndUnits } = this.tasksData
+      stepsAndUnits.forEach((item, index) => {
+        if (item.step.title === 'Post-Editing') stepsAndUnits[index].isReceivableVisible = false
+      })
+    },
+    ...mapActions({
+      alertToggle: 'alertToggle',
+      setDataValue: "setTasksDataValueRequest"
+    })
   },
   computed: {
     ...mapGetters({
-      tasksData: "getTasksData",
+      tasksData: "getTasksDataRequest",
       allUnits: "getAllUnits",
-      project: "getCurrentProject",
+      project: 'getCurrentClientRequest',
       allSteps: "getAllSteps"
     }),
     possibleStepsForAdding() {
-      if (this.tasksData.service && this.allSteps.length) {
-        return this.tasksData.service.steps
-            .map(i => i.step.title)
-            .filter(i => i !== 'Post-Editing')
-            .filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
+      if (this.allSteps.length) {
+        const { service } = this.project.requestForm
+        let steps = service.steps.map(item => ({ step: this.allSteps.find(({ _id }) => _id.toString() === item.step.toString()) }))
+        return steps.map(i => i.step.title).filter(j => !this.tasksData.stepsAndUnits.map(i => i.step.title).includes(j))
       }
       return []
     }
   },
   async created() {
+    this.hideReceivableDefaultSteps()
     await this.getMemoqTemplates()
   }
 }

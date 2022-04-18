@@ -17,7 +17,7 @@
       .row__title Urgent:
       .row__data
         .checkbox
-          input#urgent(type="checkbox", :disabled="isProjectFinished" :checked="project.isUrgent", @change="setUrgentStatus")
+          input#urgent(type="checkbox", :checked="project.isUrgent", @change="setUrgentStatus")
           label(for="urgent")
 
     .client-table
@@ -50,7 +50,7 @@
 
         template(slot="icons", slot-scope="{ row, index }")
           .client-table__icons
-            span(v-if="!isProjectFinished && canUpdateRequest")
+            span(v-if="canUpdateRequest")
               i.client-table__icon.fa.fa-envelope(
                 @click="openWYSIWYG(index)",
                 :class="{ 'client-table_opacity': true }",
@@ -65,7 +65,7 @@
             .client-table__icons(v-else)
               img(src="../../../../assets/images/latest-version/lock.png")
 
-    Add(@add="addData" v-if="!isProjectFinished && canUpdateRequest")
+    Add(@add="addData" v-if="canUpdateRequest")
 </template>
 
 <script>
@@ -324,10 +324,6 @@ export default {
         return this.project.customer.contacts.map((i) => `${ i.firstName } ${ i.surname || '' }`)
       }
     },
-    isProjectFinished() {
-      const { status } = this.project
-      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-    },
     canUpdateRequest() {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
@@ -425,7 +421,7 @@ export default {
     align-items: center;
 
     &-title {
-      font-size: 18px;
+      font-size: 16px;
       font-family: 'Myriad600';
     }
 

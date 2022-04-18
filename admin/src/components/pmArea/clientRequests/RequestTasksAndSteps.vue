@@ -276,7 +276,7 @@ export default {
   box-sizing: border-box;
   padding: 25px;
   width: 1040px;
-  margin-top: 50px;
+  margin-top: 25px;
   box-shadow: $box-shadow;
   position: relative;
   background: white;
@@ -324,7 +324,7 @@ export default {
   }
 
   &__tasks-title {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;

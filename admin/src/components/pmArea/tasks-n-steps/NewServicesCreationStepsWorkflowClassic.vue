@@ -160,6 +160,7 @@ export default {
       let stepsAndUnits = this.tasksData.stepsAndUnits
       stepsAndUnits.push({
         step,
+        isReceivableVisible: true,
         start: '',
         deadline: '',
         receivables: { unit: units[0], quantity: 0 },

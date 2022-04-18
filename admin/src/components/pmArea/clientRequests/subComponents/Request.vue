@@ -216,13 +216,6 @@ export default {
       }
       return result
     },
-    disabledPicker() {
-      return !!(this.project._id && this.project.tasks && this.project.tasks.length)
-    },
-    isProjectFinished() {
-      const { status } = this.project
-      return status === 'Closed' || status === 'Cancelled Halfway' || status === 'Cancelled'
-    },
     canUpdateRequest() {
       return this.user.group.name === "Administrators"
           || this.user.group.name === "Developers"
@@ -343,7 +336,7 @@ export default {
     &-client {
 
       &-title {
-        font-size: 18px;
+        font-size: 16px;
         font-family: 'Myriad900';
         margin-bottom: 7px;
         margin-top: 7px;
@@ -368,7 +361,7 @@ export default {
   }
 
   &__name {
-    font-size: 18px;
+    font-size: 16px;
     padding: 0 10px;
     height: 44px;
     width: 970px;

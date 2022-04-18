@@ -9,7 +9,7 @@
         .drops__menuTitle {{ selectedAccManager }}
       .drops__item
         .drops__label Project Manager:
-        .drops__menu(v-if="!isProjectFinished && canUpdateRequest")
+        .drops__menu(v-if="canUpdateRequest")
           SelectSingle(
             :options="projManagers"
             :selectedOption="selectedProjManager"
@@ -162,7 +162,7 @@ export default {
   box-shadow: $box-shadow;
   box-sizing: border-box;
   width: 420px;
-  margin-top: 40px;
+  margin-top: 25px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -171,7 +171,7 @@ export default {
   position: relative;
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     font-family: Myriad600;
     border-bottom: 1px solid $light-border;
     margin-bottom: 20px;
@@ -191,7 +191,7 @@ export default {
     &-span {
       vertical-align: sub;
       display: inline-block;
-      font-size: 18px;
+      font-size: 16px;
     }
   }
 
