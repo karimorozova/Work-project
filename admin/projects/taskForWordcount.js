@@ -130,7 +130,7 @@ async function generateStepsForCATMemoqUnit({ tasks, stepsAdditions }) {
 						payablesQuantity: 0
 					}, true)
 
-			if(!stepsAndUnits[i].isReceivableVisible){
+			if (stepsAndUnits[i].hasOwnProperty('isReceivableVisible') && !stepsAndUnits[i].isReceivableVisible) {
 				finance.Quantity.receivables = 0
 				finance.Wordcount.receivables = 0
 			}
