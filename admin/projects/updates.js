@@ -339,9 +339,15 @@ async function getTaskTargetFiles({ task, projectId, step }) {
 		}
 
 	} catch (err) {
-		console.log(err)
-		console.log("Error in getTaskTargetFiles")
-		throw new Error(err.message)
+			// TODO: temp. is error on memoq with downloading target file!
+			return {
+				...task._doc,
+				targetFiles,
+				targetFilesStages
+			}
+		// console.log(err)
+		// console.log("Error in getTaskTargetFiles")
+		// throw new Error(err.message)
 	}
 }
 
