@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import {mapActions, mapGetters} from "vuex"
 import SelectSingle from "../../SelectSingle"
 import Toggler from "../../Toggler"
 import ScheduleList from './sub-components/ScheduleList'
@@ -46,6 +46,38 @@ export default {
     ...mapActions([
       "alertToggle"
     ]),
+    async createTimeString() {
+      try {
+        const res = await this.$http.get(`/vendorsapi/vendor-availability/${this.$route.params.id}`)
+        const {data: {workSchedule, timezone}} = res;
+        let timeFrom = '';
+        let timeTo = '';
+        workSchedule.forEach(({from, to}) => {
+          timeFrom = "2013-11-18 " + from
+          timeTo = "2013-11-18 " + to
+        })
+        // console.log(timeFrom)
+        // console.log(timeTo)
+        // console.log(timezone)
+        const actualStartTime = moment.tz(timeFrom, timezone).format()
+        // const actualFinishTime = moment.tz(timeTo, timezone).format()
+        const projectTime = actualStartTime.format().tz('America/Los_Angeles').format()
+        console.log(actualStartTime)
+        console.log(projectTime);
+        // console.log(actualFinishTime);
+
+
+        // const {_d: day} = moment();
+        // console.dir(day)
+        // console.dir(day.getHours())
+        // console.dir(day.getMinutes())
+        // const str = Date()
+        // console.log(str)
+      } catch (err) {
+        console.log(err)
+      }
+
+    },
     changeSchedulePosition(sortedArr) {
       this.workSchedule = sortedArr
       this.saveAvailability('workSchedule')
@@ -61,7 +93,7 @@ export default {
       this.saveAvailability('isAvailableForWork')
       console.log(this.isAvailableForWork)
     },
-    setTimezone({ option }) {
+    setTimezone({option}) {
       this.timezone = option
       this.saveAvailability('timezone')
     },
@@ -74,23 +106,14 @@ export default {
       this.workSchedule.splice(index, 1)
       this.saveAvailability('workSchedule')
     },
-    updateWorkSchedule({ value, prop, index }) {
+    updateWorkSchedule({value, prop, index}) {
       this.workSchedule[index][prop] = value
       this.saveAvailability('workSchedule')
       // console.log(this.currentVendor._id)
     },
-    // async getTimezones() {
-    //   try {
-    //     const result = await this.$http.get('/api/timezones')
-    //     this.timezones = result.data.map(({ zone }) => zone)
-    //
-    //   } catch (err) {
-    //     console.log(err)
-    //   }
-    // },
     async getAvailability() {
       try {
-        const res = await this.$http.get(`/vendorsapi/vendor-availability/${ this.$route.params.id }`)
+        const res = await this.$http.get(`/vendorsapi/vendor-availability/${this.$route.params.id}`)
         this.setUpAvailabilityData(res)
         console.log(res)
       } catch (err) {
@@ -99,18 +122,18 @@ export default {
     },
     async saveAvailability(prop) {
       try {
-        const res = await this.$http.put(`/vendorsapi/vendor-availability-manage/${ this.$route.params.id }`, {
+        const res = await this.$http.put(`/vendorsapi/vendor-availability-manage/${this.$route.params.id}`, {
           prop,
           value: this[prop]
         })
         this.setUpAvailabilityData(res)
-        this.alertToggle({ message: "Saved", isShow: true, type: "success" })
+        this.alertToggle({message: "Saved", isShow: true, type: "success"})
       } catch (e) {
         console.log(e)
-        this.alertToggle({ message: "Cannot save info", isShow: true, type: "error" })
+        this.alertToggle({message: "Cannot save info", isShow: true, type: "error"})
       }
     },
-    setUpAvailabilityData({ data }) {
+    setUpAvailabilityData({data}) {
       console.log('retrieve start data', data)
 
       this.workSchedule = data.workSchedule
@@ -132,6 +155,7 @@ export default {
   async created() {
     await this.getAvailability()
     this.timezones = moment.tz.names()
+    await this.createTimeString()
   }
 }
 </script>
@@ -149,11 +173,9 @@ export default {
 }
 
 .title {
-  font-size: 14px;
-  margin-bottom: 25px;
-  font-family: 'Myriad400';
-
-
+  font-family: Roboto600;
+  font-size: 16px;
+  margin-bottom: 20px;
 }
 
 .available-wrapper {
@@ -164,7 +186,6 @@ export default {
 .available__toggler {
   margin-left: 30px;
 }
-
 
 .available-wrapper {
   margin-right: 80px;
@@ -190,9 +211,5 @@ export default {
   width: 220px;
   height: 32px;
   background-color: white;
-}
-
-.working-schedule {
-  padding-bottom: 60px;
 }
 </style>
