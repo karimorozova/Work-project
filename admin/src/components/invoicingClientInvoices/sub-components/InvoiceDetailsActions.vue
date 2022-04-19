@@ -29,7 +29,7 @@
         IconButton(
           :popupText="'Download invoice file'"
           @clicked="downloadInvoiceFile(invoice.invoiceFile.path)"
-          :isDisabled="!invoice.invoiceFile.path"
+          :isDisabled="!invoice.invoiceFile.hasOwnProperty('path')"
         )
           i(class="fa-solid fa-download")
 
