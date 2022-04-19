@@ -59,7 +59,14 @@ const {
 	createVendor
 } = require("./createVendor")
 
+const {
+	getVendorAvailability,
+	updateVendorAvailability
+} = require("./availability")
+
 module.exports = {
+	updateVendorAvailability,
+	getVendorAvailability,
 	getJobDetails,
 	getVendorExtraForPortal,
 	getVendorForPortal,

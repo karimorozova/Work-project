@@ -41,7 +41,9 @@ const {
 	updateVendorRatesFromSettings,
 	managePaymentMethods,
 	updateStepProp,
-	createVendor
+	createVendor,
+	getVendorAvailability,
+	updateVendorAvailability
 } = require('../vendors')
 
 const { manageStatuses } = require('../vendors/jobs')
@@ -50,6 +52,30 @@ const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
 const { Vendors, Projects, Pricelist } = require('../models')
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests')
 const { testSentMessage, rejectedPendingCompetenceTemplate } = require("../emailMessages/candidateCommunication")
+
+
+router.get("/vendor-availability/:_vendorId", async (req, res) => {
+	const { _vendorId } = req.params
+	try {
+		const vendorAvailability = await getVendorAvailability(_vendorId)
+		res.send(vendorAvailability)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor availability")
+	}
+})
+
+router.put("/vendor-availability-manage/:_vendorId", async (req, res) => {
+	const { _vendorId } = req.params
+	const { prop, value } = req.body
+	try {
+		const vendorAvailability = await updateVendorAvailability(_vendorId, { prop, value })
+		res.send(vendorAvailability)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating Vendor availability")
+	}
+})
 
 router.get('/vendor', async (req, res) => {
 	const id = req.query.id

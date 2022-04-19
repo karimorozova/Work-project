@@ -14,7 +14,10 @@ const {
 	updateStepProp,
 	hasVendorCompetenciesAndPending,
 	managePaymentMethods,
-	getVendorForPortal, getVendorExtraForPortal
+	getVendorForPortal,
+	getVendorExtraForPortal,
+	getVendorAvailability,
+	updateVendorAvailability
 } = require('../../vendors')
 
 const { upload, sendEmail } = require('../../utils')
@@ -41,6 +44,30 @@ const {
 	removeFile
 } = require('../../invoicingPayables')
 const moment = require("moment")
+
+
+router.get("/vendor-availability/:_vendorId", checkVendor, async (req, res) => {
+	const { _vendorId } = req.params
+	try {
+		const vendorAvailability = await getVendorAvailability(_vendorId)
+		res.send(vendorAvailability)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor availability")
+	}
+})
+
+router.put("/vendor-availability-manage/:_vendorId", checkVendor, async (req, res) => {
+	const { _vendorId } = req.params
+	const { prop, value } = req.body
+	try {
+		const vendorAvailability = await updateVendorAvailability(_vendorId, { prop, value })
+		res.send(vendorAvailability)
+	} catch (err) {
+	console.log(err)
+	res.status(500).send("Error on updating Vendor availability")
+}
+})
 
 
 router.get("/reports", checkVendor, async (req, res) => {

@@ -194,6 +194,21 @@
             .vendor-info__editor
               ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
 
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isAvailable')" :class="{'block__header-grey': !isAvailable}")
+          .title Availability
+          .icon(v-if="!isAvailable")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isAvailable")
+          indexAvailability
+          //.vendor-info__notes-block
+          //  .vendor-info__notes
+          //    VendorCandidate(:candidateData="currentVendor")
+          //  .vendor-info__editor
+          //    ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
+
       //.title Vendor to memoq
         //div
           //h3(@click="openMemoqModal('Saved')") SAVE
@@ -276,6 +291,7 @@ import Tabs from "../Tabs"
 import FinanceMatrixWithReset from "./pricelists/FinanceMatrixWithReset"
 import VendorBillingInfo from "./VendorBillingInfo"
 import VendorSubDetails from "./VendorSubDetails"
+import indexAvailability from "./availability/indexAvailability"
 
 export default {
   mixins: [ photoPreview ],
@@ -291,6 +307,7 @@ export default {
       isEducation: false,
       isBillingInformation: false,
       isNotes: false,
+      isAvailable: false,
 
       icons: {
         edit: { icon: require("../../assets/images/latest-version/edit.png") },
@@ -665,7 +682,8 @@ export default {
     StepTable,
     IndustryTable,
     ResultTable,
-    VendorBillingInfo
+    VendorBillingInfo,
+    indexAvailability
   },
   directives: {
     ClickOutside

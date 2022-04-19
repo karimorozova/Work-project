@@ -119,6 +119,12 @@ export default {
               path: "/settings/new-competency",
               img: require("../assets/images/navbar/Add.svg"),
               active: false
+            },
+            {
+              title: "Availability",
+              path: "/settings/availability",
+              img: require("../assets/images/navbar/Availability.svg"),
+              active: false
             }
           ]
         }
