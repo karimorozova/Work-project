@@ -516,8 +516,45 @@ const VendorSchema = new mongoose.Schema({
 			type: Number,
 			default: 0
 		}
-	} ]
-
+	} ],
+	workSchedule: [ {
+		day: {
+			type: 'String',
+			required: true,
+			enum: [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ]
+		},
+		from: {
+			type: String,
+			default: ''
+		},
+		to: {
+			type: String,
+			default: ''
+		}
+	} ],
+	absenceSchedule: [ {
+		type: {
+			type: 'String',
+			required: true,
+			enum: [ 'None', 'Holiday', 'Public holiday', 'Sick leave']
+		},
+		from: {
+			type: Date,
+			default: ''
+		},
+		to: {
+			type: Date,
+			default: ''
+		},
+		createdAt: {
+			type: 'Date',
+			default: new Date()
+		}
+	} ],
+	isAvailableForWork: {
+		type: Boolean,
+		default: true
+	}
 }, { minimize: false })
 
 VendorSchema.statics.authenticate = function (email, password, callback) {
