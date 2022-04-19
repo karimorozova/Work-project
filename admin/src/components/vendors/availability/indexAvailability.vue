@@ -169,12 +169,11 @@ export default {
 
 .available-container {
   display: flex;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 
 .title {
   font-family: Myriad600;
-  font-size: 16px;
   margin-bottom: 20px;
 }
 
