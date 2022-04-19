@@ -173,7 +173,7 @@ export default {
 }
 
 .title {
-  font-family: Roboto600;
+  font-family: Myriad600;
   font-size: 16px;
   margin-bottom: 20px;
 }
