@@ -30,6 +30,7 @@ const { ObjectId } = require("mongoose/lib/types")
 const moment = require("moment")
 const { createClient } = require("../clients/createClient")
 const { getAllPaymentMethods } = require("../settings")
+const _ = require("lodash")
 
 router.get('/payment-methods', async (req, res) => {
 	try {
@@ -365,6 +366,51 @@ router.delete('/units/:id', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on deleting unit")
+	}
+})
+
+router.get('/cc-stat-requests', async (req, res) => {
+	try {
+		const m1 = moment()
+		const todayDay = m1.date()
+		const todayMonth = m1.month() + 1
+		const todayYear = m1.year()
+
+		const m2 = moment().subtract(1, 'd')
+		const yesterdayDay = m2.date()
+		const yesterdayMonth = m2.month() + 1
+		const yesterdayYear = m2.year()
+
+		const requestsToday = await Projects.find({
+			"customer": '60c3757bb9a00961d7bb5e07',
+			"startDate": {
+				$gte: new Date(`${ todayYear }-${ todayMonth < 10 ? '0' + todayMonth : todayMonth }-${ todayDay < 10 ? '0' + todayDay : todayDay }T00:00:00.000Z`),
+				$lte: new Date(`${ todayYear }-${ todayMonth < 10 ? '0' + todayMonth : todayMonth }-${ todayDay < 10 ? '0' + todayDay : todayDay }T24:00:00.000Z`)
+			}
+		}).populate('accountManager ', [ 'firstName' ])
+		const projectsYesterday = await Projects.find({
+			"customer": '60c3757bb9a00961d7bb5e07',
+			"startDate": {
+				$gte: new Date(`${ yesterdayYear }-${ yesterdayMonth < 10 ? '0' + yesterdayMonth : yesterdayMonth }-${ yesterdayDay < 10 ? '0' + yesterdayDay : yesterdayDay }T00:00:00.000Z`),
+				$lte: new Date(`${ yesterdayYear }-${ yesterdayMonth < 10 ? '0' + yesterdayMonth : yesterdayMonth }-${ yesterdayDay < 10 ? '0' + yesterdayDay : yesterdayDay }T24:00:00.000Z`)
+			}
+		}).populate('accountManager ', [ 'firstName' ])
+
+		const html1 = Object.entries(_.groupBy(requestsToday, 'accountManager')).reduce((acc, curr) => {
+			const regex = /'.+'/gm
+			const user = regex.exec(curr[0])[0]
+			return acc += `${ user } - ${ curr[1].length }` + '<br>'
+		}, '')
+		const html2 = Object.entries(_.groupBy(projectsYesterday, 'accountManager')).reduce((acc, curr) => {
+			const regex = /'.+'/gm
+			const user = regex.exec(curr[0])[0]
+			return acc += `${ user } - ${ curr[1].length }` + '<br>'
+		}, '')
+
+		res.send(`<b>Today:</b><br>${ html1 }<br><b>Yesterday:</b><br>${ html2 }<br>`)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting stats")
 	}
 })
 
