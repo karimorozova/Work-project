@@ -9,8 +9,8 @@ const storeFile = async (file, _entityId, DIR, options = { isAdditionalFileInfo:
 				? `${ additionFileInfo }-${ nativeFileName }`
 				: `${ nativeFileName }`
 
-		const newPath = `${ DIR }/${ _entityId }/${ fileName }`
-		await moveFile(file, './dist/' + newPath)
+		const newPath = `/${ DIR }/${ _entityId }/${ fileName }`
+		await moveFile(file, './dist' + newPath)
 
 		return { path: newPath, fileName }
 	} catch (err) {

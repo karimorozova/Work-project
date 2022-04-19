@@ -1,6 +1,5 @@
 <template lang="pug">
   .template
-    .template__header
       .header
         .header__logo
           .header__logo-image
@@ -22,7 +21,6 @@
             .row__value.row__value-bold
               span(style="margin-right: 5px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
               span {{ takeInvoiceFinance().total }}
-
 
       .subheader
         .subheader__left

@@ -26,6 +26,13 @@
         )
           i.fa-solid.fa-envelope
 
+        IconButton(
+          :popupText="'Download invoice file'"
+          @clicked="downloadInvoiceFile(invoice.invoiceFile.path)"
+          :isDisabled="!invoice.invoiceFile.path"
+        )
+          i(class="fa-solid fa-download")
+
 </template>
 
 <script>
@@ -54,6 +61,12 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    downloadInvoiceFile(path) {
+      let link = document.createElement('a')
+      link.href = this.$domains.admin + '/' + path
+      link.target = "_blank"
+      link.click()
+    },
     fillSelectedEmail(emailArr) {
       this.selectedMails = emailArr
     },
