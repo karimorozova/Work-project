@@ -29,6 +29,11 @@ const LanguageSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  smartling: {
+    type: String,
+    default: '',
+    trim: true
+  },
   iso1: {
     type: String,
     default: '',

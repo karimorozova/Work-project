@@ -25,6 +25,9 @@ const { assignProjectManagers } = require('./updates')
 const { createTasksForWordcount } = require("./taskForWordcount")
 const Response = require("../helpers/Response")
 const { createClient } = require("../clients")
+const fs = require("fs")
+const csv = require('csv-parser')
+const _ = require("lodash")
 
 const createProjectIndividual = async ({ project, client, user }) => {
 	const { group: { name: role }, _id: userId } = user
@@ -616,6 +619,107 @@ const autoCreatingTranslationTaskInProjectByMemoqLink = async ({ memoqLink, proj
 	}
 }
 
+const autoCreatingTranslationTaskInProjectBySmartlingFile = async ({ workflow, projectId, internalProjectId, startDate, deadline, file }) => {
+	const allLanguages = await Languages.find()
+	const allSteps = await Step.find()
+	const allServices = await Services.find()
+	const allUnits = await Units.find()
+
+	let fileData
+	try {
+		fileData = await new Promise((resolve) => {
+			const csvData = []
+			fs.createReadStream(file.path).pipe(csv()).on('data', (data) => csvData.push(data)).on('end', () => resolve(csvData))
+		})
+	} catch (err) {
+		return new Response(Response.Error, 'Error on parsing file. Wrong file format or data')
+	}
+	const groupedByTargetLanguage = _.groupBy(fileData, 'Target Language')
+
+	try {
+		checkAllLanguages()
+	} catch (lang) {
+		return new Response(Response.Error, 'Error on creating T&S' + 'Cannot find language' + lang)
+	}
+
+	for (let [ targetSymbol, taskData ] of Object.entries(groupedByTargetLanguage)) {
+		const source = getLang(taskData[0]['Source Language'], 0)
+		const target = getLang(targetSymbol, 0)
+		const tasksInfo = {
+			service: allServices.find(item => item.title === 'Translation'),
+			source,
+			targets: [ target ],
+			stepsAndUnits: generateStepsAndUnits(taskData, { startDate, deadline, workflow }),
+			sourceFiles: [],
+			refFiles: [],
+			stepsAdditions: [],
+			projectId,
+			internalProjectId
+		}
+		try {
+			await createTasksAndStepsForCustomUnits(tasksInfo)
+		} catch (err) {
+			return new Response(Response.Error, 'Error on creating T&S')
+		}
+	}
+
+	return new Response(Response.Success, await getProject({ _id: projectId }))
+
+	function checkAllLanguages() {
+		for (let [ targetSymbol, taskData ] of Object.entries(groupedByTargetLanguage)) {
+			const source = getLang(taskData[0]['Source Language'], 0)
+			const target = getLang(targetSymbol, 0)
+			if (!source) throw taskData[0]['Source Language']
+			if (!target) throw targetSymbol
+		}
+	}
+
+	function getLang(symbol, iterator) {
+		const keys = [ 'smartling', 'xtm', 'iso1', 'iso2', 'symbol', 'memoq' ]
+		if (keys[iterator] === undefined) return null
+		const lang = allLanguages.find(item => item[keys[iterator]].toLowerCase() === symbol.toLowerCase())
+		if (!lang) return getLang(symbol, ++iterator)
+		return lang
+	}
+
+	function generateStepsAndUnits(taskData, { startDate, deadline, workflow }) {
+		const quantityWeighted = taskData.reduce((acc, curr) => acc += +curr['Weighted Word Count'], 0)
+		const quantityTotal = taskData.reduce((acc, curr) => acc += +curr['Word Count'], 0)
+
+		let basic = {
+			start: startDate,
+			deadline,
+			isReceivableVisible: true,
+			receivables: getUnitsWithQuantity(quantityWeighted),
+			payables: getUnitsWithQuantity(quantityWeighted)
+		}
+		switch (true) {
+			case workflow === 'Translation Only':
+				return [ { step: allSteps.find(item => item.title === 'Translation'), ...basic } ]
+			case workflow === 'Translation & Revising':
+				return [
+					{ step: allSteps.find(item => item.title === 'Translation'), ...basic },
+					{ step: allSteps.find(item => item.title === 'Revising'), ...basic, receivables: getUnitsWithQuantity(quantityTotal), payables: getUnitsWithQuantity(quantityTotal) }
+				]
+			case workflow === 'Post-Editing & Translation':
+				return [
+					{ step: allSteps.find(item => item.title === 'Post-Editing'), ...basic, isReceivableVisible: false },
+					{ step: allSteps.find(item => item.title === 'Translation'), ...basic }
+				]
+			case workflow === 'Post-Editing & Translation & Revising':
+				return [
+					{ step: allSteps.find(item => item.title === 'Post-Editing'), ...basic, isReceivableVisible: false },
+					{ step: allSteps.find(item => item.title === 'Translation'), ...basic },
+					{ step: allSteps.find(item => item.title === 'Revising'), ...basic, receivables: getUnitsWithQuantity(quantityTotal), payables: getUnitsWithQuantity(quantityTotal) }
+				]
+		}
+
+		function getUnitsWithQuantity(quantity) {
+			return { unit: allUnits.find(item => item.type === 'Source Word'), quantity }
+		}
+	}
+}
+
 const autoCreatingTranslationTaskInProjectByXTMFile = async ({ projectId, internalProjectId, startDate, deadline, file }) => {
 	const allLanguages = await Languages.find()
 	const allSteps = await Step.find()
@@ -716,6 +820,7 @@ module.exports = {
 	autoCreatingTaskInProject,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
 	autoCreatingTranslationTaskInProjectByXTMFile,
+	autoCreatingTranslationTaskInProjectBySmartlingFile,
 	createProjectFromMemoq,
 	createProjectIndividual
 }

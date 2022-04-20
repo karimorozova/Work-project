@@ -9,6 +9,31 @@
         @setTab="setTab"
       )
 
+    .option(v-if="selectedTab === 'Smartling Import'")
+      .taskData
+        .taskData__memoqLink(style="justify-content: center; align-items: flex-end;")
+          .taskData__memoqLink-select
+            .drop__title Workflow:
+            .drop
+              SelectSingle(
+                :selectedOption="selectedSmartlingWorkflow"
+                :options="['Post-Editing & Translation & Revising', 'Post-Editing & Translation', 'Translation & Revising', 'Translation Only']"
+                placeholder="Option"
+                @chooseOption="setSmartlingWorkflow"
+              )
+          .taskData__xtm
+            .taskData__xtm-title Smartling File:
+            .taskData__xtm-input(v-if="!smartlingFile")
+              UploadFileButton
+                input.smartling-file-input(type="file" @change='uploadSmartlingFile' :multiple='false')
+
+            .taskData__xtm-fileWrapper(v-else)
+              .taskData__xtm-fileName {{ smartlingFile }}
+              .taskData__xtm-removeFile( @click="removeSmartlingFile") &#215;
+
+        .taskData__button
+          Button(:value="'Add Tasks & Steps'" :isDisabled="isDisabledSaveButton" @clicked="saveTasksChecksSmartling")
+
     .option(v-if="selectedTab === 'XTM Import'")
       .taskData
         .taskData__xtm
@@ -122,7 +147,7 @@ export default {
   },
   data() {
     return {
-      tabs: [ 'Classic', 'Memoq Import', 'XTM Import' ],
+      tabs: [ 'Classic', 'Memoq Import', 'XTM Import', 'Smartling Import' ],
       selectedTab: 'Classic',
       selectedTabWorkflow: 'Alpha',
 
@@ -132,6 +157,10 @@ export default {
       xtmFile: '',
       xtmFileData: null,
 
+      smartlingFile: '',
+      smartlingFileData: null,
+      selectedSmartlingWorkflow: '',
+
       allServices: [],
       isAdditions: false,
       IsErrorModal: false,
@@ -140,15 +169,26 @@ export default {
     }
   },
   beforeDestroy() {
-    console.log('beforeDestroy')
     this.setDataValue({})
   },
   methods: {
+    uploadSmartlingFile(e) {
+      const file = Array.from(e.target.files)[0]
+      console.log(file)
+      this.smartlingFile = file.name
+      this.smartlingFileData = file
+    },
     removeXTMFile() {
       let inputFiles = document.querySelectorAll('.xtm-file-input')
       for (let elem of inputFiles) elem.value = ''
       this.xtmFile = ''
       this.xtmFileData = null
+    },
+    removeSmartlingFile() {
+      let inputFiles = document.querySelectorAll('.smartling-file-input')
+      for (let elem of inputFiles) elem.value = ''
+      this.smartlingFile = ''
+      this.smartlingFileData = null
     },
     uploadXTMFile(e) {
       const file = Array.from(e.target.files)[0]
@@ -165,6 +205,39 @@ export default {
     },
     setMemoqWorkflow({ option }) {
       this.selectedMemoqWorkflow = option
+    },
+    setSmartlingWorkflow({ option }) {
+      this.selectedSmartlingWorkflow = option
+    },
+    async saveTasksChecksSmartling() {
+      this.errors = []
+      if (!this.smartlingFile) this.errors.push('Please upload a Smartling file.')
+      if (!this.selectedSmartlingWorkflow) this.errors.push('Please enter the workflow.')
+      if (this.errors.length) {
+        this.IsErrorModal = true
+        return
+      }
+      this.isDisabledSaveButton = true
+      const { _id: projectId, projectId: internalProjectId, startDate, deadline } = this.currentProject
+      const formData = new FormData()
+      formData.append('workflow', this.selectedSmartlingWorkflow)
+      formData.append('file', this.smartlingFileData)
+      formData.append('projectId', projectId)
+      formData.append('internalProjectId', internalProjectId)
+      formData.append('startDate', startDate)
+      formData.append('deadline', deadline)
+
+      const res = await this.$http.post(`/pm-manage/build-TnS-from-smartling-file`, formData)
+      const { data } = res
+      if (data.status === 'success') {
+        const { data: project } = data
+        await this.setCurrentProject(project)
+        this.$parent.toggleTaskData()
+        this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
+      }else{
+        this.alertToggle({ message: data.message, isShow: true, type: "error" })
+      }
+      this.isDisabledSaveButton = false
     },
     async saveTasksChecksXTM() {
       this.errors = []
@@ -197,7 +270,7 @@ export default {
     async saveTasksChecksMemoq() {
       this.errors = []
       if (!this.memoqLink) this.errors.push('Please enter a Memoq project name.')
-      if (!this.selectedMemoqWorkflow) this.errors.push('Please enter a Memoq project name.')
+      if (!this.selectedMemoqWorkflow) this.errors.push('Please enter the workflow.')
       if (this.errors.length) {
         this.IsErrorModal = true
         return

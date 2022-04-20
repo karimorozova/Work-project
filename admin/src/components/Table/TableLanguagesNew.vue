@@ -112,28 +112,31 @@
         @closeErrors="closeErrors"
       )
 
-        template(slot="headerIcon" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-        template(slot="headerName" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-        template(slot="headerGroup" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-        template(slot="headerSymbol" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-        template(slot="headerIso1" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-            .languages__header-icon(@click="toggleTooltip('iso1')" v-click-outside="() => closeTooltip('isTooltip1')")
-              img.languages__info-icon(src="../../assets/images/info-icon-white.png")
-              .languages__tooltip(v-if="isTooltip1") Two letters
-        template(slot="headerIso2" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-            .languages__header-icon(@click="toggleTooltip('iso2')" v-click-outside="() => closeTooltip('isTooltip2')")
-              img.languages__info-icon(src="../../assets/images/info-icon-white.png")
-              .languages__tooltip(v-if="isTooltip2") Three letters
-        template(slot="headerActive" slot-scope="{ field }")
-          .languages__header {{ field.label }}
-        template(slot="headerIcons" slot-scope="{ field }")
-          .languages__header {{ field.label }}
+        //template(slot="headerIcon" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //template(slot="headerName" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //template(slot="headerGroup" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //template(slot="headerSymbol" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //template(slot="headerIso1" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //    .languages__header-icon(@click="toggleTooltip('iso1')" v-click-outside="() => closeTooltip('isTooltip1')")
+        //      img.languages__info-icon(src="../../assets/images/info-icon-white.png")
+        //      .languages__tooltip(v-if="isTooltip1") Two letters
+        //template(slot="headerIso2" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //    .languages__header-icon(@click="toggleTooltip('iso2')" v-click-outside="() => closeTooltip('isTooltip2')")
+        //      img.languages__info-icon(src="../../assets/images/info-icon-white.png")
+        //      .languages__tooltip(v-if="isTooltip2") Three letters
+        //template(slot="headerActive" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+        //template(slot="headerIcons" slot-scope="{ field }")
+        //  .languages__header {{ field.label }}
+
+        template(v-for="field in fields", :slot="field.headerKey", slot-scope="{ field }")
+          .qualifications__head-title {{ field.label }}
 
         template(slot="icon" slot-scope="{ row, index }")
           .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
@@ -181,6 +184,11 @@
           .languages__data.languages_active(v-if="currentActive === index")
             input(type="text" v-model="currentISO2")
           .languages__data(v-else) {{ row.iso2 }}
+
+        template(slot="smartling" slot-scope="{ row, index }")
+          .languages__data.languages_active(v-if="currentActive === index")
+            input(type="text" v-model="currentSmartling")
+          .languages__data(v-else) {{ row.smartling }}
 
         template(slot="active" slot-scope="{ row, index }")
           .languages__data.languages_centered(:class="{'languages_active': currentActive === index}")
@@ -238,15 +246,16 @@
 		data() {
 			return {
 				fields: [
-					{ label: "Icon", headerKey: "headerIcon", key: "icon", width: "10%", padding: "0" },
-					{ label: "Name", headerKey: "headerName", key: "name", width: "16%", padding: "0" },
-					{ label: "Group", headerKey: "headerGroup", key: "group", width: "16%", padding: "0" },
+					{ label: "Icon", headerKey: "headerIcon", key: "icon", width: "8%", padding: "0" },
+					{ label: "Name", headerKey: "headerName", key: "name", width: "13%", padding: "0" },
+					{ label: "Group", headerKey: "headerGroup", key: "group", width: "13%", padding: "0" },
 					{ label: "Symbol", headerKey: "headerSymbol", key: "symbol", width: "10%", padding: "0" },
-					{ label: "Memoq", headerKey: "headerSymbol", key: "memoq", width: "10%", padding: "0" },
+          { label: "Memoq", headerKey: "headerMemoq", key: "memoq", width: "10%", padding: "0" },
+          { label: "Smartling", headerKey: "headerSmartling", key: "smartling", width: "10%", padding: "0" },
 					{ label: "ISO 639-1", headerKey: "headerIso1", key: "iso1", width: "10%", padding: "0" },
 					{ label: "ISO 639-2", headerKey: "headerIso2", key: "iso2", width: "10%", padding: "0" },
 					{ label: "Active", headerKey: "headerActive", key: "active", width: "6%", padding: "0" },
-					{ label: "", headerKey: "headerIcons", key: "icons", width: "12%", padding: "0" }
+					{ label: "", headerKey: "headerIcons", key: "icons", width: "10%", padding: "0" }
 				],
 				languages: [],
 				currentActive: -1,
@@ -267,7 +276,8 @@
 				currentSymbol: null,
 				currentMemoq: null,
 				currentISO1: null,
-				currentISO2: null,
+        currentISO2: null,
+        currentSmartling: null,
 				currentCheckbox: null
 
 			}
@@ -358,6 +368,7 @@
 					memoq: "",
 					iso1: "",
 					iso2: "",
+          smartling: "",
 					active: false
 				})
 				this.setEditingData(this.languages.length - 1)
@@ -416,7 +427,8 @@
 				newData.append("memoq", this.currentMemoq)
 				newData.append("iso1", this.currentISO1)
 				newData.append("iso2", this.currentISO2)
-				newData.append("active", this.currentCheckbox)
+        newData.append("smartling", this.currentSmartling)
+        newData.append("active", this.currentCheckbox)
 
 				try {
 					await this.$http.post(`/api-settings/languages`, newData)
@@ -439,7 +451,7 @@
 			},
 			setEditingData(index) {
 				this.currentActive = index
-				const { _id, icon, lang, group, symbol, memoq, iso1, iso2, active } = this.languages[index]
+				const { _id, icon, lang, group, symbol, memoq, iso1, iso2, smartling, active } = this.languages[index]
 				this.currentId = _id
 				this.currentIcon = icon
 				this.currentName = lang
@@ -447,14 +459,15 @@
 				this.currentSymbol = symbol
 				this.currentMemoq = memoq
 				this.currentISO1 = iso1
-				this.currentISO2 = iso2
+        this.currentISO2 = iso2
+        this.currentSmartling = smartling
 				this.currentCheckbox = !!active
 			},
 			cancel() {
 				this.currentActive = -1
 				this.file = []
 				this.imageData = ""
-				this.currentId = this.currentIcon = this.currentName = this.currentGroup = this.currentSymbol = this.currentMemoq = this.currentISO1 = this.currentISO2 = this.currentCheckbox = null
+				this.currentId = this.currentIcon = this.currentName = this.currentGroup = this.currentSymbol = this.currentMemoq = this.currentISO1 = this.currentISO2 = this.currentSmartling = this.currentCheckbox = null
 			},
 			uploadFile(event) {
 				this.file.push(event.target.files[0])
@@ -559,7 +572,7 @@
   @import "../../assets/styles/settingsTable";
 
   .languages {
-    width: 1040px;
+    width: 1200px;
     margin: 50px;
     padding: 20px;
     border-radius: 2px;

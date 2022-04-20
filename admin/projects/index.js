@@ -67,6 +67,7 @@ const {
 	autoCreatingTranslationTaskInProject,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
 	autoCreatingTranslationTaskInProjectByXTMFile,
+	autoCreatingTranslationTaskInProjectBySmartlingFile,
 	createProjectFromMemoq,
 	createProjectFromXTMFile,
 	createProjectIndividual
@@ -117,6 +118,7 @@ module.exports = {
 	createProjectFromMemoq,
 	autoCreatingTranslationTaskInProjectByXTMFile,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
+	autoCreatingTranslationTaskInProjectBySmartlingFile,
 	getProjectForClientPortal,
 	setApprovedStepStatus,
 	getProjectsForVendorPortal,

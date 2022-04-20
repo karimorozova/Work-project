@@ -79,6 +79,11 @@ async function generateStepsForCustomUnits({ tasks, stepsAdditions }) {
 						payablesQuantity: stepsAndUnits[i].payables.quantity
 					}, false)
 
+			if (stepsAndUnits[i].hasOwnProperty('isReceivableVisible') && !stepsAndUnits[i].isReceivableVisible) {
+				finance.Quantity.receivables = 0
+				finance.Wordcount.receivables = 0
+			}
+
 			steps.push({
 				stepNumber: i + 1,
 				projectId,
@@ -95,6 +100,7 @@ async function generateStepsForCustomUnits({ tasks, stepsAdditions }) {
 				targetLanguage,
 				fullSourceLanguage,
 				fullTargetLanguage,
+				isReceivableVisible: stepsAndUnits[i].isReceivableVisible,
 				start: stepsAndUnits[i].start,
 				deadline: stepsAndUnits[i].deadline,
 				stepAndUnit: stepsAndUnits[i],

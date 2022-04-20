@@ -48,6 +48,7 @@ const {
 	cancelProjectInMemoq,
 	updateWithApprovedTasks,
 	autoCreatingTranslationTaskInProjectByMemoqLink,
+	autoCreatingTranslationTaskInProjectBySmartlingFile,
 	autoCreatingTranslationTaskInProjectByXTMFile,
 	createProjectIndividual,
 	reImportFilesFromMemoq,
@@ -134,26 +135,9 @@ router.post('/manage-receivable-visible', async (req, res) => {
 })
 
 router.post('/build-TnS-from-memoq-link', async (req, res) => {
-	const {
-		memoqLink,
-		projectId,
-		memoqWorkFlow,
-		creatorUserId,
-		internalProjectId,
-		startDate,
-		deadline
-	} = req.body
-
+	const { memoqLink, projectId, memoqWorkFlow, creatorUserId, internalProjectId, startDate, deadline } = req.body
 	try {
-		const result = await autoCreatingTranslationTaskInProjectByMemoqLink({
-			memoqLink,
-			projectId,
-			memoqWorkFlow,
-			creatorUserId,
-			internalProjectId,
-			startDate,
-			deadline
-		})
+		const result = await autoCreatingTranslationTaskInProjectByMemoqLink({ memoqLink, projectId, memoqWorkFlow, creatorUserId, internalProjectId, startDate, deadline })
 		res.send(result)
 	} catch (err) {
 		console.log(err)
@@ -161,6 +145,43 @@ router.post('/build-TnS-from-memoq-link', async (req, res) => {
 	}
 })
 
+router.post('/build-TnS-from-smartling-file', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	const { projectId, internalProjectId, startDate, deadline, workflow } = req.body
+	const { file } = req.files
+	try {
+		const result = await autoCreatingTranslationTaskInProjectBySmartlingFile({workflow, projectId, internalProjectId, startDate, deadline, file: file[0] })
+		fs.access(file[0].path, (error) => {
+			if (!error) {
+				fs.unlink(file[0].path, (err) => {
+					if (err) return console.log(err)
+				})
+			}
+		})
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
+	}
+})
+
+router.post('/build-TnS-from-xtm-file', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	const { projectId, internalProjectId, startDate, deadline } = req.body
+	const { file } = req.files
+	try {
+		const result = await autoCreatingTranslationTaskInProjectByXTMFile({ projectId, internalProjectId, startDate, deadline, file: file[0] })
+		fs.access(file[0].path, (error) => {
+			if (!error) {
+				fs.unlink(file[0].path, (err) => {
+					if (err) return console.log(err)
+				})
+			}
+		})
+		res.send(result)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Error on adding tasks ref files')
+	}
+})
 
 router.post('/build-TnS-from-xtm-file', upload.fields([ { name: 'file' } ]), async (req, res) => {
 	const { projectId, internalProjectId, startDate, deadline } = req.body
