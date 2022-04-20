@@ -522,7 +522,7 @@ function updateWordcountStepsProgress({ steps, task }) {
 	return steps.map(item => {
 		if (task.taskId === item.taskId) {
 			item.progress = item.status === 'In progress'
-					? setStepsProgress(item.step.title, docs)
+					? setStepsProgressByStepNumber(item.stepNumber, docs)
 					: item.progress
 			item.memoqDocIds = docs.map(item => item.DocumentGuid)
 		}
@@ -530,8 +530,8 @@ function updateWordcountStepsProgress({ steps, task }) {
 	})
 }
 
-function setStepsProgress(title, docs) {
-	const prop = title === 'Translation' ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
+function setStepsProgressByStepNumber(stepNumber, docs) {
+	const prop = stepNumber === 1 ? 'ConfirmedWordCount' : 'Reviewer1ConfirmedWordCount'
 	const totalProgress = docs.reduce((acc, cur) => {
 		acc.wordsDone = acc.wordsDone ? acc.wordsDone + +cur[prop] : +cur[prop]
 		acc.totalWordCount = acc.totalWordCount ? acc.totalWordCount + +cur.TotalWordCount : +cur.TotalWordCount
