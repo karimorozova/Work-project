@@ -167,15 +167,18 @@ export default {
     },
     abilityToCompleteCAT() {
       if (this.isCAT) {
-        const { memoqDocs, step: { title } } = this.job
+        const { memoqDocs, stepNumber, step: { title } } = this.job
         const filesSegmentsCompletedStatus = []
         for (const file of memoqDocs) {
-          if (title === 'Translation') {
-            filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.ConfirmedSegmentCount)
-          }
-          if (title === 'Revising') {
-            filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.Reviewer1ConfirmedSegmentCount)
-          }
+          stepNumber === 1
+              ? filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.ConfirmedSegmentCount)
+              : filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.Reviewer1ConfirmedSegmentCount)
+          // if (title === 'Translation') {
+          //   filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.ConfirmedSegmentCount)
+          // }
+          // if (title === 'Revising') {
+          //   filesSegmentsCompletedStatus.push(file.TotalSegmentCount === file.Reviewer1ConfirmedSegmentCount)
+          // }
         }
         return filesSegmentsCompletedStatus.length && filesSegmentsCompletedStatus.every(Boolean)
       }
