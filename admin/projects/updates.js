@@ -339,12 +339,12 @@ async function getTaskTargetFiles({ task, projectId, step }) {
 		}
 
 	} catch (err) {
-			// TODO: temp. is error on memoq with downloading target file!
-			return {
-				...task._doc,
-				targetFiles,
-				targetFilesStages
-			}
+		// TODO: temp. is error on memoq with downloading target file!
+		return {
+			...task._doc,
+			targetFiles,
+			targetFilesStages
+		}
 		// console.log(err)
 		// console.log("Error in getTaskTargetFiles")
 		// throw new Error(err.message)
@@ -692,14 +692,18 @@ const checkProjectHasMemoqStep = async (projectId) => {
 const regainWorkFlowStatusByStepId = async (stepId, stepAction) => {
 	let workFlowStatus
 	let { steps, tasks } = await Projects.findOne({ 'steps.stepId': stepId }).populate('steps.step')
-	const { taskId, step: { title: jobType }, memoqDocIds } = steps.find(item => item.stepId === stepId)
+	const { taskId, stepNumber, step: { title: jobType }, memoqDocIds } = steps.find(item => item.stepId === stepId)
 	const { memoqProjectId } = tasks.find(item => item.taskId === taskId)
 
-	if (jobType === 'Translation') {
-		workFlowStatus = stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted'
-	} else {
-		workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed'
-	}
+	workFlowStatus = stepNumber === 1
+			? (stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted')
+			: (stepAction === 'Start' ? 'Review1NotStarted' : 'Completed')
+
+	// if (jobType === 'Translation' || jobType === 'Post-Editing') {
+	// 	workFlowStatus = stepAction === 'Start' ? 'TranslationNotStarted' : 'Review1NotStarted'
+	// } else {
+	// 	workFlowStatus = stepAction === 'Start' ? 'Review1NotStarted' : 'Completed'
+	// }
 
 	const updatedTasks = tasks.map(item => {
 		if (item.taskId === taskId) {
