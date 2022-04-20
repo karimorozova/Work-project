@@ -639,7 +639,7 @@ const autoCreatingTranslationTaskInProjectBySmartlingFile = async ({ workflow, p
 	try {
 		checkAllLanguages()
 	} catch (lang) {
-		return new Response(Response.Error, 'Error on creating T&S' + 'Cannot find language' + lang)
+		return new Response(Response.Error, 'Error on creating T&S' + 'Cannot find language ' + lang)
 	}
 
 	for (let [ targetSymbol, taskData ] of Object.entries(groupedByTargetLanguage)) {
