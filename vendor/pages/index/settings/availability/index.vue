@@ -31,6 +31,8 @@
         @remove="removeWorkingDay"
         @update="updateWorkSchedule"
       )
+    .vacancy-calendar
+      .title Days-off
 
 
 </template>
@@ -223,8 +225,10 @@ export default {
   height: 32px;
   background-color: white;
 }
-
-.vacation-calendar {
+.working-schedule {
+  margin-bottom: 60px;
+}
+.vacancy-calendar {
   border-top: 1px solid $light-border;
   padding-top: 60px;
 }
