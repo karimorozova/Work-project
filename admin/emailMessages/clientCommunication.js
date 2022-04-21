@@ -571,8 +571,41 @@ const getPdfInvoice = (invoice) => {
           <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).discount }</span></div>
         </div>`
 			: ''
+	const tableStart = `<div class="table">
+				<table style="font-size: 14px;color: #333;width: 100%;text-align: left;border-collapse: collapse;border-bottom: 1px solid #ededed;border-left: 1px solid #ededed;">
+        <tr>
+            <th style="padding: 10px 7px;color:#fff;background:#555;border-right: 1px solid #ededed;">Title</th>
+            <th style="padding: 10px 7px;color:#fff;background:#555;border-right: 1px solid #ededed;">Quantity</th>
+            <th style="padding: 10px 7px;color:#fff;background:#555;border-right: 1px solid #ededed;">Rate</th>
+             ${ getInvoiceFinance(invoice).discount ? '<th style="padding: 10px 7px;color:#fff;background:#555;border-right: 1px solid #ededed;">Discount</th>' : '' } 
+             ${ getInvoiceFinance(invoice).vat ? '<th style="padding: 10px 7px;color:#fff;background:#555;border-right: 1px solid #ededed;">Tax</th>' : '' } 
+            <th style="padding: 10px 7px;color:#fff;background:#555;border-right: 1px solid #ededed;">Amount</th>
+        </tr>`
+	const tableBody = invoice.items.reduce((acc, item) => {
+		acc = acc + `<tr>
+		    <td style="padding: 10px 7px;border-right: 1px solid #ededed;border-top: 1px solid #ededed;">${ item.title }</td>
+		    <td style="padding: 10px 7px;border-right: 1px solid #ededed;border-top: 1px solid #ededed;">${ +(+item.quantity).toFixed(2) }</td>
+		    <td style="padding: 10px 7px;border-right: 1px solid #ededed;border-top: 1px solid #ededed;">${ +(+item.rate).toFixed(2) }</td>
+	       ${ getInvoiceFinance(invoice).discount
+				? `<td style="padding: 10px 7px;border-right: 1px solid #ededed;border-top: 1px solid #ededed;">
+							${ item.discount }
+							${ item.discountType === 'Currency' ? `<span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span>` : `<span style="margin-left: 2px;">%</span>` } 
+          </td>`
+				: '' } 
+	       ${ getInvoiceFinance(invoice).vat
+				? `<td style="padding: 10px 7px;border-right: 1px solid #ededed;border-top: 1px solid #ededed;">
+											${ item.tax }
+											${ item.taxType === 'Currency' ? `<span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span>` : `<span style="margin-left: 2px;">%</span>` } 
+									</td>`
+				: '' } 
+		    <td style="padding: 10px 7px;border-right: 1px solid #ededed;border-top: 1px solid #ededed;">${ +(+item.amount).toFixed(2) } <span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span></td>
+	     </tr>`
+		return acc
+	}, '')
+	const tableEnd = `</table></div>`
+
 	return `
-		<div class="template" style="font-family: Arial, sans-serif; width: 840px;box-sizing: border-box;padding: 40px;background: wheat; font-size:14px; color: #333;">
+		<div class="template" style="font-family: Arial, sans-serif; width: 840px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
 		  <div class="header">
 		    <div class="header__logo" style="width: 451px; margin-right: 25px; display: inline-block; vertical-align: top;">
 		      <div class="header__logo-image" style="width: 230px; ">
@@ -623,13 +656,15 @@ const getPdfInvoice = (invoice) => {
 		  </div>
 		  <div class="body">
 		    <div class="body__table">
-		      TABLE
+		    	${ tableStart }
+		    	${ tableBody }
+		    	${ tableEnd }
 		    </div>
-		    <div class="body__subtable" style="width: 280px; margin-left: 480px; margin-top: 25px;">
+		    <div class="body__subtable" style="width: 280px; margin-left: 480px; margin-top: 35px;">
 		      <div class="table-details">
 		        <div class="row" style="height: 30px;">
 		          <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">Sub Total:</div>
-		          <div class="row__value" style="width: 150px;display: inline-block;"><spanstyle="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).subTotal }</span></div>
+		          <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).subTotal }</span></div>
 		        </div>
 						${ tableDetailsVAT }
 						${ tableDetailsDiscount }

@@ -66,9 +66,11 @@ const InvoiceSchema = new mongoose.Schema({
 	invoiceFile: {
 		path: {
 			type: String,
+			default: ''
 		},
 		fileName: {
 			type: String,
+			default: ''
 		}
 	},
 	createdAt: {

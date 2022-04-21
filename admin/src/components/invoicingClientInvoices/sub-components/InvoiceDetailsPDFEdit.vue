@@ -231,16 +231,16 @@ import Add from "../../Add"
 import SelectSingle from "../../SelectSingle"
 import moment from "moment"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
-import {getAmountByPercent, getInvoiceFinance} from "../../../../invoicing/helpers"
-import Button from "../../Button";
-import {mapActions} from "vuex";
-import AddReports from "../../invoicingClientReports/AddReports";
-import IconButton from "../../IconButton";
+import { getAmountByPercent, getInvoiceFinance } from "../../../../invoicing/helpers"
+import Button from "../../Button"
+import { mapActions } from "vuex"
+import AddReports from "../../invoicingClientReports/AddReports"
+import IconButton from "../../IconButton"
 
 export default {
   mixins: [ currencyIconDetected ],
   name: "InvoiceDetailsPDFEdit",
-  components: {IconButton, AddReports, Button, SelectSingle, Add, GeneralTable, DatePicker },
+  components: { IconButton, AddReports, Button, SelectSingle, Add, GeneralTable, DatePicker },
   props: {
     invoice: {
       type: Object
@@ -297,7 +297,7 @@ export default {
       title: '',
       quantity: 1,
       rate: 0,
-      tax : 0,
+      tax: 0,
       taxType: 'Percents',
       discount: 0,
       discountType: 'Percents',
@@ -313,14 +313,15 @@ export default {
       isOpenJobsModal: false,
 
       defaultItem: {
-        title : '',
-        reportId : null,
-        quantity : 0,
-        rate : 0,
+        title: '',
+        reportId: null,
+        quantity: 0,
+        rate: 0,
+        tax: 0,
         taxType: 'Percents',
         discount: 0,
         discountType: 'Percents',
-        amount : 0,
+        amount: 0,
         type: ''
       }
     }
@@ -329,11 +330,11 @@ export default {
     ...mapActions({
       alertToggle: 'alertToggle'
     }),
-    openItemModalAdd(){
+    openItemModalAdd() {
       this.isOpenModalAddItem = true
       this.closeOptionsModal()
     },
-    openItemModalEdit(index){
+    openItemModalEdit(index) {
       this.itemEditingIndex = index
       const item = this.invoice.items[index]
       this.title = item.title
@@ -345,20 +346,20 @@ export default {
       this.discountType = item.discountType
       this.isOpenModalEditItem = true
     },
-    closeItemsModal(){
+    closeItemsModal() {
       this.isOpenModalAddItem = false
       this.isOpenModalEditItem = false
       this.setDefaultData()
       this.itemEditingIndex = null
     },
-    openOptionsModal(){
+    openOptionsModal() {
       this.isOpenModalOptions = true
       this.getItemsReports()
     },
-    closeOptionsModal(){
+    closeOptionsModal() {
       this.isOpenModalOptions = false
     },
-    saveEditItem(){
+    saveEditItem() {
       let item = this.invoice.items[this.itemEditingIndex]
       item.title = this.title
       item.rate = this.rate
@@ -371,18 +372,18 @@ export default {
       this.modifyInvoice('items', this.invoice.items)
       this.closeItemsModal()
     },
-    async saveNewItem(type, _reportId){
+    async saveNewItem(type, _reportId) {
       let item = { ...this.defaultItem }
       item.type = type
 
-      if(type === 'Custom'){
+      if (type === 'Custom') {
         item.title = this.title
-        item.rate = +(this.rate).toFixed(2)
-        item.quantity = this.quantity
+        item.rate = +(+this.rate).toFixed(2)
+        item.quantity = +this.quantity
         item.amount = +(item.rate * item.quantity).toFixed(2)
       }
 
-      if(type === 'Report'){
+      if (type === 'Report') {
         const report = this.listOfClientReports.find(i => i._id === _reportId)
         item.reportId = _reportId
         item.title = 'Language Service: report ' + report.reportId
@@ -397,10 +398,10 @@ export default {
 
       item = this.calcItemTaxAndDiscount(item)
 
-      this.modifyInvoice('items', [...this.invoice.items, item])
+      this.modifyInvoice('items', [ ...this.invoice.items, item ])
       this.closeItemsModal()
     },
-    calcItemTaxAndDiscount(item){
+    calcItemTaxAndDiscount(item) {
       if (this.discount) {
         item.discount = +this.discount
         if (this.discountType === 'Currency') {
@@ -412,7 +413,7 @@ export default {
           item.amount = +(item.amount - discountTotal).toFixed(2)
         }
       }
-      if(this.tax){
+      if (this.tax) {
         item.tax = +this.tax
         if (this.taxType === 'Currency') {
           item.taxType = 'Currency'
@@ -425,12 +426,12 @@ export default {
       }
       return item
     },
-    deleteItem(index){
+    deleteItem(index) {
       const deletedItem = this.invoice.items.splice(index, 1)
       this.itemsForDelete.push(...deletedItem)
-      this.modifyInvoice('items', [...this.invoice.items])
+      this.modifyInvoice('items', [ ...this.invoice.items ])
     },
-    setItemOption(option, prop){
+    setItemOption(option, prop) {
       this[prop] = option
     },
     takeInvoiceFinance() {
@@ -453,46 +454,46 @@ export default {
         this.alertToggle({ message: "Error on getting Payment Terms", isShow: true, type: "error" })
       }
     },
-    async getItemsReports(){
-      const existingReports = (item) => !this.invoice.items.map(i => `${i.reportId}`).includes(`${item._id}`)
-      try{
-      this.listOfClientReports = (await this.$http.post('/invoicing/reports-list/', {
-        query: {
-          invoice: null,
-          client: this.invoice.customer._id,
-          clientBillingInfo: this.invoice.clientBillingInfo
-        }
-      })).data.filter(existingReports)
+    async getItemsReports() {
+      const existingReports = (item) => !this.invoice.items.map(i => `${ i.reportId }`).includes(`${ item._id }`)
+      try {
+        this.listOfClientReports = (await this.$http.post('/invoicing/reports-list/', {
+          query: {
+            invoice: null,
+            client: this.invoice.customer._id,
+            clientBillingInfo: this.invoice.clientBillingInfo
+          }
+        })).data.filter(existingReports)
       } catch (err) {
         this.alertToggle({ message: "Error on getting Reports", isShow: true, type: "error" })
       }
     },
-    setDefaultData(){
-        this.title = ''
-        this.quantity = 1
-        this.rate = 0
-        this.tax = 0
-        this.taxType = 'Percents'
-        this.discount = 0
-        this.discountType = 'Percents'
-        this.itemEditingIndex = null
+    setDefaultData() {
+      this.title = ''
+      this.quantity = 1
+      this.rate = 0
+      this.tax = 0
+      this.taxType = 'Percents'
+      this.discount = 0
+      this.discountType = 'Percents'
+      this.itemEditingIndex = null
     },
-    openAllJobsModal(){
+    openAllJobsModal() {
       this.closeOptionsModal()
       let elem = document.getElementsByTagName('body')[0]
       elem.classList.add("hiddenScroll")
-      this.$router.replace({ path: this.$route.path, query: { clientBillingInfo: this.invoice.clientBillingInfo } } ).then(() => {
+      this.$router.replace({ path: this.$route.path, query: { clientBillingInfo: this.invoice.clientBillingInfo } }).then(() => {
         this.isOpenJobsModal = true
       })
     },
-    closeAllJobsModal(){
+    closeAllJobsModal() {
       this.closeOptionsModal()
       let elem = document.getElementsByTagName('body')[0]
       elem.classList.remove("hiddenScroll")
-      this.$router.replace({ path: this.$route.path, query: { } } ).then(() =>{
+      this.$router.replace({ path: this.$route.path, query: {} }).then(() => {
         this.isOpenJobsModal = false
-      } )
-    },
+      })
+    }
   },
   computed: {
     fieldsItemsFiltered() {
@@ -500,10 +501,10 @@ export default {
       const hasTax = this.invoice.items.some(j => !!j.tax)
       const hasDiscount = this.invoice.items.some(k => !!k.discount)
       return this.fieldsItems
-        .filter(item => (!items.length || !hasTax) ? item.key !== 'tax' : item)
-        .filter(item => (!items.length || !hasDiscount) ? item.key !== 'discount' : item)
+          .filter(item => (!items.length || !hasTax) ? item.key !== 'tax' : item)
+          .filter(item => (!items.length || !hasDiscount) ? item.key !== 'discount' : item)
     },
-    editedInvoiceItemType(){
+    editedInvoiceItemType() {
       return this.invoice.items[this.itemEditingIndex]?.type
     }
   },
@@ -629,11 +630,11 @@ export default {
     }
   }
 
-  &__table{
+  &__table {
     position: relative;
   }
 
-  &__modal{
+  &__modal {
     position: absolute;
     box-shadow: $box-shadow;
     padding: 25px;
@@ -645,17 +646,17 @@ export default {
     z-index: 3;
     box-sizing: border-box;
 
-    &-cols{
+    &-cols {
       display: flex;
     }
 
-    &-col2{
+    &-col2 {
       margin-left: 26px;
       padding-left: 25px;
       border-left: 1px solid $light-border;
     }
 
-    &-item{
+    &-item {
       display: flex;
       align-items: center;
       width: 300px;
@@ -663,13 +664,13 @@ export default {
       height: 44px;
     }
 
-    &-title{
+    &-title {
       font-size: 16px;
       font-family: Myriad600;
       margin-bottom: 15px;
     }
 
-    &-buttons{
+    &-buttons {
       display: flex;
       gap: 20px;
       justify-content: center;
@@ -689,12 +690,12 @@ export default {
   }
 }
 
-.add{
+.add {
   position: relative;
   height: 27px;
   margin-top: 10px;
 
-  &__modal{
+  &__modal {
     position: absolute;
     box-shadow: $box-shadow;
     width: 220px;
@@ -707,7 +708,8 @@ export default {
     z-index: 2;
     box-sizing: border-box;
   }
-  .selectList{
+
+  .selectList {
 
     &__close {
       padding: 5px;
@@ -722,7 +724,7 @@ export default {
       }
     }
 
-    &__item{
+    &__item {
       padding: 10px;
       border-bottom: 1px solid $light-border;
       cursor: pointer;
@@ -732,7 +734,7 @@ export default {
       align-items: center;
       color: $text;
 
-      &-flex{
+      &-flex {
         display: flex;
         gap: 10px;
       }
@@ -754,13 +756,15 @@ export default {
   &__data {
     padding: 0 7px;
   }
-  &__icons{
+
+  &__icons {
     display: flex;
     gap: 12px;
     justify-content: center;
     width: 100%;
   }
-  &__icon{
+
+  &__icon {
     cursor: pointer;
   }
 }
@@ -789,17 +793,19 @@ input {
     border: 1px solid $border-focus;
   }
 }
-.w-90{
+
+.w-90 {
   width: 95px;
   margin-right: -10px;
 }
-.input-option{
+
+.input-option {
   height: 32px;
   width: 110px;
   position: relative;
 }
 
-.full-modal{
+.full-modal {
   position: fixed;
   left: 255px;
   top: 0;
@@ -811,14 +817,14 @@ input {
   z-index: 30000;
   height: 100%;
 
-  &__close{
+  &__close {
     position: absolute;
     left: 290px;
     top: 10px;
   }
 }
 
-.table-symbol{
+.table-symbol {
   color: $dark-border;
   margin-left: 4px;
 }
