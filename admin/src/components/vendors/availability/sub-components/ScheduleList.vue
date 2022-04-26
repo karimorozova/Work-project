@@ -11,8 +11,8 @@
               @chooseOption="({option}) => updateItem(option, 'day', index)"
             )
           span.time-text from
-          .drop
-            DatePicker(
+          .datepicker
+            DatePicker.time-picker(
               class="datepicker"
               @confirm="(time) => updateItem(time, 'from', index)"
               ref="deadline"
@@ -25,12 +25,12 @@
               value-type="format"
               type="time"
               placeholder="hh:mm"
-
             )
+            .converted-time(v-if="item.from") {{ convertToActualTimezone(item.from) }}
+
           span.time-text to
-          .drop
-            DatePicker(
-              class="datepicker"
+          .datepicker
+            DatePicker.time-picker(
               @confirm="(time) => updateItem(time, 'to', index)"
               ref="deadline"
               :clearable="false"
@@ -43,6 +43,9 @@
               type="time"
               placeholder="hh:mm"
             )
+            .converted-time(v-if="item.to") {{ convertToActualTimezone(item.to) }}
+
+
           .remove-button(@click="remove(index)")
             .remove-button__icon
               i.fas.fa-trash
@@ -51,6 +54,7 @@
               i.fas.fa-arrows-alt-v
 
       Add(@add="addAvailableDay")
+
 </template>
 
 
@@ -60,6 +64,7 @@ import DatePicker from 'vue2-datepicker'
 import '@/assets/scss/datepicker.scss'
 import Add from "../../../Add";
 import draggable from 'vuedraggable'
+import moment from "moment-timezone";
 
 export default {
   name: 'ScheduleRow',
@@ -68,6 +73,9 @@ export default {
       type: Array,
       default: () => []
     },
+    timezone: {
+      type: String
+    }
   },
   components: {
     Add,
@@ -79,11 +87,32 @@ export default {
   data() {
     return {
       weekDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-      day: ''
-
+      day: '',
+      userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }
   },
   methods: {
+    convertActualDateFormat(time) {
+      const currentDate = new Date();
+      const currentDayOfMonth = currentDate.getDate().toString().padStart(2, '0');
+      const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const currentYear = currentDate.getFullYear();
+      const dateString = `${currentYear}-${currentMonth}-${currentDayOfMonth}`;
+      return `${dateString} ${time}`
+    },
+    getTimeString(timeStr) {
+      const yourDateObj = new Date();
+      yourDateObj.setTime(Date.parse(timeStr));
+      const min = yourDateObj.getMinutes().toString().padStart(2, '0');
+      const hour = yourDateObj.getHours().toString().padStart(2, '0');
+      return `${hour}:${min}`
+    },
+    convertToActualTimezone(time) {
+      const calculatedDateString = moment.tz(this.convertActualDateFormat(time), this.timezone).tz(this.userTimezone).format()
+      return this.getTimeString(calculatedDateString)
+    },
+
+
     changeItemPosition(data) {
       this.$emit('changeItemPosition', data)
     },
@@ -108,6 +137,23 @@ export default {
 <style lang="scss" scoped>
 @import "../../../../assets/scss/colors.scss";
 
+//.container {
+//  //border-right: 1px solid #ededed;
+//  padding-right: 20px;
+//}
+
+.datepicker {
+  position: relative;
+}
+
+.converted-time {
+  position: absolute;
+  top: 9px;
+  right: 50px;
+  opacity: 0.45;
+}
+
+
 .item {
   display: flex;
   align-items: center;
@@ -121,6 +167,41 @@ export default {
   background-color: white;
   margin-right: 20px;
 }
+
+.time-picker {
+  margin-right: 20px;
+
+}
+
+//.time-picker {
+//  position: relative;
+//}
+
+//.manager-time {
+//  position: absolute;
+//  top: 0;
+//  right: 310px;
+//  opacity: 0.45;
+//  z-index: 1;
+//}
+//.time {
+//  position: absolute;
+//  top: 9px;
+//  left: 250px;
+//  opacity: 0.45;
+//  z-index: 1;
+//}
+
+//.time-from {
+//position: absolute;
+//  top: 0;
+//  left: 150px;
+//}
+//.time-to {
+//  position: absolute;
+//  top: 0;
+//  right: 310px;
+//}
 
 .time-text {
   margin-right: 10px;

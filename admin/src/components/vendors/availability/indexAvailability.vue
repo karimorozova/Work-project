@@ -1,29 +1,52 @@
 <template lang="pug">
   .main
-    .available-container
-      .available-wrapper
-        label.available-title Available work
-        Toggler.available__toggler(@toggle="showAvailability" :is-active="isAvailableForWork")
-      .timezone-wrapper
-        label.timezone  Time Zone
-        .drop
-          SelectSingle(
-            :hasSearch="true"
-            :options="timezones"
-            :selectedOption="timezone"
-            placeholder="Timezone"
-            @chooseOption="setTimezone"
+    .flex-wrapper
+      .vendor-schedule
+        .available-container
+          .available-wrapper
+            label.available-title Available work
+            Toggler.available__toggler(@toggle="showAvailability" :is-active="isAvailableForWork")
+          .timezone-wrapper
+            label.timezone  Time Zone
+            .drop
+              SelectSingle(
+                :hasSearch="true"
+                :options="timezones"
+                :selectedOption="timezone"
+                placeholder="Timezone"
+                @chooseOption="setTimezone"
+              )
+        .working-schedule
+          .title Working hours
+          ScheduleList(
+            v-if="isAvailableForWork"
+            :daysList="this.workSchedule"
+            :timezone="timezone"
+            @changeItemPosition="changeSchedulePosition"
+            @add="addAvailableDay"
+            @remove="removeWorkingDay"
+            @update="updateWorkSchedule"
+
           )
-    .working-schedule
-      .title Working hours
-      ScheduleList(
-        v-if="isAvailableForWork"
-        :daysList="this.workSchedule"
-        @changeItemPosition="changeSchedulePosition"
-        @add="addAvailableDay"
-        @remove="removeWorkingDay"
-        @update="updateWorkSchedule"
-      )
+
+        //.manager-schedule
+        //  .schedule-wrapper(
+        //    v-for="(item, index) in projectManagerTime "
+        //  )
+        //    .schedule-row
+        //      span.time-text from
+        //      .time-picker {{ item.from}}
+        //      span.time-text to
+        //      .time-picker {{ item.to}}
+      //  .timezone-wrapper.timezone-wrapper__manager
+      //    span.timezone  Time Zone
+      //    .manager__timezone {{ userTimezone }}
+      //  p.title Time zone Offset in hours:
+      //    span.offset {{ timezoneOffsetInHours }} hour(s)
+
+
+
+
 </template>
 
 <script>
@@ -39,45 +62,46 @@ export default {
       workSchedule: [],
       timezone: '',
       isAvailableForWork: false,
-      timezones: []
+      timezones: [],
     }
   },
   methods: {
     ...mapActions([
       "alertToggle"
     ]),
-    async createTimeString() {
-      try {
-        const res = await this.$http.get(`/vendorsapi/vendor-availability/${this.$route.params.id}`)
-        const {data: {workSchedule, timezone}} = res;
-        let timeFrom = '';
-        let timeTo = '';
-        workSchedule.forEach(({from, to}) => {
-          timeFrom = "2013-11-18 " + from
-          timeTo = "2013-11-18 " + to
-        })
-        // console.log(timeFrom)
-        // console.log(timeTo)
-        // console.log(timezone)
-        const actualStartTime = moment.tz(timeFrom, timezone).format()
-        // const actualFinishTime = moment.tz(timeTo, timezone).format()
-        const projectTime = actualStartTime.format().tz('America/Los_Angeles').format()
-        console.log(actualStartTime)
-        console.log(projectTime);
-        // console.log(actualFinishTime);
+    // async createTimeString() {
+    //   try {
+    //     // const res = await this.$http.get(`/vendorsapi/vendor-availability/${this.$route.params.id}`)
+    //     // const {data: {workSchedule, timezone}} = res;
+    //     // this.timezoneOffsetInHours = new Date().getHours() - moment().tz(timezone).hour()
+    //
+    //
+    //     //
+    //     // workSchedule.forEach(({from, to}) => {
+    //     //   const timeFrom = `${dateString} ${from}`
+    //     //   const timeTo = `${dateString} ${to}`
+    //     //   this.getActualWorkingHoursForProjectManager(timeFrom, timeTo, timezone)
+    //     // })
+    //
+    //   } catch (err) {
+    //     console.log(err)
+    //   }
+    //
+    // },
 
+    // getActualWorkingHoursForProjectManager(timeFrom, timeTo, timezone) {
+    //   console.log(timeFrom, timeTo, timezone)
+    //   const startString =
+    //   const finishString = moment.tz(timeTo, timezone).tz(this.userTimezone).format();
+    //
+    //   // this.projectManagerTime.push({
+    //   //   from: this.getTimeString(startString),
+    //   //   to: this.getTimeString(finishString),
+    //   // })
+    //   // console.log(this.projectManagerTime)
+    //
+    // },
 
-        // const {_d: day} = moment();
-        // console.dir(day)
-        // console.dir(day.getHours())
-        // console.dir(day.getMinutes())
-        // const str = Date()
-        // console.log(str)
-      } catch (err) {
-        console.log(err)
-      }
-
-    },
     changeSchedulePosition(sortedArr) {
       this.workSchedule = sortedArr
       this.saveAvailability('workSchedule')
@@ -145,7 +169,17 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendorGeneralData",
       currentFullVendor: "getCurrentVendor"
-    })
+    }),
+    // projectManagerTime() {
+    //   console.log(this.workSchedule)
+    //   return this.workSchedule.map(({from, to}) => ({
+    //     from: this.convertToActualTimezone(from),
+    //     to: this.convertToActualTimezone(to)
+    //   }))
+    // },
+    // timezoneOffsetInHours() {
+    //   return new Date().getHours() - moment().tz(this.timezone).hour()
+    // }
   },
   components: {
     SelectSingle,
@@ -155,7 +189,6 @@ export default {
   async created() {
     await this.getAvailability()
     this.timezones = moment.tz.names()
-    await this.createTimeString()
   }
 }
 </script>
@@ -180,20 +213,22 @@ export default {
 .available-wrapper {
   display: flex;
   align-items: center;
+  margin-right: 80px;
 }
 
 .available__toggler {
   margin-left: 30px;
 }
 
-.available-wrapper {
-  margin-right: 80px;
-}
 
 .timezone-wrapper {
   display: flex;
   align-items: center;
 }
+
+//.timezone-wrapper__manager {
+//  margin-bottom: 40px;
+//}
 
 .wrapperAcc {
   padding: 25px;
@@ -211,4 +246,74 @@ export default {
   height: 32px;
   background-color: white;
 }
+
+//.vendor-schedule {
+//  border-right: 1px solid #ededed;
+//}
+
+//.flex-wrapper {
+//  display: flex;
+//}
+//
+//.manager-schedule {
+//  padding-left: 20px;
+//}
+//
+//.manager__timezone {
+//  box-sizing: border-box;
+//  border: 1px solid $border;
+//  border-radius: 2px;
+//  width: 220px;
+//  height: 32px;
+//  background-color: white;
+//  padding: 7px;
+//}
+//
+//.schedule-row {
+//  display: flex;
+//  align-items: center;
+//  margin-bottom: 20px;
+//}
+
+//.time-picker {
+//  width: 110px;
+//  height: 32px;
+//  margin-right: 20px;
+//  box-sizing: border-box;
+//  border: 1px solid $border;
+//  border-radius: 2px;
+//  background-color: white;
+//  padding: 7px;
+//
+//}
+//.time-picker {
+//  opacity: 0.45;
+//}
+//
+//.time-text {
+//  margin-right: 10px;
+//}
+//
+//.offset {
+//  display: inline-block;
+//  margin-left: 30px;
+//}
+//.manager-time {
+//  position: absolute;
+//  top: 0;
+//  right: 310px;
+//  opacity: 0.45;
+//  z-index: 1;
+//}
+//.time-from {
+//  position: absolute;
+//  top: 0;
+//  left: 150px;
+//}
+//.time-to {
+//  position: absolute;
+//  top: 0;
+//  right: 310px;
+//}
+
 </style>
