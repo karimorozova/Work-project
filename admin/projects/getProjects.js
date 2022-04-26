@@ -62,7 +62,7 @@ async function getProjects(obj) {
 			.populate('requestId', [ 'projectId' ]))
 }
 
-async function getProjectsForVendorPortalAll({ filters }) {
+async function getProjectsForVendorPortalAll({ filters = {}, project = {} }) {
 	const allLanguages = await Languages.find()
 	const allSteps = await Step.find()
 	const query = getFilteredVendorPortalProjectsQuery(filters, allLanguages, allSteps)
@@ -80,18 +80,22 @@ async function getProjectsForVendorPortalAll({ filters }) {
 				...query
 			}
 		},
-		{
-			$project: {
-				projectId: 1,
-				projectName: 1,
-				status: 1,
-				startDate: 1,
-				deadline: 1,
-				brief: 1,
-				projectManager: 1,
-				steps: 1
-			}
-		},
+		!Object.keys(project).length ?
+				{
+					$project: {
+						projectId: 1,
+						projectName: 1,
+						status: 1,
+						startDate: 1,
+						deadline: 1,
+						brief: 1,
+						projectManager: 1,
+						steps: 1
+					}
+				} :
+				{
+					$project: { ...project }
+				},
 		{
 			$unset: [
 				'steps.finance',

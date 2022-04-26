@@ -86,7 +86,6 @@ export default {
     },
     updateItem(value, prop, index) {
       this.$emit('update', { value, prop, index })
-      console.log(value)
     },
     addAvailableDay() {
       this.$emit('add', { day: '', from: '', to: '' })

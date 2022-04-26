@@ -91,6 +91,13 @@ function vendorRegistration(obj) {
 }
 
 function requestMessageForVendor(obj) {
+	const instructionsTitle = "<div style='margin-top: 35px; margin-bottom: 10px;'><b><u>Please read carefully the instructions:</u></b></div>"
+	const brief = `<p><b>General instructions:</b>${ obj.brief }</p>`
+	const vendorBrief = `<p><b>Individual instructions:</b>${ obj.vendorBrief }</p>`
+	const instructions = obj.brief || obj.vendorBrief
+			? `${ instructionsTitle }  ${ obj.brief ? brief : '' } ${ obj.vendorBrief ? vendorBrief : '' }`
+			: ''
+
 	const date = Date.now()
 	const token = jwt.sign({ vendorId: obj.vendor.id }, secretKey, { expiresIn: '24h' })
 	const langPair = obj.sourceLanguage === obj.targetLanguage ? obj.targetLanguage : obj.sourceLanguage + ' >> ' + obj.targetLanguage
@@ -143,7 +150,8 @@ function requestMessageForVendor(obj) {
 											      <div style="display: inline-block; padding: 8px; min-width: 200px;">Cost:</div>
 											      <div style="display: inline-block; padding: 8px; min-width: 200px;">${ (obj.nativeFinance.Price.payables).toFixed(2) } ${ returnIconCurrencyByStringCode('EUR') }</div>
 											  </div>
-										</div>
+										</div
+										${ instructions }
 	                  <p style="margin-top: 35px;">You can accept the quote by clicking the link below:<br>
                     <span> ${ acceptQuote }</span>
                     <span> ${ declineQuote }</span>

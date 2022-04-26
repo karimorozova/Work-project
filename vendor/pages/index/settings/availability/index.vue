@@ -78,12 +78,10 @@ export default {
       if (this.isAvailableForWork) {
         this.isAvailableForWork = false
         this.saveAvailability('isAvailableForWork')
-        console.log(this.isAvailableForWork, "---------inside if")
         return
       }
       this.isAvailableForWork = true
       this.saveAvailability('isAvailableForWork')
-      console.log(this.isAvailableForWork)
     },
     addAvailableDay(item) {
       this.workSchedule.push(item)
@@ -133,8 +131,6 @@ export default {
       }
     },
     setUpAvailabilityData({ data }) {
-      console.log('retrieve start data', data)
-
       this.workSchedule = data.workSchedule
       this.timezone = data.timezone
       this.isAvailableForWork = data.isAvailableForWork

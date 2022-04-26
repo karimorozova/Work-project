@@ -48,12 +48,14 @@ export default {
       this.lastDate.setDate(this.lastDate.getDate() + 1)
 
       const projects = await this.$axios.post(`/vendor/all-vendor-jobs`, {
-        ...this.filters,
-        stepsStatuses: { $in: [ 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ] },
-        lastDate: this.lastDate,
-        vendor: this.vendor._id,
-        isFilterZeroFinance: false,
-        isLimit: false
+        filters: {
+          ...this.filters,
+          stepsStatuses: { $in: [ 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress' ] },
+          lastDate: this.lastDate,
+          vendor: this.vendor._id,
+          isFilterZeroFinance: true,
+          isLimit: false
+        }
       })
 
       projects.data.forEach(elem => {

@@ -84,6 +84,11 @@ export default {
         this.alertToggle({ message: "Data received", isShow: true, type: "success" })
       } catch (err) {
       }
+    },
+    async onTabEnterJobDetails() {
+      if (document.visibilityState === 'visible') {
+        await this.getJobsDetails()
+      }
     }
   },
   computed: {
@@ -94,6 +99,10 @@ export default {
   },
   async created() {
     await this.getJobsDetails()
+    document.addEventListener("visibilitychange", this.onTabEnterJobDetails)
+  },
+  destroyed() {
+    document.removeEventListener('visibilitychange', this.onTabEnterJobDetails)
   }
 }
 </script>

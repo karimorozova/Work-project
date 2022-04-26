@@ -64,9 +64,9 @@ router.put("/vendor-availability-manage/:_vendorId", checkVendor, async (req, re
 		const vendorAvailability = await updateVendorAvailability(_vendorId, { prop, value })
 		res.send(vendorAvailability)
 	} catch (err) {
-	console.log(err)
-	res.status(500).send("Error on updating Vendor availability")
-}
+		console.log(err)
+		res.status(500).send("Error on updating Vendor availability")
+	}
 })
 
 
@@ -270,7 +270,7 @@ router.post("/info", checkVendor, upload.fields([ { name: 'photo' } ]), async (r
 
 router.post("/all-vendor-jobs", checkVendor, async (req, res) => {
 	try {
-		const projects = await getProjectsForVendorPortalAll({ filters: req.body })
+		const projects = await getProjectsForVendorPortalAll({ filters: req.body.filters, project: req.body.project })
 		res.send(projects)
 	} catch (err) {
 		console.log(err)

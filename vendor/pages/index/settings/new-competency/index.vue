@@ -598,18 +598,15 @@ export default {
 }
 
 .title {
-  font-size: 14px;
+  font-size: 16px;
   padding-bottom: 10px;
   padding-top: 30px;
-  text-transform: uppercase;
   font-family: 'Roboto600';
 }
 
 .title1 {
-  font-size: 14px;
+  font-size: 16px;
   padding-bottom: 10px;
-  padding-top: 20px;
-  text-transform: uppercase;
   font-family: 'Roboto600';
 }
 

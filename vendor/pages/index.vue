@@ -23,23 +23,23 @@
       .navbar__name
         .navbar__name-title VENDOR PORTAL
 
-    .content(v-if="vendor._id" )
+    .content(v-if="vendor._id")
       Header
+      ImportantVendorTodos
       .content__body
         nuxt-child
 
 </template>
 
 <script>
-
-import ClickOutside from "vue-click-outside"
 import { mapGetters, mapActions } from "vuex"
 import Header from "../components/Header"
 import { setCurrentVendor } from "../store/actions"
 import { getVendor } from "../store/getters"
+import ImportantVendorTodos from "../components/sub-components/ImportantVendorTodos"
 
 export default {
-  components: { Header },
+  components: { ImportantVendorTodos, Header },
   middleware: [ 'authenticated', 'new-user-redirect' ],
   data() {
     return {
@@ -236,9 +236,6 @@ export default {
     await this.getAllIndustries()
     await this.getAllSteps()
     await this.getAllServices()
-  },
-  directives: {
-    ClickOutside
   }
 }
 </script>

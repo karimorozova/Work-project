@@ -178,7 +178,7 @@ export default {
           label: "Job ID",
           headerKey: "headerID",
           key: "jobId",
-          style: { "width": "200px" }
+          style: { "width": "180px" }
         },
         {
           label: "Project Name",
@@ -264,12 +264,14 @@ export default {
       this.lastDate.setDate(this.lastDate.getDate() + 1)
 
       const projects = await this.$axios.post(`/vendor/all-vendor-jobs`, {
-        ...this.filters,
-        stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
-        lastDate: this.lastDate,
-        vendor: this.vendor._id,
-        isFilterZeroFinance: true,
-        isLimit: true
+        filters: {
+          ...this.filters,
+          stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
+          lastDate: this.lastDate,
+          vendor: this.vendor._id,
+          isFilterZeroFinance: true,
+          isLimit: true
+        }
       })
       this.projects = projects.data
       this.isDataRemain = projects.data.length === 25
@@ -280,12 +282,14 @@ export default {
     async bottomScrolled() {
       if (this.isDataRemain && this.lastDate) {
         const projects = (await this.$axios.post(`/vendor/all-vendor-jobs`, {
-              ...this.filters,
-              stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
-              lastDate: this.lastDate,
-              vendor: this.vendor._id,
-              isFilterZeroFinance: true,
-              isLimit: true
+              filters: {
+                ...this.filters,
+                stepsStatuses: { $in: [ 'Completed', 'Cancelled Halfway' ] },
+                lastDate: this.lastDate,
+                vendor: this.vendor._id,
+                isFilterZeroFinance: true,
+                isLimit: true
+              }
             })
         ).data
         this.projects.push(...projects)
