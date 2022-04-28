@@ -536,7 +536,6 @@ async function getMemoqFileIdAsXML(memoqProjectId, DocumentGuid) {
 	}
 }
 
-
 async function listAnalysisReports(projectId) {
 	const xml = `${ xmlHeader }
                 <soapenv:Body>
@@ -808,7 +807,30 @@ function getMemoqProjectData(project, languages, isProjectExistInSystem) {
 	}
 }
 
+
+async function deleteMemoqProject(ProjectGuid) {
+	const xml = `${ xmlHeader }
+                <soapenv:Body>
+									<ns:DeleteProject>
+						         <ns:serverProjectGuid>${ ProjectGuid }</ns:serverProjectGuid>
+						      </ns:DeleteProject>
+                </soapenv:Body>
+            </soapenv:Envelope>`
+	const headers = headerWithoutAction('DeleteProject')
+	try {
+		const { response } = await soapRequest({ url, headers, xml })
+		// const result = parser.toJson(response.body, { object: true, sanitize: true, trim: true })["s:Envelope"]["s:Body"]
+		// console.log(result)
+		return 'Done!'
+	} catch (err) {
+		console.log("Error in deleteMemoqProject")
+		console.log(err)
+		throw err
+	}
+}
+
 module.exports = {
+	deleteMemoqProject,
 	getMemoqAllProjects,
 	moveMemoqFileToProject,
 	createMemoqProjectWithTemplate,

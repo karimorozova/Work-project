@@ -12,6 +12,15 @@ const findLanguageByMemoqLanguageCode = (lang, memoqSymbol) => {
 	else if (lang.symbol === memoqSymbol) return true
 }
 
+
+function getLanguageByAnyLangCode(allLanguages, symbol, iterator) {
+	const keys = [ 'smartling', 'xtm', 'iso1', 'iso2', 'symbol', 'memoq' ]
+	if (keys[iterator] === undefined) return null
+	const lang = allLanguages.find(item => item[keys[iterator]].toLowerCase() === symbol.toLowerCase())
+	if (!lang) return getLanguageByAnyLangCode(allLanguages, symbol, ++iterator)
+	return lang
+}
+
 function calculateCrossRate(USD, GBP) {
 	const EUR = 1;
 	return {
@@ -78,6 +87,6 @@ module.exports = {
 	returnIconCurrencyByStringCode,
 	rateExchangeVendorOntoProject,
 	rateExchangeProjectOntoVendor,
-	calculateCrossRate
-
+	calculateCrossRate,
+	getLanguageByAnyLangCode
 }

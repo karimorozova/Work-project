@@ -36,6 +36,7 @@
           @setStatus="setStatus"
         )
         ProjectFinance
+        PretranslationDocuments
       //.project-info__preview(v-if="isEditAndSend")
       //  Preview(
       //    @closePreview="closePreview"
@@ -58,6 +59,7 @@ import Deliverables from './Deliverables'
 import ImportTasksToXtrf from "./ImportTasksToXtrf"
 import ValidationErrors from "../ValidationErrors"
 import NavbarList from "../NavbarLists"
+import PretranslationDocuments from "./PretranslationDocuments"
 
 export default {
   data() {
@@ -180,6 +182,7 @@ export default {
     }
   },
   components: {
+    PretranslationDocuments,
     NavbarList,
     ValidationErrors,
     ImportTasksToXtrf,

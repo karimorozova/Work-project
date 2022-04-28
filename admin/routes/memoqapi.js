@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { upload, sendEmail } = require('../utils')
-const { User, MemoqProject, Vendors, Projects } = require('../models')
+const { User, MemoqProject, Vendors, Projects, Languages } = require('../models')
 const { downloadCompletedFiles } = require('../projects')
 
 const {
@@ -10,7 +10,8 @@ const {
 	getProjectAnalysis,
 	getProjectUsers,
 	getMemoqFileId,
-	documentsWithMetrics
+	documentsWithMetrics,
+	deleteMemoqProject
 } = require('../services/memoqs/projects')
 
 const {
@@ -22,7 +23,7 @@ const {
 	moveMemoqFileToProject,
 	addProjectFile,
 	exportMemoqFile,
-	getMemoqFileChunks
+	getMemoqFileChunks, downloadMemoqFile
 } = require('../services/memoqs/files')
 
 const { getMemoqTemplates } = require("../services/memoqs/resources")
@@ -45,6 +46,9 @@ const {
 } = require('../projects')
 
 const _ = require('lodash')
+const fs = require("fs")
+const { getLanguageByAnyLangCode } = require("../helpers/commonFunctions")
+const { archiveMultipleFiles } = require("../utils/archiving")
 
 
 router.get('/users', async (req, res) => {
@@ -93,6 +97,82 @@ router.get('/templates', async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).send("Error on getting memoQ templates")
+	}
+})
+
+router.post('/clear-pretranslate-files', async (req, res) => {
+	try {
+		const { path } = req.body
+		if (fs.existsSync(`./dist${ path }`)) {
+			await fs.unlink(`./dist${ path }`, (err) => {
+				if (err) console.log(err)
+			})
+		}
+		res.send('Done!')
+	} catch (e) {
+		res.status(500).send(e.message || e)
+	}
+})
+router.post('/pretranslate-files', upload.fields([ { name: 'file' } ]), async (req, res) => {
+	// Then => Refactoring ot Delete !!!
+	const parser = require('xml2json')
+	const allLanguages = await Languages.find()
+	const { file: files } = req.files
+	const { creatorUserId, template, industry, projectId, internalProjectId, nativeProjectName, projectManager, customerName } = req.body
+	const memoqProjectIds = []
+
+	try {
+		for await (let file of files) {
+			const tasksInfo = {
+				source: allLanguages.find(i => i.symbol === 'EN-GB'),
+				targets: [],
+				industry: JSON.parse(industry),
+				template: JSON.parse(template),
+				creatorUserId,
+				projectId,
+				internalProjectId,
+				nativeProjectName,
+				projectManager,
+				customerName,
+				projectName: 'pretranslation-by-alpha'
+			}
+			const fileData = await fs.promises.readFile(file.path)
+			let parseFileData = parser.toJson(fileData, { object: true, sanitize: true, trim: true })
+			if (!parseFileData?.xliff) throw new Error(`Error on parsing ${ file.filename } file.`)
+			const target = getLanguageByAnyLangCode(allLanguages, parseFileData.xliff.file['target-language'], 0)
+			if (!target) throw new Error(`Cannot find language in system ${ parseFileData.xliff.file['target-language'] }.`)
+			tasksInfo.targets.push(target)
+			const memoqProjectId = await createMemoqProjectWithTemplate(tasksInfo)
+			memoqProjectIds.push(memoqProjectId)
+			await addProjectFile(memoqProjectId, file.path)
+			const listProjectTranslationDocuments = await getProjectTranslationDocs(memoqProjectId)
+			await downloadMemoqFile({ memoqProjectId: memoqProjectId, docId: listProjectTranslationDocuments.DocumentGuid, path: `./dist/uploads/${ file.filename }` })
+		}
+
+		const archiveFiles = []
+		for await (let file of files) archiveFiles.push({ path: file.path, name: file.filename })
+		await archiveMultipleFiles({ outputPath: `./dist/uploads/pretranslation-${ internalProjectId }.zip`, files: archiveFiles })
+		await clearUploads()
+		for await (let projectGuid of memoqProjectIds) await deleteMemoqProject(projectGuid)
+
+		res.send(`/uploads/pretranslation-${ internalProjectId }.zip`)
+
+	} catch (e) {
+		await clearUploads()
+		for await (let projectGuid of memoqProjectIds) await deleteMemoqProject(projectGuid)
+		res.status(500).send(e.message || e)
+	}
+
+	async function clearUploads() {
+		for await (let file of files) {
+			await fs.access(`./dist/uploads/${ file.filename }`, async (err) => {
+				if (err) {
+					console.log("The file does not exist.")
+				} else {
+					await fs.promises.unlink(`./dist/uploads/${ file.filename }`)
+				}
+			})
+		}
 	}
 })
 

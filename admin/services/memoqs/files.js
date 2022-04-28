@@ -141,7 +141,7 @@ async function downloadMemoqFile({ memoqProjectId, docId, path }) {
 	} catch (err) {
 		console.log(err)
 		console.log("Error in downloadMemoqFile")
-		throw new Error(err.message)
+		throw new Error(err.message + 'in path: ' + path)
 	}
 }
 
