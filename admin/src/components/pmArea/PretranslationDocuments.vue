@@ -1,7 +1,15 @@
 <template lang="pug">
-  .pretranslation
-    input.file-input(type="file" @change='uploadFiles' :multiple='true')
-    Button(@clicked="pretranslateFiles" :isDisabled="!!requestCounter" value="Pre-translate")
+  .wrap
+    .pretranslation
+      input.file-input(type="file" @change='uploadFiles' :multiple='true')
+      Button(@clicked="pretranslateFiles" :isDisabled="!!requestCounter" value="Pre-translate")
+    .filesManage(v-if="filesManage.length" v-for="item in filesManage" )
+      .filesManage__row
+        .filesManage__key.short {{item.filename}}
+        .filesManage__val {{item.status}}
+          span(v-if="item.status === 'Ready'")
+            i(class="fa-solid fa-download" style="cursor:pointer; margin-left: 10px;" @click="download(item.filename, item.path)")
+
 </template>
 
 <script>
@@ -14,7 +22,8 @@ export default {
   components: { Button },
   data() {
     return {
-      files: []
+      files: [],
+      filesManage: []
     }
   },
   methods: {
@@ -22,46 +31,60 @@ export default {
     uploadFiles(e) {
       this.files = Array.from(e.target.files)
     },
+    async download(filename, path) {
+      const _fileIdx = this.filesManage.findIndex(i => i.filename === filename)
+      let link = document.createElement('a')
+      link.href = this.$domains.admin + path
+      link.target = "_blank"
+      link.click()
+
+      setTimeout(async () => {
+        console.log('2000')
+        await this.$http.post('/memoqapi/clear-pretranslate-files', { path })
+        this.filesManage[_fileIdx].status = 'Downloaded & Deleted'
+      }, 2000)
+    },
     async pretranslateFiles() {
       if (!this.files.length) return
+      for (let file of this.files) this.filesManage.push({ filename: file.name, status: 'Pending' })
+
+      for await (let file of this.files) {
+        const _fileIdx = this.filesManage.findIndex(i => i.filename === file.name)
+
+        try {
+          this.filesManage[_fileIdx].status = 'Working'
+          const formData = await this.manageFormData(file)
+          const res = await this.$http.post('/memoqapi/pretranslate-files', formData)
+          this.filesManage[_fileIdx].status = 'Ready'
+          this.filesManage[_fileIdx].path = res.data
+          console.log(res)
+
+        } catch (e) {
+          this.filesManage[_fileIdx].status = 'Error'
+          this.alertToggle({ message: e.data, isShow: true, type: "error" })
+        }
+      }
+
+      this.files = []
+      let inputFiles = document.querySelectorAll('.file-input')
+      for (let elem of inputFiles) {
+        elem.value = ''
+      }
+    },
+    async manageFormData(file) {
       const formData = new FormData()
       const creatorUserId = await this.getCreatorUserId()
       const templates = await this.getMemoqTemplates()
-
       formData.append('creatorUserId', creatorUserId)
       formData.append('template', JSON.stringify(templates.find(i => i.name === '2 Steps - autoMT')))
-
       formData.append('industry', JSON.stringify(this.currentProject.industry))
       formData.append('projectId', this.currentProject._id)
       formData.append('internalProjectId', this.currentProject.projectId)
       formData.append('nativeProjectName', this.currentProject.projectName)
       formData.append('projectManager', this.currentProject.projectManager._id)
       formData.append('customerName', this.currentProject.customer.name)
-
-      for (let file of this.files) {
-        formData.append('file', file)
-      }
-      try {
-        const res = await this.$http.post('/memoqapi/pretranslate-files', formData)
-        let link = document.createElement('a')
-        link.href = this.$domains.admin + res.data
-        link.target = "_blank"
-        link.click()
-        setTimeout(async () => {
-          console.log('2000')
-          await this.$http.post('/memoqapi/clear-pretranslate-files', {
-            path: res.data
-          })
-        }, 2000)
-      } catch (e) {
-        this.alertToggle({ message: e.data, isShow: true, type: "error" })
-      } finally {
-        this.files = []
-        let inputFiles = document.querySelectorAll('.file-input')
-        for (let elem of inputFiles) {
-          elem.value = ''
-        }
-      }
+      formData.append('file', file)
+      return formData
     },
     async getCreatorUserId() {
       try {
@@ -94,7 +117,7 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/scss/colors";
 
-.pretranslation {
+.wrap {
   box-sizing: border-box;
   width: 400px;
   margin-top: 25px;
@@ -103,10 +126,29 @@ export default {
   background: white;
   border-radius: 2px;
   margin-top: 25px;
+}
 
+.pretranslation {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+}
+
+.filesManage {
+  margin-top: 25px;
+
+  &__row {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.short {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 220px;
 }
 </style>
