@@ -407,12 +407,9 @@ export default {
         const _idx = list.findIndex(i => i.id === id)
         if (_idx !== -1) this.layoutSettings[prop].push({ ...list[_idx], isCheck: true })
       })
-
-      console.log(this.layoutSettings[prop])
-      //TODO: ???
-      // this.layoutSettings[prop].push(
-      //     ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i))
-      // )
+      this.layoutSettings[prop].push(
+          ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
+      )
     },
     updatedSettingByUserData() {
       const { layoutsSettings: { [this.moduleType]: { fields = [], filters = [], sorting = [] } } } = this.user
