@@ -25,10 +25,6 @@ export default {
       type: Boolean,
       default: false
     },
-    // hasPopup: {
-    //   type: Boolean,
-    //   default: false
-    // },
     backgroundColor: {
       type: String
     },
@@ -90,9 +86,9 @@ export default {
     margin-top: 1px;
   }
 
-  &:active {
-    transform: scale(.96);
-  }
+  //&:active {
+  //  transform: scale(.96);
+  //}
 }
 
 .button:not(.disabled) {

@@ -44,6 +44,9 @@ import PaymentMethodsLayout from "../components/Table/PaymentMethods/Layout"
 import Company from "../components/Table/company/Layout"
 
 
+//NEW LAYOUT LISTS
+import ProjectsListLayout from '../components/allModulesLayoutsLists/Projects/index'
+
 // LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
 import Requests from '@/components/pmArea/lists/Requests'
@@ -406,7 +409,7 @@ const router = new Router({
 						{
 							path: 'draft-projects/:status',
 							name: 'draft-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{

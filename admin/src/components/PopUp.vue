@@ -4,7 +4,7 @@
       slot
     .tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
       .text {{text}}
-      //.arrow( data-popper-arrow)
+      #arrow
 </template>
 
 <script>
@@ -19,7 +19,7 @@ export default {
     },
     backgroundColor: {
       type: String,
-      default: '#eceff1'
+      default: '#fff'
     },
     text: {
       type: String,
@@ -27,20 +27,13 @@ export default {
     },
     color: {
       type: String,
-      default: '#666666'
+      default: '#333'
     },
     side: {
       type: String,
       default: 'top'
     }
   },
-  // computed: {
-  //   cssProps() {
-  //     return {
-  //       '--bg-color': this.backgroundColor,
-  //     }
-  //   }
-  // },
   methods: {
     initPopup(element, tooltip) {
       return createPopper(element, tooltip, {
@@ -92,9 +85,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import "../assets/scss/colors";
 
 .wrapper {
   width: fit-content;
+  position: relative;
 }
 
 .tooltip {
@@ -105,34 +100,12 @@ export default {
   white-space: nowrap;
   text-align: center;
   border-radius: 2px;
-  padding: 7px 12px;
+  padding: 7px 15px;
   z-index: 100000;
-  margin-left: -4px !important;
   text-align: center;
-
-  //text-overflow: ellipsis;
-  //overflow: hidden;
-  //max-width: 300px;
+  border: 1px solid $border;
 }
 
-//.arrow,
-//.arrow::before {
-//  position: absolute;
-//  width: 8px;
-//  height: 8px;
-//  background: inherit;
-//  margin-top: 1px;
-//}
-//
-//.arrow {
-//  visibility: hidden;
-//}
-
-//.arrow::before {
-//  visibility: visible;
-//  content: '';
-//  transform: rotate(45deg);
-//}
 .text {
   font-family: Myriad400;
   font-size: 14px !important;
@@ -141,6 +114,45 @@ export default {
 
 .tooltip[data-show] {
   display: block;
+}
+
+#arrow {
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.tooltip[data-popper-placement^='top'] > #arrow {
+  bottom: -8px;
+  right: calc(50% - 8px);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid $border;
+
+}
+
+.tooltip[data-popper-placement^='bottom'] > #arrow {
+  top: -8px;
+  right: calc(50% - 8px);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid $border;
+}
+
+.tooltip[data-popper-placement^='left'] > #arrow {
+  top: calc(50% - 7px);
+  right: -8px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 7px solid $border;
+}
+
+.tooltip[data-popper-placement^='right'] > #arrow {
+  top: calc(50% - 7px);
+  left: -8px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid $border;
 }
 
 </style>
