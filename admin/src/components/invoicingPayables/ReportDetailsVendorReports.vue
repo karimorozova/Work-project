@@ -31,7 +31,7 @@
       template(slot="amount" slot-scope="{ row, index }")
         .table__data
           span.currency(v-html="'&euro;'")
-          span {{ +(row.total).toFixed(2) }}
+          span {{ +(row.total || 0).toFixed(2) }}
 </template>
 
 <script>
