@@ -409,7 +409,8 @@ const router = new Router({
 						{
 							path: 'draft-projects/:status',
 							name: 'draft-projects',
-							component: ProjectsListLayout,
+							// component: ProjectsListLayout,
+							component: Projects,
 							props: true
 						},
 						{
