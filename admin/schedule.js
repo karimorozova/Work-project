@@ -13,11 +13,13 @@ const { UpdateLQAFromProject, newLQAStatusFromXTRFProjects, updateVendorBenchmar
 
 const { getAllSteps, addStepsToPayables, getPayable, getAllPaidPayables, addFile } = require('./invoicingPayables')
 const { sendRequestToZoho } = require("./services/zoho")
+
+
 const autoCreationPayablesReports = async () => {
 	const allSteps = await getAllSteps(0, 999999, {
 		"deadline": {
-			$gt: new Date('2022-02-01T00:00:00.000Z'),
-			$lt: new Date('2022-02-28T24:00:00.000Z')
+			$gt: new Date('2022-04-01T00:00:00.000Z'),
+			$lt: new Date('2022-30-28T24:00:00.000Z')
 		}
 	}, false)
 	try {
@@ -27,30 +29,30 @@ const autoCreationPayablesReports = async () => {
 	}
 	console.log(allSteps.length)
 }
+
 // autoCreationPayablesReports()
 
-const generateTotal = async () => {
-	const list = await InvoicingPayables.find()
-	for await (const report of list) {
-		const [ { totalPrice } ] = await getPayable(report._id)
-		await InvoicingPayables.updateOne({ _id: report._id }, { total: +(totalPrice).toFixed(2) })
-	}
-	console.log('DONE')
-}
+
+// const generateTotal = async () => {
+// 	const list = await InvoicingPayables.find()
+// 	for await (const report of list) {
+// 		const [ { totalPrice } ] = await getPayable(report._id)
+// 		await InvoicingPayables.updateOne({ _id: report._id }, { total: +(totalPrice).toFixed(2) })
+// 	}
+// 	console.log('DONE')
+// }
 // generateTotal()
-
-const uploadZohoInvoiceFileAll = async () => {
-	const reports = await getAllPaidPayables(0, 1e6)
-	for await (let report of reports) {
-		console.log('--1')
-		if(report.zohoBillingId){
-		console.log('start', report.reportId)
-			await sendRequestToZoho(`bills/335260000006169620?organization_id=630935724`, `JSONString=` + JSON.stringify({ "data": moment(report.lastPaymentDate).format('YYYY-MM-DD'), }), 'PUT')
-		console.log('Done', report.reportId)
-		}
-	}
-}
-
+// const uploadZohoInvoiceFileAll = async () => {
+// 	const reports = await getAllPaidPayables(0, 1e6)
+// 	for await (let report of reports) {
+// 		console.log('--1')
+// 		if(report.zohoBillingId){
+// 		console.log('start', report.reportId)
+// 			await sendRequestToZoho(`bills/335260000006169620?organization_id=630935724`, `JSONString=` + JSON.stringify({ "data": moment(report.lastPaymentDate).format('YYYY-MM-DD'), }), 'PUT')
+// 		console.log('Done', report.reportId)
+// 		}
+// 	}
+// }
 // uploadZohoInvoiceFileAll()
 
 
