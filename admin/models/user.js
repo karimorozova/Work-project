@@ -95,6 +95,10 @@ const UserSchema = new mongoose.Schema({
 					"receivables",
 					"margin"
 				]
+			},
+			sorting: {
+				type: Array,
+				default: []
 			}
 		}
 	}

@@ -11,9 +11,10 @@
           :tableFilters="tableFilters"
         )
 
-      template(slot="table" slot-scope="{ tableFields, tableMaxHeight }")
+      template(slot="table" slot-scope="{ tableFields, tableSorting, tableMaxHeight }")
         ListTable(
           :fields="tableFields"
+          :sorting="tableSorting"
           :tableMaxHeight="tableMaxHeight"
           :data="moduleData"
           @lazyLoading="lazyLoading"

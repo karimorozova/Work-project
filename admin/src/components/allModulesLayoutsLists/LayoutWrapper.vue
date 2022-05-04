@@ -18,13 +18,14 @@
       slot(
         name="table"
         :tableFields="layoutSettings.fields.filter(({ isCheck }) => isCheck)"
+        :tableSorting="layoutSettings.sorting.filter(({ isCheck }) => isCheck)"
         :tableMaxHeight="tableMaxHeight"
       )
 
     transition(name='top')
-      //.layoutWrapper__filter(v-if="isFilter")
-      .layoutWrapper__filter(v-if="true")
+      .layoutWrapper__filter(v-if="isFilter")
         .layoutWrapper__filter-body
+          Close(@clicked="toggleFilter")
           slot(
             name="filter"
             :tableFilters="layoutSettings.filters.filter(({ isCheck }) => isCheck)"
@@ -32,7 +33,7 @@
 
         .layoutWrapper__filter-buttons
           Button(value="Search")
-          Button(value="Close" :outline="true")
+          Button(value="Close" :outline="true" @clicked="toggleFilter")
 
     transition(name='slide')
       .layoutWrapper__setting(v-if="isSettings")
@@ -81,6 +82,14 @@
 
           .setting__body(v-if="selectedTab === 'sorting'")
             span(v-if="!layoutSettings.sorting.length") Setting not available...
+            .setting__draggable(v-for="item in layoutSettings.sorting")
+              .setting__draggable-titleAndOption
+                CheckBox(
+                  :isChecked="!!item.isCheck"
+                  @check="checker('sorting', item.id, true)"
+                  @uncheck="checker('sorting', item.id, false)"
+                )
+                span(:class="{'opacity04': !item.isCheck}") {{item.name}}
 
           .setting__button
             Button(value="Approve" @clicked="saveChanges")
@@ -371,7 +380,13 @@ export default {
               style: { "width": "300px" }
             }
           ],
-          sorting: []
+          sorting: [
+            {
+              id: "projectID",
+              name: "Project ID",
+              isCheck: false
+            }
+          ]
         }
       }
     }
@@ -504,21 +519,35 @@ export default {
 
   &__filter {
     position: absolute;
-    width: 300px;
     z-index: 20;
     top: 0;
     left: 0;
     right: 0;
     margin: auto;
-    background: lightslategray;
+    background: white;
+    border-bottom: 1px solid $light-border;
+    border-left: 1px solid $light-border;
+    border-right: 1px solid $light-border;
+    padding: 25px;
+    min-width: 240px;
+    width: fit-content;
+    max-width: 940px;
+    border-bottom-right-radius: 2px;
+    border-bottom-left-radius: 2px;
+
+    &-body {
+      max-height: 500px;
+      overflow: auto;
+      padding: 25px 0;
+      margin: 33px 0 25px 0;
+      border-top: 1px solid $border;
+      border-bottom: 1px solid $border;
+    }
 
     &-buttons {
       display: flex;
       justify-content: center;
       gap: 20px;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid $light-border;
     }
   }
 }

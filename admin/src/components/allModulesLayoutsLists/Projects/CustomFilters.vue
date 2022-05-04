@@ -476,7 +476,15 @@ export default {
 <style lang="scss" scoped>
 @import '../../../assets/scss/colors';
 
+.moduleFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
 .filter {
+  width: 220px;
+
   &__label {
     margin-bottom: 3px;
     font-family: 'Myriad600';

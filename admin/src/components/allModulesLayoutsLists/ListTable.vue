@@ -3,9 +3,6 @@
     @scroll="lazyLoading"
     :style="{ 'max-height': tableMaxHeight  + 'px' }"
   )
-
-    //span {{ calcMaxTableHeight }}
-
     .th__modals
       ApproveModal(
         v-if="isApproveModal"
@@ -19,11 +16,21 @@
     table
       thead
         tr
-          th(v-for="{ style, name } in fields")
+          th(v-for="{ style, name, id } in fields")
             .th__titleAndSort(:style="style") {{ name }}
+              .th__sortIcons(v-if="sorting.find(i => i.id === id)")
 
-              //slot(:name="name" :field="{ name, style }")
-              //.th__sortIcons(v-if="sortInfo && sortInfo.isSort")
+
+                //span(v-if="!getSimpleValue(id)" @click="sortBy(id, 'ASC')")
+                //  i.fas.fa-sort
+                //span
+                //  span(v-if="getSimpleValue(id)")
+                //span(v-if="getSimpleValue(id)" @click="removeSortBy(id)")
+                //  i.fas.fa-times-circle
+
+                //i.fas.fa-caret-down
+                //i.fas.fa-caret-up
+
               //  i.fas.fa-times-circle(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'" @click.stop="removeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
               //  span(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'")
               //    i.fas.fa-caret-down(v-if="sortInfo.order === 'asc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'desc'})")
@@ -41,10 +48,16 @@
 <script>
 import ApproveModal from '../ApproveModal'
 import { mapGetters } from "vuex"
+import LayoutWrapperMixin from "../../mixins/LayoutWrapperMixin"
 
 export default {
+  mixins: [ LayoutWrapperMixin ],
   props: {
     fields: {
+      type: Array,
+      default: () => []
+    },
+    sorting: {
       type: Array,
       default: () => []
     },
@@ -65,6 +78,17 @@ export default {
     return {}
   },
   methods: {
+    sortBy(key, value) {
+      this.replaceRoute(key, value)
+      this.makeDBSortingRequest()
+    },
+    removeSortBy(id) {
+      this.removeQuery(id)
+      this.makeDBSortingRequest()
+    },
+    makeDBSortingRequest() {
+      this.$emit('makeDBSortingRequest')
+    },
     approve() {
       this.$emit('approve')
     },
@@ -74,15 +98,15 @@ export default {
     closeModal() {
       this.$emit('closeModal')
     },
-    addSortKey(field) {
-      this.$emit('addSortKey', field)
-    },
-    changeSortKey(field) {
-      this.$emit('changeSortKey', field)
-    },
-    removeSortKey(field) {
-      this.$emit('removeSortKey', field)
-    },
+    // addSortKey(field) {
+    //   this.$emit('addSortKey', field)
+    // },
+    // changeSortKey(field) {
+    //   this.$emit('changeSortKey', field)
+    // },
+    // removeSortKey(field) {
+    //   this.$emit('removeSortKey', field)
+    // },
     lazyLoading(e) {
       const element = e.target
       if (element.scrollTop && Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
@@ -111,7 +135,7 @@ export default {
 }
 
 %iconsStyle {
-  transition: .2s ease-out;
+  transition: .1s ease-out;
   color: $dark-border;
   cursor: pointer;
 
@@ -132,7 +156,7 @@ export default {
 
 .fa-caret-up,
 .fa-caret-down {
-  font-size: 19px;
+  font-size: 17px;
   @extend %iconsStyle;
 }
 
