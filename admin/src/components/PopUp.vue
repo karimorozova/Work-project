@@ -4,6 +4,7 @@
       slot
     .tooltip(v-if="!isDisabled" role="tooltip" :style="{backgroundColor: backgroundColor, color: color}")
       .text {{text}}
+      .text(v-html="html" )
       #arrow
 </template>
 
@@ -22,6 +23,10 @@ export default {
       default: '#fff'
     },
     text: {
+      type: String,
+      default: ''
+    },
+    html: {
       type: String,
       default: ''
     },

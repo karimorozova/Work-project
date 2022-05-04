@@ -1,31 +1,42 @@
 <template lang="pug">
   .layoutWrapper(v-if="user._id")
-    .layoutWrapper__summaryAndIcons
 
-      .summaryAndIcons
-        .summaryAndIcons__summary
-        .summaryAndIcons__icons
-          IconButton(v-if="hasFilterButton" @clicked="toggleFilter")
-            i(class="fa-solid fa-filter")
-          IconButton(v-if="hasSettingButton" @clicked="toggleSettings")
-            i(class="fas fa-cogs")
+    .layoutWrapper__icons
+      IconButton(v-if="hasFilterButton" @clicked="toggleFilter")
+        i(class="fa-solid fa-filter")
+      IconButton(v-if="hasSettingButton" @clicked="toggleSettings")
+        i(class="fas fa-cogs")
+      slot(name="icons")
 
-      .summaryOption
+    .layoutWrapper__summary
+      div summary
+
+    .layoutWrapper__tabs
+      //h1 summary
 
     .layoutWrapper__table
-      slot(name="table")
+      slot(
+        name="table"
+        :tableFields="layoutSettings.fields.filter(({ isCheck }) => isCheck)"
+        :tableMaxHeight="tableMaxHeight"
+      )
 
-    .layoutWrapper__filter(v-if="isFilter")
-      .layoutWrapper__filter-body
-        slot(name="filter")
-      .layoutWrapper__filter-buttons
-        Button(value="Search")
-        Button(value="Close" :outline="true")
+    transition(name='top')
+      //.layoutWrapper__filter(v-if="isFilter")
+      .layoutWrapper__filter(v-if="true")
+        .layoutWrapper__filter-body
+          slot(
+            name="filter"
+            :tableFilters="layoutSettings.filters.filter(({ isCheck }) => isCheck)"
+          )
+
+        .layoutWrapper__filter-buttons
+          Button(value="Search")
+          Button(value="Close" :outline="true")
 
     transition(name='slide')
       .layoutWrapper__setting(v-if="isSettings")
         .setting
-          //.setting__title Settings
           .setting__close
             Close(@clicked="toggleSettings")
           .setting__tabs(v-if="tabs.length")
@@ -42,6 +53,17 @@
 
           .setting__body(v-if="selectedTab === 'fields'")
             span(v-if="!layoutSettings.fields.length") Setting not available...
+            draggable(handle=".handle" v-model="layoutSettings.fields")
+              .setting__draggable(v-for="item in layoutSettings.fields")
+                .setting__draggable-titleAndOption
+                  CheckBox(
+                    :isChecked="!!item.isCheck"
+                    @check="checker('fields', item.id, true)"
+                    @uncheck="checker('fields', item.id, false)"
+                  )
+                  span(:class="{'opacity04': !item.isCheck}") {{item.name}}
+                .setting__draggable-icon.handle(v-if="item.isCheck")
+                  i.fas.fa-arrows-alt-v
 
           .setting__body(v-if="selectedTab === 'filters'")
             span(v-if="!layoutSettings.filters.length") Setting not available...
@@ -61,7 +83,7 @@
             span(v-if="!layoutSettings.sorting.length") Setting not available...
 
           .setting__button
-            Button(value="Approve" )
+            Button(value="Approve" @clicked="saveChanges")
 
 </template>
 
@@ -69,7 +91,7 @@
 import IconButton from "../IconButton"
 import Button from "../Button"
 import Close from "../Close"
-import { mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import draggable from 'vuedraggable'
 import CheckBox from "../CheckBox"
 
@@ -92,9 +114,9 @@ export default {
   },
   data() {
     return {
+      tableMaxHeight: 0,
       isFilter: false,
       isSettings: false,
-      // tabs: [ 'Fields', 'Filters', 'Sorting' ],
       tabs: [],
       selectedTab: '',
       layoutSettings: {
@@ -107,105 +129,93 @@ export default {
         project: {
           filters: [
             {
-              id: "projectId",
+              id: "f_projectId",
               name: "Project ID",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "projectName",
+              id: "f_projectName",
               name: "Project Name",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "clientName",
-              name: "Client Name",
-              fixed: false,
+              id: "f_clients",
+              name: "Clients",
               isCheck: false
             },
             {
-              id: "startDate",
-              name: "Start Date",
-              fixed: false,
+              id: "f_startDate",
+              name: "Start Date Range",
               isCheck: false
             },
             {
-              id: "deadline",
-              name: "Deadline",
-              fixed: false,
+              id: "f_deadline",
+              name: "Deadline Range",
               isCheck: false
             },
             {
-              id: "projectManager",
+              id: "f_projectManager",
               name: "Project Manager",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "accountManger",
+              id: "f_accountManager",
               name: "Account Manger",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "sourceLanguages",
+              id: "f_sourceLanguages",
               name: "Source Languages",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "targetLanguages",
+              id: "f_targetLanguages",
               name: "Target Languages",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "industry",
+              id: "f_industry",
               name: "Industry",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "services",
-              name: "Services",
-              fixed: false,
+              id: "f_tasksServices",
+              name: "Tasks Services",
               isCheck: false
             },
             {
-              id: "isTest",
-              name: "Test",
-              fixed: false,
+              id: "f_stepsServices",
+              name: "Step Services",
               isCheck: false
             },
             {
-              id: "projectCurrency",
-              name: "Currency",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "paymentProfile",
-              name: "Payment Profile",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "vendors",
-              name: "Vendors",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "tasksStatuses",
+              id: "f_tasksStatuses",
               name: "Tasks Statuses",
-              fixed: false,
               isCheck: false
             },
             {
-              id: "requestId",
+              id: "f_stepsStatuses",
+              name: "Steps Statuses",
+              isCheck: false
+            },
+            {
+              id: "f_isTest",
+              name: "Test",
+              isCheck: false
+            },
+            {
+              id: "f_projectCurrency",
+              name: "Currency",
+              isCheck: false
+            },
+            {
+              id: "f_vendors",
+              name: "Vendors",
+              isCheck: false
+            },
+            {
+              id: "f_requestId",
               name: "Request ID",
-              fixed: false,
               isCheck: false
             }
           ],
@@ -213,156 +223,152 @@ export default {
             {
               id: "projectID",
               name: "Project ID",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "130px" }
             },
             {
               id: "projectName",
               name: "Project Name",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "240px" }
             },
             {
               id: "clientName",
               name: "Client Name",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "180px" }
             },
             {
               id: "startDate",
               name: "Start Date",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "130px" }
             },
             {
               id: "deadline",
               name: "Deadline",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "130px" }
             },
             {
               id: "languages",
               name: "Languages",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "220px" }
             },
             {
               id: "projectManager",
               name: "Project Manager",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "160px" }
             },
             {
               id: "accountManager",
               name: "Account Manger",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "160px" }
             },
             {
               id: "industry",
               name: "Industry",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "services",
-              name: "Services",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "130px" }
             },
             {
               id: "isTest",
               name: "Test",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "payables",
               name: "Payables",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "receivables",
               name: "Receivables",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "total",
               name: "Total",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "margin",
               name: "Margin",
-              fixed: false,
-              isCheck: false
-            }, {
-              id: "marginPercentage",
-              name: "Margin %",
-              fixed: false,
-              isCheck: false
-            }, {
+              isCheck: false,
+              style: { "width": "100px" }
+            },
+            {
               id: "roi",
               name: "Roi",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "projectCurrency",
               name: "Currency",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "status",
               name: "Status",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "paymentProfile",
-              name: "Payment Profile",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "progress",
-              name: "Progress",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "discounts",
-              name: "Discounts",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "130px" }
             },
             {
               id: "urgent",
               name: "Urgent",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "vendors",
-              name: "Vendors",
-              fixed: false,
-              isCheck: false
-            },
-            {
-              id: "tasksStatuses",
-              name: "Tasks Statuses",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "100px" }
             },
             {
               id: "requestId",
               name: "Request ID",
-              fixed: false,
-              isCheck: false
+              isCheck: false,
+              style: { "width": "150px" }
+            },
+            {
+              id: "tasksServices",
+              name: "Tasks Services",
+              isCheck: false,
+              style: { "width": "150px" }
+            },
+            {
+              id: "tasksStatuses",
+              name: "Tasks Statuses",
+              isCheck: false,
+              style: { "width": "150px" }
+            },
+            {
+              id: "stepsServices",
+              name: "Step Services",
+              isCheck: false,
+              style: { "width": "150px" }
+            },
+            {
+              id: "stepsStatuses",
+              name: "Steps Statuses",
+              isCheck: false,
+              style: { "width": "150px" }
+            },
+            {
+              id: "extraServices",
+              name: "Extra Services",
+              isCheck: false,
+              style: { "width": "130px" }
+            },
+            {
+              id: "vendors",
+              name: "Vendors",
+              isCheck: false,
+              style: { "width": "300px" }
             }
           ],
           sorting: []
@@ -371,6 +377,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions([ 'alertToggle', "setUser" ]),
     toggleFilter() {
       this.isFilter = !this.isFilter
     },
@@ -397,6 +404,23 @@ export default {
       const checked = this.layoutSettings[prop].find(i => i.id === id)
       checked.isCheck = bool
     },
+    async saveChanges() {
+      const value = {}
+      for (const key in this.layoutSettings) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+      try {
+        await this.$http.post('/api-settings/update-user-layouts-setting', {
+          userId: this.user._id,
+          prop: this.moduleType,
+          value
+        })
+        await this.setUser()
+        this.alertToggle({ message: 'Setting saved!', isShow: true, type: "success" })
+      } catch (e) {
+        this.alertToggle({ message: e.data, isShow: true, type: "error" })
+      } finally {
+        this.isSettings = false
+      }
+    },
     dataSaver(userIds, prop) {
       const list = this.layoutsPossibleSettings[this.moduleType][prop]
       if (!userIds.length) {
@@ -419,6 +443,12 @@ export default {
 
       for (let prop of [ 'fields', 'filters', 'sorting' ]) if (this.layoutSettings[prop].length) this.tabs.push(prop)
       this.selectedTab = this.tabs[0]
+    },
+    calculateTableMaxHeight() {
+      this.$nextTick(() => {
+        const { offsetHeight: layoutHeight, childNodes: [ iconsDiv, summaryDiv, tabsDiv ] } = this.$el
+        this.tableMaxHeight = layoutHeight - iconsDiv.offsetHeight - summaryDiv.offsetHeight - tabsDiv.offsetHeight
+      })
     }
   },
   computed: {
@@ -428,6 +458,7 @@ export default {
   },
   created() {
     this.updatedSettingByUserData()
+    this.calculateTableMaxHeight()
   },
   components: { CheckBox, Close, Button, IconButton, draggable }
 
@@ -443,9 +474,19 @@ export default {
   height: calc(100vh - 50px - 47px);
   background: lightblue;
   position: relative;
+  overflow: hidden;
+
+  &__icons {
+    display: flex;
+    justify-content: end;
+    gap: 12px;
+    height: 50px;
+    align-items: center;
+  }
 
   &__table {
-    background-color: #9c9c9c;
+    height: calc(100% - 50px);
+    background: wheat;
   }
 
   &__setting {
@@ -462,6 +503,15 @@ export default {
   }
 
   &__filter {
+    position: absolute;
+    width: 300px;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background: lightslategray;
+
     &-buttons {
       display: flex;
       justify-content: center;
@@ -473,21 +523,10 @@ export default {
   }
 }
 
-.summaryAndIcons {
-  display: flex;
-  justify-content: space-between;
-
-  &__icons {
-    display: flex;
-    gap: 12px;
-    margin: 10px 0 10px;
-  }
-}
-
 .setting {
   &__tabs {
     padding: 15px 0;
-    margin: 30px 0 25px 0;
+    margin: 33px 0 25px 0;
     border-top: 1px solid $border;
     border-bottom: 1px solid $border;
   }
@@ -576,37 +615,6 @@ export default {
 
 }
 
-.filterItem {
-  &__label {
-    margin-bottom: 3px;
-    font-family: 'Myriad600';
-  }
-
-  &__input {
-    position: relative;
-    height: 32px;
-    width: 220px;
-  }
-
-  input {
-    font-size: 14px;
-    color: $text;
-    border: 1px solid $border;
-    border-radius: 2px;
-    box-sizing: border-box;
-    padding: 0 7px;
-    outline: none;
-    height: 32px;
-    transition: .1s ease-out;
-    width: 220px;
-    font-family: 'Myriad400';
-
-    &:focus {
-      border: 1px solid $border-focus;
-    }
-  }
-}
-
 .slide-enter-active,
 .slide-leave-active {
   transition: 0.15s;
@@ -616,6 +624,19 @@ export default {
 .slide-enter,
 .slide-leave-to {
   transform: translateX(100%);
+  transition: 0.12s;
+  transition-timing-function: ease-in;
+}
+
+.top-enter-active,
+.top-leave-active {
+  transition: 0.15s;
+  transition-timing-function: ease-out;
+}
+
+.top-enter,
+.top-leave-to {
+  transform: translateY(-100%);
   transition: 0.12s;
   transition-timing-function: ease-in;
 }

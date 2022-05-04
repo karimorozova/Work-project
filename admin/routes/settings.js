@@ -7,6 +7,7 @@ const {
 	ClientsApiSetting,
 	Vendors,
 	Clients,
+	User
 } = require('../models')
 
 const {
@@ -34,13 +35,25 @@ const {
 	getCompanies,
 	getCompany,
 	editPaymentMethodInCompany,
-	deletePaymentMethodInCompany, toggleDefaultPaymentMethod,
+	deletePaymentMethodInCompany, toggleDefaultPaymentMethod
 } = require('../settings')
 
 const {
 	getSimpleClients
 } = require('../clients')
 const { editCompanyBase } = require("../settings/companies")
+
+router.post('/update-user-layouts-setting', async (req, res) => {
+	try {
+		const { userId, prop, value } = req.body
+		await User.updateOne({ _id: userId }, { $set: { layoutsSettings: { [prop]: value } } })
+		const updatedUser = await User.findOne({ _id: userId }).populate('groups')
+		res.send(updatedUser)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message || err || 'Error on saving settings!')
+	}
+})
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]
@@ -239,7 +252,7 @@ router.get('/payment-methods', async (req, res) => {
 })
 
 router.post('/payment-methods', async (req, res) => {
-	const {name, minimumAmount, isActive, keys} = req.body
+	const { name, minimumAmount, isActive, keys } = req.body
 	try {
 		const paymentsMethods = await createPaymentMethod({ name, minimumAmount, isActive, keys })
 		res.json(paymentsMethods)
@@ -251,7 +264,7 @@ router.post('/payment-methods', async (req, res) => {
 
 router.put('/payment-methods/:id', async (req, res) => {
 	const { id } = req.params
-	const {name, minimumAmount, isActive, keys} = req.body
+	const { name, minimumAmount, isActive, keys } = req.body
 	try {
 		const paymentsMethods = await updatePaymentMethod(id, { name, minimumAmount, isActive, keys })
 		res.json(paymentsMethods)
@@ -308,7 +321,7 @@ router.put('/payment-methods-keys/:id', async (req, res) => {
 router.delete('/payment-methods-keys/:id', async (req, res) => {
 	const { id } = req.params
 	try {
-		const paymentsMethods = await removePaymentMethodKeys( id)
+		const paymentsMethods = await removePaymentMethodKeys(id)
 		res.json(paymentsMethods)
 	} catch (err) {
 		console.log(err)
@@ -327,7 +340,7 @@ router.get('/companies', async (req, res) => {
 })
 
 router.get('/company/:id', async (req, res) => {
-	const {id} = req.params
+	const { id } = req.params
 	try {
 		console.log('gere', id)
 		const companies = await getCompany(id)
@@ -339,11 +352,11 @@ router.get('/company/:id', async (req, res) => {
 	}
 })
 
-router.post('/company', async (req, res)  => {
+router.post('/company', async (req, res) => {
 	const { companyName, officialCompanyName, isActive, isDefault } = req.body
-	console.log({test: req.body})
+	console.log({ test: req.body })
 	try {
-		const companies = await createCompany(companyName, officialCompanyName, isActive, isDefault )
+		const companies = await createCompany(companyName, officialCompanyName, isActive, isDefault)
 		res.json(companies)
 	} catch (err) {
 		console.log(err)
@@ -351,13 +364,13 @@ router.post('/company', async (req, res)  => {
 	}
 })
 
-router.post('/company/:id', upload.fields([ { name: 'photo' } ]), async (req, res)  => {
-	const {id} = req.params
-	const editedCompany  = JSON.parse(req.body.company)
+router.post('/company/:id', upload.fields([ { name: 'photo' } ]), async (req, res) => {
+	const { id } = req.params
+	const editedCompany = JSON.parse(req.body.company)
 	const photoFile = req.files["photo"]
 
 	try {
-		const company = await editCompanyDetails(id, editedCompany, photoFile )
+		const company = await editCompanyDetails(id, editedCompany, photoFile)
 		res.json(company)
 	} catch (err) {
 		console.log(err)
@@ -365,11 +378,11 @@ router.post('/company/:id', upload.fields([ { name: 'photo' } ]), async (req, re
 	}
 })
 
-router.put('/company/:id', async (req, res)  => {
+router.put('/company/:id', async (req, res) => {
 	const { id } = req.params
 	const { companyName, officialCompanyName, isActive, isDefault } = req.body
 	try {
-		const companies = await editCompanyBase(id, {companyName, officialCompanyName, isActive, isDefault} )
+		const companies = await editCompanyBase(id, { companyName, officialCompanyName, isActive, isDefault })
 		res.json(companies)
 	} catch (err) {
 		console.log(err)
@@ -389,15 +402,15 @@ router.delete('/company/:id', async (req, res) => {
 	}
 })
 
-router.post('/company/:id/payment-method', async (req, res)  => {
+router.post('/company/:id/payment-method', async (req, res) => {
 	const { id } = req.params
 	const { name, paymentType, otherStatement, paymentMethodId } = req.body
 	try {
-		let companies;
+		let companies
 		if (!paymentMethodId) {
-			companies = await addPaymentMethodToCompany(id, {name, paymentType, otherStatement} )
+			companies = await addPaymentMethodToCompany(id, { name, paymentType, otherStatement })
 		} else {
-			companies = await editPaymentMethodInCompany(id, paymentMethodId, {_id: paymentMethodId, name, paymentType, otherStatement})
+			companies = await editPaymentMethodInCompany(id, paymentMethodId, { _id: paymentMethodId, name, paymentType, otherStatement })
 		}
 		res.json(companies)
 	} catch (err) {
@@ -406,9 +419,9 @@ router.post('/company/:id/payment-method', async (req, res)  => {
 	}
 })
 
-router.put('/company/:id/payment-method/:paymentMethodId/is-default', async (req, res)  => {
+router.put('/company/:id/payment-method/:paymentMethodId/is-default', async (req, res) => {
 	const { id, paymentMethodId } = req.params
-	const { status} = req.body
+	const { status } = req.body
 	try {
 		const company = await toggleDefaultPaymentMethod(id, paymentMethodId, status)
 		res.json(company)
@@ -418,10 +431,10 @@ router.put('/company/:id/payment-method/:paymentMethodId/is-default', async (req
 	}
 })
 
-router.delete('/company/:companyId/payment-method/:paymentId', async (req, res)  => {
+router.delete('/company/:companyId/payment-method/:paymentId', async (req, res) => {
 	const { companyId, paymentId } = req.params
 	try {
-		const companies = await deletePaymentMethodInCompany(companyId, paymentId )
+		const companies = await deletePaymentMethodInCompany(companyId, paymentId)
 		res.json(companies)
 	} catch (err) {
 		console.log(err)

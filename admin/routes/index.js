@@ -28,6 +28,7 @@ router.use("/reportsapi", requiresLogin, require("./reportsapi"))
 router.use("/invoicing-payables", requiresLogin, require("./invoicingPayables"))
 router.use("/invoicing-receivables", requiresLogin, require("./invoicingReceivables"))
 router.use("/invoicing", requiresLogin, require("./invoicingLocal"))
+router.use("/layouts-api", requiresLogin, require("./layoutsGetters"))
 
 //Open API ==========================================================================
 router.use("/open-pangea", require("./OpenPangea"))

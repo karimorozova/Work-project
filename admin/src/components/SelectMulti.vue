@@ -7,10 +7,14 @@
 
       .selectedWithIcon(v-if="selectedOptions.length && isSelectedWithIcon")
         span {{ selectedOptions.length }} Selected...
+
         .controlOptions
-          .tooltip
-            .tooltipData(v-html="selectedOptions.join('<br>')")
-            i.fas.fa-info-circle
+          PopUp(
+            :html="selectedOptions.join('<br>')"
+            :side="'left'"
+          )
+            span
+              i.fas.fa-info-circle
           .remove__icon(v-if="isRemoveOption && selectedOptions.length" @click="removeOption")
             i(class="fas fa-backspace" aria-hidden='true')
 
@@ -47,9 +51,11 @@
 
 <script>
 	import ClickOutside from "vue-click-outside"
+  import PopUp from "./PopUp"
 
 	export default {
-		props: {
+    components: { PopUp },
+    props: {
 			customClass: {
 				type: String
 			},
@@ -172,9 +178,9 @@
   }
 
   .remove__icon {
-    margin-left: 7px;
+    margin-left: 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     transition: .1s ease-out;
     display: flex;
     color: $dark-border;
@@ -195,7 +201,7 @@
   }
 
   .fa-info-circle {
-    font-size: 16px;
+    font-size: 15px;
     cursor: help;
     transition: .2s ease-out;
     color: $dark-border;
