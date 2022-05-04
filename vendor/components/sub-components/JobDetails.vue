@@ -5,6 +5,12 @@
         :job="job"
         @updateProgress="getJobsDetails"
       )
+      //TEMP
+      .smartling(v-if="this.job.SmartlingJobID && this.job.status === 'In progress'" style="background-color: white;border-radius: 4px; box-shadow: rgba(99, 99, 99, 0.12) 0px 0px 1px, rgba(99, 99, 99, 0.2) 0px 1px 2px, rgba(99, 99, 99, 0.05) 0px 2px 1.3px; padding: 25px 25px 1px 25px;margin-bottom: 25px; width: 740px;")
+        .title(style="font-size: 16px; font-family:Roboto600;") Enter to Smartling:
+        p
+          a(:href="`https://ti.smartling.com/app/94d7a2dab?locale=${this.job.fullTargetLanguage.smartling || this.job.fullTargetLanguage.iso1}&translationJobUids=${this.job.SmartlingJobID}`" target="_blank") Link
+      //TEMP
       ProjectInstructions(
         v-if="job.status !== 'Completed'"
         :job="job"

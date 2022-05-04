@@ -45,6 +45,13 @@ const ProjectsSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+
+	//temp
+	SmartlingJobID: {
+		type: String,
+		default: ''
+	},
+	//
 	isSkipProgress: {
 		type: Boolean,
 		default: false

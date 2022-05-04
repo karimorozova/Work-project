@@ -15,7 +15,7 @@ const { dr1Instructions, drInstructionsCompliance } = require('../enums')
 const fs = require('fs')
 
 const getJobDetails = async (_stepId, _projectId, _vendorId) => {
-	const { projectName, projectId, steps, _id, status, brief, deadline, industry, tasks, projectManager } = await getProject({ _id: _projectId })
+	const { projectName, projectId, steps, _id, status, brief, deadline, industry, tasks, projectManager, SmartlingJobID } = await getProject({ _id: _projectId })
 	let step = steps.find(({ _id, vendor }) => `${ _id }` === `${ _stepId }` && `${ vendor._id }` === `${ _vendorId }`)
 	step = step._doc
 	const stepTask = tasks.find(item => item.taskId === step.taskId)
@@ -36,6 +36,7 @@ const getJobDetails = async (_stepId, _projectId, _vendorId) => {
 		projectDeadline: deadline,
 		brief: brief,
 		industry,
+		SmartlingJobID,
 		memoqDocs: stepTask.memoqDocs,
 		sourceFiles: stepTask.sourceFiles,
 		refFiles: stepTask.refFiles,

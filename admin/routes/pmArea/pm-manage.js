@@ -146,10 +146,10 @@ router.post('/build-TnS-from-memoq-link', async (req, res) => {
 })
 
 router.post('/build-TnS-from-smartling-file', upload.fields([ { name: 'file' } ]), async (req, res) => {
-	const { projectId, internalProjectId, startDate, deadline, workflow } = req.body
+	const { projectId, internalProjectId, startDate, deadline, workflow, SmartlingJobID } = req.body
 	const { file } = req.files
 	try {
-		const result = await autoCreatingTranslationTaskInProjectBySmartlingFile({workflow, projectId, internalProjectId, startDate, deadline, file: file[0] })
+		const result = await autoCreatingTranslationTaskInProjectBySmartlingFile({SmartlingJobID, workflow, projectId, internalProjectId, startDate, deadline, file: file[0] })
 		fs.access(file[0].path, (error) => {
 			if (!error) {
 				fs.unlink(file[0].path, (err) => {

@@ -619,7 +619,7 @@ const autoCreatingTranslationTaskInProjectByMemoqLink = async ({ memoqLink, proj
 	}
 }
 
-const autoCreatingTranslationTaskInProjectBySmartlingFile = async ({ workflow, projectId, internalProjectId, startDate, deadline, file }) => {
+const autoCreatingTranslationTaskInProjectBySmartlingFile = async ({ SmartlingJobID, workflow, projectId, internalProjectId, startDate, deadline, file }) => {
 	const allLanguages = await Languages.find()
 	const allSteps = await Step.find()
 	const allServices = await Services.find()
@@ -657,6 +657,7 @@ const autoCreatingTranslationTaskInProjectBySmartlingFile = async ({ workflow, p
 			internalProjectId
 		}
 		try {
+			await updateProject({ _id: projectId }, { SmartlingJobID })
 			await createTasksAndStepsForCustomUnits(tasksInfo)
 		} catch (err) {
 			return new Response(Response.Error, 'Error on creating T&S')

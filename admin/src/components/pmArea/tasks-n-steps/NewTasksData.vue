@@ -13,6 +13,10 @@
       .taskData
         .taskData__memoqLink(style="justify-content: center; align-items: flex-end;")
           .taskData__memoqLink-select
+            .drop__title Smartling JobID:
+            .drop__input()
+              input(style="width: 220px;" placeholder="Value" ref="JobID")
+          .taskData__memoqLink-select
             .drop__title Workflow:
             .drop
               SelectSingle(
@@ -213,6 +217,7 @@ export default {
       this.errors = []
       if (!this.smartlingFile) this.errors.push('Please upload a Smartling file.')
       if (!this.selectedSmartlingWorkflow) this.errors.push('Please enter the workflow.')
+      if (!this.$refs.JobID.value) this.errors.push('Please enter the Smartling JobID.')
       if (this.errors.length) {
         this.IsErrorModal = true
         return
@@ -226,6 +231,7 @@ export default {
       formData.append('internalProjectId', internalProjectId)
       formData.append('startDate', startDate)
       formData.append('deadline', deadline)
+      formData.append('SmartlingJobID', this.$refs.JobID.value.trim())
 
       const res = await this.$http.post(`/pm-manage/build-TnS-from-smartling-file`, formData)
       const { data } = res
@@ -234,7 +240,7 @@ export default {
         await this.setCurrentProject(project)
         this.$parent.toggleTaskData()
         this.alertToggle({ message: 'Tasks and Steps are created', isShow: true, type: "success" })
-      }else{
+      } else {
         this.alertToggle({ message: data.message, isShow: true, type: "error" })
       }
       this.isDisabledSaveButton = false
