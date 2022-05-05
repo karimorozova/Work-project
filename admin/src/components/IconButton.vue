@@ -76,7 +76,7 @@ export default {
 
   &:not(.disabled):hover {
     .button__icon {
-      color: $text;
+      color: $border-focus;
     }
   }
 
@@ -85,10 +85,6 @@ export default {
     color: $dark-border;
     margin-top: 1px;
   }
-
-  //&:active {
-  //  transform: scale(.96);
-  //}
 }
 
 .button:not(.disabled) {

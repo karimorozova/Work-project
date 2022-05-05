@@ -32,8 +32,7 @@
           )
 
         .layoutWrapper__filter-buttons
-          Button(value="Search")
-          Button(value="Close" :outline="true" @clicked="toggleFilter")
+          Button(value="Search" @clicked="makeDBFilterRequest")
 
     transition(name='slide')
       .layoutWrapper__setting(v-if="isSettings")
@@ -230,160 +229,256 @@ export default {
           ],
           fields: [
             {
-              id: "projectID",
+              id: "sf_projectID",
               name: "Project ID",
               isCheck: false,
-              style: { "width": "130px" }
+              style: { "min-width": "130px" }
             },
             {
-              id: "projectName",
+              id: "sf_projectName",
               name: "Project Name",
               isCheck: false,
-              style: { "width": "240px" }
+              style: { "min-width": "240px" }
             },
             {
-              id: "clientName",
+              id: "sf_clientName",
               name: "Client Name",
               isCheck: false,
-              style: { "width": "180px" }
+              style: { "min-width": "180px" }
             },
             {
-              id: "startDate",
+              id: "sf_startDate",
               name: "Start Date",
               isCheck: false,
-              style: { "width": "130px" }
+              style: { "min-width": "130px" }
             },
             {
-              id: "deadline",
+              id: "sf_deadline",
               name: "Deadline",
               isCheck: false,
-              style: { "width": "130px" }
+              style: { "min-width": "130px" }
             },
             {
-              id: "languages",
+              id: "sf_languages",
               name: "Languages",
               isCheck: false,
-              style: { "width": "220px" }
+              style: { "min-width": "220px" }
             },
             {
-              id: "projectManager",
+              id: "sf_projectManager",
               name: "Project Manager",
               isCheck: false,
-              style: { "width": "160px" }
+              style: { "min-width": "160px" }
             },
             {
-              id: "accountManager",
+              id: "sf_accountManager",
               name: "Account Manger",
               isCheck: false,
-              style: { "width": "160px" }
+              style: { "min-width": "160px" }
             },
             {
-              id: "industry",
+              id: "sf_industry",
               name: "Industry",
               isCheck: false,
-              style: { "width": "130px" }
+              style: { "min-width": "130px" }
             },
             {
-              id: "isTest",
+              id: "sf_isTest",
               name: "Test",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "payables",
+              id: "sf_payables",
               name: "Payables",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "receivables",
+              id: "sf_receivables",
               name: "Receivables",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "total",
+              id: "sf_total",
               name: "Total",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "margin",
+              id: "sf_margin",
               name: "Margin",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "roi",
+              id: "sf_marginPercent",
+              name: "Margin %",
+              isCheck: false,
+              style: { "min-width": "100px" }
+            },
+            {
+              id: "sf_roi",
               name: "Roi",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "projectCurrency",
+              id: "sf_projectCurrency",
               name: "Currency",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "status",
+              id: "sf_status",
               name: "Status",
               isCheck: false,
-              style: { "width": "130px" }
+              style: { "min-width": "130px" }
             },
             {
-              id: "urgent",
+              id: "sf_urgent",
               name: "Urgent",
               isCheck: false,
-              style: { "width": "100px" }
+              style: { "min-width": "100px" }
             },
             {
-              id: "requestId",
+              id: "sf_requestId",
               name: "Request ID",
               isCheck: false,
-              style: { "width": "150px" }
+              style: { "min-width": "150px" }
             },
             {
-              id: "tasksServices",
+              id: "sf_tasksServices",
               name: "Tasks Services",
               isCheck: false,
-              style: { "width": "150px" }
+              style: { "min-width": "150px" }
             },
             {
-              id: "tasksStatuses",
+              id: "sf_tasksStatuses",
               name: "Tasks Statuses",
               isCheck: false,
-              style: { "width": "150px" }
+              style: { "min-width": "150px" }
             },
             {
-              id: "stepsServices",
+              id: "sf_stepsServices",
               name: "Step Services",
               isCheck: false,
-              style: { "width": "150px" }
+              style: { "min-width": "150px" }
             },
             {
-              id: "stepsStatuses",
+              id: "sf_stepsStatuses",
               name: "Steps Statuses",
               isCheck: false,
-              style: { "width": "150px" }
+              style: { "min-width": "150px" }
             },
             {
-              id: "extraServices",
+              id: "sf_extraServices",
               name: "Extra Services",
               isCheck: false,
-              style: { "width": "130px" }
+              style: { "min-width": "130px" }
             },
             {
-              id: "vendors",
+              id: "sf_vendors",
               name: "Vendors",
               isCheck: false,
-              style: { "width": "300px" }
+              style: { "min-width": "300px" }
             }
           ],
           sorting: [
             {
-              id: "projectID",
+              id: "sf_projectID",
               name: "Project ID",
+              isCheck: false
+            },
+            {
+              id: "sf_projectName",
+              name: "Project Name",
+              isCheck: false
+            },
+            {
+              id: "sf_clientName",
+              name: "Client Name",
+              isCheck: false
+            },
+            {
+              id: "sf_startDate",
+              name: "Start Date",
+              isCheck: false
+            },
+            {
+              id: "sf_deadline",
+              name: "Deadline",
+              isCheck: false
+            },
+            {
+              id: "sf_projectManager",
+              name: "Project Manager",
+              isCheck: false
+            },
+            {
+              id: "sf_accountManager",
+              name: "Account Manger",
+              isCheck: false
+            },
+            {
+              id: "sf_industry",
+              name: "Industry",
+              isCheck: false
+            },
+            {
+              id: "sf_isTest",
+              name: "Test",
+              isCheck: false
+            },
+            {
+              id: "sf_payables",
+              name: "Payables",
+              isCheck: false
+            },
+            {
+              id: "sf_receivables",
+              name: "Receivables",
+              isCheck: false
+            },
+            {
+              id: "sf_total",
+              name: "Total",
+              isCheck: false
+            },
+            {
+              id: "sf_margin",
+              name: "Margin",
+              isCheck: false
+            },
+            {
+              id: "sf_marginPercent",
+              name: "Margin %",
+              isCheck: false
+            },
+            {
+              id: "sf_roi",
+              name: "Roi",
+              isCheck: false
+            },
+            {
+              id: "sf_projectCurrency",
+              name: "Currency",
+              isCheck: false
+            },
+            {
+              id: "sf_status",
+              name: "Status",
+              isCheck: false
+            },
+            {
+              id: "sf_urgent",
+              name: "Urgent",
+              isCheck: false
+            },
+            {
+              id: "sf_requestId",
+              name: "Request ID",
               isCheck: false
             }
           ]
@@ -393,6 +488,9 @@ export default {
   },
   methods: {
     ...mapActions([ 'alertToggle', "setUser" ]),
+    makeDBFilterRequest() {
+      this.$emit('makeDBFilterRequest')
+    },
     toggleFilter() {
       this.isFilter = !this.isFilter
     },
@@ -531,14 +629,17 @@ export default {
     padding: 25px;
     min-width: 240px;
     width: fit-content;
-    max-width: 940px;
+    max-width: 955px;
     border-bottom-right-radius: 2px;
     border-bottom-left-radius: 2px;
 
     &-body {
-      max-height: 500px;
-      overflow: auto;
-      padding: 25px 0;
+      @media (max-width: 1120px) {
+        max-height: 400px;
+        overflow: auto;
+      }
+
+      padding: 25px 0 33px;
       margin: 33px 0 25px 0;
       border-top: 1px solid $border;
       border-bottom: 1px solid $border;

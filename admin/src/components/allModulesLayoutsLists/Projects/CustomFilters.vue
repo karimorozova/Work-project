@@ -479,7 +479,7 @@ export default {
 .moduleFilters {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 15px 25px;
 }
 
 .filter {

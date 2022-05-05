@@ -19,24 +19,15 @@
           th(v-for="{ style, name, id } in fields")
             .th__titleAndSort(:style="style") {{ name }}
               .th__sortIcons(v-if="sorting.find(i => i.id === id)")
-
-
-                //span(v-if="!getSimpleValue(id)" @click="sortBy(id, 'ASC')")
-                //  i.fas.fa-sort
-                //span
-                //  span(v-if="getSimpleValue(id)")
-                //span(v-if="getSimpleValue(id)" @click="removeSortBy(id)")
-                //  i.fas.fa-times-circle
-
-                //i.fas.fa-caret-down
-                //i.fas.fa-caret-up
-
-              //  i.fas.fa-times-circle(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'" @click.stop="removeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
-              //  span(v-if="sortInfo.order === 'asc' || sortInfo.order === 'desc'")
-              //    i.fas.fa-caret-down(v-if="sortInfo.order === 'asc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'desc'})")
-              //    i.fas.fa-caret-up(v-else-if="sortInfo.order === 'desc'" @click.stop="changeSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
-              //  i.fas.fa-sort(v-else @click.stop="addSortKey({sortInfo, key: dataKey, sortField: key, order: 'asc'})")
-
+                span(v-if="!getSimpleValue(id)" @click="sortBy(id, '1')")
+                  i.fas.fa-sort
+                span(v-else)
+                  span(@click="removeSortBy(id)")
+                    i.fas.fa-times-circle
+                  span(v-if="getSimpleValue(id) === '1'" @click="sortBy(id, '-1')")
+                    i.fas.fa-caret-up
+                  span(v-if="getSimpleValue(id) === '-1'" @click="sortBy(id, '1')")
+                    i.fas.fa-caret-down
       tbody
         tr(v-for="(item, index) of data")
           td(v-for="{ id } of fields")
@@ -78,15 +69,12 @@ export default {
     return {}
   },
   methods: {
-    sortBy(key, value) {
-      this.replaceRoute(key, value)
-      this.makeDBSortingRequest()
+    async sortBy(key, value) {
+      await this.replaceRoute(key, value)
+      this.$emit('makeDBSortingRequest')
     },
-    removeSortBy(id) {
-      this.removeQuery(id)
-      this.makeDBSortingRequest()
-    },
-    makeDBSortingRequest() {
+    async removeSortBy(id) {
+      await this.removeQuery(id)
       this.$emit('makeDBSortingRequest')
     },
     approve() {
@@ -98,15 +86,6 @@ export default {
     closeModal() {
       this.$emit('closeModal')
     },
-    // addSortKey(field) {
-    //   this.$emit('addSortKey', field)
-    // },
-    // changeSortKey(field) {
-    //   this.$emit('changeSortKey', field)
-    // },
-    // removeSortKey(field) {
-    //   this.$emit('removeSortKey', field)
-    // },
     lazyLoading(e) {
       const element = e.target
       if (element.scrollTop && Math.ceil(element.scrollHeight - element.scrollTop) === element.clientHeight) {
@@ -140,7 +119,7 @@ export default {
   cursor: pointer;
 
   &:hover {
-    color: $text;
+    color: $border-focus;
   }
 }
 
@@ -150,7 +129,7 @@ export default {
 }
 
 .fa-times-circle {
-  font-size: 15px;
+  font-size: 14px;
   @extend %iconsStyle;
 }
 
@@ -158,14 +137,15 @@ export default {
 .fa-caret-down {
   font-size: 17px;
   @extend %iconsStyle;
+  margin-left: 5px;
 }
 
 .th {
   &__sortIcons {
-    gap: 7px;
     display: flex;
-    margin-right: 7px;
     align-items: center;
+    position: absolute;
+    right: 6px;
   }
 
   &__titleAndSort {
