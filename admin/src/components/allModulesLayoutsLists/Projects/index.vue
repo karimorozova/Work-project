@@ -4,7 +4,7 @@
       :hasFilterButton="true"
       :hasSettingButton="true"
       :moduleType="moduleType"
-      @makeDBFilterRequest="collectQueryData(getModuleData)"
+      @makeDBRequest="collectQueryData(getModuleData)"
     )
 
       template(slot="filter" slot-scope="{ tableFilters }")

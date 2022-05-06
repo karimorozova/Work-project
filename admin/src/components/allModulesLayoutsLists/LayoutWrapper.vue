@@ -9,7 +9,7 @@
       slot(name="icons")
 
     .layoutWrapper__summary
-      div summary
+      div {{summary}}
 
     .layoutWrapper__tabs
       //h1 summary
@@ -25,14 +25,14 @@
     transition(name='top')
       .layoutWrapper__filter(v-if="isFilter")
         .layoutWrapper__filter-body
-          Close(@clicked="toggleFilter(makeDBFilterRequest)")
+          Close(@clicked="toggleFilter(makeDBRequest)")
           slot(
             name="filter"
             :tableFilters="layoutSettings.filters.filter(({ isCheck }) => isCheck)"
           )
 
         .layoutWrapper__filter-buttons
-          Button(value="Search" @clicked="toggleFilter(makeDBFilterRequest)")
+          Button(value="Search" @clicked="toggleFilter(makeDBRequest)")
 
     transition(name='slide')
       .layoutWrapper__setting(v-if="isSettings")
@@ -126,6 +126,7 @@ export default {
       isFilter: false,
       isSettings: false,
       tabs: [],
+      // summary: [],
       selectedTab: '',
       layoutSettings: {
         filters: [],
@@ -488,8 +489,8 @@ export default {
   },
   methods: {
     ...mapActions([ 'alertToggle', "setUser" ]),
-    makeDBFilterRequest() {
-      this.$emit('makeDBFilterRequest')
+    makeDBRequest() {
+      this.$emit('makeDBRequest')
     },
     toggleFilter(callback) {
       this.isFilter = !this.isFilter
@@ -568,7 +569,18 @@ export default {
   computed: {
     ...mapGetters({
       user: "getUser"
-    })
+    }),
+    summary() {
+      const summary = []
+
+      for (const queryKey in this.$route.query) {
+        if (!!this.$route.query[queryKey]) summary.push({
+          key: queryKey,
+          value: this.$route.query[queryKey]
+        })
+      }
+      return summary
+    }
   },
   created() {
     this.updatedSettingByUserData()
