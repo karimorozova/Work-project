@@ -24,38 +24,38 @@ const getShortReportList = async () => {
 const getAllReportsFromDb = async (countToSkip, countToGet, query, projectFields, unsetFields = []) => {
 	const reports = await InvoicingClientReports.aggregate([
 		{ $match: { ...query } },
-		{
-			$lookup: {
-				from: "projects",
-				let: { 'steps': '$stepsAndProjects.step' },
-				pipeline: [
-					{ $unwind: "$steps" },
-					{ $match: { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
-					{ $addFields: { "steps.type": 'Classic' } },
-					...generateExtraFieldForSteps('steps'),
-					{ $replaceRoot: { newRoot: '$steps' } }
-				],
-				as: "stepsClassic"
-			}
-		},
-		{
-			$lookup: {
-				from: "projects",
-				let: { 'additionsSteps': '$stepsAndProjects.step' },
-				pipeline: [
-					{ $unwind: "$additionsSteps" },
-					{ $match: { "$expr": { "$in": [ "$additionsSteps._id", "$$additionsSteps" ] } } },
-					{ $addFields: { "additionsSteps.type": 'Extra' } },
-					...generateExtraFieldForSteps('additionsSteps'),
-					{ $replaceRoot: { newRoot: '$additionsSteps' } }
-				],
-				as: "stepsExtra"
-			}
-		},
-		{ $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
-		// { $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
-		{ $unset: [ 'stepsClassic', 'stepsExtra', ...unsetFields ] },
-		...(!!projectFields ? [ { $project: projectFields } ] : []),
+		// {
+		// 	$lookup: {
+		// 		from: "projects",
+		// 		let: { 'steps': '$stepsAndProjects.step' },
+		// 		pipeline: [
+		// 			{ $unwind: "$steps" },
+		// 			{ $match: { "$expr": { "$in": [ "$steps._id", "$$steps" ] } } },
+		// 			{ $addFields: { "steps.type": 'Classic' } },
+		// 			...generateExtraFieldForSteps('steps'),
+		// 			{ $replaceRoot: { newRoot: '$steps' } }
+		// 		],
+		// 		as: "stepsClassic"
+		// 	}
+		// },
+		// {
+		// 	$lookup: {
+		// 		from: "projects",
+		// 		let: { 'additionsSteps': '$stepsAndProjects.step' },
+		// 		pipeline: [
+		// 			{ $unwind: "$additionsSteps" },
+		// 			{ $match: { "$expr": { "$in": [ "$additionsSteps._id", "$$additionsSteps" ] } } },
+		// 			{ $addFields: { "additionsSteps.type": 'Extra' } },
+		// 			...generateExtraFieldForSteps('additionsSteps'),
+		// 			{ $replaceRoot: { newRoot: '$additionsSteps' } }
+		// 		],
+		// 		as: "stepsExtra"
+		// 	}
+		// },
+		// { $addFields: { "stepsWithProject": { $concatArrays: [ '$stepsClassic', '$stepsExtra' ] } } },
+		// // { $addFields: { "total": { $sum: '$stepsWithProject.finance.Price.receivables' } } },
+		// { $unset: [ 'stepsClassic', 'stepsExtra', ...unsetFields ] },
+		// ...(!!projectFields ? [ { $project: projectFields } ] : []),
 		{ $sort: { reportId: -1 } },
 		{ $skip: countToSkip },
 		{ $limit: countToGet }

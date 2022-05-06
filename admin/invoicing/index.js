@@ -14,6 +14,7 @@ const {
 const {
 	updateInvoice,
 	updateInvoiceItem,
+	payInvoice,
 } = require('./updateInvoice')
 
 const {
@@ -38,6 +39,7 @@ module.exports = {
 	getInvoice,
 	updateInvoice,
 	updateInvoiceItem,
+	payInvoice,
 	deleteInvoiceItem,
 	deleteInvoiceItemFromReport,
 	deleteInvoice

@@ -181,10 +181,10 @@
                   span(style="margin-left: 3px;") {{ +(item.total).toFixed(2) }}
                   span(style="margin-left: 3px;" v-html="returnIconCurrencyByStringCode(invoice.customer.currency)" )
 
-                .selectList__item.selectList__item-flex(@click="openAllJobsModal")
-                  span
-                    i.fas.fa-plus
-                  span Generate Report
+                //.selectList__item.selectList__item-flex(@click="openAllJobsModal")
+                //  span
+                //    i.fas.fa-plus
+                //  span Generate Report
                 .selectList__item.selectList__item-flex(@click="openItemModalAdd")
                   span
                     i.fas.fa-plus

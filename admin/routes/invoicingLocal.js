@@ -11,7 +11,7 @@ const {
 	deleteInvoiceItem,
 	deleteInvoiceItemFromReport,
 	getInvoicesForOptions,
-	sendInvoice, deleteInvoice
+	sendInvoice, deleteInvoice, payInvoice
 } = require('../invoicing')
 
 router.post("/send-invoice", async (req, res) => {
@@ -85,6 +85,17 @@ router.post("/invoice/:id", async (req, res) => {
 	try {
 		const { id } = req.params
 		await updateInvoice(id, req.body)
+		res.json(await getInvoice(id))
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Something wrong on invoicing')
+	}
+})
+
+router.post("/invoice/:id/pay", async (req, res) => {
+	try {
+		const { id } = req.params
+		await payInvoice(id)
 		res.json(await getInvoice(id))
 	} catch (err) {
 		console.log(err)

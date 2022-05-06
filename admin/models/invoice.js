@@ -94,7 +94,27 @@ const InvoiceSchema = new mongoose.Schema({
 		type: Schema.Types.ObjectId,
 		ref: 'User',
 		default: null
-	}
+	},
+	paymentInformation: [ {
+		paidAmount: {
+			type: Number
+		},
+		unpaidAmount: {
+			type: Number
+		},
+		paymentMethod: {
+			type: Object,
+			default: null
+		},
+		paymentDate: {
+			type: Date,
+			default: ''
+		},
+		notes: {
+			type: String,
+			default: ""
+		}
+	} ],
 })
 
 const Invoice = mongoose.model('Invoice', InvoiceSchema)

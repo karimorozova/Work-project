@@ -39,6 +39,8 @@
         )
           i(class="fa-solid fa-trash")
 
+        Button(v-if="invoice.status !== 'Paid'" value="Paid" @clicked="payInvoice")
+
 
 </template>
 
@@ -70,6 +72,9 @@ export default {
     }),
     deleteInvoice() {
       this.$emit('deleteInvoice')
+    },
+    payInvoice() {
+      this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/pay`)
     },
     downloadInvoiceFile(path) {
       let link = document.createElement('a')
