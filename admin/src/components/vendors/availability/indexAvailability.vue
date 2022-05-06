@@ -29,6 +29,14 @@
 
           )
 
+        .vacancy-calendar
+          .title Days-off
+          AbsenceCalendar(
+            :absenceSchedule="absenceSchedule"
+            @saveAbsenceSchedule="saveAbsenceSchedule"
+            @deleteAbsenceSchedule="deleteAbsenceSchedule"
+          )
+
         //.manager-schedule
         //  .schedule-wrapper(
         //    v-for="(item, index) in projectManagerTime "
@@ -54,6 +62,7 @@ import {mapActions, mapGetters} from "vuex"
 import SelectSingle from "../../SelectSingle"
 import Toggler from "../../Toggler"
 import ScheduleList from './sub-components/ScheduleList'
+import AbsenceCalendar from './sub-components/AbsenceCalendar'
 import moment from "moment-timezone"
 
 export default {
@@ -63,6 +72,8 @@ export default {
       timezone: '',
       isAvailableForWork: false,
       timezones: [],
+      absenceSchedule: [],
+
     }
   },
   methods: {
@@ -144,6 +155,24 @@ export default {
         console.log(err)
       }
     },
+    saveAbsenceSchedule(data){
+
+      this.absenceSchedule = data
+      this.saveAvailability('absenceSchedule')
+    },
+    deleteAbsenceSchedule(day) {
+      this.absenceSchedule.forEach(item => {
+        const startStr = new Date(item.start).toUTCString()
+        const endStr = new Date(item.end).toUTCString()
+        const dayStart = new Date(day.start).toUTCString()
+        const dayEnd = new Date(day.end).toUTCString()
+        if (dayStart === startStr && dayEnd === endStr) {
+          const index = this.absenceSchedule.indexOf(item)
+          this.absenceSchedule.splice(index, 1)
+        }
+      })
+      this.saveAvailability('absenceSchedule')
+    },
     async saveAvailability(prop) {
       try {
         const res = await this.$http.put(`/vendorsapi/vendor-availability-manage/${this.$route.params.id}`, {
@@ -163,6 +192,7 @@ export default {
       this.workSchedule = data.workSchedule
       this.timezone = data.timezone
       this.isAvailableForWork = data.isAvailableForWork
+      this.absenceSchedule = data.absenceSchedule
     }
   },
   computed: {
@@ -184,7 +214,8 @@ export default {
   components: {
     SelectSingle,
     Toggler,
-    ScheduleList
+    ScheduleList,
+    AbsenceCalendar
   },
   async created() {
     await this.getAvailability()
@@ -245,6 +276,14 @@ export default {
   width: 220px;
   height: 32px;
   background-color: white;
+}
+.vacancy-calendar {
+  position: relative;
+  border-top: 1px solid $light-border;
+  padding-top: 60px;
+}
+.working-schedule {
+  padding-bottom: 60px;
 }
 
 //.vendor-schedule {

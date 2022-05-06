@@ -205,7 +205,18 @@ const getVendorForPortal = async (query) => {
 				availability: 1,
 				password: 1,
 				memoqUserName: 1,
-				guid: 1
+				guid: 1,
+        facebook: 1,
+        experienceYears: 1,
+        linkedin: 1,
+        catExperience: 1,
+        twitter: 1,
+        softwares: 1,
+        instagram: 1,
+        telegram: 1,
+        website: 1,
+        whatsapp: 1,
+        socialMedia: 1,
 			}).populate('native')
 	)
 }
@@ -384,27 +395,6 @@ async function getFilteredVendors(filters) {
 	}
 }
 
-async function getFilteredVendorsWithCustomFilters(filters, customFilters = {}) {
-	// try {
-	//   const query = {...async getFilteringQuery(filters), ...customFilters};
-	//   return await Vendors.find(query, {
-	//     firstName: 1,
-	//     status: 1,
-	//     surname:1,
-	//     competencies: 1,
-	//     native: 1,
-	//     industries: 1,
-	//     isTest: 1,
-	//   })
-	//     .sort({ _id: 1 }).limit(25)
-	//     .populate("industries")
-	//     .populate("native")
-	// } catch (err) {
-	//   console.log(err)
-	//   console.log("Error on filtering vendors")
-	// }
-}
-
 async function getFilteredVendorsPotential(filters) {
 	try {
 
@@ -446,7 +436,6 @@ module.exports = {
 	getVendors,
 	getVendorAfterUpdate,
 	getFilteredVendors,
-	getFilteredVendorsWithCustomFilters,
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential,
 	getVendorsForSteps,

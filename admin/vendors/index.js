@@ -3,7 +3,6 @@ const {
 	getVendors,
 	getVendorAfterUpdate,
 	getFilteredVendors,
-	getFilteredVendorsWithCustomFilters,
 	hasVendorCompetenciesAndPending,
 	getFilteredVendorsPotential,
 	getVendorForPortal,
@@ -64,7 +63,14 @@ const {
 	updateVendorAvailability
 } = require("./availability")
 
+const {
+	getVendorSocialMedia,
+	updateVendorSocialMediaValue
+} = require("./socialMediaAndCommunication")
+
 module.exports = {
+	getVendorSocialMedia,
+	updateVendorSocialMediaValue,
 	updateVendorAvailability,
 	getVendorAvailability,
 	getJobDetails,
@@ -76,14 +82,12 @@ module.exports = {
 	getVendors,
 	getVendorAfterUpdate,
 	getFilteredVendors,
-	getFilteredVendorsWithCustomFilters,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
 	removeVendorDoc,
 	saveHashedPassword,
 	getPhotoLink,
 	removeOldVendorFile,
-	// getJobs,
 	updateStepProp,
 	manageNewApplication,
 	updateVendorEducation,

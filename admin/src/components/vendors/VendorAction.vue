@@ -51,7 +51,7 @@ export default {
   margin-top: 25px;
 
   &__title {
-    font-size: 18px;
+    font-size: 16px;
     border-bottom: 1px solid $light-border;
     font-family: Myriad600;
     margin-bottom: 20px;

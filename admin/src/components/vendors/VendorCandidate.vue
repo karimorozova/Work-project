@@ -5,8 +5,6 @@
       .candidate__row-key Years of experience:
       .candidate__row-value {{candidateData.experienceYears}}
     .candidate__row
-      .candidate__row-key Internet access:
-      .candidate__row-value {{candidateData.internetAccess}}
     .candidate__row
       .candidate__row-key CAT experience:
       .candidate__row-value {{candidateData.catExperience}}

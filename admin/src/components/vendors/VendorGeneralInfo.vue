@@ -58,54 +58,56 @@
             img.photo-image(:src="currentVendorFull.photo")
 
         .vendorInformation__description
-          .row.mbRow
+          .row.mbRow.phone
             .row__key Phone:
             .row__value
               input.input( type="text" placeholder="Value" :value="currentVendor.phone" @input="(e)=>updateVendorProp(e.target.value, 'phone')" ref="phone")
-          .row.mbRow
-            .row__key Native Language:
-            .row__value
-              SelectSingle(
-                :selectedOption="currentVendor.native ? currentVendor.native.lang: ''",
-                :options="filteredLanguages.map(({lang}) => lang)",
-                :hasSearch="true"
-                placeholder="Option"
-                @chooseOption="updateVendorNative"
-              )
-          .row.mbRow
+
+          .row.mbRow.timezone
             .row__key Time Zone:
             .row__value
               SelectSingle(
                 :hasSearch="true"
                 placeholder="Option"
-                :options="timezones.map(item => item.zone)",
+                :options="timezones",
                 :selectedOption="currentVendor.timezone",
                 @chooseOption="updateVendorTimeZone"
               )
-          .row
-            .row__key Gender:
-            .row__value
-              SelectSingle(
-                :options="genders"
-                :selectedOption="currentVendor.gender"
-                placeholder="Option"
-                @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
-              )
-          .row
-            .row__key Company Name:
-            .row__value
-              input.input(type="text" placeholder="Value" :value="currentVendor.companyName" @change="(e) => updateVendorProp(e.target.value,'companyName')")
-          .row
-            .row__key Skype:
-            .row__value
-              input.input(type="text" placeholder="Value" :value="currentVendor.skype" @change="(e) => updateVendorProp(e.target.value,'skype')")
+          //.row.mbRow
+          //  .row__key Availability:
+          //  .row__value
+          //    SelectSingle(
+          //      :options="availabilityList"
+          //      :selectedOption="currentVendor.availability"
+          //      placeholder="Option"
+          //      @chooseOption="(e) => updateVendorProp(e.option, 'availability')"
+          //    )
+          //.row
+          //  .row__key Gender:
+          //  .row__value
+          //    SelectSingle(
+          //      :options="genders"
+          //      :selectedOption="currentVendor.gender"
+          //      placeholder="Option"
+          //      @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
+          //    )
+          //.row
+          //  .row__key Company Name:
+          //  .row__value
+          //    input.input(type="text" placeholder="Value" :value="currentVendor.companyName" @change="(e) => updateVendorProp(e.target.value,'companyName')")
+          //.row
+          //  .row__key Skype:
+          //  .row__value
+          //    input.input(type="text" placeholder="Value" :value="currentVendor.skype" @change="(e) => updateVendorProp(e.target.value,'skype')")
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex"
 import SelectMulti from "../SelectMulti"
 import SelectSingle from "../SelectSingle"
+import RadioButton from "../RadioButton";
 import photoPreview from "../../mixins/photoPreview"
+import moment from "moment-timezone";
 
 export default {
   mixins: [ photoPreview ],
@@ -115,12 +117,13 @@ export default {
       errors: [],
       genders: [ "Male", "Female", "Other" ],
       timezone: '',
-      native: '',
+      availabilityList: ['Full-time', 'Part-time', 'Limited'],
+      availability: '',
       gender: '',
       searchLang: '',
       timezones: [],
       isImageExist: false,
-      isFileError: false
+      isFileError: false,
     }
   },
   methods: {
@@ -148,43 +151,21 @@ export default {
         this.showFileError(input)
       }
     },
-    updateVendorNative(value) {
-      const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
-      this.updateCurrentVendorGeneralData({ key: 'native', value: { _id, lang } })
-    },
+
     updateVendorTimeZone({ option }) {
       this.updateCurrentVendorGeneralData({ key: 'timezone', value: option })
+      this.timezone = this.currentVendor.timezone
     },
     updateVendorProp(value, key) {
       this.updateCurrentVendorGeneralData({ key, value })
     },
-    async getTimezones() {
-      try {
-        const result = await this.$http.get('/api/timezones')
-        this.timezones = result.data
-      } catch (err) {
-        console.log(err)
-      }
-    }
   },
   computed: {
     ...mapGetters({
       currentVendor: "getCurrentVendorGeneralData",
-      languages: "getAllLanguages",
+
       currentVendorFull: "getCurrentVendor"
     }),
-    filteredLanguages() {
-      let result = this.languages
-      if (this.addAll) {
-        result.unshift({ lang: "All", symbol: "All" })
-      }
-      result = result.filter(item => {
-        if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) !== -1) {
-          return item
-        }
-      })
-      return result
-    },
     selectedIndNames() {
       let result = []
       if (this.currentVendor.industries && this.currentVendor.industries.length) {
@@ -197,10 +178,11 @@ export default {
   },
   components: {
     SelectSingle,
-    SelectMulti
+    SelectMulti,
+    RadioButton
   },
   created() {
-    this.getTimezones()
+    this.timezones = moment.tz.names()
   }
 }
 </script>
@@ -231,13 +213,19 @@ export default {
 
   &__description {
     box-sizing: border-box;
-    padding: 25px 25px 25px 0;
+    padding: 25px 25px 0 0;
     width: 770px;
     display: flex;
     justify-content: space-between;
     box-sizing: border-box;
     flex-wrap: wrap;
   }
+}
+.vendor-info__radio {
+  display: flex;
+}
+.radio {
+  margin-right: 15px;
 }
 
 .gen-info {
@@ -340,6 +328,7 @@ export default {
   align-items: center;
   border-radius: 8%;
   background-color: white;
+  margin-top: 20px;
 
   .photo-image {
     object-fit: cover;
@@ -360,5 +349,10 @@ export default {
   cursor: pointer;
   border-radius: 8%;
 }
-
+.timezone {
+  margin-right: auto;
+}
+.phone {
+  margin-right: 42.5px;
+}
 </style>

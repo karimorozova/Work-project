@@ -7,10 +7,6 @@ const VendorSchema = new mongoose.Schema({
 		type: String,
 		trim: true
 	},
-	guid: {
-		type: String,
-		default: null
-	},
 	photo: {
 		type: String,
 		default: "",
@@ -60,44 +56,35 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
-	skype: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	memoqUserName: {
-		type: String,
-		default: '',
-		trim: true
+	notes: {
+		type: String
 	},
 	companyName: {
 		type: String,
 		default: '',
 		trim: true
 	},
-	experienceYears: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	availability: {
-		type: String,
-		default: '',
-		trim: true
-	},
 	catExperience: {
-		type: String,
-		default: '',
-		trim: true
-	},
-	internetAccess: {
-		type: String,
-		default: 'Yes',
-		trim: true
-	},
-	softwares: {
 		type: Array,
-		default: []
+		default: [],
+	},
+	socialMedial: [ {
+		key: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		value: {
+			type: String,
+			default: ''
+		},
+	} ],
+	vendorType: {
+		type: String,
+		enum: [ 'Agency', 'Individual' ],
+		default: 'Individual',
+		trim: true,
+		required: true
 	},
 	isTest: {
 		type: Boolean,
@@ -107,9 +94,11 @@ const VendorSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-	notes: {
-		type: String
+	isAvailableForWork: {
+		type: Boolean,
+		default: true
 	},
+
 	competencies: [ {
 		sourceLanguage: {
 			type: Schema.Types.ObjectId, ref: 'Language'
@@ -312,9 +301,7 @@ const VendorSchema = new mongoose.Schema({
 			default: 0
 		}
 	} ],
-	// industries: [
-	// 	{ type: Schema.Types.ObjectId, ref: 'Industries' }
-	// ],
+	//TODO refactoring on Main
 	languagePairs: [ {
 		source: {
 			type: Schema.Types.ObjectId, ref: 'Language'
@@ -533,16 +520,16 @@ const VendorSchema = new mongoose.Schema({
 		}
 	} ],
 	absenceSchedule: [ {
-		type: {
+		reason: {
 			type: 'String',
 			required: true,
-			enum: [ 'None', 'Holiday', 'Public holiday', 'Sick leave']
+			enum: [ 'None', 'Holiday', 'Public holiday', 'Sick leave' ]
 		},
-		from: {
+		start: {
 			type: Date,
 			default: ''
 		},
-		to: {
+		end: {
 			type: Date,
 			default: ''
 		},
@@ -551,10 +538,18 @@ const VendorSchema = new mongoose.Schema({
 			default: new Date()
 		}
 	} ],
-	isAvailableForWork: {
-		type: Boolean,
-		default: true
+
+	//Memoq integration
+	guid: {
+		type: String,
+		default: null
+	},
+	memoqUserName: {
+		type: String,
+		default: '',
+		trim: true
 	}
+	//Memoq integration
 }, { minimize: false })
 
 VendorSchema.statics.authenticate = function (email, password, callback) {

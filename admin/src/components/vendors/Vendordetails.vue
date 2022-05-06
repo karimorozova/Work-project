@@ -2,9 +2,20 @@
   .vendor-wrap
     SaveCancelPopUp(v-if="isChangedVendorGeneralInfo" text=""  @accept="checkForErrors" @cancel="cancel")
     .vendor-info(v-if="currentVendor._id")
+      .vendor-info__radio
+        RadioButton.radio(name="Agency" :selected="currentVendor.vendorType" @toggleRadio="toggleRadio")
+        RadioButton.radio(name="Individual" :selected="currentVendor.vendorType" @toggleRadio="toggleRadio")
 
       .vendor-info__block
         VendorMainInfo
+        .block__header.block__header--main-info(@click="toggleBlock('isMoreVendorInfo')" :class="{'block__header-grey': !isMoreVendorInfo}")
+          .title.title--main-info More information about the Vendor
+          .icon(v-if="!isMoreVendorInfo")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data.block__data--main-info(v-if="isMoreVendorInfo")
+          VendorMoreInfo(:is-agency="isAgency")
 
       .vendor-info__preview(v-if="isEditAndSend")
         WYSIWYG(
@@ -14,6 +25,15 @@
           :message="'<p>Message...</p>'",
           @send="sendQuote"
         )
+      .vendor-info__block
+        .block__header(@click="toggleBlock('isSocialMedia')" :class="{'block__header-grey': !isSocialMedia}")
+          .title Social Media & Communication
+          .icon(v-if="!isSocialMedia")
+            i.fas.fa-chevron-down
+          .icon(v-else)
+            i.fas.fa-chevron-right
+        .block__data(v-if="isSocialMedia")
+          SocialMedia
 
       .vendor-info__block
         .block__header(@click="toggleBlock('isRates')" :class="{'block__header-grey': !isRates}")
@@ -238,6 +258,7 @@
         @openPreview="openPreview"
         @openVendor="openVendor"
       )
+      VendorCurrentTime(v-if="this.currentVendor.timezone" :current-time-zone="this.currentVendor.timezone" )
       //.vendor-subinfo__general
       //  .vendor-subinfo__title {{getVendorUpdatedData.vendorId}}
       //  .block-item-subinfo
@@ -292,11 +313,18 @@ import FinanceMatrixWithReset from "./pricelists/FinanceMatrixWithReset"
 import VendorBillingInfo from "./VendorBillingInfo"
 import VendorSubDetails from "./VendorSubDetails"
 import indexAvailability from "./availability/indexAvailability"
+import VendorMoreInfo from './vendorMoreInfo/VendorMoreInfo'
+import VendorCurrentTime from "./VendorCurrentTime";
+import SocialMedia from "./vendorMoreInfo/SocialMedia"
+import RadioButton from "../RadioButton";
+
 
 export default {
   mixins: [ photoPreview ],
   data() {
     return {
+      isAgency: '',
+      isMoreVendorInfo: false,
       isPendingCompetencies: false,
       isCompetencies: false,
       isQualifications: false,
@@ -308,6 +336,8 @@ export default {
       isBillingInformation: false,
       isNotes: false,
       isAvailable: false,
+      isSocialMedia: false,
+
 
       icons: {
         edit: { icon: require("../../assets/images/latest-version/edit.png") },
@@ -369,6 +399,15 @@ export default {
       updateVendorRatesByKey: 'updateVendorRatesFromServer',
       updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo'
     }),
+    async toggleRadio({value}) {
+
+      const vendor = this.currentVendor
+      vendor.vendorType = value
+      await this.updateCurrentVendor({ vendor: JSON.stringify(vendor) })
+      this.alertToggle({ message: "Updated", isShow: true, type: "success" })
+      this.isAgency = vendor.vendorType
+
+    },
     async setVendorProp({ prop, value }) {
       if (prop === 'isTest') {
         await this.setTest(value)
@@ -376,6 +415,7 @@ export default {
       }
       try {
         this.currentVendor[prop] = value
+
         await this.updateCurrentVendor({ vendor: JSON.stringify(this.currentVendor) })
         this.alertToggle({ message: "Updated", isShow: true, type: "success" })
       } catch (err) {
@@ -623,6 +663,7 @@ export default {
         await this.storeCurrentVendor(vendor.data)
         this.initCurrentVendorGeneralData(vendor.data)
         this.oldEmail = this.currentVendor.email
+        this.isAgency =  this.currentVendor.vendorType
       } catch (err) {
         this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
       }
@@ -640,7 +681,25 @@ export default {
     }),
     isChangedVendorGeneralInfo() {
       if (this.currentVendor.hasOwnProperty('firstName')) {
-        let keys = [ 'firstName', 'surname', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'whatsapp', 'gender', 'professionalLevel', 'notes' ]
+        let keys = [
+          'firstName',
+          'surname',
+          'email',
+          'facebook',
+          "experienceYears",
+          'availability',
+          'catExperience',
+          'twitter',
+          'softwares',
+          'instagram',
+          'telegram',
+          'socialMedia',
+          'proz',
+          'smartcat',
+          'secondaryEmail',
+          'whatsapp',
+          'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'currency', 'gender', 'professionalLevel', 'notes' ]
+
         let billKeys = [ 'officialName', 'paymentTerm', 'address', 'email' ]
 
         for (let key of keys) if (JSON.stringify(this.getVendorUpdatedData[key]) !== JSON.stringify(this.currentVendor[key])) {
@@ -656,6 +715,8 @@ export default {
     }
   },
   components: {
+    RadioButton,
+    VendorCurrentTime,
     VendorSubDetails,
     FinanceMatrixWithReset,
     Tabs,
@@ -683,12 +744,15 @@ export default {
     IndustryTable,
     ResultTable,
     VendorBillingInfo,
-    indexAvailability
+    indexAvailability,
+    VendorMoreInfo,
+    SocialMedia
   },
   directives: {
     ClickOutside
   },
   created() {
+
     this.getVendor()
 
     this.$socket.on('setFreshVendorData', ({ id }) => {
@@ -719,7 +783,13 @@ export default {
 #close {
   font-size: 15px;
 }
-
+.vendor-info__radio {
+  display: flex;
+  padding-bottom: 20px;
+}
+.radio {
+  margin-right: 15px;
+}
 .rates {
   &__icons {
     display: flex;
@@ -831,9 +901,16 @@ export default {
     &-grey {
       background-color: white;
     }
+    &--main-info {
+      width: 770px;
+      margin-left: auto;
+      padding: 25px 25px 25px 0;
+      box-sizing: border-box;
+    }
 
     .title {
       font-size: 14px;
+
     }
 
     .icon {
@@ -845,6 +922,9 @@ export default {
   &__data {
     padding: 20px 20px 20px;
     border-top: 2px solid $light-border;
+    &--main-info {
+      padding: 0;
+    }
   }
 }
 
