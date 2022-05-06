@@ -33,6 +33,11 @@
       )
     .vacancy-calendar
       .title Days-off
+      AbsenceCalendar(
+        :absenceSchedule="absenceSchedule"
+        @saveAbsenceSchedule="saveAbsenceSchedule"
+        @deleteAbsenceSchedule="deleteAbsenceSchedule"
+      )
 
 
 </template>
@@ -45,14 +50,16 @@ import Toggler from "../../../../components/general/Toggler"
 import Add from "../../../../components/general/Add"
 import getBgColor from "../../../../mixins/getBgColor"
 import ScheduleList from "./sub-components/ScheduleList"
+import AbsenceCalendar from "./sub-components/V-Calendar"
 import moment from "moment-timezone"
 
-
 export default {
+
   mixins: [ getBgColor ],
   data() {
     return {
       workSchedule: [],
+      absenceSchedule: [],
       timezone: '',
       isAvailableForWork: false,
       currentTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -66,7 +73,29 @@ export default {
     ...mapActions([
       "alertToggle"
     ]),
-    changeSchedulePosition(sortedArr) {
+    closeErrors() {
+      this.areErrors = false
+    },
+    saveAbsenceSchedule(data){
+      console.log(data)
+      this.absenceSchedule = data
+      this.saveAvailability('absenceSchedule')
+    },
+    deleteAbsenceSchedule(day) {
+
+      this.absenceSchedule.forEach(item => {
+        const startStr = new Date(item.start).toUTCString()
+        const endStr = new Date(item.end).toUTCString()
+        const dayStart = new Date(day.start).toUTCString()
+        const dayEnd = new Date(day.end).toUTCString()
+            if (dayStart === startStr && dayEnd === endStr) {
+              const index = this.absenceSchedule.indexOf(item)
+              this.absenceSchedule.splice(index, 1)
+            }
+          })
+      this.saveAvailability('absenceSchedule')
+    },
+       changeSchedulePosition(sortedArr) {
       this.workSchedule = sortedArr
       this.saveAvailability('workSchedule')
     },
@@ -100,18 +129,10 @@ export default {
       this.timezone = option
       this.saveAvailability('timezone')
     },
-    // async getTimezones() {
-    //   try {
-    //     const result = await this.$axios.get('/api/timezones')
-    //     this.timezones = result.data.map(({ zone }) => zone)
-    //
-    //   } catch (err) {
-    //     console.log(err)
-    //   }
-    // },
     async getAvailability() {
       try {
         const res = await this.$axios.get(`/vendor/vendor-availability/${ this.vendor._id }`)
+
         this.setUpAvailabilityData(res)
       } catch (err) {
         console.log(err)
@@ -134,6 +155,7 @@ export default {
       this.workSchedule = data.workSchedule
       this.timezone = data.timezone
       this.isAvailableForWork = data.isAvailableForWork
+      this.absenceSchedule = data.absenceSchedule
     },
     async checkErrors() {
       this.errors = []
@@ -157,7 +179,8 @@ export default {
     SelectSingle,
     ScheduleList,
     Add,
-    Toggler
+    Toggler,
+    AbsenceCalendar
   },
   async created() {
     await this.getAvailability()
@@ -225,6 +248,7 @@ export default {
   margin-bottom: 60px;
 }
 .vacancy-calendar {
+  position: relative;
   border-top: 1px solid $light-border;
   padding-top: 60px;
 }

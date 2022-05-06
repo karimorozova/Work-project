@@ -36,6 +36,7 @@
     "nuxt": "^1.4.2",
     "pug": "^2.0.1",
     "translate": "^1.0.2",
+    "v-calendar": "^1.0.8",
     "vue-click-outside": "^1.1.0",
     "vue-cookie": "^1.1.4",
     "vue-drag-drop": "^0.2.4",

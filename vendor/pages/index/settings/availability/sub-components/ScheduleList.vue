@@ -43,7 +43,7 @@
               type="time"
               placeholder="hh:mm"
             )
-          .remove-button(@click="remove")
+          .remove-button(@click="remove(index)")
             .remove-button__icon
               i.fas.fa-trash
           .remove-button.handle(style="cursor: grab; margin-left: 10px;")
@@ -93,8 +93,8 @@ export default {
     setDay(option) {
       this.day = option
     },
-    remove() {
-      this.$emit('remove')
+    remove(index) {
+      this.$emit('remove', index)
     }
   }
 }
