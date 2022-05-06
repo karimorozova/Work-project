@@ -258,7 +258,7 @@
         @openPreview="openPreview"
         @openVendor="openVendor"
       )
-      VendorCurrentTime(v-if="this.currentVendor.timezone" :current-time-zone="this.currentVendor.timezone" )
+      VendorCurrentTime(v-if="this.currentVendor.timezone" :timezone="this.currentVendor.timezone" )
       //.vendor-subinfo__general
       //  .vendor-subinfo__title {{getVendorUpdatedData.vendorId}}
       //  .block-item-subinfo
@@ -314,9 +314,9 @@ import VendorBillingInfo from "./VendorBillingInfo"
 import VendorSubDetails from "./VendorSubDetails"
 import indexAvailability from "./availability/indexAvailability"
 import VendorMoreInfo from './vendorMoreInfo/VendorMoreInfo'
-import VendorCurrentTime from "./VendorCurrentTime";
+import VendorCurrentTime from "./VendorCurrentTime"
 import SocialMedia from "./vendorMoreInfo/SocialMedia"
-import RadioButton from "../RadioButton";
+import RadioButton from "../RadioButton"
 
 
 export default {
@@ -399,7 +399,7 @@ export default {
       updateVendorRatesByKey: 'updateVendorRatesFromServer',
       updateCurrentVendorGeneralDataBillingInfo: 'updateCurrentVendorGeneralDataBillingInfo'
     }),
-    async toggleRadio({value}) {
+    async toggleRadio({ value }) {
 
       const vendor = this.currentVendor
       vendor.vendorType = value
@@ -663,7 +663,7 @@ export default {
         await this.storeCurrentVendor(vendor.data)
         this.initCurrentVendorGeneralData(vendor.data)
         this.oldEmail = this.currentVendor.email
-        this.isAgency =  this.currentVendor.vendorType
+        this.isAgency = this.currentVendor.vendorType
       } catch (err) {
         this.alertToggle({ message: "Error on getting Vendor's info", isShow: true, type: "error" })
       }
@@ -783,13 +783,16 @@ export default {
 #close {
   font-size: 15px;
 }
+
 .vendor-info__radio {
   display: flex;
   padding-bottom: 20px;
 }
+
 .radio {
   margin-right: 15px;
 }
+
 .rates {
   &__icons {
     display: flex;
@@ -901,6 +904,7 @@ export default {
     &-grey {
       background-color: white;
     }
+
     &--main-info {
       width: 770px;
       margin-left: auto;
@@ -922,6 +926,7 @@ export default {
   &__data {
     padding: 20px 20px 20px;
     border-top: 2px solid $light-border;
+
     &--main-info {
       padding: 0;
     }

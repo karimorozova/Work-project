@@ -1,13 +1,34 @@
 <template lang="pug">
   .action
     .action__title Vendor's time:
-    .time {{ new Date().toLocaleString('en-US', { timeZone: currentTimeZone}) }}
+    .time {{ time }}
 </template>
 <script>
 
+import moment from "moment"
+
 export default {
   name: 'VendorCurrentTime',
-  props: ['currentTimeZone'],
+  props: [ 'timezone' ],
+  data() {
+    return {
+      time: this.getTime(),
+      interval: null
+    }
+  },
+  methods: {
+    getTime() {
+      return moment(new Date().toLocaleString('en-US', { timeZone: this.timezone })).format('DD/MM/YYYY, HH:mm:ss')
+    }
+  },
+  mounted() {
+    this.interval = setInterval(() => {
+      this.time = this.getTime()
+    }, 1000)
+  },
+  beforeDestroy() {
+    clearInterval(this.interval)
+  }
 }
 </script>
 <style lang="scss" scoped>

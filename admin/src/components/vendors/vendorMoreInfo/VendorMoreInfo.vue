@@ -33,7 +33,7 @@
         .row__key CAT experience:
         .row__value
           SelectMulti(
-            :selectedOptions="currentVendor.catExperience"
+            :selectedOptions="Array.isArray(currentVendor.catExperience) ? currentVendor.catExperience : []"
             :isTableDropMenu="true"
             placeholder="Options"
             :hasSearch="false"
@@ -127,7 +127,7 @@
 <script>
 import SelectSingle from '../../SelectSingle'
 import SelectMulti from '../../SelectMulti'
-import {mapActions, mapGetters} from "vuex";
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   name: 'VendorMoreInfo',
@@ -142,13 +142,13 @@ export default {
   },
   data() {
     return {
-      genders: ["Male", "Female", "Other"],
+      genders: [ "Male", "Female", "Other" ],
       gender: '',
       native: '',
       searchLang: '',
       catExperience: [],
-      catExperienceList: ['XTM', 'MemoQ', 'Trados'],
-      currencyList: ['EUR'],
+      catExperienceList: [ 'XTM', 'MemoQ', 'Trados' ],
+      currencyList: [ 'EUR' ]
 
     }
 
@@ -157,13 +157,13 @@ export default {
     ...mapGetters({
       currentVendor: "getCurrentVendorGeneralData",
       currentFullVendor: "getCurrentVendor",
-      languages: "getAllLanguages",
+      languages: "getAllLanguages"
 
     }),
     filteredLanguages() {
       let result = this.languages
       if (this.addAll) {
-        result.unshift({lang: "All", symbol: "All"})
+        result.unshift({ lang: "All", symbol: "All" })
       }
       result = result.filter(item => {
         if (item.lang.toLowerCase().indexOf(this.searchLang.toLowerCase()) !== -1) {
@@ -171,25 +171,25 @@ export default {
         }
       })
       return result
-    },
+    }
   },
   methods: {
     ...mapActions(
-      {
-        updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-        alertToggle: 'alertToggle',
-        storeCurrentVendor: "storeCurrentVendor"
-      }
+        {
+          updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
+          alertToggle: 'alertToggle',
+          storeCurrentVendor: "storeCurrentVendor"
+        }
     ),
     updateVendorNative(value) {
-      const {_id, lang} = this.filteredLanguages.find(({lang}) => lang === value.option)
-      this.updateCurrentVendorGeneralData({key: 'native', value: {_id, lang}})
+      const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
+      this.updateCurrentVendorGeneralData({ key: 'native', value: { _id, lang } })
     },
     updateVendorProp(value, key) {
-      this.updateCurrentVendorGeneralData({key, value})
+      this.updateCurrentVendorGeneralData({ key, value })
       this[key] = value
     },
-    chooseCatExperienceOptions({option}) {
+    chooseCatExperienceOptions({ option }) {
       const position = this.catExperience.indexOf(option)
       if (position !== -1) {
         this.catExperience.splice(position, 1)
@@ -197,8 +197,7 @@ export default {
         const title = this.catExperienceList.find((item) => item === option)
         this.catExperience.push(title)
       }
-
-      this.updateCurrentVendorGeneralData({key: 'catExperience', value: this.catExperience})
+      this.updateCurrentVendorGeneralData({ key: 'catExperience', value: this.catExperience })
     }
   }
 }
@@ -266,12 +265,15 @@ export default {
   font-family: Myriad600;
   font-size: 16px;
 }
+
 .website {
   margin-right: auto;
 }
+
 .company {
   margin-right: 42.5px;
 }
+
 .agency {
   padding-top: 0;
 }
