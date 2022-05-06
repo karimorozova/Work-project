@@ -3,7 +3,7 @@
 
     .layoutWrapper__icons
       IconButton(v-if="hasFilterButton" @clicked="toggleFilter")
-        i(class="fa-solid fa-filter")
+        i(class="fa-solid fa-sliders")
       IconButton(v-if="hasSettingButton" @clicked="toggleSettings")
         i(class="fas fa-cogs")
       slot(name="icons")
@@ -25,14 +25,14 @@
     transition(name='top')
       .layoutWrapper__filter(v-if="isFilter")
         .layoutWrapper__filter-body
-          Close(@clicked="toggleFilter")
+          Close(@clicked="toggleFilter(makeDBFilterRequest)")
           slot(
             name="filter"
             :tableFilters="layoutSettings.filters.filter(({ isCheck }) => isCheck)"
           )
 
         .layoutWrapper__filter-buttons
-          Button(value="Search" @clicked="makeDBFilterRequest")
+          Button(value="Search" @clicked="toggleFilter(makeDBFilterRequest)")
 
     transition(name='slide')
       .layoutWrapper__setting(v-if="isSettings")
@@ -491,8 +491,9 @@ export default {
     makeDBFilterRequest() {
       this.$emit('makeDBFilterRequest')
     },
-    toggleFilter() {
+    toggleFilter(callback) {
       this.isFilter = !this.isFilter
+      if (callback) return callback()
     },
     toggleSettings() {
       this.isSettings = !this.isSettings

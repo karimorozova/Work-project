@@ -55,7 +55,7 @@
           DatePicker(
             :value="selectedStartDateRange"
             @input="(e) => replaceRoute('f_startDate', `${ new Date(e[0]).getTime() }_${ new Date(e[1]).getTime() }`)"
-            format="MMM D"
+            format="MMM D: HH:mm"
             prefix-class="xmx"
             range-separator=" - "
             :clearable="false"
@@ -72,7 +72,7 @@
           DatePicker(
             :value="selectedDeadlineRange"
             @input="(e) => replaceRoute('f_deadline', `${ new Date(e[0]).getTime() }_${ new Date(e[1]).getTime() }`)"
-            format="MMM D"
+            format="MMM D: HH:mm"
             prefix-class="xmx"
             range-separator=" - "
             :clearable="false"

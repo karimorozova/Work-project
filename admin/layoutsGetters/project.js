@@ -1,4 +1,6 @@
 const { Projects } = require("../models")
+const { ObjectID: ObjectId } = require("mongodb")
+const { Languages, Services, ClientRequest } = require("../models")
 
 const defaultOptions = {
 	hasSkip: true,
@@ -7,8 +9,11 @@ const defaultOptions = {
 }
 
 module.exports = getLayoutProjects = async ({ query = {}, sort = {}, options = {}, countToSkip = 0, countToGet = 50 }) => {
+	const allLanguages = await Languages.find()
+	const allRequests = await ClientRequest.find()
+
 	sort = handlerSort(sort)
-	query = handlerQuery(query)
+	query = handlerQuery(query, { allLanguages, allRequests })
 
 	options = {
 		...defaultOptions,
@@ -16,7 +21,7 @@ module.exports = getLayoutProjects = async ({ query = {}, sort = {}, options = {
 	}
 
 	const data = await Projects.aggregate([
-		...(Object.keys(query).length ? [ { $math: query } ] : []),
+		...(Object.keys(query).length ? [ { $match: { ...query } } ] : []),
 		{
 			$project: {
 				projectId: 1,
@@ -165,9 +170,76 @@ const handlerSort = (rawSort) => {
 	return sort
 }
 
-const handlerQuery = (rawQuery) => {
+const handlerQuery = (rawQuery, models) => {
 	const query = {}
+	const reg = /[.*+?^${}()|[\]\\]/g
+	const { allLanguages, allRequests } = models
+
 	console.log('rawQuery', rawQuery)
+
+	// if (rawQuery['status'] && rawQuery['status'] !== 'All') {
+	// 	query["status"] = rawQuery['status']
+	// }
+	if (rawQuery['f_projectId']) {
+		const filter = rawQuery['f_projectId'].replace(reg, '\\$&')
+		query['projectId'] = { "$regex": new RegExp(filter, 'i') }
+	}
+	if (rawQuery['f_deadline']) {
+		query["deadline"] = { $gte: new Date(+rawQuery['f_deadline'].split('_')[0]), $lt: new Date(+rawQuery['f_deadline'].split('_')[1]) }
+	}
+	if (rawQuery['f_startDate']) {
+		query["startDate"] = { $gte: new Date(+rawQuery['f_startDate'].split('_')[0]), $lt: new Date(+rawQuery['f_startDate'].split('_')[1]) }
+	}
+	if (rawQuery['f_projectName']) {
+		const filter = rawQuery['f_projectName'].replace(reg, '\\$&')
+		query['projectName'] = { "$regex": new RegExp(filter, 'gi') }
+	}
+	if (rawQuery['f_vendors']) {
+		query["steps.vendor"] = { $in: rawQuery['f_vendors'].split(',').map(item => ObjectId(item)) }
+	}
+	if (rawQuery['f_clients']) {
+		query["customer"] = { $in: rawQuery['f_clients'].split(',').map(item => ObjectId(item)) }
+	}
+	if (rawQuery['f_projectManager']) {
+		query["projectManager"] = ObjectId(rawQuery['f_projectManager'])
+	}
+	if (rawQuery['f_accountManager']) {
+		query["accountManager"] = ObjectId(rawQuery['f_accountManager'])
+	}
+	if (rawQuery['f_sourceLanguages']) {
+		query["tasks.sourceLanguage"] = { $in: rawQuery['f_sourceLanguages'].split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if (rawQuery['f_targetLanguages']) {
+		query["tasks.targetLanguage"] = { $in: rawQuery['f_targetLanguages'].split(',').map(item => allLanguages.find(({ _id }) => _id.toString() === item.toString()).symbol) }
+	}
+	if (rawQuery['f_industry']) {
+		query["industry"] = ObjectId(rawQuery['f_industry'])
+	}
+	if (rawQuery['f_tasksServices']) {
+		query["tasks.service"] = { $in: rawQuery['f_tasksServices'].split(',').map(i => ObjectId(i)) }
+	}
+	if (rawQuery['f_tasksStatuses']) {
+		query["tasks.status"] = { $in: rawQuery['f_tasksStatuses'].split(',') }
+	}
+	if (rawQuery['f_stepsStatuses']) {
+		query["steps.status"] = { $in: rawQuery['f_stepsStatuses'].split(',') }
+	}
+	if (rawQuery['f_isTest']) {
+		query["isTest"] = rawQuery['f_isTest'] === "Yes"
+	}
+	if (rawQuery['f_projectCurrency']) {
+		query["projectCurrency"] = rawQuery['f_projectCurrency']
+	}
+	if (rawQuery['f_requestId']) {
+		const requests = allRequests.filter(({ projectId }) => projectId.includes(rawQuery['f_requestId']))
+		console.log(requests)
+		if (requests.length) query['requestId'] = { $in: requests.map(i => ObjectId(i._id)) }
+	}
+	if (rawQuery['f_stepsServices']) {
+		query["steps.step"] = { $in: rawQuery['f_stepsServices'].split(',').map(i => ObjectId(i)) }
+	}
+
+	console.log('FIN', query)
 
 	return query
 }
