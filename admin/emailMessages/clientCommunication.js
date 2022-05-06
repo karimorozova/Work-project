@@ -680,6 +680,33 @@ const getPdfInvoice = (invoice) => {
 		      </div>
 		    </div>
 		  </div>
+		  <div class="Payments">
+		  	<h4>Pay via Bank Transfer:</h4>
+          <div class="row" style="height: 30px;">
+	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">ACCOUNT NAME:</div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">Pangea Translation Services (Cyprus) LTD</span></div>
+	        </div>
+          <div class="row" style="height: 30px;">
+	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">BANK NAME:</div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">Hellenic Bank</span></div>
+	        </div>
+          <div class="row" style="height: 30px;">
+	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">ACCOUNT NUMBER:</div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">240-01-776394-01</span></div>
+	        </div>
+          <div class="row" style="height: 30px;">
+	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">IBAN:</div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">CY75005002400002400177639401</span></div>
+	        </div>
+          <div class="row" style="height: 30px;">
+	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">SWIFT:</div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">HEBACY2N</span></div>
+	        </div>
+          <div class="row" style="height: 30px;">
+	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">BANK ADDRESS:</div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">131 Arch. Makarios III & Ioanni Polemi P.O Box 51791, 3508 Lemesos, Cyprus</span></div>
+	        </div>
+		  </div>
 		</div>`
 
 	function paymentProfile(invoice) {
@@ -705,6 +732,34 @@ const getPdfInvoice = (invoice) => {
 	}
 }
 
+function getInvoiceSendTemplate(invoice) {
+	return `<div class="wrapper" style="width:800px;border-width:1px;border-style:solid;border-color:#bfbfbf;font-family:'Roboto', sans-serif;color:#333!important;box-sizing:border-box;" >
+                <header style="background-color:#efefef;text-align:center;" >
+                    <img class="logo" src="cid:logo@pan" alt="pangea" style="margin:7px;" >
+                </header>
+                <div class="main" style="padding:25px;">
+                    <p class="main_italic main_line15 main_weight600" style="font-weight:600;font-style:italic;margin-top:10px;margin-bottom:40px;margin-right:0;margin-left:0;line-height:1.5;">
+                    ***This is an automated message*** <br>
+                    This message is sent to you on behalf of Accounting
+                    </p>
+                    <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear Test</span></p>
+                    <p>Invoice <b>${ invoice.invoiceId }</b> for the sum of: <b>${ getInvoiceFinance(invoice).total } ${ returnIconCurrencyByStringCode(invoice.customer.currency) }</b> 
+                    	can be viewed, printed or downloaded as a PDF file from the link below.</p>
+                    <p>Kindly add the invoice ID as a reference, when sending the transfer.</p>
+                    <p style="background: rgba(245, 198, 83, 0.14);padding: 10px;">
+                    ***Please make sure that the transfer includes <b>all bank fees</b>, so that the receivables on our side match the amount stated in the invoice.***</p>
+                    <p>Click to view your Invoice and choose the payment option</p>
+                    <p>We look forward to doing more business with you.</p>
+                    <br>
+                    <p>Regards,<br>Finance team</p>
+                </div>
+                <footer>
+                    <hr size="10" style="border:none;" color="#efefef">
+                    <a class="footer__link" href="https://www.pangea.global" style="display:block;width:100%;text-align:center;padding-top:10px;padding-bottom:15px;padding-right:0;padding-left:0;text-decoration:none;color:#333;" >www.pangea.global</a>
+                </footer>
+            </div>`
+}
+
 module.exports = {
 	pdfPPPReportTemplate,
 	invoicingMessage,
@@ -717,5 +772,6 @@ module.exports = {
 	getPdfOfQuote,
 	messageForClientSendCostQuote,
 	getNotifyDeliveryMessage,
-	getPdfInvoice
+	getPdfInvoice,
+	getInvoiceSendTemplate
 }

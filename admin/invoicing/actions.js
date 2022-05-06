@@ -1,12 +1,10 @@
 const { getInvoice } = require("./getInvoicing")
 const htmlToPdf = require("html-pdf")
-const { getPdfInvoice } = require("../emailMessages/clientCommunication")
+const { getPdfInvoice, getInvoiceSendTemplate } = require("../emailMessages/clientCommunication")
 const { moveFile } = require("../utils")
 const { updateInvoice } = require("./updateInvoice")
 const { sendEmail } = require("../utils/mailTemplate")
 
-
-// const generateInvoiceFileAndSave = async (_invoiceId = '625d2ce37969e438bc78a68d') => {
 const generateInvoiceFileAndSave = async (_invoiceId) => {
 	const invoice = await getInvoice(_invoiceId)
 	const template = getPdfInvoice(invoice)
@@ -36,15 +34,18 @@ const generateInvoiceFileAndSave = async (_invoiceId) => {
 	}
 }
 
-// generateInvoiceFileAndSave()
-
 const sendInvoice = async (_invoiceId, emails) => {
 	const path = await generateInvoiceFileAndSave(_invoiceId)
+	const invoice = await getInvoice(_invoiceId)
+	const template = getInvoiceSendTemplate(invoice)
+	const subject = `Invoice ${ invoice.invoiceId } is ready (C007.0)`
 	const finalAttachment = { filename: 'invoice.pdf', path: `./dist${ path }` }
+	await updateInvoice(_invoiceId, { status: 'Sent' })
 
-	for (let email of emails) {
-		await sendEmail({ to: email, attachments: [finalAttachment], subject: 'Invoice' }, `Foo Bar`)
-	}
+	sendEmail({ to: 'maksym@pangea.global', attachments: [ finalAttachment ], subject }, template)
+	// for (let email of emails) {
+	// 	await sendEmail({ to: email, attachments: [ finalAttachment ], subject }, template)
+	// }
 }
 
 module.exports = {
