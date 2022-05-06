@@ -17,24 +17,18 @@ export const storeVendor = ({ commit, state }, payload) => {
 	const index = state.filteredVendors.findIndex(item => item._id === payload._id)
 	state.filteredVendors.splice(index, 1, payload)
 }
-export const SET_CURRENT_VENDOR_EDUCATION = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_EDUCATION', payload)
-export const SET_CURRENT_VENDOR_PROFESSIONAL_EXPERIENCE = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_PROFESSIONAL_EXPERIENCE', payload)
-export const SET_CURRENT_VENDOR_QUALIFICATIONS = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_QUALIFICATIONS', payload)
-export const SET_CURRENT_VENDOR_DOCUMENTS = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_DOCUMENTS', payload)
-export const SET_CURRENT_VENDOR_ASSESSMENT = ({ commit }, payload) => commit('SET_CURRENT_VENDOR_ASSESSMENT', payload)
-
 
 export const storeCurrentVendor = async ({ commit, dispatch, state }, payload) => {
 	commit("startRequest")
 	try {
 		let vendor = payload
-		if (vendor.pendingCompetencies.length) {
+		if (vendor.pendingCompetencies && vendor.pendingCompetencies.length) {
 			const result = await Vue.http.post('/vendorsapi/vendor-pendingCompetencies-add-benchmark', { pendingCompetencies: vendor.pendingCompetencies })
 			vendor.pendingCompetencies = result.data
 		}
 		commit('setCurrentVendor', vendor)
 	} catch (err) {
-		dispatch('alertToggle', { message: err.response.data, isShow: true, type: "error" })
+		dispatch('alertToggle', { message: err, isShow: true, type: "error" })
 	} finally {
 		commit("endRequest")
 	}

@@ -73,41 +73,15 @@
                 :selectedOption="currentVendor.timezone",
                 @chooseOption="updateVendorTimeZone"
               )
-          //.row.mbRow
-          //  .row__key Availability:
-          //  .row__value
-          //    SelectSingle(
-          //      :options="availabilityList"
-          //      :selectedOption="currentVendor.availability"
-          //      placeholder="Option"
-          //      @chooseOption="(e) => updateVendorProp(e.option, 'availability')"
-          //    )
-          //.row
-          //  .row__key Gender:
-          //  .row__value
-          //    SelectSingle(
-          //      :options="genders"
-          //      :selectedOption="currentVendor.gender"
-          //      placeholder="Option"
-          //      @chooseOption="(e) => updateVendorProp(e.option, 'gender')"
-          //    )
-          //.row
-          //  .row__key Company Name:
-          //  .row__value
-          //    input.input(type="text" placeholder="Value" :value="currentVendor.companyName" @change="(e) => updateVendorProp(e.target.value,'companyName')")
-          //.row
-          //  .row__key Skype:
-          //  .row__value
-          //    input.input(type="text" placeholder="Value" :value="currentVendor.skype" @change="(e) => updateVendorProp(e.target.value,'skype')")
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex"
 import SelectMulti from "../SelectMulti"
 import SelectSingle from "../SelectSingle"
-import RadioButton from "../RadioButton";
+import RadioButton from "../RadioButton"
 import photoPreview from "../../mixins/photoPreview"
-import moment from "moment-timezone";
+import moment from "moment-timezone"
 
 export default {
   mixins: [ photoPreview ],
@@ -117,13 +91,13 @@ export default {
       errors: [],
       genders: [ "Male", "Female", "Other" ],
       timezone: '',
-      availabilityList: ['Full-time', 'Part-time', 'Limited'],
+      availabilityList: [ 'Full-time', 'Part-time', 'Limited' ],
       availability: '',
       gender: '',
       searchLang: '',
       timezones: [],
       isImageExist: false,
-      isFileError: false,
+      isFileError: false
     }
   },
   methods: {
@@ -158,12 +132,11 @@ export default {
     },
     updateVendorProp(value, key) {
       this.updateCurrentVendorGeneralData({ key, value })
-    },
+    }
   },
   computed: {
     ...mapGetters({
       currentVendor: "getCurrentVendorGeneralData",
-
       currentVendorFull: "getCurrentVendor"
     }),
     selectedIndNames() {
@@ -221,9 +194,11 @@ export default {
     flex-wrap: wrap;
   }
 }
+
 .vendor-info__radio {
   display: flex;
 }
+
 .radio {
   margin-right: 15px;
 }
@@ -349,9 +324,11 @@ export default {
   cursor: pointer;
   border-radius: 8%;
 }
+
 .timezone {
   margin-right: auto;
 }
+
 .phone {
   margin-right: 42.5px;
 }

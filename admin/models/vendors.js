@@ -68,7 +68,7 @@ const VendorSchema = new mongoose.Schema({
 		type: Array,
 		default: [],
 	},
-	socialMedial: [ {
+	socialMedia: [ {
 		key: {
 			type: String,
 			required: true,

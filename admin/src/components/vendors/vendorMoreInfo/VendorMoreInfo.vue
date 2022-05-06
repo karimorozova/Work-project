@@ -33,7 +33,7 @@
         .row__key CAT experience:
         .row__value
           SelectMulti(
-            :selectedOptions="Array.isArray(currentVendor.catExperience) ? currentVendor.catExperience : []"
+            :selectedOptions="currentVendor.catExperience"
             :isTableDropMenu="true"
             placeholder="Options"
             :hasSearch="false"
@@ -49,78 +49,6 @@
         .row__key Website:
           .row__value
             input.input(type="text" placeholder="Value" :value="currentVendor.website" @change="(e) => updateVendorProp(e.target.value,'website')")
-
-
-    //  .row.mbRow
-    //    .row__key Years of experience:
-    //      .row__value
-    //        input.input(type="number" placeholder="Value" :value="currentVendor.experienceYears" @change="(e) => updateVendorProp(e.target.value,'experienceYears')")
-    //
-    //
-    //  .row.mbRow
-    //    .row__key Software experience:
-    //    .row__value
-    //      SelectMulti(
-    //        :selectedOptions="currentVendor.softwares"
-    //        :isTableDropMenu="true"
-    //        placeholder="Options"
-    //        :hasSearch="false"
-    //        :options="softwaresOptions"
-    //        @chooseOptions="chooseSoftwareOptions"
-    //      )
-    //  .row.mbRow
-    //    .row__key Secondary email:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.secondaryEmail" @change="(e) => updateVendorProp(e.target.value,'secondaryEmail')")
-    //  .row.mbRow
-    //    .row__key WhatsApp:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.whatsapp" @change="(e) => updateVendorProp(e.target.value,'whatsapp')")
-    //
-    //.vendorInformation__title-wrapper
-    //  .title Social Media
-    //.vendorInformation__description
-    //  .row.mbRow
-    //    .row__key Skype:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.skype" @change="(e) => updateVendorProp(e.target.value,'skype')")
-    //  .row.mbRow
-    //    .row__key Facebook:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.facebook" @change="(e) => updateVendorProp(e.target.value,'facebook')")
-    //  .row.mbRow
-    //    .row__key Linkedin:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.linkedin" @change="(e) => updateVendorProp(e.target.value,'linkedin')")
-    //  .row.mbRow
-    //    .row__key Twitter:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.twitter" @change="(e) => updateVendorProp(e.target.value,'twitter')")
-    //  .row.mbRow
-    //    .row__key Instagram:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.instagram" @change="(e) => updateVendorProp(e.target.value,'instagram')")
-    //  .row.mbRow
-    //    .row__key Telegram:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.telegram" @change="(e) => updateVendorProp(e.target.value,'telegram')")
-    //  .row.mbRow
-    //    .row__key Proz:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.proz" @change="(e) => updateVendorProp(e.target.value,'proz')")
-    //  .row.mbRow
-    //    .row__key Smartcat:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.smartcat" @change="(e) => updateVendorProp(e.target.value,'smartcat')")
-    //  .row.mbRow
-    //    .row__key Website:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.website" @change="(e) => updateVendorProp(e.target.value,'website')")
-    //
-    //  .row.mbRow
-    //    .row__key Other social media:
-    //      .row__value
-    //        input.input(type="text" placeholder="Value" :value="currentVendor.socialMedia" @change="(e) => updateVendorProp(e.target.value,'socialMedia')")
 
 </template>
 
@@ -149,16 +77,13 @@ export default {
       catExperience: [],
       catExperienceList: [ 'XTM', 'MemoQ', 'Trados' ],
       currencyList: [ 'EUR' ]
-
     }
 
   },
   computed: {
     ...mapGetters({
       currentVendor: "getCurrentVendorGeneralData",
-      currentFullVendor: "getCurrentVendor",
       languages: "getAllLanguages"
-
     }),
     filteredLanguages() {
       let result = this.languages
@@ -174,13 +99,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(
-        {
-          updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
-          alertToggle: 'alertToggle',
-          storeCurrentVendor: "storeCurrentVendor"
-        }
-    ),
+    ...mapActions({
+      updateCurrentVendorGeneralData: "updateCurrentVendorGeneralData",
+      alertToggle: 'alertToggle',
+      storeCurrentVendor: "storeCurrentVendor"
+    }),
     updateVendorNative(value) {
       const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
       this.updateCurrentVendorGeneralData({ key: 'native', value: { _id, lang } })
@@ -190,14 +113,14 @@ export default {
       this[key] = value
     },
     chooseCatExperienceOptions({ option }) {
-      const position = this.catExperience.indexOf(option)
+      const cat = [ ...this.currentVendor.catExperience ]
+      const position = cat.indexOf(option)
       if (position !== -1) {
-        this.catExperience.splice(position, 1)
+        cat.splice(position, 1)
       } else {
-        const title = this.catExperienceList.find((item) => item === option)
-        this.catExperience.push(title)
+        cat.push(this.catExperienceList.find((item) => item === option))
       }
-      this.updateCurrentVendorGeneralData({ key: 'catExperience', value: this.catExperience })
+      this.updateVendorProp(cat, 'catExperience')
     }
   }
 }

@@ -12,7 +12,6 @@ const {
 	getVendorAfterUpdate,
 	getFilteredVendors,
 	getFilteredVendorsPotential,
-	getFilteredVendorsWithCustomFilters,
 	updateVendorEducation,
 	saveVendorDocument,
 	saveVendorDocumentDefault,
@@ -43,16 +42,41 @@ const {
 	updateStepProp,
 	createVendor,
 	getVendorAvailability,
-	updateVendorAvailability
+	updateVendorAvailability,
+	getVendorSocialMedia,
+	updateVendorSocialMediaValue
 } = require('../vendors')
 
 const { manageStatuses } = require('../vendors/jobs')
 
 const { createMemoqUser, deleteMemoqUser } = require('../services/memoqs/users')
-const { Vendors, Projects, Pricelist } = require('../models')
+const { Vendors, Projects } = require('../models')
 const { getLangTests, updateLangTest, removeLangTest } = require('../langTests')
 const { testSentMessage, rejectedPendingCompetenceTemplate } = require("../emailMessages/candidateCommunication")
 
+
+router.get("/vendor-socialMedia/:_vendorId", async (req, res) => {
+	const { _vendorId } = req.params
+	try {
+		const socialMedia = await getVendorSocialMedia(_vendorId)
+		res.send(socialMedia)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on getting Vendor Social Medial")
+	}
+})
+
+router.put("/vendor-socialMedia-manage/:_vendorId", async (req, res) => {
+	const { _vendorId } = req.params
+	const { value } = req.body
+	try {
+		const socialMedia = await updateVendorSocialMediaValue(_vendorId, value)
+		res.send(socialMedia)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send("Error on updating Vendor Social Medial")
+	}
+})
 
 router.get("/vendor-availability/:_vendorId", async (req, res) => {
 	const { _vendorId } = req.params

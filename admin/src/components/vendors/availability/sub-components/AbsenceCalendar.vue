@@ -94,8 +94,8 @@ export default {
             dates: item,
 
             popover: {
-              label: `${item.reason} ${startOutput} - ${endOutput}`,
-            },
+              label: `${ item.reason } ${ startOutput } - ${ endOutput }`
+            }
           }
         }
         if (item.reason === 'Public holiday') {
@@ -103,8 +103,8 @@ export default {
             bar: 'teal',
             dates: item,
             popover: {
-              label: `${item.reason} ${startOutput} - ${endOutput}`,
-            },
+              label: `${ item.reason } ${ startOutput } - ${ endOutput }`
+            }
           }
         }
         if (item.reason === 'Holidays') {
@@ -112,8 +112,8 @@ export default {
             bar: 'indigo',
             dates: item,
             popover: {
-              label: `${item.reason} ${startOutput} - ${endOutput}`,
-            },
+              label: `${ item.reason } ${ startOutput } - ${ endOutput }`
+            }
           }
         }
         if (item.reason === 'Sick leave') {
@@ -121,16 +121,16 @@ export default {
             bar: 'red',
             dates: item,
             popover: {
-              label: `${item.reason} ${startOutput} - ${endOutput}`,
-            },
+              label: `${ item.reason } ${ startOutput } - ${ endOutput }`
+            }
           }
         }
       })
     }
   },
   methods: {
-    mouseEnter({dateTime}) {
-      this.absenceSchedule.forEach(({_id, reason, start, end}) => {
+    mouseEnter({ dateTime }) {
+      this.absenceSchedule.forEach(({ _id, reason, start, end }) => {
         const d = new Date(start)
         d.setHours(0, 0, 0, 0)
         const startTimestamp = d.getTime()
@@ -151,7 +151,7 @@ export default {
       const str = Array.from(arr[4]).join('')
       arr[4] = str
       arr.splice(3, 1)
-      return  arr.join(' ')
+      return arr.join(' ')
 
     },
     onCloseModalBtnClick() {
@@ -160,19 +160,19 @@ export default {
     onSaveModalBtnClick(data) {
       this.difference = data.end.getTime() < data.start.getTime()
       this.checkErrors()
-      if(this.errors.length) return
+      if (this.errors.length) return
       if (!data._id) {
         this.isModalOpen = false
-        return this.$emit('saveAbsenceSchedule', [...this.absenceSchedule, data])
+        return this.$emit('saveAbsenceSchedule', [ ...this.absenceSchedule, data ])
       }
 
-      this.absenceSchedule.splice(this.absenceSchedule.findIndex(({_id}) => `${_id}` === `${data._id}`), 1, data)
+      this.absenceSchedule.splice(this.absenceSchedule.findIndex(({ _id }) => `${ _id }` === `${ data._id }`), 1, data)
       this.isModalOpen = false
       return this.$emit('saveAbsenceSchedule', this.absenceSchedule)
     },
     checkErrors() {
       this.errors = []
-      if(this.difference) this.errors.push('Please enter valid end day of absence.')
+      if (this.difference) this.errors.push('Please enter valid end day of absence.')
 
       if (this.errors.length) {
         this.areErrors = true
@@ -181,16 +181,16 @@ export default {
     closeErrors() {
       this.areErrors = false
     },
-    onDayClick({dateTime, date}) {
+    onDayClick({ dateTime, date }) {
       this.editItems = []
-      this.absenceSchedule.forEach(({_id, reason, start, end}) => {
+      this.absenceSchedule.forEach(({ _id, reason, start, end }) => {
         const d = new Date(start)
         d.setHours(0, 0, 0, 0)
         const startTimestamp = d.getTime()
         const endTimestamp = new Date(end).getTime()
 
         if (startTimestamp <= dateTime && dateTime <= endTimestamp) {
-          this.editItems.push({_id, type: reason, start, end})
+          this.editItems.push({ _id, type: reason, start, end })
         }
       })
 
@@ -218,13 +218,13 @@ export default {
       this.isEditModalOpen = false
     },
     onAddBtnClick() {
-      if(this.isEditModalOpen) {
+      if (this.isEditModalOpen) {
         this.isEditModalOpen = false
       }
       this.isModalOpen = true
       this.absenceScheduleItem.start = new Date(moment().startOf("minute").toISOString())
       this.absenceScheduleItem.end = new Date(moment().startOf("minute").toISOString())
-    },
+    }
   }
 }
 </script>
@@ -249,11 +249,13 @@ export default {
   padding-bottom: 50px;
   box-shadow: $box-shadow;
 }
+
 .modal__button--add {
   position: absolute;
   bottom: 10px;
   right: 10px;
 }
+
 .modal__close {
   position: absolute;
   right: 10px;
@@ -273,4 +275,14 @@ export default {
   height: 20px;
 }
 
+.calendar /deep/ .vc-text-center.vc-text-xs.vc-text-gray-300.vc-font-semibold {
+  color: $text !important;
+}
+
+.calendar /deep/ .vc-popover-content {
+  background-color: #3FB354 !important;
+  background: white !important;
+  border: 1px solid $border !important;
+  color: $text !important;
+}
 </style>
