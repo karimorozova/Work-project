@@ -1,8 +1,12 @@
-const { Invoice, InvoicingClientReports, Clients, PaymentTerms } = require("../models")
+const { Invoice, InvoicingClientReports, Clients, PaymentTerms, Projects } = require("../models")
 const { getAmountByPercent } = require("./helpers")
 const { updateInvoice } = require("./updateInvoice")
 const moment = require("moment")
 const { createDir } = require("../utils/folder")
+const { getAllSteps } = require("../invoicingClientReports/getReports")
+const { createReports } = require("../invoicingClientReports/createReports")
+const { sendInvoice } = require("../invoicing/actions")
+const { ObjectId } = require("mongodb")
 const DIR = './dist/invoice/'
 
 const createInvoice = async (_customerId, _clientBillingInfoId) => {
@@ -41,7 +45,7 @@ const createInvoiceItem = async (_invoiceId, item) => {
 		}
 		return invoice._id
 	} catch (e) {
-
+		console.log(e)
 	}
 }
 
@@ -74,13 +78,30 @@ const createInvoiceFromReport = async ({ _reportId, _customerId, _clientBillingI
 
 		await createDir(DIR, invoice._id.toString())
 		await createInvoiceItem(invoice._id, { title, quantity, type, rate, tax, taxType, amount, reportId: _reportId })
+		return {invoiceId: invoice._id}
 	} catch (e) {
-
+		console.log(e)
 	}
+}
+
+async function createInvoicePipeline(projectId, emails) {
+	projectId = typeof projectId === "string" ? ObjectId(projectId) : projectId
+	const checkedSteps = await getAllSteps(0, 1000, { "projectId": projectId  })
+	const reportInfo = await createReports({ checkedSteps, createdBy: null })
+
+	if (!reportInfo) throw new Error('Cannot create report')
+	const { _id, reportId, client, clientBillingInfo, total} = reportInfo
+	const item = {title: `Language Service: report ${reportId}`, quantity: 1, rate: +(total).toFixed(2)}
+	const {invoiceId} = await createInvoiceFromReport({ _reportId: _id, _customerId: client, _clientBillingInfoId: clientBillingInfo , item  })
+
+	if (!emails.length) throw new Error('Billing info need at least one contact with email')
+	await Projects.findByIdAndUpdate(projectId, {invoiceId: invoiceId, reportId: _id})
+	await sendInvoice(invoiceId, emails )
 }
 
 module.exports = {
 	createInvoice,
 	createInvoiceItem,
-	createInvoiceFromReport
+	createInvoiceFromReport,
+	createInvoicePipeline,
 }

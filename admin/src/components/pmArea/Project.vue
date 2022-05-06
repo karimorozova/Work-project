@@ -34,6 +34,7 @@
                     :selectedOption="project.clientBillingInfo && project.clientBillingInfo.name || ''"
                     :options="billingInfoList.map(({name}) => name)"
                     @chooseOption="choseBillingInfo"
+                    :isDisabled="!(project.isTest || project.status === 'Draft')"
                   )
 
               .project__detailsRow-client-text {{ project.industry.name }}
@@ -284,9 +285,7 @@ export default {
       const billingInfo = this.billingInfoList.find(({ name }) => name === option)
 
       const notStartedStatuses = [ 'Draft', 'Cost Quote', 'Quote sent', 'Rejected' ]
-      if (billingInfo.paymentType === 'PPP' && notStartedStatuses.includes(this.project.status)) {
-        await this.setProjectProp({ prop: 'inPause', value: true })
-      }
+        await this.setProjectProp({ prop: 'inPause', value: billingInfo.paymentType === 'PPP' && notStartedStatuses.includes(this.project.status) })
 
       await this.setProjectProp({ prop: 'clientBillingInfo', value: billingInfo })
       await this.setProjectProp({ prop: 'paymentProfile', value: billingInfo.paymentType })

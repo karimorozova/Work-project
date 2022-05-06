@@ -1,7 +1,7 @@
 const {
 	createInvoice,
 	createInvoiceItem,
-	createInvoiceFromReport,
+	createInvoiceFromReport
 } = require('./createInvoicing')
 
 
@@ -19,6 +19,7 @@ const {
 const {
 	deleteInvoiceItem,
 	deleteInvoiceItemFromReport,
+	deleteInvoice
 } = require('./deleteInvoice')
 
 const {
@@ -39,4 +40,5 @@ module.exports = {
 	updateInvoiceItem,
 	deleteInvoiceItem,
 	deleteInvoiceItemFromReport,
+	deleteInvoice
 }

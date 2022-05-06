@@ -34,7 +34,6 @@ const getUserAuthPortal = async (email, picture) => {
 
 
 const googleOAuth = async (idToken, portal) => {
-	console.log(idToken)
 	const ticket = await client.verifyIdToken({
 		idToken: idToken,
 		audience: "1057113930206-vcj6erd2h955k9jr2e3ib3lqddrcsn7b.apps.googleusercontent.com"

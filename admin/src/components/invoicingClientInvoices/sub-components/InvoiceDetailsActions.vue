@@ -33,6 +33,13 @@
         )
           i(class="fa-solid fa-download")
 
+        IconButton(
+          :popupText="'Delete Invoice'"
+          @clicked="deleteInvoice"
+        )
+          i(class="fa-solid fa-trash")
+
+
 </template>
 
 <script>
@@ -61,6 +68,9 @@ export default {
     ...mapActions({
       alertToggle: "alertToggle"
     }),
+    deleteInvoice() {
+      this.$emit('deleteInvoice')
+    },
     downloadInvoiceFile(path) {
       let link = document.createElement('a')
       link.href = this.$domains.admin + '/' + path

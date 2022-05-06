@@ -13,6 +13,7 @@ const {
 	quoteEmitter
 } = require('../events/quote')
 const { recalculateStepFinance, calculateProjectTotal } = require("../сalculations/finance")
+const { createInvoicePipeline } = require("../invoicing/createInvoicing")
 
 router.get('/client-decide-tasks', getProjectManageToken, async (req, res) => {
 	let project = null
@@ -150,6 +151,15 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 		// 	item.deadline = new Date(newDeadline).toISOString()
 		// 	return item
 		// })
+
+		try {
+			const currentContacts = project.customer.contacts.filter(({_id}) => project.clientBillingInfo.contacts.includes(_id))
+			createInvoicePipeline(_id, currentContacts.map((({ email }) => ({ email }))))
+		}catch (err) {
+			res.status(500).send(err.message || err)
+		}
+
+
 		await Projects.updateOne({ _id }, {
 			$set: {
 				startDate: new Date(),
@@ -172,6 +182,7 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 	quoteEmitter.emit('client-decide', project, prop)
 	prop === 'accept' ? res.send({ code: -1 }) : res.send({ code: -2 })
 })
+
 
 router.get('/get-success-message', async (req, res) => {
 	let { code } = req.query

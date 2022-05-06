@@ -10,6 +10,7 @@
       )
       InvoiceDetailsActions(
         :invoice="invoice"
+        @deleteInvoice="deleteInvoice"
       )
 </template>
 
@@ -29,6 +30,10 @@ export default {
   methods: {
     async getInvoice() {
       this.invoice = (await this.$http.get(`/invoicing/invoice/${ this.$route.params.id }`)).data
+    },
+    async deleteInvoice() {
+      await this.$http.delete(`/invoicing/invoice/${ this.$route.params.id }`)
+      await this.$router.push("/pangea-finance/receivables-reports/invoice")
     }
   },
   created() {

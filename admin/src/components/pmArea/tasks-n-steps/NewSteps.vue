@@ -404,7 +404,8 @@ export default {
       }
     },
     async startJobs() {
-      const steps = this.checkedSteps.filter(({ status }) => status === 'Ready to Start')
+      const steps = this.checkedSteps
+          // .filter(({ status }) => status === 'Ready to Start')
       this.closeApproveModal()
       if (steps.length) for await (const step of steps) {
         await this.startJob(step)

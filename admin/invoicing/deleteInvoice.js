@@ -1,5 +1,6 @@
-const { Invoice, InvoicingClientReports } = require("../models")
+const { Invoice, InvoicingClientReports, Projects } = require("../models")
 const { removeDir } = require("../utils/folder")
+const { ObjectID: ObjectId } = require("mongodb")
 const DIR = './dist/invoice/'
 
 const deleteInvoiceItem = async (invoiceId, itemId) => {
@@ -8,6 +9,18 @@ const deleteInvoiceItem = async (invoiceId, itemId) => {
 		await Invoice.findByIdAndUpdate(invoiceId, { "$pull": { 'items': { '_id': itemId } } })
 	} catch (e) {
 	}
+}
+
+const deleteInvoice = async (id) => {
+	try {
+		await InvoicingClientReports.updateMany({ "invoice": id }, { invoice: null })
+		await Projects.updateMany({"steps.invoiceId": id}, {$set: {"steps.$[i].invoiceId":  null}}, {arrayFilters: [{'i.invoiceId': id}]})
+		await Projects.updateMany({"additionsSteps.invoiceId": id}, {$set: {"additionsSteps.$[i].invoiceId":  null}}, {arrayFilters: [{'i.invoiceId': id}]})
+		await Invoice.findByIdAndDelete(id)
+	} catch (e) {
+
+	}
+
 }
 
 const deleteInvoiceItemByReportId = async (_invoiceId, _reportId) => {
@@ -34,5 +47,6 @@ const deleteInvoiceItemFromReport = async (_invoiceId, _reportId) => {
 
 module.exports = {
 	deleteInvoiceItem,
-	deleteInvoiceItemFromReport
+	deleteInvoiceItemFromReport,
+	deleteInvoice,
 }

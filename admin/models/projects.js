@@ -354,7 +354,15 @@ const ProjectsSchema = new mongoose.Schema({
 		isInReportReceivables: { type: Boolean, default: false },
 		stepAndUnit: {},
 		memoqAssignmentRole: { type: Number },
-		isReceivableVisible: { type: Boolean, default: true }
+		isReceivableVisible: { type: Boolean, default: true },
+		reportId: {
+			type: Schema.Types.ObjectId, ref: 'InvoicingClientReports',
+			default: null
+		},
+		invoiceId: {
+			type: Schema.Types.ObjectId, ref: 'Invoice',
+			default: null
+		},
 	} ],
 	additionsSteps: [ {
 		projectId: { type: String, trim: true },

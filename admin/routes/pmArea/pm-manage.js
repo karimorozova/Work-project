@@ -8,7 +8,8 @@ const {
 	Vendors,
 	Discounts,
 	ClientRequest,
-	Clients
+	Clients,
+	Invoice,
 } = require('../../models')
 
 const {
@@ -531,6 +532,7 @@ router.post('/mark-project-paid', async (req, res) => {
 		const project = await getProject({ "_id": projectId })
 		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
 		const updatedProject = await updateProject({ "_id": projectId }, { steps, isPaid: true, inPause: false })
+		await Invoice.findByIdAndUpdate(project.Invoice)
 		res.send(updatedProject)
 	} catch (err) {
 		console.log(err)

@@ -1,7 +1,7 @@
 const { InvoicingClientReports } = require("../models")
 
 const { removeDir } = require("../invoicingPayables/PayablesFilesAndDirecrory")
-const { bindingStepsInReportsByOptions, getStepFromProject, recalculateReportDatesRange } = require("./helpers")
+const { bindingStepsInReportsByOptions, getStepFromProject, recalculateReportDatesRange, setInvoiceIdToSteps } = require("./helpers")
 
 const deleteReport = async (reportId) => {
 	try {
@@ -11,7 +11,8 @@ const deleteReport = async (reportId) => {
 				? receivables.stepsAndProjects.map(({ step }) => step)
 				: []
 
-		for await (const stepId of steps) await bindingStepsInReportsByOptions(stepId, false)
+		for await (const stepId of steps) await bindingStepsInReportsByOptions(stepId, false, null)
+		await setInvoiceIdToSteps([reportId], null)
 		await InvoicingClientReports.deleteOne({ _id: reportId })
 		await removeDir(DIR, reportId)
 	} catch (e) {
@@ -30,8 +31,9 @@ const deleteStepFromReport = async (reportId, stepsId) => {
 				$set: { total },
 				$pull: { 'stepsAndProjects': { "step": stepId } }
 			})
-			await bindingStepsInReportsByOptions(stepId, false)
+			await bindingStepsInReportsByOptions(stepId, false, null)
 		}
+		await setInvoiceIdToSteps([reportId], null)
 		await recalculateReportDatesRange(reportId)
 	} catch (e) {
 		console.log(e)
@@ -49,7 +51,7 @@ const addStepToReport = async (reportId, stepsId) => {
 				$set: { total },
 				$push: { 'stepsAndProjects': { step: stepId, project: _projectId, type: step.vendor ? 'Classic' : 'Extra' } }
 			})
-			await bindingStepsInReportsByOptions(stepId, true)
+			await bindingStepsInReportsByOptions(stepId, true, reportId)
 		}
 		await recalculateReportDatesRange(reportId)
 	} catch (e) {

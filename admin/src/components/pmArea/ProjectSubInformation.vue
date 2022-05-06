@@ -30,7 +30,7 @@
       .row__data
         CheckBox(:isChecked="project.isUrgent", :isDisabled="isProjectFinished" @check="() => setUrgentStatus(true)", @uncheck="() => setUrgentStatus(false)")
 
-    .sub-information__row
+    .sub-information__row(v-if="project.clientBillingInfo && project.clientBillingInfo.paymentType === 'PPP'")
       .row__title Pause:
       .row__dataFlex
         CheckBox(:isChecked="project.inPause", :isDisabled="isProjectFinished || projectInProgress" @check="() => setPause(true)",  @uncheck="() => setPause(false)")

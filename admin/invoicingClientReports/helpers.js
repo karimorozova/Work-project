@@ -3,22 +3,27 @@ const { getAllReportsFromDb } = require("./getReports")
 const { ObjectID: ObjectId } = require("mongodb")
 const moment = require("moment")
 
-const bindingStepsInReportsByOptions = async (stepId, option) => {
+const bindingStepsInReportsByOptions = async (stepId, option, reportId = null) => {
 	const isClassic = await Projects.findOne({ "steps._id": stepId })
 	const isExtra = await Projects.findOne({ "additionsSteps._id": stepId })
 
 	if (isClassic)
 		await Projects.updateOne(
 				{ "steps._id": stepId },
-				{ "steps.$[i].isInReportReceivables": option },
+				{ "steps.$[i].isInReportReceivables": option, "steps.$[i].reportId": reportId   },
 				{ arrayFilters: [ { "i._id": stepId } ] }
 		)
 	if (isExtra)
 		await Projects.updateOne(
 				{ "additionsSteps._id": stepId },
-				{ "additionsSteps.$[i].isInReportReceivables": option },
+				{ "additionsSteps.$[i].isInReportReceivables": option, "steps.$[i].reportId": reportId  },
 				{ arrayFilters: [ { "i._id": stepId } ] }
 		)
+}
+
+const setInvoiceIdToSteps = async (reportIds, invoiceId) => {
+	await Projects.updateMany({"steps.reportId": {$in: reportIds.map(id => ObjectId(id))}}, {$set: {"steps.$[i].invoiceId":  invoiceId}}, {arrayFilters: [{'i.reportId': {$in:reportIds}}]})
+	await Projects.updateMany({"additionsSteps.reportId": {$in: reportIds.map(id => ObjectId(id))}}, {$set: {"additionsSteps.$[i].invoiceId":  invoiceId}}, {arrayFilters: [{'i.reportId': {$in:reportIds}}]})
 }
 
 const getStepFromProject = async stepId => {
@@ -56,5 +61,6 @@ const recalculateReportDatesRange = async reportId => {
 module.exports = {
 	recalculateReportDatesRange,
 	bindingStepsInReportsByOptions,
-	getStepFromProject
+	getStepFromProject,
+	setInvoiceIdToSteps,
 }

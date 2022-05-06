@@ -36,10 +36,10 @@
             .table__data
               router-link(class="link-to" target='_blank' :to="{path: `/pangea-clients/all/details/${row.customer._id}`}")
                 div {{ row.customer.name }}
-              .name {{ row.selectedBillingInfo.officialName }}
+              //.name {{ row.selectedBillingInfo.officialName || '' }}
 
           template(slot="pt" slot-scope="{ row, index }")
-            .table__data {{ row.selectedBillingInfo.paymentType }}
+            //.table__data {{ row.selectedBillingInfo?.paymentType || '' }}
 
           template(slot="stepId" slot-scope="{ row, index }")
             .table__data {{ row.steps.stepId || '-' }}

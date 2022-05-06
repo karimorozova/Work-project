@@ -36,6 +36,7 @@ const {
 const { getMemoqUsers, createMemoqUser } = require('../services/memoqs/users')
 const { notifyManagerProjectStarts, managerNotifyMail, sendQuoteToVendorsAfterProjectAccepted } = require('../utils')
 const { calculateProjectTotal, recalculateStepFinance } = require("../сalculations/finance")
+const { createInvoicePipeline } = require("../invoicing/createInvoicing")
 
 
 const manageReceivableVisible = async (bool, _stepId) => {
@@ -479,6 +480,10 @@ async function getApprovedProject(project) {
 		if (!project.inPause) {
 			await notifyVendorStepStart(steps, steps, project)
 		}
+
+		const currentContacts = project.customer.contacts.filter(({_id}) => project.clientBillingInfo.contacts.includes(_id))
+		await createInvoicePipeline(project._id,  currentContacts.map((({ email }) => email)))
+
 		let updatedProject = await updateProject({ "_id": project.id }, { status: 'Approved', isStartAccepted: true, tasks, steps, isPriceUpdated: false })
 
 		if (!project.inPause) {
@@ -489,9 +494,10 @@ async function getApprovedProject(project) {
 	} catch (err) {
 		console.log(err)
 		console.log("Error in getApprovedProject")
-		throw new Error(err.message)
+		throw new Error(err.message || err)
 	}
 }
+
 
 function updateWithApprovedTasks({ taskIds, project }) {
 	const tasks = project.tasks.map(task => {

@@ -558,7 +558,7 @@ async function pdfPPPReportTemplate(report, BI) {
 }
 
 const getPdfInvoice = (invoice) => {
-	const state = paymentProfile(invoice).getState() ? `<div className="profile__text">${ paymentProfile().getState() }</div>` : ''
+	const state = paymentProfile(invoice).getState() ? `<div className="profile__text">${ paymentProfile(invoice).getState() }</div>` : ''
 	const tableDetailsVAT = getInvoiceFinance(invoice).vat
 			? `<div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">VAT:</div>

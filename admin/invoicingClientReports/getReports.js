@@ -99,6 +99,10 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
 		matchProject.$match.billingDate = queryForStep.billingDate
 		delete queryForStep.billingDate
 	}
+	if('projectId' in queryForStep ){
+		matchProject.$match._id =  queryForStep.projectId
+		delete queryForStep.projectId
+	}
 
   const lookup = {
 		$lookup:
@@ -146,7 +150,7 @@ const getAllSteps = async (countToSkip, countToGet, queryForStep) => {
           {$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ]},
           {$or: [ {"steps.isReceivableVisible": true,}, {"steps.isReceivablesVisible": true,} ]}
         ],
-				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway' ] },
+				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway', 'Created'] },
 				"steps.finance.Price.receivables": { $gt: 0 },
 				...queryForStep
 			}

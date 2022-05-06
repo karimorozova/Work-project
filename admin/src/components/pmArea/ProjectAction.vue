@@ -231,6 +231,7 @@ export default {
     },
     async getSendCostQuoteMessage() {
       try {
+        if (!this.project.clientBillingInfo) return this.alertToggle({ message: "Billing Info cannot be empty" , isShow: true, type: "error" })
         const template = await this.$http.get(`/pm-manage/quote-cost-message?projectId=${ this.project._id }`)
         this.previewMessage = template.data.message
         this.openPreviewCostQuote()
@@ -240,6 +241,7 @@ export default {
     },
     async getSendQuoteMessage() {
       try {
+        if (!this.project.clientBillingInfo) return this.alertToggle({ message: "Billing Info cannot be empty" , isShow: true, type: "error" })
         const template = await this.$http.get(`/pm-manage/quote-message?projectId=${ this.project._id }`)
         this.previewMessage = template.data.message
         this.openPreviewQuote()

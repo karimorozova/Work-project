@@ -3,6 +3,7 @@ const htmlToPdf = require("html-pdf")
 const { getPdfInvoice } = require("../emailMessages/clientCommunication")
 const { moveFile } = require("../utils")
 const { updateInvoice } = require("./updateInvoice")
+const { sendEmail } = require("../utils/mailTemplate")
 
 
 // const generateInvoiceFileAndSave = async (_invoiceId = '625d2ce37969e438bc78a68d') => {
@@ -29,6 +30,7 @@ const generateInvoiceFileAndSave = async (_invoiceId) => {
 		const newPath = `/invoice/${ _invoiceId }/invoice.pdf`
 		await moveFile({ path }, './dist' + newPath)
 		await updateInvoice(_invoiceId, { invoiceFile: { path: newPath, fileName: 'invoice.pdf' } })
+		return newPath
 	} catch (err) {
 		console.log(err)
 	}
@@ -37,10 +39,12 @@ const generateInvoiceFileAndSave = async (_invoiceId) => {
 // generateInvoiceFileAndSave()
 
 const sendInvoice = async (_invoiceId, emails) => {
-	await generateInvoiceFileAndSave(_invoiceId)
-	// const report = await getInvoice(_invoiceId)
-	// const pdfTemplate = getPdfInvoice()
-	// console.log(report, pdfTemplate, _invoiceId, emails)
+	const path = await generateInvoiceFileAndSave(_invoiceId)
+	const finalAttachment = { filename: 'invoice.pdf', path: `./dist${ path }` }
+
+	for (let email of emails) {
+		await sendEmail({ to: email, attachments: [finalAttachment], subject: 'Invoice' }, `Foo Bar`)
+	}
 }
 
 module.exports = {

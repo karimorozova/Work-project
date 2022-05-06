@@ -6,7 +6,6 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 	const lastIndex = await InvoicingClientReports.findOne().sort({ 'reportId': -1 })
 	let lastIntIndex = lastIndex != null ? parseInt(lastIndex.reportId.split('_c').pop()) : 0
 
-	await setUsedStatusToSteps(checkedSteps.filter(i => i.type === 'Classic'), checkedSteps.filter(i => i.type === 'Extra'))
 
 	const [ jobsPPP, jobsPrePayment, jobsMonthly, jobsCustom ] = [
 		checkedSteps.filter(({ selectedBillingInfo }) => selectedBillingInfo.paymentType === 'PPP'),
@@ -38,13 +37,16 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 		updatedReports: finalUpdatedReports
 	} = produceReportManyProjects(jobsCustom, updatedReports3, lastIntIndex3, createdBy)
 
-	await InvoicingClientReports.create(
+	const clientReport = await InvoicingClientReports.create(
 			...reportsPPP,
 			...reportsPrePayment,
 			...reportsMonthly,
 			...reportsCustom,
 			...finalUpdatedReports
 	)
+	await setUsedStatusToSteps(checkedSteps.filter(i => i.type === 'Classic'), checkedSteps.filter(i => i.type === 'Extra'), clientReport._id)
+
+	return clientReport
 
 	function produceReportManyProjects(jobs, reportsDB, lastIntIndex, createdBy) {
 		const temp = []
@@ -122,19 +124,20 @@ const createReports = async ({ checkedSteps, createdBy }) => {
 		}
 	}
 
-	async function setUsedStatusToSteps(classicSteps, extraSteps) {
+	async function setUsedStatusToSteps(classicSteps, extraSteps, reportId) {
 		classicSteps = classicSteps.map(({ steps }) => steps._id)
 		extraSteps = extraSteps.map(({ steps }) => steps._id)
 
-		if (classicSteps.length) await updateProjects('steps', classicSteps)
-		if (extraSteps.length) await updateProjects('additionsSteps', extraSteps)
+		if (classicSteps.length) await updateProjects('steps', classicSteps, reportId)
+		if (extraSteps.length) await updateProjects('additionsSteps', extraSteps, reportId)
 
-		async function updateProjects(key, value) {
+		async function updateProjects(key, value, reportId) {
 			const key1 = `${ key }._id`
 			const key2 = `${ key }.$[i].isInReportReceivables`
+			const key3 = `${ key }.$[i].reportId`
 			await Projects.updateMany(
 					{ [key1]: { $in: value } },
-					{ [key2]: true },
+					{ [key2]: true, [key3]: reportId },
 					{ arrayFilters: [ { 'i._id': { $in: value } } ] }
 			)
 		}
