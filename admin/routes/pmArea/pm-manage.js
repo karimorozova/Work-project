@@ -123,6 +123,7 @@ const { getEmailBackbone } = require("../../emailMessages/otherCommunication")
 // XTRF ==>
 const { createXtrfProjectWithFinance, updateFianceXTRF } = require("../../projects/xtrfApi")
 const { createSendAllTasksToXtrf, updateTaskFianceXTRF } = require("../../projects/xtrfComplianceApi")
+const { payInvoice } = require("../../invoicing")
 
 router.post('/manage-receivable-visible', async (req, res) => {
 	const { bool, _stepId } = req.body
@@ -530,10 +531,15 @@ router.post('/mark-project-paid', async (req, res) => {
 	const { projectId } = req.body
 	try {
 		const project = await getProject({ "_id": projectId })
-		const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
-		const updatedProject = await updateProject({ "_id": projectId }, { steps, isPaid: true, inPause: false })
-		await Invoice.findByIdAndUpdate(project.Invoice)
-		res.send(updatedProject)
+		if (project.clientBillingInfo.paymentType === 'PPP') {
+			const {invoiceId} = project.steps[0]
+			await payInvoice(invoiceId)
+		}else {
+			const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)
+			await updateProject({ "_id": projectId }, { steps, isPaid: true, inPause: false })
+			await Invoice.findByIdAndUpdate(project.Invoice)
+		}
+		res.send(await getProject({ '_id': projectId }))
 	} catch (err) {
 		console.log(err)
 		res.status(500).send('Internal server error / Cannot mark Project "Is Paid"')

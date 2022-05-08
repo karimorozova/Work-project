@@ -84,7 +84,7 @@ router.get("/invoice/:id", async (req, res) => {
 router.post("/invoice/:id", async (req, res) => {
 	try {
 		const { id } = req.params
-		await updateInvoice(id, req.body)
+		await updateInvoice(id, req.body, true)
 		res.json(await getInvoice(id))
 	} catch (err) {
 		console.log(err)

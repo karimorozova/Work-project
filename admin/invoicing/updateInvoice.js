@@ -5,15 +5,18 @@ const { sendQuoteToVendorsAfterProjectAccepted } = require("../utils")
 const { getProject } = require("../projects/getProjects")
 
 
-exports.updateInvoice = async (invoiceId, updateData) => {
+exports.updateInvoice = async (invoiceId, updateData, updateItems = false) => {
 	try {
-		const invoiceBeforeUpdate = await Invoice.findById(invoiceId).lean()
-		const oldReportsIds = invoiceBeforeUpdate.items.filter(i => i.type === 'Report').map(({ reportId }) => reportId.toString())
-		const addReports = updateData.hasOwnProperty('items') ? updateData.items.filter(i => i.type === 'Report' && !oldReportsIds.includes(i.reportId)).map(({ reportId }) => reportId) : []
-		const deletedReports =   updateData.hasOwnProperty('items') ? oldReportsIds.filter(i => !updateData.items.map(({ reportId }) => reportId).includes(i)) : []
+		if (updateItems) {
+			const invoiceBeforeUpdate = await Invoice.findById(invoiceId).lean()
+			const oldReportsIds = invoiceBeforeUpdate.items.filter(i => i.type === 'Report').map(({ reportId }) => reportId.toString())
+			const addReports = updateData.hasOwnProperty('items') ? updateData.items.filter(i => i.type === 'Report' && !oldReportsIds.includes(i.reportId)).map(({ reportId }) => reportId) : []
+			const deletedReports = updateData.hasOwnProperty('items') ? oldReportsIds.filter(i => !updateData.items.map(({ reportId }) => reportId).includes(i)) : []
 
-		setInvoiceIdToSteps(addReports, invoiceId)
-		setInvoiceIdToSteps(deletedReports, null)
+			setInvoiceIdToSteps(addReports, invoiceId)
+			setInvoiceIdToSteps(deletedReports, null)
+
+		}
 
 		const invoice = await Invoice.findByIdAndUpdate(invoiceId, updateData)
 		return invoice._id
@@ -22,10 +25,10 @@ exports.updateInvoice = async (invoiceId, updateData) => {
 	}
 }
 
-exports.payInvoice = async (id, data = {}) => {
+exports.payInvoice = async (invoiceId, data = {}) => {
 	try {
 		const { paymentMethod = null, paymentDate = new Date(), notes = ""} = data
-		const invoice = await Invoice.findById(id).populate('items.reportId', ['stepsAndProjects']).populate('customer', [ 'billingInfo' ]).lean()
+		const invoice = await Invoice.findById(invoiceId).populate('items.reportId', ['stepsAndProjects']).populate('customer', [ 'billingInfo' ]).lean()
 		const invoiceFinance = getInvoiceFinance(invoice)
 		const paidAmount = data?.paidAmount ? data.paidAmount : invoiceFinance.total
 		const unpaidAmount = invoiceFinance.total - paidAmount
@@ -34,10 +37,10 @@ exports.payInvoice = async (id, data = {}) => {
 
 
 		if (clientBillingInfo.paymentType === 'PPP') {
-			await createPayment(id, paidAmount, unpaidAmount, paymentMethod, paymentDate, notes )
+			await createPayment(invoiceId, paidAmount, unpaidAmount, paymentMethod, paymentDate, notes )
 		}
 		if (unpaidAmount === 0) {
-			await Invoice.findByIdAndUpdate(id, {status: "Paid"})
+			await Invoice.findByIdAndUpdate(invoiceId, {status: "Paid"})
 			const projectId = invoice.items[0].reportId.stepsAndProjects[0].project
 			const project = await getProject({ "_id": projectId })
 			const steps = await sendQuoteToVendorsAfterProjectAccepted(project.steps, project)

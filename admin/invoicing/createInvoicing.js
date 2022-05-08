@@ -7,6 +7,7 @@ const { getAllSteps } = require("../invoicingClientReports/getReports")
 const { createReports } = require("../invoicingClientReports/createReports")
 const { sendInvoice } = require("../invoicing/actions")
 const { ObjectId } = require("mongodb")
+const { setInvoiceIdToSteps } = require("../invoicingClientReports/helpers")
 const DIR = './dist/invoice/'
 
 const createInvoice = async (_customerId, _clientBillingInfoId) => {
@@ -95,7 +96,7 @@ async function createInvoicePipeline(projectId, emails) {
 	const {invoiceId} = await createInvoiceFromReport({ _reportId: _id, _customerId: client, _clientBillingInfoId: clientBillingInfo , item  })
 
 	if (!emails.length) throw new Error('Billing info need at least one contact with email')
-	await Projects.findByIdAndUpdate(projectId, {invoiceId: invoiceId, reportId: _id})
+	setInvoiceIdToSteps([reportInfo._id.toString()], invoiceId.toString())
 	await sendInvoice(invoiceId, emails )
 }
 

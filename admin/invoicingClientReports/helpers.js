@@ -22,6 +22,7 @@ const bindingStepsInReportsByOptions = async (stepId, option, reportId = null) =
 }
 
 const setInvoiceIdToSteps = async (reportIds, invoiceId) => {
+	if (!reportIds.length || !invoiceId) return
 	await Projects.updateMany({"steps.reportId": {$in: reportIds.map(id => ObjectId(id))}}, {$set: {"steps.$[i].invoiceId":  invoiceId}}, {arrayFilters: [{'i.reportId': {$in:reportIds}}]})
 	await Projects.updateMany({"additionsSteps.reportId": {$in: reportIds.map(id => ObjectId(id))}}, {$set: {"additionsSteps.$[i].invoiceId":  invoiceId}}, {arrayFilters: [{'i.reportId': {$in:reportIds}}]})
 }

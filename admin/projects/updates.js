@@ -481,12 +481,17 @@ async function getApprovedProject(project) {
 			await notifyVendorStepStart(steps, steps, project)
 		}
 
-		const currentContacts = project.customer.contacts.filter(({_id}) => project.clientBillingInfo.contacts.includes(_id))
-		await createInvoicePipeline(project._id,  currentContacts.map((({ email }) => email)))
+
 
 		let updatedProject = await updateProject({ "_id": project.id }, { status: 'Approved', isStartAccepted: true, tasks, steps, isPriceUpdated: false })
 
+		if (project.clientBillingInfo.paymentType === 'PPP') {
+			const currentContacts = project.customer.contacts.filter(({_id}) => project.clientBillingInfo.contacts.includes(_id))
+			await createInvoicePipeline(project._id,  currentContacts.map((({ email }) => email)))
+		}
+
 		if (!project.inPause) {
+			updatedProject = await Projects.findById(project.id)
 			let updatedSteps = await sendQuoteToVendorsAfterProjectAccepted(updatedProject.steps, updatedProject)
 			updatedProject = await updateProject({ "_id": project.id }, { steps: updatedSteps })
 		}

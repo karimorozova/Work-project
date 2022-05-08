@@ -153,8 +153,10 @@ router.get('/client-decide', getProjectManageToken, async (req, res) => {
 		// })
 
 		try {
-			const currentContacts = project.customer.contacts.filter(({_id}) => project.clientBillingInfo.contacts.includes(_id))
-			createInvoicePipeline(_id, currentContacts.map((({ email }) => ({ email }))))
+			if(project.clientBillingInfo.paymentType === 'PPP') {
+				const currentContacts = project.customer.contacts.filter(({_id}) => project.clientBillingInfo.contacts.includes(_id))
+				createInvoicePipeline(_id, currentContacts.map((({ email }) => ({ email }))))
+			}
 		}catch (err) {
 			res.status(500).send(err.message || err)
 		}

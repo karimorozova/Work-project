@@ -1,5 +1,14 @@
 <template lang="pug">
   .template
+    .modal(v-if="isApproveModal")
+      ApproveModal(
+        text="Are you sure?"
+        approveValue="Yes"
+        notApproveValue="Cancel"
+        @approve="deleteInvoice"
+        @notApprove="closeModal"
+        @close="closeModal"
+      )
     .modal-sender(v-if="isEmailSender")
       MailChips(
         :emails="emails"
@@ -17,12 +26,14 @@
         IconButton(
           :popupText="'Edit Invoice'"
           @clicked="editInvoice"
+          :isDisabled="invoice.status === 'Paid'"
         )
           i.fas.fa-pen
 
         IconButton(
           :popupText="'Send Invoice'"
           @clicked="openEmailSender"
+          :isDisabled="invoice.status === 'Paid'"
         )
           i.fa-solid.fa-envelope
 
@@ -35,11 +46,12 @@
 
         IconButton(
           :popupText="'Delete Invoice'"
-          @clicked="deleteInvoice"
+          @clicked="openDeleteModal"
+          :isDisabled="invoice.status === 'Paid'"
         )
           i(class="fa-solid fa-trash")
 
-        Button(v-if="invoice.status !== 'Paid'" value="Paid" @clicked="payInvoice")
+        Button(v-if="invoice.status === 'Sand'" value="Paid" @clicked="payInvoice")
 
 
 </template>
@@ -48,12 +60,13 @@
 import IconButton from "../../IconButton"
 import MailChips from "../../MailChips"
 import Button from "../../Button"
+import ApproveModal from "../../ApproveModal"
 import { mapActions, mapGetters } from "vuex"
 
 
 export default {
   name: "InvoiceDetailsActions",
-  components: { Button, MailChips, IconButton },
+  components: { Button, MailChips, IconButton, ApproveModal },
   props: {
     invoice: {
       type: Object
@@ -63,7 +76,8 @@ export default {
     return {
       selectedMails: [],
       isEmailSender: false,
-      emails: []
+      emails: [],
+      isApproveModal: false,
     }
   },
   methods: {
@@ -72,6 +86,12 @@ export default {
     }),
     deleteInvoice() {
       this.$emit('deleteInvoice')
+    },
+    openDeleteModal() {
+      this.isApproveModal = true
+    },
+    closeModal() {
+      this.isApproveModal = false
     },
     payInvoice() {
       this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/pay`)
@@ -107,6 +127,7 @@ export default {
       try {
         this.$http.post('/invoicing/send-invoice', { _invoiceId: this.invoice._id, clientContactsEmails: this.selectedMails })
         this.alertToggle({ message: "Invoice sent", isShow: true, type: "success" })
+        this.closeEmailSender()
       } catch (err) {
         console.log(err)
       }
@@ -158,8 +179,13 @@ export default {
     margin-right: 12px;
   }
 }
-
-.modal-sender {
+.modal {
+  position: absolute;
+  width: 600px;
+  left: 600px;
+  top: 320px;
+}
+.modal-sender, .modal-delete {
   position: absolute;
   width: 600px;
   left: 400px;
