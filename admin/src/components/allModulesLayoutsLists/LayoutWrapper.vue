@@ -9,9 +9,27 @@
       slot(name="icons")
 
     .layoutWrapper__summary
-      div {{summary}}
+      .summary(v-if="summary.length")
+        .summary__item(v-for="item in summary")
+          .summary__item-icon
+            span(v-if="item.summaryEnum === 'sorting'")
+              i.fa-solid.fa-arrow-up-wide-short
+            span(v-if="item.summaryEnum === 'filters'")
+              i.fa-solid.fa-magnifying-glass
+          .summary__item-name {{ item.name }}
+          .summary__item-close(@click="clearSummaryItem(item.id)")
+            Close.close__summary
+
+      .options(v-if="summary.length")
+        .options__item(@click="clearSummaryByOption('filters')") Clear Filters
+        .options__item(@click="clearSummaryByOption('sorting')") Clear Sorting
+        .options__item(@click="clearSummaryByOption") Clear Filters / Sorting
+        .options__item Save As Tab
+
+      //div {{summary}}
 
     .layoutWrapper__tabs
+      //span tabs
       //h1 summary
 
     .layoutWrapper__table
@@ -25,7 +43,7 @@
     transition(name='top')
       .layoutWrapper__filter(v-if="isFilter")
         .layoutWrapper__filter-body
-          Close(@clicked="toggleFilter(makeDBRequest)")
+          Close.close__modal(@clicked="toggleFilter(makeDBRequest)")
           slot(
             name="filter"
             :tableFilters="layoutSettings.filters.filter(({ isCheck }) => isCheck)"
@@ -38,7 +56,7 @@
       .layoutWrapper__setting(v-if="isSettings")
         .setting
           .setting__close
-            Close(@clicked="toggleSettings")
+            Close.close__modal(@clicked="toggleSettings")
           .setting__tabs(v-if="tabs.length")
             .tab
               .tab__head
@@ -102,6 +120,7 @@ import Close from "../Close"
 import { mapActions, mapGetters } from "vuex"
 import draggable from 'vuedraggable'
 import CheckBox from "../CheckBox"
+import LayoutWrapperMixin from "../../mixins/LayoutWrapperMixin";
 
 
 export default {
@@ -120,6 +139,7 @@ export default {
       required: true
     }
   },
+  mixins: [ LayoutWrapperMixin ],
   data() {
     return {
       tableMaxHeight: 0,
@@ -499,6 +519,35 @@ export default {
     toggleSettings() {
       this.isSettings = !this.isSettings
     },
+    clearSummaryItem(id) {
+      this.removeQuery(id)
+      this.makeDBRequest()
+    },
+    clearSummaryByOption(option) {
+      // let { query } = this.$route
+      // const keyPrefixes = Object.keys(query).map(key => key.split('_').at(0))
+      //
+      // if (option === 'filters' && !keyPrefixes.some(prefix => prefix === 'f')) return
+      // if (option === 'sorting' && !keyPrefixes.some(prefix => prefix === 'sf')) return
+      //
+      // const newQuery = {}
+      //
+      // const cleaner = (i) => {
+      //   const [ prefix ] = i.split('_')
+      //   return option === 'filters' ? prefix === 'sf' : prefix === 'f'
+      // }
+      //
+      // const replacer = (query) => {
+      //   return this.$router.replace({ path: this.$route.path, query })
+      // }
+      // if (!option) replacer(null)
+      // const queries = Object.keys(query).filter(cleaner)
+      // if (queries.length) for (const key of queries) {
+      //   if (query[key]) newQuery[key] = query[key]
+      // }
+      // replacer(newQuery)
+      // this.calculateTableMaxHeight()
+    },
     setTab(selectedTab, option) {
       const _idx = this.tabs.findIndex(i => i === selectedTab)
       const lastIndex = this.tabs.length - 1
@@ -547,7 +596,7 @@ export default {
         if (_idx !== -1) this.layoutSettings[prop].push({ ...list[_idx], isCheck: true })
       })
       this.layoutSettings[prop].push(
-          ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
+        ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
       )
     },
     updatedSettingByUserData() {
@@ -572,12 +621,17 @@ export default {
     }),
     summary() {
       const summary = []
-
       for (const queryKey in this.$route.query) {
-        if (!!this.$route.query[queryKey]) summary.push({
-          key: queryKey,
-          value: this.$route.query[queryKey]
-        })
+        if (!!this.$route.query[queryKey]) {
+          const [ prefix ] = queryKey.split('_')
+          const summaryEnum = prefix === 'sf' ? 'sorting' : 'filters'
+          const { name } = this.layoutsPossibleSettings[this.moduleType][summaryEnum].find(j => j.id === queryKey)
+          summary.push({
+            id: queryKey,
+            summaryEnum,
+            name,
+          })
+        }
       }
       return summary
     }
@@ -598,9 +652,13 @@ export default {
   margin: 0 50px 50px 50px;
   width: calc(100vw - 100px - 256px);
   height: calc(100vh - 50px - 47px);
-  background: lightblue;
+  //background: lightblue;
   position: relative;
   overflow: hidden;
+
+  &__summary {
+
+  }
 
   &__icons {
     display: flex;
@@ -666,6 +724,57 @@ export default {
   }
 }
 
+.options {
+  display: flex;
+  gap: 15px;
+  padding: 10px 0;
+
+  &__item {
+    color: $green;
+    letter-spacing: -0.1px;
+
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}
+
+.summary {
+  display: flex;
+  gap: 12px;
+  background: $table-header;
+  padding: 10px;
+  flex-wrap: wrap;
+
+  &__item {
+    position: relative;
+    height: 30px;
+    box-sizing: border-box;
+    border: 1px solid $border;
+    border-radius: 2px;
+    transition: .2s ease-out;
+    display: flex;
+    align-items: center;
+    background: white;
+    gap: 10px;
+    padding: 0 10px;
+
+    &-icon {
+      color: $border;
+    }
+
+    &-close {
+      margin-top: -1px;
+    }
+
+    &-name {
+      font-family: 'Myriad600';
+      cursor: default;
+    }
+  }
+}
+
 .setting {
   &__tabs {
     padding: 15px 0;
@@ -688,7 +797,7 @@ export default {
   &__draggable {
     display: flex;
     height: 40px;
-    padding: 0px 12px;
+    padding: 0 12px;
     border: 1px solid $light-border;
     margin-bottom: 8px;
     margin-right: 8px;
@@ -790,5 +899,18 @@ export default {
 
 .opacity04 {
   opacity: 0.4;
+}
+
+.close {
+  &__modal {
+    right: 25px;
+    top: 25px;
+  }
+
+  &__summary {
+    position: relative;
+    //top: 4px;
+    //right: 6px;
+  }
 }
 </style>

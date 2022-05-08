@@ -17,8 +17,8 @@ export default {
 <style lang="scss" scoped>
 .close {
   position: absolute;
-  right: 25px;
-  top: 25px;
+  //right: 25px;
+  //top: 25px;
   height: fit-content;
   width: fit-content;
   padding: 3px;
@@ -27,14 +27,14 @@ export default {
 
   &:hover {
     .icon {
-      opacity: 0.75;
+      opacity: 0.8;
     }
   }
 }
 
 .icon {
-  height: 14px;
-  width: 14px;
-  opacity: 0.5;
+  height: 13px;
+  width: 13px;
+  opacity: 0.6;
 }
 </style>
