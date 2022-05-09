@@ -605,7 +605,7 @@ const getPdfInvoice = (invoice) => {
 	const tableEnd = `</table></div>`
 
 	return `
-		<div class="template" style="font-family: Trebuchet MS; width: 848px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
+		<div class="template" style="font-family: 'Trebuchet MS', sans-serif; width: 848px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
 		  <div class="header">
 		    <div class="header__logo" style="width: 451px; margin-right: 25px; display: inline-block; vertical-align: top;">
 		      <div class="header__logo-image" style="width: 230px; ">
