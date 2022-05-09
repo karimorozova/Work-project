@@ -562,13 +562,13 @@ const getPdfInvoice = (invoice) => {
 	const tableDetailsVAT = getInvoiceFinance(invoice).vat
 			? `<div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">VAT:</div>
-	          <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).vat }</span></div>
+	          <div class="row__value" style="width: 150px;display: inline-block;"><span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).vat }</span></div>
 	        </div>`
 			: ''
 	const tableDetailsDiscount = getInvoiceFinance(invoice).discount
 			? `<div class="row" style="height: 30px;">
           <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">Discount:</div>
-          <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).discount }</span></div>
+          <div class="row__value" style="width: 150px;display: inline-block;"><span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).discount }</span></div>
         </div>`
 			: ''
 	const tableStart = `<div class="table">
@@ -605,7 +605,7 @@ const getPdfInvoice = (invoice) => {
 	const tableEnd = `</table></div>`
 
 	return `
-		<div class="template" style="font-family: Tahoma, sans-serif; width: 848px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
+		<div class="template" style="font-family: Trebuchet MS; width: 848px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
 		  <div class="header">
 		    <div class="header__logo" style="width: 451px; margin-right: 25px; display: inline-block; vertical-align: top;">
 		      <div class="header__logo-image" style="width: 230px; ">
@@ -626,7 +626,7 @@ const getPdfInvoice = (invoice) => {
 		      <div class="header__data-number" style="margin: 7px 0; font-size: 16px; font-weight: bold;">${ invoice.invoiceId }</div>
 		      <div class="row" style="height: 30px;">
 		        <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">Balance Due:</div>
-		        <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).total }</span></div>
+		        <div class="row__value" style="width: 150px;display: inline-block;"><span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).total }</span></div>
 		      </div>
 		    </div>
 		  </div>
@@ -664,18 +664,18 @@ const getPdfInvoice = (invoice) => {
 		      <div class="table-details">
 		        <div class="row" style="height: 30px;">
 		          <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">Sub Total:</div>
-		          <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).subTotal }</span></div>
+		          <div class="row__value" style="width: 150px;display: inline-block;"><span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).subTotal }</span></div>
 		        </div>
 						${ tableDetailsVAT }
 						${ tableDetailsDiscount }
 		        <div class="row" style="height: 30px;">
 		          <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">Total:</div>
-		          <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).total }</span></div>
+		          <div class="row__value" style="width: 150px;display: inline-block;"><span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).total }</span></div>
 		        </div>
 		        <div class="splitter" style="margin-top: 6px;margin-bottom: 6px;height: 1px;background-color: #ededed;width: 100%;"></div>
 		        <div class="row" style="height: 30px; width:">
 		          <div class="row__key" style="width: 115px;margin-right: 10px; display: inline-block;">Balance Due:</div>
-		          <div class="row__value" style="width: 150px;display: inline-block;"><span style="margin-right: 5px;">${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).total }</span></div>
+		          <div class="row__value" style="width: 150px;display: inline-block;"><span>${ returnIconCurrencyByStringCode(invoice.customer.currency) }</span><span>${ getInvoiceFinance(invoice).total }</span></div>
 		        </div>
 		      </div>
 		    </div>
@@ -684,27 +684,27 @@ const getPdfInvoice = (invoice) => {
 		  	<h4>Pay via Bank Transfer:</h4>
           <div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">ACCOUNT NAME:</div>
-	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">Pangea Translation Services (Cyprus) LTD</span></div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span>Pangea Translation Services (Cyprus) LTD</span></div>
 	        </div>
           <div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">BANK NAME:</div>
-	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">Hellenic Bank</span></div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span>Hellenic Bank</span></div>
 	        </div>
           <div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">ACCOUNT NUMBER:</div>
-	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">240-01-776394-01</span></div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span>240-01-776394-01</span></div>
 	        </div>
           <div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">IBAN:</div>
-	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">CY75005002400002400177639401</span></div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span>CY75005002400002400177639401</span></div>
 	        </div>
           <div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">SWIFT:</div>
-	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">HEBACY2N</span></div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span>HEBACY2N</span></div>
 	        </div>
           <div class="row" style="height: 30px;">
 	          <div class="row__key" style="width: 140px;margin-right: 10px; display: inline-block;">BANK ADDRESS:</div>
-	          <div class="row__value" style="width: 400px;display: inline-block;"><span style="margin-right: 5px;">131 Arch. Makarios III & Ioanni Polemi P.O Box 51791, 3508 Lemesos, Cyprus</span></div>
+	          <div class="row__value" style="width: 400px;display: inline-block;"><span>131 Arch. Makarios III & Ioanni Polemi P.O Box 51791, 3508 Lemesos, Cyprus</span></div>
 	        </div>
 		  </div>
 		</div>`
