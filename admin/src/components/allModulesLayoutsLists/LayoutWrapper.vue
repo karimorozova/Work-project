@@ -23,12 +23,12 @@
       .options(v-if="summary.length")
         .options__item(@click="clearSummaryByOption('filters')") Clear Filters
         .options__item(@click="clearSummaryByOption('sorting')") Clear Sorting
-        .options__item(@click="clearSummaryByOption") Clear Filters / Sorting
-        .options__item Save As Tab
+        .options__item(@click="clearSummaryByOption(null)") Clear Filters / Sorting
+        .options__item Save As Preset
 
       //div {{summary}}
 
-    .layoutWrapper__tabs
+    .layoutWrapper__presets
       //span tabs
       //h1 summary
 
@@ -108,6 +108,15 @@
                 )
                 span(:class="{'opacity04': !item.isCheck}") {{item.name}}
 
+          .setting__body(v-if="selectedTab === 'presets'")
+            span(v-if="!layoutSettings.presets.length") Setting not available...
+            draggable(handle=".handle" v-model="layoutSettings.presets")
+              .setting__draggable(v-for="item in layoutSettings.presets")
+                .setting__draggable-titleAndOption
+                  span {{ item.id }}
+                .setting__draggable-icon.handle
+                  i.fas.fa-arrows-alt-v
+
           .setting__button
             Button(value="Approve" @clicked="saveChanges")
 
@@ -120,7 +129,7 @@ import Close from "../Close"
 import { mapActions, mapGetters } from "vuex"
 import draggable from 'vuedraggable'
 import CheckBox from "../CheckBox"
-import LayoutWrapperMixin from "../../mixins/LayoutWrapperMixin";
+import LayoutWrapperMixin from "../../mixins/LayoutWrapperMixin"
 
 
 export default {
@@ -151,7 +160,8 @@ export default {
       layoutSettings: {
         filters: [],
         fields: [],
-        sorting: []
+        sorting: [],
+        presets: []
       },
 
       layoutsPossibleSettings: {
@@ -523,30 +533,34 @@ export default {
       this.removeQuery(id)
       this.makeDBRequest()
     },
-    clearSummaryByOption(option) {
-      // let { query } = this.$route
-      // const keyPrefixes = Object.keys(query).map(key => key.split('_').at(0))
-      //
-      // if (option === 'filters' && !keyPrefixes.some(prefix => prefix === 'f')) return
-      // if (option === 'sorting' && !keyPrefixes.some(prefix => prefix === 'sf')) return
-      //
-      // const newQuery = {}
-      //
-      // const cleaner = (i) => {
-      //   const [ prefix ] = i.split('_')
-      //   return option === 'filters' ? prefix === 'sf' : prefix === 'f'
-      // }
-      //
-      // const replacer = (query) => {
-      //   return this.$router.replace({ path: this.$route.path, query })
-      // }
-      // if (!option) replacer(null)
-      // const queries = Object.keys(query).filter(cleaner)
-      // if (queries.length) for (const key of queries) {
-      //   if (query[key]) newQuery[key] = query[key]
-      // }
-      // replacer(newQuery)
-      // this.calculateTableMaxHeight()
+    async clearSummaryByOption(option) {
+      let { query } = this.$route
+      const queryArr = Object.keys(query)
+      const newQuery = {}
+
+      const checker = () => {
+        if (!option) return null
+        const keyPrefixes = queryArr.map(key => key.split('_').at(0))
+        return !keyPrefixes.some(prefix => option === 'filters' ? prefix === 'f' : prefix === 'sf')
+      }
+      const replacer = async (query) => {
+        await this.$router.replace({ path: this.$route.path, query })
+      }
+      const cleaner = (item) => {
+        const [ prefix ] = item.split('_')
+        return option === 'filters' ? prefix === 'sf' : prefix === 'f'
+      }
+      const executor = async (query) => {
+        await replacer(query)
+        this.makeDBRequest()
+        this.calculateTableMaxHeight()
+      }
+
+      if (checker()) return
+      if (!option) return executor(null)
+
+      for (const key of queryArr.filter(cleaner)) if (query[key]) newQuery[key] = query[key]
+      await executor(newQuery)
     },
     setTab(selectedTab, option) {
       const _idx = this.tabs.findIndex(i => i === selectedTab)
@@ -596,22 +610,23 @@ export default {
         if (_idx !== -1) this.layoutSettings[prop].push({ ...list[_idx], isCheck: true })
       })
       this.layoutSettings[prop].push(
-        ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
+          ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
       )
     },
     updatedSettingByUserData() {
-      const { layoutsSettings: { [this.moduleType]: { fields = [], filters = [], sorting = [] } } } = this.user
+      const { layoutsSettings: { [this.moduleType]: { fields = [], filters = [], sorting = [], presets = [] } } } = this.user
       this.dataSaver(fields, 'fields')
       this.dataSaver(filters, 'filters')
       this.dataSaver(sorting, 'sorting')
+      this.layoutSettings.presets = presets
 
-      for (let prop of [ 'fields', 'filters', 'sorting' ]) if (this.layoutSettings[prop].length) this.tabs.push(prop)
+      for (let prop of [ 'fields', 'filters', 'sorting', 'presets' ]) if (this.layoutSettings[prop].length) this.tabs.push(prop)
       this.selectedTab = this.tabs[0]
     },
     calculateTableMaxHeight() {
       this.$nextTick(() => {
-        const { offsetHeight: layoutHeight, childNodes: [ iconsDiv, summaryDiv, tabsDiv ] } = this.$el
-        this.tableMaxHeight = layoutHeight - iconsDiv.offsetHeight - summaryDiv.offsetHeight - tabsDiv.offsetHeight
+        const { offsetHeight: layoutHeight, childNodes: [ iconsDiv, summaryDiv, presetsDiv ] } = this.$el
+        this.tableMaxHeight = layoutHeight - iconsDiv.offsetHeight - summaryDiv.offsetHeight - presetsDiv.offsetHeight
       })
     }
   },
@@ -629,7 +644,7 @@ export default {
           summary.push({
             id: queryKey,
             summaryEnum,
-            name,
+            name
           })
         }
       }
@@ -670,7 +685,6 @@ export default {
 
   &__table {
     height: calc(100% - 50px);
-    background: wheat;
   }
 
   &__setting {
