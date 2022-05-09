@@ -7,6 +7,7 @@ const getAmountByPercent = (total, value) => {
 }
 
 const getInvoiceFinance = (report) => {
+	if (!report.hasOwnProperty("items")) return null
 	const { items } = report
 
 	return {
