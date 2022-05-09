@@ -126,7 +126,7 @@ function getPdfOfQuote(project, tasksIds, allUnits, allSettingsSteps) {
 			: ''
 
 	return `
-	<div class="pdf" style="width: 814px; font-size: 13px; font-family: Arial, sans-serif;color: #333;padding: 30px;position: relative;">
+	<div class="pdf" style="width: 814px; font-size: 13px; font-family: Tahoma, sans-serif; color: #333;padding: 30px;position: relative;">
 			<div class="header" style="display: -webkit-box;justify-content: space-between;">
 				<div class="header__logo">
 	        <svg style="height: 72px; width: 253px;" id="Ñëîé_1" data-name="Ñëîé 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 253 72">
@@ -605,7 +605,7 @@ const getPdfInvoice = (invoice) => {
 	const tableEnd = `</table></div>`
 
 	return `
-		<div class="template" style="font-family: Arial, sans-serif; width: 840px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
+		<div class="template" style="font-family: Tahoma, sans-serif; width: 848px;box-sizing: border-box;padding: 40px;font-size:14px; color: #333;">
 		  <div class="header">
 		    <div class="header__logo" style="width: 451px; margin-right: 25px; display: inline-block; vertical-align: top;">
 		      <div class="header__logo-image" style="width: 230px; ">
@@ -743,7 +743,7 @@ function getInvoiceSendTemplate(invoice) {
                     This message is sent to you on behalf of Accounting
                     </p>
                     <p style="background: #f7f7f7; font-size: 14px; font-weight: bold; padding: 14px;"><span id="client-name-row">Dear Test</span></p>
-                    <p>Invoice <b>${ invoice.invoiceId }</b> for the sum of: <b>${ getInvoiceFinance(invoice).total } ${ returnIconCurrencyByStringCode(invoice.customer.currency) }</b> 
+                    <p>Invoice <b>${ invoice.invoiceId }</b> for the sum of: <b>${ returnIconCurrencyByStringCode(invoice.customer.currency) }${ getInvoiceFinance(invoice).total }</b> 
                     	can be viewed, printed or downloaded as a PDF file from the link below.</p>
                     <p>Kindly add the invoice ID as a reference, when sending the transfer.</p>
                     <p style="background: rgba(245, 198, 83, 0.14);padding: 10px;">

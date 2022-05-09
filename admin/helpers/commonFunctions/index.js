@@ -53,13 +53,13 @@ const rateExchangeProjectOntoVendor = (projectCurrency, vendorCurrency, nativeRa
 const returnIconCurrencyByStringCode = (currencyStingCode) => {
 	switch (currencyStingCode) {
 		case "EUR":
-			return "&nbsp;&euro;&nbsp;"
+			return "&euro;"
 		case "USD":
-			return "&nbsp;&#36;&nbsp;"
+			return "&#36;"
 		case "GBP":
-			return "&nbsp;&pound;&nbsp;"
+			return "&pound;"
 		default:
-			return "&nbsp;&euro;&nbsp;"
+			return "&euro;"
 	}
 }
 

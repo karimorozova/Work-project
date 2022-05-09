@@ -46,7 +46,7 @@
 
     .create-btn
       Button(
-        :isDisabled="isDisableSubmitButton"
+        :isDisabled="isDisableSubmitButton || !!requestCounter"
         value="Submit"
         @clicked="createProject"
       )
@@ -56,7 +56,7 @@
 import SelectSingle from "../../SelectSingle"
 import DatePicker from 'vue2-datepicker'
 import '../../../assets/scss/datepicker.scss'
-import { mapActions } from "vuex"
+import { mapActions, mapGetters } from "vuex"
 import Button from "../../Button"
 
 export default {
@@ -104,6 +104,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      requestCounter: 'getRequestCounter'
+    }),
     isDisableSubmitButton() {
       const { projectName, selectedIndustry, deadline } = this.project
       const { name, email } = this.client
