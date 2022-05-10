@@ -7,17 +7,17 @@ const { getVendorAfterUpdate } = require('../vendors/getVendors')
 const bcrypt = require('bcryptjs');
 
 async function manageNewApplication({person, cvFiles, coverLetterFiles, infoForMail}) {
+
     const allVendors = await Vendors.find()
     if(allVendors.map(i => i.email).includes(person.email)) return
-
-    const softData = JSON.parse(person['parsing-softwares'])
+    const catExperience = JSON.parse(person['parsing-catExperience'])
     const pendingCompetencies = JSON.parse(person['pendingCompetencies'])
     try {
         const lastIndex = await Vendors.findOne().sort({ 'vendorId': -1 }) ||  false
         let lastIntIndex = lastIndex.toJSON().hasOwnProperty('vendorId') ? parseInt(lastIndex.vendorId.split('_').pop()) : 0
         person.vendorId = 'VEN_' + (++lastIntIndex + '').padStart(6, "0")
 
-        let vendor = await Vendors.create({...person, pendingCompetencies, softData , status: "Potential"});
+        let vendor = await Vendors.create({...person, pendingCompetencies, catExperience, status: "Potential"});
         vendor.documents = await setDocuments(cvFiles, 'Resume', vendor.id);
         vendor.coverLetterFiles = await manageFiles(coverLetterFiles, vendor.id, 'coverLetterFile');
         const mailPassword = passwordGen.generate({ length: 8, numbers: true })

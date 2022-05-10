@@ -141,8 +141,8 @@
                       :isTableDropMenu="true"
                       placeholder="Select"
                       :hasSearch="false"
-                      :options="softwaresOptions"
-                      :selectedOptions="softwares"
+                      :options="catExperienceOptions"
+                      :selectedOptions="catExperience"
                       @chooseOptions="chooseOptions"
                     )
 
@@ -205,6 +205,7 @@ import UploadFileButton from "../components/application/UploadFileButton"
 import AgreeAndSubmit from "../components/application/AgreeAndSubmit"
 import FilesList from "../components/application/FilesList"
 import ErrorsAlert from "../components/application/ErrorsAlert"
+import {mapActions} from "vuex";
 
 export default {
   data() {
@@ -215,12 +216,12 @@ export default {
       person: {},
       errors: [],
       errorsExist: false,
-      softwares: [],
+      catExperience: [],
       coverLetter: "",
       files: { cv: [], cover: [] },
       availabilityOptions: [ "Full-time", "Part-time", "Limited" ],
       availability: "",
-      softwaresOptions: [ "XTM", "MemoQ", "Trados" ],
+      catExperienceOptions: [ "XTM", "MemoQ", "Trados" ],
       secondInfo: { CAT: false },
       industries: [],
       selectedIndustries: [],
@@ -239,6 +240,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions([ "alertToggle" ]),
     setInfoValue({ property, value }) {
       this.person[property] = value
     },
@@ -363,14 +365,14 @@ export default {
       this.person.availability = option
     },
     chooseOptions({ option }) {
-      const position = this.softwares.indexOf(option)
+      const position = this.catExperience.indexOf(option)
       if (position !== -1) {
-        this.softwares.splice(position, 1)
+        this.catExperience.splice(position, 1)
       } else {
-        const title = this.softwaresOptions.find((item) => item === option)
-        this.softwares.push(title)
+        const title = this.catExperienceOptions.find((item) => item === option)
+        this.catExperience.push(title)
       }
-      this.person.softwares = this.softwares
+      this.person.catExperience = this.catExperience
     },
     chooseIndustries({ option }) {
       const position = this.selectedIndustries.findIndex(item => item.name === option)

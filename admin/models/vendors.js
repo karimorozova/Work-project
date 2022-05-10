@@ -47,6 +47,11 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+  availability: {
+    type: String,
+    default: '',
+    trim: true
+  },
 	native: {
 		type: Schema.Types.ObjectId, ref: 'Language',
 		default: null
