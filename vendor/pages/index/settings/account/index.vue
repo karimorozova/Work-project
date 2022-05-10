@@ -45,17 +45,6 @@
 
         .Rside__row
           .Rside__col
-            label Native Language:
-            .drop
-              SelectSingle(
-                :hasSearch="true"
-                :options="languages.map(i =>i.lang)"
-                :selectedOption="this.vendor.native ? this.vendor.native.lang : ''"
-                placeholder="Option"
-                @chooseOption="({option}) => setNative(option, 'native')"
-              )
-
-          .Rside__col
             label Time Zone:
             .drop
               SelectSingle(
@@ -65,7 +54,16 @@
                 placeholder="Your Timezone"
                 @chooseOption="({option}) => setValue(option, 'timezone')"
               )
-
+          .Rside__col
+            label Native Language:
+            .drop
+              SelectSingle(
+                :hasSearch="true"
+                :options="languages.map(i =>i.lang)"
+                :selectedOption="this.vendor.native ? this.vendor.native.lang : ''"
+                placeholder="Option"
+                @chooseOption="({option}) => setNative(option, 'native')"
+              )
         .Rside__row
           .Rside__col
             label Gender:
@@ -77,20 +75,50 @@
                 @chooseOption="({option}) => setValue(option, 'gender')"
               )
           .Rside__col
-            label Skype:
-            input(type="text" autocomplete="off" :value="getActualField('skype')" placeholder="Value" @change="(e) => setValue(e.target.value, 'skype')")
+            label Currency:
+            .drop
+              SelectSingle(
+                :options="currencyList"
+                :selectedOption="getActualField('currency')"
+                placeholder="Option"
+                @chooseOption="({option}) => setValue(option, 'currency')"
+              )
+
+        .Rside__row
+          .Rside__col
+            label CAT experience:
+            .drop
+              SelectMulti(
+                :selectedOptions="getActualField('catExperience')"
+                :isTableDropMenu="true"
+                placeholder="Options"
+                :hasSearch="false"
+                :options="catExperienceList"
+                @chooseOptions="chooseCatExperienceOptions"
+              )
+
+        .Rside__title(style="margin-top: 25px;") Social Media & Communication
+        p.descr Please enter any other platform of communication, so we can reach you, in case we need
+        p.descr.descr--bottom It can be extra email, extra phone number etc.
+        SocialMediaRow(
+          :social-media="getActualField('socialMedia')"
+          @changeItemPosition="changeItemPosition"
+          @add="addSocialMedia"
+          @remove="removeSocialMedia"
+          @update="updateVendorSocialMediaValue"
+        )
 
         .Rside__title(style="margin-top: 25px;") Security
         .Rside__row
           .Rside__col
             label Password:
-            input(:type="passType1" autocomplete="off" placeholder="New Password"  v-model="password" )
+            input(type="text" autocomplete="off" placeholder="New Password"  v-model="password" )
             span.showPass(v-if="password.length" @mousemove="passType1 = 'text'" @mouseleave="passType1 = 'password'")
               i.far.fa-eye
 
           .Rside__col
             label Retype password:
-            input(:type="confirmPassType2" autocomplete="off" placeholder="Confirm New Password" v-model="confirmPassword")
+            input(type="text" autocomplete="off" placeholder="Confirm New Password" v-model="confirmPassword")
             span.showPass(v-if="confirmPassword.length" @mousemove="confirmPassType2 = 'text'" @mouseleave="confirmPassType2 = 'password'")
               i.far.fa-eye
 
@@ -103,9 +131,12 @@
 <script>
 import Button from "../../../../components/general/Button"
 import ValidationErrors from "../../../../components/general/ValidationErrors"
+import SocialMediaRow from './subcomponents/SocialMediaRow'
 import { mapActions, mapGetters } from "vuex"
 import SelectSingle from "../../../../components/general/SelectSingle"
+import SelectMulti from "../../../../components/general/SelectMulti"
 import getBgColor from "../../../../mixins/getBgColor"
+import moment from "moment-timezone";
 
 export default {
   mixins: [ getBgColor ],
@@ -124,7 +155,10 @@ export default {
       confirmPassword: "",
       imageExist: false,
       isFileError: false,
-      domain: ""
+      domain: "",
+      currencyList: [ 'EUR' ],
+      catExperienceList: ['XTM', 'MemoQ', 'Trados'],
+      catExperience: []
     }
   },
   methods: {
@@ -132,16 +166,31 @@ export default {
       "alertToggle",
       "setCurrentVendor"
     ]),
-    async getTimezones() {
-      try {
-        const result = await this.$axios.get('/api/timezones')
-        this.timezones = result.data.map(({ zone }) => zone)
-      } catch (err) {
-        console.log(err)
+    chooseCatExperienceOptions({ option }) {
+      const cat = [ ...this.vendor.catExperience ]
+      const position = cat.indexOf(option)
+      if (position !== -1) {
+        cat.splice(position, 1)
+      } else {
+        cat.push(this.catExperienceList.find((item) => item === option))
       }
+      this.setValue(cat, 'catExperience')
+    },
+    changeItemPosition(sortedArr) {
+      this.vendor.socialMedia = sortedArr
+    },
+    addSocialMedia(item) {
+      this.vendor.socialMedia.push(item)
+    },
+    removeSocialMedia(index) {
+      this.vendor.socialMedia.splice(index, 1)
+    },
+    updateVendorSocialMediaValue({ value, prop, index }) {
+      this.vendor.socialMedia[index][prop] = value
     },
     getActualField(name) {
       return this.vendor[name]
+
     },
     previewPhoto() {
       if (document.getElementsByClassName('upload-button__input').length < 1) return
@@ -215,7 +264,9 @@ export default {
           timezone: this.vendor.timezone,
           native: this.vendor.native,
           gender: this.vendor.gender,
-          skype: this.vendor.skype
+          skype: this.vendor.skype,
+          socialMedia: this.vendor.socialMedia,
+          catExperience: this.vendor.catExperience,
         }
         let formData = new FormData()
         formData.append("id", this.vendor._id)
@@ -240,13 +291,15 @@ export default {
   components: {
     ValidationErrors,
     Button,
-    SelectSingle
+    SelectSingle,
+    SelectMulti,
+    SocialMediaRow
   },
   mounted() {
     this.domain = process.env.domain
   },
-  async created() {
-    await this.getTimezones()
+  created() {
+    this.timezones = moment.tz.names()
   }
 }
 </script>
@@ -432,5 +485,14 @@ input {
   cursor: help;
   color: $dark-border;
 }
-
+.descr {
+  padding: 0;
+  margin: 0;
+  margin-bottom: 5px;
+  font-family: 'Roboto400';
+  font-size: 14px;
+    &--bottom {
+      margin-bottom: 25px;
+    }
+}
 </style>

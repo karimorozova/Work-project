@@ -199,6 +199,7 @@ const getVendorForPortal = async (query) => {
 				email: 1,
 				phone: 1,
 				timezone: 1,
+        currency: 1,
 				native: 1,
 				gender: 1,
 				skype: 1,
@@ -217,6 +218,7 @@ const getVendorForPortal = async (query) => {
         website: 1,
         whatsapp: 1,
         socialMedia: 1,
+
 			}).populate('native')
 	)
 }

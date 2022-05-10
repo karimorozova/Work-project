@@ -95,7 +95,7 @@ export default {
           })
       this.saveAvailability('absenceSchedule')
     },
-       changeSchedulePosition(sortedArr) {
+    changeSchedulePosition(sortedArr) {
       this.workSchedule = sortedArr
       this.saveAvailability('workSchedule')
     },

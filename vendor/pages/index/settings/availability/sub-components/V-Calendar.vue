@@ -13,7 +13,6 @@
       :attributes="attributes"
       is-range="true"
       :columns="$screens({ default: 1, lg: 2 })"
-      :is-expanded="true"
       @daymouseenter="mouseEnter"
 
     )
@@ -22,7 +21,7 @@
       .modal__close(@click="onCloseEditModalClick")
         i.fas.fa-times
       Button.modal__button--add(value="Add" @clicked="onAddBtnClick")
-      EditModal(
+      EditModal.edit(
         v-for="editItem in editItems"
         @edit="onEditClick"
         @remove="onRemoveClick"
@@ -263,7 +262,13 @@ export default {
   padding: 25px;
   padding-bottom: 50px;
   box-shadow: $box-shadow;
+  //margin: -10px;
+  //flex-wrap: wrap;
 }
+//.edit {
+//  flex-basis: calc((100% - 60px) / 3);
+//  margin: 10px;
+//}
 .modal__button--add {
   position: absolute;
   bottom: 10px;
@@ -287,14 +292,136 @@ export default {
   width: 20px;
   height: 20px;
 }
-.vc-border-gray-700 {
+
+.calendar /deep/ .vc-title-wrapper {
+  color: $text !important;
+  font-family: Myriad400 !important;
+
+  &:hover {
+    color: $border  !important;
+    opacity: 1;
+  }
+}
+.calendar /deep/ .vc-text-center.vc-text-xs.vc-text-gray-300.vc-font-semibold {
+  color: $text !important;
+  font-size: 14px;
+}
+.calendar /deep/ .vc-popover-content {
+
+  background: white  !important;
+  border: 1px solid $border  !important;
+  color: $text !important;
+  font-size: 14px !important;
+  font-family: Myriad400 !important;
+}
+.calendar /deep/ .vc-font-semibold {
+  font-weight: 400;
+}
+.calendar /deep/ .vc-font-medium {
+  font-weight: 400;
+}
+.calendar /deep/ .vc-text-lg {
+  font-size: 16px;
+}
+.calendar /deep/ .hover\:vc-opacity-75:hover {
+  color: $dark-border;
+  opacity: 1;
+}
+.calendar /deep/ .hover\:vc-opacity-50:hover {
+  opacity: 1;
+  & .vc-svg-icon {
+    color: $text !important;
+  }
+}
+.calendar /deep/ .hover\:vc-bg-gray-900:hover {
+  background-color: white;
+  color: $dark-border;
+}
+.calendar /deep/ .focus\:vc-border-blue-600:focus {
+  border-color: $border;
+}
+.calendar /deep/ .vc-svg-icon {
+  color: $dark-border !important;
+  &:hover {
+    color: $text !important;
+  }
+}
+.calendar /deep/ .vc-bar.vc-bg-teal-600 {
+  background-color: $green;
+}
+.calendar /deep/ .vc-bar.vc-bg-red-600 {
+  background-color: $orange;
+}
+.calendar /deep/ .vc-bar.vc-bg-gray-600 {
+  background-color: $beige;
+}
+.calendar /deep/ .vc-bar.vc-bg-orange-600 {
+  background-color:  $medium-red;
+}
+.calendar /deep/ .vc-bg-teal-500 {
+  background-color: $green;
+}
+.calendar /deep/ .vc-bg-red-500 {
+  background-color: $orange;
+}
+.calendar /deep/ .vc-bg-gray-500 {
+  background-color: $beige;
+}
+.calendar /deep/ .vc-bg-orange-500 {
+  background-color:  $medium-red;
+}
+.calendar /deep/ .vc-text-blue-100 {
+  color: $text;
+  &:focus {
+    color: $dark-border;
+  }
+}
+.calendar /deep/ .hover\:vc-bg-gray-300 {
+  background-color: white !important;
+}
+.calendar /deep/ .vc-bg-blue-100 {
+  background-color: white;
+}
+.calendar /deep/ .hover\:vc-bg-gray-900 {
+  background-color: white;
+}
+.calendar /deep/ .vc-text-blue-900 {
+  color: $text;
+}
+.calendar /deep/ .vc-shadow {
+  border-color: $border;
+}
+.calendar /deep/ .hover\:vc-shadow-inner:hover {
+  box-shadow: inset 0 2px 4px 0 transparent;
+}
+.calendar /deep/ .vc-font-bold {
+  font-weight: 400;
+}
+.calendar /deep/ .vc-shadow {
+  box-shadow: $box-shadow;
+}
+.calendar /deep/ .vc-border-blue-100 {
+  border-color: $dark-border;
+}
+.calendar /deep/ .vc-text-gray-500 {
+  color: $dark-border;
+}
+.calendar /deep/ .vc-day-content:focus {
+  background-color: $beige;
+}
+.calendar /deep/ .vc-day-content:hover {
+  background-color: $cell-background;
+}
+.calendar /deep/ .vc-w-full {
+  width: 800px !important;
 
 }
-.vc-bg-gray-800 {
-  background: #44bbdd !important;
+.container /deep/ .calendar {
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
-.vc-popover-content-wrapper >  .vc-bg-gray-800 {
-  background: #44bbdd !important;
+.container /deep/ .vc-border-gray-400 {
+  border-color: $border;
 }
 
 </style>

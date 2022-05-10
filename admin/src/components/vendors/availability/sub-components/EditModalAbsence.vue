@@ -4,7 +4,7 @@
       p.modal__title Type:
       span.modal__descr {{ editItem.type }}
     .modal__title--wrapper
-      p.modal__title From:
+      p.modal__title.modal__title--from From:
       span.modal__descr {{ editItem.start.toLocaleString() }}
     .modal__title--wrapper
       p.modal__title To:
@@ -97,10 +97,10 @@ export default {
 .modal {
   z-index: 8;
   background: white;
-  width: 200px;
-  padding: 10px 20px;
+  padding: 10px;
   border: 1px solid $border;
   margin-right: 10px;
+  width: 200px;
 
   &__close {
     font-size: 16px;
@@ -138,6 +138,9 @@ export default {
   font-weight: 500;
   font-size: 14px;
   margin: 0;
+  &--from {
+    margin-right: 4px;
+  }
 }
 
 .modal__descr {
