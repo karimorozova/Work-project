@@ -1,115 +1,141 @@
 <template lang="pug">
-  .general-wrapper
-    .left-side
-      .gen-info
-        ValidationErrors(
-          v-if="areErrorsExist"
-          :errors="errors"
-          :isAbsolute="true"
-          @closeErrors="closeErrors"
-        )
-        .vendorInformation
-          .vendorInformation__line1
-            .row
-              .row__key
-                span First Name:
-                span.require *
-              .row__value
-                input.input(
-                  type="text"
-                  placeholder="Value"
-                  :value="vendor.firstName"
-                  @change="(e) => updateProp(e,'firstName')"
-                )
-            .row
-              .row__key
-                span Surname:
-                span.require *
-              .row__value
-                input.input(
-                  type="text"
-                  placeholder="Value"
-                  :value="vendor.surname"
-                  @change="(e) => updateProp(e,'surname')"
-                )
-            .row
-              .row__key
-                span Email:
-                span.require *
-              .row__value
-                input.input(
-                  type="text"
-                  placeholder="Value"
-                  :value="vendor.email"
-                  @change="(e) => updateProp(e,'email')"
-                )
+  .container
+    .vendor-info__radio
+      RadioButton.radio(name="Agency" :selected="vendor.vendorType" @toggleRadio="toggleRadio")
+      RadioButton.radio(name="Individual" :selected="vendor.vendorType" @toggleRadio="toggleRadio")
+    .general-wrapper
 
-          .vendorInformation__line2
-            .vendorInformation__photo
-              .photo-wrap(v-if="!vendor.photo")
-                input.photo-file(type="file" @change="previewPhoto")
-                .photo-text(v-if="!isImageExist")
-                  p.photo-text__message(v-if="!isFileError") Upload File
-                    br
-                    span.photo-extensions *.jpg/jpeg/png
-                    span.photo-size <= 3MB
-                img.photo-image(v-if="isImageExist")
-                p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
-              .photo-wrap(v-if="vendor.photo")
-                input.photo-file(type="file" @change="previewPhoto")
-                img.photo-image(:src="contact.photo")
-            .vendorInformation__description
-              .row.mbRow
-                .row__key Phone:
+      .left-side
+        .gen-info
+          ValidationErrors(
+            v-if="areErrorsExist"
+            :errors="errors"
+            :isAbsolute="true"
+            @closeErrors="closeErrors"
+          )
+          .vendorInformation
+            .vendorInformation__line1
+              .row
+                .row__key
+                  span First Name:
+                  span.require *
                 .row__value
-                  input.input( type="text" placeholder="Value" :value="vendor.phone" @input="setPhone" ref="phone")
-              .row.mbRow
-                .row__key Native Language:
-                .row__value
-                  SelectSingle(
-                    :selectedOption="vendor.native ? vendor.native.lang: ''",
-                    :options="filteredLanguages.map(({lang}) => lang)",
-                    :hasSearch="true"
-                    placeholder="Option"
-                    @chooseOption="setNative"
-                  )
-              .row.mbRow
-                .row__key Time Zone:
-                .row__value
-                  SelectSingle(
-                    :hasSearch="true"
-                    placeholder="Option"
-                    :options="timezones.map(item => item.zone)",
-                    :selectedOption="vendor.timezone",
-                    @chooseOption="setTimezone"
+                  input.input(
+                    type="text"
+                    placeholder="Value"
+                    :value="vendor.firstName"
+                    @change="(e) => updateProp(e,'firstName')"
                   )
               .row
-                .row__key Gender:
+                .row__key
+                  span Surname:
+                  span.require *
                 .row__value
-                  SelectSingle(
-                    :options="genders"
-                    :selectedOption="vendor.gender"
-                    placeholder="Option"
-                    @chooseOption="updateGender"
+                  input.input(
+                    type="text"
+                    placeholder="Value"
+                    :value="vendor.surname"
+                    @change="(e) => updateProp(e,'surname')"
                   )
               .row
-                .row__key Company Name:
+                .row__key
+                  span Email:
+                  span.require *
                 .row__value
-                  input.input(type="text" placeholder="Value" :value="vendor.companyName" @change="(e) => updateProp(e,'companyName')")
-              .row
-                .row__key Skype:
-                .row__value
-                  input.input(type="text" placeholder="Value" :value="vendor.skype" @change="(e) => updateProp(e,'skype')")
+                  input.input(
+                    type="text"
+                    placeholder="Value"
+                    :value="vendor.email"
+                    @change="(e) => updateProp(e,'email')"
+                  )
 
-      .saveButtons
-        Button(value="Save" @clicked="checkForErrors")
-        Button(value="Cancel" :outline="true" @clicked="cancel")
+            .vendorInformation__line2
+              .vendorInformation__photo
+                .photo-wrap(v-if="!vendor.photo")
+                  input.photo-file(type="file" @change="previewPhoto")
+                  .photo-text(v-if="!isImageExist")
+                    p.photo-text__message(v-if="!isFileError") Upload File
+                      br
+                      span.photo-extensions *.jpg/jpeg/png
+                      span.photo-size <= 3MB
+                  img.photo-image(v-if="isImageExist")
+                  p.photo-text__error-message(v-if="isFileError") Incorrect file type or size
+                .photo-wrap(v-if="vendor.photo")
+                  input.photo-file(type="file" @change="previewPhoto")
+                  img.photo-image(:src="contact.photo")
+              .vendorInformation__description
+                .row.mbRow
+                  .row__key Phone:
+                  .row__value
+                    input.input( type="text" placeholder="Value" :value="vendor.phone" @input="setPhone" ref="phone")
+                .row.mbRow
+                  .row__key Time Zone:
+                  .row__value
+                    SelectSingle(
+                      :hasSearch="true"
+                      placeholder="Option"
+                      :options="timezones",
+                      :selectedOption="vendor.timezone",
+                      @chooseOption="setTimezone"
+                    )
+                .row.mbRow
+                  .row__key Native Language:
+                  .row__value
+                    SelectSingle(
+                      :selectedOption="vendor.native ? vendor.native.lang: ''",
+                      :options="filteredLanguages.map(({lang}) => lang)",
+                      :hasSearch="true"
+                      placeholder="Option"
+                      @chooseOption="setNative"
+                    )
+
+                .row
+                  .row__key Gender:
+                  .row__value
+                    SelectSingle(
+                      :options="genders"
+                      :selectedOption="vendor.gender"
+                      placeholder="Option"
+                      @chooseOption="updateGender"
+                    )
+                .row
+                  .row__key Currency:
+                  .row__value
+                    SelectSingle(
+                      :options="currencyList"
+                      :selectedOption="vendor.currency"
+                      placeholder="Option"
+                      @chooseOption="updateCurrency"
+                    )
+                .row
+                  .row__key CAT experience:
+                    .row__value
+                      SelectMulti(
+                        :selectedOptions="vendor.catExperience"
+                        :isTableDropMenu="true"
+                        placeholder="Options"
+                        :hasSearch="false"
+                        :options="catExperienceList"
+                        @chooseOptions="chooseCatExperienceOptions"
+                      )
+                .row.mtRow.company(v-if="isAgency === 'Agency'" )
+                  .row__key Company Name:
+                    .row__value
+                      input.input(type="text" placeholder="Value" :value="vendor.companyName" @change="(e) => updateProp(e,'companyName')")
+                .row.mtRow.website(v-if="isAgency === 'Agency'" )
+                  .row__key Website:
+                    .row__value
+                      input.input(type="text" placeholder="Value" :value="vendor.website" @change="(e) => updateProp(e,'website')")
+
+        .saveButtons
+          Button(value="Save" @clicked="checkForErrors")
+          Button(value="Cancel" :outline="true" @clicked="cancel")
 
 
-    VendorSubDetails(
-      :vendor="vendor"
-      @setVendorProp="setVendorProp"
-    )
+      VendorSubDetails(
+        :vendor="vendor"
+        @setVendorProp="setVendorProp"
+      )
 
 </template>
 
@@ -124,6 +150,8 @@ import SelectMulti from "../SelectMulti"
 import CheckBox from "../CheckBox"
 import VendorSubDetails from "./VendorSubDetails"
 import Button from "../Button"
+import moment from "moment-timezone";
+import RadioButton from "../RadioButton"
 
 export default {
   mixins: [ photoPreview ],
@@ -137,9 +165,12 @@ export default {
       photoFile: [],
       genders: [ "Male", "Female", "Other" ],
       errors: [],
+      currencyList: [ 'EUR' ],
+      catExperienceList: [ 'XTM', 'MemoQ', 'Trados' ],
+      isAgency: false,
+
 
       vendor: {
-        companyName: "",
         email: "",
         firstName: "",
         surname: "",
@@ -151,7 +182,12 @@ export default {
         status: "Active",
         timezone: "",
         isTest: false,
-        isCreatedByManager: true
+        isCreatedByManager: true,
+        catExperience: [],
+        currency: '',
+        vendorType: 'Individual',
+        website: '',
+        companyName: '',
       },
 
       isFileError: false,
@@ -230,20 +266,36 @@ export default {
     updateGender({ option }) {
       this.vendor.gender = option
     },
+    updateCurrency({ option }) {
+      this.vendor.currency = option
+    },
     setTimezone({ option }) {
+      // this.updateCurrentVendorGeneralData({ key: 'timezone', value: option })
+      // this.timezone = this.currentVendor.timezone
       this.vendor.timezone = option
     },
     setNative(value) {
       const { _id, lang } = this.filteredLanguages.find(({ lang }) => lang === value.option)
       this.vendor.native = { _id, lang }
     },
-    async getTimezones() {
-      try {
-        const result = await this.$http.get('/api/timezones')
-        this.timezones = result.data
-      } catch (err) {
-        console.log(err)
+    chooseCatExperienceOptions({ option }) {
+      const cat = [ ...this.vendor.catExperience ]
+      const position = cat.indexOf(option)
+      if (position !== -1) {
+        cat.splice(position, 1)
+      } else {
+        cat.push(this.catExperienceList.find((item) => item === option))
       }
+      this.vendor.catExperience = cat
+    },
+    async toggleRadio({ value }) {
+
+
+      this.vendor.vendorType = value
+      // await this.updateCurrentVendor({ vendor: JSON.stringify(vendor) })
+      // this.alertToggle({ message: "Updated", isShow: true, type: "success" })
+      this.isAgency = this.vendor.vendorType
+
     },
     chosenStatus(value) {
       this.vendor.status = value.option
@@ -299,7 +351,7 @@ export default {
     }
   },
   created() {
-    this.getTimezones()
+    this.timezones = moment.tz.names()
   },
   components: {
     Button,
@@ -308,7 +360,8 @@ export default {
     SelectMulti,
     ValidationErrors,
     SelectSingle,
-    Asterisk
+    Asterisk,
+    RadioButton
   },
   directives: {
     ClickOutside
@@ -319,10 +372,12 @@ export default {
 
 <style lang="scss" scoped>
 @import "../../assets/scss/colors.scss";
-
+.container {
+  padding: 50px 0 50px 50px;
+}
 .general-wrapper {
   display: flex;
-  margin: 50px 0 50px 50px;
+
 }
 
 .vendorInformation {
@@ -415,6 +470,15 @@ export default {
 .mbRow {
   margin-bottom: 15px;
 }
+.mtRow {
+  margin-top: 15px;
+}
+.website {
+  margin-right: auto;
+}
+.company {
+  margin-right: 43.5px;
+}
 
 //Photo
 .photo-text {
@@ -478,5 +542,12 @@ export default {
   cursor: pointer;
   border-radius: 8%;
 }
+.vendor-info__radio {
+  display: flex;
+  padding-bottom: 20px;
+}
 
+.radio {
+  margin-right: 15px;
+}
 </style>

@@ -97,7 +97,7 @@ const extendVendorsPendingCompetencies = async (pendingCompetencies) => {
 	const { basicPricesTable, stepMultipliersTable, industryMultipliersTable } = await Pricelist.findOne({ isVendorDefault: true })
 	const allUnits = await Units.find()
 	const { _id: catUnitId } = allUnits.find(({ type }) => type === 'CAT Wordcount')
-	const { _id: sourceWordId } = allUnits.find(({ type }) => type === 'Source Word')
+	const { _id: sourceWordId } = allUnits.find(({ type }) => type === 'Source Word')?._id || allUnits[0]
 
 	pendingCompetencies = pendingCompetencies.map(item => {
 		const {

@@ -18,7 +18,7 @@ export const mutations = {
 	},
 
 	setCurrentVendorGeneralData(state, payload) {
-		let keys = [ 'firstName', 'surname', 'facebook', 'experienceYears', 'availability', 'catExperience', 'twitter', 'proz', 'smartcat', 'secondaryEmail', 'whatsapp', 'softwares', 'instagram', 'telegram', 'socialMedia', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'currency', 'gender', 'status', 'matrix', 'professionalLevel', 'notes', 'vendorId' ]
+		let keys = [ 'firstName', 'surname', 'facebook', 'website', 'experienceYears', 'availability', 'catExperience', 'twitter', 'proz', 'smartcat', 'secondaryEmail', 'whatsapp', 'softwares', 'instagram', 'telegram', 'socialMedia', 'email', 'phone', 'timezone', 'native', 'companyName', 'website', 'skype', 'linkedin', 'currency', 'gender', 'status', 'matrix', 'professionalLevel', 'notes', 'vendorId' ]
 		const billingKeys = [	'officialName', 'email', 'paymentTerm', 'address']
 
 		for (const key of keys) state.currentVendorGeneralData[key] = payload[key]

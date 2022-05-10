@@ -83,7 +83,7 @@ export default {
         if (!this.person.native) this.errors.push("Please select your mother tongue.")
         if (!this.person.industries) this.errors.push("Please select the industries.")
         if (this.secondInfo.CAT !== true) this.errors.push("Unfortunately, you must have experience in CAT Tools to be able to join Pangea.")
-        if (this.secondInfo.CAT === true && !this.person.softwares) this.errors.push("Please select the CAT Tools you use.")
+        if (this.secondInfo.CAT === true && !this.person.catExperience) this.errors.push("Please select the CAT Tools you use.")
         if (!this.person.cv || (this.person.cv && !this.person.cv.length)) this.errors.push("Please upload CV file.")
         if (this.person.cv && this.person.cv.length && this.areCvFilesTooBig(this.person.cv)) this.errors.push("All CV files should have summarized size not more than 20Mb")
         if (this.person.hasOwnProperty('cv') && this.person.hasOwnProperty('cover')) {
