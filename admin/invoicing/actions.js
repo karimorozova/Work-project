@@ -12,7 +12,7 @@ const generateInvoiceFileAndSave = async (_invoiceId) => {
 		const path = await new Promise((resolve, reject) => {
 			htmlToPdf.create(template, {
 				type: 'pdf',
-				width: '840',
+				width: '848',
 				height: '1184',
 				orientation: "landscape",
 				base: process.env.ADMIN_URL,

@@ -398,7 +398,7 @@ export default {
       }
     },
     async acceptQuote() {
-      // const status = this.project.isStartAccepted ? "Started" : "Approved"
+      if (!this.project.clientBillingInfo) return this.alertToggle({ message: "Billing Info cannot be empty" , isShow: true, type: "error" })
       const status = "Approved"
       try {
         await this.setStatus(status)

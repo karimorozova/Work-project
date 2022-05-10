@@ -416,7 +416,7 @@ async function generatePO(requestInfo, fullVendor, project) {
 		table = tableStart + tableBody + tableEnd
 	}
 
-	return `<div class="pdf" style="height: 1054px;width: 814px;font-family: Arial, sans-serif;color: #333;padding: 30px;position: relative;">
+	return `<div class="pdf" style="height: 1054px;width: 814px;font-family: Tahoma, sans-serif;color: #333;padding: 30px;position: relative;">
 			    <div class="header" style="display: -webkit-box;justify-content: space-between;">
 			        <div class="header__logo">
 				        <svg style="height: 72px; width: 253px;" id="Ñëîé_1" data-name="Ñëîé 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 253 72">

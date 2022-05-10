@@ -99,6 +99,10 @@ const UserSchema = new mongoose.Schema({
 			sorting: {
 				type: Array,
 				default: []
+			},
+			presets: {
+				type: Array,
+				default: []
 			}
 		}
 	}

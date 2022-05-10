@@ -11,6 +11,7 @@
       InvoiceDetailsActions(
         :invoice="invoice"
         @deleteInvoice="deleteInvoice"
+        @refreshInvoice="getInvoice"
       )
 </template>
 
@@ -29,6 +30,7 @@ export default {
   },
   methods: {
     async getInvoice() {
+      console.log('GET')
       this.invoice = (await this.$http.get(`/invoicing/invoice/${ this.$route.params.id }`)).data
     },
     async deleteInvoice() {

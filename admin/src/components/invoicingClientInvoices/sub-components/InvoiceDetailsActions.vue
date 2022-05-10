@@ -51,7 +51,7 @@
         )
           i(class="fa-solid fa-trash")
 
-        Button(v-if="invoice.status === 'Sand'" value="Paid" @clicked="payInvoice")
+        Button(v-if="invoice.status === 'Sent'" value="Paid" @clicked="payInvoice")
 
 
 </template>
@@ -77,7 +77,7 @@ export default {
       selectedMails: [],
       isEmailSender: false,
       emails: [],
-      isApproveModal: false,
+      isApproveModal: false
     }
   },
   methods: {
@@ -93,8 +93,12 @@ export default {
     closeModal() {
       this.isApproveModal = false
     },
-    payInvoice() {
-      this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/pay`)
+    async payInvoice() {
+      await this.$http.post(`/invoicing/invoice/${ this.$route.params.id }/pay`)
+      this.refreshInvoice()
+    },
+    refreshInvoice() {
+      this.$emit('refreshInvoice')
     },
     downloadInvoiceFile(path) {
       let link = document.createElement('a')
@@ -123,11 +127,12 @@ export default {
     closeEmailSender() {
       this.isEmailSender = false
     },
-    sendInvoice() {
+    async sendInvoice() {
       try {
-        this.$http.post('/invoicing/send-invoice', { _invoiceId: this.invoice._id, clientContactsEmails: this.selectedMails })
+        await this.$http.post('/invoicing/send-invoice', { _invoiceId: this.invoice._id, clientContactsEmails: this.selectedMails })
         this.alertToggle({ message: "Invoice sent", isShow: true, type: "success" })
         this.closeEmailSender()
+        this.refreshInvoice()
       } catch (err) {
         console.log(err)
       }
@@ -179,12 +184,14 @@ export default {
     margin-right: 12px;
   }
 }
+
 .modal {
   position: absolute;
   width: 600px;
   left: 600px;
   top: 320px;
 }
+
 .modal-sender, .modal-delete {
   position: absolute;
   width: 600px;
