@@ -24,13 +24,16 @@
         .options__item(@click="clearSummaryByOption('filters')") Clear Filters
         .options__item(@click="clearSummaryByOption('sorting')") Clear Sorting
         .options__item(@click="clearSummaryByOption(null)") Clear Filters / Sorting
-        .options__item Save As Preset
-
-      //div {{summary}}
+        .options__item(@click="togglePresetModal") Save As Preset
 
     .layoutWrapper__presets
-      //span tabs
-      //h1 summary
+      .presets
+        .presets__items Default View
+        .presets__items(
+          v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
+          v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
+          @click="applyPreset(item.id)"
+        ) {{ item.id }}
 
     .layoutWrapper__table
       slot(
@@ -111,15 +114,36 @@
           .setting__body(v-if="selectedTab === 'presets'")
             span(v-if="!layoutSettings.presets.length") Setting not available...
             draggable(handle=".handle" v-model="layoutSettings.presets")
-              .setting__draggable(v-for="item in layoutSettings.presets")
+              .setting__draggable(v-for="(item, index) in layoutSettings.presets")
                 .setting__draggable-titleAndOption
-                  span {{ item.id }}
-                .setting__draggable-icon.handle
-                  i.fas.fa-arrows-alt-v
+                  CheckBox(
+                    :isChecked="!!item.isCheck"
+                    @check="checker('presets', item.id, true)"
+                    @uncheck="checker('presets', item.id, false)"
+                  )
+                  span(:class="{'opacity04': !item.isCheck}") {{ item.id }}
+
+                .setting__draggable-icons
+                  IconButton(@clicked="editPreset(index)")
+                    i(class="fa-solid fa-pencil")
+                  IconButton(@clicked="removePreset(index)")
+                    i(class="fa-solid fa-ban")
+                  .setting__draggable-icon.handle
+                    i.fas.fa-arrows-alt-v
 
           .setting__button
-            Button(value="Approve" @clicked="saveChanges")
+            Button(value="Approve" @clicked="saveSettingChanges")
 
+    transition(name='top')
+      .layoutWrapper__modal(v-if="isPresetModal")
+        .layoutWrapper__modal-body
+          Close.close__modal(@clicked="togglePresetModal")
+          .layoutWrapper__modal-preset
+            .layoutWrapper__modal-preset-name Preset Name:
+            .layoutWrapper__modal-preset-input
+              input(placeholder="Value" v-model="presetId")
+        .layoutWrapper__modal-buttons
+          Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
 </template>
 
 <script>
@@ -154,8 +178,12 @@ export default {
       tableMaxHeight: 0,
       isFilter: false,
       isSettings: false,
+      isPresetModal: false,
+      presetId: '',
+      presetIdIndex: null,
+      // currentPreset:
+
       tabs: [],
-      // summary: [],
       selectedTab: '',
       layoutSettings: {
         filters: [],
@@ -163,7 +191,6 @@ export default {
         sorting: [],
         presets: []
       },
-
       layoutsPossibleSettings: {
         project: {
           filters: [
@@ -524,9 +551,11 @@ export default {
     },
     toggleFilter(callback) {
       this.isFilter = !this.isFilter
+      this.isPresetModal = false
       if (callback) return callback()
     },
     toggleSettings() {
+      if (this.isSettings) this.updatedSettingByUserData()
       this.isSettings = !this.isSettings
     },
     clearSummaryItem(id) {
@@ -562,6 +591,25 @@ export default {
       for (const key of queryArr.filter(cleaner)) if (query[key]) newQuery[key] = query[key]
       await executor(newQuery)
     },
+    togglePresetModal() {
+      if (this.isPresetModal) {
+        this.presetId = ''
+        this.isEditPresetId = null
+      }
+      this.isPresetModal = !this.isPresetModal
+      this.isFilter = false
+    },
+    removePreset(index) {
+      const copy = [ ...this.layoutSettings.presets ]
+      copy.splice(index, 1)
+      this.layoutSettings.presets = copy
+    },
+    editPreset(index) {
+      const { id } = this.layoutSettings.presets.at(index)
+      this.presetId = id
+      this.presetIdIndex = index
+      this.togglePresetModal()
+    },
     setTab(selectedTab, option) {
       const _idx = this.tabs.findIndex(i => i === selectedTab)
       const lastIndex = this.tabs.length - 1
@@ -582,16 +630,36 @@ export default {
       const checked = this.layoutSettings[prop].find(i => i.id === id)
       checked.isCheck = bool
     },
-    async saveChanges() {
-      const value = {}
-      for (const key in this.layoutSettings) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+    async savePreset() {
+      const updater = async () => {
+        await this.saveSettingChanges()
+        this.togglePresetModal()
+      }
+      if (this.presetIdIndex) {
+        this.layoutSettings.presets[this.presetIdIndex].id = this.presetId
+        await updater()
+        return
+      }
+      const { fullPath } = this.$route
+      const [ , query ] = fullPath.split('?')
+      const { presets, ...rest } = this.dataGenerator()
+      this.layoutSettings.presets.push({
+        isCheck: true,
+        preset: `?${ query }`,
+        id: this.presetId,
+        snapshot: rest
+      })
+      await updater()
+    },
+    async saveSettingChanges() {
       try {
         await this.$http.post('/api-settings/update-user-layouts-setting', {
           userId: this.user._id,
           prop: this.moduleType,
-          value
+          value: this.dataGenerator()
         })
         await this.setUser()
+        this.updatedSettingByUserData()
         this.alertToggle({ message: 'Setting saved!', isShow: true, type: "success" })
       } catch (e) {
         this.alertToggle({ message: e.data, isShow: true, type: "error" })
@@ -599,7 +667,30 @@ export default {
         this.isSettings = false
       }
     },
-    dataSaver(userIds, prop) {
+    async applyPreset(id) {
+      const { presets } = this.layoutSettings
+      const { preset, snapshot: { fields, filters, sorting } } = presets.find(i => i.id === id)
+      await this.$router.replace({ path: this.$route.path + preset })
+      this.setLayoutSettingsDefault()
+      this.dataParser(fields, 'fields')
+      this.dataParser(filters, 'filters')
+      this.dataParser(sorting, 'sorting')
+      this.layoutSettings = {
+        ...this.layoutSettings,
+        presets
+      }
+      this.makeDBRequest()
+    },
+    dataGenerator() {
+      const value = {}
+      for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+      value['presets'] = this.layoutSettings['presets']
+      return value
+    },
+    setLayoutSettingsDefault() {
+      this.layoutSettings = { filters: [], fields: [], sorting: [], presets: [] }
+    },
+    dataParser(userIds, prop) {
       const list = this.layoutsPossibleSettings[this.moduleType][prop]
       if (!userIds.length) {
         this.layoutSettings[prop] = [ ...list ]
@@ -614,10 +705,12 @@ export default {
       )
     },
     updatedSettingByUserData() {
+      this.tabs = []
+      this.setLayoutSettingsDefault()
       const { layoutsSettings: { [this.moduleType]: { fields = [], filters = [], sorting = [], presets = [] } } } = this.user
-      this.dataSaver(fields, 'fields')
-      this.dataSaver(filters, 'filters')
-      this.dataSaver(sorting, 'sorting')
+      this.dataParser(fields, 'fields')
+      this.dataParser(filters, 'filters')
+      this.dataParser(sorting, 'sorting')
       this.layoutSettings.presets = presets
 
       for (let prop of [ 'fields', 'filters', 'sorting', 'presets' ]) if (this.layoutSettings[prop].length) this.tabs.push(prop)
@@ -649,6 +742,10 @@ export default {
         }
       }
       return summary
+    },
+    presetIdChecker() {
+      const { presets } = this.layoutSettings
+      return presets.filter((i, _idx) => this.presetIdIndex !== null ? _idx !== this.presetIdIndex : i).some(i => i.id === this.presetId)
     }
   },
   created() {
@@ -667,13 +764,8 @@ export default {
   margin: 0 50px 50px 50px;
   width: calc(100vw - 100px - 256px);
   height: calc(100vh - 50px - 47px);
-  //background: lightblue;
   position: relative;
   overflow: hidden;
-
-  &__summary {
-
-  }
 
   &__icons {
     display: flex;
@@ -700,7 +792,8 @@ export default {
     box-sizing: border-box;
   }
 
-  &__filter {
+  &__filter,
+  &__modal {
     position: absolute;
     z-index: 20;
     top: 0;
@@ -734,6 +827,32 @@ export default {
       display: flex;
       justify-content: center;
       gap: 20px;
+    }
+
+    &-preset {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      &-input {
+        input {
+          font-size: 14px;
+          color: $text;
+          border: 1px solid $border;
+          border-radius: 2px;
+          box-sizing: border-box;
+          padding: 0 7px;
+          outline: none;
+          height: 32px;
+          transition: .1s ease-out;
+          width: 220px;
+          font-family: 'Myriad400';
+
+          &:focus {
+            border: 1px solid $border-focus;
+          }
+        }
+      }
     }
   }
 }
@@ -783,8 +902,8 @@ export default {
     }
 
     &-name {
-      font-family: 'Myriad600';
       cursor: default;
+      margin-top: 2px;
     }
   }
 }
@@ -818,6 +937,11 @@ export default {
     justify-content: space-between;
     align-items: center;
 
+    &-icons {
+      display: flex;
+      gap: 8px;
+    }
+
     &-icon {
       font-size: 14px;
       color: $dark-border;
@@ -835,6 +959,30 @@ export default {
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+  }
+}
+
+.presets {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+
+  &__items {
+    position: relative;
+    height: 30px;
+    box-sizing: border-box;
+    border: 1px solid $border;
+    border-radius: 2px;
+    transition: .1s ease-out;
+    line-height: 30px;
+    background: white;
+    padding: 0 12px;
+    cursor: pointer;
+
+    &:hover {
+      border: 1px solid $border-focus;
     }
   }
 }

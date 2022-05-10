@@ -43,17 +43,6 @@ const {
 } = require('../clients')
 const { editCompanyBase } = require("../settings/companies")
 
-router.post('/update-user-layouts-setting', async (req, res) => {
-	try {
-		const { userId, prop, value } = req.body
-		await User.updateOne({ _id: userId }, { $set: { layoutsSettings: { [prop]: value } } })
-		const updatedUser = await User.findOne({ _id: userId }).populate('groups')
-		res.send(updatedUser)
-	} catch (err) {
-		console.log(err)
-		res.status(500).send(err.message || err || 'Error on saving settings!')
-	}
-})
 
 router.post('/languages', upload.fields([ { name: "flag" } ]), async (req, res) => {
 	const flag = req.files["flag"]
