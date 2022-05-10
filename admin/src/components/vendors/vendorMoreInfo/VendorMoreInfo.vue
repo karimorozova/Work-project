@@ -120,6 +120,7 @@ export default {
       } else {
         cat.push(this.catExperienceList.find((item) => item === option))
       }
+      console.log(cat)
       this.updateVendorProp(cat, 'catExperience')
     }
   }

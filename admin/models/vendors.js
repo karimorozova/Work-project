@@ -61,6 +61,11 @@ const VendorSchema = new mongoose.Schema({
 		default: '',
 		trim: true
 	},
+  website: {
+    type: String,
+    default: '',
+    trim: true
+  },
 	notes: {
 		type: String
 	},

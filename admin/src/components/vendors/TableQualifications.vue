@@ -106,10 +106,10 @@
 				type: Array,
 				default: () => []
 			},
-			assessmentData: {
-				type: Array,
-				default: () => []
-			},
+			// assessmentData: {
+			// 	type: Array,
+			// 	default: () => []
+			// },
 			currentVendor: {
 				type: Object
 			},

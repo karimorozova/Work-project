@@ -144,7 +144,7 @@
         .block__data(v-if="isQualifications")
           TableQualifications(
             :qualificationData="currentVendor.qualifications",
-            :assessmentData="assessmentData",
+
             :currentVendor="currentVendor",
             @updateRates="updateRates"
           )
@@ -209,8 +209,8 @@
             i.fas.fa-chevron-right
         .block__data(v-if="isNotes")
           .vendor-info__notes-block
-            .vendor-info__notes
-              VendorCandidate(:candidateData="currentVendor")
+            //.vendor-info__notes
+            //  VendorCandidate(:candidateData="currentVendor")
             .vendor-info__editor
               ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
 
@@ -223,11 +223,8 @@
             i.fas.fa-chevron-right
         .block__data(v-if="isAvailable")
           indexAvailability
-          //.vendor-info__notes-block
-          //  .vendor-info__notes
-          //    VendorCandidate(:candidateData="currentVendor")
-          //  .vendor-info__editor
-          //    ckeditor(v-model="getVendorUpdatedData.notes", :config="editorConfig")
+
+
 
       //.title Vendor to memoq
         //div
@@ -695,6 +692,7 @@ export default {
           'telegram',
           'socialMedia',
           'proz',
+          'website',
           'smartcat',
           'secondaryEmail',
           'whatsapp',
