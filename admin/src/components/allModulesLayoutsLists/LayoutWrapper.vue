@@ -28,13 +28,17 @@
 
     .layoutWrapper__presets
       .presets
-        .presets__items(:class="{'presets__items-selected': selectedPreset === 'Default View' }") Default View
+        .presets__items(
+          :class="{'presets__items-selected': selectedPreset === 'Default View' }"
+          @click="applyPreset({})"
+        ) Default View
         .presets__items(
           :class="{'presets__items-selected': selectedPreset ===  presetNameReplacer(item) }"
           v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
           v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
+          @click="applyPreset(item)"
         ) {{ presetNameReplacer(item) }}
-          //@click="applyPreset(item.id)"
+
         IconButton(popupText="Add new from copy" @clicked="toggleModalSelect")
           i(class="fa-solid fa-plus")
 
@@ -129,8 +133,8 @@
                 .setting__draggable-icons
                   IconButton(@clicked="renamePreset(index)")
                     i(class="fa-solid fa-pencil")
-                  //IconButton(@clicked="removePreset(index)")
-                  //  i(class="fa-solid fa-ban")
+                  IconButton(@clicked="removePreset(index)")
+                    i(class="fa-solid fa-ban")
                   .setting__draggable-icon.handle
                     i.fas.fa-arrows-alt-v
 
@@ -164,7 +168,7 @@
             .layoutWrapper__modal-preset-input
               input(placeholder="Value" v-model="presetModalId")
         .layoutWrapper__modal-buttons
-          Button(value="Submit" :isDisabled="!isPresetModalId || presetIdChecker" @clicked="() => this.presetIdRenameIndex !== null ? saveNewPresetName : saveNewPreset(toggleModalId)")
+          Button(value="Submit" :isDisabled="!isPresetModalId || presetIdChecker" @clicked="() => this.presetIdRenameIndex !== null ? saveNewPresetName() : saveNewPreset(toggleModalId)")
 </template>
 
 <script>
@@ -265,13 +269,6 @@ export default {
       for (const key of queryArr.filter(cleaner)) if (query[key]) newQuery[key] = query[key]
       await executor(newQuery)
     },
-
-    // removePreset(index) {
-    //   const copy = [ ...this.layoutSettings.presets ]
-    //   copy.splice(index, 1)
-    //   this.layoutSettings.presets = copy
-    // },
-
     setTab(selectedTab, option) {
       const _idx = this.tabs.findIndex(i => i === selectedTab)
       const lastIndex = this.tabs.length - 1
@@ -292,35 +289,8 @@ export default {
       const checked = this.layoutSettings[prop].find(i => i.id === id)
       checked.isCheck = bool
     },
-    // async savePreset() {
-    //   const updater = async () => {
-    //     await this.saveSettingChanges()
-    //     this.togglePresetModal()
-    //   }
-    //   if (this.presetIdRenameIndex) {
-    //     this.layoutSettings.presets[this.presetIdRenameIndex].id = this.presetId
-    //     await updater()
-    //     return
-    //   }
-
-    //   await updater()
-    // },
-    // async applyPreset(id) {
-    //   const { presets } = this.layoutSettings
-    //   const { preset, snapshot: { fields, filters, sorting } } = presets.find(i => i.id === id)
-    //   await this.$router.replace({ path: this.$route.path + preset })
-    //   this.setLayoutSettingsDefault()
-    //   this.dataParser(fields, 'fields')
-    //   this.dataParser(filters, 'filters')
-    //   this.dataParser(sorting, 'sorting')
-    //   this.layoutSettings = {
-    //     ...this.layoutSettings,
-    //     presets
-    //   }
-    //   this.makeDBRequest()
-    // },
     async saveSettingChanges() {
-
+      // TODO MOR> SAVE CURR PRESET LIKE SETTING
       const dataGenerator = () => {
         const value = {}
         for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
@@ -356,7 +326,7 @@ export default {
         if (_idx !== -1) this.layoutSettings[prop].push({ ...list[_idx], isCheck: true })
       })
       this.layoutSettings[prop].push(
-          ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
+        ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
       )
     },
     updatedSettingByUserData() {
@@ -378,6 +348,11 @@ export default {
       })
     },
     //presets logic ----------------------------------------------------------------------------------------------------------------------
+    removePreset(index) {
+      const copy = [ ...this.layoutSettings.presets ]
+      copy.splice(index, 1)
+      this.layoutSettings.presets = copy
+    },
     renamePreset(index) {
       const { id } = this.layoutSettings.presets[index]
       this.presetModalId = id
@@ -402,8 +377,30 @@ export default {
     presetNameReplacer({ id }) {
       return id.replace(/_/g, ' ')
     },
+    async applyPreset({ id = 'Default View' }) {
+      const { name, params } = this.$route
+      const paramsUpdater = async (str) => await this.$router.replace({ name, params: { ...params, presetId: str.replace(/ /g, '_') } })
+
+      if (id === 'Default View') {
+        await paramsUpdater(id)
+        this.updatedSettingByUserData()
+        this.makeDBRequest()
+        return
+      }
+      const { presets } = this.layoutSettings
+      const { preset, snapshot: { fields, filters, sorting }, id: presetId } = presets.find(i => i.id === id)
+      await paramsUpdater(presetId)
+      if (!!preset) await this.$router.replace({ path: this.$route.path + preset })
+      {
+        this.setLayoutSettingsDefault()
+        this.dataParser(fields, 'fields')
+        this.dataParser(filters, 'filters')
+        this.dataParser(sorting, 'sorting')
+        this.layoutSettings = { ...this.layoutSettings, presets }
+        this.makeDBRequest()
+      }
+    },
     async saveNewPresetName() {
-      console.log('heres')
       this.layoutSettings.presets[this.presetIdRenameIndex].id = this.presetModalId
       await this.saveSettingChanges()
       this.toggleModalId()
