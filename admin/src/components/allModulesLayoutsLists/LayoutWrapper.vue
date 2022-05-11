@@ -24,15 +24,16 @@
         .options__item(@click="clearSummaryByOption('filters')") Clear Filters
         .options__item(@click="clearSummaryByOption('sorting')") Clear Sorting
         .options__item(@click="clearSummaryByOption(null)") Clear Filters / Sorting
-        .options__item(@click="togglePresetModal") Save As Preset
+        .options__item(@click="toggleModalId") Save As New Preset
 
     .layoutWrapper__presets
       .presets
-        .presets__items Default View
+        .presets__items(:class="{'presets__items-selected': selectedPreset === 'Default View' }") Default View
         .presets__items(
+          :class="{'presets__items-selected': selectedPreset ===  presetNameReplacer(item) }"
           v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
           v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
-        ) {{ item.id }}
+        ) {{ presetNameReplacer(item) }}
           //@click="applyPreset(item.id)"
         IconButton(popupText="Add new from copy" @clicked="toggleModalSelect")
           i(class="fa-solid fa-plus")
@@ -126,10 +127,10 @@
                   span(:class="{'opacity04': !item.isCheck}") {{ item.id }}
 
                 .setting__draggable-icons
-                  IconButton(@clicked="editPreset(index)")
+                  IconButton(@clicked="renamePreset(index)")
                     i(class="fa-solid fa-pencil")
-                  IconButton(@clicked="removePreset(index)")
-                    i(class="fa-solid fa-ban")
+                  //IconButton(@clicked="removePreset(index)")
+                  //  i(class="fa-solid fa-ban")
                   .setting__draggable-icon.handle
                     i.fas.fa-arrows-alt-v
 
@@ -153,18 +154,17 @@
                 @chooseOption="({option}) => this.presetModalSelected = option"
               )
         .layoutWrapper__modal-buttons
-          Button(value="Submit" :isDisabled="!presetModalSelected || !presetModalId" @clicked="saveNewPresetFromCopy" )
-          //Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
+          Button(value="Submit" :isDisabled="!presetModalSelected || !presetModalId" @clicked="saveNewPreset(toggleModalSelect)" )
 
-      //.layoutWrapper__modal(v-if="isPresetModal")
-      //  .layoutWrapper__modal-body
-      //    Close.close__modal(@clicked="togglePresetModal")
-      //    .layoutWrapper__modal-preset
-      //      .layoutWrapper__modal-preset-name Preset Name:
-      //      .layoutWrapper__modal-preset-input
-      //        input(placeholder="Value" v-model="presetId")
-      //  .layoutWrapper__modal-buttons
-      //    Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
+      .layoutWrapper__modal(v-if="isPresetModalId")
+        .layoutWrapper__modal-body
+          Close.close__modal(@clicked="toggleModalId")
+          .layoutWrapper__modal-preset
+            .layoutWrapper__modal-preset-name Preset Name:
+            .layoutWrapper__modal-preset-input
+              input(placeholder="Value" v-model="presetModalId")
+        .layoutWrapper__modal-buttons
+          Button(value="Submit" :isDisabled="!isPresetModalId || presetIdChecker" @clicked="() => this.presetIdRenameIndex !== null ? saveNewPresetName : saveNewPreset(toggleModalId)")
 </template>
 
 <script>
@@ -202,13 +202,10 @@ export default {
       isSettings: false,
 
       isPresetModalSelect: false,
+      isPresetModalId: false,
       presetModalSelected: '',
       presetModalId: '',
-
-      // isPresetModal: false,
-
-      // presetIdIndex: null,
-      // currentPreset:
+      presetIdRenameIndex: null,
 
       tabs: [],
       selectedTab: '',
@@ -227,12 +224,13 @@ export default {
     },
     toggleFilter(callback) {
       this.isFilter = !this.isFilter
-      this.isPresetModal = false
+      //todo close modals
       if (callback) return callback()
     },
     toggleSettings() {
       if (this.isSettings) this.updatedSettingByUserData()
       this.isSettings = !this.isSettings
+      //todo close modals
     },
     clearSummaryItem(id) {
       this.removeQuery(id)
@@ -267,25 +265,13 @@ export default {
       for (const key of queryArr.filter(cleaner)) if (query[key]) newQuery[key] = query[key]
       await executor(newQuery)
     },
-    // togglePresetModal() {
-    //   if (this.isPresetModal) {
-    //     this.presetId = ''
-    //     this.isEditPresetId = null
-    //   }
-    //   this.isPresetModal = !this.isPresetModal
-    //   this.isFilter = false
-    // },
+
     // removePreset(index) {
     //   const copy = [ ...this.layoutSettings.presets ]
     //   copy.splice(index, 1)
     //   this.layoutSettings.presets = copy
     // },
-    // editPreset(index) {
-    //   const { id } = this.layoutSettings.presets.at(index)
-    //   this.presetId = id
-    //   this.presetIdIndex = index
-    //   this.togglePresetModal()
-    // },
+
     setTab(selectedTab, option) {
       const _idx = this.tabs.findIndex(i => i === selectedTab)
       const lastIndex = this.tabs.length - 1
@@ -311,8 +297,8 @@ export default {
     //     await this.saveSettingChanges()
     //     this.togglePresetModal()
     //   }
-    //   if (this.presetIdIndex) {
-    //     this.layoutSettings.presets[this.presetIdIndex].id = this.presetId
+    //   if (this.presetIdRenameIndex) {
+    //     this.layoutSettings.presets[this.presetIdRenameIndex].id = this.presetId
     //     await updater()
     //     return
     //   }
@@ -392,29 +378,59 @@ export default {
       })
     },
     //presets logic ----------------------------------------------------------------------------------------------------------------------
+    renamePreset(index) {
+      const { id } = this.layoutSettings.presets[index]
+      this.presetModalId = id
+      this.presetIdRenameIndex = index
+      this.isPresetModalId = true
+    },
+    toggleModalId() {
+      if (this.isPresetModalId) this.setModalDefault()
+      this.isPresetModalSelect = false
+      this.isPresetModalId = !this.isPresetModalId
+    },
     toggleModalSelect() {
-      if (this.isPresetModalSelect) {
-        this.presetModalSelected = ''
-        this.presetModalId = ''
-      }
+      if (this.isPresetModalSelect) this.setModalDefault()
+      this.isPresetModalId = false
       this.isPresetModalSelect = !this.isPresetModalSelect
     },
-    async saveNewPresetFromCopy() {
+    setModalDefault() {
+      this.presetModalSelected = ''
+      this.presetModalId = ''
+      this.presetIdRenameIndex = null
+    },
+    presetNameReplacer({ id }) {
+      return id.replace(/_/g, ' ')
+    },
+    async saveNewPresetName() {
+      console.log('heres')
+      this.layoutSettings.presets[this.presetIdRenameIndex].id = this.presetModalId
+      await this.saveSettingChanges()
+      this.toggleModalId()
+    },
+    async saveNewPreset(toggleCallback) {
+      const { presets } = this.layoutSettings
+      const { fullPath } = this.$route
+      const [ , query ] = fullPath.split('?')
+
       const snapshotBuilder = () => {
-        const _presetIdx = this.layoutSettings.presets.findIndex(i => i.id === this.presetModalSelected)
-        const value = {}
-        const list = _presetIdx === -1 ? this.layoutSettings : this.layoutSettings.at(_presetIdx)
-        for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = list[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+        const _presetIdx = presets.findIndex(i => i.id === this.presetModalSelected)
+        if (_presetIdx !== -1) return presets[_presetIdx].snapshot
+        let value = {}
+        for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
         return value
+      }
+      const names = () => {
+        return presets.some(i => i.id === this.presetModalId) || this.presetModalId === 'Default View' ? this.presetModalId + ' copy' : this.presetModalId
       }
       this.layoutSettings.presets.push({
         isCheck: true,
         preset: !!query ? `?${ query }` : '',
-        id: this.presetModalId,
+        id: names(),
         snapshot: snapshotBuilder()
       })
       await this.saveSettingChanges()
-      this.toggleModalSelect()
+      if (toggleCallback) return toggleCallback()
     }
   },
   computed: {
@@ -436,11 +452,16 @@ export default {
         }
       }
       return summary
+    },
+    selectedPreset() {
+      return this.$route.params.presetId.replace(/_/g, ' ')
+    },
+    presetIdChecker() {
+      const { presets } = this.layoutSettings
+      const [ index, id ] = [ this.presetIdRenameIndex, this.presetModalId ]
+      if (index !== null) return presets.filter((i, _idx) => index !== null ? _idx !== index : i).some(i => i.id === id)
+      return presets.some(i => i.id === id)
     }
-    // presetIdChecker() {
-    //   const { presets } = this.layoutSettings
-    //   return presets.filter((i, _idx) => this.presetIdIndex !== null ? _idx !== this.presetIdIndex : i).some(i => i.id === this.presetId)
-    // }
   },
   created() {
     this.updatedSettingByUserData()
@@ -679,8 +700,14 @@ export default {
     padding: 0 12px;
     cursor: pointer;
 
+    &-selected {
+      border: 1px solid $green;
+      color: $green;
+    }
+
     &:hover {
       border: 1px solid $border-focus;
+      color: $text;
     }
   }
 }
