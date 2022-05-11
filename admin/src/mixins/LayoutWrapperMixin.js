@@ -428,6 +428,11 @@ export default {
 							isCheck: false
 						}
 					]
+				},
+				vendor: {
+					filters: [],
+					fields: [],
+					sorting: []
 				}
 			}
 		}

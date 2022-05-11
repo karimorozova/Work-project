@@ -4,7 +4,7 @@ const { User } = require("../models")
 
 const {
 	getLayoutProjects,
-	getReceivablesSteps,
+	getReceivablesSteps, getLayoutVendors,
 } = require("../layoutsGetters")
 
 
@@ -24,6 +24,16 @@ router.post('/project', async (req, res) => {
 	try {
 		const { countToSkip, countToGet, sort, query } = req.body
 		const data = await getLayoutProjects({ countToSkip, countToGet, sort, query })
+		res.send(data)
+	} catch (e) {
+		res.status(500).send(e.message || e || 'Error to get a projects!')
+	}
+})
+
+router.post('/vendor', async (req, res) => {
+	try {
+		const { countToSkip, countToGet, sort, query } = req.body
+		const data = await getLayoutVendors({ countToSkip, countToGet, sort, query })
 		res.send(data)
 	} catch (e) {
 		res.status(500).send(e.message || e || 'Error to get a projects!')
