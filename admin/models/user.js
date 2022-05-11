@@ -104,6 +104,46 @@ const UserSchema = new mongoose.Schema({
 				type: Array,
 				default: []
 			}
+		},
+		"receivables-reports-steps": {
+			project: {
+				filters: {
+					type: Array,
+					default: []
+				},
+				fields: {
+					type: Array,
+					default: []
+				},
+				sorting: {
+					type: Array,
+					default: []
+				},
+				presets: {
+					type: Array,
+					default: []
+				}
+			}
+		},
+		vendor: {
+			project: {
+				filters: {
+					type: Array,
+					default: []
+				},
+				fields: {
+					type: Array,
+					default: []
+				},
+				sorting: {
+					type: Array,
+					default: []
+				},
+				presets: {
+					type: Array,
+					default: []
+				}
+			}
 		}
 	}
 
