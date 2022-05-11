@@ -192,6 +192,80 @@ export default {
         presets: []
       },
       layoutsPossibleSettings: {
+        "receivables-reports-steps": {
+          fields: [
+            {
+              id: "sf_projectName",
+              name: "Project Name",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_billingName",
+              name: "Client / Billing Name",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_paymentType",
+              name: "Payment Type",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_stepId",
+              name: "Step ID",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_step",
+              name: "Step",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_languagePair",
+              name: "Language Pair",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_billingDate",
+              name: "Billing Date",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_status",
+              name: "Status",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+            {
+              id: "sf_fee",
+              name: "Fee",
+              isCheck: false,
+              style: { "min-width": "240px" }
+            },
+          ],
+          filters: [
+            {
+              id: "f_projectName",
+              name: "Project Name",
+              isCheck: false
+            },
+
+          ],
+          sorting: [
+            {
+              id: "sf_projectName",
+              name: "Project Name",
+              isCheck: false
+            },
+          ]
+
+        },
         project: {
           filters: [
             {

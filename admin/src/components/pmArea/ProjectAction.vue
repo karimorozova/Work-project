@@ -536,15 +536,6 @@ export default {
       return result
     }
   },
-  components: {
-    Toggler,
-    PreviewQuote,
-    ApproveModal,
-    SelectSingle,
-    SelectMulti,
-    Preview,
-    Button
-  },
   async created() {
     const reasons = await this.$http.get("/api/reasons")
     for (let key in reasons.data) this.reasons.push(reasons.data[key].reason)

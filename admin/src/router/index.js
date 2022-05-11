@@ -46,6 +46,7 @@ import Company from "../components/Table/company/Layout"
 
 //NEW LAYOUT LISTS
 import ProjectsListLayout from '../components/allModulesLayoutsLists/Projects/index'
+import ReceivablesReports from '../components/allModulesLayoutsLists/ReceivablesReports/index'
 
 // LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
@@ -409,8 +410,8 @@ const router = new Router({
 						{
 							path: 'draft-projects/:status',
 							name: 'draft-projects',
-							// component: ProjectsListLayout,
-							component: Projects,
+							component: ProjectsListLayout,
+							// component: Projects,
 							props: true
 						},
 						{
@@ -611,7 +612,14 @@ const router = new Router({
 						{
 							path: 'receivables-reports/create-reports',
 							name: 'receivables-reports',
+							// component: AddReports
+							component: ReceivablesReports
+						},
+						{
+							path: 'receivables-reports/create-reports-o',
+							name: 'receivables-reports',
 							component: AddReports
+							// component: ReceivablesReports
 						},
 						{
 							path: 'receivables-reports/invoice',

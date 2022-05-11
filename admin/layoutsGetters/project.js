@@ -106,6 +106,7 @@ module.exports = getLayoutProjects = async ({ query = {}, sort = {}, options = {
 }
 
 const handlerSort = (rawSort) => {
+	console.log({ rawSort })
 	const sort = {}
 	if (!Object.keys(rawSort).length) return { _id: -1 }
 
