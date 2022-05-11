@@ -342,7 +342,7 @@ export default {
         return value
       }
       try {
-        await this.$http.post('/api-settings/update-user-layouts-setting', {
+        await this.$http.post('/layouts-api/update-user-layouts-setting', {
           userId: this.user._id,
           prop: this.moduleType,
           value: dataGenerator()
