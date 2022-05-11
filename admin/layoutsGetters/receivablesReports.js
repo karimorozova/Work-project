@@ -233,7 +233,7 @@ const handlerSort = (rawSort, allowedFields = ['projectId', 'projectName']) => {
 
 	Object.keys(rawSort).forEach(el => {
 		console.log(el.split('_')[1])
-		if (allowedFields.includes(el.split('_')[1])) sort[el.split('_')[1]] = +rawSort[el];
+		if (allowedFields.includes(el.split('_').at(-1))) sort[el.split('_')[1]] = +rawSort[el];
 	});
 
 	// if (rawSort['sf_projectID']) {

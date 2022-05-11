@@ -1,4 +1,4 @@
- <template lang="pug">
+<template lang="pug">
   .layout
     LayoutWrapper(
       :hasFilterButton="true"
@@ -130,15 +130,12 @@ import ListTable from "../ListTable"
 import LayoutWrapperMixin from "../../../mixins/LayoutWrapperMixin"
 import CustomFilters from "./CustomFilters"
 
-const MODULE_TYPE = 'project'
 export default {
   mixins: [ LayoutWrapperMixin ],
   name: "index",
   data() {
     return {
-      moduleType: MODULE_TYPE,
-      moduleData: [],
-      isDataRemain: true
+      moduleType: 'project'
     }
   },
   methods: {
@@ -166,64 +163,8 @@ export default {
             acc = acc + `${ curr.sourceLanguage } <span style="font-size: 12px;color: #999;margin: 0 2px;"><i class="fas fa-angle-double-right"></i></span> ${ curr.targetLanguages } <br>`
             return acc
           }, '')
-    },
+    }
     // Wrapper Logic >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-    async getModuleData({ sort = {}, query = {} }) {
-      console.log('getModuleData')
-      try {
-        const res = await this.$http.post(`/layouts-api/${ this.moduleType }`, {
-          countToGet: 50,
-          countToSkip: 0,
-          sort,
-          query
-        })
-        this.moduleData = res.data
-        this.isDataRemain = res.data.length === 50
-      } catch (e) {
-        this.alertToggle({ message: e.data, isShow: true, type: "error" })
-      }
-    },
-    async lazyLoading({ sort = {}, query = {} }) {
-      console.log('lazyLoading')
-      if (!this.isDataRemain) return
-      try {
-        const res = await this.$http.post(`/layouts-api/${ this.moduleType }`, {
-          countToGet: 50,
-          countToSkip: this.moduleData.length,
-          sort,
-          query
-        })
-        this.moduleData.push(...res.data)
-        this.isDataRemain = res.data.length === 50
-      } catch (e) {
-        this.alertToggle({ message: e.data, isShow: true, type: "error" })
-      }
-    },
-    collectQueryData(callback) {
-      const sort = {}
-      const query = {}
-
-      for (const paramsKey in this.$route.params) {
-        if (this.$route.params[paramsKey]) {
-          query[paramsKey] = this.$route.params[paramsKey]
-        }
-      }
-      for (const queryKey in this.$route.query) {
-        if (this.$route.query[queryKey]) {
-          const [ prefix ] = queryKey.split('_')
-          prefix === 'sf'
-              ? sort[queryKey] = this.$route.query[queryKey]
-              : query[queryKey] = this.$route.query[queryKey]
-        }
-      }
-      if (callback) return callback({ sort, query })
-    },
-    ...mapActions([ 'alertToggle' ])
-  },
-
-  created() {
-    this.collectQueryData(this.getModuleData)
   },
   components: {
     CustomFilters,
