@@ -396,9 +396,9 @@ const router = new Router({
 					component: clearRouterView,
 					children: [
 						{
-							path: 'all-projects/:status',
+							path: 'all-projects/:status/:presetId',
 							name: 'all-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -408,10 +408,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'draft-projects/:status',
+							path: 'draft-projects/:status/:presetId',
 							name: 'draft-projects',
 							component: ProjectsListLayout,
-							// component: Projects,
 							props: true
 						},
 						{
@@ -421,9 +420,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'cost-quote-projects/:status',
+							path: 'cost-quote-projects/:status/:presetId',
 							name: 'cost-quote-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -433,9 +432,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'quote-sent-projects/:status',
+							path: 'quote-sent-projects/:status/:presetId',
 							name: 'quote-sent-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -445,9 +444,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'in-progress-projects/:status',
+							path: 'in-progress-projects/:status/:presetId',
 							name: 'in-progress-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -457,9 +456,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'approved-projects/:status',
+							path: 'approved-projects/:status/:presetId',
 							name: 'approved-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -469,9 +468,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'rejected-projects/:status',
+							path: 'rejected-projects/:status/:presetId',
 							name: 'rejected-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -481,9 +480,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'closed-projects/:status',
+							path: 'closed-projects/:status/:presetId',
 							name: 'closed-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -493,9 +492,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'cancelled-projects/:status',
+							path: 'cancelled-projects/:status/:presetId',
 							name: 'cancelled-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
@@ -505,9 +504,9 @@ const router = new Router({
 							props: true
 						},
 						{
-							path: 'cancelled-halfway-projects/:status',
+							path: 'cancelled-halfway-projects/:status/:presetId',
 							name: 'cancelled-halfway-projects',
-							component: Projects,
+							component: ProjectsListLayout,
 							props: true
 						},
 						{
