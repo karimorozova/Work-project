@@ -511,7 +511,4 @@ export default {
 			if (callback) return callback({ sort, query })
 		}
 	},
-	created() {
-		this.collectQueryData(this.getModuleData)
-	}
 }

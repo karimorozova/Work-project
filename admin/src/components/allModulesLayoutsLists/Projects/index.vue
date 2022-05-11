@@ -166,6 +166,9 @@ export default {
     }
     // Wrapper Logic >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   },
+  created() {
+    this.collectQueryData(this.getModuleData)
+  },
   components: {
     CustomFilters,
     ListTable, LayoutWrapper
