@@ -29,11 +29,13 @@
     .layoutWrapper__presets
       .presets
         .presets__items Default View
-        .presets__items(
-          v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
-          v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
-          @click="applyPreset(item.id)"
-        ) {{ item.id }}
+        //.presets__items(
+        //  v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
+        //  v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
+        //  @click="applyPreset(item.id)"
+        //) {{ item.id }}
+        IconButton(popupText="Add new from copy")
+          i(class="fa-solid fa-plus")
 
     .layoutWrapper__table
       slot(
@@ -137,13 +139,24 @@
     transition(name='top')
       .layoutWrapper__modal(v-if="isPresetModal")
         .layoutWrapper__modal-body
-          Close.close__modal(@clicked="togglePresetModal")
+          //Close.close__modal(@clicked="togglePresetModal")
           .layoutWrapper__modal-preset
-            .layoutWrapper__modal-preset-name Preset Name:
+            .layoutWrapper__modal-preset-name Copy From:
             .layoutWrapper__modal-preset-input
-              input(placeholder="Value" v-model="presetId")
+              //input(placeholder="Value" v-model="presetId")
         .layoutWrapper__modal-buttons
-          Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
+          Button
+          //Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
+
+      //.layoutWrapper__modal(v-if="isPresetModal")
+      //  .layoutWrapper__modal-body
+      //    Close.close__modal(@clicked="togglePresetModal")
+      //    .layoutWrapper__modal-preset
+      //      .layoutWrapper__modal-preset-name Preset Name:
+      //      .layoutWrapper__modal-preset-input
+      //        input(placeholder="Value" v-model="presetId")
+      //  .layoutWrapper__modal-buttons
+      //    Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
 </template>
 
 <script>

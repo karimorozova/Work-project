@@ -169,7 +169,7 @@ export default {
             {
               type: 'link',
               name: 'All',
-              path: '/pangea-projects/all-projects/All/Default View'
+              path: '/pangea-projects/all-projects/All/Default_View'
             },
             {
               name: 'Quotes',
@@ -178,17 +178,17 @@ export default {
             {
               type: 'link',
               name: 'Draft',
-              path: '/pangea-projects/draft-projects/Draft/Default View'
+              path: '/pangea-projects/draft-projects/Draft/Default_View'
             },
             {
               type: 'link',
               name: 'Cost Quote',
-              path: '/pangea-projects/cost-quote-projects/Cost_Quote/Default View'
+              path: '/pangea-projects/cost-quote-projects/Cost_Quote/Default_View'
             },
             {
               type: 'link',
               name: 'Quote Sent',
-              path: '/pangea-projects/quote-sent-projects/Quote_sent/Default View'
+              path: '/pangea-projects/quote-sent-projects/Quote_sent/Default_View'
             },
             {
               name: 'In Progress',
@@ -197,17 +197,17 @@ export default {
             {
               type: 'link',
               name: 'In Progress',
-              path: '/pangea-projects/in-progress-projects/In_progress/Default View'
+              path: '/pangea-projects/in-progress-projects/In_progress/Default_View'
             },
             {
               type: 'link',
               name: 'Approved',
-              path: '/pangea-projects/approved-projects/Approved/Default View'
+              path: '/pangea-projects/approved-projects/Approved/Default_View'
             },
             {
               type: 'link',
               name: 'Rejected',
-              path: '/pangea-projects/rejected-projects/Rejected/Default View'
+              path: '/pangea-projects/rejected-projects/Rejected/Default_View'
             },
             {
               name: 'Closed',
@@ -216,17 +216,17 @@ export default {
             {
               type: 'link',
               name: 'Closed',
-              path: '/pangea-projects/closed-projects/Closed/Default View'
+              path: '/pangea-projects/closed-projects/Closed/Default_View'
             },
             {
               type: 'link',
               name: 'Cancelled',
-              path: '/pangea-projects/cancelled-projects/Cancelled/Default View'
+              path: '/pangea-projects/cancelled-projects/Cancelled/Default_View'
             },
             {
               type: 'link',
               name: 'Cancelled Halfway',
-              path: '/pangea-projects/cancelled-halfway-projects/Cancelled_Halfway/Default View'
+              path: '/pangea-projects/cancelled-halfway-projects/Cancelled_Halfway/Default_View'
             },
             {
               type: 'row'

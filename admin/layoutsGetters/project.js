@@ -1,6 +1,6 @@
 const { Projects } = require("../models")
 const { ObjectID: ObjectId } = require("mongodb")
-const { Languages, Services, ClientRequest } = require("../models")
+const { Languages, ClientRequest } = require("../models")
 
 const defaultOptions = {
 	hasSkip: true,
@@ -176,11 +176,9 @@ const handlerQuery = (rawQuery, models) => {
 	const reg = /[.*+?^${}()|[\]\\]/g
 	const { allLanguages, allRequests } = models
 
-	console.log('rawQuery', rawQuery)
-
-	// if (rawQuery['status'] && rawQuery['status'] !== 'All') {
-	// 	query["status"] = rawQuery['status']
-	// }
+	if (rawQuery['status'] && rawQuery['status'] !== 'All') {
+		query["status"] = rawQuery['status']
+	}
 	if (rawQuery['f_projectId']) {
 		const filter = rawQuery['f_projectId'].replace(reg, '\\$&')
 		query['projectId'] = { "$regex": new RegExp(filter, 'i') }
@@ -233,14 +231,11 @@ const handlerQuery = (rawQuery, models) => {
 	}
 	if (rawQuery['f_requestId']) {
 		const requests = allRequests.filter(({ projectId }) => projectId.includes(rawQuery['f_requestId']))
-		console.log(requests)
 		if (requests.length) query['requestId'] = { $in: requests.map(i => ObjectId(i._id)) }
 	}
 	if (rawQuery['f_stepsServices']) {
 		query["steps.step"] = { $in: rawQuery['f_stepsServices'].split(',').map(i => ObjectId(i)) }
 	}
-
-	console.log('FIN', query)
 
 	return query
 }

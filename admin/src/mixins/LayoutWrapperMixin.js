@@ -496,7 +496,7 @@ export default {
 			const query = {}
 
 			for (const paramsKey in this.$route.params) {
-				if (this.$route.params[paramsKey]) {
+				if (this.$route.params[paramsKey] && paramsKey === 'status') {
 					query[paramsKey] = this.$route.params[paramsKey]
 				}
 			}
@@ -510,5 +510,5 @@ export default {
 			}
 			if (callback) return callback({ sort, query })
 		}
-	},
+	}
 }

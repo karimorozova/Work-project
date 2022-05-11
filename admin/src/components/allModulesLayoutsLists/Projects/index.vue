@@ -166,8 +166,10 @@ export default {
     }
     // Wrapper Logic >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   },
-  created() {
-    this.collectQueryData(this.getModuleData)
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.collectQueryData(vm.getModuleData)
+    })
   },
   components: {
     CustomFilters,
