@@ -29,12 +29,12 @@
     .layoutWrapper__presets
       .presets
         .presets__items Default View
-        //.presets__items(
-        //  v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
-        //  v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
-        //  @click="applyPreset(item.id)"
-        //) {{ item.id }}
-        IconButton(popupText="Add new from copy")
+        .presets__items(
+          v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
+          v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
+        ) {{ item.id }}
+          //@click="applyPreset(item.id)"
+        IconButton(popupText="Add new from copy" @clicked="toggleModalSelect")
           i(class="fa-solid fa-plus")
 
     .layoutWrapper__table
@@ -137,15 +137,23 @@
             Button(value="Approve" @clicked="saveSettingChanges")
 
     transition(name='top')
-      .layoutWrapper__modal(v-if="isPresetModal")
+      .layoutWrapper__modal(v-if="isPresetModalSelect")
         .layoutWrapper__modal-body
-          //Close.close__modal(@clicked="togglePresetModal")
+          Close.close__modal(@clicked="toggleModalSelect")
           .layoutWrapper__modal-preset
+            .layoutWrapper__modal-preset-name Preset Name:
+            .layoutWrapper__modal-preset-input
+              input(placeholder="Value" v-model="presetModalId")
             .layoutWrapper__modal-preset-name Copy From:
             .layoutWrapper__modal-preset-input
-              //input(placeholder="Value" v-model="presetId")
+              SelectSingle(
+                placeholder="Option"
+                :selectedOption="presetModalSelected"
+                :options="['Default View', ...layoutSettings.presets.filter(i => i.isCheck).map(i => i.id)]"
+                @chooseOption="({option}) => this.presetModalSelected = option"
+              )
         .layoutWrapper__modal-buttons
-          Button
+          Button(value="Submit" :isDisabled="!presetModalSelected || !presetModalId" @clicked="saveNewPresetFromCopy" )
           //Button(value="Submit" :isDisabled="!presetId || presetIdChecker" @clicked="savePreset")
 
       //.layoutWrapper__modal(v-if="isPresetModal")
@@ -167,6 +175,7 @@ import { mapActions, mapGetters } from "vuex"
 import draggable from 'vuedraggable'
 import CheckBox from "../CheckBox"
 import LayoutWrapperMixin from "../../mixins/LayoutWrapperMixin"
+import SelectSingle from "../SelectSingle"
 
 
 export default {
@@ -191,9 +200,14 @@ export default {
       tableMaxHeight: 0,
       isFilter: false,
       isSettings: false,
-      isPresetModal: false,
-      presetId: '',
-      presetIdIndex: null,
+
+      isPresetModalSelect: false,
+      presetModalSelected: '',
+      presetModalId: '',
+
+      // isPresetModal: false,
+
+      // presetIdIndex: null,
       // currentPreset:
 
       tabs: [],
@@ -203,7 +217,7 @@ export default {
         fields: [],
         sorting: [],
         presets: []
-      },
+      }
     }
   },
   methods: {
@@ -253,25 +267,25 @@ export default {
       for (const key of queryArr.filter(cleaner)) if (query[key]) newQuery[key] = query[key]
       await executor(newQuery)
     },
-    togglePresetModal() {
-      if (this.isPresetModal) {
-        this.presetId = ''
-        this.isEditPresetId = null
-      }
-      this.isPresetModal = !this.isPresetModal
-      this.isFilter = false
-    },
-    removePreset(index) {
-      const copy = [ ...this.layoutSettings.presets ]
-      copy.splice(index, 1)
-      this.layoutSettings.presets = copy
-    },
-    editPreset(index) {
-      const { id } = this.layoutSettings.presets.at(index)
-      this.presetId = id
-      this.presetIdIndex = index
-      this.togglePresetModal()
-    },
+    // togglePresetModal() {
+    //   if (this.isPresetModal) {
+    //     this.presetId = ''
+    //     this.isEditPresetId = null
+    //   }
+    //   this.isPresetModal = !this.isPresetModal
+    //   this.isFilter = false
+    // },
+    // removePreset(index) {
+    //   const copy = [ ...this.layoutSettings.presets ]
+    //   copy.splice(index, 1)
+    //   this.layoutSettings.presets = copy
+    // },
+    // editPreset(index) {
+    //   const { id } = this.layoutSettings.presets.at(index)
+    //   this.presetId = id
+    //   this.presetIdIndex = index
+    //   this.togglePresetModal()
+    // },
     setTab(selectedTab, option) {
       const _idx = this.tabs.findIndex(i => i === selectedTab)
       const lastIndex = this.tabs.length - 1
@@ -292,33 +306,46 @@ export default {
       const checked = this.layoutSettings[prop].find(i => i.id === id)
       checked.isCheck = bool
     },
-    async savePreset() {
-      const updater = async () => {
-        await this.saveSettingChanges()
-        this.togglePresetModal()
-      }
-      if (this.presetIdIndex) {
-        this.layoutSettings.presets[this.presetIdIndex].id = this.presetId
-        await updater()
-        return
-      }
-      const { fullPath } = this.$route
-      const [ , query ] = fullPath.split('?')
-      const { presets, ...rest } = this.dataGenerator()
-      this.layoutSettings.presets.push({
-        isCheck: true,
-        preset: `?${ query }`,
-        id: this.presetId,
-        snapshot: rest
-      })
-      await updater()
-    },
+    // async savePreset() {
+    //   const updater = async () => {
+    //     await this.saveSettingChanges()
+    //     this.togglePresetModal()
+    //   }
+    //   if (this.presetIdIndex) {
+    //     this.layoutSettings.presets[this.presetIdIndex].id = this.presetId
+    //     await updater()
+    //     return
+    //   }
+
+    //   await updater()
+    // },
+    // async applyPreset(id) {
+    //   const { presets } = this.layoutSettings
+    //   const { preset, snapshot: { fields, filters, sorting } } = presets.find(i => i.id === id)
+    //   await this.$router.replace({ path: this.$route.path + preset })
+    //   this.setLayoutSettingsDefault()
+    //   this.dataParser(fields, 'fields')
+    //   this.dataParser(filters, 'filters')
+    //   this.dataParser(sorting, 'sorting')
+    //   this.layoutSettings = {
+    //     ...this.layoutSettings,
+    //     presets
+    //   }
+    //   this.makeDBRequest()
+    // },
     async saveSettingChanges() {
+
+      const dataGenerator = () => {
+        const value = {}
+        for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+        value['presets'] = this.layoutSettings['presets']
+        return value
+      }
       try {
         await this.$http.post('/api-settings/update-user-layouts-setting', {
           userId: this.user._id,
           prop: this.moduleType,
-          value: this.dataGenerator()
+          value: dataGenerator()
         })
         await this.setUser()
         this.updatedSettingByUserData()
@@ -328,26 +355,6 @@ export default {
       } finally {
         this.isSettings = false
       }
-    },
-    async applyPreset(id) {
-      const { presets } = this.layoutSettings
-      const { preset, snapshot: { fields, filters, sorting } } = presets.find(i => i.id === id)
-      await this.$router.replace({ path: this.$route.path + preset })
-      this.setLayoutSettingsDefault()
-      this.dataParser(fields, 'fields')
-      this.dataParser(filters, 'filters')
-      this.dataParser(sorting, 'sorting')
-      this.layoutSettings = {
-        ...this.layoutSettings,
-        presets
-      }
-      this.makeDBRequest()
-    },
-    dataGenerator() {
-      const value = {}
-      for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
-      value['presets'] = this.layoutSettings['presets']
-      return value
     },
     setLayoutSettingsDefault() {
       this.layoutSettings = { filters: [], fields: [], sorting: [], presets: [] }
@@ -383,6 +390,31 @@ export default {
         const { offsetHeight: layoutHeight, childNodes: [ iconsDiv, summaryDiv, presetsDiv ] } = this.$el
         this.tableMaxHeight = layoutHeight - iconsDiv.offsetHeight - summaryDiv.offsetHeight - presetsDiv.offsetHeight
       })
+    },
+    //presets logic ----------------------------------------------------------------------------------------------------------------------
+    toggleModalSelect() {
+      if (this.isPresetModalSelect) {
+        this.presetModalSelected = ''
+        this.presetModalId = ''
+      }
+      this.isPresetModalSelect = !this.isPresetModalSelect
+    },
+    async saveNewPresetFromCopy() {
+      const snapshotBuilder = () => {
+        const _presetIdx = this.layoutSettings.presets.findIndex(i => i.id === this.presetModalSelected)
+        const value = {}
+        const list = _presetIdx === -1 ? this.layoutSettings : this.layoutSettings.at(_presetIdx)
+        for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = list[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+        return value
+      }
+      this.layoutSettings.presets.push({
+        isCheck: true,
+        preset: !!query ? `?${ query }` : '',
+        id: this.presetModalId,
+        snapshot: snapshotBuilder()
+      })
+      await this.saveSettingChanges()
+      this.toggleModalSelect()
     }
   },
   computed: {
@@ -404,17 +436,17 @@ export default {
         }
       }
       return summary
-    },
-    presetIdChecker() {
-      const { presets } = this.layoutSettings
-      return presets.filter((i, _idx) => this.presetIdIndex !== null ? _idx !== this.presetIdIndex : i).some(i => i.id === this.presetId)
     }
+    // presetIdChecker() {
+    //   const { presets } = this.layoutSettings
+    //   return presets.filter((i, _idx) => this.presetIdIndex !== null ? _idx !== this.presetIdIndex : i).some(i => i.id === this.presetId)
+    // }
   },
   created() {
     this.updatedSettingByUserData()
     this.calculateTableMaxHeight()
   },
-  components: { CheckBox, Close, Button, IconButton, draggable }
+  components: { SelectSingle, CheckBox, Close, Button, IconButton, draggable }
 
 }
 </script>
@@ -497,6 +529,10 @@ export default {
       gap: 20px;
 
       &-input {
+        position: relative;
+        width: 220px;
+        height: 32px;
+
         input {
           font-size: 14px;
           color: $text;
