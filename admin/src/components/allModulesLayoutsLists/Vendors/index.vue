@@ -133,11 +133,10 @@ export default {
     sourceLanguages(competencies) {
       if (!competencies.length) return '-'
       const sourceLanguages = []
-      const allSourceLanguages = competencies.map(({ sourceLanguage }) => {
-        const source = this.languages.find(({ _id}) => _id === sourceLanguage).lang
-        sourceLanguages.push(source)
-        // return { sourceLanguage: source }})
-        const sourceLanguages = allSourceLanguages.map(({sourceLanguage}) => sourceLanguage)
+      competencies.map(({ sourceLanguage }) => {
+        const source = this.languages.find(({_id}) => _id === sourceLanguage).lang
+        sourceLanguages.push(source)})
+
       const filteredSourceLanguages = sourceLanguages.filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
@@ -145,10 +144,14 @@ export default {
     },
     targetLanguages(competencies) {
       if (!competencies.length) return '-'
-      const allTargetLanguages = competencies.map(({ targetLanguage }) => {
+      const targetLanguages = []
+      competencies.map(({ targetLanguage }) => {
         const target = this.languages.find(({_id}) => _id === targetLanguage).lang
-        return { targetLanguage: target }})
-      const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
+        targetLanguages.push(target)})
+      // const allTargetLanguages = competencies.map(({ targetLanguage }) => {
+      //   const target = this.languages.find(({_id}) => _id === targetLanguage).lang
+      //   return { targetLanguage: target }})
+      // const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
       const filteredTargetLanguages = targetLanguages.filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
