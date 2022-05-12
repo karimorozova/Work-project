@@ -8,10 +8,10 @@
     )
 
       template(slot="filter" slot-scope="{ tableFilters }")
-
         VendorsFilters(
           :tableFilters="tableFilters"
         )
+
       template(slot="table" slot-scope="{ tableFields, tableSorting, tableMaxHeight }")
         ListTable(
           :fields="tableFields"
@@ -22,9 +22,8 @@
           @makeDBSortingRequest="collectQueryData(getModuleData)"
         )
 
-          //template(slot="sf_vendorID" slot-scope="{ item, index }")
-          //  span {{ item.vendorId }}
-
+          template(slot="sf_vendorID" slot-scope="{ item, index }")
+            span {{ item.vendorId }}
           template(slot="sf_phone" slot-scope="{ item, index }")
             span {{ item.phone }}
           template(slot="sf_email" slot-scope="{ item, index }")
@@ -33,15 +32,13 @@
             span {{ item.currency }}
           template(slot="sf_timezone" slot-scope="{ item, index }")
             span {{ item.timezone }}
-          //template(slot="sf_status" slot-scope="{ item, index }")
-          //  span {{ item.status }}
           template(slot="sf_gender" slot-scope="{ item, index }")
             span {{ item.gender }}
           template(slot="sf_vendorType" slot-scope="{ item, index }")
             span {{ item.vendorType }}
           template(slot="sf_native" slot-scope="{ item, index }")
-            .table__data(v-html="vendorNativeLanguage(item.native)")
-
+            span(v-if='item.native') {{ item.native.lang }}
+            span(v-else) -
           template(slot="sf_isAvailableForWork" slot-scope="{ item, index }")
             span(v-if="item.isAvailableForWork")
               i.fas.fa-check
@@ -60,7 +57,8 @@
             router-link(:to="{path: `/pangea-vendors/all/details/${item._id}`}" )
               span {{ item.fullName }}
           template(slot="sf_dateInfo" slot-scope="{ item, index }")
-            span {{ item.dateInfo }}
+            span(v-if="item.dateInfo") {{ dateFormat(item.dateInfo.createdAt) }}
+            span(v-else) -
           //template(slot="sf_billingInfo" slot-scope="{ item, index }")
           //  .table__data(v-html="vendorPaymentMethods(item.billingInfo)")
           template(slot="sf_catExperience" slot-scope="{ item, index }")
@@ -89,7 +87,6 @@ import { mapGetters } from "vuex"
 
 export default {
   mixins: [ LayoutWrapperMixin ],
-  name: 'surname',
   components: {
     VendorsFilters,
     LayoutWrapper,
@@ -152,9 +149,9 @@ export default {
     //
     //   return vendorRates.join(', ')
     // },
-    vendorNativeLanguage(native) {
-      return this.languages.find(({ _id }) => _id === native).lang
-    },
+    // vendorNativeLanguage(native) {
+    //   return this.languages.find(({ _id }) => _id === native).lang
+    // },
     // sourceLanguages(competencies) {
     //   if (!competencies.length) return '-'
     //   const sourceLanguages = []
