@@ -65,35 +65,11 @@ const UserSchema = new mongoose.Schema({
 			filters: {
 				type: Array,
 				default: [
-					"projectId",
-					"startDate",
-					"sourceLanguages",
-					"projectManager",
-					"clientName",
-					"tasksStatuses",
-					"projectName",
-					"deadline",
-					"targetLanguages",
-					"accountManger",
-					"industry",
-					"isTest"
 				]
 			},
 			fields: {
 				type: Array,
 				default: [
-					"projectId",
-					"projectName",
-					"clientName",
-					"status",
-					"progress",
-					"languages",
-					"startDate",
-					"deadline",
-					"isTest",
-					"payables",
-					"receivables",
-					"margin"
 				]
 			},
 			sorting: {
@@ -124,23 +100,21 @@ const UserSchema = new mongoose.Schema({
 			}
 		},
 		vendor: {
-			project: {
-				filters: {
-					type: Array,
-					default: []
-				},
-				fields: {
-					type: Array,
-					default: []
-				},
-				sorting: {
-					type: Array,
-					default: []
-				},
-				presets: {
-					type: Array,
-					default: []
-				}
+			filters: {
+				type: Array,
+				default: []
+			},
+			fields: {
+				type: Array,
+				default: []
+			},
+			sorting: {
+				type: Array,
+				default: []
+			},
+			presets: {
+				type: Array,
+				default: []
 			}
 		}
 	}
