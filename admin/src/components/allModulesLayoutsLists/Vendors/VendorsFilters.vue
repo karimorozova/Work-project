@@ -163,6 +163,24 @@
             :isRemoveOption="true"
             @removeOption="removeQuery(id)"
           )
+      .filter(v-if="id === 'f_steps'")
+        .filter__label {{name}}
+        .filter__input
+          SelectSingle(
+            :hasSearch="true"
+            :selectedOption="selectedSteps"
+            :options="allSteps"
+            placeholder="Option"
+            @chooseOption="setSteps"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_rate'")
+        .filter__label {{name}}
+        .filter__input
+          input(type="text" placeholder="Value" :value="getSimpleValue(id)"  @change="(e) => setSimpleValue(id, e.target.value)")
+          .remove(v-if="getSimpleValue(id).length" @click="removeQuery(id)")
+            i.fas.fa-backspace
 
 </template>
 
@@ -189,6 +207,7 @@ export default {
     ...mapGetters({
       languages: "getAllLanguages",
       industries: "getAllIndustries",
+      steps: "getAllSteps",
     }),
     selectedCatExperience() {
       return this.$route.query.f_catExperience ? this.$route.query.f_catExperience.split(',') : []
@@ -213,9 +232,18 @@ export default {
       }
       return ''
     },
+    selectedSteps() {
+      if (this.$route.query.f_steps && this.steps.length) {
+        const { title } = this.steps.find(({ _id }) => `${ _id }` === `${ this.$route.query.f_steps }`)
+        return title
+      }
+      return ''
+    },
     allIndustries() {
-      console.log(this.industries)
       return this.industries.map(({ name }) => name)
+    },
+    allSteps() {
+      return this.steps.map(({ title }) => title)
     },
   },
   props: {
@@ -248,6 +276,10 @@ export default {
     setIndustry({ option }) {
       const { _id } = this.industries.find(({ name }) => name === option)
       this.replaceRoute('f_industry', _id)
+    },
+    setSteps({option}) {
+      const { _id } = this.steps.find(({ title }) => title === option)
+      this.replaceRoute('f_steps', _id)
     },
     setSourceLanguages({option}) {
       if (!this.$route.query.f_sourceLanguages) {

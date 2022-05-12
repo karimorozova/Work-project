@@ -558,6 +558,16 @@ export default {
               name: "Industries",
               isCheck: false,
             },
+            {
+              id: "f_steps",
+              name: "Steps",
+              isCheck: false,
+            },
+            {
+              id: "f_rate",
+              name: "Vendor rate",
+              isCheck: false,
+            },
           ],
           fields: [
             {
@@ -674,6 +684,18 @@ export default {
               isCheck: false,
               style: { "min-width": "130px" }
             },
+            {
+              id: "sf_steps",
+              name: "Steps",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_rate",
+              name: "Vendor rate",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
           ],
           sorting: [
             {
@@ -770,6 +792,17 @@ export default {
               id: "sf_industry",
               name: "Industries",
               isCheck: false,
+            },
+            {
+              id: "sf_steps",
+              name: "Steps",
+              isCheck: false,
+            },
+            {
+              id: "sf_rate",
+              name: "Vendor rate",
+              isCheck: false,
+              style: { "min-width": "130px" }
             },
           ]
         }

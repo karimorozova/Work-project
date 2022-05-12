@@ -24,7 +24,6 @@
 
           template(slot="sf_vendorID" slot-scope="{ item, index }")
             span {{ item.vendorId }}
-            //router-link(:to="{path: `/pangea-vendors/all/details/${item._id}`}" )
 
           template(slot="sf_phone" slot-scope="{ item, index }")
               span {{ item.phone }}
@@ -71,6 +70,10 @@
             .table__data(v-html="targetLanguages(item.competencies)")
           template(slot="sf_industry" slot-scope="{ item, index }")
             .table__data(v-html="vendorIndustries(item.competencies)")
+          template(slot="sf_steps" slot-scope="{ item, index }")
+            .table__data(v-html="vendorSteps(item.competencies)")
+          template(slot="sf_rate" slot-scope="{ item, index }")
+            .table__data(v-html="vendorRates(item.pendingCompetencies)")
 
 </template>
 
@@ -99,12 +102,14 @@ export default {
   computed: {
     ...mapGetters({
       languages: "getAllLanguages",
-      industries: "getAllIndustries"
+      industries: "getAllIndustries",
+      steps: "getAllSteps",
     }),
   },
   methods: {
     vendorPaymentMethods(obj) {
       const { paymentMethods } = obj
+      console.log(this.steps)
       if(!paymentMethods.length) return '-'
 
       const paymentTypes = paymentMethods.map(({paymentType}) => paymentType)
@@ -127,6 +132,24 @@ export default {
       return filteredIndustries.join(', ')
 
     },
+    vendorSteps(competencies) {
+      if(!competencies.length) return '-'
+      const vendorSteps = competencies.map(({step}) =>
+        this.steps.find(({_id, title}) => {
+          if (step === _id) return title
+        })
+      )
+      const filteredSteps = vendorSteps.map(({title}) => title).filter((value, index, arr) => {
+        return arr.indexOf(value) === index
+      })
+      return filteredSteps.join(', ')
+    },
+    vendorRates(pendingCompetencies) {
+      if(!pendingCompetencies.length) return '-'
+      const vendorRates = pendingCompetencies.map(({rate}) => rate)
+
+      return vendorRates.join(', ')
+    },
     vendorNativeLanguage(native) {
       return this.languages.find(({_id}) => _id === native).lang
     },
@@ -148,21 +171,21 @@ export default {
       competencies.map(({ targetLanguage }) => {
         const target = this.languages.find(({_id}) => _id === targetLanguage).lang
         targetLanguages.push(target)})
-      // const allTargetLanguages = competencies.map(({ targetLanguage }) => {
-      //   const target = this.languages.find(({_id}) => _id === targetLanguage).lang
-      //   return { targetLanguage: target }})
-      // const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
       const filteredTargetLanguages = targetLanguages.filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
       return filteredTargetLanguages.join(', ')
+
+      // const allTargetLanguages = competencies.map(({ targetLanguage }) => {
+      //   const target = this.languages.find(({_id}) => _id === targetLanguage).lang
+      //   return { targetLanguage: target }})
+      // const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
     },
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.collectQueryData(vm.getModuleData)
     })
-    console.log(33)
   },
 
 }
