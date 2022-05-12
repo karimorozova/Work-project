@@ -40,7 +40,8 @@ module.exports = getLayoutVendors = async ({ query = {}, sort = {}, options = {}
 				catExperience: 1,
 				vendorType: 1,
 				isTest: 1,
-				isAvailableForWork: 1
+				isAvailableForWork: 1,
+				vendorId: 1,
 			}
 		},
 		...(!!options.hasSort && Object.keys(sort).length ? [ { $sort: sort } ] : []),
