@@ -124,22 +124,24 @@
               .setting__draggable(v-for="(item, index) in layoutSettings.presets")
                 .setting__draggable-titleAndOption
                   CheckBox(
+                    :isDisabled="selectedPreset ===  presetNameReplacer(item)"
                     :isChecked="!!item.isCheck"
                     @check="checker('presets', item.id, true)"
                     @uncheck="checker('presets', item.id, false)"
                   )
                   span(:class="{'opacity04': !item.isCheck}") {{ item.id }}
+                  span(v-if="selectedPreset ===  presetNameReplacer(item)") [Active]
 
                 .setting__draggable-icons
-                  IconButton(@clicked="renamePreset(index)")
+                  IconButton(@clicked="renamePreset(index)" :isDisabled="selectedPreset ===  presetNameReplacer(item)")
                     i(class="fa-solid fa-pencil")
-                  IconButton(@clicked="removePreset(index)")
+                  IconButton(@clicked="removePreset(index)" :isDisabled="selectedPreset ===  presetNameReplacer(item)")
                     i(class="fa-solid fa-ban")
                   .setting__draggable-icon.handle
                     i.fas.fa-arrows-alt-v
 
           .setting__button
-            Button(value="Approve" @clicked="saveSettingChanges")
+            Button(value="Approve" @clicked="() => selectedPreset === 'Default View' ? saveSettingChanges() : saveSettingPresetChanges()")
 
     transition(name='top')
       .layoutWrapper__modal(v-if="isPresetModalSelect")
@@ -232,7 +234,7 @@ export default {
       if (callback) return callback()
     },
     toggleSettings() {
-      if (this.isSettings) this.updatedSettingByUserData()
+      if (this.isSettings) this.initSettingByUserData()
       this.isSettings = !this.isSettings
       //todo close modals
     },
@@ -289,8 +291,34 @@ export default {
       const checked = this.layoutSettings[prop].find(i => i.id === id)
       checked.isCheck = bool
     },
+    async saveSettingPresetChanges() {
+      console.log('saveSettingPresetChanges')
+      const { params: { presetId } } = this.$route
+      const _idx = this.layoutSettings.presets.findIndex(i => i.id === this.presetNameReplacer({ id: presetId }))
+      if (_idx !== -1) {
+        const snapshot = {}
+        for (const key of [ 'filters', 'fields', 'sorting' ]) snapshot[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
+        this.layoutSettings.presets[_idx] = {
+          ...this.layoutSettings.presets[_idx],
+          snapshot
+        }
+      }
+      try {
+        await this.$http.post('/layouts-api/update-user-layouts-setting-presets', {
+          userId: this.user._id,
+          prop: this.moduleType,
+          value: this.layoutSettings.presets
+        })
+        await this.setUser()
+        this.alertToggle({ message: 'Setting saved!', isShow: true, type: "success" })
+      } catch (e) {
+        this.alertToggle({ message: e.data, isShow: true, type: "error" })
+      } finally {
+        this.isSettings = false
+      }
+    },
     async saveSettingChanges() {
-      // TODO MOR> SAVE CURR PRESET LIKE SETTING
+      console.log('saveSettingChanges')
       const dataGenerator = () => {
         const value = {}
         for (const key of [ 'filters', 'fields', 'sorting' ]) value[key] = this.layoutSettings[key].filter(({ isCheck }) => isCheck).map(({ id }) => id)
@@ -304,7 +332,7 @@ export default {
           value: dataGenerator()
         })
         await this.setUser()
-        this.updatedSettingByUserData()
+        this.initSettingByUserData()
         this.alertToggle({ message: 'Setting saved!', isShow: true, type: "success" })
       } catch (e) {
         this.alertToggle({ message: e.data, isShow: true, type: "error" })
@@ -326,18 +354,27 @@ export default {
         if (_idx !== -1) this.layoutSettings[prop].push({ ...list[_idx], isCheck: true })
       })
       this.layoutSettings[prop].push(
-        ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
+          ...list.filter(i => !this.layoutSettings[prop].map(i => i.id).includes(i.id))
       )
     },
-    updatedSettingByUserData() {
+    initSettingByUserData() {
       this.tabs = []
       this.setLayoutSettingsDefault()
+      const { params: { presetId } } = this.$route
       const { layoutsSettings: { [this.moduleType]: { fields = [], filters = [], sorting = [], presets = [] } } } = this.user
-      this.dataParser(fields, 'fields')
-      this.dataParser(filters, 'filters')
-      this.dataParser(sorting, 'sorting')
-      this.layoutSettings.presets = presets
+      const _idx = presets.findIndex(i => i.id === this.presetNameReplacer({ id: presetId }))
 
+      const parserWrapper = ({ fields, filters, sorting }) => {
+        this.dataParser(fields, 'fields')
+        this.dataParser(filters, 'filters')
+        this.dataParser(sorting, 'sorting')
+      }
+
+      _idx === -1
+          ? parserWrapper({ fields, filters, sorting })
+          : parserWrapper(presets[_idx].snapshot)
+
+      this.layoutSettings.presets = presets
       for (let prop of [ 'fields', 'filters', 'sorting', 'presets' ]) if (this.layoutSettings[prop].length) this.tabs.push(prop)
       this.selectedTab = this.tabs[0]
     },
@@ -383,8 +420,9 @@ export default {
 
       if (id === 'Default View') {
         await paramsUpdater(id)
-        this.updatedSettingByUserData()
+        this.initSettingByUserData()
         this.makeDBRequest()
+        this.calculateTableMaxHeight()
         return
       }
       const { presets } = this.layoutSettings
@@ -398,12 +436,19 @@ export default {
         this.dataParser(sorting, 'sorting')
         this.layoutSettings = { ...this.layoutSettings, presets }
         this.makeDBRequest()
+        this.calculateTableMaxHeight()
       }
     },
     async saveNewPresetName() {
       this.layoutSettings.presets[this.presetIdRenameIndex].id = this.presetModalId
-      await this.saveSettingChanges()
       this.toggleModalId()
+      // const { name, params, query } = this.$route
+      // if (this.presetNameReplacer({ id: params.presetId }) !== 'Default View') await this.$router.replace({
+      //   name,
+      //   params: { ...params, presetId: this.presetModalId.replace(/ /g, '_') },
+      //   query
+      // })
+      // await this.saveSettingPresetChanges()
     },
     async saveNewPreset(toggleCallback) {
       const { presets } = this.layoutSettings
@@ -461,7 +506,7 @@ export default {
     }
   },
   created() {
-    this.updatedSettingByUserData()
+    this.initSettingByUserData()
     this.calculateTableMaxHeight()
   },
   components: { SelectSingle, CheckBox, Close, Button, IconButton, draggable }

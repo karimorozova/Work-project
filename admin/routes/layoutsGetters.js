@@ -4,13 +4,28 @@ const { User } = require("../models")
 
 const {
 	getLayoutProjects,
-	getReceivablesSteps, getLayoutVendors,
+	getReceivablesSteps, getLayoutVendors
 } = require("../layoutsGetters")
 
 
-router.post('/update-user-layouts-setting', async (req, res) => {
+router.post('/update-user-layouts-setting-presets', async (req, res) => {
+	const { userId, prop, value } = req.body
+	const query = { _id: userId }
 	try {
-		const { userId, prop, value } = req.body
+		const { layoutsSettings } = await User.findOne(query)
+		const { presets, ...rest } = layoutsSettings[prop]
+		await User.updateOne(query, { layoutsSettings: { [prop]: { ...rest, presets: value } } })
+		const updatedUser = await User.findOne(query).populate('groups')
+		res.send(updatedUser)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send(err.message || err || 'Error on saving settings!')
+	}
+})
+
+router.post('/update-user-layouts-setting', async (req, res) => {
+	const { userId, prop, value } = req.body
+	try {
 		await User.updateOne({ _id: userId }, { layoutsSettings: { [prop]: value } })
 		const updatedUser = await User.findOne({ _id: userId }).populate('groups')
 		res.send(updatedUser)
