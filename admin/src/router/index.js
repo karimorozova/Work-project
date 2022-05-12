@@ -47,6 +47,7 @@ import Company from "../components/Table/company/Layout"
 //NEW LAYOUT LISTS
 import ProjectsListLayout from '../components/allModulesLayoutsLists/Projects/index'
 import ReceivablesReports from '../components/allModulesLayoutsLists/ReceivablesReports/index'
+import VendorsListLayout from '../components/allModulesLayoutsLists/Vendors/index'
 
 // LIST ================================================================================================
 import Projects from '@/components/pmArea/lists/Projects'
@@ -267,10 +268,10 @@ const router = new Router({
 					children: [
 
 						{
-							path: 'all',
+							path: 'all-vendors/:status/:presetId',
 							name: 'all-vendors',
 							props: true,
-							component: AllVendorsTable
+              component: VendorsListLayout
 						},
 						{
 							path: 'all/details/:id',

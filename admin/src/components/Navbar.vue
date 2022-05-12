@@ -73,7 +73,7 @@ export default {
             {
               type: 'link',
               name: 'All',
-              path: '/pangea-vendors/all'
+              path: '/pangea-vendors/all-vendors/All/Default_View'
             },
             {
               type: 'link',

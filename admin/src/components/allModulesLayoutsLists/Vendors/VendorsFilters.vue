@@ -107,10 +107,59 @@
           SelectMulti(
             :selectedOptions="selectedPaymentMethods"
             :options="paymentTypes"
-            :hasSearch="true"
             placeholder="Options"
             @chooseOptions="setPaymentMethods"
             :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_catExperience'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedCatExperience"
+            :options="catOptions"
+            placeholder="Options"
+            @chooseOptions="setCatExperience"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_sourceLanguages'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedSourceLanguages"
+            :options="languages.map(({ lang }) => lang) | firstEnglishLanguage"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setSourceLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_targetLanguages'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedTargetLanguages"
+            :options="languages.map(({ lang }) => lang)"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setTargetLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_industry'")
+        .filter__label {{name}}
+        .filter__input
+          SelectSingle(
+            :hasSearch="true"
+            :selectedOption="selectedIndustry"
+            :options="allIndustries"
+            placeholder="Option"
+            @chooseOption="setIndustry"
             :isRemoveOption="true"
             @removeOption="removeQuery(id)"
           )
@@ -132,37 +181,100 @@ export default {
   data() {
     return {
       booleanOptions: [ 'Yes', 'No'],
-      paymentTypes: ['PayPal', 'Bank Details']
+      paymentTypes: ['PayPal', 'Bank Details'],
+      catOptions: ['Trados', 'XML', 'MemoQ']
     }
   },
   computed: {
     ...mapGetters({
       languages: "getAllLanguages",
+      industries: "getAllIndustries",
     }),
+    selectedCatExperience() {
+      return this.$route.query.f_catExperience ? this.$route.query.f_catExperience.split(',') : []
+    },
+    selectedPaymentMethods() {
+      return this.$route.query.f_billingInfo ? this.$route.query.f_billingInfo.split(',') : []
+    },
+    selectedSourceLanguages() {
+      return this.$route.query.f_sourceLanguages && this.languages.length
+        ? this.$route.query.f_sourceLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
+        : []
+    },
+    selectedTargetLanguages() {
+      return this.$route.query.f_targetLanguages && this.languages.length
+        ? this.$route.query.f_targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
+        : []
+    },
+    selectedIndustry() {
+      if (this.$route.query.f_industry && this.industries.length) {
+        const { name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.f_industry }`)
+        return name
+      }
+      return ''
+    },
+    allIndustries() {
+      console.log(this.industries)
+      return this.industries.map(({ name }) => name)
+    },
   },
   props: {
     tableFilters: {
       type: Array,
       default: () => []
     },
-    selectedPaymentMethods: {
-      type: Array,
-      default: () => []
-    }
   },
   methods: {
-    setPaymentMethods({ option }) {
-      this.selectedPaymentMethods.push(option)
-      // if (!this.$route.query.f_sourceLanguages) {
-      //   this.replaceRoute('f_sourceLanguages', this.getLanguageIdByLang(option))
-      //   return
-      // }
-      // let _ids = this.$route.query.f_sourceLanguages.split(',')
-      // if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
-      // else _ids.push(this.getLanguageIdByLang(option))
-      // this.replaceRoute('f_sourceLanguages', _ids.join(','))
+    setPaymentMethods({option}) {
+      if (!this.$route.query.f_billingInfo) {
+        this.replaceRoute('f_billingInfo', option)
+        return
+      }
+      let paymentOptions = this.$route.query.f_billingInfo.split(',')
+      if (paymentOptions.includes(option)) paymentOptions = paymentOptions.filter(payment => payment !== option)
+      else paymentOptions.push(option)
+      this.replaceRoute('f_billingInfo', paymentOptions.join(','))
     },
-  },
+    setCatExperience({option}) {
+      if (!this.$route.query.f_catExperience) {
+        this.replaceRoute('f_catExperience', option)
+        return
+      }
+      let catOptions = this.$route.query.f_catExperience.split(',')
+      if (catOptions.includes(option)) catOptions = catOptions.filter(catOption => catOption !== option)
+      else catOptions.push(option)
+      this.replaceRoute('f_catExperience', catOptions.join(','))
+    },
+    setIndustry({ option }) {
+      const { _id } = this.industries.find(({ name }) => name === option)
+      this.replaceRoute('f_industry', _id)
+    },
+    setSourceLanguages({option}) {
+      if (!this.$route.query.f_sourceLanguages) {
+        this.replaceRoute('f_sourceLanguages', this.getLanguageIdByLang(option))
+        return
+      }
+      let _ids = this.$route.query.f_sourceLanguages.split(',')
+      if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
+      else _ids.push(this.getLanguageIdByLang(option))
+      this.replaceRoute('f_sourceLanguages', _ids.join(','))
+    },
+    setTargetLanguages({option}) {
+      if (!this.$route.query.f_targetLanguages) {
+        this.replaceRoute('f_targetLanguages', this.getLanguageIdByLang(option))
+        return
+      }
+      let _ids = this.$route.query.f_targetLanguages.split(',')
+      if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
+      else _ids.push(this.getLanguageIdByLang(option))
+      this.replaceRoute('f_targetLanguages', _ids.join(','))
+    },
+
+    getLanguageIdByLang(option) {
+      const { _id } = this.languages.find(({ lang }) => lang === option)
+      return _id
+    },
+  }
 }
 </script>
 
