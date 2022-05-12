@@ -94,9 +94,10 @@ const handlerQuery = (rawQuery) => {
 
 	for (const rawKey of simpleFields) if (rawQuery[rawKey]) {
 		const [ , key ] = rawKey.split('_')
-		query[key] = rawQuery[rawKey]
+		const str = rawQuery[rawKey].replace(reg, '\\$&')
+		query[key] = { "$regex": new RegExp(str, 'i') }
 	}
-	
+
 	console.log('Ready Filters', query)
 	return query
 }
