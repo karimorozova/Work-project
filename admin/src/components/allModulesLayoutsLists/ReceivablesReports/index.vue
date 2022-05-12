@@ -7,16 +7,16 @@
       @makeDBRequest="collectQueryData(getModuleData)"
     )
 
-      //template(slot="filter" slot-scope="{ tableFilters }")
-      //  CustomFilters(
-      //    :tableFilters="tableFilters"
-      //  )
+      template(slot="filter" slot-scope="{ tableFilters }")
+        CustomFilters(
+          :tableFilters="tableFilters"
+        )
       template(slot="table" slot-scope="{ tableFields, tableSorting, tableMaxHeight }")
         ListTable(
           :fields="tableFields"
           :sorting="tableSorting"
-          :tableMaxHeight="tableMaxHeight"
-          :data="moduleData"
+          :tableMaxHeight="tableMaxHeight/2"
+          :data="moduleData.steps"
           @lazyLoading="collectQueryData(lazyLoading)"
           @makeDBSortingRequest="collectQueryData(getModuleData)"
         )
@@ -27,15 +27,15 @@
           template(slot="sf_projectName" slot-scope="{ item, index }")
             span {{ item.projectName.length > 28 ? item.projectName.substr(0, 28) + '...' : item.projectName }}
 
-          template(slot="sf_billingName" slot-scope="{ item, index }")
+          template(slot="sf_customer.name" slot-scope="{ item, index }")
             router-link(class="link-to" target='_blank' :to="{path: `/pangea-clients/all/details/${item.customer._id}`}")
-              div {{ item.customer.name }}
+              div {{ item.customer[0].name }}
 
-          template(slot="sf_stepId" slot-scope="{ item, index }")
+          template(slot="sf_steps.stepId" slot-scope="{ item, index }")
             span {{ item.steps.stepId || '-' }}
 
-          template(slot="sf_step" slot-scope="{ item, index }")
-            span {{ item.type === 'Classic' ? item.steps.stepAndUnit.step.title : item.steps.title }}
+          template(slot="sf_steps.stepAndUnit.step.title" slot-scope="{ item, index }")
+            span {{ item.steps.stepAndUnit.step.title || '-' }}
 
           template(slot="sf_languagePair" slot-scope="{ item, index }")
             span(v-if="item.type === 'Classic'" )
@@ -57,23 +57,36 @@
               span.currency(v-html="returnIconCurrencyByStringCode(item.projectCurrency)")
               span {{ +(item.steps.finance.Price.receivables).toFixed(2) }}
 
+        ListTable(
+          :fields="tableFields"
+          :sorting="tableSorting"
+          :tableMaxHeight="tableMaxHeight/2"
+          :data="moduleData.additionsSteps"
+          @lazyLoading="collectQueryData(lazyLoading)"
+          @makeDBSortingRequest="collectQueryData(getModuleData)"
+        )
+          template(slot="sf_projectId" slot-scope="{ item, index }")
+            router-link(:to="{path: `/pangea-projects/all-projects/All/details/${item._id}`}" )
+              span {{ item.projectId }}
+
+          template(slot="sf_projectName" slot-scope="{ item, index }")
+            span {{ item.projectName.length > 28 ? item.projectName.substr(0, 28) + '...' : item.projectName }}
+
+
+
 </template>
 
 <script>
-import { mapActions } from "vuex"
-// import LayoutWrapper from "../LayoutWrapper"
-// import ListTable from "../ListTable"
 import LayoutWrapperMixin from "../../../mixins/LayoutWrapperMixin"
-// import CustomFilters from "../Projects/CustomFilters"
 import ListTable from "../ListTable"
 import LayoutWrapper from "../LayoutWrapper"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
-// import CustomFilters from "./CustomFilters"
+import CustomFilters from "./CustomFilters"
 
 export default {
   mixins: [ LayoutWrapperMixin, currencyIconDetected ],
   components: {
-    // CustomFilters,
+    CustomFilters,
     ListTable,
     LayoutWrapper
   },
@@ -82,7 +95,10 @@ export default {
     return {
       moduleType: 'receivables-reports-steps'
     }
-  }
+  },
+  created() {
+    this.collectQueryData(this.getModuleData)
+  },
 }
 </script>
 

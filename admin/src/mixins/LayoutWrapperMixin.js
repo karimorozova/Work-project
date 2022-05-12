@@ -16,25 +16,25 @@ export default {
 							style: { "min-width": "240px" }
 						},
 						{
-							id: "sf_billingName",
+							id: "sf_customer.name",
 							name: "Client / Billing Name",
 							isCheck: false,
 							style: { "min-width": "240px" }
 						},
+						// {
+						// 	id: "sf_paymentType",
+						// 	name: "Payment Type",
+						// 	isCheck: false,
+						// 	style: { "min-width": "240px" }
+						// },
 						{
-							id: "sf_paymentType",
-							name: "Payment Type",
-							isCheck: false,
-							style: { "min-width": "240px" }
-						},
-						{
-							id: "sf_stepId",
+							id: "sf_steps.stepId",
 							name: "Step ID",
 							isCheck: false,
 							style: { "min-width": "240px" }
 						},
 						{
-							id: "sf_step",
+							id: "sf_steps.stepAndUnit.step.title",
 							name: "Step",
 							isCheck: false,
 							style: { "min-width": "240px" }
@@ -69,7 +69,22 @@ export default {
 							id: "f_projectName",
 							name: "Project Name",
 							isCheck: false
-						}
+						},
+						{
+							id: "f_customer.name",
+							name: "Client",
+							isCheck: false,
+						},
+						{
+							id: "f_steps.stepId",
+							name: "Step ID",
+							isCheck: false,
+						},
+						{
+							id: "f_steps.stepAndUnit.step.title",
+							name: "Step",
+							isCheck: false,
+						},
 
 					],
 					sorting: [
@@ -77,7 +92,24 @@ export default {
 							id: "sf_projectName",
 							name: "Project Name",
 							isCheck: false
-						}
+						},
+						{
+							id: "sf_customer.name",
+							name: "Client",
+							isCheck: false,
+						},
+						{
+							id: "sf_steps.stepId",
+							name: "Step ID",
+							isCheck: false,
+						},
+						{
+							id: "sf_steps.stepAndUnit.step.title",
+							name: "Step",
+							isCheck: false,
+						},
+
+
 					]
 				},
 				project: {
