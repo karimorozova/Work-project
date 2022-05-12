@@ -461,11 +461,318 @@ export default {
 						}
 					]
 				},
-				vendor: {
-					filters: [],
-					fields: [],
-					sorting: []
-				}
+        vendor: {
+          filters: [
+            {
+              id: "f_vendorId",
+              name: "Vendor ID",
+              isCheck: false
+            },
+            {
+              id: "f_phone",
+              name: "Vendor Phone",
+              isCheck: false
+            },
+            {
+              id: "f_email",
+              name: "Vendor Email",
+              isCheck: false
+            },
+            {
+              id: "f_currency",
+              name: "Vendor Currency",
+              isCheck: false
+            },
+            {
+              id: "f_timezone",
+              name: "Vendor Timezone",
+              isCheck: false
+            },
+            {
+              id: "f_status",
+              name: "Vendor Status",
+              isCheck: false,
+            },
+            {
+              id: "f_gender",
+              name: "Vendor Gender",
+              isCheck: false,
+            },
+            {
+              id: "f_vendorType",
+              name: "Vendor Type",
+              isCheck: false,
+            },
+            {
+              id: "f_native",
+              name: "Native Language",
+              isCheck: false,
+            },
+            {
+              id: "f_isAvailableForWork",
+              name: "Is Available",
+              isCheck: false,
+            },
+            {
+              id: "f_isTest",
+              name: "Is Test",
+              isCheck: false,
+            },
+            {
+              id: "f_companyName",
+              name: "Company Name",
+              isCheck: false,
+            },
+            {
+              id: "f_website",
+              name: "Website",
+              isCheck: false,
+            },
+            {
+              id: "f_surname",
+              name: "Vendor",
+              isCheck: false,
+            },
+            {
+              id: "f_billingInfo",
+              name: "Payment Methods",
+              isCheck: false,
+            },
+            {
+              id: "f_catExperience",
+              name: "CAT Experience",
+              isCheck: false,
+            },
+            {
+              id: "f_sourceLanguages",
+              name: "Source Languages",
+              isCheck: false
+            },
+            {
+              id: "f_targetLanguages",
+              name: "Target Languages",
+              isCheck: false,
+            },
+            {
+              id: "f_industry",
+              name: "Industries",
+              isCheck: false,
+            },
+          ],
+          fields: [
+            {
+              id: "sf_vendorID",
+              name: "Vendor ID",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_phone",
+              name: "Vendor Phone",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_email",
+              name: "Vendor Email",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_currency",
+              name: "Vendor Currency",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_timezone",
+              name: "Vendor Timezone",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_status",
+              name: "Vendor Status",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_gender",
+              name: "Vendor Gender",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_vendorType",
+              name: "Vendor Type",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_native",
+              name: "Native Language",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_isAvailableForWork",
+              name: "Is Available",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_isTest",
+              name: "is Test",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_companyName",
+              name: "Company Name",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_website",
+              name: "Website",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_surname",
+              name: "Vendor",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_billingInfo",
+              name: "Payment Methods",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_catExperience",
+              name: "CAT Experience",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_sourceLanguages",
+              name: "Source Languages",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_targetLanguages",
+              name: "Target Languages",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_industry",
+              name: "Industries",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+          ],
+          sorting: [
+            {
+              id: "sf_vendorID",
+              name: "Vendor ID",
+              isCheck: false,
+            },
+            {
+              id: "sf_phone",
+              name: "Vendor Phone",
+              isCheck: false
+            },
+            {
+              id: "sf_email",
+              name: "Vendor Email",
+              isCheck: false,
+            },
+            {
+              id: "sf_currency",
+              name: "Vendor Currency",
+              isCheck: false,
+            },
+            {
+              id: "sf_timezone",
+              name: "Vendor Timezone",
+              isCheck: false,
+            },
+            {
+              id: "sf_status",
+              name: "Vendor Status",
+              isCheck: false,
+            },
+            {
+              id: "sf_gender",
+              name: "Vendor Gender",
+              isCheck: false,
+            },
+            {
+              id: "sf_vendorType",
+              name: "Vendor Type",
+              isCheck: false,
+            },
+            {
+              id: "sf_native",
+              name: "Native Language",
+              isCheck: false,
+            },
+            {
+              id: "sf_isAvailableForWork",
+              name: "Is Available",
+              isCheck: false,
+            },
+            {
+              id: "sf_isTest",
+              name: "is Test",
+              isCheck: false,
+            },
+            {
+              id: "sf_companyName",
+              name: "Company Name",
+              isCheck: false,
+            },
+            {
+              id: "sf_website",
+              name: "Website",
+              isCheck: false,
+            },
+            {
+              id: "sf_surname",
+              name: "Vendor",
+              isCheck: false,
+            },
+            {
+              id: "sf_billingInfo",
+              name: "Payment Methods",
+              isCheck: false,
+            },
+            {
+              id: "sf_catExperience",
+              name: "CAT Experience",
+              isCheck: false,
+            },
+            {
+              id: "sf_sourceLanguages",
+              name: "Source Languages",
+              isCheck: false,
+            },
+            {
+              id: "sf_targetLanguages",
+              name: "Target Languages",
+              isCheck: false,
+            },
+            {
+              id: "sf_industry",
+              name: "Industries",
+              isCheck: false,
+            },
+          ]
+        }
 			}
 		}
 	},
