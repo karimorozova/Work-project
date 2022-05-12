@@ -22,8 +22,8 @@
           @makeDBSortingRequest="collectQueryData(getModuleData)"
         )
 
-          template(slot="sf_vendorID" slot-scope="{ item, index }")
-            span {{ item.vendorId }}
+          //template(slot="sf_vendorID" slot-scope="{ item, index }")
+          //  span {{ item.vendorId }}
 
           template(slot="sf_phone" slot-scope="{ item, index }")
             span {{ item.phone }}
@@ -33,8 +33,8 @@
             span {{ item.currency }}
           template(slot="sf_timezone" slot-scope="{ item, index }")
             span {{ item.timezone }}
-          template(slot="sf_status" slot-scope="{ item, index }")
-            span {{ item.status }}
+          //template(slot="sf_status" slot-scope="{ item, index }")
+          //  span {{ item.status }}
           template(slot="sf_gender" slot-scope="{ item, index }")
             span {{ item.gender }}
           template(slot="sf_vendorType" slot-scope="{ item, index }")
@@ -56,24 +56,26 @@
           template(slot="sf_website" slot-scope="{ item, index }")
             span(v-if="item.vendorType === 'Agency'") {{ item.website }}
             span(v-else) -
-          template(slot="sf_surname" slot-scope="{ item, index }")
+          template(slot="sf_fullName" slot-scope="{ item, index }")
             router-link(:to="{path: `/pangea-vendors/all/details/${item._id}`}" )
-              span {{ `${item.firstName} ${item.surname}` }}
-          template(slot="sf_billingInfo" slot-scope="{ item, index }")
-            .table__data(v-html="vendorPaymentMethods(item.billingInfo)")
+              span {{ item.fullName }}
+          template(slot="sf_dateInfo" slot-scope="{ item, index }")
+            span {{ item.dateInfo }}
+          //template(slot="sf_billingInfo" slot-scope="{ item, index }")
+          //  .table__data(v-html="vendorPaymentMethods(item.billingInfo)")
           template(slot="sf_catExperience" slot-scope="{ item, index }")
             span(v-if="item.catExperience.length" ) {{ item.catExperience.join(', ') }}
             span(v-else) -
-          template(slot="sf_sourceLanguages" slot-scope="{ item, index }")
-            .table__data(v-html="sourceLanguages(item.competencies)")
-          template(slot="sf_targetLanguages" slot-scope="{ item, index }")
-            .table__data(v-html="targetLanguages(item.competencies)")
-          template(slot="sf_industry" slot-scope="{ item, index }")
-            .table__data(v-html="vendorIndustries(item.competencies)")
-          template(slot="sf_steps" slot-scope="{ item, index }")
-            .table__data(v-html="vendorSteps(item.competencies)")
-          template(slot="sf_rate" slot-scope="{ item, index }")
-            .table__data(v-html="vendorRates(item.pendingCompetencies)")
+          //template(slot="sf_sourceLanguages" slot-scope="{ item, index }")
+          //  .table__data(v-html="sourceLanguages(item.competencies)")
+          //template(slot="sf_targetLanguages" slot-scope="{ item, index }")
+          //  .table__data(v-html="targetLanguages(item.competencies)")
+          //template(slot="sf_industry" slot-scope="{ item, index }")
+          //  .table__data(v-html="vendorIndustries(item.competencies)")
+          //template(slot="sf_steps" slot-scope="{ item, index }")
+          //  .table__data(v-html="vendorSteps(item.competencies)")
+          //template(slot="sf_rate" slot-scope="{ item, index }")
+          //  .table__data(v-html="vendorRates(item.pendingCompetencies)")
 
 </template>
 
@@ -107,82 +109,82 @@ export default {
     })
   },
   methods: {
-    vendorPaymentMethods(obj) {
-      const { paymentMethods } = obj
-      console.log(this.steps)
-      if (!paymentMethods.length) return '-'
-
-      const paymentTypes = paymentMethods.map(({ paymentType }) => paymentType)
-      const filteredPaymentTypes = paymentTypes.filter((value, index, arr) => {
-        return arr.indexOf(value) === index
-      })
-      return filteredPaymentTypes.join(', ')
-
-    },
-    vendorIndustries(competencies) {
-      if (!competencies.length) return '-'
-      const vendorIndustries = competencies.map(({ industry }) =>
-          this.industries.find(({ _id, name }) => {
-            if (industry === _id) return name
-          })
-      )
-      const filteredIndustries = vendorIndustries.map(({ name }) => name).filter((value, index, arr) => {
-        return arr.indexOf(value) === index
-      })
-      return filteredIndustries.join(', ')
-
-    },
-    vendorSteps(competencies) {
-      if (!competencies.length) return '-'
-      const vendorSteps = competencies.map(({ step }) =>
-          this.steps.find(({ _id, title }) => {
-            if (step === _id) return title
-          })
-      )
-      const filteredSteps = vendorSteps.map(({ title }) => title).filter((value, index, arr) => {
-        return arr.indexOf(value) === index
-      })
-      return filteredSteps.join(', ')
-    },
-    vendorRates(pendingCompetencies) {
-      if (!pendingCompetencies.length) return '-'
-      const vendorRates = pendingCompetencies.map(({ rate }) => rate)
-
-      return vendorRates.join(', ')
-    },
+    // vendorPaymentMethods(obj) {
+    //   const { paymentMethods } = obj
+    //   console.log(this.steps)
+    //   if (!paymentMethods.length) return '-'
+    //
+    //   const paymentTypes = paymentMethods.map(({ paymentType }) => paymentType)
+    //   const filteredPaymentTypes = paymentTypes.filter((value, index, arr) => {
+    //     return arr.indexOf(value) === index
+    //   })
+    //   return filteredPaymentTypes.join(', ')
+    //
+    // },
+    // vendorIndustries(competencies) {
+    //   if (!competencies.length) return '-'
+    //   const vendorIndustries = competencies.map(({ industry }) =>
+    //       this.industries.find(({ _id, name }) => {
+    //         if (industry === _id) return name
+    //       })
+    //   )
+    //   const filteredIndustries = vendorIndustries.map(({ name }) => name).filter((value, index, arr) => {
+    //     return arr.indexOf(value) === index
+    //   })
+    //   return filteredIndustries.join(', ')
+    //
+    // },
+    // vendorSteps(competencies) {
+    //   if (!competencies.length) return '-'
+    //   const vendorSteps = competencies.map(({ step }) =>
+    //       this.steps.find(({ _id, title }) => {
+    //         if (step === _id) return title
+    //       })
+    //   )
+    //   const filteredSteps = vendorSteps.map(({ title }) => title).filter((value, index, arr) => {
+    //     return arr.indexOf(value) === index
+    //   })
+    //   return filteredSteps.join(', ')
+    // },
+    // vendorRates(pendingCompetencies) {
+    //   if (!pendingCompetencies.length) return '-'
+    //   const vendorRates = pendingCompetencies.map(({ rate }) => rate)
+    //
+    //   return vendorRates.join(', ')
+    // },
     vendorNativeLanguage(native) {
       return this.languages.find(({ _id }) => _id === native).lang
     },
-    sourceLanguages(competencies) {
-      if (!competencies.length) return '-'
-      const sourceLanguages = []
-      competencies.map(({ sourceLanguage }) => {
-        const source = this.languages.find(({ _id }) => _id === sourceLanguage).lang
-        sourceLanguages.push(source)
-      })
-
-      const filteredSourceLanguages = sourceLanguages.filter((value, index, arr) => {
-        return arr.indexOf(value) === index
-      })
-      return filteredSourceLanguages.join(', ')
-    },
-    targetLanguages(competencies) {
-      if (!competencies.length) return '-'
-      const targetLanguages = []
-      competencies.map(({ targetLanguage }) => {
-        const target = this.languages.find(({ _id }) => _id === targetLanguage).lang
-        targetLanguages.push(target)
-      })
-      const filteredTargetLanguages = targetLanguages.filter((value, index, arr) => {
-        return arr.indexOf(value) === index
-      })
-      return filteredTargetLanguages.join(', ')
-
-      // const allTargetLanguages = competencies.map(({ targetLanguage }) => {
-      //   const target = this.languages.find(({_id}) => _id === targetLanguage).lang
-      //   return { targetLanguage: target }})
-      // const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
-    }
+    // sourceLanguages(competencies) {
+    //   if (!competencies.length) return '-'
+    //   const sourceLanguages = []
+    //   competencies.map(({ sourceLanguage }) => {
+    //     const source = this.languages.find(({ _id }) => _id === sourceLanguage).lang
+    //     sourceLanguages.push(source)
+    //   })
+    //
+    //   const filteredSourceLanguages = sourceLanguages.filter((value, index, arr) => {
+    //     return arr.indexOf(value) === index
+    //   })
+    //   return filteredSourceLanguages.join(', ')
+    // },
+    // targetLanguages(competencies) {
+    //   if (!competencies.length) return '-'
+    //   const targetLanguages = []
+    //   competencies.map(({ targetLanguage }) => {
+    //     const target = this.languages.find(({ _id }) => _id === targetLanguage).lang
+    //     targetLanguages.push(target)
+    //   })
+    //   const filteredTargetLanguages = targetLanguages.filter((value, index, arr) => {
+    //     return arr.indexOf(value) === index
+    //   })
+    //   return filteredTargetLanguages.join(', ')
+    //
+    //   // const allTargetLanguages = competencies.map(({ targetLanguage }) => {
+    //   //   const target = this.languages.find(({_id}) => _id === targetLanguage).lang
+    //   //   return { targetLanguage: target }})
+    //   // const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
+    // }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {

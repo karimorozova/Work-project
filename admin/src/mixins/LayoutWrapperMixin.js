@@ -529,7 +529,7 @@ export default {
               isCheck: false,
             },
             {
-              id: "f_surname",
+              id: "f_fullName",
               name: "Vendor",
               isCheck: false,
             },
@@ -568,6 +568,18 @@ export default {
               name: "Vendor rate",
               isCheck: false,
             },
+            {
+              id: "f_photo",
+              name: "Vendor photo",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "f_dateInfo",
+              name: "Date of create",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
           ],
           fields: [
             {
@@ -600,12 +612,12 @@ export default {
               isCheck: false,
               style: { "min-width": "130px" }
             },
-            {
-              id: "sf_status",
-              name: "Vendor Status",
-              isCheck: false,
-              style: { "min-width": "130px" }
-            },
+            // {
+            //   id: "sf_status",
+            //   name: "Vendor Status",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
             {
               id: "sf_gender",
               name: "Vendor Gender",
@@ -649,17 +661,17 @@ export default {
               style: { "min-width": "130px" }
             },
             {
-              id: "sf_surname",
+              id: "sf_fullName",
               name: "Vendor",
               isCheck: false,
               style: { "min-width": "130px" }
             },
-            {
-              id: "sf_billingInfo",
-              name: "Payment Methods",
-              isCheck: false,
-              style: { "min-width": "130px" }
-            },
+            // {
+            //   id: "sf_billingInfo",
+            //   name: "Payment Methods",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
             {
               id: "sf_catExperience",
               name: "CAT Experience",
@@ -667,35 +679,47 @@ export default {
               style: { "min-width": "130px" }
             },
             {
-              id: "sf_sourceLanguages",
-              name: "Source Languages",
+              id: "sf_photo",
+              name: "Vendor photo",
               isCheck: false,
               style: { "min-width": "130px" }
             },
             {
-              id: "sf_targetLanguages",
-              name: "Target Languages",
+              id: "sf_dateInfo",
+              name: "Date of create",
               isCheck: false,
               style: { "min-width": "130px" }
             },
-            {
-              id: "sf_industry",
-              name: "Industries",
-              isCheck: false,
-              style: { "min-width": "130px" }
-            },
-            {
-              id: "sf_steps",
-              name: "Steps",
-              isCheck: false,
-              style: { "min-width": "130px" }
-            },
-            {
-              id: "sf_rate",
-              name: "Vendor rate",
-              isCheck: false,
-              style: { "min-width": "130px" }
-            },
+            // {
+            //   id: "sf_sourceLanguages",
+            //   name: "Source Languages",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
+            // {
+            //   id: "sf_targetLanguages",
+            //   name: "Target Languages",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
+            // {
+            //   id: "sf_industry",
+            //   name: "Industries",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
+            // {
+            //   id: "sf_steps",
+            //   name: "Steps",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
+            // {
+            //   id: "sf_rate",
+            //   name: "Vendor rate",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
           ],
           sorting: [
             {
@@ -723,11 +747,11 @@ export default {
               name: "Vendor Timezone",
               isCheck: false,
             },
-            {
-              id: "sf_status",
-              name: "Vendor Status",
-              isCheck: false,
-            },
+            // {
+            //   id: "sf_status",
+            //   name: "Vendor Status",
+            //   isCheck: false,
+            // },
             {
               id: "sf_gender",
               name: "Vendor Gender",
@@ -764,45 +788,55 @@ export default {
               isCheck: false,
             },
             {
-              id: "sf_surname",
+              id: "sf_fullName",
               name: "Vendor",
               isCheck: false,
             },
-            {
-              id: "sf_billingInfo",
-              name: "Payment Methods",
-              isCheck: false,
-            },
+            // {
+            //   id: "sf_billingInfo",
+            //   name: "Payment Methods",
+            //   isCheck: false,
+            // },
             {
               id: "sf_catExperience",
               name: "CAT Experience",
               isCheck: false,
             },
+            // {
+            //   id: "sf_sourceLanguages",
+            //   name: "Source Languages",
+            //   isCheck: false,
+            // },
+            // {
+            //   id: "sf_targetLanguages",
+            //   name: "Target Languages",
+            //   isCheck: false,
+            // },
+            // {
+            //   id: "sf_industry",
+            //   name: "Industries",
+            //   isCheck: false,
+            // },
+            // {
+            //   id: "sf_steps",
+            //   name: "Steps",
+            //   isCheck: false,
+            // },
+            // {
+            //   id: "sf_rate",
+            //   name: "Vendor rate",
+            //   isCheck: false,
+            //   style: { "min-width": "130px" }
+            // },
             {
-              id: "sf_sourceLanguages",
-              name: "Source Languages",
+              id: "sf_photo",
+              name: "Vendor photo",
               isCheck: false,
             },
             {
-              id: "sf_targetLanguages",
-              name: "Target Languages",
+              id: "sf_dateInfo",
+              name: "Date of create",
               isCheck: false,
-            },
-            {
-              id: "sf_industry",
-              name: "Industries",
-              isCheck: false,
-            },
-            {
-              id: "sf_steps",
-              name: "Steps",
-              isCheck: false,
-            },
-            {
-              id: "sf_rate",
-              name: "Vendor rate",
-              isCheck: false,
-              style: { "min-width": "130px" }
             },
           ]
         }
