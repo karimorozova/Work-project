@@ -26,19 +26,19 @@
             span {{ item.vendorId }}
 
           template(slot="sf_phone" slot-scope="{ item, index }")
-              span {{ item.phone }}
+            span {{ item.phone }}
           template(slot="sf_email" slot-scope="{ item, index }")
-              span {{ item.email }}
+            span {{ item.email }}
           template(slot="sf_currency" slot-scope="{ item, index }")
-              span {{ item.currency }}
+            span {{ item.currency }}
           template(slot="sf_timezone" slot-scope="{ item, index }")
-              span {{ item.timezone }}
+            span {{ item.timezone }}
           template(slot="sf_status" slot-scope="{ item, index }")
-              span {{ item.status }}
+            span {{ item.status }}
           template(slot="sf_gender" slot-scope="{ item, index }")
-              span {{ item.gender }}
+            span {{ item.gender }}
           template(slot="sf_vendorType" slot-scope="{ item, index }")
-              span {{ item.vendorType }}
+            span {{ item.vendorType }}
           template(slot="sf_native" slot-scope="{ item, index }")
             .table__data(v-html="vendorNativeLanguage(item.native)")
 
@@ -51,11 +51,11 @@
               i.fas.fa-check
             span(v-else) -
           template(slot="sf_companyName" slot-scope="{ item, index }")
-              span(v-if="item.vendorType === 'Agency'") {{ item.companyName }}
-              span(v-else) -
+            span(v-if="item.vendorType === 'Agency'") {{ item.companyName }}
+            span(v-else) -
           template(slot="sf_website" slot-scope="{ item, index }")
-              span(v-if="item.vendorType === 'Agency'") {{ item.website }}
-              span(v-else) -
+            span(v-if="item.vendorType === 'Agency'") {{ item.website }}
+            span(v-else) -
           template(slot="sf_surname" slot-scope="{ item, index }")
             router-link(:to="{path: `/pangea-vendors/all/details/${item._id}`}" )
               span {{ `${item.firstName} ${item.surname}` }}
@@ -82,11 +82,11 @@ import LayoutWrapper from "../LayoutWrapper"
 import ListTable from "../ListTable"
 import LayoutWrapperMixin from "../../../mixins/LayoutWrapperMixin"
 import VendorsFilters from "./VendorsFilters"
-import {mapGetters} from "vuex";
+import { mapGetters } from "vuex"
 
 
 export default {
-  mixins: [LayoutWrapperMixin],
+  mixins: [ LayoutWrapperMixin ],
   name: 'surname',
   components: {
     VendorsFilters,
@@ -103,62 +103,63 @@ export default {
     ...mapGetters({
       languages: "getAllLanguages",
       industries: "getAllIndustries",
-      steps: "getAllSteps",
-    }),
+      steps: "getAllSteps"
+    })
   },
   methods: {
     vendorPaymentMethods(obj) {
       const { paymentMethods } = obj
       console.log(this.steps)
-      if(!paymentMethods.length) return '-'
+      if (!paymentMethods.length) return '-'
 
-      const paymentTypes = paymentMethods.map(({paymentType}) => paymentType)
-       const filteredPaymentTypes = paymentTypes.filter((value, index, arr) => {
+      const paymentTypes = paymentMethods.map(({ paymentType }) => paymentType)
+      const filteredPaymentTypes = paymentTypes.filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
       return filteredPaymentTypes.join(', ')
 
     },
     vendorIndustries(competencies) {
-      if(!competencies.length) return '-'
-      const vendorIndustries = competencies.map(({industry}) =>
-       this.industries.find(({_id, name}) => {
-          if (industry === _id) return name
-        })
+      if (!competencies.length) return '-'
+      const vendorIndustries = competencies.map(({ industry }) =>
+          this.industries.find(({ _id, name }) => {
+            if (industry === _id) return name
+          })
       )
-      const filteredIndustries = vendorIndustries.map(({name}) => name).filter((value, index, arr) => {
+      const filteredIndustries = vendorIndustries.map(({ name }) => name).filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
       return filteredIndustries.join(', ')
 
     },
     vendorSteps(competencies) {
-      if(!competencies.length) return '-'
-      const vendorSteps = competencies.map(({step}) =>
-        this.steps.find(({_id, title}) => {
-          if (step === _id) return title
-        })
+      if (!competencies.length) return '-'
+      const vendorSteps = competencies.map(({ step }) =>
+          this.steps.find(({ _id, title }) => {
+            if (step === _id) return title
+          })
       )
-      const filteredSteps = vendorSteps.map(({title}) => title).filter((value, index, arr) => {
+      const filteredSteps = vendorSteps.map(({ title }) => title).filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
       return filteredSteps.join(', ')
     },
     vendorRates(pendingCompetencies) {
-      if(!pendingCompetencies.length) return '-'
-      const vendorRates = pendingCompetencies.map(({rate}) => rate)
+      if (!pendingCompetencies.length) return '-'
+      const vendorRates = pendingCompetencies.map(({ rate }) => rate)
 
       return vendorRates.join(', ')
     },
     vendorNativeLanguage(native) {
-      return this.languages.find(({_id}) => _id === native).lang
+      return this.languages.find(({ _id }) => _id === native).lang
     },
     sourceLanguages(competencies) {
       if (!competencies.length) return '-'
       const sourceLanguages = []
       competencies.map(({ sourceLanguage }) => {
-        const source = this.languages.find(({_id}) => _id === sourceLanguage).lang
-        sourceLanguages.push(source)})
+        const source = this.languages.find(({ _id }) => _id === sourceLanguage).lang
+        sourceLanguages.push(source)
+      })
 
       const filteredSourceLanguages = sourceLanguages.filter((value, index, arr) => {
         return arr.indexOf(value) === index
@@ -169,8 +170,9 @@ export default {
       if (!competencies.length) return '-'
       const targetLanguages = []
       competencies.map(({ targetLanguage }) => {
-        const target = this.languages.find(({_id}) => _id === targetLanguage).lang
-        targetLanguages.push(target)})
+        const target = this.languages.find(({ _id }) => _id === targetLanguage).lang
+        targetLanguages.push(target)
+      })
       const filteredTargetLanguages = targetLanguages.filter((value, index, arr) => {
         return arr.indexOf(value) === index
       })
@@ -180,13 +182,15 @@ export default {
       //   const target = this.languages.find(({_id}) => _id === targetLanguage).lang
       //   return { targetLanguage: target }})
       // const targetLanguages = allTargetLanguages.map(({targetLanguage}) => targetLanguage)
-    },
+    }
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.collectQueryData(vm.getModuleData)
+      vm.collectQueryData(vm.getModuleData).then(() => {
+        console.log(vm.moduleData)
+      })
     })
-  },
+  }
 
 }
 </script>

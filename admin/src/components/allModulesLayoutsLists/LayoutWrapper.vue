@@ -33,8 +33,8 @@
           @click="applyPreset({})"
         ) Default View
         .presets__items(
-          :class="{'presets__items-selected': selectedPreset ===  presetNameReplacer(item) }"
           v-if="layoutSettings.presets.filter(({ isCheck }) => isCheck).length"
+          :class="{'presets__items-selected': selectedPreset ===  presetNameReplacer(item) }"
           v-for="item in layoutSettings.presets.filter(({ isCheck }) => isCheck)"
           @click="applyPreset(item)"
         ) {{ presetNameReplacer(item) }}
