@@ -46,7 +46,7 @@ import Company from "../components/Table/company/Layout"
 
 //NEW LAYOUT LISTS
 import ProjectsListLayout from '../components/allModulesLayoutsLists/Projects/index'
-import ReceivablesReports from '../components/allModulesLayoutsLists/ReceivablesReports/index'
+import ReceivablesReportsSteps from '../components/allModulesLayoutsLists/ReceivablesReportsSteps/index'
 import VendorsListLayout from '../components/allModulesLayoutsLists/Vendors/index'
 
 // LIST ================================================================================================
@@ -610,10 +610,10 @@ const router = new Router({
 							component: ReportDetails
 						},
 						{
-							path: 'receivables-reports/create-reports',
-							name: 'receivables-reports',
+							path: 'receivables-reports/create-reports/:presetId',
+							name: 'receivables-reports-create',
 							// component: AddReports
-							component: ReceivablesReports
+							component: ReceivablesReportsSteps
 						},
 						{
 							path: 'receivables-reports/create-reports-o',

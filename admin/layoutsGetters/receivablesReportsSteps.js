@@ -176,10 +176,11 @@ exports.getReceivablesSteps = async ({ project = {}, query = {}, queryForStep = 
 		{
 			$match: {
 				$and: [
+					//TODO: IsInReportReceivable:  {$ne: null} now it field consist null or InvoiceId
 					{$or: [ { "steps.isInReportReceivables": false }, { "steps.isInReportReceivables": { $exists: false } } ]},
 					{$or: [ {"steps.isReceivableVisible": true,}, {"steps.isReceivablesVisible": true,} ]}
 				],
-				"steps.status": { $in: [ 'Completed', 'Cancelled Halfway', 'Created'] },
+				"steps.status": { $in: [ 'Created', 'Approved', 'Rejected', 'Request Sent', 'Ready to Start', 'Waiting to Start', 'In progress', 'Completed',  'Cancelled Halfway'] },
 				"steps.finance.Price.receivables": { $gt: 0 },
 				...queryForStep
 			},

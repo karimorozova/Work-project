@@ -2,11 +2,11 @@
   .layoutWrapper(v-if="user._id")
 
     .layoutWrapper__icons
+      slot(name="icons")
       IconButton(v-if="hasFilterButton" @clicked="toggleFilter")
         i(class="fa-solid fa-sliders")
       IconButton(v-if="hasSettingButton" @clicked="toggleSettings")
         i(class="fas fa-cogs")
-      slot(name="icons")
 
     .layoutWrapper__summary
       .summary(v-if="summary.length")

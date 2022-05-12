@@ -315,8 +315,8 @@ export default {
                 },
                 {
                   type: 'link',
-                  path: '/pangea-finance/receivables-reports/create-reports',
-                  name: 'Add Reports'
+                  path: '/pangea-finance/receivables-reports/create-reports/Default_View',
+                  name: 'Add Report / Job List'
                 },
                 {
                   type: 'link',

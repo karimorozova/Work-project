@@ -6,6 +6,8 @@
       :moduleType="moduleType"
       @makeDBRequest="collectQueryData(getModuleData)"
     )
+      template(slot="icons")
+        Button(value="Test")
 
       template(slot="filter" slot-scope="{ tableFilters }")
         CustomFilters(
@@ -82,13 +84,15 @@ import ListTable from "../ListTable"
 import LayoutWrapper from "../LayoutWrapper"
 import currencyIconDetected from "../../../mixins/currencyIconDetected"
 import CustomFilters from "./CustomFilters"
+import Button from "../../Button"
 
 export default {
   mixins: [ LayoutWrapperMixin, currencyIconDetected ],
   components: {
     CustomFilters,
     ListTable,
-    LayoutWrapper
+    LayoutWrapper,
+    Button,
   },
   name: "index",
   data() {
