@@ -54,26 +54,28 @@
             span(v-if="item.vendorType === 'Agency'") {{ item.website }}
             span(v-else) -
           template(slot="sf_fullName" slot-scope="{ item, index }")
-            router-link(:to="{path: `/pangea-vendors/all/details/${item._id}`}" )
+            router-link.link(:to="{path: `/pangea-vendors/all/details/${item._id}`}" )
+              PhotoDefault(:user="item" style="margin-right: 8px;")
               span {{ item.fullName }}
-          template(slot="sf_dateInfo" slot-scope="{ item, index }")
+          template(slot="sf_dateInfo.createdAt" slot-scope="{ item, index }")
             span(v-if="item.dateInfo") {{ dateFormat(item.dateInfo.createdAt) }}
             span(v-else) -
-          //template(slot="sf_billingInfo" slot-scope="{ item, index }")
-          //  .table__data(v-html="vendorPaymentMethods(item.billingInfo)")
+          //- //template(slot="sf_billingInfo" slot-scope="{ item, index }")
+          //- //  .table__data(v-html="vendorPaymentMethods(item.billingInfo)")
           template(slot="sf_catExperience" slot-scope="{ item, index }")
             span(v-if="item.catExperience.length" ) {{ item.catExperience.join(', ') }}
             span(v-else) -
-          //template(slot="sf_sourceLanguages" slot-scope="{ item, index }")
-          //  .table__data(v-html="sourceLanguages(item.competencies)")
-          //template(slot="sf_targetLanguages" slot-scope="{ item, index }")
-          //  .table__data(v-html="targetLanguages(item.competencies)")
-          //template(slot="sf_industry" slot-scope="{ item, index }")
-          //  .table__data(v-html="vendorIndustries(item.competencies)")
-          //template(slot="sf_steps" slot-scope="{ item, index }")
-          //  .table__data(v-html="vendorSteps(item.competencies)")
-          //template(slot="sf_rate" slot-scope="{ item, index }")
-          //  .table__data(v-html="vendorRates(item.pendingCompetencies)")
+            
+          //- template(slot="sf_sourceLanguages" slot-scope="{ item, index }")
+          //-   .table__data(v-html="sourceLanguages(item.competencies,)")
+          //- //template(slot="sf_targetLanguages" slot-scope="{ item, index }")
+          //- //  .table__data(v-html="targetLanguages(item.competencies)")
+          //- //template(slot="sf_industry" slot-scope="{ item, index }")
+          //- //  .table__data(v-html="vendorIndustries(item.competencies)")
+          //- //template(slot="sf_steps" slot-scope="{ item, index }")
+          //- //  .table__data(v-html="vendorSteps(item.competencies)")
+          //- //template(slot="sf_rate" slot-scope="{ item, index }")
+          //- //  .table__data(v-html="vendorRates(item.pendingCompetencies)")
 
 </template>
 
@@ -82,6 +84,7 @@ import LayoutWrapper from "../LayoutWrapper"
 import ListTable from "../ListTable"
 import LayoutWrapperMixin from "../../../mixins/LayoutWrapperMixin"
 import VendorsFilters from "./VendorsFilters"
+import PhotoDefault from '../../PhotoDefault.vue'
 import { mapGetters } from "vuex"
 
 
@@ -90,7 +93,8 @@ export default {
   components: {
     VendorsFilters,
     LayoutWrapper,
-    ListTable
+    ListTable,
+    PhotoDefault
   },
   data() {
     return {
@@ -184,6 +188,7 @@ export default {
     // }
   },
   beforeRouteEnter(to, from, next) {
+    
     next(vm => {
       vm.collectQueryData(vm.getModuleData).then(() => {
         console.log(vm.moduleData)
@@ -195,5 +200,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.link {
+  display: flex;
+  align-items: center;
+}
 </style>

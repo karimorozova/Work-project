@@ -530,7 +530,7 @@ export default {
             },
             {
               id: "f_fullName",
-              name: "Vendor",
+              name: "Full Name",
               isCheck: false,
             },
             {
@@ -568,15 +568,14 @@ export default {
               name: "Vendor rate",
               isCheck: false,
             },
+            // {
+            //   id: "f_photo",
+            //   name: "Vendor photo",
+            //   isCheck: false,
+            // },
             {
-              id: "f_photo",
-              name: "Vendor photo",
-              isCheck: false,
-              style: { "min-width": "130px" }
-            },
-            {
-              id: "f_dateInfo",
-              name: "Date of create",
+              id: "f_dateInfo.createdAt",
+              name: "Created At",
               isCheck: false,
               style: { "min-width": "130px" }
             },
@@ -662,7 +661,7 @@ export default {
             },
             {
               id: "sf_fullName",
-              name: "Vendor",
+              name: "Full Name",
               isCheck: false,
               style: { "min-width": "130px" }
             },
@@ -679,41 +678,35 @@ export default {
               style: { "min-width": "130px" }
             },
             {
-              id: "sf_photo",
-              name: "Vendor photo",
+              id: "sf_dateInfo.createdAt",
+              name: "Created At",
               isCheck: false,
               style: { "min-width": "130px" }
             },
             {
-              id: "sf_dateInfo",
-              name: "Date of create",
+              id: "sf_sourceLanguages",
+              name: "Source Languages",
               isCheck: false,
               style: { "min-width": "130px" }
             },
-            // {
-            //   id: "sf_sourceLanguages",
-            //   name: "Source Languages",
-            //   isCheck: false,
-            //   style: { "min-width": "130px" }
-            // },
-            // {
-            //   id: "sf_targetLanguages",
-            //   name: "Target Languages",
-            //   isCheck: false,
-            //   style: { "min-width": "130px" }
-            // },
-            // {
-            //   id: "sf_industry",
-            //   name: "Industries",
-            //   isCheck: false,
-            //   style: { "min-width": "130px" }
-            // },
-            // {
-            //   id: "sf_steps",
-            //   name: "Steps",
-            //   isCheck: false,
-            //   style: { "min-width": "130px" }
-            // },
+            {
+              id: "sf_targetLanguages",
+              name: "Target Languages",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_industry",
+              name: "Industries",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
+            {
+              id: "sf_steps",
+              name: "Steps",
+              isCheck: false,
+              style: { "min-width": "130px" }
+            },
             // {
             //   id: "sf_rate",
             //   name: "Vendor rate",
@@ -789,7 +782,7 @@ export default {
             },
             {
               id: "sf_fullName",
-              name: "Vendor",
+              name: "Full Name",
               isCheck: false,
             },
             // {
@@ -802,26 +795,26 @@ export default {
               name: "CAT Experience",
               isCheck: false,
             },
-            // {
-            //   id: "sf_sourceLanguages",
-            //   name: "Source Languages",
-            //   isCheck: false,
-            // },
-            // {
-            //   id: "sf_targetLanguages",
-            //   name: "Target Languages",
-            //   isCheck: false,
-            // },
-            // {
-            //   id: "sf_industry",
-            //   name: "Industries",
-            //   isCheck: false,
-            // },
-            // {
-            //   id: "sf_steps",
-            //   name: "Steps",
-            //   isCheck: false,
-            // },
+            {
+              id: "sf_sourceLanguages",
+              name: "Source Languages",
+              isCheck: false,
+            },
+            {
+              id: "sf_targetLanguages",
+              name: "Target Languages",
+              isCheck: false,
+            },
+            {
+              id: "sf_industry",
+              name: "Industries",
+              isCheck: false,
+            },
+            {
+              id: "sf_steps",
+              name: "Steps",
+              isCheck: false,
+            },
             // {
             //   id: "sf_rate",
             //   name: "Vendor rate",
@@ -829,13 +822,8 @@ export default {
             //   style: { "min-width": "130px" }
             // },
             {
-              id: "sf_photo",
-              name: "Vendor photo",
-              isCheck: false,
-            },
-            {
-              id: "sf_dateInfo",
-              name: "Date of create",
+              id: "sf_dateInfo.createdAt",
+              name: "Created At",
               isCheck: false,
             },
           ]

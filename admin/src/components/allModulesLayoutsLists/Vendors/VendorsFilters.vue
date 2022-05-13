@@ -32,11 +32,27 @@
           input(type="text" placeholder="Value" :value="getSimpleValue(id)"  @change="(e) => setSimpleValue(id, e.target.value)")
           .remove(v-if="getSimpleValue(id).length" @click="removeQuery(id)")
             i.fas.fa-backspace
-      .filter(v-if="id === 'f_dateInfo'")
+      //- .filter(v-if="id === 'f_dateInfo.createdAt'")
+      //-   .filter__label {{name}}
+      //-   .filter__input
+      //-     input(type="text" placeholder="Value" :value="getSimpleValue(id)"  @change="(e) => setSimpleValue(id, e.target.value)")
+      //-     .remove(v-if="getSimpleValue(id).length" @click="removeQuery(id)")
+      //-       i.fas.fa-backspace
+      .filter(v-if="id === 'f_dateInfo.createdAt'")
         .filter__label {{name}}
         .filter__input
-          input(type="text" placeholder="Value" :value="getSimpleValue(id)"  @change="(e) => setSimpleValue(id, e.target.value)")
-          .remove(v-if="getSimpleValue(id).length" @click="removeQuery(id)")
+          DatePicker(
+            :value="selectedCreationDateRange"
+            @input="(e) => replaceRoute('f_dateInfo.createdAt', `${ new Date(e[0]).getTime() }_${ new Date(e[1]).getTime() }`)"
+            format="MMM D: HH:mm"
+            prefix-class="xmx"
+            range-separator=" - "
+            :clearable="false"
+            type="datetime"
+            range
+            placeholder="Datetime range"
+          )
+          .remove(v-if="!!selectedCreationDateRange[0]" @click="removeQuery(id)")
             i.fas.fa-backspace
       //.filter(v-if="id === 'f_status'")
       //  .filter__label {{name}}
@@ -131,56 +147,58 @@
             :isRemoveOption="true"
             @removeOption="removeQuery(id)"
           )
-      //.filter(v-if="id === 'f_sourceLanguages'")
-      //  .filter__label {{name}}
-      //  .filter__input
-      //    SelectMulti(
-      //      :selectedOptions="selectedSourceLanguages"
-      //      :options="languages.map(({ lang }) => lang) | firstEnglishLanguage"
-      //      :hasSearch="true"
-      //      placeholder="Options"
-      //      @chooseOptions="setSourceLanguages"
-      //      :isSelectedWithIcon="true"
-      //      :isRemoveOption="true"
-      //      @removeOption="removeQuery(id)"
-      //    )
-      //.filter(v-if="id === 'f_targetLanguages'")
-      //  .filter__label {{name}}
-      //  .filter__input
-      //    SelectMulti(
-      //      :selectedOptions="selectedTargetLanguages"
-      //      :options="languages.map(({ lang }) => lang)"
-      //      :hasSearch="true"
-      //      placeholder="Options"
-      //      @chooseOptions="setTargetLanguages"
-      //      :isSelectedWithIcon="true"
-      //      :isRemoveOption="true"
-      //      @removeOption="removeQuery(id)"
-      //    )
-      //.filter(v-if="id === 'f_industry'")
-      //  .filter__label {{name}}
-      //  .filter__input
-      //    SelectSingle(
-      //      :hasSearch="true"
-      //      :selectedOption="selectedIndustry"
-      //      :options="allIndustries"
-      //      placeholder="Option"
-      //      @chooseOption="setIndustry"
-      //      :isRemoveOption="true"
-      //      @removeOption="removeQuery(id)"
-      //    )
-      //.filter(v-if="id === 'f_steps'")
-      //  .filter__label {{name}}
-      //  .filter__input
-      //    SelectSingle(
-      //      :hasSearch="true"
-      //      :selectedOption="selectedSteps"
-      //      :options="allSteps"
-      //      placeholder="Option"
-      //      @chooseOption="setSteps"
-      //      :isRemoveOption="true"
-      //      @removeOption="removeQuery(id)"
-      //    )
+      .filter(v-if="id === 'f_sourceLanguages'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedSourceLanguages"
+            :options="languages.map(({ lang }) => lang) | firstEnglishLanguage"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setSourceLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_targetLanguages'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :selectedOptions="selectedTargetLanguages"
+            :options="languages.map(({ lang }) => lang)"
+            :hasSearch="true"
+            placeholder="Options"
+            @chooseOptions="setTargetLanguages"
+            :isSelectedWithIcon="true"
+            :isRemoveOption="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_industry'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :hasSearch="true"
+            :selectedOptions="selectedIndustries"
+            :options="allIndustries"
+            placeholder="Options"
+            @chooseOptions="setIndustries"
+            :isRemoveOption="true"
+            :isSelectedWithIcon="true"
+            @removeOption="removeQuery(id)"
+          )
+      .filter(v-if="id === 'f_steps'")
+        .filter__label {{name}}
+        .filter__input
+          SelectMulti(
+            :hasSearch="true"
+            :selectedOptions="selectedSteps"
+            :options="allSteps"
+            placeholder="Options"
+            @chooseOptions="setSteps"
+            :isRemoveOption="true"
+            :isSelectedWithIcon="true"
+            @removeOption="removeQuery(id)"
+          )
       //.filter(v-if="id === 'f_rate'")
       //  .filter__label {{name}}
       //  .filter__input
@@ -194,13 +212,16 @@
 import LayoutWrapperMixin from "../../../mixins/LayoutWrapperMixin"
 import SelectSingle from '../../SelectSingle'
 import SelectMulti from "../../SelectMulti"
+import '../../../assets/scss/datepicker.scss'
+import DatePicker from 'vue2-datepicker'
 import { mapGetters } from "vuex"
 export default {
   name: 'VendorsFilters',
   mixins: [ LayoutWrapperMixin ],
   components: {
     SelectSingle,
-    SelectMulti
+    SelectMulti,
+    DatePicker
   },
   data() {
     return {
@@ -221,36 +242,47 @@ export default {
     // selectedPaymentMethods() {
     //   return this.$route.query.f_billingInfo ? this.$route.query.f_billingInfo.split(',') : []
     // },
-    // selectedSourceLanguages() {
-    //   return this.$route.query.f_sourceLanguages && this.languages.length
-    //     ? this.$route.query.f_sourceLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
-    //     : []
-    // },
-    // selectedTargetLanguages() {
-    //   return this.$route.query.f_targetLanguages && this.languages.length
-    //     ? this.$route.query.f_targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
-    //     : []
-    // },
-    // selectedIndustry() {
-    //   if (this.$route.query.f_industry && this.industries.length) {
-    //     const { name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.f_industry }`)
-    //     return name
-    //   }
-    //   return ''
-    // },
-    // selectedSteps() {
-    //   if (this.$route.query.f_steps && this.steps.length) {
-    //     const { title } = this.steps.find(({ _id }) => `${ _id }` === `${ this.$route.query.f_steps }`)
-    //     return title
-    //   }
-    //   return ''
-    // },
-    // allIndustries() {
-    //   return this.industries.map(({ name }) => name)
-    // },
-    // allSteps() {
-    //   return this.steps.map(({ title }) => title)
-    // },
+    selectedSourceLanguages() {
+      return this.$route.query.f_sourceLanguages && this.languages.length
+        ? this.$route.query.f_sourceLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
+        : []
+    },
+    selectedTargetLanguages() {
+      return this.$route.query.f_targetLanguages && this.languages.length
+        ? this.$route.query.f_targetLanguages.split(',').map(_id => this.languages.find(language => _id === language._id).lang)
+        : []
+    },
+    selectedIndustries() {
+      return this.$route.query.f_industry && this.industries.length
+        ? this.$route.query.f_industry.split(',').map(_id => this.industries.find(industry => _id === industry._id).name)
+        : []
+      // if (this.$route.query.f_industry && this.industries.length) {
+      //   const { name } = this.industries.find(({ _id }) => `${ _id }` === `${ this.$route.query.f_industry }`)
+      //   return name
+      // }
+      // return ''
+    },
+    selectedSteps() {
+      return this.$route.query.f_steps && this.steps.length
+        ? this.$route.query.f_steps.split(',').map(_id => this.steps.find(step => _id === step._id).title)
+        : []
+      // if (this.$route.query.f_steps && this.steps.length) {
+      //   const { title } = this.steps.find(({ _id }) => `${ _id }` === `${ this.$route.query.f_steps }`)
+      //   return title
+      // }
+      // return ''
+    },
+    selectedCreationDateRange() {
+      return this.$route.query['f_dateInfo.createdAt']
+          ? [ new Date(+this.$route.query['f_dateInfo.createdAt'].split('_')[0]), new Date(+this.$route.query['f_dateInfo.createdAt'].split('_')[1]) ]
+          : [ null, null ]
+    },
+    allIndustries() {
+      return this.industries.map(({ name }) => name)
+    },
+    allSteps() {
+      return this.steps.map(({ title }) => title)
+    },
   },
   props: {
     tableFilters: {
@@ -279,39 +311,63 @@ export default {
       else catOptions.push(option)
       this.replaceRoute('f_catExperience', catOptions.join(','))
     },
-    // setIndustry({ option }) {
-    //   const { _id } = this.industries.find(({ name }) => name === option)
-    //   this.replaceRoute('f_industry', _id)
-    // },
-    // setSteps({option}) {
-    //   const { _id } = this.steps.find(({ title }) => title === option)
-    //   this.replaceRoute('f_steps', _id)
-    // },
-    // setSourceLanguages({option}) {
-    //   if (!this.$route.query.f_sourceLanguages) {
-    //     this.replaceRoute('f_sourceLanguages', this.getLanguageIdByLang(option))
-    //     return
-    //   }
-    //   let _ids = this.$route.query.f_sourceLanguages.split(',')
-    //   if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
-    //   else _ids.push(this.getLanguageIdByLang(option))
-    //   this.replaceRoute('f_sourceLanguages', _ids.join(','))
-    // },
-    // setTargetLanguages({option}) {
-    //   if (!this.$route.query.f_targetLanguages) {
-    //     this.replaceRoute('f_targetLanguages', this.getLanguageIdByLang(option))
-    //     return
-    //   }
-    //   let _ids = this.$route.query.f_targetLanguages.split(',')
-    //   if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
-    //   else _ids.push(this.getLanguageIdByLang(option))
-    //   this.replaceRoute('f_targetLanguages', _ids.join(','))
-    // },
+    setIndustries({ option }) {
+      // const { _id } = this.industries.find(({ name }) => name === option)
+      // this.replaceRoute('f_industry', _id)
+      if (!this.$route.query.f_industry) {
+        this.replaceRoute('f_industry', this.getIndustryIdByName(option))
+        return
+      }
+      let _ids = this.$route.query.f_industry.split(',')
+      if (_ids.includes(this.getIndustryIdByName(option))) _ids = _ids.filter(_id => _id !== this.getIndustryIdByName(option))
+      else _ids.push(this.getIndustryIdByName(option))
+      this.replaceRoute('f_industry', _ids.join(','))
+    },
+    setSteps({option}) {
+      // const { _id } = this.steps.find(({ title }) => title === option)
+      // this.replaceRoute('f_steps', _id)
+      if (!this.$route.query.f_steps) {
+        this.replaceRoute('f_steps', this.getStepIdByTitle(option))
+        return
+      }
+      let _ids = this.$route.query.f_steps.split(',')
+      if (_ids.includes(this.getStepIdByTitle(option))) _ids = _ids.filter(_id => _id !== this.getStepIdByTitle(option))
+      else _ids.push(this.getStepIdByTitle(option))
+      this.replaceRoute('f_steps', _ids.join(','))
+    },
+    setSourceLanguages({option}) {
+      if (!this.$route.query.f_sourceLanguages) {
+        this.replaceRoute('f_sourceLanguages', this.getLanguageIdByLang(option))
+        return
+      }
+      let _ids = this.$route.query.f_sourceLanguages.split(',')
+      if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
+      else _ids.push(this.getLanguageIdByLang(option))
+      this.replaceRoute('f_sourceLanguages', _ids.join(','))
+    },
+    setTargetLanguages({option}) {
+      if (!this.$route.query.f_targetLanguages) {
+        this.replaceRoute('f_targetLanguages', this.getLanguageIdByLang(option))
+        return
+      }
+      let _ids = this.$route.query.f_targetLanguages.split(',')
+      if (_ids.includes(this.getLanguageIdByLang(option))) _ids = _ids.filter(_id => _id !== this.getLanguageIdByLang(option))
+      else _ids.push(this.getLanguageIdByLang(option))
+      this.replaceRoute('f_targetLanguages', _ids.join(','))
+    },
 
-    // getLanguageIdByLang(option) {
-    //   const { _id } = this.languages.find(({ lang }) => lang === option)
-    //   return _id
-    // },
+    getLanguageIdByLang(option) {
+      const { _id } = this.languages.find(({ lang }) => lang === option)
+      return _id
+    },
+    getIndustryIdByName(option) {
+      const { _id } = this.industries.find(({ name }) => name === option)
+      return _id
+    },
+    getStepIdByTitle(option) {
+      const { _id } = this.steps.find(({ title }) => title === option)
+      return _id
+    },
   }
 }
 </script>
