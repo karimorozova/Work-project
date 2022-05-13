@@ -66,8 +66,8 @@
             span(v-if="item.catExperience.length" ) {{ item.catExperience.join(', ') }}
             span(v-else) -
             
-          //- template(slot="sf_sourceLanguages" slot-scope="{ item, index }")
-          //-   .table__data(v-html="sourceLanguages(item.competencies,)")
+          template(slot="sf_sourceLanguages" slot-scope="{ item, index }")
+            .table__data(v-html="vendor(item)")
           //- //template(slot="sf_targetLanguages" slot-scope="{ item, index }")
           //- //  .table__data(v-html="targetLanguages(item.competencies)")
           //- //template(slot="sf_industry" slot-scope="{ item, index }")
@@ -122,13 +122,46 @@ export default {
     //   return filteredPaymentTypes.join(', ')
     //
     // },
-    // vendorIndustries(competencies) {
-    //   if (!competencies.length) return '-'
-    //   const vendorIndustries = competencies.map(({ industry }) =>
-    //       this.industries.find(({ _id, name }) => {
-    //         if (industry === _id) return name
-    //       })
-    //   )
+    vendor(item) {
+      console.log(item);
+    },
+    vendorIndustries(competencies, qualifications, assessments, pendingCompetencies) {
+      // if (!competencies.length) return '-'
+      console.log(competencies);
+      // const competenciesIndustries = competencies.map(({ industry }) =>
+      //     this.industries.find(({ _id, name }) => {
+      //       if (industry === _id) return name
+      //     })
+      // )
+      // const qualificationsIndustries = qualifications.map(({ industries }) =>
+      //     industries.forEach(id => {
+      //       this.industries.find(({ _id, name }) => {
+      //       if (id === _id) return name
+      //     });
+          
+      //     })
+      // )
+      // const assessmentsIndustries = assessments.map(({ industries }) => {
+      //   return industries.map(({industry}) => 
+      //     this.industries.find(({ _id, name }) => {
+      //       if (industry === _id) return name
+      //     })
+      //   )
+      // })
+      // const pendingCompetenciesIndustries = pendingCompetencies.map(({ industry }) =>
+      //     this.industries.find(({ _id, name }) => {
+      //       if (industry === _id) return name
+      //     })
+      // )
+      // const filteredIndustries = [...competenciesIndustries, ...qualificationsIndustries, ...pendingCompetenciesIndustries]
+      // .map(({ name }) => name).filter((value, index, arr) => {
+      //   return arr.indexOf(value) === index
+      // })
+      // console.log(filteredIndustries);
+      // return filteredIndustries.join(', ')
+      
+    
+    },
     //   const filteredIndustries = vendorIndustries.map(({ name }) => name).filter((value, index, arr) => {
     //     return arr.indexOf(value) === index
     //   })
